@@ -4,28 +4,37 @@ import styles from './styles.module.css';
 
 const FeatureList = [
     {
-        title: 'Easy to Use',
-        Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
+        title: 'Getting started',
         description: (
             <>
-                Docusaurus was designed from the ground up to be easily installed and
-                used to get your website up and running quickly.
+                <p>
+                    Follow our tutorial to get started with our API.
+                </p>
+                <ul>
+                    <li>Connecting and authenticating</li>
+                    <li>Creating and managing projects</li>
+                    <li>Managing email accounts</li>
+                    <li>more</li>
+                </ul>
             </>
         ),
     },
     {
         title: 'API Reference',
-        Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
         description: (
             <>
-                Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-                ahead and move your docs into the <code>docs</code> directory.
+                <p>
+                    Find all of our API endpoints and their parameters in our API reference.
+                </p>
+                <ul>
+                    <li><a href={"https://mittwald-api.de/"}>v1 API Reference (mittwald Customer Center)</a></li>
+                    <li><a href={"https://api.mittwald.de/v2/docs/#/"}>v2 API Reference (mittwald Studio)</a></li>
+                </ul>
             </>
         ),
     },
     {
         title: 'SDKs and Libraries',
-        Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
         description: (
             <>
                 <p>
@@ -45,12 +54,9 @@ const FeatureList = [
     },
 ];
 
-function Feature({Svg, title, description}) {
+function Feature({title, description}) {
     return (
         <div className={clsx('col col--4')}>
-            <div className="text--center">
-                <Svg className={styles.featureSvg} role="img"/>
-            </div>
             <div className="padding-horiz--md">
                 <h3>{title}</h3>
                 {description}

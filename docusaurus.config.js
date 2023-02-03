@@ -7,7 +7,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'mittwald Developer Portal',
-  tagline: 'Dinosaurs are cool',
+  //tagline: 'Dinosaurs are cool',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
@@ -22,7 +22,7 @@ const config = {
   projectName: 'api-docs', // Usually your repo name.
 
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
+  onBrokenMarkdownLinks: 'throw',
 
   // Even if you don't use internalization, you can use this field to set useful
   // metadata like html lang. For example, if your site is Chinese, you may want
@@ -65,28 +65,35 @@ const config = {
       image: 'img/docusaurus-social-card.jpg',
       navbar: {
         style: 'primary',
-        title: 'mittwald Developer Portal',
+        title: 'Developer Portal',
         logo: {
           alt: 'mittwald',
-          src: 'img/mittwald-icon-negative.svg',
+          src: 'img/mittwald-logo.svg',
         },
         items: [
           {
             type: 'doc',
-            docId: 'intro',
+            docId: '/category/how-tos',
             position: 'left',
-            label: 'Tutorial',
+            label: 'How-Tos',
           },
-          {to: '/blog', label: 'Blog', position: 'left'},
+          //{to: '/blog', label: 'Blog', position: 'left'},
           {
-            href: 'https://github.com/facebook/docusaurus',
+            href: 'https://github.com/mittwald/api-docs',
             label: 'GitHub',
+            position: 'right',
+          },
+          {
+            type: 'localeDropdown',
             position: 'right',
           },
         ],
       },
       footer: {
         style: 'dark',
+        logo: {
+          src: 'img/mittwald-icon-negative.svg',
+        },
         links: [
           {
             title: 'Docs',
