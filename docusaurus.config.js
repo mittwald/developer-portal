@@ -43,6 +43,18 @@ const config = {
           // Remove this to remove the "edit this page" links.
           editUrl:
             'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+          lastVersion: 'current',
+          versions: {
+            current: {
+              label: 'API v2',
+              path: 'v2',
+            },
+            "1": {
+              label: "API v1",
+              path: 'v1',
+              banner: "unmaintained",
+            }
+          },
         },
         blog: {
           showReadingTime: true,
@@ -87,6 +99,10 @@ const config = {
             type: 'localeDropdown',
             position: 'right',
           },
+          {
+            type: 'docsVersionDropdown',
+            position: 'right',
+          }
         ],
       },
       footer: {

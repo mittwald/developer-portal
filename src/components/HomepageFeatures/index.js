@@ -11,7 +11,7 @@ const FeatureList = [
                     Follow our tutorial to get started with our API.
                 </p>
                 <ul>
-                    <li>Connecting and authenticating</li>
+                    <li><a href={"/docs/v2/concepts"}>Connecting and authenticating</a></li>
                     <li>Creating and managing projects</li>
                     <li>Managing email accounts</li>
                     <li>more</li>
