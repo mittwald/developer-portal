@@ -1,48 +1,61 @@
 import React from 'react';
 import clsx from 'clsx';
 import styles from './styles.module.css';
+import Translate from "@docusaurus/Translate";
 
 const FeatureList = [
     {
-        title: 'Getting started',
+        title: <Translate id="index.getting-started.title">Getting started</Translate>,
         description: (
             <>
                 <p>
-                    Follow our tutorial to get started with our API.
+                    <Translate id={"index.getting-started.body"}>
+                        Follow our tutorial to get started with our API.
+                    </Translate>
                 </p>
                 <ul>
-                    <li><a href={"/docs/v2/concepts"}>Connecting and authenticating</a></li>
-                    <li><a href={"/docs/v2/how-tos/create-project"}>Creating and managing projects</a></li>
-                    <li><a href={"/docs/v2/how-tos/manage-mailbox.md"}>Managing email accounts</a></li>
+                    <li><a href={"docs/v2/concepts"}>Connecting and authenticating</a></li>
+                    <li><a href={"docs/v2/howtos/create-project"}>Creating and managing projects</a></li>
+                    <li><a href={"docs/v2/howtos/manage-mailbox"}>Managing email accounts</a></li>
                     <li>more</li>
                 </ul>
             </>
         ),
     },
     {
-        title: 'API Reference',
+        title: <Translate id={"index.reference.title"}>API Reference</Translate>,
         description: (
             <>
                 <p>
-                    Find all of our API endpoints and their parameters in our API reference.
+                    <Translate id={"index.reference.body"}>
+                        Find all of our API endpoints and their parameters in our API reference.
+                    </Translate>
                 </p>
                 <ul>
-                    <li><a href={"https://mittwald-api.de/"}>v1 API Reference (mittwald Customer Center)</a></li>
-                    <li><a href={"https://api.mittwald.de/v2/docs/#/"}>v2 API Reference (mittwald Studio)</a></li>
+                    <li>
+                        <a href={"https://mittwald-api.de/"}><Translate id={"index.reference.v1"}>v1 API Reference
+                            (mittwald Customer Center)</Translate></a>
+                    </li>
+                    <li>
+                        <a href={"https://api.mittwald.de/v2/docs/#/"}><Translate id={"index.reference.v2"}>v2 API
+                            Reference (mittwald Studio)</Translate></a>
+                    </li>
                 </ul>
             </>
         ),
     },
     {
-        title: 'SDKs and Libraries',
+        title: <Translate id={"index.sdks.title"}>SDKs and Libraries</Translate>,
         description: (
             <>
                 <p>
-                    We strive to provide you with comprehensive and easy-to-use SDKs and
-                    libraries for all of our products in the future. Stay tuned!
+                    <Translate id={"index.sdks.body"}>
+                        We strive to provide you with comprehensive and easy-to-use SDKs and
+                        libraries for all of our products in the future. Stay tuned!
+                    </Translate>
                 </p>
                 <p>
-                    <strong>Coming soon: 🪄</strong>
+                    <strong><Translate id={"index.sdks.coming-soon"}>Coming soon</Translate>: 🪄</strong>
                 </p>
                 <ul>
                     <li>mittwald Node.JS SDK</li>
