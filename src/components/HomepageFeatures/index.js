@@ -12,8 +12,8 @@ const FeatureList = [
                 </p>
                 <ul>
                     <li><a href={"/docs/v2/concepts"}>Connecting and authenticating</a></li>
-                    <li>Creating and managing projects</li>
-                    <li>Managing email accounts</li>
+                    <li><a href={"/docs/v2/how-tos/create-project"}>Creating and managing projects</a></li>
+                    <li><a href={"/docs/v2/how-tos/manage-mailbox.md"}>Managing email accounts</a></li>
                     <li>more</li>
                 </ul>
             </>
