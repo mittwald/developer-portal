@@ -19,7 +19,7 @@ const config = {
     // GitHub pages deployment config.
     // If you aren't using GitHub pages, you don't need these.
     organizationName: 'mittwald', // Usually your GitHub org/user name.
-    projectName: 'api-docs', // Usually your repo name.
+    projectName: 'developer-portal', // Usually your repo name.
 
     onBrokenLinks: 'throw',
     onBrokenMarkdownLinks: 'throw',
@@ -99,7 +99,7 @@ const config = {
                     },
                     //{to: '/blog', label: 'Blog', position: 'left'},
                     {
-                        href: 'https://github.com/mittwald/api-docs',
+                        href: 'https://github.com/mittwald/developer-portal',
                         label: 'GitHub',
                         position: 'right',
                     },
@@ -133,7 +133,7 @@ const config = {
                         items: [
                             {
                                 label: 'Feedback',
-                                href: 'https://github.com/mittwald/api-docs/issues',
+                                href: 'https://github.com/mittwald/developer-portal/issues',
                             },
                             {
                                 label: 'Agency Hub (german)',
