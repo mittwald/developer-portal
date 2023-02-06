@@ -1,7 +1,7 @@
 const baseConfig = require("./docusaurus.config");
 const config = {
     ...baseConfig,
-    baseURL: "/developer-portal/",
+    baseUrl: "/developer-portal/",
 }
 
 module.exports = config;
