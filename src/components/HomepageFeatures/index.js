@@ -2,6 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 import styles from './styles.module.css';
 import Translate from "@docusaurus/Translate";
+import Link from "@docusaurus/Link";
 
 const FeatureList = [
     {
@@ -14,10 +15,10 @@ const FeatureList = [
                     </Translate>
                 </p>
                 <ul>
-                    <li><a href={"docs/v2/concepts"}>Connecting and authenticating</a></li>
-                    <li><a href={"docs/v2/howtos/create-project"}>Creating and managing projects</a></li>
-                    <li><a href={"docs/v2/howtos/manage-mailbox"}>Managing email accounts</a></li>
-                    <li>more</li>
+                    <li><Link to={"/docs/v2/concepts"}>Connecting and authenticating</Link></li>
+                    <li><Link to={"/docs/v2/howtos/create-project"}>Creating and managing projects</Link></li>
+                    <li><Link to={"/docs/v2/howtos/manage-mailbox"}>Managing email accounts</Link></li>
+                    <li><Link to={"/docs/v2/category/how-tos"}>more</Link></li>
                 </ul>
             </>
         ),
