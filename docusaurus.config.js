@@ -57,11 +57,6 @@ const config = {
                             label: 'API v2',
                             path: 'v2',
                         },
-                        "1": {
-                            label: "API v1",
-                            path: 'v1',
-                            banner: "unmaintained",
-                        }
                     },
                 },
                 blog: {
@@ -105,10 +100,6 @@ const config = {
                     },
                     {
                         type: 'localeDropdown',
-                        position: 'right',
-                    },
-                    {
-                        type: 'docsVersionDropdown',
                         position: 'right',
                     }
                 ],
