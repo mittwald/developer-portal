@@ -39,7 +39,7 @@ const FeatureList = [
                     </li>
                     <li>
                         <a href={"https://api.mittwald.de/v2/docs/#/"}><Translate id={"index.reference.v2"}>v2 API
-                            Reference (mittwald Studio)</Translate></a>
+                            Reference (mittwald mStudio)</Translate></a>
                     </li>
                 </ul>
             </>

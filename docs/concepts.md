@@ -11,7 +11,7 @@ The mStudio v2 API uses `https://api.mittwald.de/v2/` as base URL for all API en
 
 ### Obtaining an API token
 
-To authenticate to the API, you will need an **API Token**. You can obtain one either via the mittwald Studio Web UI or via the API itself (if you already have another API token). 
+To authenticate to the API, you will need an **API Token**. You can obtain one either via the mittwald mStudio Web UI or via the API itself (if you already have another API token). 
 
 1. **In the UI**, go to your user profile and choose the [API tokens](https://studio.mittwald.de/app/profile/api-tokens) menu item.
 2. Alternatively, **via the API**, use the `/v2/signup/token/api` endpoint. This requires you to already have an existing API token:
