@@ -16,7 +16,7 @@ function HomepageHeader() {
                 <h1 className="hero__title"><Translate id={"index.title"}>mittwald Developer Portal</Translate></h1>
                 <div className={styles.buttons}>
                     <Link
-                        className="button button--secondary button--lg"
+                        className="button button--success button--lg"
                         to="/docs/v2/intro">
                         <Translate id={"index.cta"}>Get started with our API</Translate>
                     </Link>
@@ -30,12 +30,14 @@ export default function Home() {
     const {siteConfig} = useDocusaurusContext();
     return (
         <Layout
-            title={`Hello from ${siteConfig.title}`}
+            title={`${siteConfig.title}`}
             description="Description will go into a meta tag in <head />">
+            <div className={styles.wrapper}>
             <HomepageHeader/>
             <main>
                 <HomepageFeatures/>
             </main>
+            </div>
         </Layout>
     );
 }
