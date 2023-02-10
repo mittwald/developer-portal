@@ -50,7 +50,7 @@ const config = {
                     // Please change this to your repo.
                     // Remove this to remove the "edit this page" links.
                     editUrl:
-                        'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+                        'https://github.com/mittwald/developer-portal/tree/main/',
                     lastVersion: 'current',
                     versions: {
                         current: {
@@ -86,6 +86,12 @@ const config = {
                     src: 'img/mittwald-logo.svg',
                 },
                 items: [
+                    {
+                        type: 'doc',
+                        docId: 'intro',
+                        position: 'left',
+                        label: 'Introduction',
+                    },
                     {
                         type: 'doc',
                         docId: '/category/how-tos',

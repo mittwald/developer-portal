@@ -15,7 +15,7 @@ const FeatureList = [
                     </Translate>
                 </p>
                 <ul>
-                    <li><Link to={"/docs/v2/concepts"}>Connecting and authenticating</Link></li>
+                    <li><Link to={"/docs/v2/intro"}>Connecting and authenticating</Link></li>
                     <li><Link to={"/docs/v2/howtos/create-project"}>Creating and managing projects</Link></li>
                     <li><Link to={"/docs/v2/howtos/manage-mailbox"}>Managing email accounts</Link></li>
                     <li><Link to={"/docs/v2/category/how-tos"}>more</Link></li>
@@ -34,14 +34,19 @@ const FeatureList = [
                 </p>
                 <ul>
                     <li>
-                        <a href={"https://mittwald-api.de/"}><Translate id={"index.reference.v1"}>v1 API Reference
-                            (mittwald Customer Center)</Translate></a>
+                        <strong><Translate id={"index.reference.v1"}>v1 API (mittwald Customer Center)</Translate></strong><br />
+                        <a href={"https://mittwald-api.de"}><Translate id={"index.reference.reference"}>Reference</Translate></a> | <a href={"https://mittwald-api.de/docs/swagger-public.json"}><Translate id={"index.reference.swagger"}>Swagger 2.0 specification</Translate></a>
                     </li>
                     <li>
-                        <a href={"https://api.mittwald.de/v2/docs/#/"}><Translate id={"index.reference.v2"}>v2 API
-                            Reference (mittwald mStudio)</Translate></a>
+                        <strong><Translate id={"index.reference.v2"}>v2 API (mittwald mStudio)</Translate></strong><br />
+                        <a href={"https://api.mittwald.de/v2/docs/#/"}><Translate id={"index.reference.reference"}>Reference</Translate></a> | <a href={"https://api.mittwald.de/openapi"}><Translate id={"index.reference.openapi"}>OpenAPI 3.0 specification</Translate></a>
                     </li>
                 </ul>
+                <p>
+                    <Translate id={"index.reference.explanation"}>
+                        All of our API references are available in both human-readable form, and as a machine-readable OpenAPI specification.
+                    </Translate>
+                </p>
             </>
         ),
     },
@@ -63,6 +68,9 @@ const FeatureList = [
                     <li>mittwald PHP SDK</li>
                     <li>mittwald Go SDK</li>
                 </ul>
+                <p>
+                    <strong><Translate id={"index.sdks.own-sdks"}>Have you built your own library that uses our API? Let us know, and we'll link it here!</Translate> 💙</strong>
+                </p>
             </>
         ),
     },
