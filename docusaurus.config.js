@@ -79,7 +79,7 @@ const config = {
             // Replace with your project's social card
             image: 'img/docusaurus-social-card.jpg',
             navbar: {
-                style: 'primary',
+                // style: 'primary',
                 title: 'Developer Portal',
                 logo: {
                     alt: 'mittwald',
@@ -111,10 +111,6 @@ const config = {
                 ],
             },
             footer: {
-                style: 'dark',
-                /*logo: {
-                    src: 'img/mittwald-icon-negative.svg',
-                },*/
                 links: [
                     {
                         title: 'Docs',
