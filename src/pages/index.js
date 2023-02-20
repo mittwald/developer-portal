@@ -34,7 +34,7 @@ export default function Home() {
             description="Description will go into a meta tag in <head />">
             <div className={styles.wrapper}>
             <HomepageHeader/>
-            <main>
+            <main className={"index"}>
                 <HomepageFeatures/>
             </main>
             </div>
