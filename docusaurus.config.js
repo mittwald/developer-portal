@@ -88,15 +88,15 @@ const config = {
                 items: [
                     {
                         type: 'doc',
-                        docId: 'intro',
+                        docId: 'api/intro',
                         position: 'left',
-                        label: 'Introduction',
+                        label: 'API Usage',
                     },
                     {
                         type: 'doc',
-                        docId: '/category/how-tos',
+                        docId: '/category/technologies',
                         position: 'left',
-                        label: 'How-Tos',
+                        label: 'Technologies',
                     },
                     //{to: '/blog', label: 'Blog', position: 'left'},
                     {
@@ -117,7 +117,7 @@ const config = {
                         items: [
                             {
                                 label: 'Tutorial',
-                                to: '/docs/v2/intro',
+                                to: '/docs/v2/api/intro',
                             },
                         ],
                     },

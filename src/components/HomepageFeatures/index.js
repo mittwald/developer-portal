@@ -15,9 +15,9 @@ const FeatureList = [
                     </Translate>
                 </p>
                 <ul>
-                    <li><Link to={"/docs/v2/intro"}>Connecting and authenticating</Link></li>
-                    <li><Link to={"/docs/v2/howtos/create-project"}>Creating and managing projects</Link></li>
-                    <li><Link to={"/docs/v2/howtos/manage-mailbox"}>Managing email accounts</Link></li>
+                    <li><Link to={"/docs/v2/api/intro"}>Connecting and authenticating</Link></li>
+                    <li><Link to={"/docs/v2/api/howtos/create-project"}>Creating and managing projects</Link></li>
+                    <li><Link to={"/docs/v2/api/howtos/manage-mailbox"}>Managing email accounts</Link></li>
                     <li><Link to={"/docs/v2/category/how-tos"}>more</Link></li>
                 </ul>
             </>
