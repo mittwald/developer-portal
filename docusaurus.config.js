@@ -71,6 +71,17 @@ const config = {
                 },
             }),
         ],
+        ["redocusaurus", {
+            specs: [
+                {
+                    spec: "https://api.mittwald.de/openapi",
+                    route: "/reference/v2",
+                },
+            ],
+            theme: {
+                primaryColor: "#27367b",
+            }
+        }]
     ],
 
     themeConfig:
