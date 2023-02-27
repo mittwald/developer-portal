@@ -7,6 +7,13 @@ sidebar_position: 2
 
 Die mStudio v2 API verwendet `https://api.mittwald.de/v2/` als Basis-URL für alle API-Endpunkte.
 
+## Spezifikation
+
+Die vollständige API-Spezifikation im [OpenAPI 3.0-Format](https://spec.openapis.org/oas/v3.0.0) findest du hier:
+
+1. [OpenAPI 3.0-Spezifikation](https://api.mittwald.de/openapi) (maschinenlesbar)
+2. [Swagger UI](https://api.mittwald.de/v2/docs/) (menschenlesbar)
+
 ## Authentifizierung
 
 ### Ein API-Token beziehen
