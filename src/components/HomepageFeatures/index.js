@@ -35,11 +35,11 @@ const FeatureList = [
                 <ul>
                     <li>
                         <strong><Translate id={"index.reference.v1"}>v1 API (mittwald Customer Center)</Translate></strong><br />
-                        <a href={"https://mittwald-api.de"}><Translate id={"index.reference.reference"}>Reference</Translate></a> | <a href={"https://mittwald-api.de/docs/swagger-public.json"}><Translate id={"index.reference.swagger"}>Swagger 2.0 specification</Translate></a>
+                        <Link to={"https://mittwald-api.de"}><Translate id={"index.reference.reference"}>Reference</Translate></Link> | <a href={"https://mittwald-api.de/docs/swagger-public.json"}><Translate id={"index.reference.swagger"}>Swagger 2.0 specification</Translate></a>
                     </li>
                     <li>
                         <strong><Translate id={"index.reference.v2"}>v2 API (mittwald mStudio)</Translate></strong><br />
-                        <a href={"/reference/v2"}><Translate id={"index.reference.reference"}>Reference</Translate></a> | <a href={"https://api.mittwald.de/openapi"}><Translate id={"index.reference.openapi"}>OpenAPI 3.0 specification</Translate></a>
+                        <Link to={"/reference/v2"}><Translate id={"index.reference.reference"}>Reference</Translate></Link> | <a href={"https://api.mittwald.de/openapi"}><Translate id={"index.reference.openapi"}>OpenAPI 3.0 specification</Translate></a>
                     </li>
                 </ul>
                 <p>
