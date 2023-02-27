@@ -1,3 +1,0 @@
----
-title: Managing email accounts
----

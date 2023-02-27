@@ -1,6 +1,6 @@
 ---
-title: Creating a Project
-description: How to create a project
+title: Creating a project
+description: This article describes how to create a new project in various deployment scenarios.
 tags:
   - Projects
 ---
