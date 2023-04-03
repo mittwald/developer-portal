@@ -1,41 +1,19 @@
-# Website
+# mittwald Developer Portal
 
-This website is built using [Docusaurus 2](https://docusaurus.io/), a modern static website generator.
+This repository contains the sources of the [mittwald Developer Portal](https://developers.mittwald.de).
 
-### Installation
+## License
 
-```
-$ yarn
-```
+This documentation is licensed under a [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-nc-sa/4.0/).
 
-### Local Development
+## Feedback
 
-```
-$ yarn start
-```
+Please use this project's [issue tracker](https://github.com/mittwald/developer-portal/issues) to report specific suggestions or issues, or alternative ly the [discussion board](https://github.com/mittwald/developer-portal/discussions) for more open-ended discussions or general Q&A.
 
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
+For security-related issues, please refrain from using the public issue tracker or discussion board. Have a look at the [security policy](./SECURITY.md), instead.
 
-### Build
+Also, please note that neither the issue tracker nor the discussion board are a support channel for mittwald's hosting products. Please use our regular [support options](https://www.mittwald.de/impressum) to receive product support.
 
-```
-$ yarn build
-```
+## Contributing
 
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
-
-### Deployment
-
-Using SSH:
-
-```
-$ USE_SSH=true yarn deploy
-```
-
-Not using SSH:
-
-```
-$ GIT_USER=<Your GitHub username> yarn deploy
-```
-
-If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+We are happy to accept external contributions to our documentation. See the [Contribution guide](./CONTRIBUTING.md) for more information.
