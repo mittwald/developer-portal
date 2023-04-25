@@ -61,10 +61,15 @@ const FeatureList = [
                     </Translate>
                 </p>
                 <p>
+                    <strong><Translate id={"index.sdks.available"}>Available now</Translate>: 🚀</strong>
+                </p>
+                <ul>
+                    <li><Link to="/docs/v2/api/sdks/javascript">mittwald JavaScript SDK</Link> (Node.JS and browser)</li>
+                </ul>
+                <p>
                     <strong><Translate id={"index.sdks.coming-soon"}>Coming soon</Translate>: 🪄</strong>
                 </p>
                 <ul>
-                    <li>mittwald Node.JS SDK</li>
                     <li>mittwald PHP SDK</li>
                     <li>mittwald Go SDK</li>
                 </ul>
