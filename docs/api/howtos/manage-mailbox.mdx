@@ -1,54 +1,82 @@
 ---
 title: Managing email accounts
-description: This article explains different kinds of mailboxes and how to manage them via the API
+description:
+  This article explains different kinds of mailboxes and how to manage them via
+  the API
 tags:
   - Email
 ---
 
-import ApiSchema from '@theme/ApiSchema';
+import ApiSchema from "@theme/ApiSchema";
 
 ## Types of mailboxes
 
 In our API, we differentiate between two types of mailboxes:
 
-- **E-Mail adresses** are used to _send and receive_ emails. They are either associated with a mailbox (that you can connect to using an email client) or with a forwarding address (that forwards all incoming emails to one or more other email addresses).
-- **Delivery boxes** are used to _send_ emails. They are used to send emails from a web application or a script.
+- **E-Mail adresses** are used to _send and receive_ emails. They are either
+  associated with a mailbox (that you can connect to using an email client) or
+  with a forwarding address (that forwards all incoming emails to one or more
+  other email addresses).
+- **Delivery boxes** are used to _send_ emails. They are used to send emails
+  from a web application or a script.
 
 ## Requirements
 
-To manage email accounts, you will need an existing project. You can create a new project using the [Creating a project](./create-project) guide.
+To manage email accounts, you will need an existing project. You can create a
+new project using the [Creating a project](./create-project) guide.
 
 ## Create a new email account
 
-To create a new email account, send a `POST` request to the `/v2/projects/{projectID}/mailaddresses` endpoint. The request body must contain a JSON object with the following properties:
+To create a new email account, send a `POST` request to the
+`/v2/projects/{projectID}/mailaddresses` endpoint. The request body must contain
+a JSON object with the following properties:
 
-<ApiSchema example pointer="#/components/schemas/de.mittwald.v1.mail.CreateMailAddress" />
+<ApiSchema
+  example
+  pointer="#/components/schemas/de.mittwald.v1.mail.CreateMailAddress"
+/>
 
 :::caution
 
-Take note of the password you set for the email account. You will not be able to retrieve it later.
+Take note of the password you set for the email account. You will not be able to
+retrieve it later.
 
 :::
 
 ## Create a new forwarding address
 
-A forwarding address is an email address that forwards all incoming emails to one or more other email addresses. To create a new forwarding address, send a `POST` request to the `/v2/projects/{projectID}/mailaddresses` endpoint. The request body must contain a JSON object with the following properties:
+A forwarding address is an email address that forwards all incoming emails to
+one or more other email addresses. To create a new forwarding address, send a
+`POST` request to the `/v2/projects/{projectID}/mailaddresses` endpoint. The
+request body must contain a JSON object with the following properties:
 
-<ApiSchema example pointer="#/components/schemas/de.mittwald.v1.mail.CreateForwardAddress" />
+<ApiSchema
+  example
+  pointer="#/components/schemas/de.mittwald.v1.mail.CreateForwardAddress"
+/>
 
 ## Create a new delivery box
 
-A delivery box is an email address that can be used to send emails from a web application or a script. To create a new delivery box, send a `POST` request to the `/v2/projects/{projectID}/deliveryboxes` endpoint. The request body must contain a JSON object with the following properties:
+A delivery box is an email address that can be used to send emails from a web
+application or a script. To create a new delivery box, send a `POST` request to
+the `/v2/projects/{projectID}/deliveryboxes` endpoint. The request body must
+contain a JSON object with the following properties:
 
-- `description` (string, required): A description for the delivery box. This description will be displayed in the web interface.
-- `password` (string, required): The password for the delivery box. This password will be used to authenticate against the SMTP server.
+- `description` (string, required): A description for the delivery box. This
+  description will be displayed in the web interface.
+- `password` (string, required): The password for the delivery box. This
+  password will be used to authenticate against the SMTP server.
 
 :::caution
 
-Take note of the password you set for the delivery box. You will not be able to retrieve it later.
+Take note of the password you set for the delivery box. You will not be able to
+retrieve it later.
 
 :::
 
 ## Deleting email accounts
 
-To delete an email address or a delivery box, send a `DELETE` request to the `/v2/mailaddresses/{id}` or `/v2/deliveryboxes/{id}` endpoint, respectively. The `id` parameter must contain the ID of the email address or delivery box you want to delete. No request body is needed.
+To delete an email address or a delivery box, send a `DELETE` request to the
+`/v2/mailaddresses/{id}` or `/v2/deliveryboxes/{id}` endpoint, respectively. The
+`id` parameter must contain the ID of the email address or delivery box you want
+to delete. No request body is needed.

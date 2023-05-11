@@ -6,24 +6,32 @@ tags:
   - Databases
 ---
 
-import ApiSchema from '@theme/ApiSchema';
+import ApiSchema from "@theme/ApiSchema";
 
 This article describes how to create a Redis database via the API.
 
 ## Prerequisites
 
-To create a Redis database, you will need to have access to a project. You can find out how to create a project [here](./create-project). You will need the **project ID** for the subsequent operations.
+To create a Redis database, you will need to have access to a project. You can
+find out how to create a project [here](./create-project). You will need the
+**project ID** for the subsequent operations.
 
 ## List available Redis versions
 
-Set a `GET` request to the `/v2/redis-versions` endpoint to get a list of available Redis versions.
+Set a `GET` request to the `/v2/redis-versions` endpoint to get a list of
+available Redis versions.
 
 ## Creating a Redis database
 
-To create a Redis database, send a `POST` request to the `/v2/projects/{projectID}/redis-databases` endpoint. The request body must contain a JSON object with the following properties:
+To create a Redis database, send a `POST` request to the
+`/v2/projects/{projectID}/redis-databases` endpoint. The request body must
+contain a JSON object with the following properties:
 
-- `description` should contain a human-readable description of the database. This is a required value.
-- `version` should contain the version of the database. This is a required value, and must reference an existing version as returned by the `/v2/redis-versions` endpoint.
+- `description` should contain a human-readable description of the database.
+  This is a required value.
+- `version` should contain the version of the database. This is a required
+  value, and must reference an existing version as returned by the
+  `/v2/redis-versions` endpoint.
 
 The response will contain the following properties:
 
@@ -31,9 +39,13 @@ The response will contain the following properties:
 
 ## Accessing the database
 
-After creating a database, you can send a `GET` request to the `/v2/redis-databases/{id}` route.
+After creating a database, you can send a `GET` request to the
+`/v2/redis-databases/{id}` route.
 
 Among others, the response will contain the following values:
 
-- `hostname` and `port` contain the hostname and port of the database. You can use these values to connect to the database from within your hosting environment.
-- `configuration` allows you to inspect the specific configuration values that were applied to your database.
+- `hostname` and `port` contain the hostname and port of the database. You can
+  use these values to connect to the database from within your hosting
+  environment.
+- `configuration` allows you to inspect the specific configuration values that
+  were applied to your database.

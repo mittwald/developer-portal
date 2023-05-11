@@ -2,27 +2,47 @@
 title: Redis
 ---
 
-Für einen Webshop ist gute Performance ein echter Wettbewerbsvorteil. Damit du deine Ladezeiten weiter minimieren kannst, unterstützt der Space-Server ab sofort Redis. Wozu du die Datenbank verwenden kannst und wie du sie einrichtest, liest du hier.
+Für einen Webshop ist gute Performance ein echter Wettbewerbsvorteil. Damit du
+deine Ladezeiten weiter minimieren kannst, kannst du in allen Space-Server- und
+proSpace-Tarifen Redis nutzen. Wozu du die Datenbank verwenden kannst und wie du
+sie einrichtest, liest du hier.
 
 # Was ist Redis?
 
-Redis (kurz für Remote Dictionary Server) ist **In-Memory-Datenbank** und **Key-Value-Store** in einem. Das heißt: Anstatt auf der Festplatte werden deine Daten im Arbeitsspeicher abgelegt. Jeder Eintrag erhält seinen eigenen Schlüssel, über den er direkt abgerufen wird. Das sorgt für sehr kurze Zugriffszeiten.
+Redis (kurz für Remote Dictionary Server) ist **In-Memory-Datenbank** und
+**Key-Value-Store** in einem. Das heißt: Anstatt auf der Festplatte werden deine
+Daten im Arbeitsspeicher abgelegt. Jeder Eintrag erhält seinen eigenen
+Schlüssel, über den er direkt abgerufen wird. Das sorgt für sehr kurze
+Zugriffszeiten.
 
 # Wozu brauche ich Redis?
 
-Generell gilt: Redis macht deine Projekte schneller, wenn Daten schnell geschrieben und abgefragt werden. Dank der überragenden Performance lässt sich Redis ideal als Cache verwenden. Auch als Session-Storage für Shopsysteme ist die Datenbank beliebt.
+Generell gilt: Redis macht deine Projekte schneller, wenn Daten schnell
+geschrieben und abgefragt werden. Dank der überragenden Performance lässt sich
+Redis ideal als Cache verwenden. Auch als Session-Storage für Shopsysteme ist
+die Datenbank beliebt.
 
-# Wie richte ich Redis auf dem Space-Server ein?
+# Wie erstelle ich eine Redis-Datenbank?
 
-Redis einzurichten ist einfach. Je nach CMS oder Shopsystem musst du jedoch einige Dinge beachten. Ich erkläre dir Schritt für Schritt, wie es geht.
+Redis einzurichten ist einfach. Je nach CMS oder Shopsystem musst du jedoch
+einige Dinge beachten. Ich erkläre dir Schritt für Schritt, wie es geht.
 
-## Allgemeine Einstellungen
+## Über das mStudio
 
-Lege zunächst im mStudio, der Verwaltungsumgebung deines Space-Servers, eine Redis Datenbank an. Anschließend findest du in den Details unter Verbindungsinformationen sowohl Host als auch Port. Beide benötigst du für die Konfiguration deines Systems.
+Lege zunächst im mStudio, der Verwaltungsumgebung deines Space-Servers bzw.
+deines proSpaces, eine Redis Datenbank an. Anschließend findest du in den
+Details unter Verbindungsinformationen sowohl Host als auch Port. Beide
+benötigst du für die Konfiguration deines Systems.
 
-## php.ini anpassen
+## Über die API
 
-Die Datei liegt in deinem Projekt unter `.config/php/php.ini`. Füge den folgenden Code ein:
+Du kannst eine Redis-Datenbank auch über die API erstellen. Lies hierzu den
+Artikel ["Eine Redis-Datenbank erstellen"](../../api/howtos/create-redis).
+
+# Redis als Session-Storage für PHP konfigurieren
+
+Die `php.ini`-Datei liegt in deinem Projekt unter `.config/php/php.ini`. Füge
+den folgenden Code ein:
 
 ```ini
 extension=redis.so
@@ -30,15 +50,20 @@ session.save_handler = redis
 session.save_path = "tcp://HOST:PORT?database=15"
 ```
 
-Ändere nun du die Variablen `HOST` und `PORT`. Dafür verwendest du die Angaben aus den Verbindungsinformationen.
+Ändere nun du die Variablen `HOST` und `PORT`. Dafür verwendest du die Angaben
+aus den Verbindungsinformationen.
 
-Jede Redis Datenbank hat standardmäßig 16 Session Datenbanken, die von 0 – 15 angesprochen werden können.
+Jede Redis Datenbank hat standardmäßig 16 Datenbanken, die von 0 bis 15
+angesprochen werden können.
 
-## Übliche Anwendungen einrichten
+# Übliche Anwendungen einrichten
 
-### Shopware 6
+## Shopware 6
 
-Die Konfiguration für Redis trägst du in deiner Shopware 6 Installation in der `services.yaml` ein. Sie liegt im Verzeichnis `/config`. Falls dort noch keine Datei vorhanden ist, legst du diese einfach an. Folgende Zeilen fügst du am Ende der Datei ein:
+Die Konfiguration für Redis trägst du in deiner Shopware 6 Installation in der
+`services.yaml` ein. Sie liegt im Verzeichnis `/config`. Falls dort noch keine
+Datei vorhanden ist, legst du diese einfach an. Folgende Zeilen fügst du am Ende
+der Datei ein:
 
 ```yaml
 parameters:
@@ -49,19 +74,20 @@ services:
   Redis:
     class: Redis
     calls:
-    - method: connect
-      arguments:
-        - "%env(REDIS_SESSION_HOST)%"
-        - "%env(int:REDIS_SESSION_PORT)%"
-    - method: select
-      arguments:
-        - "%env(int:REDIS_SESSION_DATABASE)%"
+      - method: connect
+        arguments:
+          - "%env(REDIS_SESSION_HOST)%"
+          - "%env(int:REDIS_SESSION_PORT)%"
+      - method: select
+        arguments:
+          - "%env(int:REDIS_SESSION_DATABASE)%"
     Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler:
       arguments:
         - "@Redis"
 ```
 
-Erstelle nun im Ordner `config/packages` die Datei `framework.yaml`. In die Datei fügst du Folgendes ein:
+Erstelle nun im Ordner `config/packages` die Datei `framework.yaml`. In die
+Datei fügst du Folgendes ein:
 
 ```yaml
 framework:
@@ -126,7 +152,8 @@ Füge im Shopware Verzeichnis in `config.php` Folgendes ein:
 
 ### Joomla 4
 
-In der Joomla Administration hinterlegst du unter _System -> Konfiguration -> System_ bei "Sitzung (Session)" diese Konfiguration:
+In der Joomla Administration hinterlegst du unter _System -> Konfiguration ->
+System_ bei "Sitzung (Session)" diese Konfiguration:
 
 - Sitzungsspeicher: Redis
 - Persistentes Redis: Ja
@@ -135,11 +162,15 @@ In der Joomla Administration hinterlegst du unter _System -> Konfiguration -> Sy
 - Redis-Server-Authentifizierung: so belassen
 - Redis-Datenbank: Datenbank eintragen
 
-Bei Redis-Datenbank gewünschte freie Datenbank zwischen 0 und 15 wählen, und dann Speichern.
+Bei Redis-Datenbank gewünschte freie Datenbank zwischen 0 und 15 wählen, und
+dann Speichern.
 
 ### WordPress
 
-Im WordPress Backend klickst du unter _Plugins_ und auf "Installieren". In der Suche findest du über den Begriff "Redis Object Cache" auf der ersten Position das richtige Plugin. Dieses musst du installieren. Nach der Installation fügst du der `wp-config.php` folgenden Eintrag hinzu:
+Im WordPress Backend klickst du unter _Plugins_ und auf "Installieren". In der
+Suche findest du über den Begriff "Redis Object Cache" auf der ersten Position
+das richtige Plugin. Dieses musst du installieren. Nach der Installation fügst
+du der `wp-config.php` folgenden Eintrag hinzu:
 
 ```php
 define('WP_REDIS_PATH', 'HOST');
@@ -148,15 +179,17 @@ define('WP_REDIS_DATABASE', '0');
 define('WP_REDIS_SCHEME', 'unix');
 ```
 
-Als Wert für `WP_REDIS_DATABASE` wählst du eine freie Datenbank zwischen 0 und 15.
+Als Wert für `WP_REDIS_DATABASE` wählst du eine freie Datenbank zwischen 0
+und 15.
 
 ### TYPO3
 
-Erstelle `AdditionalConfiguration.php` im Ordner `typo3conf` und füge Folgendes ein. Sollte die Datei bereits existieren, kannst du `<?php` weglassen.
+Erstelle eine Datei `AdditionalConfiguration.php` im Ordner `typo3conf` und füge
+Folgendes ein. Sollte die Datei bereits existieren, kannst du `<?php` weglassen.
 
 ```php
 <?php
- 
+
 $redisHost = 'HOST';
 $redisPort = PORT;
 $redisCaches = [
