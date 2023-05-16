@@ -1,0 +1,70 @@
+---
+title: Installing a Node.js application
+description: Learn how to install a Node.js application via the API
+tags:
+  - Node.js
+---
+
+## Prerequisites
+
+To install a Node.JS application, you will need to have the following:
+
+- The project ID of an existing project
+- The application and version ID of the generic custom Node.JS application (see
+  next section)
+
+## Determine the app and app version ID
+
+Before installing a Node.JS application, you will need to determine the
+application ID and version ID of the generic custom Node.JS application.
+
+For this, call the `/v2/apps` endpoint, and find the "Node.js" application. It
+should have a stable ID of `3e7f920b-a711-4d2f-9871-661e1b41a2f0`. You can then
+use that ID to retrieve the recommended version to install for this app, by
+calling the `/v2/apps/{appID}/versions` endpoint. You can filter the returned
+versions by the `recommended` property.
+
+Please note that the actual version is rather inconsequential, as it refers only
+to the starter template used to create the application. The actual version of
+the application will be determined by your own code.
+
+## Install the application
+
+To deploy your application, you will need to call the
+`POST /v2/projects/{projectID}/appinstallations` endpoint. The relevant fields
+are the following:
+
+- `appVersionId` needs to be the app version ID that you retrieved in the
+  previous step.
+- `userInputs` needs to be an array of objects, each containing a `name` and
+  `value` property. The allowed values for `name` are contained in the
+  `userInputs` array of the app version object. In the case of Node.js, the only
+  allowed value is `entrypoint`, which is the command that will be run to start
+  your application.
+- `updatePolicy` needs to be set to `none`, you will typically want to update
+  your application by yourself.
+
+The complete HTTP request should look like this:
+
+```http request
+POST /v2/project/{projectID}/appinstallations HTTP/1.1
+Content-Type: application/json
+
+{
+  "appVersionId": "97fb8684-3fe3-4720-86fb-fb0524ae88d1",
+  "description": "Your node.js app",
+  "updatePolicy": "none",
+  "userInputs": [{
+    "name": "entrypoint",
+    "value": "yarn start"
+  }]
+}
+```
+
+The response will contain the installation ID, that you can subsequently use to
+access your application.
+
+To observe the installation status, you can call the
+`/v2/appinstallations/{installationID}` endpoint. Pay special attention to the
+`installationPath` field; this will contain the directory in your project file
+system that you should deploy your application to.

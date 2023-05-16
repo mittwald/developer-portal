@@ -1,0 +1,100 @@
+---
+title: Node.JS
+description: Learn how to deploy and manage Node.JS applications.
+tags:
+  - Node.JS
+---
+
+import PlanCompatibility from "@site/src/components/PlanCompatibility";
+
+<PlanCompatibility plans={["ps", "ss"]} />
+
+## Starting a Node.JS application
+
+### Via the mStudio UI
+
+To start a Node.JS application from the mStudio, follow these steps:
+
+1. Navigate to the project that you want to create the application in.
+2. Select the "Apps" menu item in the sidebar.
+3. Click the "Create App" button and select "Custom Node.JS app".
+4. In the installation wizard, select the entrypoint command that should be used
+   to start your application and complete the wizard.
+
+### Via the API
+
+To learn how to deploy a Node.JS application via the API, read the article
+["Starting a Node.JS application"](../../api/howtos/create-nodejs).
+
+### Deploying your app
+
+After you have created your Node.JS app, you can deploy your code by moving it
+into the designated application directory. You may use any method that you
+prefer to deploy your code, such as a local Git clone, rsync or SFTP.
+
+:::info
+
+Since the deployment of your application is optimized for production usage, the
+platform will **NOT** automatically restart your application on code changes.
+You will need to restart your application manually after you have deployed your
+code. See the section on
+[managing your process lifecycle](#managing-your-process-lifecycle) for more
+information.
+
+:::
+
+## Making your app accessible via HTTP
+
+After you have created your Node.JS app, you can make it accessible via HTTP.
+Our platform will make sure that the process that you have configured in the
+previous step will be running at all times.
+
+:::info
+
+There is a possibility that your application will not immediately start when you
+have created your application _before_ deploying any code. In this case, our
+automation will attempt to start your process for a certain number of times and
+then back off. When connected to a shell in your hosting environment, you can
+use the `mittnitectl job status` command to inspect your process status, and
+then `mittnitectl job start` to start your process. See the section on
+[managing your process lifecycle](#managing-your-process-lifecycle) for more
+information.
+
+:::
+
+You can connect your application to the internet by linking it to a domain via
+the mStudio or the API. Our platform will take care of routing any traffic to
+that domain to your application, and will also handle TLS termination, if you
+have configured a certificate.
+
+Your Node.JS application simply needs to listen for plain HTTP traffic on a port
+that should be read from the `PORT` environment variable.
+
+:::caution
+
+Please **DO NOT** make any assumptions about the port that your application
+should listen on. The port that your application should listen on is provided
+via the `PORT` environment variable, and may change at any time.
+
+:::
+
+## Managing your process lifecycle
+
+With a Node.JS application, the entire lifecycle of your process is managed
+within the application itself. Within your hosting environment, your Node.JS
+process is managed by the
+[mittnite init system](https://github.com/mittwald/mittnite), a lightweight
+process manager that is responsible for starting, stopping and restarting your
+application.
+
+Within your hosting environment, you can use the `mittnitectl` command to manage
+your application:
+
+- `mittnitectl start` starts your application
+- `mittnitectl stop` stops your application
+- `mittnitectl restart` restarts your application
+
+You can also use `mittnitectl` to view the status of your application:
+
+- `mittnitectl status` shows the status of your application
+- `mittnitectl logs` shows the logs of your application
