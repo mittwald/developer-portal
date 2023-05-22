@@ -18,22 +18,39 @@ const FeatureList = [
         </p>
         <ul>
           <li>
-            <Link to={"/docs/v2/api/intro"}>Connecting and authenticating</Link>
+            <Link to={"/docs/v2/api/intro"}><Translate id="index.getting-started.connecting">Connecting and authenticating</Translate></Link>
           </li>
           <li>
             <Link to={"/docs/v2/api/howtos/create-project"}>
-              Creating and managing projects
+              <Translate id="index.getting-started.creating-projects">Creating and managing projects</Translate>
             </Link>
           </li>
           <li>
             <Link to={"/docs/v2/api/howtos/manage-mailbox"}>
-              Managing email accounts
+              <Translate id="index.getting-started.manage-mailbox">Managing email accounts</Translate>
             </Link>
           </li>
           <li>
-            <Link to={"/docs/v2/category/how-tos"}>more</Link>
+            <Link to={"/docs/v2/api/howtos/create-nodejs"}>
+              <Translate id="index.getting-started.create-nodejs">Installing a Node.js application</Translate>
+            </Link>
+          </li>
+          <li>
+            <Link to={"/docs/v2/category/how-tos"}><Translate id="index.getting-started.more">more</Translate></Link>
           </li>
         </ul>
+        <p>
+          <strong>
+            <Translate id={"index.getting-started.missing"}>
+              Missing something?
+            </Translate>
+          </strong>{" "}
+          <Link href="https://github.com/mittwald/developer-portal/issues/new?assignees=&labels=suggestion&projects=&template=suggestion.md">
+            <Translate id="index.getting-started.missing.cta">
+              Use this project's issue tracker to leave a suggestion!
+            </Translate>
+          </Link>
+        </p>
       </>
     ),
   },
