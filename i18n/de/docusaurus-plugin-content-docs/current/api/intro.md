@@ -15,7 +15,7 @@ Die vollständige API-Spezifikation im
 
 1. [OpenAPI 3.0-Spezifikation](https://api.mittwald.de/openapi)
    (maschinenlesbar)
-2. [Swagger UI](https://api.mittwald.de/v2/docs/) (menschenlesbar)
+2. [HTML-Dokumentation](/reference/v2) (menschenlesbar)
 
 ## Authentifizierung
 

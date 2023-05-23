@@ -15,7 +15,7 @@ You can find the full API specification in the
 
 1. [OpenAPI 3.0 specification](https://api.mittwald.de/openapi)
    (machine-readable)
-2. [Swagger UI](https://api.mittwald.de/v2/docs/) (human-readable)
+2. [Rendered HTML documentation](/reference/v2) (human-readable)
 
 ## Authentication
 
