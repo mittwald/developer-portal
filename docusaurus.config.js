@@ -32,12 +32,12 @@ const config = {
     locales: ["en", "de"],
     localeConfigs: {
       en: {
-        label: "English"
+        label: "English",
       },
       de: {
-        label: "Deutsch"
-      }
-    }
+        label: "Deutsch",
+      },
+    },
   },
 
   presets: [
@@ -49,43 +49,45 @@ const config = {
           sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl:
-            "https://github.com/mittwald/developer-portal/tree/main/",
+          editUrl: "https://github.com/mittwald/developer-portal/tree/main/",
           lastVersion: "current",
           versions: {
             current: {
               label: "API v2",
-              path: "v2"
-            }
-          }
+              path: "v2",
+            },
+          },
         },
         blog: {
           showReadingTime: true,
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/"
+            "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
         },
         theme: {
-          customCss: require.resolve("./src/css/custom.css")
-        }
-      })
+          customCss: require.resolve("./src/css/custom.css"),
+        },
+      }),
     ],
-    ["redocusaurus", {
-      specs: [
-        {
-          spec: "https://api.mittwald.de/openapi",
-          route: "/reference/v2"
-        }
-      ],
-      theme: {
-        primaryColor: "#27367b"
-      }
-    }]
+    [
+      "redocusaurus",
+      {
+        specs: [
+          {
+            spec: "https://api.mittwald.de/openapi",
+            route: "/reference/v2",
+          },
+        ],
+        theme: {
+          primaryColor: "#27367b",
+        },
+      },
+    ],
   ],
 
   themeConfig:
-  /** @type {import("@docusaurus/preset-classic").ThemeConfig} */
+    /** @type {import("@docusaurus/preset-classic").ThemeConfig} */
     ({
       // Replace with your project's social card
       image: "img/docusaurus-social-card.jpg",
@@ -94,38 +96,38 @@ const config = {
         title: "Developer Portal",
         logo: {
           alt: "mittwald",
-          src: "img/mittwald-logo.svg"
+          src: "img/mittwald-logo.svg",
         },
         items: [
           {
             type: "doc",
             docId: "api/intro",
             position: "left",
-            label: "API Usage"
+            label: "API Usage",
           },
           {
             type: "doc",
             docId: "/category/technologies",
             position: "left",
-            label: "Technologies"
+            label: "Technologies",
           },
           {
             type: "doc",
             docId: "/category/sdks-and-libraries",
             position: "left",
-            label: "SDKs"
+            label: "SDKs",
           },
           //{to: '/blog', label: 'Blog', position: 'left'},
           {
             href: "https://github.com/mittwald/developer-portal",
             label: "GitHub",
-            position: "right"
+            position: "right",
           },
           {
             type: "localeDropdown",
-            position: "right"
-          }
-        ]
+            position: "right",
+          },
+        ],
       },
       footer: {
         links: [
@@ -133,49 +135,57 @@ const config = {
             title: "Docs",
             items: [
               {
-                label: "Tutorial",
-                to: "/docs/v2/api/intro"
-              }
-            ]
+                label: "API usage",
+                to: "/docs/v2/api/intro",
+              },
+              {
+                label: "Technologies",
+                to: "/docs/v2/category/technologies",
+              },
+              {
+                label: "SDKs and Libraries",
+                to: "/docs/v2/category/sdks-and-libraries",
+              },
+            ],
           },
           {
             title: "Community",
             items: [
               {
                 label: "Feedback",
-                href: "https://github.com/mittwald/developer-portal/issues"
+                href: "https://github.com/mittwald/developer-portal/issues",
               },
               {
                 label: "Agency Hub (german)",
-                href: "https://agenturen.mittwald.de"
-              }
-            ]
+                href: "https://agenturen.mittwald.de",
+              },
+            ],
           },
           {
             title: "More",
             items: [
               {
                 label: "Terms of Service",
-                href: "https://www.mittwald.de/agb"
+                href: "https://www.mittwald.de/agb",
               },
               {
                 label: "Privacy Policy",
-                href: "https://www.mittwald.de/datenschutz"
+                href: "https://www.mittwald.de/datenschutz",
               },
               {
                 label: "Legal",
-                href: "https://www.mittwald.de/impressum"
-              }
-            ]
-          }
+                href: "https://www.mittwald.de/impressum",
+              },
+            ],
+          },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Mittwald CM Service GmbH & Co. KG. Built with Docusaurus.`
+        copyright: `Copyright © ${new Date().getFullYear()} Mittwald CM Service GmbH & Co. KG. Built with Docusaurus.`,
       },
       prism: {
         theme: lightCodeTheme,
-        darkTheme: darkCodeTheme
-      }
-    })
+        darkTheme: darkCodeTheme,
+      },
+    }),
 };
 
 module.exports = config;
