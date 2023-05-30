@@ -4,6 +4,8 @@ import styles from "./styles.module.css";
 import Translate from "@docusaurus/Translate";
 import Link from "@docusaurus/Link";
 
+const issueTrackerURL =
+  "https://github.com/mittwald/developer-portal/issues/new?assignees=&labels=suggestion&projects=&template=suggestion.md";
 const FeatureList = [
   {
     title: (
@@ -13,30 +15,42 @@ const FeatureList = [
       <>
         <p>
           <Translate id={"index.getting-started.body"}>
-            Follow our tutorial to get started with our API.
+            Follow our how-tos to get started with our API.
           </Translate>
         </p>
         <ul>
           <li>
-            <Link to={"/docs/v2/api/intro"}><Translate id="index.getting-started.connecting">Connecting and authenticating</Translate></Link>
+            <Link to={"/docs/v2/api/intro"}>
+              <Translate id="index.getting-started.connecting">
+                Connecting and authenticating
+              </Translate>
+            </Link>
           </li>
           <li>
             <Link to={"/docs/v2/api/howtos/create-project"}>
-              <Translate id="index.getting-started.creating-projects">Creating and managing projects</Translate>
+              <Translate id="index.getting-started.creating-projects">
+                Creating and managing projects
+              </Translate>
             </Link>
           </li>
           <li>
             <Link to={"/docs/v2/api/howtos/manage-mailbox"}>
-              <Translate id="index.getting-started.manage-mailbox">Managing email accounts</Translate>
+              <Translate id="index.getting-started.manage-mailbox">
+                Managing email accounts
+              </Translate>
             </Link>
           </li>
           <li>
             <Link to={"/docs/v2/api/howtos/create-nodejs"}>
-              <Translate id="index.getting-started.create-nodejs">Installing a Node.js application</Translate>
+              <Translate id="index.getting-started.create-nodejs">
+                Installing a Node.js application
+              </Translate>
             </Link>
           </li>
           <li>
-            <Link to={"/docs/v2/category/how-tos"}><Translate id="index.getting-started.more">more</Translate></Link>
+            <Link to={"/docs/v2/category/how-tos"}>
+              <Translate id="index.getting-started.more">more</Translate>
+            </Link>
           </li>
         </ul>
         <p>
@@ -45,9 +59,9 @@ const FeatureList = [
               Missing something?
             </Translate>
           </strong>{" "}
-          <Link href="https://github.com/mittwald/developer-portal/issues/new?assignees=&labels=suggestion&projects=&template=suggestion.md">
+          <Link href={issueTrackerURL}>
             <Translate id="index.getting-started.missing.cta">
-              Use this project's issue tracker to leave a suggestion!
+              Use this project's issue tracker to leave a suggestion.
             </Translate>
           </Link>
         </p>
@@ -60,15 +74,14 @@ const FeatureList = [
       <>
         <p>
           <Translate id={"index.reference.body"}>
-            Find all of our API endpoints and their parameters in our API
-            reference.
+            All endpoints and parameters of our API at a glance, including human readable references and machine readable specifications in the OpenAPI format.
           </Translate>
         </p>
         <ul>
           <li>
             <strong>
               <Translate id={"index.reference.v1"}>
-                v1 API (mittwald Customer Center)
+                v1 API (Customer Center)
               </Translate>
             </strong>
             <br />
@@ -84,9 +97,7 @@ const FeatureList = [
           </li>
           <li>
             <strong>
-              <Translate id={"index.reference.v2"}>
-                v2 API (mittwald mStudio)
-              </Translate>
+              <Translate id={"index.reference.v2"}>v2 API (mStudio)</Translate>
             </strong>
             <br />
             <Link to={"/reference/v2"}>
@@ -100,12 +111,6 @@ const FeatureList = [
             </a>
           </li>
         </ul>
-        <p>
-          <Translate id={"index.reference.explanation"}>
-            All of our API references are available in both human-readable form,
-            and as a machine-readable OpenAPI specification.
-          </Translate>
-        </p>
       </>
     ),
   },
@@ -144,9 +149,13 @@ const FeatureList = [
         <p>
           <strong>
             <Translate id={"index.sdks.own-sdks"}>
-              Have you built your own library that uses our API? Let us know,
-              and we'll link it here!
+              Have you built your own library that uses our API?
             </Translate>{" "}
+            <Link href={issueTrackerURL}>
+              <Translate id="index.sdks.issue">
+                Let us know, and we'll link it here!
+              </Translate>
+            </Link>
             💙
           </strong>
         </p>

@@ -103,7 +103,7 @@ const config = {
             type: "doc",
             docId: "api/intro",
             position: "left",
-            label: "API Usage",
+            label: "API Docs",
           },
           {
             type: "doc",
@@ -112,10 +112,9 @@ const config = {
             label: "Technologies",
           },
           {
-            type: "doc",
-            docId: "/category/sdks-and-libraries",
+            href: "/reference/v2",
             position: "left",
-            label: "SDKs",
+            label: "Reference",
           },
           //{to: '/blog', label: 'Blog', position: 'left'},
           {
@@ -146,6 +145,10 @@ const config = {
                 label: "SDKs and Libraries",
                 to: "/docs/v2/category/sdks-and-libraries",
               },
+              {
+                label: "Reference",
+                to: "/reference/v2",
+              }
             ],
           },
           {
