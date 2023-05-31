@@ -120,21 +120,16 @@ const FeatureList = [
       <>
         <p>
           <Translate id={"index.sdks.body"}>
-            We strive to provide you with comprehensive and easy-to-use SDKs and
-            libraries for all of our products in the future. Stay tuned!
+            Make it easy for yourself and use one of our SDKs or libraries to
+            integrate our API into your application:
           </Translate>
-        </p>
-        <p>
-          <strong>
-            <Translate id={"index.sdks.available"}>Available now</Translate>: 🚀
-          </strong>
         </p>
         <ul>
           <li>
             <Link to="/docs/v2/api/sdks/javascript">
               mittwald JavaScript SDK
             </Link>{" "}
-            (Node.JS and browser)
+            (Node.js + browser)
           </li>
         </ul>
         <p>
