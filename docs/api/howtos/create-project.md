@@ -1,5 +1,6 @@
 ---
-title: Creating a project
+sidebar_label: Creating a project
+title: Creating a project using the API
 description:
   This article describes how to create a new project in various deployment
   scenarios.

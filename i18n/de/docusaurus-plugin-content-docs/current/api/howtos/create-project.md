@@ -1,5 +1,6 @@
 ---
-title: Ein Projekt erstellen
+sidebar_label: Ein Projekt erstellen
+title: Ein Projekt über die API erstellen
 description:
   Dieser Artikel beschreibt, wie ein neues Projekt in verschiedenen
   Deployment-Szenarien erstellt werden kann
