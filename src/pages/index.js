@@ -7,6 +7,7 @@ import HomepageFeatures from "@site/src/components/HomepageFeatures";
 
 import styles from "./index.module.css";
 import Translate from "@docusaurus/Translate";
+import { translate } from "@docusaurus/Translate";
 
 function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext();
@@ -33,8 +34,7 @@ export default function Home() {
   const { siteConfig } = useDocusaurusContext();
   return (
     <Layout
-      title={`${siteConfig.title}`}
-      description="Description will go into a meta tag in <head />"
+      description={translate({id: "index.description", message: "The mittwald Developer Portal provides developers with the resources they need to integrate mittwald products into their own applications using our API."})}
     >
       <div className={styles.wrapper}>
         <HomepageHeader />
