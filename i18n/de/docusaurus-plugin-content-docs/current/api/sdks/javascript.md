@@ -4,14 +4,14 @@ description:
   mittwald-API.
 ---
 
-# JavaScript (Node.JS/Browser)
+# JavaScript (Node.js/Browser)
 
 Aktuell bieten wir die folgenden Bibliotheken an:
 
 - Die
   [**mittwald API-Client**-Bibliothek `@mittwald/api-client`](https://github.com/mittwald/api-client-js)
   ist eine automatisch generierte Client-Bibliothek für die mStudio-v2-API. Sie
-  kann sowohl in Node.JS- als auch in Browser-basierten Anwendungen genutzt
+  kann sowohl in Node.js- als auch in Browser-basierten Anwendungen genutzt
   werden.
 
 Coming Soon:
