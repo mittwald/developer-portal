@@ -47,11 +47,13 @@ const FeatureList = [
               </Translate>
             </Link>
           </li>
+          {/*
           <li>
             <Link to={"/docs/v2/category/how-tos"}>
               <Translate id="index.getting-started.more">more</Translate>
             </Link>
           </li>
+          */}
         </ul>
         <p>
           <strong>
@@ -59,6 +61,7 @@ const FeatureList = [
               Missing something?
             </Translate>
           </strong>{" "}
+          <Translate id="index.getting-started.more-soon">More how-tos are coming soon.</Translate>{" "}
           <Link href={issueTrackerURL}>
             <Translate id="index.getting-started.missing.cta">
               Use this project's issue tracker to leave a suggestion.
