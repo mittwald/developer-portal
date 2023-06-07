@@ -157,7 +157,7 @@ const FeatureList = [
               <Translate id="index.sdks.issue">
                 Let us know, and we'll link it here!
               </Translate>
-            </Link>
+            </Link>{" "}
             💙
           </strong>
         </p>
