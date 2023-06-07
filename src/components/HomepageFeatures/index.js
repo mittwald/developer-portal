@@ -61,7 +61,9 @@ const FeatureList = [
               Missing something?
             </Translate>
           </strong>{" "}
-          <Translate id="index.getting-started.more-soon">More how-tos are coming soon.</Translate>{" "}
+          <Translate id="index.getting-started.more-soon">
+            More how-tos are coming soon.
+          </Translate>{" "}
           <Link href={issueTrackerURL}>
             <Translate id="index.getting-started.missing.cta">
               Use this project's issue tracker to leave a suggestion.
@@ -77,7 +79,9 @@ const FeatureList = [
       <>
         <p>
           <Translate id={"index.reference.body"}>
-            All endpoints and parameters of our API at a glance, including human readable references and machine readable specifications in the OpenAPI format.
+            All endpoints and parameters of our API at a glance, including human
+            readable references and machine readable specifications in the
+            OpenAPI format.
           </Translate>
         </p>
         <ul>

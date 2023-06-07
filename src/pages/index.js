@@ -34,7 +34,11 @@ export default function Home() {
   const { siteConfig } = useDocusaurusContext();
   return (
     <Layout
-      description={translate({id: "index.description", message: "The mittwald Developer Portal provides developers with the resources they need to integrate mittwald products into their own applications using our API."})}
+      description={translate({
+        id: "index.description",
+        message:
+          "The mittwald Developer Portal provides developers with the resources they need to integrate mittwald products into their own applications using our API.",
+      })}
     >
       <div className={styles.wrapper}>
         <HomepageHeader />
