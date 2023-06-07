@@ -1,6 +1,8 @@
 ---
 title: Einleitung und API-Konzepte
 sidebar_position: 2
+description: |
+  Diese Seite bietet eine Einführung in die mStudio v2 API und ihre Konzepte.
 ---
 
 ## Basis-URLs

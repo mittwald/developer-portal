@@ -1,6 +1,8 @@
 ---
 title: API-Stabilitätsgarantien
 sidebar_position: 3
+description: |
+  Diese Seite enthält Informationen zu den Stabilitätsgarantien der mStudio v2 API.
 ---
 
 Unsere API ist versioniert. Das bedeutet, dass wir garantieren, dass die API
