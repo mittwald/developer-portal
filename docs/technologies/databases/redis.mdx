@@ -13,44 +13,29 @@ import PlanCompatibility from "@site/src/components/PlanCompatibility";
 
 ## What is Redis?
 
-For an e-commerce website, good performance is a real competitive advantage. To
-further minimize your load times, you can use Redis in all Space server and
-proSpace plans. Here you can read about what you can use the database for and
-how to set it up.
+For an e-commerce website, good performance is a real competitive advantage. To further minimize your load times, you can use Redis in all Space server and proSpace plans. Here you can read about what you can use the database for and how to set it up.
 
-Redis (short for Remote Dictionary Server) is an **in-memory database** and
-**key-value store** in one. That means your data is stored in the working memory
-instead of on the hard drive. Each entry receives its own key, through which it
-can be accessed directly. This ensures very short access times.
+Redis (short for Remote Dictionary Server) is an **in-memory database** and **key-value store** in one. That means your data is stored in the working memory instead of on the hard drive. Each entry receives its own key, through which it can be accessed directly. This ensures very short access times.
 
 ## Why do I need Redis?
 
-In general, Redis speeds up your projects when data needs to be written and
-queried quickly. Thanks to its outstanding performance, Redis is ideal as a
-cache. The database is also popular as a session storage for shop systems.
+In general, Redis speeds up your projects when data needs to be written and queried quickly. Thanks to its outstanding performance, Redis is ideal as a cache. The database is also popular as a session storage for shop systems.
 
 ## How do I create a Redis database?
 
-Setting up Redis is easy. However, depending on the CMS or shop system you use,
-there are a few things you need to consider. I will explain to you step by step
-how to do it.
+Setting up Redis is easy. However, depending on the CMS or shop system you use, there are a few things you need to consider. I will explain to you step by step how to do it.
 
 ### Using the mStudio
 
-First, create a Redis database in the mStudio, the management environment of
-your Space Server or proSpace. You will then find both the host and port in the
-details under connection information. You need both for the configuration of
-your system.
+First, create a Redis database in the mStudio, the management environment of your Space Server or proSpace. You will then find both the host and port in the details under connection information. You need both for the configuration of your system.
 
 ### Using the API
 
-You can also create a Redis database via the API. To do this, read the article
-["Creating a Redis database"](../../api/howtos/create-redis).
+You can also create a Redis database via the API. To do this, read the article ["Creating a Redis database"](../../api/howtos/create-redis).
 
 ## Configuring Redis as a session storage for PHP
 
-The `php.ini` file is located in your project under `.config/php/php.ini`. Add
-the following code:
+The `php.ini` file is located in your project under `.config/php/php.ini`. Add the following code:
 
 ```ini
 extension=redis.so
@@ -58,19 +43,15 @@ session.save_handler = redis
 session.save_path = "tcp://HOST:PORT?database=15"
 ```
 
-Now change the variables `HOST` and `PORT`. Use the information from the
-connection information.
+Now change the variables `HOST` and `PORT`. Use the information from the connection information.
 
-By default, each Redis database has 16 databases that can be accessed from 0
-to 15.
+By default, each Redis database has 16 databases that can be accessed from 0 to 15.
 
 ## Setting up common applications
 
 ### Shopware 6
 
-In your Shopware 6 installation, you enter the configuration for Redis in the
-`services.yaml`. It is located in the directory `/config`. If there is no file
-there yet, simply create one. Add the following lines at the end of the file:
+In your Shopware 6 installation, you enter the configuration for Redis in the `services.yaml`. It is located in the directory `/config`. If there is no file there yet, simply create one. Add the following lines at the end of the file:
 
 ```yaml
 parameters:
@@ -93,8 +74,7 @@ services:
         - "@Redis"
 ```
 
-Now create the file `framework.yaml` in the `config/packages` folder. Add the
-following to the file:
+Now create the file `framework.yaml` in the `config/packages` folder. Add the following to the file:
 
 ```yaml
 framework:
@@ -159,8 +139,7 @@ Add the following to `config.php` in the Shopware directory:
 
 ### Joomla 4
 
-In the Joomla administration, go to _System -> Configuration -> System_ and
-configure the following under "Session":
+In the Joomla administration, go to _System -> Configuration -> System_ and configure the following under "Session":
 
 - Session handler: Redis
 - Persistent Redis: Yes
@@ -173,9 +152,7 @@ Select the desired database number for Redis database and save.
 
 ### WordPress
 
-In the WordPress backend, go to _Plugins_ and click on "Add New". Search for
-"Redis Object Cache" and install the plugin that appears as the first result.
-After installation, add the following entry to `wp-config.php`:
+In the WordPress backend, go to _Plugins_ and click on "Add New". Search for "Redis Object Cache" and install the plugin that appears as the first result. After installation, add the following entry to `wp-config.php`:
 
 ```php
 define('WP_REDIS_PATH', 'HOST');
@@ -184,13 +161,11 @@ define('WP_REDIS_DATABASE', '0');
 define('WP_REDIS_SCHEME', 'unix');
 ```
 
-Choose a free database number between 0 and 15 for the `WP_REDIS_DATABASE`
-value.
+Choose a free database number between 0 and 15 for the `WP_REDIS_DATABASE` value.
 
 ### TYPO3
 
-Create a file named `AdditionalConfiguration.php` in the `typo3conf` folder and
-add the following. If the file already exists, you can omit `<?php`.
+Create a file named `AdditionalConfiguration.php` in the `typo3conf` folder and add the following. If the file already exists, you can omit `<?php`.
 
 ```php
 <?php

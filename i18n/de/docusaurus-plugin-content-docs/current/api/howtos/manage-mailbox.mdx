@@ -11,24 +11,16 @@ import ApiSchema from "@theme/ApiSchema";
 
 In unserer API unterscheiden wir zwischen zwei Arten von E-Mail-Konten:
 
-- **E-Mail-Adressen** werden verwendet, um E-Mails zu _senden und zu empfangen_.
-  Sie sind entweder mit einem Postfach (das du mit einem E-Mail-Client verbinden
-  kannst) oder mit einer Weiterleitungsadresse (die alle eingehenden E-Mails an
-  eine oder mehrere andere E-Mail-Adressen weiterleitet) verknüpft.
-- **Postausgänge** werden verwendet, um E-Mails zu _senden_. Sie werden
-  verwendet, um E-Mails von einer Webanwendung oder einem Skript zu senden.
+- **E-Mail-Adressen** werden verwendet, um E-Mails zu _senden und zu empfangen_. Sie sind entweder mit einem Postfach (das du mit einem E-Mail-Client verbinden kannst) oder mit einer Weiterleitungsadresse (die alle eingehenden E-Mails an eine oder mehrere andere E-Mail-Adressen weiterleitet) verknüpft.
+- **Postausgänge** werden verwendet, um E-Mails zu _senden_. Sie werden verwendet, um E-Mails von einer Webanwendung oder einem Skript zu senden.
 
 ## Voraussetzungen
 
-Um E-Mail-Konten zu verwalten, benötigst du ein bestehendes Projekt. Um ein
-neues Projekt per API zu erstellen, folge dem
-["Erstellen eines Projekts"](./create-project)-Guide.
+Um E-Mail-Konten zu verwalten, benötigst du ein bestehendes Projekt. Um ein neues Projekt per API zu erstellen, folge dem ["Erstellen eines Projekts"](./create-project)-Guide.
 
 ## Ein neues E-Mail-Konto erstellen
 
-Um ein neues E-Mail-Konto zu erstellen, sende eine `POST`-Anfrage an den
-`/v2/projects/{projectID}/mailaddresses`-Endpunkt. Die Anfrage muss ein
-JSON-Objekt mit den folgenden Eigenschaften enthalten:
+Um ein neues E-Mail-Konto zu erstellen, sende eine `POST`-Anfrage an den `/v2/projects/{projectID}/mailaddresses`-Endpunkt. Die Anfrage muss ein JSON-Objekt mit den folgenden Eigenschaften enthalten:
 
 <ApiSchema
   example
@@ -37,18 +29,13 @@ JSON-Objekt mit den folgenden Eigenschaften enthalten:
 
 :::caution
 
-Merke dir das Passwort, das du für das E-Mail-Konto festgelegt hast. Du hast
-später keine Möglichkeit mehr, es über die API abzurufen.
+Merke dir das Passwort, das du für das E-Mail-Konto festgelegt hast. Du hast später keine Möglichkeit mehr, es über die API abzurufen.
 
 :::
 
 ## Eine neue Weiterleitungsadresse erstellen
 
-Eine Weiterleitungsadresse ist eine E-Mail-Adresse, die alle eingehenden E-Mails
-an eine oder mehrere andere E-Mail-Adressen weiterleitet. Um eine neue
-Weiterleitungsadresse zu erstellen, sende eine `POST`-Anfrage an den
-`/v2/projects/{projectID}/mailaddresses`-Endpunkt. Die Anfrage muss ein
-JSON-Objekt mit den folgenden Eigenschaften enthalten:
+Eine Weiterleitungsadresse ist eine E-Mail-Adresse, die alle eingehenden E-Mails an eine oder mehrere andere E-Mail-Adressen weiterleitet. Um eine neue Weiterleitungsadresse zu erstellen, sende eine `POST`-Anfrage an den `/v2/projects/{projectID}/mailaddresses`-Endpunkt. Die Anfrage muss ein JSON-Objekt mit den folgenden Eigenschaften enthalten:
 
 <ApiSchema
   example
@@ -57,29 +44,17 @@ JSON-Objekt mit den folgenden Eigenschaften enthalten:
 
 ## Einen neuen Postausgang erstellen
 
-Ein Postausgang ist eine E-Mail-Adresse, die verwendet wird, um E-Mails von
-einer Webanwendung oder einem Skript zu senden. Um einen neuen Postausgang zu
-erstellen, sende eine `POST`-Anfrage an den
-`/v2/projects/{projectID}/deliveryboxes`-Endpunkt. Die Anfrage muss ein
-JSON-Objekt mit den folgenden Eigenschaften enthalten:
+Ein Postausgang ist eine E-Mail-Adresse, die verwendet wird, um E-Mails von einer Webanwendung oder einem Skript zu senden. Um einen neuen Postausgang zu erstellen, sende eine `POST`-Anfrage an den `/v2/projects/{projectID}/deliveryboxes`-Endpunkt. Die Anfrage muss ein JSON-Objekt mit den folgenden Eigenschaften enthalten:
 
-- `description` (String, Pflichtfeld): Eine Beschreibung des Postausgangs. Diese
-  Beschreibung wird in der Web-Oberfläche angezeigt.
-- `password` (String, Pflichtfeld): Das Passwort für den Postausgang. Dieses
-  Passwort wird verwendet, um sich gegenüber dem SMTP-Server zu
-  authentifizieren.
+- `description` (String, Pflichtfeld): Eine Beschreibung des Postausgangs. Diese Beschreibung wird in der Web-Oberfläche angezeigt.
+- `password` (String, Pflichtfeld): Das Passwort für den Postausgang. Dieses Passwort wird verwendet, um sich gegenüber dem SMTP-Server zu authentifizieren.
 
 :::caution
 
-Merke dir das Passwort, das du für das E-Mail-Konto festgelegt hast. Du hast
-später keine Möglichkeit mehr, es über die API abzurufen.
+Merke dir das Passwort, das du für das E-Mail-Konto festgelegt hast. Du hast später keine Möglichkeit mehr, es über die API abzurufen.
 
 :::
 
 ## E-Mail-Konten löschen
 
-Um eine E-Mail-Adresse oder Postausgang zu löschen, sende eine `DELETE`-Anfrage
-an den `/v2/mailaddresses/{id}` oder `/v2/deliveryboxes/{id}`-Endpunkt (je
-nachdem, welches Konto du löschen möchtest). Der `id`-Parameter muss die ID der
-E-Mail-Adresse oder des Postausgangs enthalten, den du löschen möchtest. Es ist
-kein Request-Body erforderlich.
+Um eine E-Mail-Adresse oder Postausgang zu löschen, sende eine `DELETE`-Anfrage an den `/v2/mailaddresses/{id}` oder `/v2/deliveryboxes/{id}`-Endpunkt (je nachdem, welches Konto du löschen möchtest). Der `id`-Parameter muss die ID der E-Mail-Adresse oder des Postausgangs enthalten, den du löschen möchtest. Es ist kein Request-Body erforderlich.
