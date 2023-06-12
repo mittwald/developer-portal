@@ -12,29 +12,27 @@ tags:
 
 There are different ways to deploy a new project:
 
-1. When you have access to a _project placement group_ (which you will get for
-   example when using the "Space Server" plan[^1]), you can create a new project
-   in that group. Any projects deployed on a placement group will utilize the
-   same shared resource pool. Since you pay for the placement group, you can
-   deploy as many projects as resource utilization allows, without additional
-   costs.
-2. For the future, we reserve the option to offer the creation of stand-alone
-   projects. These will be projects that are _not_ part of a placement group,
-   and will be deployed on a shared resource pool. You will pay for the
-   resources used by the project, and you will be able to deploy as many
-   projects as you want.
+1. When you have access to a **server** (which you will get for example when
+   using the "Space Server" plan[^1]), you can create a new project on that
+   server. Any projects deployed on a server will utilize the same shared
+   resource pool. Since you pay for the server, you can deploy as many projects
+   as resource utilization allows, without additional costs.
+2. For the future, we reserve the option to offer the creation of **stand-alone
+   projects**. These will be projects that are _not_ part of a server, and will
+   be deployed on a shared resource pool. You will pay for the resources used by
+   the project, and you will be able to deploy as many projects as you want.
 
-## Creating a project...
+## Creating a project…
 
-### ...in a placement group
+### …on a server
 
-To create a project in an existing placement group, you will require that
-placement group's ID. You can find all placement groups you have access to using
-the `GET /v2/placementgroups` API endpoint.
+To create a project on an existing server, you will require that server’s ID.
+You can find all servers you have access to using the
+[`GET /v2/servers` API endpoint](https://developer.mittwald.de/reference/v2/#tag/Project/operation/project-list-servers).
 
 To create a new project, send a `POST` request to the
-`/v2/placementgroups/{placementGroupID}/projects` endpoint. The request body
-must contain a JSON object with the following properties:
+`/v2/placementgroups/{serverId}/projects` endpoint. The request body must
+contain a JSON object with the following properties:
 
 - `description` should contain a human-readable description of the project. This
   is a required value.
@@ -44,7 +42,10 @@ properties:
 
 - `id` is the ID of the newly created project.
 
-### ...as a stand-alone project
+For details please refer to the
+[endpoint documentation for `project-create-project`](https://developer.mittwald.de/reference/v2/#tag/Project/operation/project-create-project).
+
+### …as a stand-alone project
 
 :::note
 
@@ -59,5 +60,8 @@ available within a few seconds). To check whether a project is ready, send a
 `GET` request to the `/v2/projects/{projectID}` endpoint. Among other
 properties, the response will contain an `isReady` property. This property will
 be `true` when the project is ready, and `false` otherwise.
+
+For details please refer to the
+[endpoint documentation for `project-get-project`](https://developer.mittwald.de/reference/v2/#tag/Project/operation/project-get-project).
 
 [^1]: https://www.mittwald.de/space-server
