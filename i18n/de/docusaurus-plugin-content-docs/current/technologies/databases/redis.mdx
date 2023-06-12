@@ -176,10 +176,32 @@ dann Speichern.
 
 ### WordPress
 
-Im WordPress Backend klickst du unter _Plugins_ und auf "Installieren". In der
-Suche findest du über den Begriff "Redis Object Cache" auf der ersten Position
-das richtige Plugin. Dieses musst du installieren. Nach der Installation fügst
-du der `wp-config.php` folgenden Eintrag hinzu:
+Wir empfehlen das Plugin
+**[Redis Object Cache](https://wordpress.org/plugins/redis-cache/)**.
+
+Installiere zunächst das Plugin "Redis Object Cache"
+
+```shell
+wp plugin install redis-cache --activate
+```
+
+und setze die benötigten Konfigurations-Einträge:
+
+```shell
+wp config set --type=constant WP_REDIS_PATH HOST
+wp config set --type=constant WP_REDIS_PORT PORT
+wp config set --type=constant WP_REDIS_DATABASE 0
+wp config set --type=constant WP_REDIS_SCHEME unix
+```
+
+- Nutze den `hostname` und `port` der Datenbank als Werte für `WP_REDIS_PATH`
+  und `WP_REDIS_PORT` (siehe
+  [GET https://api.mittwald.de/v2/redis-databases/{id}](https://developer.mittwald.de/reference/v2#tag/Database/operation/database-get-redis-database))
+- Wähle eine freie Datenbank zwischen 0 und 15 als Wert für `WP_REDIS_DATABASE`.
+
+Wenn du die WP-CLI nicht benutzen möchtest, kannst du das Plugin auch über das
+WordPress-Dashboard installieren. Nach der Installation und Aktivierung fügst du
+der wp-config.php folgende Einträge hinzu:
 
 ```php
 define('WP_REDIS_PATH', 'HOST');
@@ -187,9 +209,6 @@ define('WP_REDIS_PORT', 'PORT');
 define('WP_REDIS_DATABASE', '0');
 define('WP_REDIS_SCHEME', 'unix');
 ```
-
-Als Wert für `WP_REDIS_DATABASE` wählst du eine freie Datenbank zwischen 0
-und 15.
 
 ### TYPO3
 
