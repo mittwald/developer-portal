@@ -92,7 +92,7 @@ const FeatureList = [
               </Translate>
             </strong>
             <br />
-            <Link to={"https://mittwald-api.de"}>
+            <Link to={"/reference/v1"}>
               <Translate id={"index.reference.reference"}>Reference</Translate>
             </Link>{" "}
             |{" "}
