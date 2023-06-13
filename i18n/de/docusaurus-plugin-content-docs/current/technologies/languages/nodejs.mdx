@@ -13,95 +13,58 @@ import PlanCompatibility from "@site/src/components/PlanCompatibility";
 
 ### Über die mStudio-Oberfläche
 
-Um eine Node.js-Anwendung über die mStudio-Oberfläche zu starten, folge diesen
-Schritten:
+Um eine Node.js-Anwendung über die mStudio-Oberfläche zu starten, folge diesen Schritten:
 
 1. Navigiere zum Projekt, in dem du die Anwendung erstellen möchtest.
 2. Wähle im Seitenmenü den Punkt "Apps" aus.
-3. Klicke auf den Button "App erstellen" und wähle "Benutzerdefinierte
-   Node.js-App" aus.
-4. Wähle im Installations-Assistenten den Eintrittspunkt-Befehl aus, der
-   verwendet werden soll, um deine Anwendung zu starten, und schließe den
-   Assistenten ab.
+3. Klicke auf den Button "App erstellen" und wähle "Benutzerdefinierte Node.js-App" aus.
+4. Wähle im Installations-Assistenten den Eintrittspunkt-Befehl aus, der verwendet werden soll, um deine Anwendung zu starten, und schließe den Assistenten ab.
 
 ### Über die API
 
-Um zu erfahren, wie man eine Node.js-Anwendung über die API bereitstellt, lies
-den Artikel ["Eine Node.js-Anwendung starten"](../../api/howtos/create-nodejs).
+Um zu erfahren, wie man eine Node.js-Anwendung über die API bereitstellt, lies den Artikel ["Eine Node.js-Anwendung starten"](../../api/howtos/create-nodejs).
 
 ### Deine Anwendung bereitstellen
 
-Nachdem du deine Node.js-Anwendung erstellt hast, kannst du deinen Code
-deployen, indem du ihn in das dafür vorgesehene Installationsverzeichnis
-hochlädst. Um deinen Code bereitzustellen, kannst du die Methode wählen, die zu
-bevorzugst, wie beispielsweise ein lokal ausgeführter Git-Klon, rsync oder SFTP.
+Nachdem du deine Node.js-Anwendung erstellt hast, kannst du deinen Code deployen, indem du ihn in das dafür vorgesehene Installationsverzeichnis hochlädst. Um deinen Code bereitzustellen, kannst du die Methode wählen, die zu bevorzugst, wie beispielsweise ein lokal ausgeführter Git-Klon, rsync oder SFTP.
 
 :::info
 
-Da das Deployment deiner Anwendung für den produktiven Einsatz optimiert ist,
-wird die Plattform **NICHT** automatisch deine Anwendung bei Code-Änderungen neu
-starten. Du musst deine Anwendung manuell neu starten, nachdem du deinen Code
-bereitgestellt hast. Siehe den Abschnitt über die
-[Verwaltung des Prozesslebenszyklus](#verwaltung-des-prozesslebenszyklus) für
-weitere Informationen.
+Da das Deployment deiner Anwendung für den produktiven Einsatz optimiert ist, wird die Plattform **NICHT** automatisch deine Anwendung bei Code-Änderungen neu starten. Du musst deine Anwendung manuell neu starten, nachdem du deinen Code bereitgestellt hast. Siehe den Abschnitt über die [Verwaltung des Prozesslebenszyklus](#verwaltung-des-prozesslebenszyklus) für weitere Informationen.
 
 :::
 
 ## Deine Anwendung über HTTP zugänglich machen
 
-Nachdem Du Deine Node.js-Anwendung erstellt hast, kannst Du sie über HTTP
-zugänglich machen. Unsere Plattform stellt sicher, dass der Prozess, den Du in
-dem vorherigen Schritt konfiguriert hast, jederzeit ausgeführt wird.
+Nachdem Du Deine Node.js-Anwendung erstellt hast, kannst Du sie über HTTP zugänglich machen. Unsere Plattform stellt sicher, dass der Prozess, den Du in dem vorherigen Schritt konfiguriert hast, jederzeit ausgeführt wird.
 
 :::info
 
-Es besteht die Möglichkeit, dass Deine Anwendung nicht sofort gestartet wird,
-wenn Du Deine Anwendung _vor_ dem Deployment von Code erstellst. In diesem Fall
-versucht unsere Automatisierung, Deinen Prozess für eine bestimmte Anzahl von
-Versuchen zu starten und dann abzubrechen. Wenn Du mit einer Shell in Deiner
-Hosting-Umgebung verbunden bist, kannst Du das `mittnitectl job status`-Kommando
-verwenden, um den Status Deines Prozesses zu überprüfen und dann
-`mittnitectl job start`, um Deinen Prozess zu starten. Siehe den Abschnitt über
-[das Verwalten Deines Prozesslebenszyklus](#das-verwalten-deines-prozesslebenszyklus)
-für weitere Informationen.
+Es besteht die Möglichkeit, dass Deine Anwendung nicht sofort gestartet wird, wenn Du Deine Anwendung _vor_ dem Deployment von Code erstellst. In diesem Fall versucht unsere Automatisierung, Deinen Prozess für eine bestimmte Anzahl von Versuchen zu starten und dann abzubrechen. Wenn Du mit einer Shell in Deiner Hosting-Umgebung verbunden bist, kannst Du das `mittnitectl job status`-Kommando verwenden, um den Status Deines Prozesses zu überprüfen und dann `mittnitectl job start`, um Deinen Prozess zu starten. Siehe den Abschnitt über [das Verwalten Deines Prozesslebenszyklus](#das-verwalten-deines-prozesslebenszyklus) für weitere Informationen.
 
 :::
 
-Du kannst Deine Anwendung mit dem Internet verbinden, indem Du sie über das
-mStudio oder die API mit einer Domain verknüpfst. Unsere Plattform kümmert sich
-darum, den Datenverkehr von dieser Domain zu Deiner Anwendung zu routen, und
-kümmert sich auch um die TLS-Terminierung, wenn Du ein Zertifikat konfiguriert
-hast.
+Du kannst Deine Anwendung mit dem Internet verbinden, indem Du sie über das mStudio oder die API mit einer Domain verknüpfst. Unsere Plattform kümmert sich darum, den Datenverkehr von dieser Domain zu Deiner Anwendung zu routen, und kümmert sich auch um die TLS-Terminierung, wenn Du ein Zertifikat konfiguriert hast.
 
-Deine Node.js-Anwendung muss einfach auf einem Port lauschen, der aus der
-`PORT`-Umgebungsvariablen gelesen werden sollte.
+Deine Node.js-Anwendung muss einfach auf einem Port lauschen, der aus der `PORT`-Umgebungsvariablen gelesen werden sollte.
 
 :::caution
 
-Bitte mache **KEINE** Annahmen über den Port, auf dem Deine Anwendung hören
-sollte. Der Port, auf dem Deine Anwendung hören sollte, wird über die
-`PORT`-Umgebungsvariable bereitgestellt und kann sich jederzeit ändern.
+Bitte mache **KEINE** Annahmen über den Port, auf dem Deine Anwendung hören sollte. Der Port, auf dem Deine Anwendung hören sollte, wird über die `PORT`-Umgebungsvariable bereitgestellt und kann sich jederzeit ändern.
 
 :::
 
 ## Das Verwalten Deines Prozesslebenszyklus
 
-Bei einer Node.js-Anwendung wird der gesamte Lebenszyklus Deines Prozesses
-innerhalb der Anwendung selbst verwaltet. Innerhalb Deiner Hosting-Umgebung wird
-Dein Node.js-Prozess vom
-[mittnite init system](https://github.com/mittwald/mittnite), einem leichten
-Prozessmanager verwaltet, der für das Starten, Stoppen und Neustarten Deiner
-Anwendung verantwortlich ist.
+Bei einer Node.js-Anwendung wird der gesamte Lebenszyklus Deines Prozesses innerhalb der Anwendung selbst verwaltet. Innerhalb Deiner Hosting-Umgebung wird Dein Node.js-Prozess vom [mittnite init system](https://github.com/mittwald/mittnite), einem leichten Prozessmanager verwaltet, der für das Starten, Stoppen und Neustarten Deiner Anwendung verantwortlich ist.
 
-Innerhalb Deiner Hosting-Umgebung kannst Du das `mittnitectl`-Kommando
-verwenden, um Deine Anwendung zu verwalten:
+Innerhalb Deiner Hosting-Umgebung kannst Du das `mittnitectl`-Kommando verwenden, um Deine Anwendung zu verwalten:
 
 - `mittnitectl start` startet Deine Anwendung
 - `mittnitectl stop` stoppt Deine Anwendung
 - `mittnitectl restart` startet Deine Anwendung neu
 
-Du kannst `mittnitectl` auch verwenden, um den Status Deiner Anwendung
-anzuzeigen:
+Du kannst `mittnitectl` auch verwenden, um den Status Deiner Anwendung anzuzeigen:
 
 - `mittnitectl status` zeigt den Status Deiner Anwendung an
 - `mittnitectl logs` zeigt die Logs Deiner Anwendung an

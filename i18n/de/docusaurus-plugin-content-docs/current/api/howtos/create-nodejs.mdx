@@ -1,50 +1,35 @@
 ---
 sidebar_label: Installieren einer Node.js-Anwendung
 title: Installieren einer Node.js-Anwendung über die API
-description:
-  Lerne, wie du eine Node.js-Anwendung über die mStudio-API installiert.
+description: Lerne, wie du eine Node.js-Anwendung über die mStudio-API installiert.
 tags:
   - Node.js
 ---
+
+import OperationHint from "@site/src/components/OperationHint";
 
 ### Voraussetzungen
 
 Um eine Node.js-Anwendung zu installieren, benötigst Du Folgendes:
 
 - Die Projekt-ID eines vorhandenen Projekts
-- Die App- und Versions-ID der generischen benutzerdefinierten Node.js-Anwendung
-  (siehe nächster Abschnitt)
+- Die App- und Versions-ID der generischen benutzerdefinierten Node.js-Anwendung (siehe nächster Abschnitt)
 
 ### Bestimmen der Anwendungs- und App-Version-ID
 
-Bevor Du eine Node.js-Anwendung installierst, musst Du die App-ID und die
-Versions-ID der generischen benutzerdefinierten Node.js-Anwendung bestimmen.
+Bevor Du eine Node.js-Anwendung installierst, musst Du die App-ID und die Versions-ID der generischen benutzerdefinierten Node.js-Anwendung bestimmen.
 
-Hierzu rufe die `/v2/apps`-Endpunkt auf und suche die "Node.js"-Anwendung. Ihre
-stabile ID sollte `3e7f920b-a711-4d2f-9871-661e1b41a2f0` sein. Du kannst dann
-diese ID verwenden, um die empfohlene Version für diese App abzurufen, indem Du
-den `/v2/apps/{appID}/versions`-Endpunkt aufrufst. Du kannst die zurückgegebenen
-Versionen nach der `recommended`-Eigenschaft filtern.
+Hierzu rufe die `/v2/apps`-Endpunkt auf und suche die "Node.js"-Anwendung. Ihre stabile ID sollte `3e7f920b-a711-4d2f-9871-661e1b41a2f0` sein. Du kannst dann diese ID verwenden, um die empfohlene Version für diese App abzurufen, indem Du den `/v2/apps/{appID}/versions`-Endpunkt aufrufst. Du kannst die zurückgegebenen Versionen nach der `recommended`-Eigenschaft filtern.
 
-Beachte, dass die tatsächliche Version weitgehend unerheblich ist, da sie nur
-auf die Starter-Vorlage verweist, die zur Erstellung der Anwendung verwendet
-wird. Die tatsächliche Version der Anwendung wird durch Deinen eigenen Code
-bestimmt.
+Beachte, dass die tatsächliche Version weitgehend unerheblich ist, da sie nur auf die Starter-Vorlage verweist, die zur Erstellung der Anwendung verwendet wird. Die tatsächliche Version der Anwendung wird durch Deinen eigenen Code bestimmt.
 
 ### Installieren der Anwendung
 
-Um Deine Anwendung bereitzustellen, rufe den
-`POST /v2/projects/{projectID}/appinstallations`-Endpunkt auf. Die relevanten
-Felder sind die folgenden:
+Um Deine Anwendung bereitzustellen, rufe den `POST /v2/projects/{projectID}/appinstallations`-Endpunkt auf. Die relevanten Felder sind die folgenden:
 
-- `appVersionId` sollte die App-Version-ID sein, die Du im vorherigen Schritt
-  abgerufen hast.
-- `userInputs` sollte ein Array von Objekten sein, die jeweils eine `name`- und
-  eine `value`-Eigenschaft enthalten. Im Fall von Node.js ist der einzige
-  zulässige Wert für `name` der Wert `entrypoint`. Der dazugehörige `value` ist
-  der Befehl, der ausgeführt wird, um Deine Anwendung zu starten.
-- `updatePolicy` sollte im Fall einer von dir selbst verwalteten Anwendung immer
-  auf `none` gesetzt sein.
+- `appVersionId` sollte die App-Version-ID sein, die Du im vorherigen Schritt abgerufen hast.
+- `userInputs` sollte ein Array von Objekten sein, die jeweils eine `name`- und eine `value`-Eigenschaft enthalten. Im Fall von Node.js ist der einzige zulässige Wert für `name` der Wert `entrypoint`. Der dazugehörige `value` ist der Befehl, der ausgeführt wird, um Deine Anwendung zu starten.
+- `updatePolicy` sollte im Fall einer von dir selbst verwalteten Anwendung immer auf `none` gesetzt sein.
 
 Die vollständige HTTP-Anfrage sollte wie folgt aussehen:
 
@@ -63,10 +48,8 @@ Content-Type: application/json
 }
 ```
 
-Die Antwort enthält die Installations-ID, die Du anschließend verwenden kannst,
-um auf Deine Anwendung zuzugreifen.
+<OperationHint tag="App" operation="app-request-appinstallation" />
 
-Um den Installationsstatus zu überwachen, rufe den
-`/v2/appinstallations/{installationID}`-Endpunkt auf. Beachte das Feld
-`installationPath`, das das Verzeichnis in Deinem Projekt-Dateisystem enthält,
-in das Du Deine Anwendung bereitstellen solltest.
+Die Antwort enthält die Installations-ID, die Du anschließend verwenden kannst, um auf Deine Anwendung zuzugreifen.
+
+Um den Installationsstatus zu überwachen, rufe den `/v2/appinstallations/{installationID}`-Endpunkt auf. Beachte das Feld `installationPath`, das das Verzeichnis in Deinem Projekt-Dateisystem enthält, in das Du Deine Anwendung bereitstellen solltest.
