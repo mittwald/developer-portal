@@ -75,10 +75,12 @@ const config = {
       {
         specs: [
           {
+            id: "v1",
             spec: "https://mittwald-api.de/docs/swagger-public.json",
             route: "/reference/v1",
           },
           {
+            id: "v2",
             spec: "https://api.mittwald.de/openapi",
             route: "/reference/v2",
           },
