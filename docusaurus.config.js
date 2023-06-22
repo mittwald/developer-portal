@@ -88,6 +88,7 @@ const config = {
         ],
         theme: {
           primaryColor: "#27367b",
+          primaryColorDark: "#abb9ff"
         },
       },
     ],
