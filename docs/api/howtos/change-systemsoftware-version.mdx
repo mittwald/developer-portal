@@ -1,0 +1,42 @@
+---
+sidebar_label: Change a system software version
+sidebar_position: 100
+title: Change the version of a system software via the mStudio API
+description: Learn how to change the version of a system software (like PHP or Node.JS) via the mStudio API
+tags:
+  - Node.js
+  - PHP
+---
+
+import OperationLink from "@site/src/components/OperationLink";
+import OperationHint from "@site/src/components/OperationHint";
+
+## Prerequisites
+
+This article assumes that you have already created an app installation and that you have the ID of that app installation. You can also use the <OperationLink tag="App" operation="app-get-appinstallation">`GET /v2/appinstallations/{appInstallationId}` endpoint</OperationLink> to inspect the current configuration of said app installation. Relevant for this article is the `.systemSoftware` property, which is a map that contains the ID of the system software (as key) and the version that is currently installed.
+
+## Determine the system software and version IDs
+
+First, you need to determine the IDs of the system software and the version you want to change to. You can do this by calling the <OperationLink tag="App" operation="app-list-systemsoftwares">`GET /v2/systemsoftwares` endpoint</OperationLink> and filtering the result set by the desired `.name` property.
+
+Using that ID, you can then call the <OperationLink tag="App" operation="app-list-systemsoftwareversions">`GET /v2/systemsoftwares/{systemSoftwareId}/versions` endpoint</OperationLink> to get a list of all available versions for that system software. To only select specific versions, you can use the `versionRange` query parameter. This parameter accepts any valid [semantic versioning constraint](https://devhints.io/semver), like `>= 14.0.0` or `^14.0.0`.
+
+## Changing the system software version
+
+To change the system software version, use the <OperationLink tag="App" operation="app-patch-appinstallation">`PATCH /v2/appinstallations/{appinstallationId}` endpoint</OperationLink>. You only need to provide the `.systemSoftware` property in the request body, which should contain the ID of the system software and the version you want to change to:
+
+```
+PATCH /v2/appinstallations/{appInstallationId} HTTP/1.1
+Content-Type: application/json
+
+{
+  "systemSoftware": {
+    "<insert system software id>": {
+      "systemSoftwareVersion": "<insert system software version id>",
+      "updatePolicy": "patchLevel"
+    }
+  }
+}
+```
+
+<OperationHint tag="App" operation="app-patch-appinstallation" />
