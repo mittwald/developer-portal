@@ -78,7 +78,7 @@ Some special routes may be exempt from rate limiting. These routes will respond 
 
 ## Eventual Consistency
 
-The read models of our event sourced architecture are [eventually consistent](https://en.wikipedia.org/wiki/Eventual_consistency). If you want to learn about this have a read of the [blog post about event sourcing](https://www.mittwald.de/blog/webentwicklung-design/was-ist-eventsourcing). As a consequence, changes being made by a POST, PUT, PATCH or DELETE request may take a moment until all read models are updated. This may cause a (GET) request executed immediately after the mutating request run into an error, typically with an HTTP status code like `404` or `403`. To handle this eventual consistency you can use a combination of the response header `etag` and the request header `if-event-reached`.
+The read models of our event sourced architecture are [eventually consistent](https://en.wikipedia.org/wiki/Eventual_consistency). If you want to learn about this, have a read of the [blog post about event sourcing](https://www.mittwald.de/blog/webentwicklung-design/was-ist-eventsourcing). As a consequence, changes being made by a POST, PUT, PATCH or DELETE request may take a moment until all read models are updated. This may cause a (GET) request executed immediately after the mutating request to run into an error, typically with an HTTP status code like `404` or `403`. To handle this eventual consistency, you can use a combination of the response header `etag` and the request header `if-event-reached`.
 
 To prevent the issue, you might use the event id returned in the `etag` header of the mutating request.
 
