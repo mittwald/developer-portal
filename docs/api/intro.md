@@ -75,3 +75,21 @@ Usage of the API is rate-limited to prevent abuse. You can inspect the rate limi
 - `X-RateLimit-Reset`: The remaining time (in seconds) until the current rate limit period ends and a new one begins.
 
 Some special routes may be exempt from rate limiting. These routes will respond with a `X-RateLimit-Exempt` header set to `yes`.
+
+## Eventual Consistency
+
+The read models of our event sourced architecture are [eventually consistent](https://en.wikipedia.org/wiki/Eventual_consistency). If you want to learn about this have a read of the [blog post about event sourcing](https://www.mittwald.de/blog/webentwicklung-design/was-ist-eventsourcing). As a consequence, changes being made by a POST, PUT, PATCH or DELETE request may take a moment until all read models are updated. This may cause a (GET) request executed immediately after the mutating request run into an error, typically with an HTTP status code like `404` or `403`. To handle this eventual consistency you can use a combination of the response header `etag` and the request header `if-event-reached`.
+
+To prevent the issue, you might use the event id returned in the `etag` header of the mutating request.
+
+```
+etag: 276638689419853824
+```
+
+This event id might be used as the value for the `if-event-reached` header of the subsequent (GET) request. If this header is set, the processing services will wait until the event is handled. After the event is handled, the service will execute and answer the request.
+
+```
+if-event-reached: 276638689419853824
+```
+
+Please note, that such a request can fail with `412 Precondition Failed` if the event is not reached within 10 seconds.
