@@ -74,4 +74,22 @@ Die API ist auf eine bestimmte Anzahl von Anfragen pro Zeitraum begrenzt, um Mis
 - `X-RateLimit-Remaining`: Die Anzahl der Anfragen, die noch im aktuellen Zeitraum verbleiben.
 - `X-RateLimit-Reset`: Die verbleibende Zeit (in Sekunden), bis der aktuelle Zeitraum endet und ein neuer beginnt.
 
-Einige spezielle Routen sind von der Limitierng ausgenommen. Diese Routen antworten mit einem `X-RateLimit-Exempt` Header, der auf `yes` gesetzt ist.
+Einige spezielle Routen sind von der Limitierung ausgenommen. Diese Routen antworten mit einem `X-RateLimit-Exempt` Header, der auf `yes` gesetzt ist.
+
+## Eventual Consistency
+
+Die Read Models unserer Event Sourcing-Architektur sind [eventually consistent](https://en.wikipedia.org/wiki/Eventual_consistency). Wenn du mehr darüber erfahren möchtest, lies den [Blog-Post über Event Sourcing](https://www.mittwald.de/blog/webentwicklung-design/was-ist-eventsourcing). Als Konsequenz kann es einen Moment dauern, bis alle Read Models nach einer POST-, PUT-, PATCH- oder DELETE-Anfrage aktualisiert sind. Dies kann dazu führen, dass eine (GET-)Anfrage, die unmittelbar nach der mutierenden Anfrage ausgeführt wird, einen Fehler verursacht, typischerweise mit einem HTTP-Statuscode wie `404` oder `403`. Um diese Eventual Consistency zu handhaben, kannst du eine Kombination aus dem Antwort-Header `etag` und dem Anfrage-Header `if-event-reached` verwenden.
+
+Um das Problem zu verhindern, kannst du die Event-ID verwenden, die im `etag`-Header der mutierenden Anfrage zurückgegeben wird.
+
+```
+etag: 276638689419853824
+```
+
+Diese Event-ID ist die ID des Events, das die mutierende Anfrage ausgelöst hat. Wenn dieser Header gesetzt ist, werden die verarbeitenden Services warten, bis das Event verarbeitet wurde. Nachdem das Event verarbeitet wurde, wird der Service die Anfrage ausführen und beantworten.
+
+```
+if-event-reached: 276638689419853824
+```
+
+Bitte beachte, dass eine solche Anfrage mit `412 Precondition Failed` fehlschlagen kann, wenn das Event nicht innerhalb von 10 Sekunden erreicht wird.
