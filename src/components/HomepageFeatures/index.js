@@ -3,6 +3,7 @@ import clsx from "clsx";
 import styles from "./styles.module.css";
 import Translate from "@docusaurus/Translate";
 import Link from "@docusaurus/Link";
+import { NewBadge } from "../NewBadge";
 
 const issueTrackerURL =
   "https://github.com/mittwald/developer-portal/issues/new?assignees=&labels=suggestion&projects=&template=suggestion.md";
@@ -132,6 +133,9 @@ const FeatureList = [
           </Translate>
         </p>
         <ul>
+          <li>
+            <Link to="/docs/v2/api/sdks/cli">mittwald CLI</Link> <NewBadge />
+          </li>
           <li>
             <Link to="/docs/v2/api/sdks/javascript">
               mittwald JavaScript SDK
