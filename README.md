@@ -1,6 +1,6 @@
 # mittwald Developer Portal
 
-This repository contains the sources of the [mittwald Developer Portal](https://developers.mittwald.de).
+This repository contains the sources of the [mittwald Developer Portal](https://developer.mittwald.de).
 
 ## License
 
