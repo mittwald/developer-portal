@@ -15,7 +15,7 @@ function HomepageHeader() {
     <header className={clsx("hero hero--primary", styles.heroBanner)}>
       <div className="container">
         <h1 className="hero__title">
-          <Translate id={"index.title"}>mittwald Developer Portal</Translate>
+          <Translate id={"index.title"}>Developer Portal</Translate>
         </h1>
         <div className={styles.buttons}>
           <Link
