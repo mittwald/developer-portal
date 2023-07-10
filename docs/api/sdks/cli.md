@@ -6,20 +6,31 @@ description: An introduction on how to use the mittwald command-line interface (
 
 ## Installing
 
-### Using NPM
+### Any OS, using NPM
+
+With a local Node.js installation, you can install the mittwald CLI using NPM:
 
 ```
 $ npm install -g @mittwald/cli
 $ mw --help
 ```
 
-### Using Homebrew
+### macOS, using the installer package
+
+Retrieve the latest release package (`*.pkg` file) from our [releases page](https://github.com/mittwald/cli/releases), and run the installer. Pay attention to the processor architecture, and load the `mw-*-arm64.pkg` file when your'e using an ARM Mac, and the `mw-*-amd64.pkg` file when using an Intel Mac.
+
+### macOS, using Homebrew
 
 ```
 $ brew tap mittwald/cli
 $ brew install mittwald-cli
 $ mw --help
 ```
+
+### Windows, using the installer package
+
+Retrieve the latest release package (`*.exe` file) from our [releases page](https://github.com/mittwald/cli/releases), and run the installer.
+
 
 ### Using Docker
 
@@ -54,5 +65,3 @@ For non-interactive usage (for example in CI/CD pipelines), you can also pass th
 $ export MW_API_TOKEN=********
 $ mw login status
 ```
-
-## Common usage principles
