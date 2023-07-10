@@ -31,14 +31,14 @@ $ mw --help
 
 Retrieve the latest release package (`*.exe` file) from our [releases page](https://github.com/mittwald/cli/releases), and run the installer.
 
-
 ### Using Docker
 
 ```
+$ export MITTWALD_API_TOKEN=xxx
 $ docker run \
     --rm \
     -it \
-    -v $HOME:/.config/mw:/app/.config/mw \
+    -e MITTWALD_API_TOKEN \
     mittwald/cli --help
 ```
 
@@ -59,9 +59,9 @@ $ mw login token
 Enter your mStudio API token: ********
 ```
 
-For non-interactive usage (for example in CI/CD pipelines), you can also pass the token via the `MW_API_TOKEN` environment variable:
+For non-interactive usage (for example in CI/CD pipelines), you can also pass the token via the `MITTWALD_API_TOKEN` environment variable:
 
 ```
-$ export MW_API_TOKEN=********
+$ export MITTWALD_API_TOKEN=********
 $ mw login status
 ```
