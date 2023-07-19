@@ -82,13 +82,13 @@ const config = {
           },
           {
             id: "v2",
-            spec: "https://api.mittwald.de/openapi",
+            spec: "https://api.mittwald.de/openapi?withRedirects=false",
             route: "/reference/v2",
           },
         ],
         theme: {
           primaryColor: "#27367b",
-          primaryColorDark: "#abb9ff"
+          primaryColorDark: "#abb9ff",
         },
       },
     ],
@@ -154,7 +154,7 @@ const config = {
               {
                 label: "Reference",
                 to: "/reference/v2",
-              }
+              },
             ],
           },
           {
