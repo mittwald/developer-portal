@@ -4,6 +4,12 @@ sidebar_label: CLI
 description: An introduction on how to use the mittwald command-line interface (CLI)
 ---
 
+:::danger
+
+Please note that the CLI is currently in an experimental state, and may change without prior notice. We're happy to receive feedback and feature requests via [GitHub issues](https://github.com/mittwald/cli/issues).
+
+:::
+
 ## Installing
 
 ### Any OS, using NPM
