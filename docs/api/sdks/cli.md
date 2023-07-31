@@ -21,17 +21,23 @@ $ npm install -g @mittwald/cli
 $ mw --help
 ```
 
-### macOS, using the installer package
-
-Retrieve the latest release package (`*.pkg` file) from our [releases page](https://github.com/mittwald/cli/releases), and run the installer. Pay attention to the processor architecture, and load the `mw-*-arm64.pkg` file when you're using an ARM Mac, and the `mw-*-amd64.pkg` file when using an Intel Mac.
-
 ### macOS, using Homebrew
 
 ```
 $ brew tap mittwald/cli
-$ brew install mittwald-cli
+$ brew install mw
 $ mw --help
 ```
+
+### macOS, using the installer package
+
+Retrieve the latest release package (`*.pkg` file) from our [releases page](https://github.com/mittwald/cli/releases), and run the installer. Pay attention to the processor architecture, and load the `mw-*-arm64.pkg` file when you're using an ARM Mac, and the `mw-*-amd64.pkg` file when using an Intel Mac.
+
+:::info
+
+Currently, our alpha release packages are not signed with a developer certificate. You may need to allow the installer to run in your system preferences.
+
+:::
 
 ### Windows, using the installer package
 
