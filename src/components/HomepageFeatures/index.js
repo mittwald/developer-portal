@@ -134,7 +134,12 @@ const FeatureList = [
         </p>
         <ul>
           <li>
-            <Link to="/docs/v2/api/sdks/cli">mittwald CLI</Link> <NewBadge />
+            <Link to="/docs/v2/api/sdks/cli">mittwald CLI</Link>
+          </li>
+          <li>
+            <Link to="/docs/v2/api/sdks/php">
+              mittwald PHP SDK
+            </Link> <NewBadge />
           </li>
           <li>
             <Link to="/docs/v2/api/sdks/javascript">
@@ -149,7 +154,6 @@ const FeatureList = [
           </strong>
         </p>
         <ul>
-          <li>mittwald PHP SDK</li>
           <li>mittwald Go SDK</li>
         </ul>
         <p>
