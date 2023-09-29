@@ -1,0 +1,94 @@
+---
+title: Extensions
+description: |
+  Extensions are the perfect way to extend the mStudio with functionality that is not available out of the box.
+  This section will guide you through the process of understanding and creating your own extension.
+---
+
+# Extensions
+
+Extensions are the perfect way to extend the mStudio with functionality that is not available out of the box. This section will guide you through the process of understanding and creating your own extension.
+
+## Some definitions first
+
+### Contributor
+
+We regard you, an organization in context of an mStudio, willing to deliver content for the mStudio and users of that, as a `Contributor`. Not every Organization is able to contribute to the mStudio, as Organizations have to be "promoted" to a Contributor.
+
+### Contribution
+
+A `Contribution` is a piece of content, that is provided by a Contributor to the mStudio. Currently, this can be an Extension, but in the future, more possibilities may be evaluated.
+
+### Extension
+
+An `Extension` is a concrete Contribution to the mStudio. It may be composed of multiple components, playing together to provide a specific benefit for the mStudio User. Currently we are talking about External Applications and Frontend Fragments as components, an Extension may consist of.
+
+### Extension Context
+
+As Extension may be added to different kinds of Entities, we generally call the Entity an `Extension Context`. Currently available Extension Contexts are Organization and Project. More may be added in the future. For every Extension, you as a Contributor have to decide, which Extension Contexts it is available for.
+
+### Extension Instance
+
+When adding an Extension to an Extension Context, an `Extension Instance` is created. An Extension Instance is a concrete instance of an Extension in a specific Extension Context. For example, if you add an Extension to a Project, an Extension Instance is created for that Project. If you add the same Extension to another Project, another Extension Instance is created for that Project. This is important, because every Extension Instance has its own ID, Configuration, consented Scopes and so on.
+
+### Scope
+
+A `Scope`is a set of permissions, an Extension can request. When adding an Extension to an Extension Context, the mStudio User has to consent to all of them.
+
+### Domain Action
+
+`Domain Action` is a universal term for an arbitrary request that can be performed against our Public API like creating a new Project or inviting a User to an Organization.
+
+### Fragment
+
+A piece of content, code or any other kind of data that has to be reviewed by us and has to be included, executed or rendered by the mStudio is called a `Fragment`. A `Frontend Fragment`, a piece of frontend code, that is rendered inside the mStudio, is a Fragment for example.
+
+## Components of an Extension
+
+As mentioned before, for now an Extension should address the development of external applications with own backend and frontend and frontend fragments, integrated into the mStudio. These do not exclude each other. An Extension may consist of multiple of these components.
+
+### External Application
+
+An external application is a regular application which can be hosted anywhere. It may offer an endpoint to be called for specific Lifecycle Webhooks of ExtensionInstances. External applications may or may not use own user management and authentication as well as an own frontend, so in theory the external application is completely usable without being registered on our platform. This is especially useful for whitelabel solutions. To perform authenticated Domain Actions out of the context of an mStudio User, the external application has to configure Webhook Endpoints to receive an Extension Secret and the Extension Instance ID. These parameters can be used to retrieve an Extension Access Token and to perform Domain Actions in behalf of the Extension Instance.
+
+![External Application](./resources/external-application.png)
+
+### Frontend Fragment
+
+A frontend Fragment is a piece of frontend, that (almost) seemlessly integrates into the mStudio. The target should be to convey the feeling of a native mStudio feature.
+
+To perform authenticated Domain Actions, the frontend fragment uses the existing User Access Token and a given ExtensionInstanceID to call Domain Actions against the Extension Proxy. The Extension Proxy resolves these parameters to a Extension Access Token and proxies the Domain Action on behalf of the Extension Instance.
+
+Frontend fragments will be defined more thoroughly in the future.
+
+## Performing authenticated Domain Actions ...
+
+### ... as registered mStudio User in context of an External Application
+
+To authenticate an mStudio User in context of an external application, there are two ways, we agree to use.
+
+Firstly, the external application may use the mStudio OAuth2 Authentication Flow. Further details on this will be provided in the future, as this is not designed completely, yet.
+
+Secondly, you as a contributor may provide a URL (Template) for the Extension, the user can access through a button inside mStudio to redirect to the External Application. During the redirect we provide an Access Token Retrieval Key as a query parameter. The External Application can use this to retrieve an actual Access Token to authenticate against the gRPC Gateway.
+
+![Access Token Retrieval Key](./resources/access-token-retrieval-key.png)
+
+Asking the user for mStudio Credentials directly is not a way we aggree to use, because we are not willing to teach the user to give his credentials to a third party application.
+
+After successfully authenticating the user, the user can perform Domain Actions against the gRPC Gateway. Note that currently this is only possible through an external backend because of CORS restrictions. In future, possibilities of automatically accept Cross Origins of Extensions External Applications will be evaluated.
+
+### ... as registered mStudio User in behalf of an Extension Instance
+
+To perform Domain Actions as a registered mStudio User but in behalf of and only with permissions of an extension instance, the user needs a valid User Access Token (for external applications see above) and the specific ExtensionInstanceID. Given these paramters, the user can perform Domain Actions against the Extension Proxy. When doing this, we assure, not only the Extension Instance but also the user itself is allowed to perform the Domain Action and the user has access to the ExtensionInstance. Given, you are using this attempt, you no longer have to decide, whether a specific user is allowed to perform a specific Domain Action on a specific Extension Context.
+
+This flow is interesting for external applications that either technically are not really an Extension (because nothing has to be added to any Extension Context) or are a hybrid of an Extension and the previous approach. (e.g. to implement an admin panel for registered mStudio users and a user panel for not registered endcustomers). Further it is relevant for Frontend Fragments (see below).
+
+![Access Token Retrieval Key in Context of Extension](./resources/access-token-retrieval-key-extension.png)
+
+![Frontend Fragments](./resources/frontend-fragment.png)
+
+### ... as not registered user in context of an External Application in behalf of an Extension Instance
+
+Performing a Domain Action in context of an external application as a not registered user is the key use case for Extensions with external applications, trying to provide features that are not directly coupled to manual interaction of specific mStudio User. The external application has to provide an endpoint for incoming Lifecycle Webhook calls to obtain ExtensionInstallationID and Extension Secret pairs (see above) that can be used to gain an Extension Access Token. This Extension Access Token can be used to perform Domain Actions against the gRPC Gateway.
+
+![Extension Secret Authentication](./resources/extension-secret-authentication.png)
