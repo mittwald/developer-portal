@@ -51,7 +51,7 @@ As mentioned before, for now an Extension should address the development of exte
 
 An external application is a regular application which can be hosted anywhere. It may offer an endpoint to be called for specific Lifecycle Webhooks of ExtensionInstances. External applications may or may not use own user management and authentication as well as an own frontend, so in theory the external application is completely usable without being registered on our platform. This is especially useful for whitelabel solutions. To perform authenticated Domain Actions out of the context of an mStudio User, the external application has to configure Webhook Endpoints to receive an Extension Secret and the Extension Instance ID. These parameters can be used to retrieve an Extension Access Token and to perform Domain Actions in behalf of the Extension Instance.
 
-![External Application](./resources/external-application.png)
+![External Application](../../resources/contributing/extensions/external-application.png)
 
 ### Frontend Fragment
 
@@ -69,26 +69,26 @@ To authenticate an mStudio User in context of an external application, there are
 
 Firstly, the external application may use the mStudio OAuth2 Authentication Flow. Further details on this will be provided in the future, as this is not designed completely, yet.
 
-Secondly, you as a contributor may provide a URL (Template) for the Extension, the user can access through a button inside mStudio to redirect to the External Application. During the redirect we provide an Access Token Retrieval Key as a query parameter. The External Application can use this to retrieve an actual Access Token to authenticate against the gRPC Gateway.
+Secondly, you as a contributor may provide a URL (Template) for the Extension, the user can access through a button inside mStudio to redirect to the External Application. During the redirect we provide an Access Token Retrieval Key as a query parameter. The External Application can use this to retrieve an actual Access Token to authenticate against the public API.
 
-![Access Token Retrieval Key](./resources/access-token-retrieval-key.png)
+![Access Token Retrieval Key](../../resources/contributing/extensions/access-token-retrieval-key.png)
 
 Asking the user for mStudio Credentials directly is not a way we aggree to use, because we are not willing to teach the user to give his credentials to a third party application.
 
-After successfully authenticating the user, the user can perform Domain Actions against the gRPC Gateway. Note that currently this is only possible through an external backend because of CORS restrictions. In future, possibilities of automatically accept Cross Origins of Extensions External Applications will be evaluated.
+After successfully authenticating the user, the user can perform Domain Actions against the public API. Note that currently this is only possible through an external backend because of CORS restrictions. In future, possibilities of automatically accept Cross Origins of Extensions External Applications will be evaluated.
+
+### ... as not registered user in context of an External Application
+
+Performing a Domain Action in context of an external application as a not registered user is the key use case for Extensions with external applications, establishing a separate user management or trying to provide features that are not directly coupled to manual interaction of a specific mStudio User. The external application has to provide an endpoint for incoming Lifecycle Webhook calls to obtain ExtensionInstanceID and Extension Secret pairs (see above) that can be used to gain an Extension Access Token. This Extension Access Token can be used to perform Domain Actions against the public API.
+
+![Extension Secret Authentication](../../resources/contributing/extensions/extension-secret-authentication.png)
 
 ### ... as registered mStudio User in behalf of an Extension Instance
 
 To perform Domain Actions as a registered mStudio User but in behalf of and only with permissions of an extension instance, the user needs a valid User Access Token (for external applications see above) and the specific ExtensionInstanceID. Given these paramters, the user can perform Domain Actions against the Extension Proxy. When doing this, we assure, not only the Extension Instance but also the user itself is allowed to perform the Domain Action and the user has access to the ExtensionInstance. Given, you are using this attempt, you no longer have to decide, whether a specific user is allowed to perform a specific Domain Action on a specific Extension Context.
 
-This flow is interesting for external applications that either technically are not really an Extension (because nothing has to be added to any Extension Context) or are a hybrid of an Extension and the previous approach. (e.g. to implement an admin panel for registered mStudio users and a user panel for not registered endcustomers). Further it is relevant for Frontend Fragments (see below).
+This flow is interesting applications that are a hybrid of the previously mentioned approaches (e.g. to implement an admin panel for registered mStudio users and a user panel for not registered endcustomers). Further it is relevant for Frontend Fragments (see below).
 
-![Access Token Retrieval Key in Context of Extension](./resources/access-token-retrieval-key-extension.png)
+![Access Token Retrieval Key in Context of Extension](../../resources/contributing/extensions/access-token-retrieval-key-extension.png)
 
-![Frontend Fragments](./resources/frontend-fragment.png)
-
-### ... as not registered user in context of an External Application in behalf of an Extension Instance
-
-Performing a Domain Action in context of an external application as a not registered user is the key use case for Extensions with external applications, trying to provide features that are not directly coupled to manual interaction of specific mStudio User. The external application has to provide an endpoint for incoming Lifecycle Webhook calls to obtain ExtensionInstallationID and Extension Secret pairs (see above) that can be used to gain an Extension Access Token. This Extension Access Token can be used to perform Domain Actions against the gRPC Gateway.
-
-![Extension Secret Authentication](./resources/extension-secret-authentication.png)
+![Frontend Fragments](../../resources/contributing/extensions/frontend-fragment.png)
