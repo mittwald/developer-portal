@@ -4,8 +4,8 @@ namespace Deployer;
 
 require 'recipe/common.php';
 require 'contrib/rsync.php';
-require getenv("HOME") . "/.composer/vendor/autoload.php";
-require getenv("HOME") . "/.composer/vendor/mittwald/deployer-recipes/recipes/deploy.php";
+require '/root/.composer/vendor/autoload.php';
+require '/root/.composer/vendor/mittwald/deployer-recipes/recipes/deploy.php';
 
 // Config
 
