@@ -12,7 +12,9 @@ if [ ! -f ./deploy.php ] ; then
   cp /deploy.php .
 fi
 
+echo "::group::Deploying application ${MITTWALD_APP_ID}"
 dep deploy \
   -o mittwald_app_id="${MITTWALD_APP_ID}" \
   -o rsync_src="${LOCAL_DIR}" \
   -o domain="${MITTWALD_DOMAIN}"
+echo "::endgroup::"
