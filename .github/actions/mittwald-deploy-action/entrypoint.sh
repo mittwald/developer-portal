@@ -6,6 +6,11 @@ export MITTWALD_DOMAIN="$3"
 
 set -e
 
+if [ -z "${MITTWALD_APP_ID}" ] ; then
+  echo "MITTWALD_APP_ID must be set"
+  exit 1
+fi
+
 cd /github/workspace
 
 if [ ! -f ./deploy.php ] ; then
