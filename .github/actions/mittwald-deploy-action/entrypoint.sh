@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -ex
+set -e
 
 export MITTWALD_APP_ID="$1"
 export LOCAL_DIR="$2"
