@@ -6,12 +6,12 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 
 /** @type {import("@docusaurus/types").Config} */
 const config = {
-  title: "mittwald Developer Portal",
+  title: "mittwald Contributor Portal",
   //tagline: 'Dinosaurs are cool',
   favicon: "img/favicon.ico",
 
   // Set the production url of your site here
-  url: "https://developer.mittwald.de",
+  url: "https://contributor.mittwald.de",
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: "/",
@@ -19,7 +19,7 @@ const config = {
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: "mittwald", // Usually your GitHub org/user name.
-  projectName: "developer-portal", // Usually your repo name.
+  projectName: "contributor-portal", // Usually your repo name.
 
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "throw",
@@ -50,7 +50,7 @@ const config = {
           sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl: "https://github.com/mittwald/developer-portal/tree/master/",
+          editUrl: "https://github.com/mittwald/contributor-portal/tree/master/",
           lastVersion: "current",
           versions: {
             current: {
@@ -99,7 +99,7 @@ const config = {
     ({
       navbar: {
         // style: 'primary',
-        title: "Developer Portal",
+        title: "Contributor Portal",
         logo: {
           alt: "mittwald",
           src: "img/mittwald-logo.svg",
@@ -118,13 +118,19 @@ const config = {
             label: "Technologies",
           },
           {
+            type: "doc",
+            docId: "/category/contributing",
+            position: "left",
+            label: "Contributing",
+          },
+          {
             href: "/reference/v2",
             position: "left",
             label: "Reference",
           },
           //{to: '/blog', label: 'Blog', position: 'left'},
           {
-            href: "https://github.com/mittwald/developer-portal",
+            href: "https://github.com/mittwald/contributor-portal",
             label: "GitHub",
             position: "right",
           },
@@ -162,7 +168,7 @@ const config = {
             items: [
               {
                 label: "Feedback",
-                href: "https://github.com/mittwald/developer-portal/issues",
+                href: "https://github.com/mittwald/contributor-portal/issues",
               },
               {
                 label: "Agency Hub (german)",
@@ -189,6 +195,12 @@ const config = {
           },
         ],
         copyright: `Copyright © ${new Date().getFullYear()} Mittwald CM Service GmbH & Co. KG. Built with Docusaurus.`,
+      },
+      announcementBar: {
+        content: "This site is a <b>private preview</b> for the mittwald contributor portal. The documentation provided on this site is a work in progress and <b>confidential</b>.",
+        isCloseable: false,
+        backgroundColor: "#ff9343",
+        textColor: "#fff"
       },
       prism: {
         theme: lightCodeTheme,
