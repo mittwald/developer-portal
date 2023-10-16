@@ -25,7 +25,7 @@ echo "${MITTWALD_SSH_PUBLIC_KEY}" > ./.mw-deployer/deployer.pub
 echo "${MITTWALD_SSH_PRIVATE_KEY}" > ./.mw-deployer/deployer
 
 echo "::group::Deploying application ${MITTWALD_APP_ID}"
-dep deploy \
+dep --ansi deploy \
   -o mittwald_app_id="${MITTWALD_APP_ID}" \
   -o mittwald_ssh_public_key_file=./.mw-deployer/deployer.pub \
   -o mittwald_ssh_private_key_file=./.mw-deployer/deployer \
