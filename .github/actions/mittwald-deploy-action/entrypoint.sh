@@ -1,12 +1,12 @@
 #!/bin/sh
 
+set -ex
+
 export MITTWALD_APP_ID="$1"
 export LOCAL_DIR="$2"
 export MITTWALD_DOMAIN="$3"
 export MITTWALD_SSH_PUBLIC_KEY="$4"
 export MITTWALD_SSH_PRIVATE_KEY="$5"
-
-set -e
 
 if [ -z "${MITTWALD_APP_ID}" ] ; then
   echo "MITTWALD_APP_ID must be set"
