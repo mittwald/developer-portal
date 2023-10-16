@@ -27,4 +27,14 @@ mittwald_app()
 
 // Hooks
 
+task('deploy:prepare', [
+    'deploy:info',
+    'deploy:setup',
+    'deploy:lock',
+    'deploy:release',
+    'rsync',
+    'deploy:shared',
+    'deploy:writable',
+]);
+
 after('deploy:failed', 'deploy:unlock');
