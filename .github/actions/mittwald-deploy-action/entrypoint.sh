@@ -19,11 +19,16 @@ if [ ! -f ./deploy.php ] ; then
   cp /deploy.php .
 fi
 
+mkdir -p .mw-deployer/
+
+echo "${MITTWALD_SSH_PUBLIC_KEY}" > ./.mw-deployer/deployer.pub
+echo "${MITTWALD_SSH_PRIVATE_KEY}" > ./.mw-deployer/deployer
+
 echo "::group::Deploying application ${MITTWALD_APP_ID}"
 dep deploy \
   -o mittwald_app_id="${MITTWALD_APP_ID}" \
-  -o mittwald_ssh_public_key="${MITTWALD_SSH_PUBLIC_KEY}" \
-  -o mittwald_ssh_private_key="${MITTWALD_SSH_PRIVATE_KEY}" \
+  -o mittwald_ssh_public_key_file=./.mw-deployer/deployer.pub \
+  -o mittwald_ssh_private_key_file=./.mw-deployer/deployer \
   -o rsync_src="${LOCAL_DIR}" \
   -o domain="${MITTWALD_DOMAIN}"
 echo "::endgroup::"
