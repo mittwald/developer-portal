@@ -8,7 +8,7 @@ COPY entrypoint.sh /entrypoint.sh
 COPY deploy.php /deploy.php
 
 RUN composer global config minimum-stability dev && \
-    composer global require deployer/deployer=^7.3.1 mittwald/deployer-recipes=dev-debug-ssh && \
+    composer global require deployer/deployer=^7.3.1 mittwald/deployer-recipes=dev-master && \
     ln -s /root/.composer/vendor/bin/dep /usr/local/bin/dep
 
 ENTRYPOINT ["/entrypoint.sh"]
