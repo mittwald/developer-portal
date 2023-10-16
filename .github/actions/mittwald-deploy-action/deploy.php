@@ -4,8 +4,14 @@ namespace Deployer;
 
 require 'recipe/common.php';
 require 'contrib/rsync.php';
-require '/root/.composer/vendor/autoload.php';
-require '/root/.composer/vendor/mittwald/deployer-recipes/recipes/deploy.php';
+
+if (getenv("CI") !== false) {
+    require '/root/.composer/vendor/autoload.php';
+    require '/root/.composer/vendor/mittwald/deployer-recipes/recipes/deploy.php';
+} else {
+    require getenv('HOME') . '/.composer/vendor/autoload.php';
+    require getenv('HOME') . '/.composer/vendor/mittwald/deployer-recipes/recipes/deploy.php';
+}
 
 // Config
 
