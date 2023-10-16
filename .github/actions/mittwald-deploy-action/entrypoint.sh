@@ -24,6 +24,8 @@ mkdir -p .mw-deployer/
 echo "${MITTWALD_SSH_PUBLIC_KEY}" > ./.mw-deployer/deployer.pub
 echo "${MITTWALD_SSH_PRIVATE_KEY}" > ./.mw-deployer/deployer
 
+chmod 0600 ./.mw-deployer/deployer
+
 echo "::group::Deploying application ${MITTWALD_APP_ID}"
 dep --ansi "${INPUT_VERBOSITY}" deploy \
   -o mittwald_app_id="${MITTWALD_APP_ID}" \
