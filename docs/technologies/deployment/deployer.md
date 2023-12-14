@@ -93,11 +93,42 @@ host('ssh.fiestel.project.host') // you can determine your SSH host via the "mw 
 
 The rest of your Deployer configuration depends on your project, and for this reason, will not be covered by this guide. For example, if you are deploying a TYPO3 project, you might want to use the [TYPO3 Deployer recipe](https://deployer.org/docs/7.x/recipe/typo3).
 
-## Additional recipe features
+## Advanced recipe how-tos
 
-The [mittwald deployer recipe][mw-deployer] provides some additional features that might be useful for your deployment:
+The [mittwald deployer recipe][mw-deployer] provides some additional features that might be useful for your deployment.
 
-- The recipe will respect the `domain` setting of your application, and will automatically look for a matching virtual host configured for your project. If a matching virtual host is found, the recipe will automatically link the virtual host with your application and its document root. You can also override the domain name(s) by setting the `mittwald_domains` variable:
+### Deploying to multiple environments
+
+Often, you will want to deploy your application to multiple environments, e.g. a staging and a production environment. To do so, you can create multiple apps on the mittwald platform:
+
+```
+$ mw app create php \
+    --document-root /current/public \
+    --site-title "My project (PROD)"
+$ mw app create php \
+    --document-root /current/public \
+    --site-title "My project (STAGING)"
+```
+
+You can then define multiple hosts in your `deploy.php` file, and set the `mittwald_app_id` variable for each host:
+
+```php
+mittwald_app('<prod-app-id>', hostname: 'mittwald-prod')
+    ->set('branch', 'main');
+
+mittwald_app('<staging-app-id>', hostname: 'mittwald-staging')
+    ->set('branch', 'develop');
+```
+
+:::warning
+
+Make sure to specify the `hostname` parameter when using the `mittwald_app` shortcut function, since otherwise the host definitions would overwrite each other.
+
+:::
+
+### Configuring domains
+
+The recipe will respect the `domain` setting of your application, and will automatically look for a matching virtual host configured for your project. If a matching virtual host is found, the recipe will automatically link the virtual host with your application and its document root. You can also override the domain name(s) by setting the `mittwald_domains` variable:
 
     ```php
     // default:
@@ -105,7 +136,9 @@ The [mittwald deployer recipe][mw-deployer] provides some additional features th
     set('mittwald_domains', ['mittwald.example', 'www.mittwald.example']);
     ```
 
-- You can also set the `mittwald_app_dependencies` value. This value may contain an associative list of system software names and versions that your application depends on. The recipe will automatically install the required software packages on the application's host. For example:
+### Configuring PHP version and other dependencies
+
+You can also set the `mittwald_app_dependencies` value. This value may contain an associative list of system software names and versions that your application depends on. The recipe will automatically install the required software packages in the application's runtime environment. For example:
 
     ```php
     set('mittwald_app_dependencies', [
@@ -117,6 +150,75 @@ The [mittwald deployer recipe][mw-deployer] provides some additional features th
 :::tip
 Use the `mw app dependency list` command to get an overview of available dependencies.
 :::
+
+## CI integration
+
+### Github Actions
+
+To use this recipe in a Github actions workflow, you should first configure the following secrets in your repository settings:
+
+- `MITTWALD_API_TOKEN` should contain your mittwald API token
+- `MITTWALD_APP_ID` should contain the ID of the mittwald application you want to deploy to.
+- `MITTWALD_SSH_PRIVATE_KEY` should contain the private key of the SSH key pair that should be used for deployment.
+- `MITTWALD_SSH_PUBLIC_KEY` should contain the public key of the SSH key pair that should be used for deployment.
+
+Then, you can use the following workflow to deploy your application:
+
+```yaml
+steps:
+  - uses: actions/checkout@v4
+
+  - name: Setup PHP
+    uses: shivammathur/setup-php@v2
+    with:
+      php-version: 8.2
+
+  - name: Install dependencies
+    run: composer install --prefer-dist --no-progress --no-suggest
+    
+  - name: Deploy SSH keys
+    env:
+      MITTWALD_SSH_PRIVATE_KEY: ${{ secrets.MITTWALD_SSH_PRIVATE_KEY }}
+      MITTWALD_SSH_PUBLIC_KEY: ${{ secrets.MITTWALD_SSH_PUBLIC_KEY }}
+    run: |
+      mkdir -p .mw-deploy
+      echo "${MITTWALD_SSH_PRIVATE_KEY}" > .mw-deploy/id_rsa
+      echo "${MITTWALD_SSH_PUBLIC_KEY}" > .mw-deploy/id_rsa.pub
+      chmod 600 .mw-deploy/id_rsa*
+
+  - name: Run deployer
+    run: |
+      ./vendor/bin/dep deploy \
+        -o mittwald_app_id={{ secrets.MITTWALD_APP_ID }} \
+        -o mittwald_ssh_public_key_file=.mw-deploy/id_rsa.pub \
+        -o mittwald_ssh_private_key_file=.mw-deploy/id_rsa
+    env:
+      MITTWALD_API_TOKEN: ${{ secrets.MITTWALD_API_TOKEN }}
+```
+
+### Gitlab CI
+
+This Gitlab CI workflow uses the same repository variables as the Github actions example above:
+
+```yaml
+deploy:
+  image: php:8.2-cli
+  stage: deploy
+  before_script:
+    - wget https://raw.githubusercontent.com/composer/getcomposer.org/76a7060ccb93902cd7576b67264ad91c8a2700e2/web/installer -O - -q | php -- --quiet
+    - apt-get update && apt-get install -y git openssh-client
+    - mkdir -p .mw-deploy
+    - echo "$MITTWALD_SSH_PRIVATE_KEY" > .mw-deploy/id_rsa
+    - echo "$MITTWALD_SSH_PUBLIC_KEY" > .mw-deploy/id_rsa.pub
+    - chmod 600 .mw-deploy/id_rsa*
+  script:
+    - ./vendor/bin/dep deploy \
+        -o mittwald_app_id=$MITTWALD_APP_ID \
+        -o mittwald_ssh_public_key_file=.mw-deploy/id_rsa.pub \
+        -o mittwald_ssh_private_key_file=.mw-deploy/id_rsa
+  environment:
+    name: production
+```
 
 ## Common issues
 
