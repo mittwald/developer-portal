@@ -35,9 +35,9 @@ Make sure to take note of the application's ID, as you will need it later. In th
 
 #### Fully managed: Using the mittwald deployer recipe
 
-:::caution
+:::warning
 
-The [mittwald deployer recipe][mw-deployer] is currently in an experimental state. We welcome any feedback and suggestions for improvement. Please use the [issue tracker][mw-deployer-issues] to report any issues you encounter. 💙
+The [mittwald deployer recipe][mw-deployer] is currently in a beta state. We welcome any feedback and suggestions for improvement. Please use the [issue tracker][mw-deployer-issues] to report any issues you encounter. 💙
 
 :::
 
