@@ -24,6 +24,11 @@ const config = {
 
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "throw",
+
+  // Broken anchors need to be ignored because of Redocusaurus
+  // Reset to "throw" once https://github.com/rohit-gohri/redocusaurus/issues/321 is fixed
+  onBrokenAnchors: "ignore",
+
   trailingSlash: true,
 
   // Even if you don't use internalization, you can use this field to set useful
