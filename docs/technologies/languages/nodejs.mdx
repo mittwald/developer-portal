@@ -1,32 +1,53 @@
 ---
-title: Node.js
+title: Managing and deploying Node.js applications
+sidebar_label: Node.js
 description: Learn how to deploy and manage Node.js applications.
 tags:
   - Node.js
 ---
 
 import PlanCompatibility from "@site/src/components/PlanCompatibility";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
 
 <PlanCompatibility plans={["ps", "ss"]} />
 
 ## Starting a Node.js application
 
-### Via the mStudio UI
+<Tabs groupId="access-mode">
+  <TabItem value="gui" label="mStudio UI">
+    To start a Node.js application from the mStudio, follow these steps:
 
-To start a Node.js application from the mStudio, follow these steps:
+    1. Navigate to the project that you want to create the application in.
+    2. Select the "Apps" menu item in the sidebar.
+    3. Click the "Create App" button and select "Custom Node.js app".
+    4. In the installation wizard, select the entrypoint command that should be used to start your application and complete the wizard.
 
-1. Navigate to the project that you want to create the application in.
-2. Select the "Apps" menu item in the sidebar.
-3. Click the "Create App" button and select "Custom Node.js app".
-4. In the installation wizard, select the entrypoint command that should be used to start your application and complete the wizard.
+    After the installation has completed, observe the installation directory in the UI.
 
-### Via the API
+  </TabItem>
+  <TabItem value="cli" label="CLI">
+    To start a Node.js application from the CLI, run the following command:
 
-To learn how to deploy a Node.js application via the API, read the article ["Starting a Node.js application"](../../../api/howtos/create-nodejs).
+    ```bash
+    $ mw app create node --wait --entrypoint "npm start"
+    ```
 
-### Deploying your app
+    The `--wait` flag will cause the CLI to wait until the installation has completed. The `--entrypoint` flag will cause the CLI to configure the specified entrypoint command as the command that should be used to start your application. If omitted, the default entrypoint command `yarn start` will be used.
+
+    After the installation has completed, use the `mw app get` command to observe the installation directory.
+
+  </TabItem>
+  <TabItem value="api" label="API">
+    To learn how to deploy a Node.js application via the API, read the article ["Starting a Node.js application"](../../../api/howtos/create-nodejs).
+  </TabItem>
+</Tabs>
+
+## Deploying your app
 
 After you have created your Node.js app, you can deploy your code by moving it into the designated application directory. You may use any method that you prefer to deploy your code, such as a local Git clone, rsync or SFTP.
+
+Have a look at our collection of [deployment guides](/docs/v2/category/deployment-guides) for more information on how to deploy your code.
 
 :::info
 

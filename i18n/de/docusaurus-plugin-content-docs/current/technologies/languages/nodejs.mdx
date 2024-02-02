@@ -1,32 +1,53 @@
 ---
-title: Node.js
+title: Node.js-Anwendungen verwalten und deployen
+sidebar_label: Node.js
 description: Erfahre, wie man Node.js-Anwendungen bereitstellt und verwaltet.
 tags:
   - Node.js
 ---
 
 import PlanCompatibility from "@site/src/components/PlanCompatibility";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
 
 <PlanCompatibility plans={["ps", "ss"]} />
 
 ## Eine Node.js-Anwendung starten
 
-### Über die mStudio-Oberfläche
+<Tabs groupId="access-mode">
+  <TabItem value="gui" label="mStudio UI">
+    Um eine Node.js-Anwendung über die mStudio-Oberfläche zu starten, folge diesen Schritten:
 
-Um eine Node.js-Anwendung über die mStudio-Oberfläche zu starten, folge diesen Schritten:
+    1. Navigiere zum Projekt, in dem du die Anwendung erstellen möchtest.
+    2. Wähle im Seitenmenü den Punkt "Apps" aus.
+    3. Klicke auf den Button "App erstellen" und wähle "Benutzerdefinierte Node.js-App" aus.
+    4. Wähle im Installations-Assistenten den Eintrittspunkt-Befehl aus, der verwendet werden soll, um deine Anwendung zu starten, und schließe den Assistenten ab.
 
-1. Navigiere zum Projekt, in dem du die Anwendung erstellen möchtest.
-2. Wähle im Seitenmenü den Punkt "Apps" aus.
-3. Klicke auf den Button "App erstellen" und wähle "Benutzerdefinierte Node.js-App" aus.
-4. Wähle im Installations-Assistenten den Eintrittspunkt-Befehl aus, der verwendet werden soll, um deine Anwendung zu starten, und schließe den Assistenten ab.
+    Nach Abschluss der Installation, achte auf das Installationsverzeichnis, das in der UI angezeigt wird.
 
-### Über die API
+  </TabItem>
+  <TabItem value="cli" label="CLI">
+    Um eine Node.js-Anwendung über die CLI zu starten, führe den folgenden Befehl aus:
 
-Um zu erfahren, wie man eine Node.js-Anwendung über die API bereitstellt, lies den Artikel ["Eine Node.js-Anwendung starten"](../../../api/howtos/create-nodejs).
+    ```bash
+    $ mw app create node --wait --entrypoint "npm start"
+    ```
+
+    Das `--wait`-Flag sorgt dafür, dass die CLI wartet, bis die Installation abgeschlossen ist. Das `--entrypoint`-Flag enthält den Befehl, der verwendet werden soll, um deine Anwendung tatsächlich zu starten. Falls er weggelassen wird, wird der Standardwert `yarn start` verwendet.
+
+    Nachdem die Installation abgeschlossen wurde, verwende das `mw app get`-Kommando, um das Installationsverzeichnis zu ermitteln.
+
+  </TabItem>
+  <TabItem value="api" label="API">
+    Um zu erfahren, wie man eine Node.js-Anwendung über die API bereitstellt, lies den Artikel ["Eine Node.js-Anwendung starten"](../../../api/howtos/create-nodejs).
+  </TabItem>
+</Tabs>
 
 ### Deine Anwendung bereitstellen
 
 Nachdem du deine Node.js-Anwendung erstellt hast, kannst du deinen Code deployen, indem du ihn in das dafür vorgesehene Installationsverzeichnis hochlädst. Um deinen Code bereitzustellen, kannst du die Methode wählen, die zu bevorzugst, wie beispielsweise ein lokal ausgeführter Git-Klon, rsync oder SFTP.
+
+Für mehr Informationen, wie du deinen Code am besten bereitstellen kannst, wirf einen Blick auf unsere Sammlung von [Deployment-Anleitungen](/docs/v2/category/deployment-guides).
 
 :::info
 
