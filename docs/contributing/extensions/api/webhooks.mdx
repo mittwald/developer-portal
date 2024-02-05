@@ -1,0 +1,101 @@
+---
+title: Webhooks
+description: |
+  tbw
+---
+
+## URL-Templates
+
+In den URLs, an die Lifecycle-Webhooks gesendet werden, können optional verschiedene Platzhalter verwendet werden. Diese Informationen finden sich auch nochmal im Body des Webhooks.
+
+Mögliche Platzhalter sind:
+
+- `apiVersion`
+- `contributorId`
+- `extensionId`
+- `extensionInstanceId`
+
+Diese können folgendermaßen verwendet werden:
+
+`https://example.com/mstudio-webhooks/:apiVersion/extensions/:extensionId?action=added&id=:extensionInstanceId`
+
+## Payload
+
+### ExtensionAddedToContext
+
+```json
+{
+  "apiVersion": "v1",
+  "kind": "ExtensionAddedToContext",
+
+  "id": "d990eb39-041b-40b4-abb9-7a39678a0464",
+  "context": {
+    "id": "ecdae35d-8da2-430e-9ca8-bff36cd1f65e",
+    "kind": "customer"
+  },
+  "consentedScopes": ["mail:read", "mail:write", "domain:read"],
+  "state": {
+    "enabled": true
+  },
+  "meta": {
+    "createdAt": "2024-02-25T13:45:23Z"
+  },
+  "secret": "ROFLieg83rjfdoi9lLIifdlfi399fndLKFHj39fjdlr"
+}
+```
+
+### ExtensionInstanceUpdated
+
+```json
+{
+  "apiVersion": "v1",
+  "kind": "ExtensionInstanceUpdated",
+
+  "id": "d990eb39-041b-40b4-abb9-7a39678a0464",
+  "context": {
+    "id": "ecdae35d-8da2-430e-9ca8-bff36cd1f65e",
+    "kind": "customer"
+  },
+  "consentedScopes": ["mail:read", "mail:write", "domain:read", "domain:write"],
+  "state": {
+    "enabled": true
+  },
+  "meta": {
+    "createdAt": "2024-02-25T13:45:23Z"
+  }
+}
+```
+
+### ExtensionInstanceSecretRotated
+
+```json
+{
+  "apiVersion": "v1",
+  "kind": "ExtensionInstanceUpdated",
+
+  "id": "d990eb39-041b-40b4-abb9-7a39678a0464",
+  "secret": "LOLieg83rjfdoi9lLIifdlfi399fndLKFHj39fjdlr"
+}
+```
+
+### ExtensionInstanceRemovedFromContext
+
+```json
+{
+  "apiVersion": "v1",
+  "kind": "ExtensionInstanceRemovedFromContext",
+
+  "id": "d990eb39-041b-40b4-abb9-7a39678a0464",
+  "context": {
+    "id": "ecdae35d-8da2-430e-9ca8-bff36cd1f65e",
+    "kind": "customer"
+  },
+  "consentedScopes": ["mail:read", "mail:write", "domain:read", "domain:write"],
+  "state": {
+    "enabled": true
+  },
+  "meta": {
+    "createdAt": "2024-02-25T13:45:23Z"
+  }
+}
+```
