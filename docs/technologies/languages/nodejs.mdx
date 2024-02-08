@@ -100,29 +100,28 @@ enableGlobalCache: false
 
 ## Environment Variables
 
-In der Regel werden Umgebungsvariablen genutzt, um Node.js-Apps zu konfigurieren. Je nach Node.js-Version empfehlen wir unterschiedliche Varianten, um diese zu definieren.
+Environment variables are generally used to configure Node.js applications. Depending on the Node.js version, we recommend different variants to define these.
 
 <Tabs groupId="environment-variables">
   <TabItem value="below-20-6" label="< Node.js 20.6">
-    Du kannst Umgebungsvariablen in folgenden Dateien definieren. Sie sind dann automatisch in deiner App verfügbar:
+    You can define environment variables in the following files. They are then automatically available in your application:
 
-    - `/files/.mwsoftware/node`
-    - `/files/.mwsoftware/node/.config/node/.env`
-    - `/etc/node/.env`
+    - `/files/.mwsoftware/node/.env`
+    - `/home/p-xxxxxx/.config/node/.env`
 
   </TabItem>
   <TabItem value="from-20-6" label=">= Node.js 20.6">
-    Ab Node.js 20.6 steht ein (experimentelles) Flag `--env-fileconfig` zur Verfügung (vgl. [Node.js-Dokumentation](https://nodejs.org/dist/latest-v20.x/docs/api/cli.html#--env-fileconfig)). Dieses kann beliebig oft angegeben werden, um .env-Dateien zu laden, deren Umgebungsvariablen dann in der App verfügbar sind.
+    As of Node.js 20.6, an (experimental) flag `--env-fileconfig` is available (see [Node.js documentation](https://nodejs.org/dist/latest-v20.x/docs/api/cli.html#--env-fileconfig)). This can be specified as often as required to load .env files whose environment variables are then available in the app.
 
-    Um das Flag zu nutzen, konfiguriere den Startbefehl deiner Node.js-App beispielsweise folgendermaßen:
+    To use the flag, configure the start command of your Node.js app as follows, for example:
 
     ```bash
     node --env-fileconfig=.env server.js
     ```
 
-    Der Pfad zur `.env`-Datei wird dabei relativ zum Working Directory angegeben.
+    The path to the `.env` file is specified relative to the working directory.
 
-    Nutzt du ein npm- oder yarn-Script zum Start deiner App, gilt folgendes Beispiel:
+    If you use an npm or yarn script to start your application, the following example applies:
 
     ```json title="package.json"
     {
