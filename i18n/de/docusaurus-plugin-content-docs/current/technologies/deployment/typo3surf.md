@@ -1,5 +1,10 @@
 ---
-title: TYPO3 Surf
+title: PHP-Anwendungen mit TYPO3 Surf deployen
+sidebar_label: TYPO3 Surf
+tags:
+  - PHP
+  - TYPO3
+  - Deployment
 description: >
   TYPO3 Surf ist ein Deployment-Tool, das speziell für TYPO3- und Neos-Projekte entwickelt wurde. Es kann jedoch auch für andere Arten von Anwendungen verwendet werden.
 ---

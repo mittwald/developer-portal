@@ -1,5 +1,9 @@
 ---
-title: Deployer
+title: PHP-Anwendungen mit Deployer deployen
+sidebar_label: Deployer
+tags:
+  - PHP
+  - Deployment
 description: >
   Deployer ist ein in PHP geschriebenes Deployment-Tool. Es kann sowohl für PHP-Anwendungen, als auch für andere Anwendungen verwendet werden.
 ---

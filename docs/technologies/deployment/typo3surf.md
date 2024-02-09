@@ -1,5 +1,10 @@
 ---
-title: TYPO3 Surf
+title: Deploying PHP applications with TYPO3 Surf
+sidebar_label: TYPO3 Surf
+tags:
+  - PHP
+  - TYPO3
+  - Deployment
 description: >
   TYPO3 Surf is a deployment tool written specifically with TYPO3 and Neos projects in mind. However, it can also be used to deploy other types of applications.
 ---
@@ -41,6 +46,5 @@ $node->setOption('username', 'ssh-XXXXXX@<app-id>');
 ```
 
 The rest of your TYPO3 Surf configuration depends on your project, and for this reason, will not be covered by this guide. Please refer to the [TYPO3 Surf documentation][surf] for more information.
-
 
 [surf]: https://docs.typo3.org/other/typo3/surf/main/en-us/Index.html
