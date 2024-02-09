@@ -163,7 +163,11 @@ You can also set the `mittwald_app_dependencies` value. This value may contain a
     ]);
     ```
 
-:::tip Use the `mw app dependency list` command to get an overview of available dependencies. :::
+:::tip
+
+Use the `mw app dependency list` command to get an overview of available dependencies.
+
+:::
 
 ## CI integration
 

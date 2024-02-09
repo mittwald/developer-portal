@@ -157,7 +157,11 @@ set('mittwald_app_dependencies', [
 ]);
 ```
 
-:::tip Verwende das `mw app dependency list`-Kommando, um einen Überblick über verfügbare Abhängigkeiten zu erhalten. :::
+:::tip
+
+Verwende das `mw app dependency list`-Kommando, um einen Überblick über verfügbare Abhängigkeiten zu erhalten.
+
+:::
 
 ## CI-Integration
 
