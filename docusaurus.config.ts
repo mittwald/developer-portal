@@ -3,6 +3,7 @@
 
 import { Config } from "@docusaurus/types";
 import { themes } from "prism-react-renderer";
+import { Options, ThemeConfig } from "@docusaurus/preset-classic";
 
 const lightCodeTheme = themes.github;
 const darkCodeTheme = themes.dracula;
@@ -51,7 +52,6 @@ const config: Config = {
   presets: [
     [
       "classic",
-      /** @type {import("@docusaurus/preset-classic").Options} */
       {
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
@@ -76,7 +76,7 @@ const config: Config = {
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
         },
-      },
+      } satisfies Options,
     ],
     [
       "redocusaurus",
@@ -101,108 +101,106 @@ const config: Config = {
     ],
   ],
 
-  themeConfig:
-    /** @type {import("@docusaurus/preset-classic").ThemeConfig} */
-    {
-      navbar: {
-        // style: 'primary',
-        title: "Developer Portal",
-        logo: {
-          alt: "mittwald",
-          src: "img/mittwald-logo.svg",
+  themeConfig: {
+    navbar: {
+      // style: 'primary',
+      title: "Developer Portal",
+      logo: {
+        alt: "mittwald",
+        src: "img/mittwald-logo.svg",
+      },
+      items: [
+        {
+          type: "doc",
+          docId: "api/intro",
+          position: "left",
+          label: "API Docs",
         },
-        items: [
-          {
-            type: "doc",
-            docId: "api/intro",
-            position: "left",
-            label: "API Docs",
-          },
-          {
-            type: "doc",
-            docId: "/category/technologies",
-            position: "left",
-            label: "Technologies",
-          },
-          {
-            href: "/reference/v2",
-            position: "left",
-            label: "Reference",
-          },
-          //{to: '/blog', label: 'Blog', position: 'left'},
-          {
-            href: "https://github.com/mittwald/developer-portal",
-            label: "GitHub",
-            position: "right",
-          },
-          {
-            type: "localeDropdown",
-            position: "right",
-          },
-        ],
-      },
-      footer: {
-        links: [
-          {
-            title: "Docs",
-            items: [
-              {
-                label: "API usage",
-                to: "/docs/v2/api/intro",
-              },
-              {
-                label: "Technologies",
-                to: "/docs/v2/category/technologies",
-              },
-              {
-                label: "SDKs and Libraries",
-                to: "/docs/v2/category/sdks-and-libraries",
-              },
-              {
-                label: "Reference",
-                to: "/reference/v2",
-              },
-            ],
-          },
-          {
-            title: "Community",
-            items: [
-              {
-                label: "Feedback",
-                href: "https://github.com/mittwald/developer-portal/issues",
-              },
-              {
-                label: "Agency Hub (german)",
-                href: "https://agenturen.mittwald.de",
-              },
-            ],
-          },
-          {
-            title: "More",
-            items: [
-              {
-                label: "Terms of Service",
-                href: "https://www.mittwald.de/agb",
-              },
-              {
-                label: "Privacy Policy",
-                href: "https://www.mittwald.de/datenschutz",
-              },
-              {
-                label: "Legal",
-                href: "https://www.mittwald.de/impressum",
-              },
-            ],
-          },
-        ],
-        copyright: `Copyright © ${new Date().getFullYear()} Mittwald CM Service GmbH & Co. KG. Built with Docusaurus.`,
-      },
-      prism: {
-        theme: lightCodeTheme,
-        darkTheme: darkCodeTheme,
-        additionalLanguages: ["php", "shell-session"],
-      },
+        {
+          type: "doc",
+          docId: "/category/technologies",
+          position: "left",
+          label: "Technologies",
+        },
+        {
+          href: "/reference/v2",
+          position: "left",
+          label: "Reference",
+        },
+        //{to: '/blog', label: 'Blog', position: 'left'},
+        {
+          href: "https://github.com/mittwald/developer-portal",
+          label: "GitHub",
+          position: "right",
+        },
+        {
+          type: "localeDropdown",
+          position: "right",
+        },
+      ],
     },
+    footer: {
+      links: [
+        {
+          title: "Docs",
+          items: [
+            {
+              label: "API usage",
+              to: "/docs/v2/api/intro",
+            },
+            {
+              label: "Technologies",
+              to: "/docs/v2/category/technologies",
+            },
+            {
+              label: "SDKs and Libraries",
+              to: "/docs/v2/category/sdks-and-libraries",
+            },
+            {
+              label: "Reference",
+              to: "/reference/v2",
+            },
+          ],
+        },
+        {
+          title: "Community",
+          items: [
+            {
+              label: "Feedback",
+              href: "https://github.com/mittwald/developer-portal/issues",
+            },
+            {
+              label: "Agency Hub (german)",
+              href: "https://agenturen.mittwald.de",
+            },
+          ],
+        },
+        {
+          title: "More",
+          items: [
+            {
+              label: "Terms of Service",
+              href: "https://www.mittwald.de/agb",
+            },
+            {
+              label: "Privacy Policy",
+              href: "https://www.mittwald.de/datenschutz",
+            },
+            {
+              label: "Legal",
+              href: "https://www.mittwald.de/impressum",
+            },
+          ],
+        },
+      ],
+      copyright: `Copyright © ${new Date().getFullYear()} Mittwald CM Service GmbH & Co. KG. Built with Docusaurus.`,
+    },
+    prism: {
+      theme: lightCodeTheme,
+      darkTheme: darkCodeTheme,
+      additionalLanguages: ["php", "shell-session"],
+    },
+  } satisfies ThemeConfig,
 };
 
 module.exports = config;
