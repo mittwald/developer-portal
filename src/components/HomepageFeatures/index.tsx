@@ -137,9 +137,8 @@ const FeatureList = [
             <Link to="/docs/v2/api/sdks/cli">mittwald CLI</Link>
           </li>
           <li>
-            <Link to="/docs/v2/api/sdks/php">
-              mittwald PHP SDK
-            </Link> <NewBadge />
+            <Link to="/docs/v2/api/sdks/php">mittwald PHP SDK</Link>{" "}
+            <NewBadge />
           </li>
           <li>
             <Link to="/docs/v2/api/sdks/javascript">
@@ -174,7 +173,12 @@ const FeatureList = [
   },
 ];
 
-function Feature({ title, description }) {
+interface FeatureProps {
+  title: React.ReactNode;
+  description: React.ReactNode;
+}
+
+function Feature({ title, description }: FeatureProps) {
   return (
     <div className={clsx("col col--4")}>
       <div className={clsx("padding--md", styles.feature)}>
