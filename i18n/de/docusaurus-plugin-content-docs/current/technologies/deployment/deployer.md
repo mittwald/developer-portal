@@ -68,6 +68,7 @@ Das Rezept wird automatisch die folgenden Dinge konfigurieren:
 
 - Der `deploy_path` wird auf den Installationspfad der Anwendung gesetzt.
 - Ein SSH-Benutzer wird für die Anwendung erstellt, und der `remote_user` wird auf diesen Benutzer gesetzt. Standardmäßig wird der in der `ssh_copy_id`-Variable konfigurierte SSH-Schlüssel für die Authentifizierung verwendet. Um ein anderes SSH-Schlüsselpaar zu verwenden, setze die `mittwald_ssh_public_key`- und `mittwald_ssh_private_key`-Variablen (alternativ setze die `mittwald_ssh_public_key_file`- und `mittwald_ssh_private_key_file`-Variablen auf den Pfad der entsprechenden Dateien).
+- Der [PHP OPcache][opcache] wird automatisch nach dem Deployment geleert.
 
 #### Alternative: Ohne das mittwald Deployer-Rezept
 
@@ -83,6 +84,21 @@ Verwende das Installationsverzeichnis der Anwendung als `deploy_path` in deiner 
 host('ssh.fiestel.project.host') // you can determine your SSH host via the "mw project get" command
     ->set('remote_user', 'ssh-XXXXXX@<app-id>')
     ->set('deploy_path', '/html/<app-installation-path>');
+```
+
+Um den [OPcache][opcache] zu leeren, kannst du deine eigene Task-Definition zu deiner `deploy.php`-Datei hinzufügen, die nach der `deploy:symlink`-Phase ausgeführt werden soll. Das folgende Beispiel verwendet das [CacheTool][cachetool], um den OPcache für die Anwendung selektiv zu leeren:
+
+```php
+task("opcache:flush", function (): void {
+    if (!test("[ -x cachetool.phar ]")) {
+        run("curl -sLO https://github.com/gordalina/cachetool/releases/latest/download/cachetool.phar");
+        run("chmod +x cachetool.phar");
+    }
+
+    run('./cachetool.phar opcache:invalidate:scripts --fcgi=127.0.0.1:9000 {{ deploy_path }}');
+});
+
+after("deploy:symlink", "opcache:flush");
 ```
 
 Der Rest deiner Deployer-Konfiguration hängt von deinem Projekt ab und wird daher nicht von dieser Anleitung abgedeckt. Wenn du beispielsweise ein TYPO3-Projekt deployen möchtest, könntest du das [TYPO3 Deployer-Rezept](https://deployer.org/docs/7.x/recipe/typo3) verwenden.
@@ -226,3 +242,5 @@ Dieses Problem wird durch das [SSH-Multiplexing-Feature](https://deployer.org/do
 
 [mw-deployer]: https://packagist.org/packages/mittwald/deployer-recipes
 [mw-deployer-issues]: https://github.com/mittwald/deployer-recipes/issues
+[opcache]: https://www.php.net/manual/de/book.opcache.php
+[cachetool]: https://github.com/gordalina/cachetool
