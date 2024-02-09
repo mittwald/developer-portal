@@ -74,6 +74,7 @@ The recipe will automatically configure the following things:
 
 - The `deploy_path` will be set to the application's installation path.
 - An SSH user will be created for the application, and the `remote_user` will be set to that user. By default, the SSH key configured in the `ssh_copy_id` variable will be used for authentication. To use a different SSH key pair, set the `mittwald_ssh_public_key` and `mittwald_ssh_private_key` variables (alternative, set the `mittwald_ssh_public_key_file` and `mittwald_ssh_private_key_file` variables to the path of the respective files).
+- The [PHP OPcache][opcache] will automatically be cleared after deployment.
 
 #### Alternative: Without the mittwald deployer recipe
 
@@ -89,6 +90,21 @@ Use the app installation directory as the `deploy_path` in your `deploy.php` fil
 host('ssh.fiestel.project.host') // you can determine your SSH host via the "mw project get" command
     ->set('remote_user', 'ssh-XXXXXX@<app-id>')
     ->set('deploy_path', '/html/<app-installation-path>');
+```
+
+To flush the [OPcache][opcache], you can add your own task definition to your `deploy.php` file, to be executed after the `deploy:symlink` stage. The following example uses the [CacheTool][cachetool] to selectively flush the OPcache for the application:
+
+```php
+task("opcache:flush", function (): void {
+    if (!test("[ -x cachetool.phar ]")) {
+        run("curl -sLO https://github.com/gordalina/cachetool/releases/latest/download/cachetool.phar");
+        run("chmod +x cachetool.phar");
+    }
+
+    run('./cachetool.phar opcache:invalidate:scripts --fcgi=127.0.0.1:9000 {{ deploy_path }}');
+});
+
+after("deploy:symlink", "opcache:flush");
 ```
 
 The rest of your Deployer configuration depends on your project, and for this reason, will not be covered by this guide. For example, if you are deploying a TYPO3 project, you might want to use the [TYPO3 Deployer recipe](https://deployer.org/docs/7.x/recipe/typo3).
@@ -146,10 +162,8 @@ You can also set the `mittwald_app_dependencies` value. This value may contain a
         'composer' => '>=2.0',
     ]);
     ```
-  
-:::tip
-Use the `mw app dependency list` command to get an overview of available dependencies.
-:::
+
+:::tip Use the `mw app dependency list` command to get an overview of available dependencies. :::
 
 ## CI integration
 
@@ -175,7 +189,7 @@ steps:
 
   - name: Install dependencies
     run: composer install --prefer-dist --no-progress --no-suggest
-    
+
   - name: Deploy SSH keys
     env:
       MITTWALD_SSH_PRIVATE_KEY: ${{ secrets.MITTWALD_SSH_PRIVATE_KEY }}
@@ -212,10 +226,7 @@ deploy:
     - echo "$MITTWALD_SSH_PUBLIC_KEY" > .mw-deploy/id_rsa.pub
     - chmod 600 .mw-deploy/id_rsa*
   script:
-    - ./vendor/bin/dep deploy \
-        -o mittwald_app_id=$MITTWALD_APP_ID \
-        -o mittwald_ssh_public_key_file=.mw-deploy/id_rsa.pub \
-        -o mittwald_ssh_private_key_file=.mw-deploy/id_rsa
+    - ./vendor/bin/dep deploy \ -o mittwald_app_id=$MITTWALD_APP_ID \ -o mittwald_ssh_public_key_file=.mw-deploy/id_rsa.pub \ -o mittwald_ssh_private_key_file=.mw-deploy/id_rsa
   environment:
     name: production
 ```
@@ -237,3 +248,5 @@ This issue is caused by Deployers [SSH multiplexing feature](https://deployer.or
 
 [mw-deployer]: https://packagist.org/packages/mittwald/deployer-recipes
 [mw-deployer-issues]: https://github.com/mittwald/deployer-recipes/issues
+[opcache]: https://www.php.net/manual/en/book.opcache.php
+[cachetool]: https://github.com/gordalina/cachetool
