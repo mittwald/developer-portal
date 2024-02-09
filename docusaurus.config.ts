@@ -1,12 +1,13 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const { themes } = require("prism-react-renderer");
+import { Config } from "@docusaurus/types";
+import { themes } from "prism-react-renderer";
+
 const lightCodeTheme = themes.github;
 const darkCodeTheme = themes.dracula;
 
-/** @type {import("@docusaurus/types").Config} */
-const config = {
+const config: Config = {
   title: "mittwald Developer Portal",
   //tagline: 'Dinosaurs are cool',
   favicon: "img/favicon.ico",
@@ -51,7 +52,7 @@ const config = {
     [
       "classic",
       /** @type {import("@docusaurus/preset-classic").Options} */
-      ({
+      {
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
@@ -75,7 +76,7 @@ const config = {
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
         },
-      }),
+      },
     ],
     [
       "redocusaurus",
@@ -102,7 +103,7 @@ const config = {
 
   themeConfig:
     /** @type {import("@docusaurus/preset-classic").ThemeConfig} */
-    ({
+    {
       navbar: {
         // style: 'primary',
         title: "Developer Portal",
@@ -199,9 +200,9 @@ const config = {
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
-        additionalLanguages: ["php", "shell-session"]
+        additionalLanguages: ["php", "shell-session"],
       },
-    }),
+    },
 };
 
 module.exports = config;
