@@ -108,12 +108,12 @@ Environment variables are generally used to configure Node.js applications. Depe
 
   </TabItem>
   <TabItem value="from-20-6" label=">= Node.js 20.6">
-    As of Node.js 20.6, an (experimental) flag `--env-fileconfig` is available (see [Node.js documentation](https://nodejs.org/dist/latest-v20.x/docs/api/cli.html#--env-fileconfig)). This can be specified as often as required to load .env files whose environment variables are then available in the app.
+    As of Node.js 20.6, an (experimental) flag `--env-file` is available (see [Node.js documentation](https://nodejs.org/dist/latest-v20.x/docs/api/cli.html#--env-fileconfig)). This can be specified as often as required to load .env files whose environment variables are then available in the app.
 
     To use the flag, configure the start command of your Node.js app as follows, for example:
 
     ```bash
-    node --env-fileconfig=.env server.js
+    node --env-file=.env server.js
     ```
 
     The path to the `.env` file is specified relative to the working directory.
@@ -124,7 +124,7 @@ Environment variables are generally used to configure Node.js applications. Depe
     {
       [..]
       "scripts": {
-        "start": "node --env-fileconfig=.env server.js"
+        "start": "node --env-file=.env server.js"
       }
       [..]
     }

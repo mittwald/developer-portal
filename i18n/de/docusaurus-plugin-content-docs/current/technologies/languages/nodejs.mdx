@@ -108,12 +108,12 @@ In der Regel werden Umgebungsvariablen genutzt, um Node.js-Apps zu konfigurieren
 
   </TabItem>
   <TabItem value="from-20-6" label=">= Node.js 20.6">
-    Ab Node.js 20.6 steht ein (experimentelles) Flag `--env-fileconfig` zur Verfügung (vgl. [Node.js-Dokumentation](https://nodejs.org/dist/latest-v20.x/docs/api/cli.html#--env-fileconfig)). Dieses kann beliebig oft angegeben werden, um .env-Dateien zu laden, deren Umgebungsvariablen dann in der App verfügbar sind.
+    Ab Node.js 20.6 steht ein (experimentelles) Flag `--env-file` zur Verfügung (vgl. [Node.js-Dokumentation](https://nodejs.org/dist/latest-v20.x/docs/api/cli.html#--env-fileconfig)). Dieses kann beliebig oft angegeben werden, um .env-Dateien zu laden, deren Umgebungsvariablen dann in der App verfügbar sind.
 
     Um das Flag zu nutzen, konfiguriere den Startbefehl deiner Node.js-App beispielsweise folgendermaßen:
 
     ```bash
-    node --env-fileconfig=.env server.js
+    node --env-file=.env server.js
     ```
 
     Der Pfad zur `.env`-Datei wird dabei relativ zum Working Directory angegeben.
@@ -124,7 +124,7 @@ In der Regel werden Umgebungsvariablen genutzt, um Node.js-Apps zu konfigurieren
     {
       [..]
       "scripts": {
-        "start": "node --env-fileconfig=.env server.js"
+        "start": "node --env-file=.env server.js"
       }
       [..]
     }
