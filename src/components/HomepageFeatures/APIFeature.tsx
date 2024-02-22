@@ -164,7 +164,7 @@ function APILibraries() {
 
 export default function APIFeature() {
   return (
-    <FeatureRow>
+    <FeatureRow variant>
       <div className="container">
         <div className="row">
           <div className={clsx("col col--4")}>
