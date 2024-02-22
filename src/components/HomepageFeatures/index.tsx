@@ -4,6 +4,7 @@ import styles from "./styles.module.css";
 import Translate from "@docusaurus/Translate";
 import Link from "@docusaurus/Link";
 import { NewBadge } from "../NewBadge";
+import FeatureRow from "@site/src/components/HomepageFeatures/FeatureRow";
 
 const issueTrackerURL =
   "https://github.com/mittwald/developer-portal/issues/new?assignees=&labels=suggestion&projects=&template=suggestion.md";
@@ -191,7 +192,7 @@ function Feature({ title, description }: FeatureProps) {
 
 export default function HomepageFeatures() {
   return (
-    <section className={styles.features}>
+    <FeatureRow>
       <div className="container">
         <div className="row">
           {FeatureList.map((props, idx) => (
@@ -199,6 +200,6 @@ export default function HomepageFeatures() {
           ))}
         </div>
       </div>
-    </section>
+    </FeatureRow>
   );
 }

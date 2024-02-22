@@ -1,0 +1,184 @@
+import clsx from "clsx";
+import styles from "@site/src/components/HomepageFeatures/styles.module.css";
+import FeatureRow from "./FeatureRow";
+import Intro from "./Intro";
+import Translate from "@docusaurus/Translate";
+import Link from "@docusaurus/Link";
+import React from "react";
+import LinkGroup from "@site/src/components/LinkGroup";
+import { NewBadge } from "@site/src/components/NewBadge";
+
+function PlatformIntro() {
+  return (
+    <Intro>
+      <h3>
+        <Translate id={"index.deploy.title"}>
+          Deploy your software easily
+        </Translate>
+      </h3>
+      <p>
+        <Translate id={"index.deploy.body"}>
+          Deploy your applications and services to our platform with ease. We
+          support a variety of programming languages, frameworks and databases.
+        </Translate>
+      </p>
+    </Intro>
+  );
+}
+
+function PlatformCoreFeatures() {
+  return (
+    <>
+      <h3>
+        <Translate id="index.deploy.platform.title">
+          Platform features
+        </Translate>
+      </h3>
+      <p>
+        <Translate id={"index.deploy.platform.body"}>
+          Our platform provides a variety of features to help you deploy your
+          applications and services:
+        </Translate>
+      </p>
+      <ul>
+        <li>
+          <LinkGroup
+            title={
+              <Translate id="index.deploy.platform.language">
+                Runtime environments
+              </Translate>
+            }
+            links={[
+              <Link to="/docs/v2/technologies/languages/php">PHP</Link>,
+              <Link to="/docs/v2/technologies/languages/nodejs">Node.js</Link>,
+              <Link href="https://github.com/mittwald/feature-requests/issues">
+                Python
+              </Link>,
+              <Link href="https://github.com/mittwald/feature-requests/issues/1">
+                Docker
+              </Link>,
+            ]}
+          />
+        </li>
+        <li>
+          <LinkGroup
+            title={
+              <Translate id="index.deploy.platform.databases">
+                Databases
+              </Translate>
+            }
+            links={[
+              <Link to="/docs/v2/technologies/databases/mysql">MySQL</Link>,
+              <Link to="/docs/v2/technologies/databases/redis">Redis</Link>,
+              <Link to="/docs/v2/technologies/databases/opensearch">
+                OpenSearch
+              </Link>,
+            ]}
+          />
+        </li>
+      </ul>
+      <p>
+        <Translate id="index.deploy.platform.features">
+          Missing features?
+        </Translate>{" "}
+        <Link href="https://github.com/mittwald/feature-requests/issues">
+          <Translate id="index.deploy.platform.features-link">
+            Request them here!
+          </Translate>
+        </Link>
+      </p>
+    </>
+  );
+}
+
+function PlatformTools() {
+  return (
+    <>
+      <h3>
+        <Translate id="index.deploy.tools.title">
+          Tooling and Integration
+        </Translate>
+      </h3>
+      <p>
+        <Translate id="index.deploy.tools.body">
+          We provide a variety of tools, integrations and tutorials to help you
+          deploy your applications and services:
+        </Translate>
+      </p>
+      <ul>
+        <li>
+          <LinkGroup
+            title={
+              <Translate id="index.deploy.tools.development">
+                Local development
+              </Translate>
+            }
+            links={[
+              <Link href="https://github.com/mittwald/ddev">
+                DDEV <NewBadge />
+              </Link>,
+            ]}
+          />
+        </li>
+        <li>
+          <LinkGroup
+            title={
+              <Translate id="index.deploy.tools.provisioning">
+                Provisioning
+              </Translate>
+            }
+            links={[
+              <Link href="https://github.com/mittwald/terraform-provider-mittwald">
+                Terraform
+              </Link>,
+              <Link href="https://github.com/mittwald/terraform-provider-mittwald">
+                Ansible
+              </Link>,
+            ]}
+          />
+        </li>
+        <li>
+          <LinkGroup
+            title={
+              <Translate id="index.deploy.tools.deployment">
+                Deployment
+              </Translate>
+            }
+            links={[
+              <Link to="/docs/v2/technologies/deployment/deployer">
+                Deployer
+              </Link>,
+              <Link to="/docs/v2/technologies/deployment/typo3surf">
+                TYPO3 Surf
+              </Link>,
+            ]}
+          />
+        </li>
+      </ul>
+    </>
+  );
+}
+
+export default function PlatformFeature() {
+  return (
+    <FeatureRow>
+      <div className="container">
+        <div className="row">
+          <div className={clsx("col col--4")}>
+            <PlatformIntro />
+          </div>
+          <div className={clsx("col col--4")}>
+            <div className={clsx("padding--md", styles.feature)}>
+              <PlatformCoreFeatures />
+            </div>
+          </div>
+          <div className={clsx("col col--4")}>
+            <div className={clsx("padding--md", styles.feature)}>
+              <PlatformTools />
+            </div>
+          </div>
+        </div>
+      </div>
+    </FeatureRow>
+  );
+}
