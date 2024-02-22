@@ -4,7 +4,12 @@ import Admonition from "@theme/Admonition";
 import Translate from "@docusaurus/Translate";
 import OperationLink from "../OperationLink";
 
-export default function OperationHint({ tag, operation }) {
+export interface OperationHintProps {
+  tag: string;
+  operation: string;
+}
+
+export default function OperationHint({ tag, operation }: OperationHintProps) {
   return (
     <Admonition type="info">
       <Translate id={"components.OperationHint.text"}>
