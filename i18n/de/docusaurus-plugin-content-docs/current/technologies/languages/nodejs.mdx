@@ -97,3 +97,37 @@ Wenn dein Projekt [Yarn PnP](https://yarnpkg.com/features/pnp) nutzt, ist es emp
 ```yml title=".yarnrc"
 enableGlobalCache: false
 ```
+
+## Umgebungsvariablen
+
+In der Regel werden Umgebungsvariablen genutzt, um Node.js-Apps zu konfigurieren. Je nach Node.js-Version empfehlen wir unterschiedliche Varianten, um diese zu definieren.
+
+<Tabs groupId="environment-variables">
+  <TabItem value="below-20-6" label="< Node.js 20.6">
+    Du kannst Umgebungsvariablen in der Datei `~/.config/node/.env` definieren. Dort definierte Variablen sind dann automatisch in deiner App verfügbar.
+
+  </TabItem>
+  <TabItem value="from-20-6" label=">= Node.js 20.6">
+    Ab Node.js 20.6 steht ein (experimentelles) Flag `--env-file` zur Verfügung (vgl. [Node.js-Dokumentation](https://nodejs.org/dist/latest-v20.x/docs/api/cli.html#--env-fileconfig)). Dieses kann beliebig oft angegeben werden, um .env-Dateien zu laden, deren Umgebungsvariablen dann in der App verfügbar sind.
+
+    Um das Flag zu nutzen, konfiguriere den Startbefehl deiner Node.js-App beispielsweise folgendermaßen:
+
+    ```bash
+    node --env-file=.env server.js
+    ```
+
+    Der Pfad zur `.env`-Datei wird dabei relativ zum Working Directory angegeben.
+
+    Nutzt du ein npm- oder yarn-Script zum Start deiner App, gilt folgendes Beispiel:
+
+    ```json title="package.json"
+    {
+      [..]
+      "scripts": {
+        "start": "node --env-file=.env server.js"
+      }
+      [..]
+    }
+    ```
+  </TabItem>
+</Tabs>
