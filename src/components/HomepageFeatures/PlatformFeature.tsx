@@ -49,8 +49,8 @@ function PlatformCoreFeatures() {
               </Translate>
             }
             links={[
-              <Link to="/docs/v2/technologies/languages/php">PHP</Link>,
-              <Link to="/docs/v2/technologies/languages/nodejs">Node.js</Link>,
+              <Link to="/docs/v2/platform/languages/php">PHP</Link>,
+              <Link to="/docs/v2/platform/languages/nodejs">Node.js</Link>,
               <Link href="https://github.com/mittwald/feature-requests/issues">
                 Python
               </Link>,
@@ -68,9 +68,9 @@ function PlatformCoreFeatures() {
               </Translate>
             }
             links={[
-              <Link to="/docs/v2/technologies/databases/mysql">MySQL</Link>,
-              <Link to="/docs/v2/technologies/databases/redis">Redis</Link>,
-              <Link to="/docs/v2/technologies/databases/opensearch">
+              <Link to="/docs/v2/platform/databases/mysql">MySQL</Link>,
+              <Link to="/docs/v2/platform/databases/redis">Redis</Link>,
+              <Link to="/docs/v2/platform/databases/opensearch">
                 OpenSearch
               </Link>,
             ]}
@@ -145,10 +145,8 @@ function PlatformTools() {
               </Translate>
             }
             links={[
-              <Link to="/docs/v2/technologies/deployment/deployer">
-                Deployer
-              </Link>,
-              <Link to="/docs/v2/technologies/deployment/typo3surf">
+              <Link to="/docs/v2/platform/deployment/deployer">Deployer</Link>,
+              <Link to="/docs/v2/platform/deployment/typo3surf">
                 TYPO3 Surf
               </Link>,
             ]}

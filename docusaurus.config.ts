@@ -4,6 +4,7 @@
 import { Config } from "@docusaurus/types";
 import { themes } from "prism-react-renderer";
 import { Options, ThemeConfig } from "@docusaurus/preset-classic";
+import { Options as ClientRedirectOptions } from "@docusaurus/plugin-client-redirects";
 
 const lightCodeTheme = themes.github;
 const darkCodeTheme = themes.dracula;
@@ -48,6 +49,19 @@ const config: Config = {
       },
     },
   },
+
+  plugins: [
+    [
+      "@docusaurus/plugin-client-redirects",
+      {
+        createRedirects(path) {
+          if (path.includes("/platform")) {
+            return path.replace("/platform", "/technologies");
+          }
+        },
+      } satisfies ClientRedirectOptions,
+    ],
+  ],
 
   presets: [
     [
@@ -118,9 +132,9 @@ const config: Config = {
         },
         {
           type: "doc",
-          docId: "/category/technologies",
+          docId: "/category/platform",
           position: "left",
-          label: "Technologies",
+          label: "Platform",
         },
         {
           href: "/reference/v2",
@@ -149,8 +163,8 @@ const config: Config = {
               to: "/docs/v2/api/intro",
             },
             {
-              label: "Technologies",
-              to: "/docs/v2/category/technologies",
+              label: "Platform",
+              to: "/docs/v2/category/platform",
             },
             {
               label: "SDKs and Libraries",
