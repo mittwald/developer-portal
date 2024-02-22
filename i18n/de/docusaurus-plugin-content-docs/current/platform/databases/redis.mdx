@@ -8,6 +8,8 @@ description: |
 ---
 
 import PlanCompatibility from "@site/src/components/PlanCompatibility";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
 
 <PlanCompatibility plans={["ps", "ss"]} />
 
@@ -25,13 +27,34 @@ Generell gilt: Redis macht deine Projekte schneller, wenn Daten schnell geschrie
 
 Redis einzurichten ist einfach. Je nach CMS oder Shopsystem musst du jedoch einige Dinge beachten. Ich erkläre dir Schritt für Schritt, wie es geht.
 
-### Über das mStudio
+<Tabs groupId="access-mode">
+  <TabItem value="gui" label="mStudio UI">
+    Um eine Redis-Datenbank im mStudio zu erstellen, folge diesen Schritten:
 
-Lege zunächst im mStudio, der Verwaltungsumgebung deines Space-Servers bzw. deines proSpaces, eine Redis Datenbank an. Anschließend findest du in den Details unter Verbindungsinformationen sowohl Host als auch Port. Beide benötigst du für die Konfiguration deines Systems.
+    1. Navigiere zu dem Projekt, in dem du die Datenbank erstellen möchtest.
+    2. Wähle im Seitenmenü den Punkt "Datenbanken".
+    3. Klicke auf den Button "Datenbank erstellen" und wähle "Redis".
+    4. Gib eine Beschreibung für die Datenbank ein und wähle die gewünschte Version.
 
-### Über die API
+    Nachdem die Installation abgeschlossen ist, findest du die Host- und Port-Angaben in den Details unter "Verbindungsinformationen". Diese benötigst du für die Konfiguration deines Systems.
 
-Du kannst eine Redis-Datenbank auch über die API erstellen. Lies hierzu den Artikel ["Eine Redis-Datenbank erstellen"](../../../api/howtos/create-redis).
+  </TabItem>
+  <TabItem value="cli" label="CLI">
+    Um eine Redis-Datenbank über die CLI zu erstellen, führe den folgenden Befehl aus:
+
+    ```bash
+    $ mw database redis create --description "My Redis database" --version 7.2
+    ```
+
+    Nachdem die Installation abgeschlossen ist, nutze den Befehl `mw database redis get`, um die Verbindungsinformationen zu sehen.
+
+  </TabItem>
+  <TabItem value="api" label="API">
+
+    Um eine Redis-Datenbank über die API zu erstellen, sei auf den Artikel ["Erstellen einer Redis-Datenbank über die API"](../../../api/howtos/create-redis) verwiesen.
+
+  </TabItem>
+</Tabs>
 
 ## Redis als Session-Storage für PHP konfigurieren
 
@@ -189,31 +212,30 @@ Für alle Versionen bis TYPO3 11.5 erstellst du eine `AdditionalConfiguration.ph
 $redisHost = 'HOST';
 $redisPort = PORT;
 $redisCaches = [
-	'pages' => [
-     	'defaultLifetime' => 86400*7,
-     	'compression' => true,
-	],
-	'pagesection' => [
-     	'defaultLifetime' => 86400*7,
-	],
-	'hash' => [],
-	'rootline' => [],
+    'pages' => [
+     	  'defaultLifetime' => 86400*7,
+     	  'compression' => true,
+    ],
+    'pagesection' => [
+        'defaultLifetime' => 86400*7,
+    ],
+    'hash' => [],
+    'rootline' => [],
 ];
 $redisDatabase = 0;
 foreach ($redisCaches as $name => $values) {
-	$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'][$name]['backend'] = \TYPO3\CMS\Core\Cache\Backend\RedisBackend::class;
+    $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'][$name]['backend'] = \TYPO3\CMS\Core\Cache\Backend\RedisBackend::class;
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'][$name]['options'] = [
     	'database' => $redisDatabase++,
     	'hostname' => $redisHost,
     	'port' => $redisPort
-	];
-	if (isset($values['defaultLifetime'])) {
-       	$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'][$name]['options']['defaultLifetime']
-           	= $values['lifetime'];
-	}
-	if (isset($values['compression'])) {
-           $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'][$name]['options']['compression']
-           	= $values['compression'];
-	}
+    ];
+    if (isset($values['defaultLifetime'])) {
+       	$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'][$name]['options']['defaultLifetime'] = $values['lifetime'];
+    }
+
+    if (isset($values['compression'])) {
+        $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'][$name]['options']['compression'] = $values['compression'];
+    }
 }
 ```
