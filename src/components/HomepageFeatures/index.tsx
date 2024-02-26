@@ -97,9 +97,9 @@ const FeatureList = [
               <Translate id={"index.reference.reference"}>Reference</Translate>
             </Link>{" "}
             |{" "}
-            <a href={"https://api.mittwald.de/v1/swagger/swagger-public.json"}>
-              <Translate id={"index.reference.swagger"}>
-                Swagger 2.0 specification
+            <a href={"https://api.mittwald.de/v1/openapi.json"}>
+              <Translate id={"index.reference.openapi"}>
+                OpenAPI 3.0 specification
               </Translate>
             </a>
           </li>
