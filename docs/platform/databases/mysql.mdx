@@ -1,0 +1,61 @@
+---
+title: MySQL
+description: |
+  MySQL is an open-source relational database management system (RDBMS). It is a popular choice for web applications and is often used in combination with PHP. This guide will help you get started with MySQL on your mittwald space.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import OperationHint from "@site/src/components/OperationHint";
+
+## Creating a MySQL database
+
+<Tabs groupId="access-mode">
+  <TabItem value="gui" label="mStudio UI">
+    To create a MySQL database in the mStudio, follow these steps:
+
+    1. Navigate to the project that you want to create the database in.
+    2. Select the "Databases" menu item in the sidebar.
+    3. Click the "Create Database" button and select "MySQL".
+    4. Enter a description for the database, select the desired version and choose a password for the database user.
+
+    After the installation has completed, observe the host and port in the details under connection information. You
+    need both for the configuration of your system.
+
+  </TabItem>
+  <TabItem value="cli" label="CLI">
+    To create a MySQL database from the CLI, run the following commands:
+
+    ```bash
+    $ mw database mysql create --description "My MySQL database" --version 8.0
+    ```
+
+    This command will prompt you to enter a password for the database user. To skip the prompt, use the `--password` option (be careful, because this will store the password in your shell history), or set the `MYSQL_PWD` environment variable, first:
+
+    ```bash
+    $ read -s MYSQL_PWD
+    $ export MYSQL_PWD
+    $ mw database mysql create ...
+    ```
+
+    There are additional flags that you can provide to set additional options:
+
+    - `--character-set` and `--collation` to set the [character set and collation](https://dev.mysql.com/doc/refman/8.0/en/charset-mysql.html) for the database. These default to `utf8mb4` and `utf8mb4_unicode_ci`, respectively. Usually, there is little reason to change these, except when migrating from an existing database.
+    - `--user-access-level` allows you to restrict the permissions of the database user. The default is `full`, which grants all permissions. You can also choose `readonly`.
+    - `--user-external` allows you to create a user that can connect from outside the mittwald cloud platform. This is disabled by default.
+
+    After the installation has completed, use the `mw database mysql get` command to observe the connection information.
+
+  </TabItem>
+  <TabItem value="api" label="API">
+
+    <OperationHint tag="Database" operation="database-create-mysql-database" />
+
+  </TabItem>
+</Tabs>
+
+## Operational concerns
+
+### Managed backup and recovery
+
+### Manual backup and recovery
