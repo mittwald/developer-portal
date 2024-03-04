@@ -20,7 +20,7 @@ It's also recommended to have the [mittwald CLI][cli] installed, although it's o
 
 ### Using the mittwald CLI
 
-If you already have an existing application on the mittwald platform, and have the [mittwald CLI][cli] installed, you can streamline the setup process for your PHP application with DDEV. The mittwald CLI allows you to create a new DDEV environment tailored to your mittwald app quickly.
+If you already have the [mittwald CLI][cli] installed, you can set up a DDEV project for your mittwald app with a single command.
 
 To initiate the setup, run the following command in your terminal, replacing `<app-id>` with your application ID (usually formatted as `a-xxxxx`), and `<project-name>` with a suitable name for your project:
 
@@ -28,7 +28,7 @@ To initiate the setup, run the following command in your terminal, replacing `<a
 $ mw ddev init <app-id> --project-name <project-name>
 ```
 
-This command automatically configures a DDEV environment to closely match your existing mittwald app, including PHP and MySQL versions and the document root. Additionally, it installs and configures the [mittwald DDEV addon][ddev-addon], which integrates seamlessly with DDEV.
+This command automatically configures a DDEV environment to closely match the environment of your existing mittwald app, including PHP and MySQL versions and the document root. Additionally, it installs and configures the [mittwald DDEV addon][ddev-addon], which integrates seamlessly with DDEV.
 
 :::tip
 

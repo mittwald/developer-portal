@@ -14,13 +14,13 @@ Bevor du loslegen kannst, stelle sicher, dass du die erforderlichen Tools auf de
 - [DDEV](https://ddev.readthedocs.io/en/stable/): DDEV ist eine lokale Entwicklungsumgebung, die das Einrichten und Verwalten von PHP-Anwendungen auf deinem Computer vereinfacht.
 - [Docker](https://www.docker.com/): Docker ist eine Plattform zum Entwickeln, Deployment und Ausführen von Anwendungen in Containern.
 
-Es wird auch empfohlen, die [mittwald CLI][cli] installiert zu haben, obwohl es für diese Einrichtung optional ist.
+Wir empfehlen außerdem, die [mittwald CLI][cli] für die Einrichtung zu verwenden -- obwohl es auch ohne geht.
 
 ## Einrichten einer DDEV-Umgebung
 
-### Verwendung des mittwald CLI
+### Mit der mittwald CLI
 
-Wenn du bereits eine bestehende App auf der mittwald-Plattform hast, und die [mittwald CLI][cli] installiert hast, kannst du den Einrichtungsprozess für deine PHP-Anwendung mit DDEV optimieren. Die mittwald CLI ermöglicht es dir, schnell eine neue DDEV-Umgebung einzurichten, die auf deine mittwald-App zugeschnitten ist.
+Wenn du die [mittwald CLI][cli] bereits installiert hast, kannst du mit einem einzigen Befehl ein DDEV-Projekt für deine mittwald-App einrichten. 
 
 Um die Einrichtung zu starten, führe den folgenden Befehl in deinem Terminal aus und ersetze `<app-id>` durch deine App-ID (üblicherweise im Format `a-xxxxx`) und `<project-name>` durch einen geeigneten Namen für dein Projekt:
 
