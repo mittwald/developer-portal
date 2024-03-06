@@ -16,11 +16,15 @@ Bevor du loslegen kannst, stelle sicher, dass du die erforderlichen Tools auf de
 
 Wir empfehlen außerdem, die [mittwald CLI][cli] für die Einrichtung zu verwenden -- obwohl es auch ohne geht.
 
-## Einrichten einer DDEV-Umgebung
+## Einrichten einer neuen DDEV-Umgebung für ein mittwald-Projekt
+
+Die folgenden Anweisungen führen dich durch die Einrichtung einer DDEV-Umgebung für deine mittwald-App. Du kannst zwischen der Verwendung der mittwald CLI oder der manuellen Konfiguration deiner DDEV-Umgebung wählen.
+
+Diese Anweisungen funktionieren sowohl für die Einrichtung einer neuen DDEV-Umgebung als auch für das Verbinden einer mittwald-App mit einer vorhandenen DDEV-Umgebung.
 
 ### Mit der mittwald CLI
 
-Wenn du die [mittwald CLI][cli] bereits installiert hast, kannst du mit einem einzigen Befehl ein DDEV-Projekt für deine mittwald-App einrichten. 
+Wenn du die [mittwald CLI][cli] bereits installiert hast, kannst du mit einem einzigen Befehl ein DDEV-Projekt für deine mittwald-App einrichten.
 
 Um die Einrichtung zu starten, führe den folgenden Befehl in deinem Terminal aus und ersetze `<app-id>` durch deine App-ID (üblicherweise im Format `a-xxxxx`) und `<project-name>` durch einen geeigneten Namen für dein Projekt:
 

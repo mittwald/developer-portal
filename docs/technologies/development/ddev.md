@@ -16,7 +16,11 @@ Before getting started, make sure you have the necessary tools installed on your
 
 It's also recommended to have the [mittwald CLI][cli] installed, although it's optional for this setup.
 
-## Setting up a DDEV environment
+## Setting up a DDEV environment for a mittwald project
+
+The following instructions guide you through setting up a DDEV environment for your mittwald app. You can choose between using the mittwald CLI or manually configuring your DDEV environment.
+
+These instructions work both for setting up a new DDEV environment, and also for connecting a mittwald app to an existing DDEV environment.
 
 ### Using the mittwald CLI
 
