@@ -9,12 +9,28 @@ description: DDEV ist eine lokale Entwicklungsumgebung für PHP-Anwendungen. Es 
 
 ## Voraussetzungen
 
+### Benötigte Werkzeuge
+
 Bevor du loslegen kannst, stelle sicher, dass du die erforderlichen Tools auf deinem lokalen Rechner installiert hast:
 
 - [DDEV](https://ddev.readthedocs.io/en/stable/): DDEV ist eine lokale Entwicklungsumgebung, die das Einrichten und Verwalten von PHP-Anwendungen auf deinem Computer vereinfacht.
 - [Docker](https://www.docker.com/): Docker ist eine Plattform zum Entwickeln, Deployment und Ausführen von Anwendungen in Containern.
 
 Wir empfehlen außerdem, die [mittwald CLI][cli] für die Einrichtung zu verwenden -- obwohl es auch ohne geht.
+
+### SSH-Konnektivität herstellen
+
+Um die `ddev pull`- und `ddev push`-Befehle verwenden zu können, musst du eine SSH-Authentifizierung zwischen deinem lokalen Rechner und deiner mittwald-App herstellen. Füge dazu deinen lokalen SSH-Public-Key zu den autorisierten Schlüsseln deines mStudio-Benutzers hinzu. Mit der mittwald CLI kannst du ein neues SSH-Schlüsselpaar erstellen und den öffentlichen Schlüssel mit einem einzigen Befehl in deinem mStudio-Konto importieren:
+
+```
+$ mw user ssh-key create
+```
+
+Wenn du bereits ein vorhandenes SSH-Schlüsselpaar hast, kannst du den öffentlichen Schlüssel mit dem folgenden Befehl in deinem mStudio-Konto importieren:
+
+```
+$ mw user ssh-key import
+```
 
 ## Einrichten einer neuen DDEV-Umgebung für ein mittwald-Projekt
 

@@ -9,12 +9,28 @@ description: DDEV is a local development environment for PHP applications. It pr
 
 ## Prerequisites
 
+### Required tools
+
 Before getting started, make sure you have the necessary tools installed on your local machine:
 
 - [DDEV](https://ddev.readthedocs.io/en/stable/): DDEV is a local development environment that simplifies setting up and managing PHP applications on your computer.
 - [Docker](https://www.docker.com/): Docker is a platform for developing, shipping, and running applications inside containers.
 
 It's also recommended to have the [mittwald CLI][cli] installed, although it's optional for this setup.
+
+### Setting up SSH connectivity
+
+To use the `ddev pull` and `ddev push` commands, you need to set up SSH connectivity between your local machine and your mittwald app. To do this, add your local SSH public key to your mStudio user's authorized keys. With the mittwald CLI, you create a new SSH keypair and import the public key to your mStudio account with a single command:
+
+```
+$ mw user ssh-key create
+```
+
+If you already have an existing SSH keypair, you can import the public key to your mStudio account with the following command:
+
+```
+$ mw user ssh-key import
+```
 
 ## Setting up a DDEV environment for a mittwald project
 
