@@ -20,7 +20,7 @@ It's also recommended to have the [mittwald CLI][cli] installed, although it's o
 
 ### Setting up SSH connectivity
 
-To use the `ddev pull` and `ddev push` commands, you need to set up SSH connectivity between your local machine and your mittwald app. To do this, add your local SSH public key to your mStudio user's authorized keys. With the mittwald CLI, you create a new SSH keypair and import the public key to your mStudio account with a single command:
+To use the `ddev pull` and `ddev push` commands, you need to set up SSH connectivity between your local machine and your mittwald app. To do this, add your local SSH public key to your mStudio user's authorized keys. With the mittwald CLI, you can create a new SSH keypair and import the public key to your mStudio account with a single command:
 
 ```
 $ mw user ssh-key create
