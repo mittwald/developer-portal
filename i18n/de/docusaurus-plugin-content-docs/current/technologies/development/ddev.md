@@ -22,13 +22,13 @@ Wir empfehlen außerdem, die [mittwald CLI][cli] für die Einrichtung zu verwend
 
 Um die `ddev pull`- und `ddev push`-Befehle verwenden zu können, musst du eine SSH-Authentifizierung zwischen deinem lokalen Rechner und deiner mittwald-App herstellen. Füge dazu deinen lokalen SSH-Public-Key zu den autorisierten Schlüsseln deines mStudio-Benutzers hinzu. Mit der mittwald CLI kannst du ein neues SSH-Schlüsselpaar erstellen und den öffentlichen Schlüssel mit einem einzigen Befehl in deinem mStudio-Konto importieren:
 
-```
+```shell-session
 $ mw user ssh-key create
 ```
 
 Wenn du bereits ein vorhandenes SSH-Schlüsselpaar hast, kannst du den öffentlichen Schlüssel mit dem folgenden Befehl in deinem mStudio-Konto importieren:
 
-```
+```shell-session
 $ mw user ssh-key import
 ```
 
@@ -44,7 +44,11 @@ Wenn du die [mittwald CLI][cli] bereits installiert hast, kannst du mit einem ei
 
 Um die Einrichtung zu starten, führe den folgenden Befehl in deinem Terminal aus und ersetze `<app-id>` durch deine App-ID (üblicherweise im Format `a-xxxxx`) und `<project-name>` durch einen geeigneten Namen für dein Projekt:
 
-```bash
+```shell-session
+$ # Projektverzeichnis erstellen und betreten
+$ mkdir project-dir && cd project-dir
+
+$ # DDEV-Umgebung initialisieren
 $ mw ddev init <app-id> --project-name <project-name>
 ```
 

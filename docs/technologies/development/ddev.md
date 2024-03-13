@@ -22,13 +22,13 @@ It's also recommended to have the [mittwald CLI][cli] installed, although it's o
 
 To use the `ddev pull` and `ddev push` commands, you need to set up SSH connectivity between your local machine and your mittwald app. To do this, add your local SSH public key to your mStudio user's authorized keys. With the mittwald CLI, you can create a new SSH keypair and import the public key to your mStudio account with a single command:
 
-```
+```shell-session
 $ mw user ssh-key create
 ```
 
 If you already have an existing SSH keypair, you can import the public key to your mStudio account with the following command:
 
-```
+```shell-session
 $ mw user ssh-key import
 ```
 
@@ -44,7 +44,11 @@ If you already have the [mittwald CLI][cli] installed, you can set up a DDEV pro
 
 To initiate the setup, run the following command in your terminal, replacing `<app-id>` with your application ID (usually formatted as `a-xxxxx`), and `<project-name>` with a suitable name for your project:
 
-```bash
+```shell-session
+$ # Create and enter project directory
+$ mkdir project-dir && cd project-dir
+
+$ # Initialize DDEV environment
 $ mw ddev init <app-id> --project-name <project-name>
 ```
 
@@ -60,7 +64,7 @@ You can update your DDEV environment to match any changes in your mittwald app's
 
 If you don't have the mittwald CLI installed or prefer a manual approach, you can still set up a DDEV environment for your PHP app. Here's how:
 
-```bash
+```shell-session
 $ ddev config \
     --project-type <type> \
     --php-version <php-version> \
@@ -80,13 +84,13 @@ DDEV simplifies the process of synchronizing code and databases between your loc
 
 To pull the code and database from your mittwald app to your local DDEV environment, use:
 
-```bash
+```shell-session
 $ ddev pull mittwald
 ```
 
 Conversely, to push your local code and database changes to your mittwald app, execute:
 
-```bash
+```shell-session
 $ ddev push mittwald
 ```
 
@@ -102,7 +106,7 @@ The [mittwald DDEV addon][ddev-addon] enables you to run the [mittwald CLI][cli]
 
 To utilize the mittwald CLI inside your DDEV environment, use the following syntax:
 
-```bash
+```shell-session
 $ ddev mw <command>
 ```
 
