@@ -5,7 +5,7 @@ import { Config } from "@docusaurus/types";
 import { themes } from "prism-react-renderer";
 import { Options, ThemeConfig } from "@docusaurus/preset-classic";
 
-const lightCodeTheme = themes.github;
+const lightCodeTheme = themes.oneLight;
 const darkCodeTheme = themes.dracula;
 
 const config: Config = {
