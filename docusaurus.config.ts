@@ -98,7 +98,7 @@ const config: Config = {
         specs: [
           {
             id: "v1",
-            spec: "https://api.mittwald.de/v1/swagger/swagger-public.json",
+            spec: "https://api.mittwald.de/v1/openapi.json",
             route: "/reference/v1",
           },
           {
