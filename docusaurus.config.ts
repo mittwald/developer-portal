@@ -55,11 +55,16 @@ const config: Config = {
       "@docusaurus/plugin-client-redirects",
       {
         createRedirects(path) {
-          if (path.includes("/platform")) {
-            return path.replace("/platform", "/technologies");
+          let newPath = path;
+          if (newPath.includes("/platform")) {
+            newPath = newPath.replace("/platform", "/technologies");
           }
-          if (path.includes("/languages")) {
-            return path.replace("/languages", "/workloads");
+          if (newPath.includes("/workloads")) {
+            newPath = newPath.replace("/workloads", "/languages");
+          }
+
+          if (newPath !== path) {
+            return newPath;
           }
         },
       } satisfies ClientRedirectOptions,
