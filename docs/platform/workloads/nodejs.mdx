@@ -1,6 +1,7 @@
 ---
 title: Managing and deploying Node.js applications
 sidebar_label: Node.js
+sidebar_position: 20
 description: Learn how to deploy and manage Node.js applications.
 tags:
   - Node.js
@@ -57,38 +58,67 @@ Since the deployment of your application is optimized for production usage, the 
 
 ## Making your app accessible via HTTP
 
-After you have created your Node.js app, you can make it accessible via HTTP. Our platform will make sure that the process that you have configured in the previous step will be running at all times.
-
-:::info
-
-There is a possibility that your application will not immediately start when you have created your application _before_ deploying any code. In this case, our automation will attempt to start your process for a certain number of times and then back off. When connected to a shell in your hosting environment, you can use the `mittnitectl job status` command to inspect your process status, and then `mittnitectl job start` to start your process. See the section on [managing your process lifecycle](#managing-your-process-lifecycle) for more information.
-
-:::
-
-You can connect your application to the internet by linking it to a domain via the mStudio or the API. Our platform will take care of routing any traffic to that domain to your application, and will also handle TLS termination, if you have configured a certificate.
-
-Your Node.js application simply needs to listen for plain HTTP traffic on a port that should be read from the `PORT` environment variable.
-
-:::caution
-
-Please **DO NOT** make any assumptions about the port that your application should listen on. The port that your application should listen on is provided via the `PORT` environment variable, and may change at any time.
-
-:::
+See our guide on [Running Webservers](../webservers#making-your-app-accessible-via-http) to learn how to make your Node.js app accessible via HTTP.
 
 ## Managing your process lifecycle
 
-With a Node.js application, the entire lifecycle of your process is managed within the application itself. Within your hosting environment, your Node.js process is managed by the [mittnite init system](https://github.com/mittwald/mittnite), a lightweight process manager that is responsible for starting, stopping and restarting your application.
+See our guide on [Running Webservers](../webserverss/#managing-your-process-lifecycle) to learn how to manage the process lifecycle of your Node.js application.
 
-Within your hosting environment, you can use the `mittnitectl` command to manage your application:
+## Example application
 
-- `mittnitectl job start` starts your application
-- `mittnitectl job stop` stops your application
-- `mittnitectl job restart` restarts your application
+### Express.js
 
-You can also use `mittnitectl` to view the status of your application:
+The following code snippet shows a minimal example of an [Express](https://expressjs.com) application that listens on the port specified in the `PORT` environment variable:
 
-- `mittnitectl job status` shows the status of your application
-- `mittnitectl job logs` shows the logs of your application
+```javascript title="app.js"
+const express = require("express");
+const app = express();
+const port = parseInt(process.env.PORT, 10) || 3000;
+
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
+```
+
+### PM2 with live-reloading
+
+To enable advanced features like live-reloading (useful for development) or clustering (when you want to use all available CPU cores), you can use the [PM2](https://pm2.keymetrics.io) process manager.
+
+For this, you need to create a Node.js app with `pm2` as its entrypoint (or alternatively, configure `pm2 start ecosystem.config.js --no-daemon` as the `start` script in your `package.json` file):
+
+```bash
+$ mw app create node --wait --entrypoint "pm2 start ecosystem.config.js --no-daemon"
+```
+
+:::important
+
+The `--no-daemon` flag in this example is especially important. It tells PM2 to run in the foreground, which is necessary for the platform to monitor the process correctly. **Without the `--no-daemon` flag, the platform will not be able to keep your application running**.
+
+:::
+
+For this, you need to have PM2 installed in your application environment. You can install it via NPM:
+
+```shellsession title="SSH shell session"
+$ npm install -g pm2
+```
+
+Next, create an ecosystem configuration file `ecosystem.config.js` in your application directory:
+
+```javascript title="ecosystem.config.js"
+module.exports = {
+  apps: [{
+    name: "test-app",
+    script: "src/server.js",
+    watch: ["src"]
+  }]
+}
+```
+
+In this example, PM2 will start the `src/server.js` script as the main application, and watch the `src` directory for changes. If any changes are detected, PM2 will automatically restart the application. Have a look at the [PM2 documentation reference](https://pm2.keymetrics.io/docs/usage/process-management/) for more information.
 
 ## Using Yarn Plug'n'Play
 

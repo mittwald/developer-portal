@@ -1,0 +1,53 @@
+---
+title: Running webservers
+sidebar_label: Webservers
+sidebar_position: 100
+description: How to start and operate your own webserver
+tags:
+  - Webserver
+---
+
+Some type of applications contain their own webserver, which is responsible for serving HTTP requests. This guide will show you how to create a webserver application and make it accessible via HTTP. Examples for these kinds of applications are:
+
+- [Node.js](../nodejs) applications
+- [Python](../python) applications
+- ReactPHP applications
+
+## Prerequisites
+
+As a prerequisite, you need an mStudio application that contains a webserver, for example a [Node.js](../nodejs) or [Python](../python) application. The application needs to have an "entrypoint" that starts your webserver.
+
+## Making your app accessible via HTTP
+
+After you have created your webserver application, you can make it accessible via HTTP. Our platform will make sure that the process that you have configured in the previous step will be running at all times.
+
+:::info
+
+There is a possibility that your application will not immediately start when you have created your application _before_ deploying any code. In this case, our automation will attempt to start your process for a certain number of times and then back off. When connected to a shell in your hosting environment, you can use the `mittnitectl job status` command to inspect your process status, and then `mittnitectl job start` to start your process. See the section on [managing your process lifecycle](#managing-your-process-lifecycle) for more information.
+
+:::
+
+You can connect your application to the internet by linking it to a domain via the mStudio or the API. Our platform will take care of routing any traffic to that domain to your application, and will also handle TLS termination, if you have configured a certificate.
+
+Your application simply needs to listen for plain HTTP traffic on a port that should be read from the `PORT` environment variable.
+
+:::caution
+
+Please **DO NOT** make any assumptions about the port that your application should listen on. The port that your application should listen on is provided via the `PORT` environment variable, and may change at any time.
+
+:::
+
+## Managing your process lifecycle
+
+With a webserver application, the entire lifecycle of your process is managed within the application itself. Within your hosting environment, your process is managed by the [mittnite init system](https://github.com/mittwald/mittnite), a lightweight process manager that is responsible for starting, stopping and restarting your application.
+
+Within your hosting environment, you can use the `mittnitectl` command to manage your application:
+
+- `mittnitectl job start` starts your application
+- `mittnitectl job stop` stops your application
+- `mittnitectl job restart` restarts your application
+
+You can also use `mittnitectl` to view the status of your application:
+
+- `mittnitectl job status` shows the status of your application
+- `mittnitectl job logs` shows the logs of your application

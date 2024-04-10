@@ -58,6 +58,9 @@ const config: Config = {
           if (path.includes("/platform")) {
             return path.replace("/platform", "/technologies");
           }
+          if (path.includes("/languages")) {
+            return path.replace("/languages", "/workloads");
+          }
         },
       } satisfies ClientRedirectOptions,
     ],
