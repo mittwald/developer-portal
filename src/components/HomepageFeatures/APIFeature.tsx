@@ -83,8 +83,8 @@ function APIDocumentation() {
           <ReferenceLink
             version="v1"
             spec={{
-              url: "https://api.mittwald.de/v1/swagger/swagger-public.json",
-              type: "swagger",
+              url: "https://api.mittwald.de/v1/openapi.json",
+              type: "openapi",
             }}
           />
         </li>
