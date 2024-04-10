@@ -123,31 +123,17 @@ function PlatformTools() {
         <li>
           <LinkGroup
             title={
-              <Translate id="index.deploy.tools.provisioning">
-                Provisioning
-              </Translate>
-            }
-            links={[
-              <Link href="https://github.com/mittwald/terraform-provider-mittwald">
-                Terraform
-              </Link>,
-              <Link href="https://github.com/mittwald/terraform-provider-mittwald">
-                Ansible
-              </Link>,
-            ]}
-          />
-        </li>
-        <li>
-          <LinkGroup
-            title={
-              <Translate id="index.deploy.tools.deployment">
-                Deployment
+              <Translate id="index.deploy.tools.deployment-provisioning">
+                Deployment and Provisioning
               </Translate>
             }
             links={[
               <Link to="/docs/v2/platform/deployment/deployer">Deployer</Link>,
               <Link to="/docs/v2/platform/deployment/typo3surf">
                 TYPO3 Surf
+              </Link>,
+              <Link href="https://github.com/mittwald/terraform-provider-mittwald">
+                Terraform
               </Link>,
             ]}
           />
