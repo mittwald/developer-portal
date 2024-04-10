@@ -2,11 +2,12 @@ import clsx from "clsx";
 import styles from "@site/src/components/HomepageFeatures/styles.module.css";
 import FeatureRow from "./FeatureRow";
 import Intro from "./Intro";
-import Translate from "@docusaurus/Translate";
+import Translate, { translate } from "@docusaurus/Translate";
 import Link from "@docusaurus/Link";
 import React, { ReactNode } from "react";
 import { NewBadge } from "@site/src/components/NewBadge";
 import { IssueTrackerLink } from "@site/src/components/IssueTrackerLink";
+import LinkGroup from "@site/src/components/LinkGroup";
 
 interface ReferenceLinkProps {
   version: string;
@@ -33,16 +34,7 @@ function ReferenceLink({
   ];
   return (
     <>
-      <strong>
-        <Translate id={`index.reference.${version}`} />
-      </strong>
-      <br />
-      {links.map((link, i) => (
-        <>
-          {link}
-          {i < links.length - 1 && " | "}
-        </>
-      ))}
+      <LinkGroup title={translate({id: `index.reference.${version}`})} links={links} />
     </>
   );
 }
