@@ -59,4 +59,61 @@ import OperationHint from "@site/src/components/OperationHint";
 
 ### Managed backup and recovery
 
+The mittwald cloud platform automatically creates backups of your projects and their databases at regular intervals. You can inspect the available backups as any time using the mStudio UI or the [`mw` CLI][cli], using the `mw backup list` command. You can also create a backup manually using the `mw backup create` command:
+
+```shellsession title="Local shell session"
+$ mw backup create --wait --expires 30d
+```
+
+To recover the contents of a single MySQL database, you can follow the following steps:
+
+1. Download a backup to your local machine:
+
+    ```shellsession title="Local shell session"
+    $ mw backup download <backup-id> --format tar --output backup.tar.gz
+    ```
+
+2. After downloading the backup, you can extract the database contents from the downloaded archive:
+
+    ```shellsession title="Local shell session"
+    $ database_id=<database-id>
+    $ tar xfz backup.tar.gz dbdump-${database_id/_/-}
+    ```
+
+    :::note
+    Note that in the archive files, the database ID is spelled differently. Whereas it usually follows the format `mysql_XXXXXX`, in the archive, it is spelled with dashes instead of underscores, like `mysql-XXXXXX`.
+    :::
+
+
+3. Recover the backup using the `mw database mysql import` command. For this, you need to have an SSH key set up on your local machine, which is also linked to your mStudio user account.
+
+    ```shellsession title="Local shell session"
+    $ database_id=<database-id>
+    $ mw database mysql import ${database_id} --input dbdump-${database_id/_/-}/*.sql.gz --gzip
+    ```
+
 ### Manual backup and recovery
+
+You can use the [`mw` CLI][cli] to manually create (and restore) backups of your MySQL database. As a prerequisite, you need to have an SSH key set up on your local machine, which is also linked to your mStudio user account.
+
+To create a backup, run the following command:
+
+```shellsession title="Local shell session"
+$ mw database mysql dump <database-id> --output dump.sql.gz --gzip
+```
+
+In this command, replace `<database-id>` with the ID of the MySQL database you want to back up. The `--gzip` flag compresses the backup file, which can save disk space and reduce transfer times.
+
+:::tip
+
+If you want to create the backup with a different user than the one you are currently logged in with, you can use the `--ssh-user` flag to specify a different user for the SSH connection. However, you still need to make sure that an SSH key is set up on your local machine for that user.
+
+:::
+
+To restore a backup, run the following command:
+
+```shellsession title="Local shell session"
+$ mw database mysql import <database-id> --input dump.sql.gz --gzip
+```
+
+[cli]: /docs/v2/api/sdks/cli
