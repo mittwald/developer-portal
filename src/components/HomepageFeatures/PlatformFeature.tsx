@@ -49,8 +49,8 @@ function PlatformCoreFeatures() {
               </Translate>
             }
             links={[
-              <Link to="/docs/v2/platform/languages/php">PHP</Link>,
-              <Link to="/docs/v2/platform/languages/nodejs">Node.js</Link>,
+              <Link to="/docs/v2/platform/workloads/php">PHP</Link>,
+              <Link to="/docs/v2/platform/workloads/nodejs">Node.js</Link>,
               <Link href="https://github.com/mittwald/feature-requests/issues">
                 Python
               </Link>,
