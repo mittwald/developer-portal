@@ -1,6 +1,7 @@
 ---
 title: Node.js-Anwendungen verwalten und deployen
 sidebar_label: Node.js
+sidebar_position: 20
 description: Erfahre, wie man Node.js-Anwendungen bereitstellt und verwaltet.
 tags:
   - Node.js
@@ -57,38 +58,67 @@ Da das Deployment deiner Anwendung für den produktiven Einsatz optimiert ist, w
 
 ## Deine Anwendung über HTTP zugänglich machen
 
-Nachdem Du Deine Node.js-Anwendung erstellt hast, kannst Du sie über HTTP zugänglich machen. Unsere Plattform stellt sicher, dass der Prozess, den Du in dem vorherigen Schritt konfiguriert hast, jederzeit ausgeführt wird.
-
-:::info
-
-Es besteht die Möglichkeit, dass Deine Anwendung nicht sofort gestartet wird, wenn Du Deine Anwendung _vor_ dem Deployment von Code erstellst. In diesem Fall versucht unsere Automatisierung, Deinen Prozess für eine bestimmte Anzahl von Versuchen zu starten und dann abzubrechen. Wenn Du mit einer Shell in Deiner Hosting-Umgebung verbunden bist, kannst Du das `mittnitectl job status`-Kommando verwenden, um den Status Deines Prozesses zu überprüfen und dann `mittnitectl job start`, um Deinen Prozess zu starten. Siehe den Abschnitt über [das Verwalten Deines Prozesslebenszyklus](#das-verwalten-deines-prozesslebenszyklus) für weitere Informationen.
-
-:::
-
-Du kannst Deine Anwendung mit dem Internet verbinden, indem Du sie über das mStudio oder die API mit einer Domain verknüpfst. Unsere Plattform kümmert sich darum, den Datenverkehr von dieser Domain zu Deiner Anwendung zu routen, und kümmert sich auch um die TLS-Terminierung, wenn Du ein Zertifikat konfiguriert hast.
-
-Deine Node.js-Anwendung muss einfach auf einem Port lauschen, der aus der `PORT`-Umgebungsvariablen gelesen werden sollte.
-
-:::caution
-
-Bitte mache **KEINE** Annahmen über den Port, auf dem Deine Anwendung hören sollte. Der Port, auf dem Deine Anwendung hören sollte, wird über die `PORT`-Umgebungsvariable bereitgestellt und kann sich jederzeit ändern.
-
-:::
+Wirf einen Blick auf unseren Leitfaden zum [Betrieb von Webservern](../webservers#deine-anwendung-über-http-zugänglich-machen), um zu erfahren, wie du deine Node.js-Anwendung über HTTP zugänglich machen kannst.
 
 ## Das Verwalten Deines Prozesslebenszyklus
 
-Bei einer Node.js-Anwendung wird der gesamte Lebenszyklus Deines Prozesses innerhalb der Anwendung selbst verwaltet. Innerhalb Deiner Hosting-Umgebung wird Dein Node.js-Prozess vom [mittnite init system](https://github.com/mittwald/mittnite), einem leichten Prozessmanager verwaltet, der für das Starten, Stoppen und Neustarten Deiner Anwendung verantwortlich ist.
+Wirf einen Blick auf unseren Leitfaden zum [Betrieb von Webservern](../webservers#das-verwalten-deines-prozesslebenszyklus), um zu erfahren, wie du den Prozesslebenszyklus deiner Node.js-Anwendung verwalten kannst.
 
-Innerhalb Deiner Hosting-Umgebung kannst Du das `mittnitectl`-Kommando verwenden, um Deine Anwendung zu verwalten:
+## Beispielanwendungen
 
-- `mittnitectl job start` startet Deine Anwendung
-- `mittnitectl job stop` stoppt Deine Anwendung
-- `mittnitectl job restart` startet Deine Anwendung neu
+### Express.js
 
-Du kannst `mittnitectl` auch verwenden, um den Status Deiner Anwendung anzuzeigen:
+Der folgende Code-Schnipsel zeigt ein minimales Beispiel einer [Express](https://expressjs.com)-Anwendung, die auf dem Port lauscht, der in der Umgebungsvariable `PORT` angegebenen ist:
 
-- `mittnitectl job status` zeigt den Status Deiner Anwendung an
-- `mittnitectl job logs` zeigt die Logs Deiner Anwendung an
+```javascript title="app.js"
+const express = require("express");
+const app = express();
+const port = parseInt(process.env.PORT, 10) || 3000;
+
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
+```
+
+### PM2 mit Live-Reloading
+
+Um fortgeschrittene Funktionen wie einen automatischen Neustart bei Code-Änderungen (nützlich für die Entwicklung) oder Clustering (wenn du alle verfügbaren CPU-Kerne nutzen möchtest) zu aktivieren, kannst du den [PM2](https://pm2.keymetrics.io) Prozessmanager verwenden.
+
+Hierzu musst du eine Node.js-Anwendung mit `pm2` als Einstiegspunkt erstellen (oder alternativ `pm2 start ecosystem.config.js --no-daemon` als `start`-Skript in deiner `package.json`-Datei konfigurieren):
+
+```bash
+$ mw app create node --wait --entrypoint "pm2 start ecosystem.config.js --no-daemon"
+```
+
+:::important
+
+Das Flag `--no-daemon` in diesem Beispiel ist besonders wichtig. Es sagt PM2, dass es im Vordergrund laufen soll. Das ist notwendig, damit die Plattform den Prozess korrekt überwachen kann. **Ohne das `--no-daemon`-Flag wird die Plattform nicht in der Lage sein, deine Anwendung am Laufen zu halten**.
+
+:::
+
+Weiterhin musst du PM2 in deiner Anwendungsumgebung installiert haben. Du kannst es über NPM installieren:
+
+```shellsession title="SSH shell session"
+$ npm install -g pm2
+```
+
+Erstelle als nächstes eine ecosystem-Konfigurationsdatei `ecosystem.config.js` in deinem Anwendungsverzeichnis:
+
+```javascript title="ecosystem.config.js"
+module.exports = {
+  apps: [{
+    name: "test-app",
+    script: "src/server.js",
+    watch: ["src"]
+  }]
+}
+```
+
+In diesem Beispiel wird PM2 das `src/server.js`-Skript als Hauptanwendung starten und das `src`-Verzeichnis auf Änderungen überwachen. Wenn Änderungen erkannt werden, wird PM2 die Anwendung automatisch neu starten. Weitere Informationen findest du in der [PM2-Dokumentationsreferenz](https://pm2.keymetrics.io/docs/usage/process-management/).
 
 ## Yarn Plug'n'Play benutzen
 

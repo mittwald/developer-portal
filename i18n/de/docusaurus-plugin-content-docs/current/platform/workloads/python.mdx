@@ -1,0 +1,153 @@
+---
+title: Python-Anwendungen verwalten und deployen
+sidebar_label: Python
+sidebar_position: 30
+description: Erfahre, wie du Python-Anwendungen deployen und verwalten kannst.
+tags:
+  - Python
+---
+
+import PlanCompatibility from "@site/src/components/PlanCompatibility";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+<PlanCompatibility plans={["ps", "ss"]} />
+
+## Eine Python-Anwendung starten
+
+<Tabs groupId="access-mode">
+  <TabItem value="gui" label="mStudio UI">
+    Um eine Python-Anwendung über die mStudio-Oberfläche zu starten, folge diesen Schritten:
+
+    1. Navigiere zum Projekt, in dem du die Anwendung erstellen möchtest.
+    2. Wähle im Seitenmenü den Punkt "Apps" aus.
+    3. Klicke auf den Button "App erstellen" und wähle "Benutzerdefinierte Python-App" aus.
+    4. Wähle im Installations-Assistenten den Eintrittspunkt-Befehl aus, der verwendet werden soll, um deine Anwendung zu starten, und schließe den Assistenten ab.
+
+    Nach Abschluss der Installation, achte auf das Installationsverzeichnis, das in der UI angezeigt wird.
+
+  </TabItem>
+  <TabItem value="cli" label="CLI">
+    Um eine Python-Anwendung über die CLI zu starten, führe den folgenden Befehl aus:
+
+    ```bash
+    $ mw app create python --wait --entrypoint "python server.py"
+    ```
+
+    Das `--wait`-Flag sorgt dafür, dass die CLI wartet, bis die Installation abgeschlossen ist. Das `--entrypoint`-Flag enthält den Befehl, der verwendet werden soll, um deine Anwendung tatsächlich zu starten. Falls er weggelassen wird, wird der Standardwert `yarn start` verwendet.
+
+    Nachdem die Installation abgeschlossen wurde, verwende das `mw app get`-Kommando, um das Installationsverzeichnis zu ermitteln.
+
+  </TabItem>
+  <TabItem value="api" label="API">
+    To learn how to deploy a Node.js application via the API, read the article ["Starting a Node.js application"](../../../api/howtos/create-nodejs).
+  </TabItem>
+</Tabs>
+
+### Deine Anwendung bereitstellen
+
+Nachdem du deine Python-Anwendung erstellt hast, kannst du deinen Code deployen, indem du ihn in das dafür vorgesehene Installationsverzeichnis hochlädst. Um deinen Code bereitzustellen, kannst du die Methode wählen, die zu bevorzugst, wie beispielsweise ein lokal ausgeführter Git-Klon, rsync oder SFTP.
+
+Für mehr Informationen, wie du deinen Code am besten bereitstellen kannst, wirf einen Blick auf unsere Sammlung von [Deployment-Anleitungen](/docs/v2/category/deployment-guides).
+
+:::info
+
+Da das Deployment deiner Anwendung für den produktiven Einsatz optimiert ist, wird die Plattform **NICHT** automatisch deine Anwendung bei Code-Änderungen neu starten. Du musst deine Anwendung manuell neu starten, nachdem du deinen Code bereitgestellt hast. Siehe den Abschnitt über die [Verwaltung des Prozesslebenszyklus](#verwaltung-des-prozesslebenszyklus) für weitere Informationen.
+
+:::
+
+## Deine Anwendung über HTTP zugänglich machen
+
+Wirf einen Blick auf unseren Leitfaden zum [Betrieb von Webservern](../webservers#deine-anwendung-über-http-zugänglich-machen), um zu erfahren, wie du deine Python-Anwendung über HTTP zugänglich machen kannst.
+
+## Das Verwalten Deines Prozesslebenszyklus
+
+Wirf einen Blick auf unseren Leitfaden zum [Betrieb von Webservern](../webservers#das-verwalten-deines-prozesslebenszyklus), um zu erfahren, wie du den Prozesslebenszyklus deiner Python-Anwendung verwalten kannst.
+
+## Beispielanwendungen
+
+### Flask mit Gunicorn
+
+Dieser Abschnitt zeigt dir, wie du eine einfache Python-Anwendung mit [Flask](https://flask.palletsprojects.com/en/3.0.x/) und [Gunicorn](https://gunicorn.org/) bereitstellen kannst. Dafür musst du eine benutzerdefinierte Python-Installation mit dem Einstiegspunkt `gunicorn -w4 server:app` erstellen:
+
+```shellsession title="Local shell session"
+$ mw app create python --wait --entrypoint "gunicorn -w4 server:app"
+```
+
+Bezüglich des Einstiegspunkts:
+
+- Der `-w`-Parameter steuert die Anzahl der Worker-Prozesse. Die [Gunicorn-Dokumentation](https://docs.gunicorn.org/en/stable/design.html#how-many-workers) empfiehlt, _2 × [Anzahl der CPU-Kerne] + 1_ als Ausgangspunkt zu verwenden.
+- Der Teil `server:app` bezieht sich auf das `app`-Objekt in der Datei `server.py`. Diese werden im nächsten Schritt erstellt.
+
+Installiere zunächst die erforderlichen Abhängigkeiten über pip:
+
+```shellsession title="SSH shell session"
+$ pip install gunicorn flask
+```
+
+Erstelle dann eine `server.py` in deinem Anwendungsverzeichnis:
+
+```python title="server.py"
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route("/")
+def hello():
+    return "<p>Hello World</p>"
+```
+
+Gunicorn respektiert automatisch die `PORT`-Umgebungsvariable, sodass du den Port nicht gesondert in deinem Anwendungscode berücksichtigen musst.
+
+Um sicherzustellen, dass deine Anwendung läuft, verwende die Befehle `mittnitectl job status` und `mittnitectl job start`:
+
+```shellsession title="SSH shell session"
+$ mittnitectl job status
+$ mittnitectl job start
+```
+
+### Django mit Gunicorn
+
+Dieser Abschnitt zeigt dir, wie du eine einfache Python-Anwendung mit [Django](https://www.djangoproject.com/) und [Gunicorn](https://gunicorn.org/) bereitstellen kannst. Dafür musst du eine benutzerdefinierte Python-Installation mit dem Einstiegspunkt `gunicorn -w 4 <project-name>.wsgi:application` erstellen. In diesem Befehl steuert der `-w`-Parameter die Anzahl der Worker-Prozesse und `<project-name>` ist der Name deines Django-Projekts:
+
+```shellsession title="Local shell session"
+$ mw app create python --wait --entrypoint "gunicorn -w 4 <project-name>.wsgi:application"
+```
+
+Bezüglich des Einstiegspunkts:
+
+- Der `-w`-Parameter steuert die Anzahl der Worker-Prozesse. Die [Gunicorn-Dokumentation](https://docs.gunicorn.org/en/stable/design.html#how-many-workers) empfiehlt, _2 × [Anzahl der CPU-Kerne] + 1_ als Ausgangspunkt zu verwenden.
+- `<project-name>` bezieht sich auf den Namen deines Django-Projekts. Wenn du ein neues Django-Projekt erstellst, ist dies das erste Argument, das du an den Befehl `django-admin startproject` übergibst.
+
+Folge dem [offiziellen Django-Tutorial](https://docs.djangoproject.com/en/5.0/intro/tutorial01/) um zu lernen, wie du ein Django-Projekt initialisierst. Zusammengefasst, verwende folgenden Befehl, um ein neues Projekt in deinem Anwendungsverzeichnis zu initialisieren:
+
+```shellsession title="SSH shell session"
+$ django-admin startproject <project-name> .
+```
+
+Gunicorn respektiert automatisch die `PORT`-Umgebungsvariable, sodass du den Port nicht gesondert in deinem Anwendungscode berücksichtigen musst.
+
+Um sicherzustellen, dass deine Anwendung läuft, verwende die Befehle `mittnitectl job status` und `mittnitectl job start`:
+
+```shellsession title="SSH shell session"
+$ mittnitectl job status
+$ mittnitectl job start
+```
+
+### Django Entwicklungsserver
+
+Wenn du mit Django arbeitest, kannst du auch den integrierten Entwicklungsserver verwenden. Der Entwicklungsserver ist nicht für den produktiven Einsatz geeignet, eignet sich jedoch für Entwicklungs- und Testzwecke, da er automatisch bei Code-Änderungen neu lädt.
+
+Um den Entwicklungsserver zu verwenden, musst du ein Wrapper-Skript erstellen, um die `PORT`-Umgebungsvariable korrekt auszulesen. Erstelle dafür deine Python-Anwendung mit dem Einstiegspunkt `bash start.sh`:
+
+```shellsession title="Local shell session"
+$ mw app create python --wait --entrypoint "bash start.sh"
+```
+
+Initialisiere dann deine Django-Anwendung wie im vorherigen Abschnitt beschrieben und erstelle eine `start.sh`-Datei in deinem Anwendungsverzeichnis:
+
+```bash title="start.sh"
+#!/bin/bash
+
+exec python manage.py runserver ${PORT:-8000}
+```

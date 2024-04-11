@@ -1,0 +1,53 @@
+---
+title: Webserver betreiben
+sidebar_label: Webserver
+sidebar_position: 100
+description: Wie du deinen eigenen Webserver startest und betreibst
+tags:
+  - Webserver
+---
+
+Manche Anwendungen enthalten ihren eigenen Webserver, der für die Verarbeitung von HTTP-Anfragen verantwortlich ist. Diese Anleitung zeigt dir, wie du eine Webserver-Anwendung erstellst und über HTTP zugänglich machst. Beispiele für solche Anwendungen sind:
+
+- [Node.js](../nodejs)-Anwendungen
+- [Python](../python)-Anwendungen
+- ReactPHP-Anwendungen
+
+## Voraussetzungen
+
+Als Voraussetzung benötigst du eine mStudio-Anwendung, die einen Webserver enthält, z. B. eine [Node.js](../nodejs)- oder [Python](../python)-Anwendung. Die Anwendung muss einen "Einstiegspunkt" haben, der deinen Webserver startet.
+
+## Deine Anwendung über HTTP zugänglich machen
+
+Nachdem du deine Anwendung erstellt hast, kannst du sie über HTTP zugänglich machen. Unsere Plattform stellt sicher, dass der Prozess, den du in dem vorherigen Schritt als "Einstiegspunkt" konfiguriert hast, jederzeit ausgeführt wird.
+
+:::info
+
+Es besteht die Möglichkeit, dass deine Anwendung nicht sofort gestartet wird, wenn du deine Anwendung _vor_ dem Deployment von Code erstellst. In diesem Fall versucht unsere Automatisierung, deinen Prozess für eine bestimmte Anzahl von Versuchen zu starten und dann abzubrechen. Wenn du mit einer Shell in deiner Hosting-Umgebung verbunden bist, kannst du das `mittnitectl job status`-Kommando verwenden, um den Status deines Prozesses zu überprüfen und dann `mittnitectl job start`, um deinen Prozess zu starten. Siehe den Abschnitt über [das Verwalten deines Prozesslebenszyklus](#das-verwalten-deines-prozesslebenszyklus) für weitere Informationen.
+
+:::
+
+Du kannst deine Anwendung mit dem Internet verbinden, indem du sie über das mStudio oder die API mit einer Domain verknüpfst. Unsere Plattform kümmert sich darum, den Datenverkehr von dieser Domain zu deiner Anwendung zu routen, und kümmert sich auch um die TLS-Terminierung, wenn du ein Zertifikat konfiguriert hast.
+
+Der Webserver deiner Anwendung muss einfach auf einem Port lauschen, der aus der `PORT`-Umgebungsvariablen gelesen werden sollte.
+
+:::caution
+
+Bitte mache **KEINE** Annahmen über den Port, auf dem deine Anwendung hören sollte. Der Port, auf dem deine Anwendung hören sollte, wird über die `PORT`-Umgebungsvariable bereitgestellt und kann sich jederzeit ändern.
+
+:::
+
+## Das Verwalten deines Prozesslebenszyklus
+
+Bei einer Anwendung mit eigenem Webserver wird der gesamte Lebenszyklus deines Prozesses innerhalb der Anwendung selbst verwaltet. Innerhalb deiner Hosting-Umgebung wird dein Prozess vom [mittnite-Initsystem](https://github.com/mittwald/mittnite), einem leichtgewichtigen Prozessmanager verwaltet, der für das Starten, Stoppen und Neustarten deiner Anwendung verantwortlich ist.
+
+Innerhalb deiner Hosting-Umgebung kannst du das `mittnitectl`-Kommando verwenden, um deine Anwendung zu verwalten:
+
+- `mittnitectl job start` startet deine Anwendung
+- `mittnitectl job stop` stoppt deine Anwendung
+- `mittnitectl job restart` startet deine Anwendung neu
+
+Du kannst `mittnitectl` auch verwenden, um den Status deiner Anwendung anzuzeigen:
+
+- `mittnitectl job status` zeigt den Status deiner Anwendung an
+- `mittnitectl job logs` zeigt die Logs deiner Anwendung an
