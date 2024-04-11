@@ -112,6 +112,7 @@ function PlatformTools() {
               </Translate>
             }
             links={[
+              <Link to="/docs/v2/api/sdks/cli">CLI</Link>,
               <Link href="https://github.com/mittwald/ddev">
                 DDEV <NewBadge />
               </Link>,

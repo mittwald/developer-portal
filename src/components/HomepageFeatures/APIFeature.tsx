@@ -122,7 +122,10 @@ function APILibraries() {
       </p>
       <ul>
         <li>
-          <Link to="/docs/v2/api/sdks/php">mittwald PHP SDK</Link> <NewBadge />
+          <Link to="/docs/v2/api/sdks/cli">mittwald CLI</Link>
+        </li>
+        <li>
+          <Link to="/docs/v2/api/sdks/php">mittwald PHP SDK</Link>
         </li>
         <li>
           <Link to="/docs/v2/api/sdks/javascript">mittwald JavaScript SDK</Link>{" "}
