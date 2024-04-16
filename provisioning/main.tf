@@ -2,12 +2,27 @@ terraform {
   required_providers {
     mittwald = {
       source = "mittwald/mittwald"
-      version = "1.0.0-alpha1"
+      version = "1.0.0-alpha5"
+    }
+  }
+
+  cloud {
+    organization = "mittwald"
+    workspaces {
+      name = "developer-portal"
     }
   }
 }
 
-provider "mittwald" {}
+variable "mittwald_api_key" {
+  type        = string
+  description = "The API token for the Mittwald API"
+  sensitive   = true
+}
+
+provider "mittwald" {
+  api_key = var.mittwald_api_key
+}
 
 variable "hostname" {
   type = string
