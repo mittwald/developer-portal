@@ -7,7 +7,6 @@ function PageViewTracker({ children }: PropsWithChildren<{}>) {
   const location = useLocation();
 
   useEffect(() => {
-    console.log("tracking pageview", location.pathname);
     trackPageView({});
   }, [location]);
 
