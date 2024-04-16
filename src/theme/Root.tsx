@@ -19,7 +19,7 @@ export default function Root({ children }: PropsWithChildren<{}>) {
     urlBase: "https://developer.mittwald.de/stats/",
     siteId: 1,
     configurations: {
-      disableCookies: true
+      disableCookies: true,
       setSecureCookie: true,
     }
   });
