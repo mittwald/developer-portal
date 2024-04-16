@@ -20,7 +20,7 @@ export default function Root({ children }: PropsWithChildren<{}>) {
     siteId: 1,
     configurations: {
       disableCookies: true
-      // setSecureCookie: true,
+      setSecureCookie: true,
     }
   });
 
