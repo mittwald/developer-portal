@@ -70,6 +70,22 @@ resource "mittwald_app" "matomo" {
   }
 }
 
+resource "mittwald_cronjob" "matomo_archive" {
+  project_id = mittwald_project.developer_portal.id
+  app_id = mittwald_app.matomo.id
+
+  interval = "*/15 * * * *"
+  description = "Matomo Archival Cronjob"
+
+  destination = {
+    command = {
+      interpreter = "php"
+      path = mittwald_app.matomo.installation_path_absolute
+      arguments = ["console", "core:archive"]
+    }
+  }
+}
+
 resource "mittwald_virtualhost" "developer_portal" {
   project_id = mittwald_project.developer_portal.id
   hostname = var.hostname
