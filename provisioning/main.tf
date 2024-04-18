@@ -79,7 +79,7 @@ resource "mittwald_cronjob" "matomo_archive" {
 
   destination = {
     command = {
-      interpreter = "php"
+      interpreter = "/usr/bin/php"
       path = mittwald_app.matomo.installation_path_absolute
       parameters = ["console", "core:archive"]
     }
