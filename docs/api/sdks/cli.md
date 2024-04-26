@@ -80,11 +80,12 @@ $ mw login status
 
 ## General usage
 
-### Project/Server/Organization contexts
+### App Installation/Project/Server/Organization contexts
 
-Many commands of the CLI act in the context of a certain project, server or organization, and as such require a `--project-id`, `--server-id` or `--org-id` flag. You can either pass these flags to each command, or set them globally using the `mw context` command:
+Many commands of the CLI act in the context of a certain app installation, project, server or organization, and as such require a `--installation-id`, `--project-id`, `--server-id` or `--org-id` flag. You can either pass these flags to each command, or set them globally using the `mw context` command:
 
 ```bash
+$ mw context set --installation-id=...
 $ mw context set --project-id=...
 $ mw context set --server-id=...
 $ mw context set --org-id=...
