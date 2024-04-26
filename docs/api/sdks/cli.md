@@ -78,6 +78,40 @@ $ export MITTWALD_API_TOKEN=********
 $ mw login status
 ```
 
+### SSH
+
+To set up public key authentication, add your local SSH public key to your mStudio user's authorized keys. With the mittwald CLI, you can create a new SSH keypair and import the public key to your mStudio account with a single command:
+
+```
+$ mw user ssh-key create
+```
+
+If you already have an existing SSH keypair, you can import the public key to your mStudio account with the following command:
+
+```
+$ mw user ssh-key import
+```
+
+#### Using the SSH key
+
+A few commands like `mw [app|project] download`, `mw [app|project] ssh` and some of the subcomands for `mw database` support the flag `--ssh-identity-file`. Using this flag the ssh private key is used to authenticate.
+
+```
+$ mw project ssh ... --ssh-identity-file="~/.ssh/mstudio-cli
+```
+
+Alternatively you can also set this value by setting the `MITTWALD_SSH_IDENTITY_FILE` environment variable.
+
+Another way to use the key is to add the following to your `~/.ssh/config`
+
+```
+Host *.project.host
+  IdentityFile ~/.ssh/mstudio-cli
+```
+
+This way you can run the commands `mw [app|project] download` and `mw [app|project] ssh` without setting the key every time.
+
+
 ## General usage
 
 ### App Installation/Project/Server/Organization contexts
