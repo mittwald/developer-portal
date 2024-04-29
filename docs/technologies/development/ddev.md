@@ -20,17 +20,9 @@ It's also recommended to have the [mittwald CLI][cli] installed, although it's o
 
 ### Setting up SSH connectivity
 
-To use the `ddev pull` and `ddev push` commands, you need to set up SSH connectivity between your local machine and your mittwald app. To do this, add your local SSH public key to your mStudio user's authorized keys. With the mittwald CLI, you can create a new SSH keypair and import the public key to your mStudio account with a single command:
+To use the `ddev pull` and `ddev push` commands, you need to set up SSH connectivity between your local machine and your mittwald app. To do this, follow the ["SSH authentication" section][cli-ssh] of the mittwald CLI documentation.
 
-```shell-session
-$ mw user ssh-key create
-```
-
-If you already have an existing SSH keypair, you can import the public key to your mStudio account with the following command:
-
-```shell-session
-$ mw user ssh-key import
-```
+Additionally, the DDEV integration with mittwald requires SSH connectivity to work correctly from within the DDEV web container. Typically, all your SSH keys are passed into the DDEV container using an SSH agent when you run `ddev auth ssh`. However, if you encounter issues like `too many authentication failures`, you may need to manually configure your SSH keys inside the DDEV container. Have a look at the ["common issues"](#common-issues) section for more information.
 
 ## Setting up a DDEV environment for a mittwald project
 
@@ -112,6 +104,28 @@ $ ddev mw <command>
 
 Replace `<command>` with any supported command from the mittwald CLI.
 
+## Common issues
+
+### SSH connections fail with `too many authentication failures`
+
+This error may occur when you have a lot SSH key pairs configured on your local machine, and the remote server rejects the connection after too many failed authentication attempts.
+
+To circumvent this issue, you can manually configure your SSH keys inside the DDEV web container. To do this, follow these steps:
+
+1. Add the required SSH key directly to the DDEV web container, by symlinking it into `.ddev/homeadditions`:
+
+    ```shell-session
+    $ mkdir -p .ddev/homeadditions/.ssh
+    $ ln -s ~/.ssh/mstudio ~/.ddev/homeadditions/.ssh/mstudio
+    ```
+   
+2. Set the `MITTWALD_SSH_IDENTITY_FILE` environment variable to point to the symlinked SSH key:
+
+    ```shell-session
+    $ ddev config --web-environment-add MITTWALD_SSH_IDENTITY_FILE=~/.ssh/mstudio
+    ```
+
 [cli]: /docs/v2/api/sdks/cli
+[cli-ssh]: /docs/v2/api/sdks/cli/#ssh
 [apitoken]: /docs/v2/api/intro
 [ddev-addon]: https://github.com/mittwald/ddev
