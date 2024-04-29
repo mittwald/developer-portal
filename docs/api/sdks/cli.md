@@ -56,6 +56,8 @@ $ docker run \
 
 ## Authenticating
 
+### API access
+
 To use the CLI, you first need to authenticate your client using an API token. Have a look at the ["Obtaining an API token" section](../../intro#obtaining-an-api-token) of the introduction for details on how to obtain an API token.
 
 :::note
@@ -80,37 +82,47 @@ $ mw login status
 
 ### SSH
 
-To set up public key authentication, add your local SSH public key to your mStudio user's authorized keys. With the mittwald CLI, you can create a new SSH keypair and import the public key to your mStudio account with a single command:
+A few commands (like `mw [app|project] download`, `mw [app|project] ssh` and some of the subcomands for `mw database`) connect to your actual hosting environment via SSH. For these commands, your local environment needs to be set up with an SSH keypair to authenticate against the remote server without prompting for your password.
 
-```
-$ mw user ssh-key create
-```
+1. **If you already have an existing SSH private key**, you can import the public key to your mStudio account with the following command:
 
-If you already have an existing SSH keypair, you can import the public key to your mStudio account with the following command:
+    ```
+    $ mw user ssh-key import
+    ```
+   
+2. **To create and import a new SSH keypair**, you can use the following command:
 
-```
-$ mw user ssh-key import
-```
+    ```
+    $ mw user ssh-key create
+    ```
+   
+Usually, the key pair should be used automatically by the CLI. To explicitly specify the key pair to use (for example, if you receive a `too many authentication failures` error), you have a few options:
 
-#### Using the SSH key
+1. All commands that require an SSH connection respect your systems [SSH configuration](https://linux.die.net/man/5/ssh_config) (typically in `~/.ssh/config`). You can specify the key to use for a specific host like this:
 
-A few commands like `mw [app|project] download`, `mw [app|project] ssh` and some of the subcomands for `mw database` support the flag `--ssh-identity-file`. Using this flag the ssh private key is used to authenticate.
+    ```txt title="~/.ssh/config"
+    Host *.project.host
+      IdentityFile ~/.ssh/mstudio-cli
+    ```
+   
+2. Alternatively, all commands that require an SSH connection accept a `--ssh-identity-file` flag that you can use to specify the key to use:
 
-```
-$ mw project ssh ... --ssh-identity-file="~/.ssh/mstudio-cli
-```
+    ```
+    $ mw app download ... --ssh-identity-file="~/.ssh/mstudio-cli"
+    ```
+   
+3. Instead of the `--ssh-identity-file` flag, you can also set the `MITTWALD_SSH_IDENTITY_FILE` environment variable to specify the key to use:
 
-Alternatively you can also set this value by setting the `MITTWALD_SSH_IDENTITY_FILE` environment variable.
+    ```
+    $ export MITTWALD_SSH_IDENTITY_FILE=~/.ssh/mstudio-cli
+    $ mw app download ...
+    ```
+   
+    You can also set the `MITTWALD_SSH_IDENTITY_FILE` environment variable in your shell profile (`~/.zshrc` or `~/.bashrc`) to make it available in every shell session:
 
-Another way to use the key is to add the following to your `~/.ssh/config`
-
-```
-Host *.project.host
-  IdentityFile ~/.ssh/mstudio-cli
-```
-
-This way you can run the commands `mw [app|project] download` and `mw [app|project] ssh` without setting the key every time.
-
+    ```
+    $ echo 'export MITTWALD_SSH_IDENTITY_FILE=~/.ssh/mstudio-cli' >> ~/.zshrc
+    ```
 
 ## General usage
 

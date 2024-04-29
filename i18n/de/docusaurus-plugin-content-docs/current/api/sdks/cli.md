@@ -50,6 +50,8 @@ $ docker run \
 
 ## Authentifizierung
 
+### API-Zugriff
+
 Um die CLI zu verwenden, musst du dich zunächst mit einem API-Token authentifizieren. Schau dir den Abschnitt ["Ein API-Token beziehen"](../../intro#obtaining-an-api-token) der Einführung an, um Details zum Erhalt eines API-Tokens zu erfahren.
 
 :::note
@@ -71,6 +73,50 @@ Für nicht-interaktive Nutzung (beispielsweise in CI/CD-Pipelines), kannst du da
 $ export MITTWALD_API_TOKEN=********
 $ mw login status
 ```
+
+### SSH
+
+Einige Befehle (wie `mw [app|project] download`, `mw [app|project] ssh` und einige der Subkommandos für `mw database`) verbinden sich über SSH mit deiner tatsächlichen Hosting-Umgebung. Für diese Befehle muss deine lokale Umgebung mit einem SSH-Schlüsselpaar eingerichtet sein, um sich gegen den Remote-Server zu authentifizieren, ohne nach deinem Passwort zu fragen.
+
+1. **Falls du bereits ein vorhandenes SSH-Privatschlüssel-Paar hast**, kannst du den öffentlichen Schlüssel mit folgendem Befehl in deinem mStudio-Konto importieren:
+
+    ```
+    $ mw user ssh-key import
+    ```
+   
+2. **Um ein neues SSH-Schlüsselpaar zu erstellen und zu importieren**, kannst du den folgenden Befehl verwenden:
+
+    ```
+    $ mw user ssh-key create
+    ```
+
+Normalerweise sollte das Schlüsselpaar automatisch von der CLI verwendet werden. Um explizit ein bestimmtes zu verwendendes Schlüsselpaar anzugeben (zum Beispiel, wenn du einen `too many authentication failures`-Fehler erhältst), hast du ein paar Optionen:
+
+1. Alle Befehle, die eine SSH-Verbindung erfordern, respektieren deine [SSH-Konfiguration](https://linux.die.net/man/5/ssh_config) (üblicherweise in `~/.ssh/config`). Du kannst den Schlüssel, der für einen bestimmten Host verwendet werden soll, wie folgt angeben:
+
+    ```txt title="~/.ssh/config"
+    Host *.project.host
+      IdentityFile ~/.ssh/mstudio-cli
+    ```
+
+2. Alternativ akzeptieren alle Befehle, die eine SSH-Verbindung erfordern, ein `--ssh-identity-file`-Flag, mit dem du den zu verwendenden Schlüssel angeben kannst:
+
+    ```
+    $ mw app download ... --ssh-identity-file="~/.ssh/mstudio-cli"
+    ```
+
+3. Anstelle des `--ssh-identity-file`-Flags kannst du auch die `MITTWALD_SSH_IDENTITY_FILE`-Umgebungsvariable setzen, um den zu verwendenden Schlüssel anzugeben:
+
+    ```
+    $ export MITTWALD_SSH_IDENTITY_FILE=~/.ssh/mstudio-cli
+    $ mw app download ...
+    ```
+   
+    Du kannst die `MITTWALD_SSH_IDENTITY_FILE`-Umgebungsvariable auch in deinem Shell-Profil (`~/.zshrc` oder `~/.bashrc`) setzen, um sie in jeder Shell-Sitzung verfügbar zu machen:
+
+    ```
+    $ echo 'export MITTWALD_SSH_IDENTITY_FILE=~/.ssh/mstudio-cli' >> ~/.zshrc
+    ```
 
 ## Allgemeine Verwendung
 
