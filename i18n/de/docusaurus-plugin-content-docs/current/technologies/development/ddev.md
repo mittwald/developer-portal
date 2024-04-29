@@ -20,17 +20,9 @@ Wir empfehlen außerdem, die [mittwald CLI][cli] für die Einrichtung zu verwend
 
 ### SSH-Konnektivität herstellen
 
-Um die `ddev pull`- und `ddev push`-Befehle verwenden zu können, musst du eine SSH-Authentifizierung zwischen deinem lokalen Rechner und deiner mittwald-App herstellen. Füge dazu deinen lokalen SSH-Public-Key zu den autorisierten Schlüsseln deines mStudio-Benutzers hinzu. Mit der mittwald CLI kannst du ein neues SSH-Schlüsselpaar erstellen und den öffentlichen Schlüssel mit einem einzigen Befehl in deinem mStudio-Konto importieren:
+Um die Befehle `ddev pull` und `ddev push` verwenden zu können, musst du eine SSH-Verbindung zwischen deinem lokalen Rechner und deiner mittwald-App ermöglichen. Folge dazu dem Abschnitt ["SSH-Authentifizierung"][cli-ssh] der mittwald CLI-Dokumentation.
 
-```shell-session
-$ mw user ssh-key create
-```
-
-Wenn du bereits ein vorhandenes SSH-Schlüsselpaar hast, kannst du den öffentlichen Schlüssel mit dem folgenden Befehl in deinem mStudio-Konto importieren:
-
-```shell-session
-$ mw user ssh-key import
-```
+Weiterhin ist für die korrekte Funktion der DDEV-Integration mit mittwald eine SSH-Konnektivität von innerhalb des DDEV-Webcontainers erforderlich. Normalerweise werden alle deine SSH-Schlüssel in den DDEV-Container über einen SSH-Agenten übergeben, wenn du `ddev auth ssh` ausführst. Wenn du jedoch Probleme wie `too many authentication failures` hast, musst du möglicherweise deine SSH-Schlüssel manuell im DDEV-Container konfigurieren. Siehe den Abschnitt ["Häufige Probleme"](#häufige-probleme) für weitere Informationen.
 
 ## Einrichten einer neuen DDEV-Umgebung für ein mittwald-Projekt
 
@@ -112,7 +104,29 @@ $ ddev mw <command>
 
 Ersetze `<command>` durch einen unterstützten Befehl des mittwald CLI.
 
+## Häufige Probleme
+
+### SSH-Verbindungen schlagen mit `too many authentication failures` fehl
+
+Dieser Fehler kann auftreten, wenn du viele SSH-Schlüsselpaare auf deinem lokalen Rechner konfiguriert hast und der Remote-Server die Verbindung nach zu vielen fehlgeschlagenen Authentifizierungsversuchen ablehnt.
+
+Um dieses Problem zu umgehen, kannst du deine SSH-Schlüssel manuell im DDEV-Webcontainer konfigurieren. Führe dazu folgende Schritte aus:
+
+1. Füge den erforderlichen SSH-Schlüssel direkt zum DDEV-Webcontainer hinzu, indem du ihn in `.ddev/homeadditions` verlinkst:
+
+    ```shell-session
+    $ mkdir -p .ddev/homeadditions/.ssh
+    $ ln -s ~/.ssh/mstudio ~/.ddev/homeadditions/.ssh/mstudio
+    ```
+
+2. Setze die Umgebungsvariable `MITTWALD_SSH_IDENTITY_FILE` so, dass sie auf den verlinkten SSH-Schlüssel zeigt:
+
+    ```shell-session
+    $ ddev config --web-environment-add MITTWALD_SSH_IDENTITY_FILE=~/.ssh/mstudio
+    ```
+
 [cli]: /docs/v2/api/sdks/cli
+[cli-ssh]: /docs/v2/api/sdks/cli/#ssh
 [apitoken]: /docs/v2/api/intro
 [ddev-addon]: https://github.com/mittwald/ddev
 
