@@ -30,6 +30,8 @@ The following instructions guide you through setting up a DDEV environment for y
 
 These instructions work both for setting up a new DDEV environment, and also for connecting a mittwald app to an existing DDEV environment.
 
+It's also up to you if you want to initialize an empty project and pull code and database from an already installed app on the server, or if you want to setup a DDEV environment for an already existing codebase on your local machine. 
+
 ### Using the mittwald CLI
 
 If you already have the [mittwald CLI][cli] installed, you can set up a DDEV project for your mittwald app with a single command.
@@ -42,6 +44,9 @@ $ mkdir project-dir && cd project-dir
 
 $ # Initialize DDEV environment
 $ mw ddev init <app-id> --project-name <project-name>
+
+$ # Optional: Pull code and database from server
+$ ddev pull mittwald
 ```
 
 This command automatically configures a DDEV environment to closely match the environment of your existing mittwald app, including PHP and MySQL versions and the document root. Additionally, it installs and configures the [mittwald DDEV addon][ddev-addon], which integrates seamlessly with DDEV.
@@ -80,7 +85,7 @@ To pull the code and database from your mittwald app to your local DDEV environm
 $ ddev pull mittwald
 ```
 
-Conversely, to push your local code and database changes to your mittwald app, execute:
+Conversely, to push your local code and database changes to your mittwald app, run the following command:
 
 ```shell-session
 $ ddev push mittwald
@@ -108,11 +113,13 @@ Replace `<command>` with any supported command from the mittwald CLI.
 
 ### SSH connections fail with `too many authentication failures`
 
-This error may occur when you have a lot SSH key pairs configured on your local machine, and the remote server rejects the connection after too many failed authentication attempts.
+This error may occur when you have a lot of SSH key pairs configured on your local machine. In this case, the remote server may reject the connection after too many failed authentication attempts.
 
 To circumvent this issue, you can manually configure your SSH keys inside the DDEV web container. To do this, follow these steps:
 
-1. Add the required SSH key directly to the DDEV web container, by symlinking it into `.ddev/homeadditions`:
+0. Find the SSH key pair that you want to use for the connection, and make sure that the public key is added to your mStudio user profile. For the following steps, we'll assume that the SSH key is named `mstudio` and the private key is stored in `~/.ssh/mstudio`.
+
+1. Add the required SSH key directly to the DDEV web container by symlinking it into `.ddev/homeadditions`:[^1]
 
     ```shell-session
     $ mkdir -p .ddev/homeadditions/.ssh
@@ -129,3 +136,5 @@ To circumvent this issue, you can manually configure your SSH keys inside the DD
 [cli-ssh]: /docs/v2/api/sdks/cli/#ssh
 [apitoken]: /docs/v2/api/intro
 [ddev-addon]: https://github.com/mittwald/ddev
+
+[^1]: DDEV `homeadditions` are a mechanism to extend your home directory within the web container. Have a look at the [manual](https://ddev.readthedocs.io/en/stable/users/extend/in-container-configuration/) for more information.

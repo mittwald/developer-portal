@@ -30,6 +30,8 @@ Die folgenden Anweisungen führen dich durch die Einrichtung einer DDEV-Umgebung
 
 Diese Anweisungen funktionieren sowohl für die Einrichtung einer neuen DDEV-Umgebung als auch für das Verbinden einer mittwald-App mit einer vorhandenen DDEV-Umgebung.
 
+Dir steht es auch frei, ob du ein leeres Projekt initialisieren und Code und Datenbank von einer bereits installierten App auf dem Server abrufen möchtest, oder ob du eine DDEV-Umgebung für eine bereits vorhandene Codebasis auf deinem lokalen Rechner einrichten möchtest.
+
 ### Mit der mittwald CLI
 
 Wenn du die [mittwald CLI][cli] bereits installiert hast, kannst du mit einem einzigen Befehl ein DDEV-Projekt für deine mittwald-App einrichten.
@@ -42,6 +44,9 @@ $ mkdir project-dir && cd project-dir
 
 $ # DDEV-Umgebung initialisieren
 $ mw ddev init <app-id> --project-name <project-name>
+
+$ # Optional: Code und Datenbank vom Server abrufen
+$ ddev pull mittwald
 ```
 
 Dieser Befehl konfiguriert automatisch eine DDEV-Umgebung, die deiner vorhandenen mittwald-App weitgehend entspricht, einschließlich PHP- und MySQL-Versionen sowie des Document Roots. Darüber hinaus installiert und konfiguriert er das [mittwald DDEV-Addon][ddev-addon], das nahtlos mit DDEV integriert ist.
@@ -112,6 +117,8 @@ Dieser Fehler kann auftreten, wenn du viele SSH-Schlüsselpaare auf deinem lokal
 
 Um dieses Problem zu umgehen, kannst du deine SSH-Schlüssel manuell im DDEV-Webcontainer konfigurieren. Führe dazu folgende Schritte aus:
 
+0. Finde das SSH-Schlüsselpaar, das du für die Verbindung verwenden möchtest, und stelle sicher, dass der öffentliche Schlüssel zu deinem mStudio-Benutzerprofil hinzugefügt ist. Für die folgenden Schritte gehen wir davon aus, dass der SSH-Schlüssel `mstudio` heißt und der private Schlüssel in `~/.ssh/mstudio` gespeichert ist.
+
 1. Füge den erforderlichen SSH-Schlüssel direkt zum DDEV-Webcontainer hinzu, indem du ihn in `.ddev/homeadditions` verlinkst:
 
     ```shell-session
@@ -130,6 +137,4 @@ Um dieses Problem zu umgehen, kannst du deine SSH-Schlüssel manuell im DDEV-Web
 [apitoken]: /docs/v2/api/intro
 [ddev-addon]: https://github.com/mittwald/ddev
 
-```
-
-```
+[^1]: DDEV-`homeadditions` sind ein Mechanismus, um dein Home-Verzeichnis innerhalb des Webcontainers zu erweitern. Siehe das [Handbuch](https://ddev.readthedocs.io/en/stable/users/extend/in-container-configuration/) für weitere Informationen.
