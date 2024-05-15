@@ -39,7 +39,8 @@ Wenn du die [mittwald CLI][cli] bereits installiert hast, kannst du mit einem ei
 Um die Einrichtung zu starten, führe den folgenden Befehl in deinem Terminal aus und ersetze `<app-id>` durch deine App-ID (üblicherweise im Format `a-xxxxx`) und `<project-name>` durch einen geeigneten Namen für dein Projekt:
 
 ```shell-session
-$ # Projektverzeichnis erstellen und betreten
+$ # Projektverzeichnis erstellen und betreten; alternativ kann dies auch ein
+    vorhandenes Projekt sein, z. B. geklont aus einem Git-Repository
 $ mkdir project-dir && cd project-dir
 
 $ # DDEV-Umgebung initialisieren

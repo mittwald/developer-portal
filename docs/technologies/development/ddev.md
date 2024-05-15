@@ -39,7 +39,8 @@ If you already have the [mittwald CLI][cli] installed, you can set up a DDEV pro
 To initiate the setup, run the following command in your terminal, replacing `<app-id>` with your application ID (usually formatted as `a-xxxxx`), and `<project-name>` with a suitable name for your project:
 
 ```shell-session
-$ # Create and enter project directory
+$ # Create and enter project directory; alternatively, this may also be an
+    existing project, for example cloned from a Git repository
 $ mkdir project-dir && cd project-dir
 
 $ # Initialize DDEV environment
