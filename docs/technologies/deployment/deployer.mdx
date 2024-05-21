@@ -269,13 +269,13 @@ This issue is caused by Deployers [SSH multiplexing feature](https://deployer.or
       Hostname ssh.fiestel.project.host
       User ssh-XXXXXX@<app-id>
   ```
-  
+
 ### Host key verification failed
 
-This issue is caused by the SSH client not being able to verify the [host key](https://csrc.nist.gov/glossary/term/host_key) of the mittwald platform. To fix this issue, you can add the mittwald platform's host key to your known hosts file. You can do this by running the following command on your local machine:
+This issue is caused by the SSH client not being able to verify the [host key](https://csrc.nist.gov/glossary/term/host_key) of the mittwald platform. To fix this issue, you can add the mittwald platform's host key to your known hosts file. You can do this by running the following command on your local machine (replace `[hostname]` with the actual SSH hostname):
 
 ```shell-session
-$ ssh-keyscan ssh.gestringen.project.host >> ~/.ssh/known-hosts
+$ ssh-keyscan [hostname] >> ~/.ssh/known-hosts
 ```
 
 Alternatively, you can configure your SSH client to automatically accept unknown host keys by setting the `StrictHostKeyChecking` option to `accept-new` in your SSH configuration file (usually `~/.ssh/config`).
