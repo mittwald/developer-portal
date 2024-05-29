@@ -8,6 +8,9 @@ description: >
   Deployer ist ein in PHP geschriebenes Deployment-Tool. Es kann sowohl für PHP-Anwendungen, als auch für andere Anwendungen verwendet werden.
 ---
 
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
 [Deployer](https://deployer.org/) ist ein Deployment-Tool für PHP-Anwendungen. Diese Anleitung zeigt dir, wie du eine PHP-Anwendung in ein mittwald Cloud-Projekt mit Deployer deployen kannst.
 
 ## Voraussetzungen
@@ -202,6 +205,10 @@ steps:
       echo "${MITTWALD_SSH_PUBLIC_KEY}" > .mw-deploy/id_rsa.pub
       chmod 600 .mw-deploy/id_rsa*
 
+  # HINWEIS: Wenn du das mittwald deployer-Rezept NICHT verwendest, musst du hier
+  # den SSH-Hostschlüssel zur known_hosts-Datei hinzufügen.
+  # Siehe Abschnitt "Host key verification failed" weiter unten für weitere Informationen.
+
   - name: Run deployer
     run: |
       ./vendor/bin/dep deploy \
@@ -227,6 +234,11 @@ deploy:
     - echo "$MITTWALD_SSH_PRIVATE_KEY" > .mw-deploy/id_rsa
     - echo "$MITTWALD_SSH_PUBLIC_KEY" > .mw-deploy/id_rsa.pub
     - chmod 600 .mw-deploy/id_rsa*
+
+    # HINWEIS: Wenn du das mittwald deployer-Rezept NICHT verwendest, musst du hier
+    # den SSH-Hostschlüssel zur known_hosts-Datei hinzufügen.
+    # Siehe Abschnitt "Host key verification failed" weiter unten für weitere Informationen.
+
   script:
     - ./vendor/bin/dep deploy \ -o mittwald_app_id=$MITTWALD_APP_ID \ -o mittwald_ssh_public_key_file=.mw-deploy/id_rsa.pub \ -o mittwald_ssh_private_key_file=.mw-deploy/id_rsa
   environment:
@@ -248,7 +260,66 @@ Dieses Problem wird durch das [SSH-Multiplexing-Feature](https://deployer.org/do
       User ssh-XXXXXX@<app-id>
   ```
 
+### Host key verification failed
+
+Dieser Fehler wird dadurch verursacht, dass der SSH-Client den [Hostschlüssel](https://csrc.nist.gov/glossary/term/host_key) der mittwald-Plattform nicht verifizieren kann. Um dieses Problem zu beheben, kannst du den Hostschlüssel der mittwald-Plattform zu deiner `known_hosts`-Datei hinzufügen. Führe dazu den folgenden Befehl auf deinem lokalen Rechner aus (ersetze `[hostname]` durch den tatsächlichen SSH-Hostnamen):
+
+```shell-session
+$ ssh-keyscan [hostname] >> ~/.ssh/known-hosts
+```
+
+Alternativ kannst du deinen SSH-Client so konfigurieren, dass er unbekannte Hostschlüssel automatisch akzeptiert, indem du die `StrictHostKeyChecking`-Option in deiner SSH-Konfigurationsdatei auf `accept-new` setzt (normalerweise `~/.ssh/config`).
+
+```shell-session
+$ echo "StrictHostKeyChecking accept-new" >> ~/.ssh/config
+```
+
+Aus dem Security-Blickwinkel ist es empfehlenswert, den Hostschlüssel im Voraus hinzuzufügen, wie im ersten Lösungsvorschlag beschrieben. In einer CI-Umgebung kannst du den Hostschlüssel statisch als Secret oder Umgebungsvariable hinzufügen, und dann vor dem Deployment in die `known_hosts`-Datei schreiben:
+
+<Tabs groupId="ci-solution">
+  <TabItem value="github" label="GitHub Actions">
+
+    Konfiguriere zuerst den SSH-Hostschlüssel als Secret für dein Repository. Mit der [GitHub CLI][github-cli] kannst du das mit dem folgenden Befehl tun (ersetze `[hostname]` durch deinen tatsächlichen SSH-Hostnamen):
+
+    ```shell-session
+    $ ssh-keyscan [hostname] | gh secret set MITTWALD_SSH_HOST_KEY -a actions
+    ```
+
+    Füge anschließend den folgenden Schritt zu deiner GitHub Actions-Pipeline hinzu:
+
+    ```yaml
+    - name: Deploy SSH host key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.MITTWALD_SSH_HOST_KEY }}" > ~/.ssh/known-hosts
+    ```
+
+  </TabItem>
+  <TabItem value="gitlab" label="GitLab CI">
+
+    Konfiguriere zuerst den SSH-Hostschlüssel als Secret für dein Repository. Mit der [Gitlab CLI][gitlab-cli] kannst du das mit dem folgenden Befehl tun (ersetze `[hostname]` durch deinen tatsächlichen SSH-Hostnamen):
+
+    ```shell-session
+    $ ssh-keyscan [hostname] | glab variable set MITTWALD_SSH_HOST_KEY
+    ```
+
+    Füge anschließend den folgenden Schritt zu deiner Gitlab CI-Pipeline hinzu:
+
+    ```yaml
+    deploy:
+      image: php:8.2-cli
+      stage: deploy
+      before_script:
+        # [...]
+        - echo "$MITTWALD_SSH_HOST_KEY" > ~/.ssh/known-hosts
+    ```
+
+  </TabItem>
+</Tabs>
+
 [mw-deployer]: https://packagist.org/packages/mittwald/deployer-recipes
 [mw-deployer-issues]: https://github.com/mittwald/deployer-recipes/issues
 [opcache]: https://www.php.net/manual/de/book.opcache.php
 [cachetool]: https://github.com/gordalina/cachetool
+[github-cli]: https://cli.github.com
+[gitlab-cli]: https://docs.gitlab.com/ee/editor_extensions/gitlab_cli/
