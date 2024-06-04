@@ -5,36 +5,38 @@ import Intro from "./Intro";
 import Translate, { translate } from "@docusaurus/Translate";
 import Link from "@docusaurus/Link";
 import React, { ReactNode } from "react";
-import { NewBadge } from "@site/src/components/NewBadge";
 import { IssueTrackerLink } from "@site/src/components/IssueTrackerLink";
 import LinkGroup from "@site/src/components/LinkGroup";
 
 interface ReferenceLinkProps {
   version: string;
+  title: string;
   additionalLinks?: ReactNode[];
   spec: {
     type: "openapi" | "swagger";
+    typeLabel: string;
     url: string;
   };
 }
 
-function ReferenceLink({
-  version,
-  additionalLinks = [],
-  spec,
-}: ReferenceLinkProps) {
+function ReferenceLink(
+  {
+    version,
+    title,
+    additionalLinks = [],
+    spec
+  }: ReferenceLinkProps
+) {
   const links = [
     <Link key="ref" to={`/reference/${version}`}>
       <Translate id={"index.reference.reference"}>Reference</Translate>
     </Link>,
     ...additionalLinks,
-    <Link key="spec" href={spec.url}>
-      <Translate id={`index.reference.${spec.type}`} />
-    </Link>,
+    <Link key="spec" href={spec.url}>{spec.typeLabel}</Link>
   ];
   return (
     <>
-      <LinkGroup title={translate({id: `index.reference.${version}`})} links={links} />
+      <LinkGroup title={title} links={links} />
     </>
   );
 }
@@ -62,7 +64,7 @@ function APIIntro() {
 function APIDocumentation() {
   return (
     <>
-      <h3>Documentation</h3>
+      <h3><Translate id="index.reference.title">API documentation</Translate></h3>
       <p>
         <Translate id={"index.reference.body"}>
           All endpoints and parameters of our API at a glance, including human
@@ -74,23 +76,27 @@ function APIDocumentation() {
         <li>
           <ReferenceLink
             version="v1"
+            title={translate({ id: "index.reference.v1" })}
             spec={{
               url: "https://api.mittwald.de/v1/openapi.json",
-              type: "openapi",
+              typeLabel: translate({ id: "index.reference.openapi" }),
+              type: "openapi"
             }}
           />
         </li>
         <li>
           <ReferenceLink
             version="v2"
+            title={translate({ id: "index.reference.v2" })}
             additionalLinks={[
               <Link key="into" to="/docs/v2/api/intro">
                 <Translate id="index.reference.intro">Introduction</Translate>
-              </Link>,
+              </Link>
             ]}
             spec={{
               url: "https://api.mittwald.de/openapi",
-              type: "openapi",
+              typeLabel: translate({ id: "index.reference.openapi" }),
+              type: "openapi"
             }}
           />
         </li>
@@ -113,7 +119,7 @@ function APIDocumentation() {
 function APILibraries() {
   return (
     <>
-      <h3>SDKs and Libraries</h3>
+      <h3><Translate id="index.sdks.title">SDKs and Libraries</Translate></h3>
       <p>
         <Translate id={"index.sdks.body"}>
           Make it easy for yourself and use one of our SDKs or libraries to
