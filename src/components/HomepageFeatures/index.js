@@ -189,6 +189,13 @@ const FeatureList = [
               </Translate>
             </Link>
           </li>
+          <li>
+            <Link to="https://mittwald.github.io/flow">
+              <Translate id="index.contributing.flow">
+                Use Flow, the mittwald design system, to develop frontends                
+              </Translate>
+            </Link>
+          </li>
         </ul>
         <p>
           <strong>
