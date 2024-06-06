@@ -1,13 +1,15 @@
 import * as path from "path";
 import * as fs from "fs";
 import $RefParser from "@apidevtools/json-schema-ref-parser";
+import { OpenAPIV3 } from "openapi-types";
 
 (async () => {
+  const sidebar = [];
 
   const spec = await fetch("https://api.mittwald.de/v2/openapi.json?withRedirects=false");
   const specJson = await spec.json();
 
-  const specJsonUnrefed = await $RefParser.dereference(specJson, {
+  const specJsonUnrefed: OpenAPIV3.Document = await $RefParser.dereference(specJson, {
     dereference: {
       circular: "ignore",
     },
@@ -16,6 +18,7 @@ import $RefParser from "@apidevtools/json-schema-ref-parser";
   for (const {name, description} of specJsonUnrefed.tags) {
     const slug = name.replace(/ /g, "").toLowerCase().replace(/[^a-z0-9]/, "");
     const operationsDir = path.join("docs", "reference", "operations", slug);
+    const sidebarItems = [];
 
     console.log(operationsDir);
     fs.mkdirSync(operationsDir, {recursive: true});
@@ -25,21 +28,57 @@ import $RefParser from "@apidevtools/json-schema-ref-parser";
       for (const method of Object.keys(operations)) {
         const operation = operations[method];
         if (operation.tags.includes(name)) {
-          const summary: string = operation.summary;
+          const summary: string = operation.summary.replace(/\.$/, "");
           const operationFile = path.join(operationsDir, operation.operationId + ".mdx");
+          const serializedSpec = JSON.stringify(operation);
 
-          const referenceComponent = `<OperationReference path="${urlPath}" method="${method}" spec={${JSON.stringify(operation)}} />`;
+          sidebarItems.push({
+            "type": "doc",
+            "id": `reference/operations/${slug}/${operation.operationId}`,
+            "className": "api-operation-" + method
+          })
 
+          // language=text
           fs.writeFileSync(operationFile, `---
 title: ${summary}
+displayed_sidebar: referenceSidebar
 ---
 
-import OperationReference from "@site/src/components/openapi/OperationReference";
+import {OperationMetadata, OperationRequest, OperationResponses} from "@site/src/components/openapi/OperationReference";
+import {OperationUsage} from "@site/src/components/openapi/OperationUsage";
 
-${referenceComponent}
+<OperationMetadata path="${urlPath}" method="${method}" spec={${serializedSpec}} />
+
+## Request
+
+<OperationRequest spec={${serializedSpec}} />
+
+## Responses
+
+<OperationResponses spec={${serializedSpec}} />
+
+## Usage examples
+
+<OperationUsage method="${method}" url="${urlPath}" spec={${serializedSpec}} baseURL="https://api.mittwald.de/v2/" />
+
 `);
         }
       }
     }
+
+    sidebar.push({
+      "type": "category",
+      "label": name,
+      "link": {
+        "type": "generated-index",
+        "title": name,
+        "description": description,
+        "slug": `/category/reference/${slug}`,
+        "keywords": ["api-reference"],
+      },
+      "items": sidebarItems
+    })
   }
+
+  fs.writeFileSync("sidebar.reference.json", JSON.stringify(sidebar, null, 2));
 })().catch(console.error);

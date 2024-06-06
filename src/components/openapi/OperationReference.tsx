@@ -164,7 +164,7 @@ function OperationResponseBody({ title, spec }: { title: string, spec: OpenAPIV3
 
 }
 
-function OperationRequest({ spec }: { spec: OpenAPIV3.OperationObject }) {
+export function OperationRequest({ spec }: { spec: OpenAPIV3.OperationObject }) {
   const parameters = (spec.parameters ?? []).filter(isParameterObject);
 
   const pathParameters = parameters.filter((param) => param.in === "path");
@@ -179,7 +179,6 @@ function OperationRequest({ spec }: { spec: OpenAPIV3.OperationObject }) {
   }
 
   return <>
-    <h2><Translate key="openapi.operation.request.title">Request</Translate></h2>
     <OperationParameterList
       title={translate({ id: "openapi.operation.request.pathparams", message: "Path parameters" })}
       params={pathParameters} />
@@ -196,7 +195,9 @@ function OperationRequest({ spec }: { spec: OpenAPIV3.OperationObject }) {
 
 function OperationResponse({ status, response }: { status: string; response: OpenAPIV3.ResponseObject }) {
   return <>
-    <h3><HTTPResponseStatus code={status} /> {response.description}</h3>
+    <h3><HTTPResponseStatus code={status} /></h3>
+
+    <Markdown>{response.description}</Markdown>
 
     <OperationResponseHeaderList
       title={translate({ id: "openapi.operation.response.headers", message: "Response headers" })}
@@ -206,22 +207,26 @@ function OperationResponse({ status, response }: { status: string; response: Ope
   </>;
 }
 
-function OperationResponses({ spec }: { spec: OpenAPIV3.OperationObject }) {
+export function OperationResponses({ spec }: { spec: OpenAPIV3.OperationObject }) {
   const responseCodes = Object.keys(spec.responses);
   return <>
-    <h2>Responses</h2>
     {responseCodes.map((status) => <OperationResponse key={status} status={status}
                                                       response={spec.responses[status] as ResponseObject} />)}
   </>;
 }
 
-function OperationReference({ path, method, spec }: { path: string, method: string, spec: OpenAPIV3.OperationObject }) {
+export function OperationMetadata({ method, path, spec }: { path: string, method: string, spec: OpenAPIV3.OperationObject }) {
   return <>
     <pre>{method.toUpperCase()} <OperationPath path={path} /></pre>
     <hr />
     {spec.description ? <Markdown>{spec.description}</Markdown> : null}
-    <OperationRequest spec={spec} />
+  </>
+}
 
+function OperationReference({ path, method, spec }: { path: string, method: string, spec: OpenAPIV3.OperationObject }) {
+  return <>
+    <OperationMetadata path={path} method={method} spec={spec} />
+    <OperationRequest spec={spec} />
     <OperationResponses spec={spec} />
 
     <h2>Complete OpenAPI spec</h2>
