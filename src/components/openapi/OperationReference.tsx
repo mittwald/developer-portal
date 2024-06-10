@@ -7,13 +7,21 @@ import Schema from "@site/src/components/openapi/Schema";
 import Type from "@site/src/components/openapi/Type";
 import { Optional, Required } from "@site/src/components/openapi/RequiredOptional";
 import Translate, { translate } from "@docusaurus/Translate";
-import ParameterObject = OpenAPIV3.ParameterObject;
-import ReferenceObject = OpenAPIV3.ReferenceObject;
-import ResponseObject = OpenAPIV3.ResponseObject;
 import HTTPResponseStatus from "@site/src/components/openapi/HTTPResponseStatus";
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import SchemaExample from "@site/src/components/openapi/SchemaExample";
+import Accordion from "@mittwald/flow-react-components/Accordion";
+import Heading from "@mittwald/flow-react-components/Heading";
+import Content from "@mittwald/flow-react-components/Content";
+import Text from "@mittwald/flow-react-components/Content";
+import LabeledValue from "@mittwald/flow-react-components/LabeledValue";
+import Label from "@mittwald/flow-react-components/Label";
+import ColumnLayout from "@mittwald/flow-react-components/ColumnLayout";
+import StatusBadge from "@mittwald/flow-react-components/StatusBadge";
+import ParameterObject = OpenAPIV3.ParameterObject;
+import ReferenceObject = OpenAPIV3.ReferenceObject;
+import ResponseObject = OpenAPIV3.ResponseObject;
 
 function OperationPath({ path }: { path: string }) {
   const components = path.split("/");
@@ -81,12 +89,16 @@ function OperationParameterList({ title, params }: { title: string, params: Para
     return undefined;
   }
 
-  return <>
-    <h3>{title}</h3>
+  const hasRequired = params.some((param) => param.required);
+
+  return <Accordion>
+    <Heading><div style={{flexGrow: 1}}>{title}</div> {hasRequired ? <Required /> : undefined}</Heading>
+    <Content>
     <ul className={styles.parameterList}>
       {params.map((param, idx) => <OperationParameter key={idx} param={param} />)}
     </ul>
-  </>;
+    </Content>
+  </Accordion>;
 }
 
 function OperationResponseHeaderList({ title, headers }: {
@@ -118,8 +130,9 @@ function OperationRequestBody({ title, spec }: { title: string, spec: OpenAPIV3.
   const required = spec.required ? <Required /> : <Optional />;
 
   if ("application/json" in spec.content) {
-    return <>
-      <h3>{title} {required}</h3>
+    return <Accordion>
+      <Heading><div style={{flexGrow: 1}}>{title}</div>{required}</Heading>
+      <Content>
       <p>Format: <code>application/json</code></p>
       <Tabs groupId="request-body" defaultValue="schema">
         <TabItem value="schema" label="Schema">
@@ -129,7 +142,8 @@ function OperationRequestBody({ title, spec }: { title: string, spec: OpenAPIV3.
           <SchemaExample schema={spec.content["application/json"].schema} />
         </TabItem>
       </Tabs>
-    </>;
+      </Content>
+    </Accordion>;
   }
 
 }
@@ -141,15 +155,24 @@ function OperationResponseBody({ title, spec }: { title: string, spec: OpenAPIV3
 
   if (!spec.content) {
     return <>
-      <h4>{title}</h4>
-      <p><Translate id={"openapi.operation.response.nocontent"}>No response content specified.</Translate></p>
-    </>
+      <Text><Translate id={"openapi.operation.response.nocontent"}>No response content specified.</Translate></Text>
+    </>;
   }
 
   if ("application/json" in spec.content) {
     return <>
-      <h4>{title}</h4>
-      <p>Format: <code>application/json</code></p>
+      <ColumnLayout m={[1, 5]}>
+        <LabeledValue>
+          <Label>Format</Label>
+          <Content>application/json</Content>
+        </LabeledValue>
+        <LabeledValue>
+          <Label><Translate id="openapi.operation.response.description">Description</Translate></Label>
+          <Content>
+            <Markdown>{spec.description}</Markdown>
+          </Content>
+        </LabeledValue>
+      </ColumnLayout>
 
       <Tabs groupId="request-body" defaultValue="schema">
         <TabItem value="schema" label="Schema">
@@ -195,10 +218,6 @@ export function OperationRequest({ spec }: { spec: OpenAPIV3.OperationObject }) 
 
 function OperationResponse({ status, response }: { status: string; response: OpenAPIV3.ResponseObject }) {
   return <>
-    <h3><HTTPResponseStatus code={status} /></h3>
-
-    <Markdown>{response.description}</Markdown>
-
     <OperationResponseHeaderList
       title={translate({ id: "openapi.operation.response.headers", message: "Response headers" })}
       headers={response.headers as Record<string, OpenAPIV3.HeaderObject>} />
@@ -210,17 +229,28 @@ function OperationResponse({ status, response }: { status: string; response: Ope
 export function OperationResponses({ spec }: { spec: OpenAPIV3.OperationObject }) {
   const responseCodes = Object.keys(spec.responses);
   return <>
-    {responseCodes.map((status) => <OperationResponse key={status} status={status}
-                                                      response={spec.responses[status] as ResponseObject} />)}
+    {responseCodes.map((status) => (
+      <Accordion key={status} defaultExpanded={status.startsWith("2")}>
+        <Heading><HTTPResponseStatus code={status} /></Heading>
+        <Content>
+          <OperationResponse key={status} status={status}
+                             response={spec.responses[status] as ResponseObject} />
+        </Content>
+      </Accordion>
+    ))}
   </>;
 }
 
-export function OperationMetadata({ method, path, spec }: { path: string, method: string, spec: OpenAPIV3.OperationObject }) {
+export function OperationMetadata({ method, path, spec }: {
+  path: string,
+  method: string,
+  spec: OpenAPIV3.OperationObject
+}) {
   return <>
     <pre>{method.toUpperCase()} <OperationPath path={path} /></pre>
     <hr />
     {spec.description ? <Markdown>{spec.description}</Markdown> : null}
-  </>
+  </>;
 }
 
 function OperationReference({ path, method, spec }: { path: string, method: string, spec: OpenAPIV3.OperationObject }) {

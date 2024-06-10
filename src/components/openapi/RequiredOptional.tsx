@@ -1,9 +1,10 @@
 import styles from "@site/src/components/openapi/RequiredOptional.module.css";
+import StatusBadge from "@mittwald/flow-react-components/StatusBadge";
 
 export function Required() {
-  return <span className={styles.required}>required</span>;
+  return <StatusBadge status="warning">required</StatusBadge>;
 }
 
 export function Optional() {
-  return <span className={styles.optional}>optional</span>;
+  return <StatusBadge status="info">optional</StatusBadge>;
 }
