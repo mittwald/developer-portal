@@ -68,7 +68,7 @@ import {OperationUsage} from "@site/src/components/openapi/OperationUsage";
 
 ## Usage examples
 
-<OperationUsage method="${method}" url="${urlPathWithBase}" spec={${serializedSpec}} baseURL="${serverURL}" />
+<OperationUsage method="${method}" url="${urlPathWithBase}" spec={${serializedSpec}} baseURL="${serverURL}" withJavascript={${apiVersion !== "v1"}} withPHP={${apiVersion !== "v1"}} />
 
 `);
         }
@@ -102,7 +102,7 @@ import {OperationUsage} from "@site/src/components/openapi/OperationUsage";
         },
         {
           "type": "category",
-          "label": "Reference",
+          "label": "Reference (v1)",
           link: {
             type: "generated-index",
             title: "API Reference",
