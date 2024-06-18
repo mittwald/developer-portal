@@ -196,7 +196,6 @@ export function OperationRequest({ spec }: { spec: OpenAPIV3.OperationObject }) 
 
   if (spec.requestBody === undefined && parameters.length === 0) {
     return <>
-      <h2><Translate key="openapi.operation.request.title">Request</Translate></h2>
       <p><Translate key="openapi.operation.request.empty">No request parameters.</Translate></p>
     </>;
   }
