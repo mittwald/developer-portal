@@ -6,8 +6,8 @@ description: |
   Dieser Artikel erklärt die verschiedenen Arten von E-Mail-Konten und wie du sie über die API verwalten kannst.
 ---
 
-import ApiSchema from "@theme/ApiSchema";
 import OperationHint from "@site/src/components/OperationHint";
+import SchemaFromSpec from "@site/src/components/openapi/SchemaFromSpec";
 
 ## Arten von E-Mail-Konten
 
@@ -24,11 +24,7 @@ Um E-Mail-Konten zu verwalten, benötigst du ein bestehendes Projekt. Um ein neu
 
 Um ein neues E-Mail-Konto zu erstellen, sende eine `POST`-Anfrage an den `/v2/projects/{projectID}/mailaddresses`-Endpunkt. Die Anfrage muss ein JSON-Objekt mit den folgenden Eigenschaften enthalten:
 
-<ApiSchema
-  example
-  id="v2"
-  pointer="#/components/schemas/de.mittwald.v1.mail.CreateMailAddress"
-/>
+<SchemaFromSpec apiVersion="v2" path="#/components/schemas/de.mittwald.v1.mail.CreateMailAddress" withExample />
 
 :::caution
 
@@ -36,17 +32,13 @@ Merke dir das Passwort, das du für das E-Mail-Konto festgelegt hast. Du hast sp
 
 :::
 
-<OperationHint tag="Mail" operation="mail-mailaddress-create" />
+<OperationHint tag="Mail" operation="mail-create-mail-address" />
 
 ## Eine neue Weiterleitungsadresse erstellen
 
 Eine Weiterleitungsadresse ist eine E-Mail-Adresse, die alle eingehenden E-Mails an eine oder mehrere andere E-Mail-Adressen weiterleitet. Um eine neue Weiterleitungsadresse zu erstellen, sende eine `POST`-Anfrage an den `/v2/projects/{projectID}/mailaddresses`-Endpunkt. Die Anfrage muss ein JSON-Objekt mit den folgenden Eigenschaften enthalten:
 
-<ApiSchema
-  example
-  id="v2"
-  pointer="#/components/schemas/de.mittwald.v1.mail.CreateForwardAddress"
-/>
+<SchemaFromSpec apiVersion="v2" path="#/components/schemas/de.mittwald.v1.mail.CreateForwardAddress" withExample />
 
 ## Einen neuen Postausgang erstellen
 
@@ -61,7 +53,7 @@ Merke dir das Passwort, das du für das E-Mail-Konto festgelegt hast. Du hast sp
 
 :::
 
-<OperationHint tag="Mail" operation="mail-deliverybox-create" />
+<OperationHint tag="Mail" operation="mail-create-deliverybox" />
 
 ## E-Mail-Konten löschen
 
