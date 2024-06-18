@@ -5,8 +5,9 @@ import { OpenAPIV3 } from "openapi-types";
 
 (async () => {
   const sidebar = [];
+  const apiVersion = "v2" as const;
 
-  const spec = await fetch("https://api.mittwald.de/v2/openapi.json?withRedirects=false");
+  const spec = await fetch(`https://api.mittwald.de/${apiVersion}/openapi.json?withRedirects=false`);
   const specJson = await spec.json();
 
   const specJsonUnrefed: OpenAPIV3.Document = await $RefParser.dereference(specJson, {
@@ -41,7 +42,6 @@ import { OpenAPIV3 } from "openapi-types";
           // language=text
           fs.writeFileSync(operationFile, `---
 title: ${summary}
-displayed_sidebar: referenceSidebar
 ---
 
 import {OperationMetadata, OperationRequest, OperationResponses} from "@site/src/components/openapi/OperationReference";
