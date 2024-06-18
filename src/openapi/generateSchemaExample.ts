@@ -25,7 +25,7 @@ export function generateSchemaExample(schema: OpenAPIV3.SchemaObject): any {
   if (schema.type === "string") {
     if (schema.format === "date-time") {
       return new Date().toISOString();
-    } else if (schema.format === "email") {
+    } else if (schema.format === "email" || schema.format === "idn-email") {
       return "email@mittwald.example";
     } else if (schema.format === "uuid") {
       return "f0f86186-0a5a-45b2-aa33-502777496347";
