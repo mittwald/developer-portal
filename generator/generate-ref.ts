@@ -17,7 +17,7 @@ import { OpenAPIV3 } from "openapi-types";
 
   for (const {name, description} of specJsonUnrefed.tags) {
     const slug = name.replace(/ /g, "").toLowerCase().replace(/[^a-z0-9]/, "");
-    const operationsDir = path.join("docs", "reference", "operations", slug);
+    const operationsDir = path.join("docs", "reference", slug);
     const sidebarItems = [];
 
     console.log(operationsDir);
@@ -34,7 +34,7 @@ import { OpenAPIV3 } from "openapi-types";
 
           sidebarItems.push({
             "type": "doc",
-            "id": `reference/operations/${slug}/${operation.operationId}`,
+            "id": `reference/${slug}/${operation.operationId}`,
             "className": "api-operation-" + method
           })
 
