@@ -39,10 +39,10 @@ function Array({key, schema}: {key: number; schema: OpenAPIV3.SchemaObject}) {
 
 function Property({name, schema, required}: {name: string, schema: any, required: boolean}) {
   const requiredOrOptional = required ? <Required /> : undefined;
-  const body = [];
+  let body: ReactNode;
 
   if (schema.description) {
-    body.push(<Markdown>{schema.description}</Markdown>);
+    body = <Markdown>{schema.description}</Markdown>;
   }
 
   return <li key={name}>
