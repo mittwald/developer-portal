@@ -248,6 +248,17 @@ export function OperationMetadata({ method, path, spec }: {
 }) {
   return <>
     <pre>{method.toUpperCase()} <OperationPath path={path} /></pre>
+
+    <ColumnLayout m={[1, 5]}>
+      <LabeledValue>
+        <Label>API version</Label>
+        <Content>{path.split("/").filter(p => p.startsWith("v"))[0]}</Content>
+      </LabeledValue>
+      <LabeledValue>
+        <Label>Request method</Label>
+        <Content>{method.toUpperCase()}</Content>
+      </LabeledValue>
+    </ColumnLayout>
     <hr />
     {spec.description ? <Markdown>{spec.description}</Markdown> : null}
   </>;
