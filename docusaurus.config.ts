@@ -86,6 +86,10 @@ const config: Config = {
               label: "API v2",
               path: "v2",
             },
+            v1: {
+              label: "API v1",
+              path: "v1",
+            }
           },
         },
         blog: {
