@@ -85,10 +85,13 @@ const config: Config = {
             current: {
               label: "API v2",
               path: "v2",
+              banner: "none",
+              badge: false,
             },
             v1: {
               label: "API v1",
               path: "v1",
+              banner: "unmaintained",
             }
           },
         },
@@ -149,7 +152,8 @@ const config: Config = {
           label: "Platform",
         },
         {
-          href: "/reference/v2",
+          type: "doc",
+          docId: "/category/reference",
           position: "left",
           label: "Reference",
         },
@@ -184,7 +188,7 @@ const config: Config = {
             },
             {
               label: "Reference",
-              to: "/reference/v2",
+              to: "/docs/v2/category/reference",
             },
           ],
         },
