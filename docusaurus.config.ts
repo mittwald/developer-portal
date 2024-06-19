@@ -107,27 +107,6 @@ const config: Config = {
         },
       } satisfies Options,
     ],
-    [
-      "redocusaurus",
-      {
-        specs: [
-          {
-            id: "v1",
-            spec: "https://api.mittwald.de/v1/openapi.json",
-            route: "/reference/v1",
-          },
-          {
-            id: "v2",
-            spec: "https://api.mittwald.de/openapi?withRedirects=false",
-            route: "/reference/v2",
-          },
-        ],
-        theme: {
-          primaryColor: "#27367b",
-          primaryColorDark: "#abb9ff",
-        },
-      },
-    ],
   ],
 
   themeConfig: {
