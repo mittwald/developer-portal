@@ -1,10 +1,9 @@
 import styles from "./OperationReference.module.css";
-import { Fragment, ReactNode } from "react";
+import { Fragment } from "react";
 import Markdown from "react-markdown";
 import CodeBlock from "@theme/CodeBlock";
 import { OpenAPIV3 } from "openapi-types";
 import Schema from "@site/src/components/openapi/Schema";
-import Type from "@site/src/components/openapi/Type";
 import {
   Optional,
   Required,
@@ -22,48 +21,21 @@ import LabeledValue from "@mittwald/flow-react-components/LabeledValue";
 import Label from "@mittwald/flow-react-components/Label";
 import ColumnLayout from "@mittwald/flow-react-components/ColumnLayout";
 import OperationPath from "@site/src/components/openapi/OperationPath";
+import OperationInputValue from "@site/src/components/openapi/OperationInputValue";
 import ParameterObject = OpenAPIV3.ParameterObject;
 import ReferenceObject = OpenAPIV3.ReferenceObject;
 import ResponseObject = OpenAPIV3.ResponseObject;
-
-function OperationValue({
-  name,
-  schema,
-  required,
-  body,
-}: {
-  name: string;
-  schema: OpenAPIV3.SchemaObject;
-  required: boolean | undefined;
-  body: ReactNode;
-}) {
-  return (
-    <li>
-      <div className={styles.parameterListHeader}>
-        <span className={styles.parameterName}>{name}</span>
-        <Type className={styles.parameterType} schema={schema} />
-        {required !== undefined && (
-          <>
-            <div className={styles.parameterListHeaderSpacer} />
-            {required ? <Required /> : <Optional />}
-          </>
-        )}
-      </div>
-      <div className={styles.parameterListBody}>{body}</div>
-    </li>
-  );
-}
 
 function OperationParameter({ param }: { param: ParameterObject }) {
   const body = [];
 
   if (param.description) {
-    body.push(<Markdown>{param.description}</Markdown>);
+    body.push(<Markdown key="description">{param.description}</Markdown>);
   }
 
   if (param.example) {
     body.push(
-      <div>
+      <div key="example">
         <span className={styles.parameterExample}>Example:</span>
         <code>{JSON.stringify(param.example)}</code>
       </div>,
@@ -71,7 +43,7 @@ function OperationParameter({ param }: { param: ParameterObject }) {
   }
 
   return (
-    <OperationValue
+    <OperationInputValue
       name={param.name}
       schema={param.schema as OpenAPIV3.SchemaObject}
       required={param.required}
@@ -94,7 +66,7 @@ function OperationResponseHeader({
   }
 
   return (
-    <OperationValue
+    <OperationInputValue
       name={name}
       schema={header.schema as OpenAPIV3.SchemaObject}
       required={header.required}

@@ -1,71 +1,11 @@
 import styles from "@site/src/components/openapi/OperationReference.module.css";
-import Type from "@site/src/components/openapi/Type";
-import { Required } from "@site/src/components/openapi/RequiredOptional";
-import Markdown from "react-markdown";
 import { ReactNode } from "react";
 import { OpenAPIV3 } from "openapi-types";
-
-function Alternative({ schema }: { schema: any }) {
-  const body = [];
-
-  return (
-    <li>
-      <div className={styles.parameterListHeader}>
-        <span className={styles.parameterAlternative}>Alternative</span>
-        <Type className={styles.parameterType} schema={schema} />
-      </div>
-      <div className={styles.parameterListBody}>{body}</div>
-      <Schema schema={schema} />
-    </li>
-  );
-}
-
-function Array({ schema }: { schema: OpenAPIV3.SchemaObject }) {
-  const body = [];
-
-  return (
-    <li>
-      <div className={styles.parameterListHeader}>
-        <span className={styles.parameterAlternative}>Array[</span>
-      </div>
-      <div className={styles.parameterListBody}>{body}</div>
-      <Schema schema={schema} />
-      <div className={styles.parameterListHeader}>
-        <span className={styles.parameterAlternative}>]</span>
-      </div>
-    </li>
-  );
-}
-
-function Property({
-  name,
-  schema,
-  required,
-}: {
-  name: string;
-  schema: any;
-  required: boolean;
-}) {
-  const requiredOrOptional = required ? <Required /> : undefined;
-  let body: ReactNode;
-
-  if (schema.description) {
-    body = <Markdown>{schema.description}</Markdown>;
-  }
-
-  return (
-    <li key={name}>
-      <div className={styles.parameterListHeader}>
-        <span className={styles.parameterName}>{name}</span>
-        <Type className={styles.parameterType} schema={schema} />
-        <div className={styles.parameterListHeaderSpacer} />
-        {requiredOrOptional}
-      </div>
-      <div className={styles.parameterListBody}>{body}</div>
-      <Schema schema={schema} />
-    </li>
-  );
-}
+import {
+  AlternativeValue,
+  ArrayValue,
+  PropertyValue,
+} from "@site/src/components/openapi/OperationInputValue";
 
 function Schema({ schema }: { schema: OpenAPIV3.SchemaObject }) {
   if (
@@ -78,7 +18,7 @@ function Schema({ schema }: { schema: OpenAPIV3.SchemaObject }) {
     if (schema.properties) {
       properties.push(
         Object.entries(schema.properties).map(([name, property], idx) => (
-          <Property
+          <PropertyValue
             key={idx}
             name={name}
             schema={property}
@@ -90,7 +30,7 @@ function Schema({ schema }: { schema: OpenAPIV3.SchemaObject }) {
 
     if (schema.additionalProperties) {
       properties.push(
-        <Property
+        <PropertyValue
           key="additionalProperties"
           name="*"
           schema={schema.additionalProperties}
@@ -106,7 +46,7 @@ function Schema({ schema }: { schema: OpenAPIV3.SchemaObject }) {
     return (
       <ul className={styles.parameterList}>
         {schema.oneOf.map((s: any, idx: number) => (
-          <Alternative key={idx} schema={s} />
+          <AlternativeValue key={idx} schema={s} />
         ))}
       </ul>
     );
@@ -115,7 +55,7 @@ function Schema({ schema }: { schema: OpenAPIV3.SchemaObject }) {
   if (schema.type === "array") {
     return (
       <ul className={styles.parameterList}>
-        <Array
+        <ArrayValue
           schema={schema.items as OpenAPIV3.SchemaObject}
           required={false}
         />

@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import styles from "@site/src/components/openapi/OperationPath.module.css";
+import styles from "./OperationPath.module.css";
 
 function OperationPath({ path }: { path: string }) {
   const components = path.split("/");
