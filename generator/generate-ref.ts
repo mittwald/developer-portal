@@ -7,11 +7,13 @@ import * as yaml from "yaml";
 
 type APIVersion = `v${number}`
 
-async function loadAndDereferenceSpec(apiVersion: APIVersion): Promise<OpenAPIV3.Document> {
+async function loadSpec(apiVersion: APIVersion): Promise<OpenAPIV3.Document> {
   const spec = await fetch(`https://api.mittwald.de/${apiVersion}/openapi.json?withRedirects=false`);
-  const specJson = await spec.json();
+  return await spec.json();
+}
 
-  return await $RefParser.dereference(specJson, {
+async function dereferenceSpec(spec: OpenAPIV3.Document): Promise<OpenAPIV3.Document> {
+  return await $RefParser.dereference(spec, {
     dereference: {
       circular: "ignore",
     },
@@ -61,6 +63,10 @@ import {OperationUsage} from "@site/src/components/openapi/OperationUsage";
 `);
 }
 
+function exportSpecToSource(spec: OpenAPIV3.Document, apiVersion: APIVersion) {
+  fs.writeFileSync(`src/openapi/openapi-${apiVersion}.json`, JSON.stringify(spec, null, 2));
+}
+
 function slugFromTagName(tagName: string): string {
   return tagName.replace(/ /g, "").toLowerCase().replace(/[^a-z0-9]/, "");
 }
@@ -71,8 +77,11 @@ function stripTrailingDot(str: string|undefined): string|undefined {
 
 async function renderAPIDocs (apiVersion: APIVersion, outputPath: string){
   const sidebar = [];
-  const spec = await loadAndDereferenceSpec(apiVersion);
+  const originalSpec = await loadSpec(apiVersion);
+  const spec = await dereferenceSpec(originalSpec);
   const [serverURL, basePath] = determineServerURLAndBasePath(apiVersion, spec);
+
+  exportSpecToSource(originalSpec, apiVersion);
 
   for (const {name, description} of spec.tags) {
     const slug = slugFromTagName(name);
