@@ -3,6 +3,7 @@ import * as fs from "fs";
 import $RefParser from "@apidevtools/json-schema-ref-parser";
 import { OpenAPIV3 } from "openapi-types";
 import * as url from "url";
+import * as yaml from "yaml";
 
 async function renderAPIDocs (apiVersion: "v1" | "v2", outputPath: string){
   const sidebar = [];
@@ -48,9 +49,16 @@ async function renderAPIDocs (apiVersion: "v1" | "v2", outputPath: string){
             "className": "api-operation-" + method
           })
 
+          const frontMatter = {
+            title: summary ?? operation.operationId,
+            description: operation.description ?? "",
+          }
+
+          const frontMatterYAML = yaml.stringify(frontMatter);
+
           // language=text
           fs.writeFileSync(operationFile, `---
-title: ${summary ?? operation.operationId}
+${frontMatterYAML}
 ---
 
 import {OperationMetadata, OperationRequest, OperationResponses} from "@site/src/components/openapi/OperationReference";
