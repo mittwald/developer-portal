@@ -86,43 +86,43 @@ A few commands (like `mw [app|project] download`, `mw [app|project] ssh` and som
 
 1. **If you already have an existing SSH private key**, you can import the public key to your mStudio account with the following command:
 
-    ```
-    $ mw user ssh-key import
-    ```
-   
+   ```
+   $ mw user ssh-key import
+   ```
+
 2. **To create and import a new SSH keypair**, you can use the following command:
 
-    ```
-    $ mw user ssh-key create
-    ```
-   
+   ```
+   $ mw user ssh-key create
+   ```
+
 Usually, the key pair should be used automatically by the CLI. To explicitly specify the key pair to use (for example, if you receive a `too many authentication failures` error), you have a few options:
 
 1. All commands that require an SSH connection respect your systems [SSH configuration](https://linux.die.net/man/5/ssh_config) (typically in `~/.ssh/config`). You can specify the key to use for a specific host like this:
 
-    ```txt title="~/.ssh/config"
-    Host *.project.host
-      IdentityFile ~/.ssh/mstudio-cli
-    ```
-   
+   ```txt title="~/.ssh/config"
+   Host *.project.host
+     IdentityFile ~/.ssh/mstudio-cli
+   ```
+
 2. Alternatively, all commands that require an SSH connection accept a `--ssh-identity-file` flag that you can use to specify the key to use:
 
-    ```
-    $ mw app download ... --ssh-identity-file="~/.ssh/mstudio-cli"
-    ```
-   
+   ```
+   $ mw app download ... --ssh-identity-file="~/.ssh/mstudio-cli"
+   ```
+
 3. Instead of the `--ssh-identity-file` flag, you can also set the `MITTWALD_SSH_IDENTITY_FILE` environment variable to specify the key to use:
 
-    ```
-    $ export MITTWALD_SSH_IDENTITY_FILE=~/.ssh/mstudio-cli
-    $ mw app download ...
-    ```
-   
-    You can also set the `MITTWALD_SSH_IDENTITY_FILE` environment variable in your shell profile (`~/.zshrc` or `~/.bashrc`) to make it available in every shell session:
+   ```
+   $ export MITTWALD_SSH_IDENTITY_FILE=~/.ssh/mstudio-cli
+   $ mw app download ...
+   ```
 
-    ```
-    $ echo 'export MITTWALD_SSH_IDENTITY_FILE=~/.ssh/mstudio-cli' >> ~/.zshrc
-    ```
+   You can also set the `MITTWALD_SSH_IDENTITY_FILE` environment variable in your shell profile (`~/.zshrc` or `~/.bashrc`) to make it available in every shell session:
+
+   ```
+   $ echo 'export MITTWALD_SSH_IDENTITY_FILE=~/.ssh/mstudio-cli' >> ~/.zshrc
+   ```
 
 ## General usage
 

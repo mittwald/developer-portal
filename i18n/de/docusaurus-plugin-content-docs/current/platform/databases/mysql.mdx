@@ -68,29 +68,29 @@ Um die Inhalte einer einzelnen MySQL-Datenbank wiederherzustellen, kannst du die
 
 1. Lade ein Backup auf deinen lokalen Rechner herunter:
 
-    ```shellsession title="Local shell session"
-    $ mw backup download <backup-id> --format tar --output backup.tar.gz
-    ```
+   ```shellsession title="Local shell session"
+   $ mw backup download <backup-id> --format tar --output backup.tar.gz
+   ```
 
 2. Nachdem du das Backup heruntergeladen hast, kannst du den Inhalt der Datenbank aus dem heruntergeladenen Archiv extrahieren:
 
-    ```shellsession title="Local shell session"
-    $ database_id=<database-id>
-    $ tar xfz backup.tar.gz dbdump-${database_id/_/-}
-    ```
+   ```shellsession title="Local shell session"
+   $ database_id=<database-id>
+   $ tar xfz backup.tar.gz dbdump-${database_id/_/-}
+   ```
 
-    :::note
+   :::note
 
-    Beachte, dass in den Archivdateien die Datenbank-ID anders geschrieben ist. Während sie normalerweise das Format `mysql_XXXXXX` hat, wird sie im Archiv mit Bindestrichen anstelle von Unterstrichen geschrieben, wie `mysql-XXXXXX`.
+   Beachte, dass in den Archivdateien die Datenbank-ID anders geschrieben ist. Während sie normalerweise das Format `mysql_XXXXXX` hat, wird sie im Archiv mit Bindestrichen anstelle von Unterstrichen geschrieben, wie `mysql-XXXXXX`.
 
-    :::
+   :::
 
 3. Stelle das Backup mit dem Befehl `mw database mysql import` wieder her. Dafür musst du einen SSH-Schlüssel auf deinem lokalen Rechner eingerichtet haben, der auch mit deinem mStudio-Benutzerkonto verknüpft ist.
 
-    ```shellsession title="Local shell session"
-    $ database_id=<database-id>
-    $ mw database mysql import ${database_id} --input dbdump-${database_id/_/-}/*.sql.gz --gzip
-    ```
+   ```shellsession title="Local shell session"
+   $ database_id=<database-id>
+   $ mw database mysql import ${database_id} --input dbdump-${database_id/_/-}/*.sql.gz --gzip
+   ```
 
 ### Manuelle Sicherung und Wiederherstellung
 

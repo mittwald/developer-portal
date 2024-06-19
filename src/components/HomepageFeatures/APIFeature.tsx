@@ -19,20 +19,20 @@ interface ReferenceLinkProps {
   };
 }
 
-function ReferenceLink(
-  {
-    version,
-    title,
-    additionalLinks = [],
-    spec
-  }: ReferenceLinkProps
-) {
+function ReferenceLink({
+  version,
+  title,
+  additionalLinks = [],
+  spec,
+}: ReferenceLinkProps) {
   const links = [
     <Link key="ref" to={`/docs/${version}/category/reference`}>
       <Translate id={"index.reference.reference"}>Reference</Translate>
     </Link>,
     ...additionalLinks,
-    <Link key="spec" href={spec.url}>{spec.typeLabel}</Link>
+    <Link key="spec" href={spec.url}>
+      {spec.typeLabel}
+    </Link>,
   ];
   return (
     <>
@@ -64,7 +64,9 @@ function APIIntro() {
 function APIDocumentation() {
   return (
     <>
-      <h3><Translate id="index.reference.title">API documentation</Translate></h3>
+      <h3>
+        <Translate id="index.reference.title">API documentation</Translate>
+      </h3>
       <p>
         <Translate id={"index.reference.body"}>
           All endpoints and parameters of our API at a glance, including human
@@ -80,7 +82,7 @@ function APIDocumentation() {
             spec={{
               url: "https://api.mittwald.de/v1/openapi.json",
               typeLabel: translate({ id: "index.reference.openapi" }),
-              type: "openapi"
+              type: "openapi",
             }}
           />
         </li>
@@ -91,12 +93,12 @@ function APIDocumentation() {
             additionalLinks={[
               <Link key="into" to="/docs/v2/api/intro">
                 <Translate id="index.reference.intro">Introduction</Translate>
-              </Link>
+              </Link>,
             ]}
             spec={{
               url: "https://api.mittwald.de/openapi",
               typeLabel: translate({ id: "index.reference.openapi" }),
-              type: "openapi"
+              type: "openapi",
             }}
           />
         </li>
@@ -119,7 +121,9 @@ function APIDocumentation() {
 function APILibraries() {
   return (
     <>
-      <h3><Translate id="index.sdks.title">SDKs and Libraries</Translate></h3>
+      <h3>
+        <Translate id="index.sdks.title">SDKs and Libraries</Translate>
+      </h3>
       <p>
         <Translate id={"index.sdks.body"}>
           Make it easy for yourself and use one of our SDKs or libraries to

@@ -9,11 +9,15 @@ export function generateSchemaExample(schema: OpenAPIV3.SchemaObject): any {
     const example: any = {};
     if (schema.properties) {
       Object.entries(schema.properties).forEach(([name, property]) => {
-        example[name] = generateSchemaExample(property as OpenAPIV3.SchemaObject);
+        example[name] = generateSchemaExample(
+          property as OpenAPIV3.SchemaObject,
+        );
       });
     }
     if (schema.additionalProperties) {
-      example["string"] = generateSchemaExample(schema.additionalProperties as OpenAPIV3.SchemaObject);
+      example["string"] = generateSchemaExample(
+        schema.additionalProperties as OpenAPIV3.SchemaObject,
+      );
     }
     return example;
   }

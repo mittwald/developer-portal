@@ -1,12 +1,26 @@
 import { OpenAPIV3 } from "openapi-types";
 
-function Type({ schema, className }: { schema: OpenAPIV3.SchemaObject, className?: string }) {
+function Type({
+  schema,
+  className,
+}: {
+  schema: OpenAPIV3.SchemaObject;
+  className?: string;
+}) {
   if (schema.type === "array") {
-    return <span className={className}>array of <Type schema={schema.items as OpenAPIV3.SchemaObject} /></span>;
+    return (
+      <span className={className}>
+        array of <Type schema={schema.items as OpenAPIV3.SchemaObject} />
+      </span>
+    );
   }
 
   if (schema.oneOf !== undefined) {
-    return <span className={className}>one of {schema.oneOf.length} alternatives</span>;
+    return (
+      <span className={className}>
+        one of {schema.oneOf.length} alternatives
+      </span>
+    );
   }
 
   const addendums = [];
@@ -34,7 +48,11 @@ function Type({ schema, className }: { schema: OpenAPIV3.SchemaObject, className
   }
 
   if (addendums.length > 0) {
-    return <span className={className}>{schema.type} ({addendums.join(", ")})</span>;
+    return (
+      <span className={className}>
+        {schema.type} ({addendums.join(", ")})
+      </span>
+    );
   }
 
   return <span className={className}>{schema.type}</span>;

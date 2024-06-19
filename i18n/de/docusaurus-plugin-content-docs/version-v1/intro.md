@@ -3,9 +3,9 @@
 :::warning
 
 **Für die öffentliche v1-API, alle Bestandteile und diese Dokumentation bieten wir keinen Support. Wir behalten uns vor, Änderungen jederzeit und ohne Ankündigung oder Dokumentation durchzuführen.**
- 
+
 :::
- 
+
 ## Authentifizierung
 
 ### Mit Nutzername & Passwort
@@ -43,7 +43,7 @@ Rückgabewert dieses Aufrufs ist ein API-Token. Dieses hat eine begrenzte Gülti
 
 :::important
 
-Client-Applikationen sollten das API-Token für seine Gültigkeitsdauer cachen, und erst *anschließend* ein neues Token über die API anfordern.
+Client-Applikationen sollten das API-Token für seine Gültigkeitsdauer cachen, und erst _anschließend_ ein neues Token über die API anfordern.
 
 :::
 
@@ -58,7 +58,7 @@ POST /v1/authentication/tokens HTTP/1.1
 Host: api.mittwald.de
 Content-Type: application/json
 
-{  
+{
     "description": "Meine Anwendung"
 }
 ```
