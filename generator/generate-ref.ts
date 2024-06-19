@@ -5,59 +5,39 @@ import { OpenAPIV3 } from "openapi-types";
 import * as url from "url";
 import * as yaml from "yaml";
 
-async function renderAPIDocs (apiVersion: "v1" | "v2", outputPath: string){
-  const sidebar = [];
+type APIVersion = `v${number}`
 
+async function loadAndDereferenceSpec(apiVersion: APIVersion): Promise<OpenAPIV3.Document> {
   const spec = await fetch(`https://api.mittwald.de/${apiVersion}/openapi.json?withRedirects=false`);
   const specJson = await spec.json();
 
-  const specJsonUnrefed: OpenAPIV3.Document = await $RefParser.dereference(specJson, {
+  return await $RefParser.dereference(specJson, {
     dereference: {
       circular: "ignore",
     },
-  }) as any;
+  });
+}
 
+function determineServerURLAndBasePath(apiVersion: APIVersion, spec: OpenAPIV3.Document): [string, string] {
   let basePath = "";
 
-  const serverURL = specJsonUnrefed.servers?.[0].url ?? `https://api.mittwald.de/${apiVersion}`;
+  const serverURL = spec.servers?.[0].url ?? `https://api.mittwald.de/${apiVersion}`;
   if (serverURL) {
     const parsedServerURL = url.parse(serverURL);
     basePath = parsedServerURL.pathname;
   }
 
-  for (const {name, description} of specJsonUnrefed.tags) {
-    const slug = name.replace(/ /g, "").toLowerCase().replace(/[^a-z0-9]/, "");
-    const operationsDir = path.join(outputPath, slug);
-    const sidebarItems = [];
+  return [serverURL, basePath];
+}
 
-    console.log(operationsDir);
-    fs.mkdirSync(operationsDir, {recursive: true});
+function renderAPISpecToFile(operationFile: string, frontMatterYAML: any, urlPathWithBase: string, method: string, serializedSpec: string, serverURL: string, apiVersion: APIVersion) {
+  const withSDKExamples = apiVersion !== "v1";
 
-    for (const urlPath of Object.keys(specJsonUnrefed.paths)) {
-      const operations = specJsonUnrefed.paths[urlPath];
-      const urlPathWithBase = basePath + urlPath.replace(new RegExp(`${basePath}/`), "/");
-      for (const method of Object.keys(operations)) {
-        const operation = operations[method];
-        if (operation.tags.includes(name)) {
-          const summary: string = operation.summary?.replace(/\.$/, "");
-          const operationFile = path.join(operationsDir, operation.operationId + ".mdx");
-          const serializedSpec = JSON.stringify(operation);
+  // Yes, this is JavaScript that renders more JavaScript (or mdx, to be precise).
+  // Yes, this is a bit weird and opens up a whole can of worms. Oh, well.
 
-          sidebarItems.push({
-            "type": "doc",
-            "id": `reference/${slug}/${operation.operationId}`,
-            "className": "api-operation-" + method
-          })
-
-          const frontMatter = {
-            title: summary ?? operation.operationId,
-            description: operation.description ?? "",
-          }
-
-          const frontMatterYAML = yaml.stringify(frontMatter);
-
-          // language=text
-          fs.writeFileSync(operationFile, `---
+  // language=text
+  fs.writeFileSync(operationFile, `---
 ${frontMatterYAML}
 ---
 
@@ -76,9 +56,56 @@ import {OperationUsage} from "@site/src/components/openapi/OperationUsage";
 
 ## Usage examples
 
-<OperationUsage method="${method}" url="${urlPathWithBase}" spec={${serializedSpec}} baseURL="${serverURL}" withJavascript={${apiVersion !== "v1"}} withPHP={${apiVersion !== "v1"}} />
+<OperationUsage method="${method}" url="${urlPathWithBase}" spec={${serializedSpec}} baseURL="${serverURL}" withJavascript={${withSDKExamples}} withPHP={${withSDKExamples}} />
 
 `);
+}
+
+function slugFromTagName(tagName: string): string {
+  return tagName.replace(/ /g, "").toLowerCase().replace(/[^a-z0-9]/, "");
+}
+
+function stripTrailingDot(str: string|undefined): string|undefined {
+  return str?.replace(/\.$/, "");
+}
+
+async function renderAPIDocs (apiVersion: APIVersion, outputPath: string){
+  const sidebar = [];
+  const spec = await loadAndDereferenceSpec(apiVersion);
+  const [serverURL, basePath] = determineServerURLAndBasePath(apiVersion, spec);
+
+  for (const {name, description} of spec.tags) {
+    const slug = slugFromTagName(name);
+    const operationsDir = path.join(outputPath, slug);
+    const sidebarItems = [];
+
+    fs.mkdirSync(operationsDir, {recursive: true});
+
+    for (const urlPath of Object.keys(spec.paths)) {
+      const operations = spec.paths[urlPath];
+      const urlPathWithBase = basePath + urlPath.replace(new RegExp(`${basePath}/`), "/");
+      for (const method of Object.keys(operations)) {
+        const operation = operations[method];
+        if (operation.tags.includes(name)) {
+          // Strip trailing dot from summary because they are annoying in the sidebar
+          const summary: string = stripTrailingDot(operation.summary);
+          const operationFile = path.join(operationsDir, operation.operationId + ".mdx");
+          const serializedSpec = JSON.stringify(operation);
+
+          sidebarItems.push({
+            "type": "doc",
+            "id": `reference/${slug}/${operation.operationId}`,
+            "className": "api-operation-" + method
+          })
+
+          const frontMatter = {
+            title: summary ?? operation.operationId,
+            description: operation.description ?? "",
+          }
+
+          const frontMatterYAML = yaml.stringify(frontMatter);
+
+          renderAPISpecToFile(operationFile, frontMatterYAML, urlPathWithBase, method, serializedSpec, serverURL, apiVersion);
         }
       }
     }
