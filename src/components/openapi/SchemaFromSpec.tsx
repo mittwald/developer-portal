@@ -1,11 +1,8 @@
 import Schema from "@site/src/components/openapi/Schema";
-import { useEffect, useState } from "react";
-import { OpenAPIV3 } from "openapi-types";
 import TabItem from "@theme/TabItem";
 import SchemaExample from "@site/src/components/openapi/SchemaExample";
 import Tabs from "@theme/Tabs";
-
-type APIVersion = `v${number}`;
+import { APIVersion, specs } from "@site/src/openapi/specs";
 
 interface Props {
   apiVersion: APIVersion;
@@ -19,25 +16,9 @@ interface Props {
  * @param apiVersion API version from which to load the schema ("v1", "v2", etc.)
  * @param path The path to the schema in the OpenAPI spec
  * @param withExample Whether to render an example of the schema
- * @todo This component should be refactored to support static site generation;
- *    right now, it only works on the browser and loads the entire OpenAPI spec
- *    for each render.
  */
 function SchemaFromSpec({ apiVersion, path, withExample }: Props) {
-  const [spec, setSpec] = useState<OpenAPIV3.Document | null>(null);
-
-  useEffect(() => {
-    (async () => {
-      const specURL = `https://api.mittwald.de/${apiVersion}/openapi.json`;
-      const spec = await (await fetch(specURL)).json();
-
-      setSpec(spec);
-    })();
-  }, [apiVersion, path]);
-
-  if (spec === null) {
-    return <p>Loading...</p>;
-  }
+  const spec = specs[apiVersion];
 
   let refPath = path.split("/");
   let current = spec;
@@ -52,14 +33,16 @@ function SchemaFromSpec({ apiVersion, path, withExample }: Props) {
   }
 
   if (withExample) {
-    return <Tabs groupId="component" defaultValue="schema">
-      <TabItem value="schema" label="Schema">
-        <Schema schema={current} />
-      </TabItem>
-      <TabItem value="example" label="Example">
-        <SchemaExample schema={current} />
-      </TabItem>
-    </Tabs>;
+    return (
+      <Tabs groupId="component" defaultValue="schema">
+        <TabItem value="schema" label="Schema">
+          <Schema schema={current} />
+        </TabItem>
+        <TabItem value="example" label="Example">
+          <SchemaExample schema={current} />
+        </TabItem>
+      </Tabs>
+    );
   }
 
   return <Schema schema={current} />;
