@@ -1,12 +1,14 @@
 import clsx from "clsx";
 import styles from "@site/src/components/HomepageFeatures/styles.module.css";
 import FeatureRow from "./FeatureRow";
-import Intro from "./Intro";
+import Intro, { IntroHeader } from "./Intro";
 import Translate, { translate } from "@docusaurus/Translate";
 import Link from "@docusaurus/Link";
 import React, { ReactNode } from "react";
 import { IssueTrackerLink } from "@site/src/components/IssueTrackerLink";
 import LinkGroup from "@site/src/components/LinkGroup";
+import Icon from "@mittwald/flow-react-components/Icon";
+import { IconPlugConnected } from "@tabler/icons-react";
 
 interface ReferenceLinkProps {
   version: string;
@@ -44,11 +46,16 @@ function ReferenceLink({
 function APIIntro() {
   return (
     <Intro>
-      <h3>
-        <Translate id={"index.api.title"}>
-          Automate and integrate with our API
-        </Translate>
-      </h3>
+      <IntroHeader>
+        <Icon>
+          <IconPlugConnected />
+        </Icon>
+        <h3>
+          <Translate id={"index.api.title"}>
+            Automate and integrate with our API
+          </Translate>
+        </h3>
+      </IntroHeader>
       <p>
         <Translate id={"index.api.body"}>
           Our API allows you to manage your mittwald products and services

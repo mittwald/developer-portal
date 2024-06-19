@@ -1,21 +1,28 @@
 import clsx from "clsx";
 import styles from "@site/src/components/HomepageFeatures/styles.module.css";
 import FeatureRow from "./FeatureRow";
-import Intro from "./Intro";
+import Intro, { IntroHeader } from "./Intro";
 import Translate from "@docusaurus/Translate";
 import Link from "@docusaurus/Link";
 import React from "react";
 import LinkGroup from "@site/src/components/LinkGroup";
 import { NewBadge } from "@site/src/components/NewBadge";
+import Icon from "@mittwald/flow-react-components/Icon";
+import { IconCloudNetwork } from "@tabler/icons-react";
 
 function PlatformIntro() {
   return (
     <Intro>
-      <h3>
-        <Translate id={"index.deploy.title"}>
-          Deploy your software easily
-        </Translate>
-      </h3>
+      <IntroHeader>
+        <Icon>
+          <IconCloudNetwork />
+        </Icon>
+        <h3>
+          <Translate id={"index.deploy.title"}>
+            Deploy your software easily
+          </Translate>
+        </h3>
+      </IntroHeader>
       <p>
         <Translate id={"index.deploy.body"}>
           Deploy your applications and services to our platform with ease. We
@@ -52,7 +59,9 @@ function PlatformCoreFeatures() {
               <Link to="/docs/v2/platform/workloads/php">PHP</Link>,
               <Link to="/docs/v2/platform/workloads/nodejs">Node.js</Link>,
               <Link to="/docs/v2/platform/workloads/python">Python</Link>,
-              <Link href="https://github.com/mittwald/feature-requests/issues/1">Docker (planned)</Link>
+              <Link href="https://github.com/mittwald/feature-requests/issues/1">
+                Docker (planned)
+              </Link>,
             ]}
           />
         </li>
