@@ -15,7 +15,10 @@ Some type of applications contain their own webserver, which is responsible for 
 
 ## Prerequisites
 
-As a prerequisite, you need an mStudio application that contains a webserver, for example a [Node.js](../nodejs) or [Python](../python) application. The application needs to have an "entrypoint" that starts your webserver.
+As a prerequisite, you need an mStudio application that contains a webserver, for example a [Node.js](../nodejs) or [Python](../python) application. The application needs to have an "entrypoint"; meaning a console command that starts your webserver. The entrypoint command must fulfill the following requirements:
+
+- It should open a local TCP port on which the webserver listens for incoming HTTP requests; the port is provided via the `PORT` environment variable.
+- The command should run the webserver in the foreground, so that the process does not exit immediately.
 
 ## Making your app accessible via HTTP
 

@@ -15,7 +15,10 @@ Manche Anwendungen enthalten ihren eigenen Webserver, der für die Verarbeitung 
 
 ## Voraussetzungen
 
-Als Voraussetzung benötigst du eine mStudio-Anwendung, die einen Webserver enthält, z. B. eine [Node.js](../nodejs)- oder [Python](../python)-Anwendung. Die Anwendung muss einen "Einstiegspunkt" haben, der deinen Webserver startet.
+Als Voraussetzung benötigst du eine mStudio-Anwendung, die einen Webserver enthält, z. B. eine [Node.js](../nodejs)- oder [Python](../python)-Anwendung. Die Anwendung muss einen "Einstiegspunkt" haben; also einen Konsolenbefehl, der deinen Webserver startet. Der Einstiegspunkt-Befehl sollte die folgenden Anforderungen erfüllen:
+
+- Er sollte einen lokalen TCP-Port öffnen, auf dem der Webserver auf eingehende HTTP-Anfragen lauscht; der Port wird über die Umgebungsvariable `PORT` vorgegeben.
+- Der Befehl sollte den Webserver im Vordergrund ausführen, damit der Prozess nicht sofort beendet wird.
 
 ## Deine Anwendung über HTTP zugänglich machen
 
