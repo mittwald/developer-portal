@@ -5,6 +5,10 @@ export function generateSchemaExample(schema: OpenAPIV3.SchemaObject): any {
     return schema.example;
   }
 
+  if (schema.oneOf) {
+    return generateSchemaExample(schema.oneOf[0] as OpenAPIV3.SchemaObject);
+  }
+
   if (schema.type === "object") {
     const example: any = {};
     if (schema.properties) {
