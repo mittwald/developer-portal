@@ -21,30 +21,10 @@ import Text from "@mittwald/flow-react-components/Content";
 import LabeledValue from "@mittwald/flow-react-components/LabeledValue";
 import Label from "@mittwald/flow-react-components/Label";
 import ColumnLayout from "@mittwald/flow-react-components/ColumnLayout";
-import StatusBadge from "@mittwald/flow-react-components/StatusBadge";
+import OperationPath from "@site/src/components/openapi/OperationPath";
 import ParameterObject = OpenAPIV3.ParameterObject;
 import ReferenceObject = OpenAPIV3.ReferenceObject;
 import ResponseObject = OpenAPIV3.ResponseObject;
-
-function OperationPath({ path }: { path: string }) {
-  const components = path.split("/");
-  const parts = components.map((part, index) => {
-    if (part.startsWith("{")) {
-      return (
-        <Fragment key={index}>
-          <span className={styles.variableLinkParameter}>{part}</span>/
-        </Fragment>
-      );
-    }
-    return (
-      <Fragment key={index}>
-        <span>{part}</span>/
-      </Fragment>
-    );
-  });
-
-  return <>{parts}</>;
-}
 
 function OperationValue({
   name,
@@ -220,13 +200,7 @@ function OperationRequestBody({
   }
 }
 
-function OperationResponseBody({
-  title,
-  spec,
-}: {
-  title: string;
-  spec: OpenAPIV3.ResponseObject | undefined;
-}) {
+function OperationResponseBody({ spec }: { spec?: OpenAPIV3.ResponseObject }) {
   if (!spec) {
     return null;
   }
