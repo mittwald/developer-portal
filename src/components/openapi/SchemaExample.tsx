@@ -20,7 +20,7 @@ function SchemaExample({
   }
   const example = generateSchemaExample(schema);
   return (
-    <CodeBlock showLineNumbers={true} language="json" title={title}>
+    <CodeBlock showLineNumbers={true} language="yaml" title={title}>
       {JSON.stringify(example, null, 2)}
     </CodeBlock>
   );
