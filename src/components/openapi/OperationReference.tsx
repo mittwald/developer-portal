@@ -36,7 +36,9 @@ function OperationParameter({ param }: { param: ParameterObject }) {
   if (param.example) {
     body.push(
       <div key="example">
-        <span className={styles.parameterExample}>Example:</span>
+        <span className={styles.parameterExample}>
+          <Translate id="openapi.example">Example</Translate>:
+        </span>
         <code>{JSON.stringify(param.example)}</code>
       </div>,
     );
