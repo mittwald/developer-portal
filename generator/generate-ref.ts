@@ -43,7 +43,8 @@ function renderAPISpecToFile(operationFile: string, frontMatterYAML: any, urlPat
 ${frontMatterYAML}
 ---
 
-import {OperationMetadata, OperationRequest, OperationResponses} from "@site/src/components/openapi/OperationReference";
+import {OperationRequest, OperationResponses} from "@site/src/components/openapi/OperationReference";
+import {OperationMetadata} from "@site/src/components/openapi/OperationMetadata";
 import {OperationUsage} from "@site/src/components/openapi/OperationUsage";
 
 <OperationMetadata path="${urlPathWithBase}" method="${method}" spec={${serializedSpec}} />

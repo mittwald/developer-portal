@@ -20,8 +20,8 @@ import Text from "@mittwald/flow-react-components/Content";
 import LabeledValue from "@mittwald/flow-react-components/LabeledValue";
 import Label from "@mittwald/flow-react-components/Label";
 import ColumnLayout from "@mittwald/flow-react-components/ColumnLayout";
-import OperationPath from "@site/src/components/openapi/OperationPath";
 import OperationInputValue from "@site/src/components/openapi/OperationInputValue";
+import { OperationMetadata } from "@site/src/components/openapi/OperationMetadata";
 import ParameterObject = OpenAPIV3.ParameterObject;
 import ReferenceObject = OpenAPIV3.ReferenceObject;
 import ResponseObject = OpenAPIV3.ResponseObject;
@@ -329,39 +329,6 @@ export function OperationResponses({
           </Content>
         </Accordion>
       ))}
-    </>
-  );
-}
-
-export function OperationMetadata({
-  method,
-  path,
-  spec,
-}: {
-  path: string;
-  method: string;
-  spec: OpenAPIV3.OperationObject;
-}) {
-  return (
-    <>
-      <pre>
-        {method.toUpperCase()} <OperationPath path={path} />
-      </pre>
-
-      <ColumnLayout m={[1, 5]}>
-        <LabeledValue>
-          <Label>API version</Label>
-          <Content>
-            {path.split("/").filter((p) => p.startsWith("v"))[0]}
-          </Content>
-        </LabeledValue>
-        <LabeledValue>
-          <Label>Request method</Label>
-          <Content>{method.toUpperCase()}</Content>
-        </LabeledValue>
-      </ColumnLayout>
-      <hr />
-      {spec.description ? <Markdown>{spec.description}</Markdown> : null}
     </>
   );
 }
