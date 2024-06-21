@@ -28,7 +28,7 @@ function ReferenceLink({
   spec,
 }: ReferenceLinkProps) {
   const links = [
-    <Link key="ref" to={`/docs/${version}/category/reference`}>
+    <Link key="ref" to={`/docs/${version}/reference`}>
       <Translate id={"index.reference.reference"}>Reference</Translate>
     </Link>,
     ...additionalLinks,

@@ -132,7 +132,7 @@ const config: Config = {
         },
         {
           type: "doc",
-          docId: "/category/reference",
+          docId: "/reference",
           position: "left",
           label: "Reference",
         },
@@ -167,7 +167,7 @@ const config: Config = {
             },
             {
               label: "Reference",
-              to: "/docs/v2/category/reference",
+              to: "/docs/v2/reference",
             },
           ],
         },

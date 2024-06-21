@@ -42,7 +42,7 @@ const sidebars = {
       link: {
         type: "generated-index",
         title: "API Reference",
-        slug: "/category/reference",
+        slug: "/reference",
         keywords: ["api-reference"]
       }
     }
