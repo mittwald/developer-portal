@@ -80,9 +80,11 @@ function OperationResponseHeader({
 function OperationParameterList({
   title,
   params,
+  expanded,
 }: {
   title: string;
   params: ParameterObject[];
+  expanded: boolean;
 }) {
   if (params.length === 0) {
     return undefined;
@@ -91,13 +93,13 @@ function OperationParameterList({
   const hasRequired = params.some((param) => param.required);
 
   return (
-    <Accordion>
+    <Accordion defaultExpanded={expanded}>
       <Heading>
         <div style={{ flexGrow: 1 }}>{title}</div>{" "}
         {hasRequired ? <Required /> : undefined}
       </Heading>
       <Content>
-        <ul className={styles.parameterList}>
+        <ul className={styles.parameterList} style={{marginBottom: "1rem"}}>
           {params.map((param, idx) => (
             <OperationParameter key={idx} param={param} />
           ))}
@@ -255,6 +257,7 @@ export function OperationRequest({
           message: "Path parameters",
         })}
         params={pathParameters}
+        expanded={true}
       />
       <OperationParameterList
         title={translate({
@@ -262,6 +265,7 @@ export function OperationRequest({
           message: "Query parameters",
         })}
         params={queryParameters}
+        expanded={false}
       />
       <OperationParameterList
         title={translate({
@@ -269,6 +273,7 @@ export function OperationRequest({
           message: "Header parameters",
         })}
         params={headerParameters}
+        expanded={false}
       />
       <OperationRequestBody
         title={translate({
