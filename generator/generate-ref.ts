@@ -127,7 +127,7 @@ async function renderAPIDocs (apiVersion: APIVersion, outputPath: string){
         "type": "generated-index",
         "title": name,
         "description": description,
-        "slug": `/category/reference/${slug}`,
+        "slug": `/reference/${slug}`,
         "keywords": ["api-reference"],
       },
       "items": sidebarItems
@@ -151,7 +151,7 @@ async function renderAPIDocs (apiVersion: APIVersion, outputPath: string){
           link: {
             type: "generated-index",
             title: "API Reference",
-            slug: "/category/reference",
+            slug: "/reference",
             keywords: ["api-reference"]
           },
           "items": sidebar
