@@ -1,25 +1,31 @@
 ---
-sidebar_label: Installing a Node.js application
-title: Installing a Node.js application using the API
-description: Learn how to install a Node.js application via the mStudio API
+sidebar_label: Installing a Node.js or Python application
+title: Installing a Node.js or Python application using the API
+description: Learn how to install an application that starts its own webserver (like Node.js or Python) via the mStudio API
 tags:
   - Node.js
+  - Python
 ---
 
 import OperationHint from "@site/src/components/OperationHint";
 
 ## Prerequisites
 
-To install a Node.js application, you will need to have the following:
+To install a Node.js or Python application, you will need to have the following:
 
 - The project ID of an existing project ([how to create a project](../create-project))
-- The application and version ID of the generic custom Node.js application (see next section)
+- The application and version ID of the generic custom Node.js/Python application (see next section)
 
 ## Determine the app and app version ID
 
-Before installing a Node.js application, you will need to determine the application ID and version ID of the generic custom Node.js application.
+Before installing a Node.js or Python application, you will need to determine the application ID and version ID of the generic custom Node.js (or Python, respectively) application.
 
-For this, call the `/v2/apps` endpoint, and find the "Node.js" application. It should have a stable ID of `3e7f920b-a711-4d2f-9871-661e1b41a2f0`. You can then use that ID to retrieve the recommended version to install for this app, by calling the `/v2/apps/{appID}/versions` endpoint. You can filter the returned versions by the `recommended` property.
+For this, call the `/v2/apps` endpoint, and find the "Node.js" or "Python" application. These should have the following stable IDs:
+
+- Node.js: `3e7f920b-a711-4d2f-9871-661e1b41a2f0`
+- Python: `be57d166-dae9-4480-bae2-da3f3c6f0a2e`
+
+Use the respective ID, depending on whether you want to install a Node.js or Python application. You can then use that ID to retrieve the recommended version to install for this app, by calling the `/v2/apps/{appID}/versions` endpoint. You can filter the returned versions by the `recommended` property.
 
 Please note that the actual version is rather inconsequential, as it refers only to the starter template used to create the application. The actual version of the application will be determined by your own code.
 

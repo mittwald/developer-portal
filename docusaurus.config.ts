@@ -4,6 +4,7 @@
 import { Config } from "@docusaurus/types";
 import { themes } from "prism-react-renderer";
 import { Options, ThemeConfig } from "@docusaurus/preset-classic";
+import { Options as ClientRedirectOptions } from "@docusaurus/plugin-client-redirects";
 
 const lightCodeTheme = themes.oneLight;
 const darkCodeTheme = themes.dracula;
@@ -49,6 +50,27 @@ const config: Config = {
     },
   },
 
+  plugins: [
+    [
+      "@docusaurus/plugin-client-redirects",
+      {
+        createRedirects(path) {
+          let newPath = path;
+          if (newPath.includes("/platform")) {
+            newPath = newPath.replace("/platform", "/technologies");
+          }
+          if (newPath.includes("/workloads")) {
+            newPath = newPath.replace("/workloads", "/languages");
+          }
+
+          if (newPath !== path) {
+            return newPath;
+          }
+        },
+      } satisfies ClientRedirectOptions,
+    ],
+  ],
+
   presets: [
     [
       "classic",
@@ -63,7 +85,14 @@ const config: Config = {
             current: {
               label: "API v2",
               path: "v2",
+              banner: "none",
+              badge: false,
             },
+            v1: {
+              label: "API v1",
+              path: "v1",
+              banner: "unmaintained",
+            }
           },
         },
         blog: {
@@ -77,27 +106,6 @@ const config: Config = {
           customCss: require.resolve("./src/css/custom.css"),
         },
       } satisfies Options,
-    ],
-    [
-      "redocusaurus",
-      {
-        specs: [
-          {
-            id: "v1",
-            spec: "https://api.mittwald.de/v1/openapi.json",
-            route: "/reference/v1",
-          },
-          {
-            id: "v2",
-            spec: "https://api.mittwald.de/openapi?withRedirects=false",
-            route: "/reference/v2",
-          },
-        ],
-        theme: {
-          primaryColor: "#27367b",
-          primaryColorDark: "#abb9ff",
-        },
-      },
     ],
   ],
 
@@ -118,12 +126,13 @@ const config: Config = {
         },
         {
           type: "doc",
-          docId: "/category/technologies",
+          docId: "/category/platform",
           position: "left",
-          label: "Technologies",
+          label: "Platform",
         },
         {
-          href: "/reference/v2",
+          type: "doc",
+          docId: "/reference",
           position: "left",
           label: "Reference",
         },
@@ -149,8 +158,8 @@ const config: Config = {
               to: "/docs/v2/api/intro",
             },
             {
-              label: "Technologies",
-              to: "/docs/v2/category/technologies",
+              label: "Platform",
+              to: "/docs/v2/category/platform",
             },
             {
               label: "SDKs and Libraries",
@@ -158,7 +167,7 @@ const config: Config = {
             },
             {
               label: "Reference",
-              to: "/reference/v2",
+              to: "/docs/v2/reference",
             },
           ],
         },

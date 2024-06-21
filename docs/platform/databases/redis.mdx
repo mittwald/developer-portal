@@ -1,0 +1,241 @@
+---
+title: Redis
+sidebar_position: 20
+description: >
+  For an e-commerce website, good performance is a real competitive advantage. To further minimize your load times, you can use Redis in all Space server and proSpace plans. Here you can read about what you can use the database for and how to set it up.
+---
+
+import PlanCompatibility from "@site/src/components/PlanCompatibility";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+<PlanCompatibility plans={["ps", "ss"]} />
+
+## What is Redis?
+
+For an e-commerce website, good performance is a real competitive advantage. To further minimize your load times, you can use Redis in all Space server and proSpace plans. Here you can read about what you can use the database for and how to set it up.
+
+Redis (short for Remote Dictionary Server) is an **in-memory database** and **key-value store** in one. That means your data is stored in the working memory instead of on the hard drive. Each entry receives its own key, through which it can be accessed directly. This ensures very short access times.
+
+## Why do I need Redis?
+
+In general, Redis speeds up your projects when data needs to be written and queried quickly. Thanks to its outstanding performance, Redis is ideal as a cache. The database is also popular as a session storage for shop systems.
+
+## How do I create a Redis database?
+
+Setting up Redis is easy. However, depending on the CMS or shop system you use, there are a few things you need to consider. I will explain to you step by step how to do it.
+
+<Tabs groupId="access-mode">
+  <TabItem value="gui" label="mStudio UI">
+    To create a Redis database in the mStudio, follow these steps:
+
+    1. Navigate to the project that you want to create the database in.
+    2. Select the "Databases" menu item in the sidebar.
+    3. Click the "Create Database" button and select "Redis".
+    4. Enter a description for the database and select the desired version.
+
+    After the installation has completed, observe the host and port in the details under connection information. You
+    need both for the configuration of your system.
+
+  </TabItem>
+  <TabItem value="cli" label="CLI">
+    To create a Redis database from the CLI, run the following command:
+
+    ```bash
+    $ mw database redis create --description "My Redis database" --version 7.2
+    ```
+
+    After the installation has completed, use the `mw database redis get` command to observe the connection information.
+
+  </TabItem>
+  <TabItem value="api" label="API">
+
+    To learn how to create a Redis database via the API, read the article ["Creating a Redis
+    database"](../../../api/howtos/create-redis).
+
+  </TabItem>
+</Tabs>
+
+## Configuring Redis as a session storage for PHP
+
+The `php.ini` file is located in your project under `.config/php/php.ini`. Add the following code:
+
+```ini
+extension=redis.so
+session.save_handler = redis
+session.save_path = "tcp://HOST:PORT?database=15"
+```
+
+Now change the variables `HOST` and `PORT`. Use the information from the connection information.
+
+By default, each Redis database has 16 databases that can be accessed from 0 to 15.
+
+## Setting up common applications
+
+### Shopware 6
+
+In your Shopware 6 installation, you enter the configuration for Redis in the `services.yaml`. It is located in the directory `/config`. If there is no file there yet, simply create one. Add the following lines at the end of the file:
+
+```yaml
+parameters:
+  app.redis.cache.host: "%env(REDIS_CACHE_HOST)%"
+  app.redis.cache.port: "%env(int:REDIS_CACHE_PORT)%"
+  app.redis.cache.database: "%env(int:REDIS_CACHE_DATABASE)%"
+services:
+  Redis:
+    class: Redis
+    calls:
+      - method: connect
+        arguments:
+          - "%env(REDIS_SESSION_HOST)%"
+          - "%env(int:REDIS_SESSION_PORT)%"
+      - method: select
+        arguments:
+          - "%env(int:REDIS_SESSION_DATABASE)%"
+    Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler:
+      arguments:
+        - "@Redis"
+```
+
+Now create the file `framework.yaml` in the `config/packages` folder. Add the following to the file:
+
+```yaml
+framework:
+  cache:
+    app: cache.adapter.redis
+    system: cache.adapter.redis
+    default_redis_provider: "redis://%app.redis.cache.host%:%app.redis.cache.port%/%app.redis.cache.database%"
+  session:
+    handler_id: Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler
+```
+
+Finally, add the following at the end of `.env`:
+
+```shell
+REDIS_CACHE_HOST="HOST"
+REDIS_CACHE_PORT="PORT"
+REDIS_CACHE_DATABASE="1"
+
+REDIS_SESSION_HOST="HOST"
+REDIS_SESSION_PORT="PORT"
+REDIS_SESSION_DATABASE="0"
+```
+
+### Shopware 5
+
+Add the following to `config.php` in the Shopware directory:
+
+```php
+// Sessions for backend and frontend in Redis in DB2
+'session' => [
+    'save_handler' => 'redis',
+    'save_path' => 'tcp://HOST:PORT/2',
+],
+
+'backendsession' => [
+    'save_handler' => 'redis',
+    'save_path' => 'tcp://HOST:PORT/2',
+],
+
+// Models Cache in Redis in DB3
+'model' => [
+    'redisHost' => 'tcp://HOST',
+    'redisPort' => 'PORT',
+    'redisDbIndex' => '3',
+    'cacheProvider' => 'redis',
+],
+
+// Shopware backend cache in Redis in DB3
+'cache' => [
+    'backend' => 'redis',
+    'backendOptions' => [
+        'servers' => [
+            [
+                'host' => 'tcp://HOST',
+                'port' => 'PORT',
+                'dbindex' => '3',
+            ],
+        ],
+    ],
+],
+```
+
+### Joomla 4
+
+In the Joomla administration, go to _System -> Configuration -> System_ and configure the following under "Session":
+
+- Session handler: Redis
+- Persistent Redis: Yes
+- Redis server host/socket: Enter HOST
+- Redis port: Enter PORT
+- Redis server authentication: Leave as is
+- Redis database: Enter a desired free database number between 0 and 15
+
+Select the desired database number for Redis database and save.
+
+### WordPress
+
+We recommend the plugin **[Redis Object Cache](https://wordpress.org/plugins/redis-cache/)**. Install said plugin via the CLI
+
+```shell
+wp plugin install redis-cache --activate
+```
+
+and set the required configuration constants:
+
+```shell
+wp config set --type=constant WP_REDIS_PATH HOST
+wp config set --type=constant WP_REDIS_PORT PORT
+wp config set --type=constant WP_REDIS_DATABASE 0
+wp config set --type=constant WP_REDIS_SCHEME unix
+```
+
+- use the `hostname` and `port` specified for the database as values for `WP_REDIS_PATH` and `WP_REDIS_PORT` (see [`GET https://api.mittwald.de/v2/redis-databases/{id}`](https://developer.mittwald.de/reference/v2#tag/Database/operation/database-get-redis-database))
+- Choose a free database number between 0 and 15 for the `WP_REDIS_DATABASE` value.
+
+If you don’t like to use the WP-CLI, you can also install the plugin via the WordPress backend. After installation and activation, add the following entries to `wp-config.php`:
+
+```php
+define('WP_REDIS_PATH', 'HOST');
+define('WP_REDIS_PORT', 'PORT');
+define('WP_REDIS_DATABASE', '0');
+define('WP_REDIS_SCHEME', 'unix');
+```
+
+### TYPO3
+
+For all versions up to TYPO3 11.5 you create a file named `AdditionalConfiguration.php` in the `typo3conf` folder. For TYPO3 version 12.4 and higher you create a file named `additional.php` in the folders `typo3conf/system` (for symlink installations) or `config/system` (for composer installations). Please add the following in each case. If the file already exists, you can omit `<?php`.
+
+```php
+<?php
+
+$redisHost = 'HOST';
+$redisPort = PORT;
+$redisCaches = [
+    'pages' => [
+     	  'defaultLifetime' => 86400*7,
+     	  'compression' => true,
+    ],
+    'pagesection' => [
+        'defaultLifetime' => 86400*7,
+    ],
+    'hash' => [],
+    'rootline' => [],
+];
+$redisDatabase = 0;
+foreach ($redisCaches as $name => $values) {
+    $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'][$name]['backend'] = \TYPO3\CMS\Core\Cache\Backend\RedisBackend::class;
+    $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'][$name]['options'] = [
+    	'database' => $redisDatabase++,
+    	'hostname' => $redisHost,
+    	'port' => $redisPort
+    ];
+    if (isset($values['defaultLifetime'])) {
+       	$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'][$name]['options']['defaultLifetime'] = $values['lifetime'];
+    }
+
+    if (isset($values['compression'])) {
+        $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'][$name]['options']['compression'] = $values['compression'];
+    }
+}
+```
