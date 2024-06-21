@@ -30,7 +30,7 @@ The following instructions guide you through setting up a DDEV environment for y
 
 These instructions work both for setting up a new DDEV environment, and also for connecting a mittwald app to an existing DDEV environment.
 
-It's also up to you if you want to initialize an empty project and pull code and database from an already installed app on the server, or if you want to setup a DDEV environment for an already existing codebase on your local machine. 
+It's also up to you if you want to initialize an empty project and pull code and database from an already installed app on the server, or if you want to setup a DDEV environment for an already existing codebase on your local machine.
 
 ### Using the mittwald CLI
 
@@ -122,16 +122,16 @@ To circumvent this issue, you can manually configure your SSH keys inside the DD
 
 1. Add the required SSH key directly to the DDEV web container by symlinking it into `.ddev/homeadditions`:[^1]
 
-    ```shell-session
-    $ mkdir -p .ddev/homeadditions/.ssh
-    $ ln -s ~/.ssh/mstudio ~/.ddev/homeadditions/.ssh/mstudio
-    ```
-   
+   ```shell-session
+   $ mkdir -p .ddev/homeadditions/.ssh
+   $ ln -s ~/.ssh/mstudio ~/.ddev/homeadditions/.ssh/mstudio
+   ```
+
 2. Set the `MITTWALD_SSH_IDENTITY_FILE` environment variable to point to the symlinked SSH key:
 
-    ```shell-session
-    $ ddev config --web-environment-add MITTWALD_SSH_IDENTITY_FILE=~/.ssh/mstudio
-    ```
+   ```shell-session
+   $ ddev config --web-environment-add MITTWALD_SSH_IDENTITY_FILE=~/.ssh/mstudio
+   ```
 
 [cli]: /docs/v2/api/sdks/cli
 [cli-ssh]: /docs/v2/api/sdks/cli/#ssh

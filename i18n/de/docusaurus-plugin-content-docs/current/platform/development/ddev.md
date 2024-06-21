@@ -122,16 +122,16 @@ Um dieses Problem zu umgehen, kannst du deine SSH-Schlüssel manuell im DDEV-Web
 
 1. Füge den erforderlichen SSH-Schlüssel direkt zum DDEV-Webcontainer hinzu, indem du ihn in `.ddev/homeadditions` verlinkst:
 
-    ```shell-session
-    $ mkdir -p .ddev/homeadditions/.ssh
-    $ ln -s ~/.ssh/mstudio ~/.ddev/homeadditions/.ssh/mstudio
-    ```
+   ```shell-session
+   $ mkdir -p .ddev/homeadditions/.ssh
+   $ ln -s ~/.ssh/mstudio ~/.ddev/homeadditions/.ssh/mstudio
+   ```
 
 2. Setze die Umgebungsvariable `MITTWALD_SSH_IDENTITY_FILE` so, dass sie auf den verlinkten SSH-Schlüssel zeigt:
 
-    ```shell-session
-    $ ddev config --web-environment-add MITTWALD_SSH_IDENTITY_FILE=~/.ssh/mstudio
-    ```
+   ```shell-session
+   $ ddev config --web-environment-add MITTWALD_SSH_IDENTITY_FILE=~/.ssh/mstudio
+   ```
 
 [cli]: /docs/v2/api/sdks/cli
 [cli-ssh]: /docs/v2/api/sdks/cli/#ssh
