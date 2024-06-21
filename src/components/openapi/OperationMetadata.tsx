@@ -71,7 +71,7 @@ export function OperationMetadata({
           </Label>
           <Content>
             <div>{spec.operationId}</div>
-            <CopyButton text={spec.operationId} />
+            <CopyButton text={spec.operationId} size="s" />
           </Content>
         </LabeledValue>
       </ColumnLayout>
