@@ -99,7 +99,7 @@ function OperationParameterList({
         {hasRequired ? <Required /> : undefined}
       </Heading>
       <Content>
-        <ul className={styles.parameterList} style={{marginBottom: "1rem"}}>
+        <ul className={styles.parameterList} style={{ marginBottom: "1rem" }}>
           {params.map((param, idx) => (
             <OperationParameter key={idx} param={param} />
           ))}
