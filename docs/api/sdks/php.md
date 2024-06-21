@@ -10,7 +10,9 @@ For PHP, we offer the [**mittwald API client** library `mittwald/api-client`](ht
 
 Install this package using [Composer](https://getcomposer.org):
 
-    $ composer require mittwald/api-client
+```
+$ composer require mittwald/api-client
+```
 
 To use the client, import the `Mittwald\ApiClient\MittwaldAPIV2Client` class, and instantiate it via one of the factory functions:
 

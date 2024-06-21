@@ -1,0 +1,119 @@
+---
+title: MySQL
+sidebar_position: 10
+description: |
+  MySQL ist ein Open-Source-Relationales Datenbankmanagementsystem (RDBMS). Es ist eine beliebte Wahl für Webanwendungen und wird oft in Kombination mit PHP verwendet. Dieser Leitfaden hilft dir, MySQL in deinem mittwald-Space zu verwenden.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import OperationHint from "@site/src/components/OperationHint";
+
+## Eine MySQL-Datenbank erstellen
+
+<Tabs groupId="access-mode">
+  <TabItem value="gui" label="mStudio UI">
+    Um eine MySQL-Datenbank im mStudio zu erstellen, befolge diese Schritte:
+
+    1. Navigiere zu dem Projekt, in dem du die Datenbank erstellen möchtest.
+    2. Wähle im Seitenmenü den Menüpunkt "Datenbanken".
+    3. Klicke auf den Button "Datenbank erstellen" und wähle "MySQL".
+    4. Gib eine Beschreibung für die Datenbank ein, wähle die gewünschte Version und lege ein Passwort für den Datenbankbenutzer fest.
+
+    Nachdem die Installation abgeschlossen ist, beobachte den Host und den Port in den Details unter Verbindungsinformationen. Du benötigst beides für die Konfiguration deines Systems.
+
+  </TabItem>
+  <TabItem value="cli" label="CLI">
+    Um eine MySQL-Datenbank über die CLI zu erstellen, führe die folgenden Befehle aus:
+
+    ```bash
+    $ mw database mysql create --description "My MySQL database" --version 8.0
+    ```
+
+    Dieser Befehl fordert dich auf, ein Passwort für den Datenbankbenutzer einzugeben. Um die Aufforderung zu überspringen, verwende die Option `--password` (sei vorsichtig, da das Passwort in deiner Shell-History gespeichert wird) oder setze zuerst die Umgebungsvariable `MYSQL_PWD`:
+
+    ```bash
+    $ read -s MYSQL_PWD
+    $ export MYSQL_PWD
+    $ mw database mysql create ...
+    ```
+
+    Es gibt zusätzliche Flags, die du angeben kannst, um zusätzliche Optionen festzulegen:
+
+    - `--character-set` und `--collation` um den [Zeichensatz und die Kollation](https://dev.mysql.com/doc/refman/8.0/en/charset-mysql.html) für die Datenbank festzulegen. Diese sind standardmäßig auf `utf8mb4` und `utf8mb4_unicode_ci` festgelegt. Normalerweise sollte es nur wenige Gründe geben, diese zu ändern, außer bei der Migration von einer vorhandenen Datenbank.
+    - `--user-access-level` erlaubt dir, die Berechtigungen des Datenbankbenutzers einzuschränken. Standardmäßig ist dies `full`, was alle Berechtigungen gewährt. Du kannst auch `readonly` wählen.
+    - `--user-external` erlaubt dir, einen Benutzer zu erstellen, der sich von außerhalb der mittwald-Plattform verbinden kann. Dies ist standardmäßig deaktiviert.
+
+    Nachdem die Installation abgeschlossen ist, verwende den Befehl `mw database mysql get`, um die Verbindungsinformationen zu beobachten.
+
+  </TabItem>
+  <TabItem value="api" label="API">
+
+    <OperationHint tag="Database" operation="database-create-mysql-database" />
+
+  </TabItem>
+</Tabs>
+
+## Betrieb
+
+### Managed Backup und Wiederherstellung
+
+Die mittwald-Cloud-Plattform erstellt in regelmäßigen Abständen automatisch Backups deiner Projekte und ihrer Datenbanken. Du kannst die verfügbaren Backups jederzeit über die mStudio-Benutzeroberfläche oder das [`mw` CLI][cli] einsehen, indem du den Befehl `mw backup list` verwendest. Du kannst auch manuell ein Backup erstellen, indem du den Befehl `mw backup create` ausführst:
+
+```shellsession title="Local shell session"
+$ mw backup create --wait --expires 30d
+```
+
+Um die Inhalte einer einzelnen MySQL-Datenbank wiederherzustellen, kannst du die folgenden Schritte befolgen:
+
+1. Lade ein Backup auf deinen lokalen Rechner herunter:
+
+   ```shellsession title="Local shell session"
+   $ mw backup download <backup-id> --format tar --output backup.tar.gz
+   ```
+
+2. Nachdem du das Backup heruntergeladen hast, kannst du den Inhalt der Datenbank aus dem heruntergeladenen Archiv extrahieren:
+
+   ```shellsession title="Local shell session"
+   $ database_id=<database-id>
+   $ tar xfz backup.tar.gz dbdump-${database_id/_/-}
+   ```
+
+   :::note
+
+   Beachte, dass in den Archivdateien die Datenbank-ID anders geschrieben ist. Während sie normalerweise das Format `mysql_XXXXXX` hat, wird sie im Archiv mit Bindestrichen anstelle von Unterstrichen geschrieben, wie `mysql-XXXXXX`.
+
+   :::
+
+3. Stelle das Backup mit dem Befehl `mw database mysql import` wieder her. Dafür musst du einen SSH-Schlüssel auf deinem lokalen Rechner eingerichtet haben, der auch mit deinem mStudio-Benutzerkonto verknüpft ist.
+
+   ```shellsession title="Local shell session"
+   $ database_id=<database-id>
+   $ mw database mysql import ${database_id} --input dbdump-${database_id/_/-}/*.sql.gz --gzip
+   ```
+
+### Manuelle Sicherung und Wiederherstellung
+
+Du kannst das [`mw` CLI][cli] verwenden, um manuell Backups deiner MySQL-Datenbank zu erstellen (und wiederherzustellen). Als Voraussetzung musst du einen SSH-Schlüssel auf deinem lokalen Rechner eingerichtet haben, der auch mit deinem mStudio-Benutzerkonto verknüpft ist.
+
+Um ein Backup zu erstellen, führe den folgenden Befehl aus:
+
+```shellsession title="Local shell session"
+$ mw database mysql dump <database-id> --output dump.sql.gz --gzip
+```
+
+Ersetze in diesem Befehl `<database-id>` durch die ID der MySQL-Datenbank, die du sichern möchtest. Der `--gzip`-Flag komprimiert die Backup-Datei, was Speicherplatz sparen und die Übertragungszeiten reduzieren kann.
+
+:::tip
+
+Wenn du das Backup mit einem anderen Benutzer erstellen möchtest als dem, mit dem du gerade angemeldet bist, kannst du den `--ssh-user`-Flag verwenden, um einen anderen Benutzer für die SSH-Verbindung anzugeben. Du musst jedoch sicherstellen, dass ein SSH-Schlüssel auf deinem lokalen Rechner für diesen Benutzer eingerichtet ist.
+
+:::
+
+Um ein Backup wiederherzustellen, führe den folgenden Befehl aus:
+
+```shellsession title="Local shell session"
+$ mw database mysql import <database-id> --input dump.sql.gz --gzip
+```
+
+[cli]: /docs/v2/api/sdks/cli

@@ -22,6 +22,17 @@ You can use the following commands to build this project locally:
 - `npm run build` to build a production release (this may be necessary to work with multi-lingual content).
 - `npm run serve` to serve a production release locally.
 
+## How-Tos
+
+### Updating translation files
+
+Translation of components is done using [Docuraurus' built-in translation file handling][docu-i18n]. To update the translation files, you can use the following steps:
+
+```
+$ npm run docusaurus write-translations
+$ npm run docusaurus write-translations -- -l de
+```
+
 [md]: https://www.markdownguide.org
 [mdx]: https://mdxjs.com
 [docu-md]: https://docusaurus.io/docs/markdown-features
