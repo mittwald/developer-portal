@@ -27,6 +27,9 @@ mittwald_app()
 
 // Hooks
 
+// Disable opcache:flush task, because there is no Opcache to flush
+task('mittwald:opcache:flush', function () {});
+
 task('deploy:prepare', [
     'deploy:info',
     'deploy:setup',
