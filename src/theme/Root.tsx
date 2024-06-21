@@ -1,6 +1,11 @@
 import React, { PropsWithChildren, useEffect } from "react";
-import { createInstance, MatomoProvider, useMatomo } from "@datapunt/matomo-tracker-react";
+import {
+  createInstance,
+  MatomoProvider,
+  useMatomo,
+} from "@datapunt/matomo-tracker-react";
 import { useLocation } from "@docusaurus/router";
+import "@mittwald/flow-react-components/styles";
 
 function PageViewTracker({ children }: PropsWithChildren<{}>) {
   const { trackPageView } = useMatomo();
@@ -20,14 +25,12 @@ export default function Root({ children }: PropsWithChildren<{}>) {
     configurations: {
       disableCookies: true,
       setSecureCookie: true,
-    }
+    },
   });
 
   return (
     <MatomoProvider value={matomoInstance}>
-      <PageViewTracker>
-        {children}
-      </PageViewTracker>
+      <PageViewTracker>{children}</PageViewTracker>
     </MatomoProvider>
   );
 }

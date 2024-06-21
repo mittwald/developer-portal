@@ -2,10 +2,11 @@ import React from "react";
 import clsx from "clsx";
 import Link from "@docusaurus/Link";
 import Layout from "@theme/Layout";
-import HomepageFeatures from "@site/src/components/HomepageFeatures";
 
 import styles from "./index.module.css";
 import Translate, { translate } from "@docusaurus/Translate";
+import APIFeature from "@site/src/components/HomepageFeatures/APIFeature";
+import PlatformFeature from "@site/src/components/HomepageFeatures/PlatformFeature";
 
 function HomepageHeader() {
   return (
@@ -39,7 +40,8 @@ export default function Home() {
       <div className={styles.wrapper}>
         <HomepageHeader />
         <main className={"index"}>
-          <HomepageFeatures />
+          <PlatformFeature />
+          <APIFeature />
         </main>
       </div>
     </Layout>

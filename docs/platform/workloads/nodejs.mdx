@@ -1,0 +1,166 @@
+---
+title: Managing and deploying Node.js applications
+sidebar_label: Node.js
+sidebar_position: 20
+description: Learn how to deploy and manage Node.js applications.
+tags:
+  - Node.js
+---
+
+import PlanCompatibility from "@site/src/components/PlanCompatibility";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+<PlanCompatibility plans={["ps", "ss"]} />
+
+## Starting a Node.js application
+
+<Tabs groupId="access-mode">
+  <TabItem value="gui" label="mStudio UI">
+    To start a Node.js application from the mStudio, follow these steps:
+
+    1. Navigate to the project that you want to create the application in.
+    2. Select the "Apps" menu item in the sidebar.
+    3. Click the "Create App" button and select "Custom Node.js app".
+    4. In the installation wizard, select the entrypoint command that should be used to start your application and complete the wizard.
+
+    After the installation has completed, observe the installation directory in the UI.
+
+  </TabItem>
+  <TabItem value="cli" label="CLI">
+    To start a Node.js application from the CLI, run the following command:
+
+    ```bash
+    $ mw app create node --wait --entrypoint "npm start"
+    ```
+
+    The `--wait` flag will cause the CLI to wait until the installation has completed. The `--entrypoint` flag will cause the CLI to configure the specified entrypoint command as the command that should be used to start your application. If omitted, the default entrypoint command `yarn start` will be used.
+
+    After the installation has completed, use the `mw app get` command to observe the installation directory.
+
+  </TabItem>
+  <TabItem value="api" label="API">
+    To learn how to deploy a Node.js application via the API, read the article ["Starting a Node.js application"](../../../api/howtos/create-nodejs).
+  </TabItem>
+</Tabs>
+
+## Deploying your app
+
+After you have created your Node.js app, you can deploy your code by moving it into the designated application directory. You may use any method that you prefer to deploy your code, such as a local Git clone, rsync or SFTP.
+
+Have a look at our collection of [deployment guides](/docs/v2/category/deployment-guides) for more information on how to deploy your code.
+
+:::info
+
+Since the deployment of your application is optimized for production usage, the platform will **NOT** automatically restart your application on code changes. You will need to restart your application manually after you have deployed your code. See the section on [managing your process lifecycle](#managing-your-process-lifecycle) for more information.
+
+:::
+
+## Making your app accessible via HTTP
+
+See our guide on [Running Webservers](../webservers#making-your-app-accessible-via-http) to learn how to make your Node.js app accessible via HTTP.
+
+## Managing your process lifecycle
+
+See our guide on [Running Webservers](../webservers/#managing-your-process-lifecycle) to learn how to manage the process lifecycle of your Node.js application.
+
+## Example applications
+
+### Express.js
+
+The following code snippet shows a minimal example of an [Express](https://expressjs.com) application that listens on the port specified in the `PORT` environment variable:
+
+```javascript title="app.js"
+const express = require("express");
+const app = express();
+const port = parseInt(process.env.PORT, 10) || 3000;
+
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
+```
+
+### PM2 with live-reloading
+
+To enable advanced features like live-reloading (useful for development) or clustering (when you want to use all available CPU cores), you can use the [PM2](https://pm2.keymetrics.io) process manager.
+
+For this, you need to create a Node.js app with `pm2` as its entrypoint (or alternatively, configure `pm2 start ecosystem.config.js --no-daemon` as the `start` script in your `package.json` file):
+
+```bash
+$ mw app create node --wait --entrypoint "pm2 start ecosystem.config.js --no-daemon"
+```
+
+:::important
+
+The `--no-daemon` flag in this example is especially important. It tells PM2 to run in the foreground, which is necessary for the platform to monitor the process correctly. **Without the `--no-daemon` flag, the platform will not be able to keep your application running**.
+
+:::
+
+Furthermore, you need to have PM2 installed in your application environment. You can install it via NPM:
+
+```shellsession title="SSH shell session"
+$ npm install -g pm2
+```
+
+Next, create an ecosystem configuration file `ecosystem.config.js` in your application directory:
+
+```javascript title="ecosystem.config.js"
+module.exports = {
+  apps: [
+    {
+      name: "test-app",
+      script: "src/server.js",
+      watch: ["src"],
+    },
+  ],
+};
+```
+
+In this example, PM2 will start the `src/server.js` script as the main application, and watch the `src` directory for changes. If any changes are detected, PM2 will automatically restart the application. Have a look at the [PM2 documentation reference](https://pm2.keymetrics.io/docs/usage/process-management/) for more information.
+
+## Using Yarn Plug'n'Play
+
+If your project uses the [Yarn PnP](https://yarnpkg.com/features/pnp) installation mode, it is recommended to disable the [global cache](https://yarnpkg.com/configuration/yarnrc#enableGlobalCache).
+
+```yml title=".yarnrc"
+enableGlobalCache: false
+```
+
+## Environment Variables
+
+Environment variables are generally used to configure Node.js applications. Depending on the Node.js version, we recommend different variants to define these.
+
+<Tabs groupId="environment-variables">
+  <TabItem value="below-20-6" label="< Node.js 20.6">
+    You can define environment variables in the file `~/.config/node/.env`. Variables defined there are then automatically available in your application.
+
+  </TabItem>
+  <TabItem value="from-20-6" label=">= Node.js 20.6">
+    As of Node.js 20.6, an (experimental) flag `--env-file` is available (see [Node.js documentation](https://nodejs.org/dist/latest-v20.x/docs/api/cli.html#--env-fileconfig)). This can be specified as often as required to load .env files whose environment variables are then available in the app.
+
+    To use the flag, configure the start command of your Node.js app as follows, for example:
+
+    ```bash
+    node --env-file=.env server.js
+    ```
+
+    The path to the `.env` file is specified relative to the working directory.
+
+    If you use an npm or yarn script to start your application, the following example applies:
+
+    ```json title="package.json"
+    {
+      [..]
+      "scripts": {
+        "start": "node --env-file=.env server.js"
+      }
+      [..]
+    }
+    ```
+
+  </TabItem>
+</Tabs>
