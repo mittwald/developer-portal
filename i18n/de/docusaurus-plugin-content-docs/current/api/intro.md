@@ -14,7 +14,7 @@ Die mStudio v2 API verwendet `https://api.mittwald.de/v2/` als Basis-URL für al
 Die vollständige API-Spezifikation im [OpenAPI 3.0-Format](https://spec.openapis.org/oas/v3.0.0) findest du hier:
 
 1. [OpenAPI 3.0-Spezifikation](https://api.mittwald.de/openapi) (maschinenlesbar)
-2. [HTML-Dokumentation](../../category/reference) (menschenlesbar)
+2. [HTML-Dokumentation](../../reference) (menschenlesbar)
 
 ## Authentifizierung
 
