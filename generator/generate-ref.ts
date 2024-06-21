@@ -102,10 +102,15 @@ async function renderAPIDocs (apiVersion: APIVersion, outputPath: string){
           const operationFile = path.join(operationsDir, operation.operationId + ".mdx");
           const serializedSpec = JSON.stringify(operation);
 
+          const classNames = [`api-operation-${method}`];
+          if (operation.deprecated) {
+            classNames.push("api-operation-deprecated");
+          }
+
           sidebarItems.push({
             "type": "doc",
             "id": `reference/${slug}/${operation.operationId}`,
-            "className": "api-operation-" + method
+            "className": classNames.join(" "),
           })
 
           const frontMatter = {
