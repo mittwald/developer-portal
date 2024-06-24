@@ -5,8 +5,10 @@ import clsx from "clsx";
 import OperationPath from "@site/src/components/openapi/OperationPath";
 import Markdown from "react-markdown";
 import StatusBadge from "@mittwald/flow-react-components/StatusBadge";
+import { APIVersion } from "@site/src/openapi/specs";
 
 interface Props {
+  apiVersion: APIVersion;
   method: string;
   path: string;
   docId: string;
@@ -15,9 +17,9 @@ interface Props {
 }
 
 function OperationDocCard(p: Props) {
-  const { method, path, docId, deprecated, summary } = p;
+  const { method, path, docId, deprecated, summary, apiVersion } = p;
   return <div className={clsx("card", "margin-bottom--md", styles.card, deprecated ? styles.deprecated : null)}>
-    <Link to={"/docs/v2/" + docId}>
+    <Link to={`/docs/${apiVersion}/${docId}`}>
       <div className={styles.header}>
         <HTTPMethod method={method} deprecated={deprecated} />
         <div className={styles.path}>

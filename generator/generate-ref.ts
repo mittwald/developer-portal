@@ -76,7 +76,7 @@ function stripTrailingDot(str: string | undefined): string | undefined {
   return str?.replace(/\.$/, "");
 }
 
-async function renderTagIndexPage(name: string, description: string, outputPath: string, sidebarItems: any[]): Promise<void> {
+async function renderTagIndexPage(apiVersion: APIVersion, name: string, description: string, outputPath: string, sidebarItems: any[]): Promise<void> {
   const indexFile = path.join(outputPath, "index.mdx");
 
   const frontMatter = {
@@ -87,7 +87,8 @@ async function renderTagIndexPage(name: string, description: string, outputPath:
   const frontMatterYAML: string = yaml.stringify(frontMatter);
 
   const cardList = sidebarItems.
-    map(i => `<OperationDocCard 
+    map(i => `<OperationDocCard
+      apiVersion={${JSON.stringify(apiVersion)}}
       method={${JSON.stringify(i.customProps.method)}}
       path={${JSON.stringify(i.customProps.path)}}
       docId={${JSON.stringify(i.id)}}
@@ -170,7 +171,7 @@ async function renderAPIDocs(apiVersion: APIVersion, outputPath: string) {
       }
     }
 
-    await renderTagIndexPage(name, description, operationsDir, sidebarItems);
+    await renderTagIndexPage(apiVersion, name, description, operationsDir, sidebarItems);
 
     sidebar.push({
       type: "category",
