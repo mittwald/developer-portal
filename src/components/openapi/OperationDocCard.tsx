@@ -15,25 +15,38 @@ interface Props {
 }
 
 function OperationDocCard(p: Props) {
-  const { apiVersion} = p;
+  const { apiVersion } = p;
   const { operation, method, path } = p.operation;
   const deprecated = isDeprecated(operation);
   const docId = buildDocumentId(operation);
 
-  return <div className={clsx("card", "margin-bottom--md", styles.card, deprecated ? styles.deprecated : null)}>
-    <Link to={`/docs/${apiVersion}/${docId}`}>
-      <div className={styles.header}>
-        <HTTPMethod method={method} deprecated={deprecated} />
-        <div className={styles.headerText}>
-          {operation.summary ? <Markdown>{operation.summary}</Markdown> : null}
-          <div className={styles.path}>
-            <OperationPath path={path} />
+  return (
+    <div
+      className={clsx(
+        "card",
+        "margin-bottom--md",
+        styles.card,
+        deprecated ? styles.deprecated : null,
+      )}
+    >
+      <Link to={`/docs/${apiVersion}/${docId}`}>
+        <div className={styles.header}>
+          <HTTPMethod method={method} deprecated={deprecated} />
+          <div className={styles.headerText}>
+            {operation.summary ? (
+              <Markdown>{operation.summary}</Markdown>
+            ) : null}
+            <div className={styles.path}>
+              <OperationPath path={path} />
+            </div>
           </div>
+          {deprecated ? (
+            <StatusBadge status="warning">deprecated!</StatusBadge>
+          ) : null}
         </div>
-        {deprecated ? <StatusBadge status="warning">deprecated!</StatusBadge> : null}
-      </div>
-    </Link>
-  </div>;
+      </Link>
+    </div>
+  );
 }
 
 export default OperationDocCard;

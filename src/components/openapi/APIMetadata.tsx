@@ -5,7 +5,7 @@ import ColumnLayout from "@mittwald/flow-react-components/ColumnLayout";
 
 export default function APIMetadata({
   version,
-  baseURL
+  baseURL,
 }: {
   version: string;
   baseURL: string;
@@ -15,9 +15,7 @@ export default function APIMetadata({
       <ColumnLayout m={[1, 5]}>
         <LabeledValue>
           <Label>API version</Label>
-          <Content>
-            {version}
-          </Content>
+          <Content>{version}</Content>
         </LabeledValue>
         <LabeledValue>
           <Label>Base URL</Label>
