@@ -7,13 +7,13 @@ function OperationPath({ path }: { path: string }) {
     if (part.startsWith("{")) {
       return (
         <Fragment key={index}>
-          <span className={styles.variableLinkParameter}>{part}</span>/
+          <span className={styles.variableLinkParameter}>{part}</span>/<wbr/>
         </Fragment>
       );
     }
     return (
       <Fragment key={index}>
-        <span>{part}</span>/
+        <span>{part}</span>/<wbr/>
       </Fragment>
     );
   });

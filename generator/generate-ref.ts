@@ -79,35 +79,24 @@ function stripTrailingDot(str: string | undefined): string | undefined {
 async function renderTagIndexPage(apiVersion: APIVersion, name: string, description: string, outputPath: string, sidebarItems: any[]): Promise<void> {
   const indexFile = path.join(outputPath, "index.mdx");
 
-  const frontMatter = {
+  const frontMatter = yaml.stringify({
     title: name,
     description,
     displayed_sidebar: "apiSidebar",
-  };
-  const frontMatterYAML: string = yaml.stringify(frontMatter);
-
-  const cardList = sidebarItems.
-    map(i => `<OperationDocCard
-      apiVersion={${JSON.stringify(apiVersion)}}
-      method={${JSON.stringify(i.customProps.method)}}
-      path={${JSON.stringify(i.customProps.path)}}
-      docId={${JSON.stringify(i.id)}}
-      summary={${JSON.stringify(i.customProps.summary)}}
-      deprecated={${JSON.stringify(i.customProps.deprecated)}} />`).
-    join("\n");
+  });
 
   // language=text
   const content = `---
-${frontMatterYAML}
+${frontMatter}
 ---
 
-import OperationDocCard from "@site/src/components/openapi/OperationDocCard";
+import OperationDocCardList from "@site/src/components/openapi/OperationDocCardList";
 
 # ${name}
 
 ${description}
 
-${cardList}
+<OperationDocCardList apiVersion="${apiVersion}" tag="${name}" />
 `;
 
   fs.writeFileSync(indexFile, content, { encoding: "utf-8" });

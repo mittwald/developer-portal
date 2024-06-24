@@ -4,7 +4,31 @@ import specv2 from "./openapi-v2.json";
 
 export type APIVersion = `v${number}`;
 
+export type OperationWithMeta = {
+  path: string;
+  method: string;
+  operation: OpenAPIV3.OperationObject;
+}
+
 export const specs: Record<APIVersion, OpenAPIV3.Document> = {
   v1: specv1 as OpenAPIV3.Document,
   v2: specv2 as OpenAPIV3.Document,
 };
+
+export function useSpec(version: APIVersion) {
+  return specs[version];
+}
+
+export function getOperationByTag(spec: OpenAPIV3.Document, tag: string): OperationWithMeta[] {
+  const operations = Object.entries(spec.paths).flatMap(([path, methods]) =>
+    Object.entries(methods).map(([method, operation]) => ({
+      path,
+      method,
+      operation,
+    }))
+  );
+
+  return operations.filter(({ operation }) =>
+    operation.tags?.includes(tag)
+  );
+}

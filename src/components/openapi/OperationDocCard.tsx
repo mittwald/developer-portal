@@ -5,26 +5,30 @@ import clsx from "clsx";
 import OperationPath from "@site/src/components/openapi/OperationPath";
 import Markdown from "react-markdown";
 import StatusBadge from "@mittwald/flow-react-components/StatusBadge";
-import { APIVersion } from "@site/src/openapi/specs";
+import { APIVersion, OperationWithMeta } from "@site/src/openapi/specs";
+import isDeprecated from "@site/src/openapi/isDeprecated";
+import buildDocumentId from "@site/src/openapi/buildDocumentId";
 
 interface Props {
   apiVersion: APIVersion;
-  method: string;
-  path: string;
-  docId: string;
-  deprecated: boolean;
-  summary: string;
+  operation: OperationWithMeta;
 }
 
 function OperationDocCard(p: Props) {
-  const { method, path, docId, deprecated, summary, apiVersion } = p;
+  const { apiVersion} = p;
+  const { operation, method, path } = p.operation;
+  const deprecated = isDeprecated(operation);
+  const docId = buildDocumentId(operation);
+
   return <div className={clsx("card", "margin-bottom--md", styles.card, deprecated ? styles.deprecated : null)}>
     <Link to={`/docs/${apiVersion}/${docId}`}>
       <div className={styles.header}>
         <HTTPMethod method={method} deprecated={deprecated} />
-        <div className={styles.path}>
-          <OperationPath path={path} />
-          {summary ? <Markdown>{summary}</Markdown> : null}
+        <div className={styles.headerText}>
+          {operation.summary ? <Markdown>{operation.summary}</Markdown> : null}
+          <div className={styles.path}>
+            <OperationPath path={path} />
+          </div>
         </div>
         {deprecated ? <StatusBadge status="warning">deprecated!</StatusBadge> : null}
       </div>
