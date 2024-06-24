@@ -15,8 +15,8 @@ async function loadSpec(apiVersion: APIVersion): Promise<OpenAPIV3.Document> {
 async function dereferenceSpec(spec: OpenAPIV3.Document): Promise<OpenAPIV3.Document> {
   return await $RefParser.dereference(spec, {
     dereference: {
-      circular: "ignore",
-    },
+      circular: "ignore"
+    }
   });
 }
 
@@ -32,7 +32,7 @@ function determineServerURLAndBasePath(apiVersion: APIVersion, spec: OpenAPIV3.D
   return [serverURL, basePath];
 }
 
-function renderAPISpecToFile(operationFile: string, frontMatterYAML: any, urlPathWithBase: string, method: string, serializedSpec: string, serverURL: string, apiVersion: APIVersion) {
+function renderAPISpecToFile(operationFile: string, frontMatterYAML: string, urlPathWithBase: string, method: string, serializedSpec: string, serverURL: string, apiVersion: APIVersion) {
   const withSDKExamples = apiVersion !== "v1";
 
   // Yes, this is JavaScript that renders more JavaScript (or mdx, to be precise).
@@ -72,11 +72,47 @@ function slugFromTagName(tagName: string): string {
   return tagName.replace(/ /g, "").toLowerCase().replace(/[^a-z0-9]/, "");
 }
 
-function stripTrailingDot(str: string|undefined): string|undefined {
+function stripTrailingDot(str: string | undefined): string | undefined {
   return str?.replace(/\.$/, "");
 }
 
-async function renderAPIDocs (apiVersion: APIVersion, outputPath: string){
+async function renderTagIndexPage(name: string, description: string, outputPath: string, sidebarItems: any[]): Promise<void> {
+  const indexFile = path.join(outputPath, "index.mdx");
+
+  const frontMatter = {
+    title: name,
+    description,
+    displayed_sidebar: "apiSidebar",
+  };
+  const frontMatterYAML: string = yaml.stringify(frontMatter);
+
+  const cardList = sidebarItems.
+    map(i => `<OperationDocCard 
+      method={${JSON.stringify(i.customProps.method)}}
+      path={${JSON.stringify(i.customProps.path)}}
+      docId={${JSON.stringify(i.id)}}
+      summary={${JSON.stringify(i.customProps.summary)}}
+      deprecated={${JSON.stringify(i.customProps.deprecated)}} />`).
+    join("\n");
+
+  // language=text
+  const content = `---
+${frontMatterYAML}
+---
+
+import OperationDocCard from "@site/src/components/openapi/OperationDocCard";
+
+# ${name}
+
+${description}
+
+${cardList}
+`;
+
+  fs.writeFileSync(indexFile, content, { encoding: "utf-8" });
+}
+
+async function renderAPIDocs(apiVersion: APIVersion, outputPath: string) {
   const sidebar = [];
   const originalSpec = await loadSpec(apiVersion);
   const spec = await dereferenceSpec(originalSpec);
@@ -84,12 +120,12 @@ async function renderAPIDocs (apiVersion: APIVersion, outputPath: string){
 
   exportSpecToSource(originalSpec, apiVersion);
 
-  for (const {name, description} of spec.tags) {
+  for (const { name, description } of spec.tags) {
     const slug = slugFromTagName(name);
     const operationsDir = path.join(outputPath, slug);
     const sidebarItems = [];
 
-    fs.mkdirSync(operationsDir, {recursive: true});
+    fs.mkdirSync(operationsDir, { recursive: true });
 
     for (const urlPath of Object.keys(spec.paths)) {
       const operations = spec.paths[urlPath];
@@ -111,12 +147,21 @@ async function renderAPIDocs (apiVersion: APIVersion, outputPath: string){
             "type": "doc",
             "id": `reference/${slug}/${operation.operationId}`,
             "className": classNames.join(" "),
-          })
+            "customProps": {
+              method,
+              path: urlPath,
+              deprecated: operation.deprecated,
+              summary,
+            }
+          });
 
           const frontMatter = {
             title: summary ?? operation.operationId,
             description: operation.description ?? "",
-          }
+            openapi: {
+              method
+            }
+          };
 
           const frontMatterYAML = yaml.stringify(frontMatter);
 
@@ -124,6 +169,8 @@ async function renderAPIDocs (apiVersion: APIVersion, outputPath: string){
         }
       }
     }
+
+    await renderTagIndexPage(name, description, operationsDir, sidebarItems);
 
     sidebar.push({
       "type": "category",
@@ -133,10 +180,10 @@ async function renderAPIDocs (apiVersion: APIVersion, outputPath: string){
         "title": name,
         "description": description,
         "slug": `/reference/${slug}`,
-        "keywords": ["api-reference"],
+        "keywords": ["api-reference"]
       },
       "items": sidebarItems
-    })
+    });
   }
 
   if (apiVersion === "v2") {
@@ -162,7 +209,7 @@ async function renderAPIDocs (apiVersion: APIVersion, outputPath: string){
           "items": sidebar
         }
       ]
-    }
+    };
     fs.writeFileSync(path.join("versioned_sidebars", `version-${apiVersion}-sidebars.json`), JSON.stringify(completeSidebar, null, 2));
   }
 }
