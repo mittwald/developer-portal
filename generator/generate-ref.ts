@@ -173,16 +173,13 @@ async function renderAPIDocs(apiVersion: APIVersion, outputPath: string) {
     await renderTagIndexPage(name, description, operationsDir, sidebarItems);
 
     sidebar.push({
-      "type": "category",
-      "label": name,
-      "link": {
-        "type": "generated-index",
-        "title": name,
-        "description": description,
-        "slug": `/reference/${slug}`,
-        "keywords": ["api-reference"]
+      type: "category",
+      label: name,
+      link: {
+        type: "doc",
+        id: `reference/${slug}/index`,
       },
-      "items": sidebarItems
+      items: sidebarItems
     });
   }
 
