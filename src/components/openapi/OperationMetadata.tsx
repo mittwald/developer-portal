@@ -83,7 +83,7 @@ export function OperationMetadata({
         </LabeledValue>
         <LabeledValue className={styles.operationIdValue}>
           <Label className={styles.labelWithHelp}>
-            <OperationIdHelp /> Operation ID
+            Operation ID <OperationIdHelp />
           </Label>
           <Content>
             <div>{spec.operationId}</div>
