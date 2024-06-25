@@ -17,6 +17,7 @@ import InlineAlert from "@mittwald/flow-react-components/InlineAlert";
 import styles from "./OperationMetadata.module.css";
 import Translate from "@docusaurus/Translate";
 import Admonition from "@theme/Admonition";
+import isDeprecated from "@site/src/openapi/isDeprecated";
 
 function OperationIdHelp() {
   return (
@@ -49,14 +50,6 @@ function DeprecationNotice() {
         refer to this operation's description for alternatives.
       </Translate>
     </Admonition>
-  );
-}
-
-function isDeprecated(spec: OpenAPIV3.OperationObject): boolean {
-  return (
-    spec.deprecated ||
-    spec.operationId.startsWith("deprecated-") ||
-    spec.operationId.endsWith("-deprecated")
   );
 }
 
