@@ -57,10 +57,12 @@ export function OperationMetadata({
   method,
   path,
   spec,
+  withDescription = true,
 }: {
   path: string;
   method: string;
   spec: OpenAPIV3.OperationObject;
+  withDescription?: boolean;
 }) {
   return (
     <>
@@ -92,7 +94,7 @@ export function OperationMetadata({
         </LabeledValue>
       </ColumnLayout>
       <hr />
-      {spec.description ? <Markdown>{spec.description}</Markdown> : null}
+      {spec.description && withDescription ? <Markdown>{spec.description}</Markdown> : null}
     </>
   );
 }

@@ -32,22 +32,52 @@ function determineServerURLAndBasePath(apiVersion: APIVersion, spec: OpenAPIV3.D
   return [serverURL, basePath];
 }
 
-function renderAPISpecToFile(operationFile: string, frontMatterYAML: string, urlPathWithBase: string, method: string, serializedSpec: string, serverURL: string, apiVersion: APIVersion) {
+function loadDescriptionOverride(apiVersion: APIVersion, operationId: string): string | undefined {
+  const descriptionOverridePath = path.join("generator", "overlays", apiVersion, operationId, "description.md");
+  if (fs.existsSync(descriptionOverridePath)) {
+    return fs.readFileSync(descriptionOverridePath, { encoding: "utf-8" });
+  }
+  return undefined;
+}
+
+function renderAPISpecToFile(
+  operationFile: string,
+  urlPathWithBase: string,
+  method: string,
+  spec: OpenAPIV3.OperationObject,
+  serverURL: string,
+  apiVersion: APIVersion,
+) {
   const withSDKExamples = apiVersion !== "v1";
+  const serializedSpec = JSON.stringify(spec);
+  const summary: string = stripTrailingDot(spec.summary);
+
+  const frontMatter = yaml.stringify({
+    title: summary ?? spec.operationId,
+    description: spec.description ?? "",
+    openapi: {
+      method
+    }
+  });
+
+  const descriptionOverride = loadDescriptionOverride(apiVersion, spec.operationId);
 
   // Yes, this is JavaScript that renders more JavaScript (or mdx, to be precise).
   // Yes, this is a bit weird and opens up a whole can of worms. Oh, well.
 
   // language=text
   fs.writeFileSync(operationFile, `---
-${frontMatterYAML}
+${frontMatter}
 ---
 
 import {OperationRequest, OperationResponses} from "@site/src/components/openapi/OperationReference";
 import {OperationMetadata} from "@site/src/components/openapi/OperationMetadata";
 import {OperationUsage} from "@site/src/components/openapi/OperationUsage";
+import OperationLink from "@site/src/components/OperationLink";
 
-<OperationMetadata path="${urlPathWithBase}" method="${method}" spec={${serializedSpec}} />
+<OperationMetadata path="${urlPathWithBase}" method="${method}" spec={${serializedSpec}} withDescription={${descriptionOverride === undefined}} />
+
+${descriptionOverride ?? ""}
 
 ## Request
 
@@ -145,17 +175,7 @@ async function renderAPIDocs(apiVersion: APIVersion, outputPath: string) {
             }
           });
 
-          const frontMatter = {
-            title: summary ?? operation.operationId,
-            description: operation.description ?? "",
-            openapi: {
-              method
-            }
-          };
-
-          const frontMatterYAML = yaml.stringify(frontMatter);
-
-          renderAPISpecToFile(operationFile, frontMatterYAML, urlPathWithBase, method, serializedSpec, serverURL, apiVersion);
+          renderAPISpecToFile(operationFile, urlPathWithBase, method, operation, serverURL, apiVersion);
         }
       }
     }
