@@ -1,0 +1,46 @@
+---
+title: Lifecycle Webhooks
+sidebar_position: 2
+---
+
+## Was sind Lifecycle Webhooks?
+
+Lifecycle Events werden von mittwald genutzt, um die externe Anwendung über sie betreffende Ereignisse zu informieren.
+
+Alle Webhooks werden `at least once` aufgerufen.
+
+### ExtensionAddedToContext
+
+Dieses Event wird genutzt, um der externen Anwendung mitzuteilen, dass eine Extension zu einem neuen Context hinzugefügt wurde.
+
+In diesem Event wird der externen Anwendung erstmalig die `Extension Instance ID` und das `Extension Instance Secret` mitgeteilt.
+Diese können nachfolgend verwendet werden, um sich gegenüber mittwald zu authentifizieren.
+
+Für weitere Informationen dazu, wie das `Extension Instance Secret` verwendet werden kann, siehe [Authentifizierung](./authentication.mdx#extension-instance-secret).
+
+
+### InstanceUpdated
+
+In diesem Event wird der externen Anwendung eine Zustandsänderung der `Extension Instance` mitgeteilt. Der externen Anwendung wird dabei immer der gesamte neue Zustand mitgeteilt.
+
+Das kann beispielsweise die De-/Aktivierung der `Extension Instance` sein.
+
+### SecretRotated
+
+Aus Sicherheitsaspekten werden wir regelmäßig das `Extension Instance Secret` rotieren. Das neue Secret wird über diesen Webhook mitgeteilt. Das vorherige Secret ist ab diesem Zeitpunkt nicht mehr gültig.
+
+### InstanceRemovedFromContext
+
+Eine `Extension Instance` wurde aus einem Context entfernt.
+
+Datenschutzrelevante Konsequenzen sollten an dieser Stelle berücksichtigt werden.
+## Webhook Validierung
+
+Um sicherzustellen, dass der Webhook von mittwald ausging, bieten wir die Möglichkeit, die Identität des Senders und den Inhalt des Request Bodys zu verifizieren.
+Dazu signieren wir den versendeten Request Body und schicken die Signatur inklusive der Meta-Informationen darüber in Request-Headern mit.
+
+Dies ist aus Sicht des Contributors und der Extension wichtig, da somit sichergestellt werden kann, dass der Webhook-Call wirklich von mittwald stammt.
+Ohne eine funktionierende Webhook Validierung besteht das Risiko, dass ein potentieller Angreifer nur die URL kennen muss, um falsche Extension Instances vorzutäuschen oder bestehende zu korrumpieren.
+
+
+

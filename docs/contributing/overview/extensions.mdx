@@ -1,0 +1,62 @@
+---
+title: Extensions
+sidebar_position: 1
+---
+
+## Was ist eine Extension?
+
+TODO
+
+## Aus welchen Informationen besteht eine Extension?
+
+### Name und Beschreibung
+
+TODO
+
+### State
+
+TODO
+
+### Tags
+
+TODO
+
+### Support
+
+TODO
+
+### Scopes
+
+TODO
+
+### Extension Context
+
+TODO
+
+### Lifecycle Webhook Endpoints
+
+Eine Extension muss definieren, an welche URLs Lifecycle-Webhooks gesendet werden sollen. Über diese Webhooks wird der Extension mitgeteilt, welche Extension Instances existieren und in welchem Zustand sie sich befinden.
+Für jeden Lifecycle kann ein eigener Webhook-Endpoint konfiguriert werden. Für weitere Informationen zu Lifecycle-Webhooks siehe [Lifecycle Webhooks Konzept](../concepts/lifecycle-webhooks)
+
+In den URLs, an die Lifecycle-Webhooks gesendet werden, können optional verschiedene Platzhalter verwendet werden.
+Für weitere Informationen zum Templating siehe [Templating von Konfigurationswerten](../../reference/templating).
+Für eine Übersicht, welche Platzhalter für Lifecycle-Webhooks verwendet werden können, siehe [Lifecycle Webhooks Referenz](../../reference/webhooks)
+
+### External Frontend
+
+Eine Extension kann optional ein externes Frontend angeben, das dazu dient, einen Einstiegspunkt aus dem mStudio heraus in die Extension zu bieten.
+Das externe Frontend wird als URL angegeben und kann getemplated werden.
+Siehe dazu auch [Templating von Konfigurationswerten](../../reference/templating)
+
+Für das interne Routing sinnvolle Platzhalter sind:
+
+- `apiVersion` - API-Version des External Frontend URL Templates. Zu Beginn immer `v1`. Siehe auch [Versionierung von APIs](../../reference/api-versioning)
+- `contributorId` - Die ID des Contributors im UUID-Format
+- `extensionId` - Die ID der Extension im UUID-Format
+- `extensionInstanceId` - Die ID der Extension-Instance im UUID-Format
+
+
+Um das Single Sign On-Feature mittels ATReK zu nutzen, müssen folgende Platzhalter in der URL definiert werden:
+
+- `accessTokenRetrievalKey`
+- `userId`

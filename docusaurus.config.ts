@@ -132,7 +132,7 @@ const config: Config = {
         },
         {
           type: "doc",
-          docId: "/category/contributing",
+          docId: "contributing/index",
           position: "left",
           label: "Contributing",
         },
@@ -222,6 +222,10 @@ const config: Config = {
       additionalLanguages: ["php", "shell-session"],
     },
   } satisfies ThemeConfig,
+  markdown: {
+    mermaid: true,
+  },
+  themes: ['@docusaurus/theme-mermaid']
 };
 
 module.exports = config;

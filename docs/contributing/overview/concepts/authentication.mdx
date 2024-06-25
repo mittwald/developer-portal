@@ -1,0 +1,70 @@
+---
+title: Authentication
+sidebar_position: 1
+---
+
+## OAuth2
+
+mittwald unterstützt OAuth 2.0 als Authentifizierungsmechanismus für die öffentliche API. Dieser Mechanismus ist in dem [RFC 6749](https://tools.ietf.org/html/rfc6749) spezifiziert. Unterstützt werden die folgenden OAuth 2.0 Flows:
+
+- Authorization Code Grant
+- Authorization Code Grant with PKCE
+
+Für jede Extension wird automatisch auch ein OAuth Client mit der gleichen ID wie die der Extension erstellt. Dieser Client kann verwendet werden, um OAuth 2.0 Authentifizierungsabläufe durchzuführen.
+Für weitere Informationen über die OAuth2 Endpunkte siehe [OAuth2 Endpunkte]("../../../../../reference/api#oauth2")
+
+## Access Token Retrieval Key
+
+Um mStudio Benutzern einen bequemen Einstieg in die externe Anwendung zu ermöglichen, bietet das mStudio einen Single Sign On (SSO) Mechanismus an.
+Per Knopfdruck im mStudio wird der Benutzer zur externen Anwendung weitergeleitet und ist authentifiziert.
+
+Dazu generiert das mStudio einen Access Token Retrieval Key (ATReK) und übermittelt diesen beim Click an das Frontend der Extension, sofern der Platzhalter im External Frontend URL-Template verwendet wird.
+In Kombination mit der User ID, die ebenfalls per Platzhalter an die Extension gegeben werden kann, kann die Extension den ATReK verwenden, um ein Access Token für das mStudio zu beziehen.
+Das Access Token, das durch einen ATReK ausgestellt wird, repräsentiert den ausstellenden mStudio-User, eingeschränkt durch die Scopes der Extension.
+
+Der ATReK ist sehr kurzlebig und nur einmalig gültig.
+Nach Verwendung wird dieser ungültig.
+Aufgrund der Kurzlebigkeit des ATReKs ist es wichtig, dass die externe Anwendung den ATReK sofort verwendet, um ein Access Token zu beziehen.
+Für weitere Informationen darüber, wie ein ATReK gegen ein Access Token ausgetauscht wird, siehe [Access Token Retrieval Key Referenz]("../../../../../reference/api#access-token-retrieval-key")
+
+## Extension Instance Secret
+
+Um autark und ohne Nutzerinteraktion agieren zu können, erhält die Extension ein eigenes Secret pro Extension Instance.
+Dieses wird der externen Anwendung mittels Lifecycle Webhooks übermittelt.
+In Kombination mit der `Extension Instance ID`, die ebenfalls über den Webhook Call übermittelt wird, kann die externe Anwendung dieses verwenden, um ein Access Token für das mStudio zu beziehen.
+Dieses Access Token kann anschließend verwendet werden, um Domain Actions auszuführen.
+
+Für weitere Informationen über die Informationen, die in Lifecycle Webhooks mitgeschickt werden, siehe [Lifecycle Webhooks]("../../../../../reference/webhooks)
+Für weitere Informationen darüber, wie ein Extension Secret gegen ein Access Token ausgetauscht wird, siehe [Extension Secret Referenz]("../../../../../reference/api#extension-secret")
+
+## Verwendung des erhaltenen Access Tokens
+
+TODO
+
+## Ausführen von authentifizierten Domain Actions ...
+
+### ... als mStudio-Benutzer durch eine externe Anwendung
+
+Um einen mStudio-Benutzer im Context einer externen Anwendung zu authentifizieren, sind zwei Möglichkeiten vorgesehen.
+
+Erstens kannst du als Contributor eine URL (oder ein URL-Template) für die Extension bereitstellen, die der Benutzer über eine Schaltfläche im mStudio aufrufen kann, um zur externen Anwendung weitergeleitet zu werden. Während der Weiterleitung stellen wir einen Access Token Retrieval Key bereit. Die externe Anwendung kann diesen verwenden, um das eigentliche Access Token zum Authentifizieren gegen die öffentliche API abzurufen.
+
+Zweitens kann die externe Anwendung den mStudio OAuth2-Authentifizierungsablauf verwenden. Weitere Details dazu werden in Zukunft bereitgestellt, da dies noch nicht vollständig ausgearbeitet ist.
+
+Das direkte Abfragen der mStudio-Anmeldeinformationen ist keine Methode, die wir akzeptieren, da wir dem Benutzer nicht beibringen möchten, seine Anmeldeinformationen an eine Drittanbieteranwendung weiterzugeben.
+
+Nach erfolgreicher Authentifizierung kann der mStudio-Benutzer Domain Actions ausführen. Beachte, dass dies aufgrund von CORS-Einschränkungen derzeit nur über ein externes _Backend_ möglich ist.
+
+### ... als autonom agierende externe Anwendung
+
+Die Durchführung einer Domain Action als externe Anwendung ohne Benutzerkontext ist der Hauptanwendungsfall für Extensions, die Funktionen bereitstellen, die nicht direkt mit der manuellen Interaktion eines Users verknüpft sind. Zu diesem Zweck kann das zuvor über das entsprechende Lebenszyklus-Ereignis mitgeteilte Secret verwendet werden, um ein Extension Access Token abzurufen. Dieses Access Token kann verwendet werden, um Domain Actions auszuführen.
+
+### ... als externe Anwendung mit eigener Nutzerverwaltung
+
+Analog zur zuvor beschriebenen Methode kann der gleiche Prozess verwendet werden, um eine eigene Nutzerverwaltung bereitzustellen. Nutzer, die von der externen Anwendung registriert werden, kommunizieren alle im Namen der Extension-Instance und teilen sich unterliegend dasselbe Extension Secret.
+
+### ... als mStudio-Benutzer im Namen einer Extension-Instance
+
+Um Domain Actions als registrierter mStudio-Benutzer, aber im Namen und nur mit Berechtigungen einer Extension-Instance durchzuführen, wird sichergestellt, dass Access Token, die über den AccessTokenRetrievalKey ausgestellt werden, nur die Domain Actions ausführen können, auf die sowohl der User als auch die Extension Zugriff haben.
+
+Dieser Ablauf ist interessant für Externe Anwendungen, die eine Mischung aus den vorherigen Ansätzen darstellen (z.B. um ein Admin-Panel für mStudio-Benutzer und ein Benutzer-Panel für extension-seitig verwaltete Endkunden zu implementieren).

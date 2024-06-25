@@ -47,21 +47,21 @@ function ExtensionsFeature() {
       </p>
       <ul>
         <li>
-          <Link to="/docs/v2/contributing/extensions">
+          <Link to="/docs/v2/contributing">
             <Translate id="index.contributing.extensions.link-overview">
               Introduction and overview
             </Translate>
           </Link>
         </li>
         <li>
-          <Link to="/docs/v2/contributing/extensions/concepts/authenticated-requests">
+          <Link to="/docs/v2/contributing/overview/concepts/authentication/">
             <Translate id="index.contributing.extensions.link-auth">
               Integrating with mStudio access controls
             </Translate>
           </Link>
         </li>
         <li>
-          <Link to="/docs/v2/category/extensions/api/">
+          <Link to="/docs/v2/category/reference/">
             <Translate id="index.contributing.extensions.link-api">
               API and webhook specifications
             </Translate>
@@ -72,7 +72,7 @@ function ExtensionsFeature() {
         <Translate id="index.contributing.extensions.more">
           Check the complete documentation.
         </Translate>{" "}
-        <Link to="/docs/v2/category/extensions">
+        <Link to="/docs/v2/contributing">
           <Translate id="index.contributing.extensions.more.link">
             Read more!
           </Translate>

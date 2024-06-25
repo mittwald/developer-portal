@@ -1,25 +1,10 @@
 ---
-title: Webhooks
-description: |
-  tbw
+title: Lifecycle Webhooks
+sidebar_position: 1
 ---
 
-## URL-Templates
 
-In den URLs, an die Lifecycle-Webhooks gesendet werden, können optional verschiedene Platzhalter verwendet werden. Diese Informationen finden sich auch nochmal im Body des Webhooks.
-
-Mögliche Platzhalter sind:
-
-- `apiVersion`
-- `contributorId`
-- `extensionId`
-- `extensionInstanceId`
-
-Diese können folgendermaßen verwendet werden:
-
-`https://example.com/mstudio-webhooks/:apiVersion/extensions/:extensionId?action=added&id=:extensionInstanceId`
-
-## Payload
+## Webhook Example Payloads
 
 ### ExtensionAddedToContext
 
@@ -133,7 +118,8 @@ Diese können folgendermaßen verwendet werden:
 }
 ```
 
-## Verifizierung
+
+## Validierung von Lifecycle Webhooks
 
 Um sicherzustellen, dass der Webhook von mittwald ausging, bieten wir die Möglichkeit, die Identität des Senders und den Inhalt des Request Bodys zu verifizieren. Dazu signieren wir den versendeten Request Body und schicken die Signatur inklusive der Meta-Informationen darüber in Request-Headern mit.
 
@@ -177,3 +163,7 @@ Um den selben Request nur einmalig zu akzeptieren, kann die `request.id` persist
 Um zu überprüfen, ob der Request den richtigen Empfänger erreicht, kann das Feld `request.target.url` überprüft werden.
 
 Um veraltete Requests erkennen zu können, bietet das Feld `request.createdAt` einen Anhaltspunkt.
+
+### Referenzimplementierungen für die Validierung von Lifecycle Webhooks
+
+TODO
