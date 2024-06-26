@@ -14,6 +14,7 @@ interface OperationUsageProps {
   baseURL: string;
   withJavascript?: boolean;
   withPHP?: boolean;
+  children?: ReactElement<TabItemProps>[] | ReactElement<TabItemProps>;
 }
 
 export function OperationUsage(props: OperationUsageProps) {
@@ -25,38 +26,45 @@ export function OperationUsage(props: OperationUsageProps) {
     withJavascript = true,
     withPHP = true,
   } = props;
+  let { children } = props;
 
-  const items: ReactElement<TabItemProps>[] = [
-    <TabItem key="curl" value="curl" label="cURL">
-      <CodeBlock language="shell-session">
-        {generateCurlCodeExample(method, url, spec, baseURL)}
-      </CodeBlock>
-    </TabItem>,
-  ];
-
-  if (withJavascript) {
-    items.push(
-      <TabItem key="javascript" value="javascript" label="JavaScript SDK">
-        <CodeBlock language="javascript">
-          {generateJavascriptCodeExample(method, url, spec, baseURL)}
-        </CodeBlock>
-      </TabItem>,
-    );
+  if (!Array.isArray(children)) {
+    children = [children];
   }
 
-  if (withPHP) {
-    items.push(
+  if (withPHP && !children.some(i => i.key === "php")) {
+    children.unshift(
       <TabItem key="php" value="php" label="PHP SDK">
         <CodeBlock language="php">
           {generatePHPCodeExample(method, url, spec, baseURL)}
         </CodeBlock>
-      </TabItem>,
+      </TabItem>
+    );
+  }
+
+  if (withJavascript && !children.some(i => i.key === "javascript")) {
+    children.unshift(
+      <TabItem key="javascript" value="javascript" label="JavaScript SDK">
+        <CodeBlock language="javascript">
+          {generateJavascriptCodeExample(method, url, spec, baseURL)}
+        </CodeBlock>
+      </TabItem>
+    );
+  }
+
+  if (!children.some(i => i.key === "curl")) {
+    children.unshift(
+      <TabItem key="curl" value="curl" label="cURL">
+        <CodeBlock language="shell-session">
+          {generateCurlCodeExample(method, url, spec, baseURL)}
+        </CodeBlock>
+      </TabItem>
     );
   }
 
   return (
     <Tabs groupId="usage-language" defaultValue="curl">
-      {items}
+      {children}
     </Tabs>
   );
 }

@@ -40,6 +40,14 @@ function loadDescriptionOverride(apiVersion: APIVersion, operationId: string): s
   return undefined;
 }
 
+function loadCodeExample(apiVersion: APIVersion, operationId: string, language: string): string | undefined {
+  const codeExamplePath = path.join("generator", "overlays", apiVersion, operationId, `example-${language}.md`);
+  if (fs.existsSync(codeExamplePath)) {
+    return fs.readFileSync(codeExamplePath, { encoding: "utf-8" });
+  }
+  return undefined;
+}
+
 function renderAPISpecToFile(
   operationFile: string,
   urlPathWithBase: string,
@@ -61,6 +69,12 @@ function renderAPISpecToFile(
   });
 
   const descriptionOverride = loadDescriptionOverride(apiVersion, spec.operationId);
+  const exampleOverrides = [
+    ["curl", "cURL", loadCodeExample(apiVersion, spec.operationId, "curl")],
+    ["javascript", "JavaScript SDK", loadCodeExample(apiVersion, spec.operationId, "javascript")],
+    ["php", "PHP SDK", loadCodeExample(apiVersion, spec.operationId, "php")],
+    ["cli", "mw CLI", loadCodeExample(apiVersion, spec.operationId, "cli")],
+  ].filter(([,, i]) => i !== undefined).map(([key, label, content]) => `<TabItem key="${key}" value="${key}" label="${label}">\n\n${content}\n\n</TabItem>`);
 
   // Yes, this is JavaScript that renders more JavaScript (or mdx, to be precise).
   // Yes, this is a bit weird and opens up a whole can of worms. Oh, well.
@@ -74,6 +88,7 @@ import {OperationRequest, OperationResponses} from "@site/src/components/openapi
 import {OperationMetadata} from "@site/src/components/openapi/OperationMetadata";
 import {OperationUsage} from "@site/src/components/openapi/OperationUsage";
 import OperationLink from "@site/src/components/OperationLink";
+import TabItem from "@theme/TabItem";
 
 <OperationMetadata path="${urlPathWithBase}" method="${method}" spec={${serializedSpec}} withDescription={${descriptionOverride === undefined}} />
 
@@ -89,7 +104,9 @@ ${descriptionOverride ?? ""}
 
 ## Usage examples
 
-<OperationUsage method="${method}" url="${urlPathWithBase}" spec={${serializedSpec}} baseURL="${serverURL}" withJavascript={${withSDKExamples}} withPHP={${withSDKExamples}} />
+<OperationUsage method="${method}" url="${urlPathWithBase}" spec={${serializedSpec}} baseURL="${serverURL}" withJavascript={${withSDKExamples}} withPHP={${withSDKExamples}}>
+${exampleOverrides.join("\n\n")}
+</OperationUsage>
 
 `);
 }
