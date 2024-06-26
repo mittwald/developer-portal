@@ -26,7 +26,7 @@ export function OperationUsage(props: OperationUsageProps) {
     withJavascript = true,
     withPHP = true,
   } = props;
-  let { children } = props;
+  let { children = [] } = props;
 
   if (!Array.isArray(children)) {
     children = [children];
