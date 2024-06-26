@@ -21,9 +21,9 @@ There are different ways to deploy a new project:
 
 ### …on a server
 
-To create a project on an existing server, you will require that server’s ID. You can find all servers you have access to using the <OperationLink tag="Project" operation="project-list-servers">`GET /v2/servers` API endpoint</OperationLink>.
+To create a project on an existing server, you will require that server’s ID. You can find all servers you have access to using the <OperationLink  operation="project-list-servers" /> endpoint.
 
-To create a new project, send a `POST` request to the `/v2/placementgroups/{serverId}/projects` endpoint. The request body must contain a JSON object with the following properties:
+To create a new project, send a request to the <OperationLink operation="project-create-project" /> endpoint. The request body must contain a JSON object with the following properties:
 
 - `description` should contain a human-readable description of the project. This is a required value.
 
@@ -31,7 +31,7 @@ The response, when successful, will contain a JSON object with the following pro
 
 - `id` is the ID of the newly created project.
 
-<OperationHint tag="Project" operation="project-create-project" />
+<OperationHint operation="project-create-project" />
 
 ### …as a stand-alone project
 
@@ -43,7 +43,7 @@ Creating stand-alone projects is not supported, as of yet.
 
 ## Observing project readiness
 
-A newly created project will not be available immediately (however, it should be available within a few seconds). To check whether a project is ready, send a `GET` request to the `/v2/projects/{projectID}` endpoint. Among other properties, the response will contain an `isReady` property. This property will be `true` when the project is ready, and `false` otherwise.
+A newly created project will not be available immediately (however, it should be available within a few seconds). To check whether a project is ready, send a request to the <OperationLink operation="project-get-project" /> endpoint. Among other properties, the response will contain an `isReady` property. This property will be `true` when the project is ready, and `false` otherwise.
 
 <OperationHint tag="Project" operation="project-get-project" />
 
