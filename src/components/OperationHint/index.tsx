@@ -1,8 +1,9 @@
 import React from "react";
-
-import Admonition from "@theme/Admonition";
 import Translate from "@docusaurus/Translate";
-import OperationLink from "../OperationLink";
+import OperationDocCardById from "@site/src/components/openapi/OperationDocCardById";
+import InlineAlert from "@mittwald/flow-react-components/InlineAlert";
+import Content from "@mittwald/flow-react-components/Content";
+import Heading from "@mittwald/flow-react-components/Heading";
 
 export interface OperationHintProps {
   tag: string;
@@ -11,15 +12,11 @@ export interface OperationHintProps {
 
 export default function OperationHint({ tag, operation }: OperationHintProps) {
   return (
-    <Admonition type="info">
-      <Translate id={"components.OperationHint.text"}>
-        For details please refer to the endpoint documentation for the following
-        endpoint
-      </Translate>
-      :{" "}
-      <OperationLink tag={tag} operation={operation}>
-        <code>{operation}</code>
-      </OperationLink>
-    </Admonition>
+    <InlineAlert status="info">
+      <Heading><Translate id="components.OperationHint.text" />: </Heading>
+      <Content>
+        <OperationDocCardById apiVersion="v2" operationId={operation} />
+      </Content>
+    </InlineAlert>
   );
 }

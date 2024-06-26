@@ -12,6 +12,7 @@ export default function AdmonitionWrapper(props: Props): JSX.Element {
   const status = {
     note: "info",
     caution: "warning",
+    warning: "warning",
   };
 
   return (

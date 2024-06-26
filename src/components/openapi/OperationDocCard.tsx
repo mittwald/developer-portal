@@ -14,7 +14,7 @@ interface Props {
   operation: OperationWithMeta;
 }
 
-function OperationDocCard(p: Props) {
+export default function OperationDocCard(p: Props) {
   const { apiVersion } = p;
   const { operation, method, path } = p.operation;
   const deprecated = isDeprecated(operation);
@@ -48,5 +48,3 @@ function OperationDocCard(p: Props) {
     </div>
   );
 }
-
-export default OperationDocCard;
