@@ -32,22 +32,67 @@ function determineServerURLAndBasePath(apiVersion: APIVersion, spec: OpenAPIV3.D
   return [serverURL, basePath];
 }
 
-function renderAPISpecToFile(operationFile: string, frontMatterYAML: string, urlPathWithBase: string, method: string, serializedSpec: string, serverURL: string, apiVersion: APIVersion) {
+function loadDescriptionOverride(apiVersion: APIVersion, operationId: string): string | undefined {
+  const descriptionOverridePath = path.join("generator", "overlays", apiVersion, operationId, "description.md");
+  if (fs.existsSync(descriptionOverridePath)) {
+    return fs.readFileSync(descriptionOverridePath, { encoding: "utf-8" });
+  }
+  return undefined;
+}
+
+function loadCodeExample(apiVersion: APIVersion, operationId: string, language: string): string | undefined {
+  const codeExamplePath = path.join("generator", "overlays", apiVersion, operationId, `example-${language}.md`);
+  if (fs.existsSync(codeExamplePath)) {
+    return fs.readFileSync(codeExamplePath, { encoding: "utf-8" });
+  }
+  return undefined;
+}
+
+function renderAPISpecToFile(
+  operationFile: string,
+  urlPathWithBase: string,
+  method: string,
+  spec: OpenAPIV3.OperationObject,
+  serverURL: string,
+  apiVersion: APIVersion,
+) {
   const withSDKExamples = apiVersion !== "v1";
+  const serializedSpec = JSON.stringify(spec);
+  const summary: string = stripTrailingDot(spec.summary);
+
+  const frontMatter = yaml.stringify({
+    title: summary ?? spec.operationId,
+    description: spec.description ?? "",
+    openapi: {
+      method
+    }
+  });
+
+  const descriptionOverride = loadDescriptionOverride(apiVersion, spec.operationId);
+  const exampleOverrides = [
+    ["curl", "cURL", loadCodeExample(apiVersion, spec.operationId, "curl")],
+    ["javascript", "JavaScript SDK", loadCodeExample(apiVersion, spec.operationId, "javascript")],
+    ["php", "PHP SDK", loadCodeExample(apiVersion, spec.operationId, "php")],
+    ["cli", "mw CLI", loadCodeExample(apiVersion, spec.operationId, "cli")],
+  ].filter(([,, i]) => i !== undefined).map(([key, label, content]) => `<TabItem key="${key}" value="${key}" label="${label}">\n\n${content}\n\n</TabItem>`);
 
   // Yes, this is JavaScript that renders more JavaScript (or mdx, to be precise).
   // Yes, this is a bit weird and opens up a whole can of worms. Oh, well.
 
   // language=text
   fs.writeFileSync(operationFile, `---
-${frontMatterYAML}
+${frontMatter}
 ---
 
 import {OperationRequest, OperationResponses} from "@site/src/components/openapi/OperationReference";
 import {OperationMetadata} from "@site/src/components/openapi/OperationMetadata";
 import {OperationUsage} from "@site/src/components/openapi/OperationUsage";
+import OperationLink from "@site/src/components/OperationLink";
+import TabItem from "@theme/TabItem";
 
-<OperationMetadata path="${urlPathWithBase}" method="${method}" spec={${serializedSpec}} />
+<OperationMetadata path="${urlPathWithBase}" method="${method}" spec={${serializedSpec}} withDescription={${descriptionOverride === undefined}} />
+
+${descriptionOverride ?? ""}
 
 ## Request
 
@@ -59,7 +104,9 @@ import {OperationUsage} from "@site/src/components/openapi/OperationUsage";
 
 ## Usage examples
 
-<OperationUsage method="${method}" url="${urlPathWithBase}" spec={${serializedSpec}} baseURL="${serverURL}" withJavascript={${withSDKExamples}} withPHP={${withSDKExamples}} />
+<OperationUsage method="${method}" url="${urlPathWithBase}" spec={${serializedSpec}} baseURL="${serverURL}" withJavascript={${withSDKExamples}} withPHP={${withSDKExamples}}>
+${exampleOverrides.join("\n\n")}
+</OperationUsage>
 
 `);
 }
@@ -78,6 +125,12 @@ function stripTrailingDot(str: string | undefined): string | undefined {
 
 async function renderTagIndexPage(apiVersion: APIVersion, name: string, description: string, outputPath: string, sidebarItems: any[]): Promise<void> {
   const indexFile = path.join(outputPath, "index.mdx");
+
+  const overrideFile = path.join("generator", "overlays", apiVersion, slugFromTagName(name) + ".mdx");
+  if (fs.existsSync(overrideFile)) {
+    fs.copyFileSync(overrideFile, indexFile);
+    return;
+  }
 
   const frontMatter = yaml.stringify({
     title: name,
@@ -145,17 +198,7 @@ async function renderAPIDocs(apiVersion: APIVersion, outputPath: string) {
             }
           });
 
-          const frontMatter = {
-            title: summary ?? operation.operationId,
-            description: operation.description ?? "",
-            openapi: {
-              method
-            }
-          };
-
-          const frontMatterYAML = yaml.stringify(frontMatter);
-
-          renderAPISpecToFile(operationFile, frontMatterYAML, urlPathWithBase, method, serializedSpec, serverURL, apiVersion);
+          renderAPISpecToFile(operationFile, urlPathWithBase, method, operation, serverURL, apiVersion);
         }
       }
     }

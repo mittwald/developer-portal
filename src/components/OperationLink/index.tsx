@@ -11,6 +11,8 @@ export default function OperationLink({
   operation,
   children,
 }: PropsWithChildren<OperationLinkProps>) {
+  children = children || <code>{operation}</code>;
+
   const url = `/docs/v2/reference/${tag.toLowerCase()}/${operation}`;
   return <Link to={url}>{children}</Link>;
 }
