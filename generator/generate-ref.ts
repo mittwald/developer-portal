@@ -126,6 +126,12 @@ function stripTrailingDot(str: string | undefined): string | undefined {
 async function renderTagIndexPage(apiVersion: APIVersion, name: string, description: string, outputPath: string, sidebarItems: any[]): Promise<void> {
   const indexFile = path.join(outputPath, "index.mdx");
 
+  const overrideFile = path.join("generator", "overlays", apiVersion, slugFromTagName(name) + ".mdx");
+  if (fs.existsSync(overrideFile)) {
+    fs.copyFileSync(overrideFile, indexFile);
+    return;
+  }
+
   const frontMatter = yaml.stringify({
     title: name,
     description,
