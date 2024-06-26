@@ -20,28 +20,28 @@ Um eine Redis-Datenbank zu erstellen, benötigst Du Zugriff auf ein Projekt. Wie
 
 ## Liste verfügbarer Redis-Versionen
 
-Sende eine `GET`-Anfrage an den Endpunkt `/v2/redis-versions`, um eine Liste der verfügbaren Redis-Versionen zu erhalten (<OperationLink tag="database" operation="database-list-redis-versions">Dokumentation für den `database-list-redis-versions`-Endpunkt</OperationLink>).
+Sende eine `GET`-Anfrage an den <OperationLink operation="database-list-redis-versions" />-Endpunkt, um eine Liste der verfügbaren Redis-Versionen zu erhalten.
 
 ## Erstellen einer Redis-Datenbank
 
-Um eine Redis-Datenbank zu erstellen, sende eine `POST`-Anfrage an den Endpunkt `/v2/projects/{projectID}/redis-databases`. Der Anfrage-Body muss ein JSON-Objekt mit den folgenden Eigenschaften enthalten:
+Um eine Redis-Datenbank zu erstellen, sende eine Anfrage an den <OperationLink operation="database-create-redis-database" />-Endpunkt. Der Anfrage-Body muss ein JSON-Objekt mit den folgenden Eigenschaften enthalten:
 
 - `description` sollte eine für Menschen lesbare Beschreibung der Datenbank enthalten. Dies ist ein Pflichtwert.
-- `version` sollte die Version der Datenbank enthalten. Dies ist ein Pflichtwert und muss auf eine vorhandene Version verweisen, die vom Endpunkt `/v2/redis-versions` zurückgegeben wird.
+- `version` sollte die Version der Datenbank enthalten. Dies ist ein Pflichtwert und muss auf eine vorhandene Version verweisen, die vom Endpunkt <OperationLink operation="database-list-redis-versions" /> zurückgegeben wird.
 
 Die Antwort enthält die folgenden Eigenschaften:
 
 - `id` enthält die ID der erstellten Datenbank.
 
-<OperationHint tag="Database" operation="database-create-redis-database" />
+<OperationHint operation="database-create-redis-database" />
 
 ## Zugriff auf die Datenbank
 
-Nachdem Du eine Datenbank erstellt hast, kannst Du eine `GET`-Anfrage an den Pfad `/v2/redis-databases/{id}` senden.
+Nachdem Du eine Datenbank erstellt hast, kannst Du eine Anfrage an den <OperationLink operation="database-get-redis-database" />-Endpunkt senden.
 
 Die Antwort enthält unter anderem die folgenden Werte:
 
 - `hostname` und `port` enthalten den Hostnamen und den Port der Datenbank. Du kannst diese Werte verwenden, um dich von deiner Hosting-Umgebung aus mit der Datenbank zu verbinden.
 - `configuration` ermöglicht es Dir, die spezifischen Konfigurationswerte einzusehen, die auf Deine Datenbank angewendet wurden.
 
-<OperationHint tag="Database" operation="database-get-redis-database" />
+<OperationHint operation="database-get-redis-database" />

@@ -12,9 +12,14 @@ export interface OperationHintProps {
 
 export default function OperationHint({ operation }: OperationHintProps) {
   operation = Array.isArray(operation) ? operation : [operation];
+
+  const heading = operation.length > 1 ?
+    <Translate id="components.OperationHint.text.plural" /> :
+    <Translate id="components.OperationHint.text" />;
+
   return (
     <InlineAlert status="info">
-      <Heading><Translate id={"components.OperationHint.text" + (operation.length > 1 ? ".plural" : "")} />: </Heading>
+      <Heading>{heading}:</Heading>
       <Content>
         <div className={styles.operations}>
           {operation.map((o, idx) => <OperationDocCardById key={idx} apiVersion="v2" operationId={o} variant="compact" />)}

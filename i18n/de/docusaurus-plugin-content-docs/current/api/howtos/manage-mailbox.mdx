@@ -7,6 +7,7 @@ description: |
 ---
 
 import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
 import SchemaFromSpec from "@site/src/components/openapi/SchemaFromSpec";
 
 ## Arten von E-Mail-Konten
@@ -22,7 +23,7 @@ Um E-Mail-Konten zu verwalten, benötigst du ein bestehendes Projekt. Um ein neu
 
 ## Ein neues E-Mail-Konto erstellen
 
-Um ein neues E-Mail-Konto zu erstellen, sende eine `POST`-Anfrage an den `/v2/projects/{projectID}/mailaddresses`-Endpunkt. Die Anfrage muss ein JSON-Objekt mit den folgenden Eigenschaften enthalten:
+Um ein neues E-Mail-Konto zu erstellen, sende eine Anfrage an den <OperationLink operation="mail-create-mail-address" />-Endpunkt. Die Anfrage muss ein JSON-Objekt mit den folgenden Eigenschaften enthalten:
 
 <SchemaFromSpec
   apiVersion="v2"
@@ -36,11 +37,11 @@ Merke dir das Passwort, das du für das E-Mail-Konto festgelegt hast. Du hast sp
 
 :::
 
-<OperationHint tag="Mail" operation="mail-create-mail-address" />
+<OperationHint operation="mail-create-mail-address" />
 
 ## Eine neue Weiterleitungsadresse erstellen
 
-Eine Weiterleitungsadresse ist eine E-Mail-Adresse, die alle eingehenden E-Mails an eine oder mehrere andere E-Mail-Adressen weiterleitet. Um eine neue Weiterleitungsadresse zu erstellen, sende eine `POST`-Anfrage an den `/v2/projects/{projectID}/mailaddresses`-Endpunkt. Die Anfrage muss ein JSON-Objekt mit den folgenden Eigenschaften enthalten:
+Eine Weiterleitungsadresse ist eine E-Mail-Adresse, die alle eingehenden E-Mails an eine oder mehrere andere E-Mail-Adressen weiterleitet. Um eine neue Weiterleitungsadresse zu erstellen, sende eine Anfrage an den <OperationLink operation="mail-create-mail-address" />-Endpunkt. Die Anfrage muss ein JSON-Objekt mit den folgenden Eigenschaften enthalten:
 
 <SchemaFromSpec
   apiVersion="v2"
@@ -50,7 +51,7 @@ Eine Weiterleitungsadresse ist eine E-Mail-Adresse, die alle eingehenden E-Mails
 
 ## Einen neuen Postausgang erstellen
 
-Ein Postausgang ist eine E-Mail-Adresse, die verwendet wird, um E-Mails von einer Webanwendung oder einem Skript zu senden. Um einen neuen Postausgang zu erstellen, sende eine `POST`-Anfrage an den `/v2/projects/{projectID}/deliveryboxes`-Endpunkt. Die Anfrage muss ein JSON-Objekt mit den folgenden Eigenschaften enthalten:
+Ein Postausgang ist eine E-Mail-Adresse, die verwendet wird, um E-Mails von einer Webanwendung oder einem Skript zu senden. Um einen neuen Postausgang zu erstellen, sende eine Anfrage an den <OperationLink operation="mail-create-deliverybox" />-Endpunkt. Die Anfrage muss ein JSON-Objekt mit den folgenden Eigenschaften enthalten:
 
 - `description` (String, Pflichtfeld): Eine Beschreibung des Postausgangs. Diese Beschreibung wird in der Web-Oberfläche angezeigt.
 - `password` (String, Pflichtfeld): Das Passwort für den Postausgang. Dieses Passwort wird verwendet, um sich gegenüber dem SMTP-Server zu authentifizieren.
@@ -65,4 +66,6 @@ Merke dir das Passwort, das du für das E-Mail-Konto festgelegt hast. Du hast sp
 
 ## E-Mail-Konten löschen
 
-Um eine E-Mail-Adresse oder Postausgang zu löschen, sende eine `DELETE`-Anfrage an den `/v2/mailaddresses/{id}` oder `/v2/deliveryboxes/{id}`-Endpunkt (je nachdem, welches Konto du löschen möchtest). Der `id`-Parameter muss die ID der E-Mail-Adresse oder des Postausgangs enthalten, den du löschen möchtest. Es ist kein Request-Body erforderlich.
+Um eine E-Mail-Adresse oder Postausgang zu löschen, sende eine Anfrage an den <OperationLink operation="mail-delete-mail-address" />- oder  <OperationLink operation="mail-delete-delivery-box" />-Endpunkt (je nachdem, welches Konto du löschen möchtest). Der `id`-Parameter muss die ID der E-Mail-Adresse oder des Postausgangs enthalten, den du löschen möchtest. Es ist kein Request-Body erforderlich.
+
+<OperationHint tag="Mail" operation={["mail-delete-mail-address", "mail-delete-delivery-box"]} />
