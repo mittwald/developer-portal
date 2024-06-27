@@ -21,9 +21,9 @@ Es gibt verschiedene Möglichkeiten, ein neues Projekt zu erstellen:
 
 ### ...auf einem Server
 
-Voraussetzung dafür, ein Projekt auf einem bestehenden Server zu erstellen, ist die ID dieses Servers. Du kannst alle Server finden, auf die du Zugriff hast, indem du den <OperationLink tag="Project" operation="project-list-servers">`GET /v2/servers`-API-Endpunkt</OperationLink> verwendest.
+Voraussetzung dafür, ein Projekt auf einem bestehenden Server zu erstellen, ist die ID dieses Servers. Du kannst alle Server finden, auf die du Zugriff hast, indem du den <OperationLink operation="project-list-servers" />-Endpunkt verwendest.
 
-Um ein neues Projekt zu erstellen, sende eine `POST`-Anfrage an den `/v2/servers/{serverID}/projects`-Endpunkt. Der Anfragetext muss ein JSON-Objekt mit den folgenden Eigenschaften enthalten:
+Um ein neues Projekt zu erstellen, sende eine Anfrage an den <OperationLink operation="project-create-project" />-Endpunkt. Der Anfragetext muss ein JSON-Objekt mit den folgenden Eigenschaften enthalten:
 
 - `description` (String, Pflichtfeld) sollte eine menschenlesbare Beschreibung des Projekts enthalten.
 
@@ -31,7 +31,7 @@ Die Antwort im Erfolgsfall enthält ein JSON-Objekt mit den folgenden Eigenschaf
 
 - `id` ist die ID des neu erstellten Projekts.
 
-<OperationHint tag="Project" operation="project-create-project" />
+<OperationHint operation="project-create-project" />
 
 ### ...als Standalone-Projekt
 
@@ -43,8 +43,8 @@ Das Erstellen von Standalone-Projekten wird derzeit nicht unterstützt.
 
 ## Überprüfen der Projekt-Verfügbarkeit
 
-Ein neu erstelltes Projekt ist nicht sofort verfügbar (sollte es jedoch innerhalb weniger Sekunden sein). Um zu überprüfen, ob ein Projekt bereit ist, sende eine `GET`-Anfrage an den `/v2/projects/{projectID}`-Endpunkt. Unter anderem enthält die Antwort eine `isReady`-Eigenschaft. Diese Eigenschaft ist `true`, wenn das Projekt bereitgestellt und verfügbar ist, und andernfalls `false`.
+Ein neu erstelltes Projekt ist nicht sofort verfügbar (sollte es jedoch innerhalb weniger Sekunden sein). Um zu überprüfen, ob ein Projekt bereit ist, sende eine Anfrage an den <OperationLink operation="project-get-project" />-Endpunkt. Unter anderem enthält die Antwort eine `isReady`-Eigenschaft. Diese Eigenschaft ist `true`, wenn das Projekt bereitgestellt und verfügbar ist, und andernfalls `false`.
 
-<OperationHint tag="Project" operation="project-get-project" />
+<OperationHint operation="project-get-project" />
 
 [^1]: https://www.mittwald.de/space-server

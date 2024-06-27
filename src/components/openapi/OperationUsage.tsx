@@ -32,33 +32,33 @@ export function OperationUsage(props: OperationUsageProps) {
     children = [children];
   }
 
-  if (withPHP && !children.some(i => i.key === "php")) {
+  if (withPHP && !children.some((i) => i.key === "php")) {
     children.unshift(
       <TabItem key="php" value="php" label="PHP SDK">
         <CodeBlock language="php">
           {generatePHPCodeExample(method, url, spec, baseURL)}
         </CodeBlock>
-      </TabItem>
+      </TabItem>,
     );
   }
 
-  if (withJavascript && !children.some(i => i.key === "javascript")) {
+  if (withJavascript && !children.some((i) => i.key === "javascript")) {
     children.unshift(
       <TabItem key="javascript" value="javascript" label="JavaScript SDK">
         <CodeBlock language="javascript">
           {generateJavascriptCodeExample(method, url, spec, baseURL)}
         </CodeBlock>
-      </TabItem>
+      </TabItem>,
     );
   }
 
-  if (!children.some(i => i.key === "curl")) {
+  if (!children.some((i) => i.key === "curl")) {
     children.unshift(
       <TabItem key="curl" value="curl" label="cURL">
         <CodeBlock language="shell-session">
           {generateCurlCodeExample(method, url, spec, baseURL)}
         </CodeBlock>
-      </TabItem>
+      </TabItem>,
     );
   }
 

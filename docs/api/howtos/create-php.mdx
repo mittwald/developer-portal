@@ -7,6 +7,7 @@ tags:
 ---
 
 import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
 
 ## Prerequisites
 
@@ -19,13 +20,13 @@ To install a PHP application, you will need to have the following:
 
 Before installing a PHP application, you will need to determine the application ID and version ID of the generic custom PHP application.
 
-For this, call the `/v2/apps` endpoint, and find the "PHP" application. It should have a stable ID of `34220303-cb87-4592-8a95-2eb20a97b2ac`. You can then use that ID to retrieve the recommended version to install for this app, by calling the `/v2/apps/{appID}/versions` endpoint. You can filter the returned versions by the `recommended` property.
+For this, call the <OperationLink operation="app-list-apps" /> endpoint, and find the "PHP" application. It should have a stable ID of `34220303-cb87-4592-8a95-2eb20a97b2ac`. You can then use that ID to retrieve the recommended version to install for this app, by calling the <OperationLink operation="app-list-appversions" /> endpoint. You can filter the returned versions by the `recommended` property.
 
 Please note that the actual version is rather inconsequential, as it refers only to the starter template used to create the application. The actual version of the application will be determined by your own code.
 
 ## Install the application
 
-To deploy your application, you will need to call the `POST /v2/projects/{projectID}/appinstallations` endpoint. The relevant fields are the following:
+To deploy your application, you will need to call the <OperationLink operation="app-request-appinstallation" /> endpoint. The relevant fields are the following:
 
 - `appVersionId` needs to be the app version ID that you retrieved in the previous step.
 - `updatePolicy` needs to be set to `none`, as you will typically want to update your application by yourself.
@@ -47,4 +48,4 @@ The response will contain the installation ID, that you can subsequently use to 
 
 <OperationHint tag="App" operation="app-request-appinstallation" />
 
-To observe the installation status, you can call the `/v2/appinstallations/{installationID}` endpoint. Pay special attention to the `installationPath` field; this will contain the directory in your project file system that you should deploy your application to.
+To observe the installation status, you can call the <OperationLink operation="app-get-appinstallation" /> endpoint. Pay special attention to the `installationPath` field; this will contain the directory in your project file system that you should deploy your application to.

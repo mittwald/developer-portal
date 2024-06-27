@@ -94,7 +94,9 @@ export function OperationMetadata({
         </LabeledValue>
       </ColumnLayout>
       <hr />
-      {spec.description && withDescription ? <Markdown>{spec.description}</Markdown> : null}
+      {spec.description && withDescription ? (
+        <Markdown>{spec.description}</Markdown>
+      ) : null}
     </>
   );
 }

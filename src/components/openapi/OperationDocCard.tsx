@@ -12,10 +12,11 @@ import buildDocumentId from "@site/src/openapi/buildDocumentId";
 interface Props {
   apiVersion: APIVersion;
   operation: OperationWithMeta;
+  variant?: "compact";
 }
 
-function OperationDocCard(p: Props) {
-  const { apiVersion } = p;
+export default function OperationDocCard(p: Props) {
+  const { apiVersion, variant } = p;
   const { operation, method, path } = p.operation;
   const deprecated = isDeprecated(operation);
   const docId = buildDocumentId(operation);
@@ -24,9 +25,10 @@ function OperationDocCard(p: Props) {
     <div
       className={clsx(
         "card",
-        "margin-bottom--md",
+        variant === "compact" ? "margin-bottom--xs" : "margin-bottom--md",
         styles.card,
         deprecated ? styles.deprecated : null,
+        variant === "compact" ? styles.compact : null
       )}
     >
       <Link to={`/docs/${apiVersion}/${docId}`}>
@@ -48,5 +50,3 @@ function OperationDocCard(p: Props) {
     </div>
   );
 }
-
-export default OperationDocCard;
