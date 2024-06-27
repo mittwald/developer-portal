@@ -3,6 +3,7 @@ import TabItem from "@theme/TabItem";
 import Schema from "@site/src/components/openapi/Schema";
 import SchemaExample from "@site/src/components/openapi/SchemaExample";
 import { OpenAPIV3 } from "openapi-types";
+import { translate } from "@docusaurus/Translate";
 
 interface Props {
   schema: OpenAPIV3.SchemaObject;
@@ -18,10 +19,10 @@ interface Props {
 export default function SchemaWithExample({ schema }: Props) {
   return (
     <Tabs groupId="component" defaultValue="schema">
-      <TabItem value="schema" label="Schema">
+      <TabItem value="schema" label={translate({id: "components.SchemaWithExample.schema"})}>
         <Schema schema={schema} />
       </TabItem>
-      <TabItem value="example" label="Example">
+      <TabItem value="example" label={translate({id: "components.SchemaWithExample.example"})}>
         <SchemaExample schema={schema} />
       </TabItem>
     </Tabs>
