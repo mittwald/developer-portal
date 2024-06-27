@@ -7,16 +7,19 @@ sidebar_position: 2
 
 Lifecycle Events werden von mittwald genutzt, um die externe Anwendung über sie betreffende Ereignisse zu informieren.
 
-Alle Webhooks werden `at least once` aufgerufen.
+Alle Webhooks werden `at least once` aufgerufen und sind somit so zu entwerfen, dass mehrfache Aufrufe nicht zu Fehlern führen.
 
 ### ExtensionAddedToContext
 
-Dieses Event wird genutzt, um der externen Anwendung mitzuteilen, dass eine Extension zu einem neuen Context hinzugefügt wurde.
+Dieses Event dient dazu, externen Anwendungen mitzuteilen, dass die Extension zu einem neuen Kontext hinzugefügt wurde.
+Im Rahmen dieses Prozesses werden die Extension Instance ID und das Extension Instance Secret erstmalig übermittelt.
 
-In diesem Event wird der externen Anwendung erstmalig die `Extension Instance ID` und das `Extension Instance Secret` mitgeteilt.
-Diese können nachfolgend verwendet werden, um sich gegenüber mittwald zu authentifizieren.
+Das Extension Instance Secret kann jedoch erst verwendet werden, nachdem der entsprechende Webhook erfolgreich verarbeitet wurde.
+Aufgrund der asynchronen Verarbeitung kann auch nach erfolgreicher Verarbeitung noch ein zeitlicher Abstand bestehen, bis das Secret tatsächlich genutzt werden kann.
 
-Für weitere Informationen dazu, wie das `Extension Instance Secret` verwendet werden kann, siehe [Authentifizierung](./authentication.mdx#extension-instance-secret).
+Daher wird empfohlen, die Verarbeitung und die Verwendung des Secrets voneinander zu entkoppeln, um sicherzustellen, dass die Anwendung korrekt funktioniert und keine unnötigen Wartezeiten entstehen.
+
+Für weitere Informationen dazu, wie das Extension Instance Secret verwendet werden kann, siehe [Authentifizierung](./authentication.mdx#extension-instance-secret).
 
 
 ### InstanceUpdated
@@ -27,7 +30,10 @@ Das kann beispielsweise die De-/Aktivierung der `Extension Instance` sein.
 
 ### SecretRotated
 
-Aus Sicherheitsaspekten werden wir regelmäßig das `Extension Instance Secret` rotieren. Das neue Secret wird über diesen Webhook mitgeteilt. Das vorherige Secret ist ab diesem Zeitpunkt nicht mehr gültig.
+Aus Sicherheitsaspekten werden wir regelmäßig das Extension Instance Secret rotieren.
+Das neue Secret wird über diesen Webhook mitgeteilt.
+Das vorherige Secret ist ab diesem Zeitpunkt nicht mehr gültig.
+Siehe dazu auch [ExtensionAddedToContext](#extensionaddedtocontext).
 
 ### InstanceRemovedFromContext
 
