@@ -6,6 +6,7 @@ description: |
 ---
 
 import OperationLink from "@site/src/components/OperationLink";
+import OperationExample from "@site/src/components/OperationExample";
 
 ## Base URLs
 
@@ -27,18 +28,11 @@ To authenticate to the API, you will need an **API Token**. You can obtain one e
 1. **In the UI**, go to your user profile and choose the [API tokens](https://studio.mittwald.de/app/profile/api-tokens) menu item.
 2. Alternatively, **via the API**, use the <OperationLink operation="user-create-api-token" /> endpoint. This requires you to already have an existing API token:
 
-   ```http
-   POST /v2/users/self/api-tokens HTTP/1.1
-   Host: api.mittwald.de
-   Content-Type: application/json
-   Authorization: Bearer <EXISTING_API_TOKEN>
-
-   {
-     "description": "My API token",
-     "expiresAt": "2021-12-31T23:59:59+00:00",
-     "roles": ["api_read", "api_write"]
-   }
-   ```
+   <OperationExample operation="user-create-api-token" headers={{"Authorization": "Bearer <EXISTING_API_TOKEN>"}} example={{
+     description: "My API token",
+     expiresAt: "2021-12-31T23:59:59+00:00",
+     roles: ["api_read", "api_write"]
+   }} />
 
    The response will contain a JSON document with a `token` key. This is your API token.
 

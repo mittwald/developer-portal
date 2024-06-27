@@ -9,6 +9,7 @@ tags:
 
 import OperationHint from "@site/src/components/OperationHint";
 import OperationLink from "@site/src/components/OperationLink";
+import OperationExample from "@site/src/components/OperationExample";
 
 ## Prerequisites
 
@@ -40,11 +41,7 @@ To deploy your application, you will need to call the <OperationLink operation="
 
 The complete HTTP request should look like this:
 
-```http request
-POST /v2/project/{projectID}/appinstallations HTTP/1.1
-Content-Type: application/json
-
-{
+<OperationExample operation="app-request-appinstallation" example={{
   "appVersionId": "97fb8684-3fe3-4720-86fb-fb0524ae88d1",
   "description": "Your Node.js app",
   "updatePolicy": "none",
@@ -52,8 +49,7 @@ Content-Type: application/json
     "name": "entrypoint",
     "value": "yarn start"
   }]
-}
-```
+}} />
 
 The response will contain the installation ID, that you can subsequently use to access your application.
 
