@@ -2,7 +2,6 @@ import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import Schema from "@site/src/components/openapi/Schema";
 import SchemaExample from "@site/src/components/openapi/SchemaExample";
-import { APIVersion } from "@site/src/openapi/specs";
 import { OpenAPIV3 } from "openapi-types";
 
 interface Props {

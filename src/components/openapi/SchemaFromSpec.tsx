@@ -18,7 +18,11 @@ interface Props {
  * @param path The path to the schema in the OpenAPI spec
  * @param withExample Whether to render an example of the schema
  */
-export default function SchemaFromSpec({ apiVersion, path, withExample }: Props) {
+export default function SchemaFromSpec({
+  apiVersion,
+  path,
+  withExample,
+}: Props) {
   const spec = specs[apiVersion];
 
   let refPath = path.split("/");
