@@ -3,16 +3,12 @@ import { Fragment } from "react";
 import Markdown from "react-markdown";
 import CodeBlock from "@theme/CodeBlock";
 import { OpenAPIV3 } from "openapi-types";
-import Schema from "@site/src/components/openapi/Schema";
 import {
   Optional,
   Required,
 } from "@site/src/components/openapi/RequiredOptional";
 import Translate, { translate } from "@docusaurus/Translate";
 import HTTPResponseStatus from "@site/src/components/openapi/HTTPResponseStatus";
-import Tabs from "@theme/Tabs";
-import TabItem from "@theme/TabItem";
-import SchemaExample from "@site/src/components/openapi/SchemaExample";
 import Accordion from "@mittwald/flow-react-components/Accordion";
 import Heading from "@mittwald/flow-react-components/Heading";
 import Content from "@mittwald/flow-react-components/Content";
@@ -25,6 +21,7 @@ import { OperationMetadata } from "@site/src/components/openapi/OperationMetadat
 import ParameterObject = OpenAPIV3.ParameterObject;
 import ReferenceObject = OpenAPIV3.ReferenceObject;
 import ResponseObject = OpenAPIV3.ResponseObject;
+import SchemaWithExample from "@site/src/components/openapi/SchemaWithExample";
 
 function OperationParameter({ param }: { param: ParameterObject }) {
   const body = [];
@@ -162,14 +159,7 @@ function OperationRequestBody({
           <p>
             Format: <code>application/json</code>
           </p>
-          <Tabs groupId="request-body" defaultValue="schema">
-            <TabItem value="schema" label="Schema">
-              <Schema schema={spec.content["application/json"].schema} />
-            </TabItem>
-            <TabItem value="example" label="Example">
-              <SchemaExample schema={spec.content["application/json"].schema} />
-            </TabItem>
-          </Tabs>
+          <SchemaWithExample schema={spec.content["application/json"].schema} withRawJSONSchema />
         </Content>
       </Accordion>
     );
@@ -213,14 +203,7 @@ function OperationResponseBody({ spec }: { spec?: OpenAPIV3.ResponseObject }) {
           </LabeledValue>
         </ColumnLayout>
 
-        <Tabs groupId="request-body" defaultValue="schema">
-          <TabItem value="schema" label="Schema">
-            <Schema schema={spec.content["application/json"].schema} />
-          </TabItem>
-          <TabItem value="example" label="Example">
-            <SchemaExample schema={spec.content["application/json"].schema} />
-          </TabItem>
-        </Tabs>
+        <SchemaWithExample schema={spec.content["application/json"].schema} withRawJSONSchema />
       </>
     );
   }
