@@ -5,6 +5,8 @@ description: |
   Diese Seite bietet eine Einführung in die mStudio v2 API und ihre Konzepte.
 ---
 
+import OperationLink from "@site/src/components/OperationLink";
+
 ## Basis-URLs
 
 Die mStudio v2 API verwendet `https://api.mittwald.de/v2/` als Basis-URL für alle API-Endpunkte.
@@ -23,10 +25,10 @@ Die vollständige API-Spezifikation im [OpenAPI 3.0-Format](https://spec.openapi
 Um dich an der API zu authentifizieren, benötigst du ein **API-Token**. Du kannst es entweder über die mittwald mStudio Web-UI oder über die API selbst beziehen (wenn du bereits über ein anderes API-Token verfügst).
 
 1. **In der Web-UI** gehe zu deinem Benutzerprofil und wähle den Menüpunkt [API-Tokens](https://studio.mittwald.de/app/profile/api-tokens) aus.
-2. Alternativ, **über die API**, verwende den `/v2/signup/token/api`-Endpunkt. Dieser setzt voraus, dass du ein bereits bestehendes API-Token hast:
+2. Alternativ, **über die API**, verwende den <OperationLink operation="user-create-api-token" />-Endpunkt. Dieser setzt voraus, dass du ein bereits bestehendes API-Token hast:
 
    ```http
-   POST /v2/signup/token/api HTTP/1.1
+   POST /v2/users/self/api-tokens HTTP/1.1
    Host: api.mittwald.de
    Content-Type: application/json
    Authorization: Bearer <EXISTING_API_TOKEN>
