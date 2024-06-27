@@ -15,6 +15,7 @@ interface Props {
  * This component renders a schema with an example in a tabbed view.
  *
  * @param schema The schema to render and to generate an example for
+ * @param withRawJSONSchema Whether to show the raw JSON schema in a tab
  * @see Schema
  * @see SchemaExample
  */
