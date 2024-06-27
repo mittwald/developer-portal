@@ -5,6 +5,7 @@ import {
 } from "@site/src/openapi/specs";
 import OperationDocCard from "@site/src/components/openapi/OperationDocCard";
 import ColumnLayout from "@mittwald/flow-react-components/ColumnLayout";
+import compareOperation from "@site/src/openapi/compareOperation";
 
 interface Props {
   apiVersion: APIVersion;
@@ -13,7 +14,7 @@ interface Props {
 
 export default function OperationDocCardList(p: Props) {
   const spec = useSpec(p.apiVersion);
-  const operations = getOperationByTag(spec, p.tag);
+  const operations = getOperationByTag(spec, p.tag).sort(compareOperation);
 
   const cards = operations.map((operation) => {
     return (
