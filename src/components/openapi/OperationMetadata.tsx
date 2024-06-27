@@ -13,8 +13,11 @@ import {
 import { Heading } from "@mittwald/flow-react-components/Heading";
 import { Text } from "@mittwald/flow-react-components/Text";
 import { Button } from "@mittwald/flow-react-components/Button";
+import InlineAlert from "@mittwald/flow-react-components/InlineAlert";
 import styles from "./OperationMetadata.module.css";
 import Translate from "@docusaurus/Translate";
+import Admonition from "@theme/Admonition";
+import isDeprecated from "@site/src/openapi/isDeprecated";
 
 function OperationIdHelp() {
   return (
@@ -39,20 +42,35 @@ function OperationIdHelp() {
   );
 }
 
+function DeprecationNotice() {
+  return (
+    <Admonition type="warning">
+      <Translate id="openapi.operation.metadata.deprecationnotice.text">
+        This operation is deprecated and should not be used anymore. Please
+        refer to this operation's description for alternatives.
+      </Translate>
+    </Admonition>
+  );
+}
+
 export function OperationMetadata({
   method,
   path,
   spec,
+  withDescription = true,
 }: {
   path: string;
   method: string;
   spec: OpenAPIV3.OperationObject;
+  withDescription?: boolean;
 }) {
   return (
     <>
       <pre>
         {method.toUpperCase()} <OperationPath path={path} />
       </pre>
+
+      {isDeprecated(spec) && <DeprecationNotice />}
 
       <ColumnLayout m={[1, 1, 2]}>
         <LabeledValue>
@@ -67,16 +85,18 @@ export function OperationMetadata({
         </LabeledValue>
         <LabeledValue className={styles.operationIdValue}>
           <Label className={styles.labelWithHelp}>
-            <OperationIdHelp /> Operation ID
+            Operation ID <OperationIdHelp />
           </Label>
           <Content>
             <div>{spec.operationId}</div>
-            <CopyButton text={spec.operationId} size="s" />
+            <CopyButton text={spec.operationId} size="s" variant="plain" />
           </Content>
         </LabeledValue>
       </ColumnLayout>
       <hr />
-      {spec.description ? <Markdown>{spec.description}</Markdown> : null}
+      {spec.description && withDescription ? (
+        <Markdown>{spec.description}</Markdown>
+      ) : null}
     </>
   );
 }

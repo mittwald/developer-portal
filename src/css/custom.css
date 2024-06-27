@@ -182,7 +182,7 @@ a.menu__link {
 }
 
 aside {
-  border: none !important;
+  /*border: none !important;*/
   clip-path: none !important;
 }
 
@@ -245,6 +245,11 @@ p a {
 
   /** underline offset is necessary because <code> blocks nested in linkes look shitty otherwise */
   text-underline-offset: 0.2em;
+}
+
+/** Required when a DocCardList is used in a markdown file */
+a.card {
+  text-decoration: none;
 }
 
 .markdown strong a {
@@ -468,6 +473,25 @@ section.row {
   }
 }
 
+.api-operation-deprecated a {
+  color: var(--color--gray--600);
+}
+
+.api-operation-deprecated a::before {
+  text-decoration: none !important;
+  background-color: var(--color--gray--600) !important;
+}
+
+[data-theme="dark"] .api-operation-deprecated a {
+  color: var(--color--gray--800);
+}
+
+[data-theme="dark"] .api-operation-deprecated a::before {
+  text-decoration: none !important;
+  background-color: var(--color--gray--800) !important;
+  color: black;
+}
+
 .api-operation-get a::before {
   content: "GET";
   border-radius: 4px;
@@ -531,4 +555,8 @@ section.row {
   font-weight: bold;
   min-width: 48px;
   text-align: center;
+}
+
+.flow--inline-alert {
+  margin-bottom: var(--ifm-leading);
 }

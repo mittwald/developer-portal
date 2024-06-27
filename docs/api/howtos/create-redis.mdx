@@ -18,14 +18,14 @@ To create a Redis database, you will need to have access to a project. Refer to 
 
 ## List available Redis versions
 
-Set a `GET` request to the `/v2/redis-versions` endpoint to get a list of available Redis versions. (<OperationLink tag="database" operation="database-list-redis-versions">endpoint documentation for `database-list-redis-versions`</OperationLink>)
+Set a request to the <OperationLink operation="database-list-redis-versions" /> endpoint to get a list of available Redis versions.
 
 ## Creating a Redis database
 
-To create a Redis database, send a `POST` request to the `/v2/projects/{projectID}/redis-databases` endpoint. The request body must contain a JSON object with the following properties:
+To create a Redis database, send a request to the <OperationLink operation="database-create-redis-database" /> endpoint. The request body must contain a JSON object with the following properties:
 
 - `description` should contain a human-readable description of the database. This is a required value.
-- `version` should contain the version of the database. This is a required value, and must reference an existing version as returned by the `/v2/redis-versions` endpoint.
+- `version` should contain the version of the database. This is a required value, and must reference an existing version as returned by the <OperationLink operation="database-list-redis-versions" /> endpoint.
 
 The response will contain the following properties:
 
@@ -35,7 +35,7 @@ The response will contain the following properties:
 
 ## Accessing the database
 
-After creating a database, you can send a `GET` request to the `/v2/redis-databases/{id}` route.
+After creating a database, you can send a request to the <OperationLink operation="database-get-redis-database" /> route.
 
 Among others, the response will contain the following values:
 

@@ -40,10 +40,12 @@ const sidebars = {
       label: "API Reference",
       items: require("./sidebar.reference.json"),
       link: {
-        type: "generated-index",
-        title: "API Reference",
-        slug: "/reference",
-        keywords: ["api-reference"]
+        type: "doc",
+        id: "reference/index"
+        // type: "generated-index",
+        // title: "API Reference",
+        // slug: "/reference",
+        // keywords: ["api-reference"]
       }
     }
   ],
