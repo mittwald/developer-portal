@@ -74,7 +74,13 @@ function OneOfSchema({ schema }: Props) {
   );
 }
 
-function Schema({ schema }: Props) {
+/**
+ * Renders a graphical representation of an OpenAPI-style JSON schema.
+ *
+ * @param schema The schema for which a documentation should be rendered
+ * @constructor
+ */
+export default function Schema({ schema }: Props) {
   if (isObjectSchema(schema)) {
     return <ObjectSchema schema={schema} />;
   }
@@ -87,5 +93,3 @@ function Schema({ schema }: Props) {
     return <ArraySchema schema={schema} />;
   }
 }
-
-export default Schema;

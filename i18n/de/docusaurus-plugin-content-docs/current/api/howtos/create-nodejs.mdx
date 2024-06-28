@@ -8,6 +8,8 @@ tags:
 ---
 
 import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+import OperationExample from "@site/src/components/OperationExample";
 
 ### Voraussetzungen
 
@@ -20,18 +22,18 @@ Um eine Node.js- oder Python-Anwendung zu installieren, benötigst Du Folgendes:
 
 Bevor Du eine Node.js- oder Python-Anwendung installierst, musst Du die App-ID und die Versions-ID der generischen benutzerdefinierten Node.js- bzw. Python-Anwendung bestimmen.
 
-Hierzu rufe die `/v2/apps`-Endpunkt auf und suche die "Node.js"- oder "Python"-Anwendung. Diese sollten die folgenden (stabilen) IDs haben:
+Hierzu rufe die <OperationLink operation="app-list-apps" />-Endpunkt auf und suche die "Node.js"- oder "Python"-Anwendung. Diese sollten die folgenden (stabilen) IDs haben:
 
 - Node.js: `3e7f920b-a711-4d2f-9871-661e1b41a2f0`
 - Python: `be57d166-dae9-4480-bae2-da3f3c6f0a2e`
 
-Wähle die entsprechende Anwendungs-ID, je nachdem, ob du eine Node.js- oder Python-Anwendung installieren möchtest. Du kannst dann diese ID verwenden, um die empfohlene Version für diese App abzurufen, indem Du den `/v2/apps/{appID}/versions`-Endpunkt aufrufst. Du kannst die zurückgegebenen Versionen nach der `recommended`-Eigenschaft filtern.
+Wähle die entsprechende Anwendungs-ID, je nachdem, ob du eine Node.js- oder Python-Anwendung installieren möchtest. Du kannst dann diese ID verwenden, um die empfohlene Version für diese App abzurufen, indem Du den <OperationLink operation="app-list-appversions" />-Endpunkt aufrufst. Du kannst die zurückgegebenen Versionen nach der `recommended`-Eigenschaft filtern.
 
 Beachte, dass die tatsächliche Version weitgehend unerheblich ist, da sie nur auf die Starter-Vorlage verweist, die zur Erstellung der Anwendung verwendet wird. Die tatsächliche Version der Anwendung wird durch Deinen eigenen Code bestimmt.
 
 ### Installieren der Anwendung
 
-Um Deine Anwendung bereitzustellen, rufe den `POST /v2/projects/{projectID}/appinstallations`-Endpunkt auf. Die relevanten Felder sind die folgenden:
+Um Deine Anwendung bereitzustellen, rufe den <OperationLink operation="app-request-appinstallation" />-Endpunkt auf. Die relevanten Felder sind die folgenden:
 
 - `appVersionId` sollte die App-Version-ID sein, die Du im vorherigen Schritt abgerufen hast.
 - `userInputs` sollte ein Array von Objekten sein, die jeweils eine `name`- und eine `value`-Eigenschaft enthalten. Im Fall von Node.js ist der einzige zulässige Wert für `name` der Wert `entrypoint`. Der dazugehörige `value` ist der Befehl, der ausgeführt wird, um Deine Anwendung zu starten.
@@ -39,23 +41,18 @@ Um Deine Anwendung bereitzustellen, rufe den `POST /v2/projects/{projectID}/appi
 
 Die vollständige HTTP-Anfrage sollte wie folgt aussehen:
 
-```http request
-POST /v2/project/{projectID}/appinstallations HTTP/1.1
-Content-Type: application/json
-
-{
+<OperationExample operation="app-request-appinstallation" example={{
   "appVersionId": "97fb8684-3fe3-4720-86fb-fb0524ae88d1",
-  "description": "Deine Node.js-Anwendung",
+  "description": "Your Node.js app",
   "updatePolicy": "none",
   "userInputs": [{
     "name": "entrypoint",
     "value": "yarn start"
   }]
-}
-```
+}} />
 
-<OperationHint tag="App" operation="app-request-appinstallation" />
+<OperationHint operation="app-request-appinstallation" />
 
 Die Antwort enthält die Installations-ID, die Du anschließend verwenden kannst, um auf Deine Anwendung zuzugreifen.
 
-Um den Installationsstatus zu überwachen, rufe den `/v2/appinstallations/{installationID}`-Endpunkt auf. Beachte das Feld `installationPath`, das das Verzeichnis in Deinem Projekt-Dateisystem enthält, in das Du Deine Anwendung bereitstellen solltest.
+Um den Installationsstatus zu überwachen, rufe den <OperationLink operation="app-get-appinstallation" />-Endpunkt auf. Beachte das Feld `installationPath`, das das Verzeichnis in Deinem Projekt-Dateisystem enthält, in das Du Deine Anwendung bereitstellen solltest.

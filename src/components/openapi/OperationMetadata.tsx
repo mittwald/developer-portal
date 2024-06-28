@@ -17,6 +17,7 @@ import InlineAlert from "@mittwald/flow-react-components/InlineAlert";
 import styles from "./OperationMetadata.module.css";
 import Translate from "@docusaurus/Translate";
 import Admonition from "@theme/Admonition";
+import isDeprecated from "@site/src/openapi/isDeprecated";
 
 function OperationIdHelp() {
   return (
@@ -52,22 +53,16 @@ function DeprecationNotice() {
   );
 }
 
-function isDeprecated(spec: OpenAPIV3.OperationObject): boolean {
-  return (
-    spec.deprecated ||
-    spec.operationId.startsWith("deprecated-") ||
-    spec.operationId.endsWith("-deprecated")
-  );
-}
-
 export function OperationMetadata({
   method,
   path,
   spec,
+  withDescription = true,
 }: {
   path: string;
   method: string;
   spec: OpenAPIV3.OperationObject;
+  withDescription?: boolean;
 }) {
   return (
     <>
@@ -90,16 +85,18 @@ export function OperationMetadata({
         </LabeledValue>
         <LabeledValue className={styles.operationIdValue}>
           <Label className={styles.labelWithHelp}>
-            <OperationIdHelp /> Operation ID
+            Operation ID <OperationIdHelp />
           </Label>
           <Content>
             <div>{spec.operationId}</div>
-            <CopyButton text={spec.operationId} size="s" />
+            <CopyButton text={spec.operationId} size="s" variant="plain" />
           </Content>
         </LabeledValue>
       </ColumnLayout>
       <hr />
-      {spec.description ? <Markdown>{spec.description}</Markdown> : null}
+      {spec.description && withDescription ? (
+        <Markdown>{spec.description}</Markdown>
+      ) : null}
     </>
   );
 }

@@ -3,6 +3,7 @@ import TabItem from "@theme/TabItem";
 import SchemaExample from "@site/src/components/openapi/SchemaExample";
 import Tabs from "@theme/Tabs";
 import { APIVersion, specs } from "@site/src/openapi/specs";
+import SchemaWithExample from "@site/src/components/openapi/SchemaWithExample";
 
 interface Props {
   apiVersion: APIVersion;
@@ -17,7 +18,11 @@ interface Props {
  * @param path The path to the schema in the OpenAPI spec
  * @param withExample Whether to render an example of the schema
  */
-function SchemaFromSpec({ apiVersion, path, withExample }: Props) {
+export default function SchemaFromSpec({
+  apiVersion,
+  path,
+  withExample,
+}: Props) {
   const spec = specs[apiVersion];
 
   let refPath = path.split("/");
@@ -33,19 +38,8 @@ function SchemaFromSpec({ apiVersion, path, withExample }: Props) {
   }
 
   if (withExample) {
-    return (
-      <Tabs groupId="component" defaultValue="schema">
-        <TabItem value="schema" label="Schema">
-          <Schema schema={current} />
-        </TabItem>
-        <TabItem value="example" label="Example">
-          <SchemaExample schema={current} />
-        </TabItem>
-      </Tabs>
-    );
+    return <SchemaWithExample schema={current} />;
   }
 
   return <Schema schema={current} />;
 }
-
-export default SchemaFromSpec;

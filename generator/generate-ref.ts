@@ -4,6 +4,7 @@ import $RefParser from "@apidevtools/json-schema-ref-parser";
 import { OpenAPIV3 } from "openapi-types";
 import * as url from "url";
 import * as yaml from "yaml";
+import compareOperation from "@site/src/openapi/compareOperation";
 
 type APIVersion = `v${number}`
 
@@ -15,8 +16,8 @@ async function loadSpec(apiVersion: APIVersion): Promise<OpenAPIV3.Document> {
 async function dereferenceSpec(spec: OpenAPIV3.Document): Promise<OpenAPIV3.Document> {
   return await $RefParser.dereference(spec, {
     dereference: {
-      circular: "ignore",
-    },
+      circular: "ignore"
+    }
   });
 }
 
@@ -32,22 +33,67 @@ function determineServerURLAndBasePath(apiVersion: APIVersion, spec: OpenAPIV3.D
   return [serverURL, basePath];
 }
 
-function renderAPISpecToFile(operationFile: string, frontMatterYAML: any, urlPathWithBase: string, method: string, serializedSpec: string, serverURL: string, apiVersion: APIVersion) {
+function loadDescriptionOverride(apiVersion: APIVersion, operationId: string): string | undefined {
+  const descriptionOverridePath = path.join("generator", "overlays", apiVersion, operationId, "description.md");
+  if (fs.existsSync(descriptionOverridePath)) {
+    return fs.readFileSync(descriptionOverridePath, { encoding: "utf-8" });
+  }
+  return undefined;
+}
+
+function loadCodeExample(apiVersion: APIVersion, operationId: string, language: string): string | undefined {
+  const codeExamplePath = path.join("generator", "overlays", apiVersion, operationId, `example-${language}.md`);
+  if (fs.existsSync(codeExamplePath)) {
+    return fs.readFileSync(codeExamplePath, { encoding: "utf-8" });
+  }
+  return undefined;
+}
+
+function renderAPISpecToFile(
+  operationFile: string,
+  urlPathWithBase: string,
+  method: string,
+  spec: OpenAPIV3.OperationObject,
+  serverURL: string,
+  apiVersion: APIVersion,
+) {
   const withSDKExamples = apiVersion !== "v1";
+  const serializedSpec = JSON.stringify(spec);
+  const summary: string = stripTrailingDot(spec.summary);
+
+  const frontMatter = yaml.stringify({
+    title: summary ?? spec.operationId,
+    description: spec.description ?? "",
+    openapi: {
+      method
+    }
+  });
+
+  const descriptionOverride = loadDescriptionOverride(apiVersion, spec.operationId);
+  const exampleOverrides = [
+    ["curl", "cURL", loadCodeExample(apiVersion, spec.operationId, "curl")],
+    ["javascript", "JavaScript SDK", loadCodeExample(apiVersion, spec.operationId, "javascript")],
+    ["php", "PHP SDK", loadCodeExample(apiVersion, spec.operationId, "php")],
+    ["cli", "mw CLI", loadCodeExample(apiVersion, spec.operationId, "cli")],
+  ].filter(([,, i]) => i !== undefined).map(([key, label, content]) => `<TabItem key="${key}" value="${key}" label="${label}">\n\n${content}\n\n</TabItem>`);
 
   // Yes, this is JavaScript that renders more JavaScript (or mdx, to be precise).
   // Yes, this is a bit weird and opens up a whole can of worms. Oh, well.
 
   // language=text
   fs.writeFileSync(operationFile, `---
-${frontMatterYAML}
+${frontMatter}
 ---
 
 import {OperationRequest, OperationResponses} from "@site/src/components/openapi/OperationReference";
 import {OperationMetadata} from "@site/src/components/openapi/OperationMetadata";
 import {OperationUsage} from "@site/src/components/openapi/OperationUsage";
+import OperationLink from "@site/src/components/OperationLink";
+import TabItem from "@theme/TabItem";
 
-<OperationMetadata path="${urlPathWithBase}" method="${method}" spec={${serializedSpec}} />
+<OperationMetadata path="${urlPathWithBase}" method="${method}" spec={${serializedSpec}} withDescription={${descriptionOverride === undefined}} />
+
+${descriptionOverride ?? ""}
 
 ## Request
 
@@ -59,7 +105,9 @@ import {OperationUsage} from "@site/src/components/openapi/OperationUsage";
 
 ## Usage examples
 
-<OperationUsage method="${method}" url="${urlPathWithBase}" spec={${serializedSpec}} baseURL="${serverURL}" withJavascript={${withSDKExamples}} withPHP={${withSDKExamples}} />
+<OperationUsage method="${method}" url="${urlPathWithBase}" spec={${serializedSpec}} baseURL="${serverURL}" withJavascript={${withSDKExamples}} withPHP={${withSDKExamples}}>
+${exampleOverrides.join("\n\n")}
+</OperationUsage>
 
 `);
 }
@@ -72,11 +120,43 @@ function slugFromTagName(tagName: string): string {
   return tagName.replace(/ /g, "").toLowerCase().replace(/[^a-z0-9]/, "");
 }
 
-function stripTrailingDot(str: string|undefined): string|undefined {
+function stripTrailingDot(str: string | undefined): string | undefined {
   return str?.replace(/\.$/, "");
 }
 
-async function renderAPIDocs (apiVersion: APIVersion, outputPath: string){
+async function renderTagIndexPage(apiVersion: APIVersion, name: string, description: string, outputPath: string, sidebarItems: any[]): Promise<void> {
+  const indexFile = path.join(outputPath, "index.mdx");
+
+  const overrideFile = path.join("generator", "overlays", apiVersion, slugFromTagName(name) + ".mdx");
+  if (fs.existsSync(overrideFile)) {
+    fs.copyFileSync(overrideFile, indexFile);
+    return;
+  }
+
+  const frontMatter = yaml.stringify({
+    title: name,
+    description,
+    displayed_sidebar: "apiSidebar",
+  });
+
+  // language=text
+  const content = `---
+${frontMatter}
+---
+
+import OperationDocCardList from "@site/src/components/openapi/OperationDocCardList";
+
+# ${name}
+
+${description}
+
+<OperationDocCardList apiVersion="${apiVersion}" tag="${name}" />
+`;
+
+  fs.writeFileSync(indexFile, content, { encoding: "utf-8" });
+}
+
+async function renderAPIDocs(apiVersion: APIVersion, outputPath: string) {
   const sidebar = [];
   const originalSpec = await loadSpec(apiVersion);
   const spec = await dereferenceSpec(originalSpec);
@@ -84,12 +164,15 @@ async function renderAPIDocs (apiVersion: APIVersion, outputPath: string){
 
   exportSpecToSource(originalSpec, apiVersion);
 
-  for (const {name, description} of spec.tags) {
+  const tags = (spec.tags ?? []).sort((a, b) => a.name.localeCompare(b.name));
+
+  for (const { name, description } of tags) {
     const slug = slugFromTagName(name);
     const operationsDir = path.join(outputPath, slug);
-    const sidebarItems = [];
 
-    fs.mkdirSync(operationsDir, {recursive: true});
+    let sidebarItems = [];
+
+    fs.mkdirSync(operationsDir, { recursive: true });
 
     for (const urlPath of Object.keys(spec.paths)) {
       const operations = spec.paths[urlPath];
@@ -111,32 +194,32 @@ async function renderAPIDocs (apiVersion: APIVersion, outputPath: string){
             "type": "doc",
             "id": `reference/${slug}/${operation.operationId}`,
             "className": classNames.join(" "),
-          })
+            "customProps": {
+              method,
+              path: urlPath,
+              deprecated: operation.deprecated,
+              summary,
+            }
+          });
 
-          const frontMatter = {
-            title: summary ?? operation.operationId,
-            description: operation.description ?? "",
-          }
-
-          const frontMatterYAML = yaml.stringify(frontMatter);
-
-          renderAPISpecToFile(operationFile, frontMatterYAML, urlPathWithBase, method, serializedSpec, serverURL, apiVersion);
+          renderAPISpecToFile(operationFile, urlPathWithBase, method, operation, serverURL, apiVersion);
         }
       }
     }
 
+    sidebarItems = sidebarItems.sort((a, b) => compareOperation(a.customProps, b.customProps));
+
+    await renderTagIndexPage(apiVersion, name, description, operationsDir, sidebarItems);
+
     sidebar.push({
-      "type": "category",
-      "label": name,
-      "link": {
-        "type": "generated-index",
-        "title": name,
-        "description": description,
-        "slug": `/reference/${slug}`,
-        "keywords": ["api-reference"],
+      type: "category",
+      label: name,
+      link: {
+        type: "doc",
+        id: `reference/${slug}/index`,
       },
-      "items": sidebarItems
-    })
+      items: sidebarItems
+    });
   }
 
   if (apiVersion === "v2") {
@@ -162,7 +245,7 @@ async function renderAPIDocs (apiVersion: APIVersion, outputPath: string){
           "items": sidebar
         }
       ]
-    }
+    };
     fs.writeFileSync(path.join("versioned_sidebars", `version-${apiVersion}-sidebars.json`), JSON.stringify(completeSidebar, null, 2));
   }
 }
