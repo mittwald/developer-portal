@@ -3,4 +3,79 @@ title: Scopes
 sidebar_position: 3
 ---
 
-TODO
+Scopes sind ein Konzept, um die Zugriffsrechte auf die mStudio Public API zu gruppieren und einzuschränken.
+Ein Scope ist ein Satz an Berechtigungen, der es einem Benutzer oder einer Anwendung erlaubt, auf bestimmte Operationen von Ressourcen zuzugreifen.
+
+Scopes wirken sich immer einschränkend auf die Zugriffsrechte aus.
+Das bedeutet, dass ein Scope nie mehr Rechte einräumen kann,
+als ohne Scope bereits vorhanden sind.
+Ein Scope kann jedoch Rechte entziehen, die ohne durch Scopes eingeschränkt zu sein, vorhanden wären.
+
+## Scopes in der mStudio Public API
+
+Die Scopes in der mStudio API sind in der Regel nach den fachlichen Domänen benannt, auf die sie sich beziehen.
+So gibt es beispielsweise die fachlichen Domänen `project`, `app` oder `database`, für die jeweils Scopes existieren.
+Für die fachlichen Domänen sind die Scopes jeweils aufgeteilt in lesenden, schreibenden und löschenden Zugriff.
+Für die `project`-Domäne gibt es demzufolge die Scopes `project:read`, `project:write` und `project:delete`.
+
+## Ermittlung von benötigten Scopes
+
+Die benötigten Scopes für eine bestimmte Operation können in der Regel aus der [API Referenz](../../../../reference) der mStudio Public API entnommen werden.
+Auf oberster Ebene sind alle fachlichen Domänen in Form von OpenAPI Tags definiert.
+Innerhalb der Tags sind die einzelnen Operationen beschrieben.
+Für die jeweilige Operation ergibt sich in der Regel also der benötigte Scope aus dem Tag und der Methode der Operation.
+
+Die fachliche Domäne ist ebenfalls aus der Operation ID ersichtlich, da sie durch die fachliche Domäne gepräfixt ist.
+Auf jeder Detailansicht einer Operation, die in der API Referenz beschrieben ist, wird die ID dieser Operation angezeigt.
+
+In einzelnen Fällen kann es vorkommen, dass eine Operation technisch bedingt mehrere Scopes benötigt
+oder der Scope nicht direkt aus der Operation abgeleitet werden kann.
+In diesen Fällen die benötigten Scopes explizit in der Beschreibung der Operation angegeben.
+
+### Verfügbarkeit von Scopes
+
+Derzeit sind noch nicht alle Scopes für die mStudio API implementiert.
+Die derzeit verfügbaren Scopes sind:
+
+- Customer
+
+  - `customer:read`
+  - `customer:write`
+  - `customer:delete`
+
+- Contract
+  - `contract:read`
+  - `contract:write`
+  - `contract:delete`
+- Project
+  - `project:read`
+  - `project:write`
+  - `project:delete`
+- Domain
+  - `domain:read`
+  - `domain:write`
+  - `domain:delete`
+- Mail
+  - `mail:read`
+  - `mail:write`
+  - `mail:delete`
+- User
+  - `user:read`
+  - `user:write`
+  - `user:delete`
+
+mittwald arbeitet daran, weitere Scopes zu implementieren und die Verfügbarkeit der Scopes zu erweitern.
+Wenn ein Scope benötigt wird, der nicht in dieser Liste aufgeführt ist, kann dieser [bei mittwald angefragt werden](../../../how-to/support/).
+Es wird sich darum bemüht, den Scope zeitnah zur Verfügung zu stellen.
+
+### Beispiel
+
+Die [Get a Project](../../../../reference/project/project-get-project/)
+Operation hat die ID `project-get-project` und den OpenAPI Tag `Project`.
+Außerdem hat die Operation die HTTP-Methode `GET`.
+Daraus ergibt sich, dass für diese Operation der Scope `project:read` benötigt wird.
+
+### Ausblick
+
+In Zukunft ist es geplant, direkt aus der API Referenz die benötigten Scopes für eine Operation ermitteln zu können oder ggf. zu dokumentieren,
+dass eine bestimmte Operation nicht für die Nutzung durch OAuth2 oder Extensions vorgesehen ist.
