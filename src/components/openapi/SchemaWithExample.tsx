@@ -1,14 +1,14 @@
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import Schema from "@site/src/components/openapi/Schema";
-import SchemaExample from "@site/src/components/openapi/SchemaExample";
+import SchemaExample, { ExampleFormat } from "@site/src/components/openapi/SchemaExample";
 import { OpenAPIV3 } from "openapi-types";
 import { translate } from "@docusaurus/Translate";
 import CodeBlock from "@theme/CodeBlock";
 
 interface Props {
   schema: OpenAPIV3.SchemaObject;
-  format?: "json" | "yaml";
+  format?: ExampleFormat;
   withRawJSONSchema?: boolean;
 }
 

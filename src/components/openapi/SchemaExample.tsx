@@ -6,8 +6,10 @@ import * as yaml from "yaml";
 interface Props {
   title?: string;
   schema: OpenAPIV3.SchemaObject;
-  format?: "json" | "yaml";
+  format?: ExampleFormat;
 }
+
+export type ExampleFormat = "json" | "yaml";
 
 /**
  * This component renders an example of a given schema.
