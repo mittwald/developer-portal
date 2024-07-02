@@ -8,6 +8,7 @@ import CodeBlock from "@theme/CodeBlock";
 
 interface Props {
   schema: OpenAPIV3.SchemaObject;
+  format?: "json" | "yaml";
   withRawJSONSchema?: boolean;
 }
 
@@ -16,17 +17,18 @@ interface Props {
  *
  * @param schema The schema to render and to generate an example for
  * @param withRawJSONSchema Whether to show the raw JSON schema in a tab
+ * @param format Optional format for the example (json or yaml)
  * @see Schema
  * @see SchemaExample
  */
-export default function SchemaWithExample({ schema, withRawJSONSchema }: Props) {
+export default function SchemaWithExample({ schema, withRawJSONSchema, format }: Props) {
   return (
     <Tabs groupId="component" defaultValue="schema">
       <TabItem value="schema" label={translate({id: "components.SchemaWithExample.schema"})}>
         <Schema schema={schema} />
       </TabItem>
       <TabItem value="example" label={translate({id: "components.SchemaWithExample.example"})}>
-        <SchemaExample schema={schema} />
+        <SchemaExample schema={schema} format={format} />
       </TabItem>
       {withRawJSONSchema && <TabItem value="raw" label={translate({id: "components.SchemaWithExample.raw"})}>
         <CodeBlock language="yaml">{JSON.stringify(schema, null, 2)}</CodeBlock>
