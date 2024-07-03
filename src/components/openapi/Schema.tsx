@@ -92,4 +92,6 @@ export default function Schema({ schema }: Props) {
   if (schema.type === "array") {
     return <ArraySchema schema={schema} />;
   }
+
+  return <PropertyValue name="*" schema={schema} required={false} />;
 }
