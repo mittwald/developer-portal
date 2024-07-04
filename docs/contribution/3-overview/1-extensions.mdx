@@ -1,0 +1,93 @@
+---
+title: Extensions
+---
+
+## Was ist eine Extension?
+
+Aus fachlicher Sicht ist eine Extension eine Erweiterung des mStudio, die es ermöglicht,
+zusätzliche Funktionalitäten für das mStudio bereitzustellen.
+Sie wird dem mStudio bekannt gemacht und kann von potenziellen Nutzern zu einem [Extension Context](../../glossary#extension-context) hinzugefügt werden.
+Beim Hinzufügen einer Extension zu einem Extension Context wird eine [Extension Instance](../../glossary#extension-instance) erstellt.
+Die Extension ist also die Beschreibung einer Erweiterung, die zu einem Extension Context hinzugefügt werden kann.
+Die Extension Instance ist die konkrete Ausprägung einer Extension in einem Extension Context.
+
+Aus technischer Sicht ist eine Extension eine außerhalb des mStudio betriebene Applikation,
+die über REST-APIs mit dem mStudio integriert wird.
+Eine Extension muss ein öffentlich erreichbares Backend bereitstellen und kann optional ein Frontend bereitstellen,
+wenn es für die Nutzung der Extension sinnvoll ist.
+Das Backend einer Extension verarbeitet [Lifecycle Webhooks](../concepts/lifecycle-webhooks),
+über die das mStudio die Extension über den Zustand ihrer Extension Instances informiert.
+Außerdem bieten Extensions verschiedene [Authentifizierungs- und Authorisierungsstrategien](../concepts/authentication),
+um authentifizierte [Domain Actions](../../glossary#domain-action) im mStudio durchführen zu können.
+Dies kann entweder im Namen des mStudio Users, der die Extension bedient oder im Namen der Extension selbst geschehen.
+
+## Aus welchen Informationen besteht eine Extension?
+
+Eine Extension besteht aus verschiedenen Informationen, die ebenfalls in der [Extension Referenz](../../reference/extensions) beschrieben sind.
+Die einzelnen Attribute werden im folgenden Abschnitt genauer erläutert.
+
+### Name und Beschreibung
+
+TODO
+
+### State
+
+TODO
+
+### Tags
+
+TODO
+
+### Support
+
+TODO
+
+### Scopes
+
+TODO
+
+### Extension Context
+
+TODO
+
+### Lifecycle Webhook Endpoints
+
+Eine Extension muss definieren, an welche URLs Lifecycle-Webhooks gesendet werden sollen. Über diese Webhooks wird der Extension mitgeteilt, welche Extension Instances existieren und in welchem Zustand sie sich befinden.
+Für jeden Lifecycle kann ein eigener Webhook-Endpoint konfiguriert werden. Für weitere Informationen zu Lifecycle-Webhooks siehe [Lifecycle Webhooks Konzept](../concepts/lifecycle-webhooks)
+
+In den URLs, an die Lifecycle-Webhooks gesendet werden, können optional verschiedene Platzhalter verwendet werden.
+Für weitere Informationen zum Templating siehe [Templating von Konfigurationswerten](../concepts/templating).
+Für eine Übersicht, welche Platzhalter für Lifecycle-Webhooks verwendet werden können, siehe [Lifecycle Webhooks Referenz](../../reference/webhooks)
+
+### External Frontend
+
+Eine Extension kann optional ein externes Frontend angeben, das dazu dient, einen Einstiegspunkt aus dem mStudio heraus in die Extension zu bieten.
+Das externe Frontend wird als URL angegeben und kann getemplated werden.
+Siehe dazu auch [Templating von Konfigurationswerten](../concepts/templating)
+
+Für das interne Routing sinnvolle Platzhalter sind:
+
+- `apiVersion` - API-Version des External Frontend URL Templates. Zu Beginn immer `v1`. Siehe auch [Versionierung von APIs](../concepts/api-versioning)
+- `contributorId` - Die ID des Contributors im UUID-Format
+- `extensionId` - Die ID der Extension im UUID-Format
+- `extensionInstanceId` - Die ID der Extension Instance im UUID-Format
+
+Um das Single Sign On-Feature mittels ATReK zu nutzen, müssen folgende Platzhalter in der URL definiert werden:
+
+- `accessTokenRetrievalKey`
+- `userId`
+
+## Versionierung von Extensions
+
+Das mStudio sieht kein Konzept für die Versionierung von Extensions vor.
+Extensions sind eigenständige Applikationen, die zur Laufzeit in der Verantwortung des Contributors liegen
+und nur per API mit dem mStudio integriert sind.
+Deshalb kann mittwald keinen verlässlichen Einfluss auf die Versionierung und Stabilität von Versionen der Extensions nehmen.
+
+Falls eine Extension den Anwendungsfall hat, Funktionalität in verschiedenen Versionen bereitzustellen,
+erfolgt die Versionierung von Extensions unabhängig vom mStudio in Eigenimplementierung.
+Der Contributor ist für die Versionierung der Extension verantwortlich und kann dabei eigene Regeln und Konventionen festlegen.
+
+Falls die Extension selbst eine API bereitstellt, die von externen Applikationen genutzt wird,
+wird empfohlen auf Versionierung und Stabilität dieser API zu achten.
+Hierbei können gängige Konventionen und Best Practices für API-Versionierung angewendet werden.

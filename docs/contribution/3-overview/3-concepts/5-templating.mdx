@@ -1,0 +1,17 @@
+---
+title: Templating von Konfigurationswerten
+---
+
+An verschiedenen Stellen kann statt einem statischen Wert auch ein Template, also ein Wert mit Platzhaltern verwendet werden.
+Dazu wird an entsprechender Stelle in der Dokumentation festgehalten, welche Parameter verwendet werden können.
+An sämtlichen Stellen, an denen Templating verwendet werden kann, wird dies explizit erwähnt.
+
+Wenn für einen Konfigurationswert ein Template verwendet werden soll, werden die Platzhalter stets in der Form `:parameterName` angegeben.
+
+Für eine URL würde ein Template also wie folgt aussehen:
+
+`https://example.com/sso/:apiVersion/extensions/:extensionId?userId=:userId&accessTokenRetrievalKey=:accessTokenRetrievalKey`
+
+Wobei in diesem Beispiel `:apiVersion`, `:extensionId`, `:userId` und `:accessTokenRetrievalKey` die Platzhalter sind und automatisch durch die entsprechenden Werte ersetzt werden.
+
+Unbekannte Parameter werden von der Template-Engine ignoriert und nicht ersetzt.

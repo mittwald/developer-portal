@@ -7,7 +7,7 @@ import styles from "./index.module.css";
 import Translate, { translate } from "@docusaurus/Translate";
 import APIFeature from "@site/src/components/HomepageFeatures/APIFeature";
 import PlatformFeature from "@site/src/components/HomepageFeatures/PlatformFeature";
-import ContributingFeature from "@site/src/components/HomepageFeatures/ContributingFeature";
+import ContributionFeature from "@site/src/components/HomepageFeatures/ContributionFeature";
 
 function HomepageHeader() {
   return (
@@ -43,7 +43,7 @@ export default function Home() {
         <main className={"index"}>
           <PlatformFeature />
           <APIFeature />
-          <ContributingFeature />
+          <ContributionFeature />
         </main>
       </div>
     </Layout>

@@ -132,9 +132,9 @@ const config: Config = {
         },
         {
           type: "doc",
-          docId: "contributing/index",
+          docId: "contribution/index",
           position: "left",
-          label: "Contributing",
+          label: "Contribution",
         },
         {
           type: "doc",
