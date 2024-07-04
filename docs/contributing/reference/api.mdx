@@ -16,11 +16,56 @@ derzeit nur über ein externes **Backend** möglich ist.
 
 ## Authentifizierung mittels Extension Instance Secret
 
-TODO
+Jede Extension erhält über Lifecycle Webhooks ein Secret, das für die Authentifizierung gegenüber der mStudio API verwendet werden kann.
+Initial wird das Secret über den `ExtensionAddedToContext`-Webhook übermittelt.
+Das mStudio rotiert automatisiert regelmäßig das Secret.
+über den `ExtensionInstanceSecretRotated`-Webhook wird das neue Secret dann übermittelt.
+Das alte Secret ist in diesem Moment invalidiert.
+
+Für weitere Informationen über die Webhooks siehe [Lifecycle Webhooks](../webhooks).
+
+Das Secret kann aus der `secret` Property des Webhook Request Bodies entnommen werden.
+Dieses kann dann in Kombination mit der Extension Instance ID, die unter der Property `id` zu finden ist, verwendet werden, um ein Access Token zu beziehen.
+Dafür muss die [extension-authenticate-instance](../../../reference/marketplace/extension-authenticate-instance/)-Operation verwendet werden.
+Die `extensionInstanceId` wird als Pfad-Parameter übergeben und das Secret im Request Body als `extensionInstanceSecret`-Property.
+
+Als Response wird der `publicToken`, der für die Authentifizierung gegenüber der mStudio API verwendet werden kann, zurückgegeben.
+Außerdem wird eine `expiry` Property zurückgegeben, die den Zeitpunkt angibt, an dem das Token abläuft.
+Ein Extension Access Token ist kurzlebig und kann nicht verlängert werden.
+Wenn das Token abgelaufen ist, muss ein neues Token bezogen werden.
+Außderm werden alle Access Tokens automatisch invalidiert, wenn eine Extension von einem Context entfernt wird
+oder eine Extension Instance deaktiviert wird.
 
 ## OAuth2
 
-TODO
+Das mStudio implementiert konform zu [RFC 6749](https://tools.ietf.org/html/rfc6749) OAuth2 als Authentifizierungsmechanismus für die öffentliche API.
+Unterstützt wird derzeit nur der Authorization Code Flow (mit PKCE).
+
+Die benötigten API-Endpunkte für den OAuth2 Flow sind:
+
+- [user-oauth-get-authorization](../../../reference/user/user-oauth-get-authorization)
+- [user-oauth-retrieve-access-token](../../../reference/user/user-oauth-retrieve-access-token)
+
+Für die Implementierung des OAuth2 Clients empfiehlt mittwald die Verwendung einer OAuth2 Client Library,
+die mit [RFC 6749](https://tools.ietf.org/html/rfc6749) konform ist.
+
+Im Folgenden ist der Ablauf des Authorization Code Flows grob skizziert:
+
+```mermaid
+sequenceDiagram
+
+Client->>mStudio API: GET /oauth2/authorize
+mStudio API-->>mStudio Frontend: Redirect zu Login
+mStudio Frontend->>mStudio API: POST /authenticate
+mStudio API-->>mStudio Frontend: Resource Owner Access Token
+mStudio Frontend->>mStudio API: GET /oauth2/authorize
+mStudio API-->>mStudio Frontend: Redirect zu Consent
+mStudio Frontend->>mStudio API: Consent
+mStudio API-->>Client: Redirect zu Client mit Authorization Code
+Client->>mStudio API: POST /oauth2/token
+mStudio API-->>Client: OAuth2 Access Token
+
+```
 
 ## Verwendung eines Access Token Retrieval Keys
 
@@ -61,4 +106,13 @@ sequenceDiagram
 
 ## Abruf von Webhook Signatur Public Keys
 
-TODO
+Zur [Prüfung der Signatur eines Lifecycle Webhooks](../webhooks#validierung-von-lifecycle-webhooks) muss der öffentliche Schlüssel des mStudio bekannt sein.
+Dieser kann über die [extension-get-public-key](../../../reference/marketplace/extension-get-public-key) Route abgerufen werden.
+Dazu muss der Identifier des Public Keys, der sich hinter dem `X-Marketplace-Signature-Serial`-Header verbirgt als Pfad-Parameter übergeben werden.
+Der Public Key wird base64 kodiert im Response Body zurückgegeben.
+
+Für eine bestimmte Signature-Serial wird ein stabiler Public Key garantiert.
+Das bedeutet, dass der Public Key gecacht oder persistiert werden kann.
+Erst wenn sich die Signature-Serial ändert, muss der neue Public Key abgerufen werden.
+Dies wird nicht im Voraus angekündigt.
+Es sollte also bei jedem Lifecycle-Webhook die Signature-Serial geprüft und ggf. automatisiert der neue Public Key abgerufen werden.
