@@ -34,7 +34,7 @@ function generateCurlCodeExample(
   const completeURL = new URL(url, baseURL);
   completeURL.search = queryParamsSet.toString();
 
-  const params = ["--fail"];
+  const params = ["--fail", "--location"];
 
   if (method !== "get") {
     params.push("-X " + method.toUpperCase());
