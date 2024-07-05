@@ -16,34 +16,35 @@ Im Rahmen dieses Prozesses werden die Extension Instance ID und das Extension In
 Das Extension Instance Secret kann jedoch erst verwendet werden, nachdem der entsprechende Webhook erfolgreich verarbeitet wurde.
 Aufgrund der asynchronen Verarbeitung kann auch nach erfolgreicher Verarbeitung noch ein zeitlicher Abstand bestehen, bis das Secret tatsächlich genutzt werden kann.
 
-Daher wird empfohlen, die Verarbeitung und die Verwendung des Secrets voneinander zu entkoppeln, um sicherzustellen, dass die Anwendung korrekt funktioniert und keine unnötigen Wartezeiten entstehen.
+Daher wird empfohlen, die Verarbeitung und die Verwendung des Secrets voneinander zu entkoppeln und damit zu rechnen,
+dass Versuche, das Secret zu verwenden, fehlschlagen können.
 
 Für weitere Informationen dazu, wie das Extension Instance Secret verwendet werden kann, siehe [Authentifizierung](../authentication#extension-instance-secret).
 
-
 ### ExtensionInstanceUpdated
 
-In diesem Event wird der externen Anwendung eine Zustandsänderung der `Extension Instance` mitgeteilt. Der externen Anwendung wird dabei immer der gesamte neue Zustand mitgeteilt.
+In diesem Event wird der externen Anwendung eine Zustandsänderung der `Extension Instance` mitgeteilt.
+Der externen Anwendung wird dabei immer der gesamte neue Zustand mitgeteilt.
 
 Das kann beispielsweise die De-/Aktivierung der `Extension Instance` sein.
 
 ### ExtensionInstanceSecretRotated
 
-Aus Sicherheitsaspekten werden wir regelmäßig das Extension Instance Secret rotieren.
+Aus Sicherheitsgründen wird das Extension Instance Secret regelmäßig rotiert.
 Das neue Secret wird über diesen Webhook mitgeteilt.
 Das vorherige Secret ist ab diesem Zeitpunkt nicht mehr gültig.
-Siehe dazu auch [ExtensionAddedToContext](#extensionaddedtocontext).
+Analog zum [ExtensionAddedToContext](#extensionaddedtocontext)-Webhook kann auch hier ein zeitlicher Abstand zwischen dem Webhook und der tatsächlichen Nutzbarkeit des Secrets bestehen.
 
 ### ExtensionInstanceRemovedFromContext
 
-Eine `Extension Instance` wurde aus einem Context entfernt.
+Dieser Webhook drückt aus, dass eine `Extension Instance` aus einem Context entfernt wurde.
+Datenschutzrelevante Konsequenzen, wie die Löschung von personenbezogenen Daten, sollten an dieser Stelle berücksichtigt werden.
 
-Datenschutzrelevante Konsequenzen sollten an dieser Stelle berücksichtigt werden.
 ## Webhook Validierung
 
-Um sicherzustellen, dass der Webhook von mittwald ausging, bieten wir die Möglichkeit, die Identität des Senders und den Inhalt des Request Bodys zu verifizieren.
-Dazu signieren wir den versendeten Request Body und schicken die Signatur inklusive der Meta-Informationen darüber in Request-Headern mit.
+Um sicherzustellen, dass der Webhook von mittwald ausging, wird die Möglichkeit geboten, die Identität des Senders und den Inhalt des Request Bodys zu verifizieren.
+Neben dem Request Body, der den Webhook Payload enthält, wird in Request Headern eine Signatur inklusive der Meta-Informationen über diese versendet.
 
 Dies ist aus Sicht des Contributors und der Extension wichtig, da somit sichergestellt werden kann, dass der Webhook-Call wirklich von mittwald stammt.
-Ohne eine funktionierende Webhook Validierung besteht das Risiko, dass ein potentieller Angreifer nur die URL kennen muss, um falsche Extension Instances vorzutäuschen oder bestehende zu korrumpieren.
+Ohne eine funktionierende Webhook Validierung besteht das Risiko, dass ein potenzieller Angreifer nur die URL kennen muss, um falsche Extension Instances vorzutäuschen oder bestehende zu korrumpieren.
 Für weitere Informationen dazu, wie Webhooks auf ihre Echtheit überprüft werden können, siehe [Validierung von Lifecycle Webhooks Referenz](../../../reference/webhooks#validierung-von-lifecycle-webhooks).
