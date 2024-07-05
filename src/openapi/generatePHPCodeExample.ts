@@ -76,11 +76,12 @@ function generatePHPCodeExample(
 
   let bodyConstructor = "";
   if (bodyClassName) {
-    bodyConstructor = `// TODO: Please consult the properties and constructor signature of\n// ${bodyClassName} to learn how to construct a valid instance\n$body = new ${bodyClassName}(/* TODO: ... */);\n`;
+    bodyConstructor = `\n// TODO: Please consult the properties and constructor signature of\n// ${bodyClassName} to learn how to construct a valid instance\n$body = new ${bodyClassName}(/* TODO: ... */);\n`;
   }
 
   return `${uses.map((use) => `use ${use};`).join("\n")}
-
+  
+$client = MittwaldAPIClient::newWithToken(getenv('MITTWALD_API_TOKEN'));
 ${bodyConstructor}
 $request = (new ${operationId}Request(${constructorParamsCode}))${constructorModifiersCode};
 $response = $client->${camelcase(tag)}()->${camelcase(operationId)}($request);
