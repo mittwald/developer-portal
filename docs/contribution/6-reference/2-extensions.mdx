@@ -48,6 +48,55 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
         example:
           "Eine Beispiel Extension, die zeigen soll, welche Informationen benötigt werden, um eine Extension einzureichen",
       },
+      detailedDescriptions: {
+        type: "object",
+        description: "Ausführliche Beschreibungen der Extension in unterschiedlichen Sprachen",
+        required: ["de"],
+        properties: {
+          de: {
+            type: "object",
+            description: "Ausführliche Beschreibung der Extension in Deutsch",
+            required: ["markdown"],
+            properties: {
+              markdown: {
+                type: "string",
+                description: "Ein Beschreibungstext mit Markdown-Formatierungen",
+                minLength: 1,
+                example: 
+                  "# Ein Beispiel\nDies ist eine Beispiel Extension-Beschreibung.\n## Weitere Informationen\nHier könnten **weitere** Informationen stehen.",
+              },
+              plain: {
+                type: "string",
+                description: "Ein Beschreibungstext ohne Formatierungen",
+                minLength: 1,
+                example:
+                  "Eine ausführliche Besipiel Extension-Beschreibung. Diese enthält keine Formatierungen."
+              },
+            }
+          },
+          en: {
+            type: "object",
+            description: "Ausführliche Beschreibung der Extension in Englisch",
+            required: ["markdown"],
+            properties: {
+              markdown: {
+                type: "string",
+                description: "Ein Beschreibungstext mit Markdown-Formatierungen",
+                minLength: 1,
+                example: 
+                  "# An example\nThis is an example extension description.\n## Further informations\nHere could be **further** informations.",
+              },
+              plain: {
+                type: "string",
+                description: "Ein Beschreibungstext ohne Formatierungen",
+                minLength: 1,
+                exmple:
+                  "A detailed example extension description. This does not contain any formatting."
+              },
+            }
+          }
+        }
+      },
       extensionContext: {
         type: "string",
         enum: ["project", "customer"],
