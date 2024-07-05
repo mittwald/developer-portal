@@ -17,9 +17,11 @@ function generateJavascriptCodeExample(
     Object.keys(spec.responses).find((status) => status.startsWith("2")) ??
     "200";
 
+  const tagPrefixRegex = new RegExp(`^${spec.tags[0]}-`, 'i');
+
   const requestObject: any = {};
   const tag = camelcase(tsTypeName(spec.tags[0]));
-  const operationId = camelcase(tsTypeName(spec.operationId));
+  const operationId = camelcase(tsTypeName(spec.operationId.replace(tagPrefixRegex, "")));
 
   for (const pathParam of pathParams) {
     requestObject[pathParam.name] = generateSchemaExample(
