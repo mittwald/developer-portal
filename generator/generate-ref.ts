@@ -5,6 +5,7 @@ import { OpenAPIV3 } from "openapi-types";
 import * as url from "url";
 import * as yaml from "yaml";
 import compareOperation from "@site/src/openapi/compareOperation";
+import OperationDocCardById from "@site/src/components/openapi/OperationDocCardById";
 
 type APIVersion = `v${number}`
 
@@ -33,10 +34,14 @@ function determineServerURLAndBasePath(apiVersion: APIVersion, spec: OpenAPIV3.D
   return [serverURL, basePath];
 }
 
-function loadDescriptionOverride(apiVersion: APIVersion, operationId: string): string | undefined {
-  const descriptionOverridePath = path.join("generator", "overlays", apiVersion, operationId, "description.md");
+function loadDescriptionOverride(apiVersion: APIVersion, operationId: string, part: "pre"|"post"): string | undefined {
+  const filename = part === "pre" ? "description.md" : "description-post.md";
+  const descriptionOverridePath = path.join("generator", "overlays", apiVersion, operationId, filename);
   if (fs.existsSync(descriptionOverridePath)) {
     return fs.readFileSync(descriptionOverridePath, { encoding: "utf-8" });
+  }
+  if (fs.existsSync(descriptionOverridePath + "x")) {
+    return fs.readFileSync(descriptionOverridePath + "x", { encoding: "utf-8" });
   }
   return undefined;
 }
@@ -69,7 +74,9 @@ function renderAPISpecToFile(
     }
   });
 
-  const descriptionOverride = loadDescriptionOverride(apiVersion, spec.operationId);
+  const descriptionOverridePre = loadDescriptionOverride(apiVersion, spec.operationId, "pre");
+  const descriptionOverridePost = loadDescriptionOverride(apiVersion, spec.operationId, "post");
+
   const exampleOverrides = [
     ["curl", "cURL", loadCodeExample(apiVersion, spec.operationId, "curl")],
     ["javascript", "JavaScript SDK", loadCodeExample(apiVersion, spec.operationId, "javascript")],
@@ -88,12 +95,15 @@ ${frontMatter}
 import {OperationRequest, OperationResponses} from "@site/src/components/openapi/OperationReference";
 import {OperationMetadata} from "@site/src/components/openapi/OperationMetadata";
 import {OperationUsage} from "@site/src/components/openapi/OperationUsage";
+import OperationDocCardById from "@site/src/components/openapi/OperationDocCardById";
 import OperationLink from "@site/src/components/OperationLink";
+import OperationHint from "@site/src/components/OperationHint";
+import OperationExample from "@site/src/components/OperationExample";
 import TabItem from "@theme/TabItem";
 
-<OperationMetadata path="${urlPathWithBase}" method="${method}" spec={${serializedSpec}} withDescription={${descriptionOverride === undefined}} />
+<OperationMetadata path="${urlPathWithBase}" method="${method}" spec={${serializedSpec}} withDescription={${descriptionOverridePre === undefined}} />
 
-${descriptionOverride ?? ""}
+${descriptionOverridePre ?? ""}
 
 ## Request
 
@@ -108,6 +118,8 @@ ${descriptionOverride ?? ""}
 <OperationUsage method="${method}" url="${urlPathWithBase}" spec={${serializedSpec}} baseURL="${serverURL}" withJavascript={${withSDKExamples}} withPHP={${withSDKExamples}}>
 ${exampleOverrides.join("\n\n")}
 </OperationUsage>
+
+${descriptionOverridePost ?? ""}
 
 `);
 }

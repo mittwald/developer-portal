@@ -10,10 +10,11 @@ interface Props {
   operation: string;
   example: any;
   headers?: Record<string, string>;
+  withoutLink?: boolean;
 }
 
 export default function OperationExample(p: Props) {
-  const { apiVersion = "v2" as APIVersion } = p;
+  const { apiVersion = "v2" as APIVersion, withoutLink = false } = p;
   const spec = useSpec(apiVersion);
   const operation = getOperationById(spec, p.operation);
   const headers = {
@@ -36,6 +37,6 @@ export default function OperationExample(p: Props) {
 
   return <>
     <CodeBlock language="yaml">{body}</CodeBlock>
-    <div className={clsx(styles.reference)}>{link}</div>
+    {withoutLink || <div className={clsx(styles.reference)}>{link}</div>}
   </>
 }
