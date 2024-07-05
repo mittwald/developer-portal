@@ -5,7 +5,7 @@ import { OpenAPIV3 } from "openapi-types";
 import * as url from "url";
 import * as yaml from "yaml";
 import compareOperation from "@site/src/openapi/compareOperation";
-import OperationDocCardById from "@site/src/components/openapi/OperationDocCardById";
+import * as ejs from "ejs";
 
 type APIVersion = `v${number}`
 
@@ -54,7 +54,50 @@ function loadCodeExample(apiVersion: APIVersion, operationId: string, language: 
   return undefined;
 }
 
-function renderAPISpecToFile(
+function substituteInTitle(title: string|undefined): string|undefined {
+  if (!title) {
+    return title;
+  }
+
+  const replacements: [RegExp, string][] = [
+    [/['`]([^`]+)['`]/g, "$1"],
+    [/AppInstallation(s)?/, "app installation$1"],
+    [/AppVersion(s)?/, "app version$1"],
+    [/App(s)?/, "app$1"],
+    [/DatabaseUser(s)?/, "database user$1"],
+    [/MySQL-?Database(s)?/i, "MySQL database$1"],
+    [/MySQLUser(s)?/i, "MySQL user$1"],
+    [/MySQLVersion(s)?/i, "MySQL version$1"],
+    [/RedisDatabase(s)?/i, "Redis database$1"],
+    [/RedisVersion(s)?/i, "Redis database$1"],
+    [/SystemSoftwareVersion(s)?/, "system software version$1"],
+    [/SystemSoftware(s)?/, "system software$1"],
+    [/ProjectBackupSchedule(s)?/, "project backup schedule$1"],
+    [/BackupSchedule(s)?/, "backup schedule$1"],
+    [/ProjectBackupExport(s)?/, "project backup export$1"],
+    [/ProjectBackup(s)?/, "project backup$1"],
+    [/CronjobExecution(s)?/, "cronjob execution$1"],
+    [/Cronjob(s)?/, "cronjob$1"],
+    [/CustomerInvite(s)?/, "customer invite$1"],
+    [/CustomerMembership(s)?/, "customer membership$1"],
+    [/DNSZone(s)?/, "DNS Zone$1"],
+    [/DeliveryBox(es)?/, "delivery box$1"],
+    [/MailAddress(es)?/, "mail address$1"],
+    [/Email-?Address(es)?/, "mail address$1"],
+    [/ExtensionInstance(s)?/, "extension instance$1"],
+    [/Contributor(s)?/, "contributor$1"],
+    [/SSHUser(s)?/, "SSH user$1"],
+    [/SFTPUser(s)?/, "SFTP user$1"],
+  ]
+
+  for (const [pattern, replacement] of replacements) {
+    title = title.replace(pattern, replacement);
+  }
+
+  return title;
+}
+
+async function renderAPISpecToFile(
   operationFile: string,
   urlPathWithBase: string,
   method: string,
@@ -63,16 +106,7 @@ function renderAPISpecToFile(
   apiVersion: APIVersion,
 ) {
   const withSDKExamples = apiVersion !== "v1";
-  const serializedSpec = JSON.stringify(spec);
-  const summary: string = stripTrailingDot(spec.summary);
-
-  const frontMatter = yaml.stringify({
-    title: summary ?? spec.operationId,
-    description: spec.description ?? "",
-    openapi: {
-      method
-    }
-  });
+  const summary: string = substituteInTitle(stripTrailingDot(spec.summary));
 
   const descriptionOverridePre = loadDescriptionOverride(apiVersion, spec.operationId, "pre");
   const descriptionOverridePost = loadDescriptionOverride(apiVersion, spec.operationId, "post");
@@ -84,44 +118,20 @@ function renderAPISpecToFile(
     ["cli", "mw CLI", loadCodeExample(apiVersion, spec.operationId, "cli")],
   ].filter(([,, i]) => i !== undefined).map(([key, label, content]) => `<TabItem key="${key}" value="${key}" label="${label}">\n\n${content}\n\n</TabItem>`);
 
-  // Yes, this is JavaScript that renders more JavaScript (or mdx, to be precise).
-  // Yes, this is a bit weird and opens up a whole can of worms. Oh, well.
+  const rendered = await ejs.renderFile("generator/templates/operation.mdx.ejs", {
+    yaml,
+    summary,
+    descriptionOverridePre,
+    descriptionOverridePost,
+    urlPathWithBase,
+    method,
+    spec,
+    withSDKExamples,
+    exampleOverrides,
+    serverURL,
+  });
 
-  // language=text
-  fs.writeFileSync(operationFile, `---
-${frontMatter}
----
-
-import {OperationRequest, OperationResponses} from "@site/src/components/openapi/OperationReference";
-import {OperationMetadata} from "@site/src/components/openapi/OperationMetadata";
-import {OperationUsage} from "@site/src/components/openapi/OperationUsage";
-import OperationDocCardById from "@site/src/components/openapi/OperationDocCardById";
-import OperationLink from "@site/src/components/OperationLink";
-import OperationHint from "@site/src/components/OperationHint";
-import OperationExample from "@site/src/components/OperationExample";
-import TabItem from "@theme/TabItem";
-
-<OperationMetadata path="${urlPathWithBase}" method="${method}" spec={${serializedSpec}} withDescription={${descriptionOverridePre === undefined}} />
-
-${descriptionOverridePre ?? ""}
-
-## Request
-
-<OperationRequest spec={${serializedSpec}} />
-
-## Responses
-
-<OperationResponses spec={${serializedSpec}} />
-
-## Usage examples
-
-<OperationUsage method="${method}" url="${urlPathWithBase}" spec={${serializedSpec}} baseURL="${serverURL}" withJavascript={${withSDKExamples}} withPHP={${withSDKExamples}}>
-${exampleOverrides.join("\n\n")}
-</OperationUsage>
-
-${descriptionOverridePost ?? ""}
-
-`);
+  fs.writeFileSync(operationFile, rendered, { encoding: "utf-8" });
 }
 
 function exportSpecToSource(spec: OpenAPIV3.Document, apiVersion: APIVersion) {
@@ -145,25 +155,12 @@ async function renderTagIndexPage(apiVersion: APIVersion, name: string, descript
     return;
   }
 
-  const frontMatter = yaml.stringify({
-    title: name,
+  const content = await ejs.renderFile("generator/templates/index.mdx.ejs", {
+    yaml,
+    name,
     description,
-    displayed_sidebar: "apiSidebar",
+    apiVersion,
   });
-
-  // language=text
-  const content = `---
-${frontMatter}
----
-
-import OperationDocCardList from "@site/src/components/openapi/OperationDocCardList";
-
-# ${name}
-
-${description}
-
-<OperationDocCardList apiVersion="${apiVersion}" tag="${name}" />
-`;
 
   fs.writeFileSync(indexFile, content, { encoding: "utf-8" });
 }
@@ -214,7 +211,7 @@ async function renderAPIDocs(apiVersion: APIVersion, outputPath: string) {
             }
           });
 
-          renderAPISpecToFile(operationFile, urlPathWithBase, method, operation, serverURL, apiVersion);
+          await renderAPISpecToFile(operationFile, urlPathWithBase, method, operation, serverURL, apiVersion);
         }
       }
     }

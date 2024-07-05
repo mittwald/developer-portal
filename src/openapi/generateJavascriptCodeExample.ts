@@ -41,9 +41,17 @@ function generateJavascriptCodeExample(
   if (queryParams.length > 0) {
     requestObject.queryParameters = {};
     for (const queryParam of queryParams) {
-      requestObject.queryParameters[queryParam.name] = generateSchemaExample(
-        queryParam.schema as OpenAPIV3.SchemaObject,
-      );
+      let example = generateSchemaExample(queryParam.schema as OpenAPIV3.SchemaObject);
+
+      if (queryParam.name === "skip") {
+        continue;
+      } else if (queryParam.name === "limit") {
+        example = 50;
+      } else if (queryParam.name === "page") {
+        example = 1;
+      }
+
+      requestObject.queryParameters[queryParam.name] = example;
     }
   }
 

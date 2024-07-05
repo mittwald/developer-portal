@@ -51,9 +51,16 @@ function generatePHPCodeExample(
 
   if (queryParams.length > 0) {
     for (const queryParam of queryParams) {
-      constructorModifiers[queryParam.name] = JSON.stringify(
-        generateSchemaExample(queryParam.schema as OpenAPIV3.SchemaObject),
-      );
+      let example = generateSchemaExample(queryParam.schema as OpenAPIV3.SchemaObject);
+      if (queryParam.name === "skip") {
+        continue;
+      } else if (queryParam.name === "limit") {
+        example = 50;
+      } else if (queryParam.name === "page") {
+        example = 1;
+      }
+
+      constructorModifiers[queryParam.name] = JSON.stringify(example);
     }
   }
 
