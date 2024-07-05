@@ -34,7 +34,7 @@ export function ArrayValue({ schema }: { schema: OpenAPIV3.SchemaObject }) {
         <span className={styles.parameterAlternative}>Array[</span>
       </div>
       <div className={styles.parameterListBody}>{body}</div>
-      <Schema schema={schema} />
+      <PropertyValue name="*" schema={schema} required={false} />
       <div className={styles.parameterListHeader}>
         <span className={styles.parameterAlternative}>]</span>
       </div>
@@ -58,6 +58,8 @@ export function PropertyValue({
     body = <Markdown>{schema.description}</Markdown>;
   }
 
+  const hasSubSchema = schema.properties || schema.additionalProperties || schema.items;
+
   return (
     <li key={name}>
       <div className={styles.parameterListHeader}>
@@ -67,7 +69,7 @@ export function PropertyValue({
         {requiredOrOptional}
       </div>
       <div className={styles.parameterListBody}>{body}</div>
-      <Schema schema={schema} />
+      {hasSubSchema && <Schema schema={schema} />}
     </li>
   );
 }

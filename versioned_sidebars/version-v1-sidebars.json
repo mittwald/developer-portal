@@ -18,76 +18,6 @@
       "items": [
         {
           "type": "category",
-          "label": "Authentifizierung",
-          "link": {
-            "type": "doc",
-            "id": "reference/authentifizierung/index"
-          },
-          "items": [
-            {
-              "type": "doc",
-              "id": "reference/authentifizierung/listApplicationTokens",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/authentication/tokens",
-                "summary": "Auslesen von erstellten Application-Tokens"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/authentifizierung/createApplicationToken",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/authentication/tokens",
-                "summary": "Hinterlegen von neuen Application-Tokens"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/authentifizierung/getAccessToken",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/authentication/accesstoken",
-                "summary": "get new access token"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/authentifizierung/deleteApplicationToken",
-              "className": "api-operation-delete",
-              "customProps": {
-                "method": "delete",
-                "path": "/authentication/tokens/{uuid}",
-                "summary": "Löschen von Application-Tokens"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/authentifizierung/getUserName",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/authentication/self",
-                "summary": "User-Name des aktuellen Logins"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/authentifizierung/verifyToken",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/verify",
-                "summary": "Verify an existing authentication token"
-              }
-            }
-          ]
-        },
-        {
-          "type": "category",
           "label": "Accounts",
           "link": {
             "type": "doc",
@@ -136,12 +66,11 @@
             },
             {
               "type": "doc",
-              "id": "reference/accounts/listAccountsByCustomer",
+              "id": "reference/accounts/getAccountStatistics",
               "className": "api-operation-get",
               "customProps": {
                 "method": "get",
-                "path": "/customers/{customerNumber}/accounts",
-                "summary": "Accounts eines Kunden"
+                "path": "/accounts/{accountIdentifier}/stats"
               }
             },
             {
@@ -155,621 +84,12 @@
             },
             {
               "type": "doc",
-              "id": "reference/accounts/getAccountStatistics",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/accounts/{accountIdentifier}/stats"
-              }
-            }
-          ]
-        },
-        {
-          "type": "category",
-          "label": "Reseller",
-          "link": {
-            "type": "doc",
-            "id": "reference/reseller/index"
-          },
-          "items": [
-            {
-              "type": "doc",
-              "id": "reference/reseller/getReseller",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/resellers/{resellerIdentifier}",
-                "summary": "Reseller auslesen"
-              }
-            }
-          ]
-        },
-        {
-          "type": "category",
-          "label": "Database",
-          "link": {
-            "type": "doc",
-            "id": "reference/database/index"
-          },
-          "items": [
-            {
-              "type": "doc",
-              "id": "reference/database/listDatabaseTypes",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/databasetypes",
-                "summary": "Datenbanktypen"
-              }
-            }
-          ]
-        },
-        {
-          "type": "category",
-          "label": "Domains",
-          "link": {
-            "type": "doc",
-            "id": "reference/domains/index"
-          },
-          "items": [
-            {
-              "type": "doc",
-              "id": "reference/domains/listDomainsByAccount",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/accounts/{accountIdentifier}/domains",
-                "summary": "Domains eines Accounts auslesen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/domains/registerNewDomain",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/accounts/{accountIdentifier}/domains",
-                "summary": "Domain registrieren/Transfer einleiten"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/domains/domainProxyList",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/accounts/{accountIdentifier}/domainsproxies",
-                "summary": "Domain Proxies eines Accounts"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/domains/deleteDomain",
-              "className": "api-operation-delete",
-              "customProps": {
-                "method": "delete",
-                "path": "/accounts/{accountIdentifier}/domains/{domainIdentifier}",
-                "summary": "Domain löschen/kündigen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/domains/getDomainAuthCode",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/accounts/{accountIdentifier}/domains/{domainIdentifier}/authcode",
-                "summary": "Auth-Code einer Domain auslesen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/domains/listSubdomainsByDomain",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/accounts/{accountIdentifier}/domains/{domainIdentifier}/subdomains",
-                "summary": "Subdomains eines Accounts auslesen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/domains/createSubdomain",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/accounts/{accountIdentifier}/domains/{domainIdentifier}/subdomains",
-                "summary": "Subdomain erstellen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/domains/deleteSubdomain",
-              "className": "api-operation-delete",
-              "customProps": {
-                "method": "delete",
-                "path": "/accounts/{accountIdentifier}/domains/{domainIdentifier}/subdomains",
-                "summary": "Subdomain löschen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/domains/checkDomainAvailability",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/domains/{domainIdentifier}/actions/check",
-                "summary": "Domainverfügbarkeit prüfen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/domains/listPublicToplevelDomains",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/public/topleveldomains",
-                "summary": "Öffentliche Toplevel-Domains auslesen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/domains/listToplevelDomains",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/topleveldomains",
-                "summary": "Toplevel-Domains auslesen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/domains/getToplevelDomain",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/topleveldomains/{topLevelDomainIdentifier}",
-                "summary": "Toplevel-Domain auslesen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/domains/getDomainOverview",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/accounts/{accountIdentifier}/domainOverview",
-                "summary": "Get domain overview"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/domains/getDnsOverview",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/accounts/{accountIdentifier}/dns",
-                "summary": "Get dns overview"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/domains/getAccountIpAddresses",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/accounts/{accountIdentifier}/ip-addresses",
-                "summary": "IP Adressen des Accounts auslesen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/domains/updateDnsRecords",
-              "className": "api-operation-put",
-              "customProps": {
-                "method": "put",
-                "path": "/accounts/{accountIdentifier}/dns/{domainIdentifier}",
-                "summary": "Update DNS information for a domain"
-              }
-            }
-          ]
-        },
-        {
-          "type": "category",
-          "label": "Mailadressen",
-          "link": {
-            "type": "doc",
-            "id": "reference/mailadressen/index"
-          },
-          "items": [
-            {
-              "type": "doc",
-              "id": "reference/mailadressen/listEmailAddressesByAccount",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/accounts/{accountIdentifier}/mailaddresses",
-                "summary": "Mailadressen eines Accounts auslesen"
-              }
-            }
-          ]
-        },
-        {
-          "type": "category",
-          "label": "Notification",
-          "link": {
-            "type": "doc",
-            "id": "reference/notification/index"
-          },
-          "items": [
-            {
-              "type": "doc",
-              "id": "reference/notification/getNotifications",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/notifications",
-                "summary": "Notifications auslesen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/notification/deleteNotifications",
-              "className": "api-operation-delete",
-              "customProps": {
-                "method": "delete",
-                "path": "/notifications",
-                "summary": "Notifications löschen"
-              }
-            }
-          ]
-        },
-        {
-          "type": "category",
-          "label": "Software",
-          "link": {
-            "type": "doc",
-            "id": "reference/software/index"
-          },
-          "items": [
-            {
-              "type": "doc",
-              "id": "reference/software/listSoftwares",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/software",
-                "summary": "Unterstützte Software auslesen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/software/listSoftwareInstallationsByAccount",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/accounts/{accountIdentifier}/installations",
-                "summary": "Softwareinstallationen auslesen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/software/updatePhp",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/accounts/{accountIdentifier}/installations/actions/update-php",
-                "summary": "PHP Updaten"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/software/getSoftwareInstallation",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/installations/{installationIdentifier}",
-                "summary": "Details einer Softwareinstallation auslesen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/software/listSoftwareInstallationExtensions",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/installations/{installationIdentifier}/extensions",
-                "summary": "Extensions einer Softwareinstallation auslesen"
-              }
-            }
-          ]
-        },
-        {
-          "type": "category",
-          "label": "Kunden",
-          "link": {
-            "type": "doc",
-            "id": "reference/kunden/index"
-          },
-          "items": [
-            {
-              "type": "doc",
-              "id": "reference/kunden/getCurrentCustomer",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/customer",
-                "summary": "Details zu dem aktuellem Kunden"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/kunden/getOwnCustomer",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/customers/self",
-                "summary": "Details zum aktuell eingeloggten Kunden"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/kunden/getCustomer",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/customers/{customerNumber}",
-                "summary": "Kundendetails auslesen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/kunden/getCustomerContractPartner",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/customers/{customerNumber}/contractpartner",
-                "summary": "Vertragspartner auslesen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/kunden/updateCustomerContractPartner",
-              "className": "api-operation-put",
-              "customProps": {
-                "method": "put",
-                "path": "/customers/{customerNumber}/contractpartner",
-                "summary": "Vertragspartner ändern"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/kunden/getCustomerContactPerson",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/customers/{customerNumber}/contactperson",
-                "summary": "Ansprechpartner auslesen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/kunden/updateCustomerContactPerson",
-              "className": "api-operation-put",
-              "customProps": {
-                "method": "put",
-                "path": "/customers/{customerNumber}/contactperson",
-                "summary": "Ansprechpartner ändern"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/kunden/getCustomerPaymentSettings",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/customers/{customerNumber}/paymentsettings",
-                "summary": "Zahlungseinstellungen auslesen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/kunden/updateCustomerPaymentSettings",
-              "className": "api-operation-put",
-              "customProps": {
-                "method": "put",
-                "path": "/customers/{customerNumber}/paymentsettings",
-                "summary": "Zahlungseinstellungen ändern"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/kunden/getCustomerBillingRecipient",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/customers/{customerNumber}/billingrecipient",
-                "summary": "Rechungsempfänger auslesen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/kunden/updateCustomerBillingRecipient",
-              "className": "api-operation-put",
-              "customProps": {
-                "method": "put",
-                "path": "/customers/{customerNumber}/billingrecipient",
-                "summary": "Rechnungsempfänger ändern"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/kunden/resetCustomerBillingRecipient",
-              "className": "api-operation-delete",
-              "customProps": {
-                "method": "delete",
-                "path": "/customers/{customerNumber}/billingrecipient",
-                "summary": "Rechnungsempfänger eines Kunden zurücksetzen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/kunden/getCustomerBillingSettings",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/customers/{customerNumber}/billingsettings",
-                "summary": "Rechungseinstellungen auslesen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/kunden/updateCustomerBillingSettings",
-              "className": "api-operation-put",
-              "customProps": {
-                "method": "put",
-                "path": "/customers/{customerNumber}/billingsettings",
-                "summary": "Rechnungseinstellungen ändern"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/kunden/listInvoicesByCustomer",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/customers/{customerNumber}/invoices",
-                "summary": "Rechnungen eines Kunden"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/kunden/listAccountsByCustomer",
+              "id": "reference/accounts/listAccountsByCustomer",
               "className": "api-operation-get",
               "customProps": {
                 "method": "get",
                 "path": "/customers/{customerNumber}/accounts",
                 "summary": "Accounts eines Kunden"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/kunden/getBenefitDetails",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/customers/{customerNumber}/benefits/{benefit}",
-                "summary": "Details zu einer gebuchten Leistung"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/kunden/getAvContractStatus",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/customers/{customerNumber}/dsgvocontractstatus",
-                "summary": "Status des AV-Vertrags eines Kunden mit mittwald"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/kunden/getCustomerSettings",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/customers/{customerNumber}/settings",
-                "summary": "Hole Einstellungen eines Kunden"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/kunden/setCustomerSettings",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/customers/{customerNumber}/settings",
-                "summary": "Setze Einstellungen des Kunden"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/kunden/getInvoice",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/invoices/{invoiceNumber}",
-                "summary": "Rechnung eines Kunden"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/kunden/getPaymentReceipts",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/invoices/{invoiceNumber}/paymentreceipts",
-                "summary": "Zahlungseingänge einer Rechnung"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/kunden/getFlag",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/flagging/flags/{flagId}",
-                "summary": "Flags (z.B. DSGVO)"
-              }
-            }
-          ]
-        },
-        {
-          "type": "category",
-          "label": "Verträge",
-          "link": {
-            "type": "doc",
-            "id": "reference/vertrge/index"
-          },
-          "items": [
-            {
-              "type": "doc",
-              "id": "reference/vertrge/listContractsByCustomer",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/customers/{customerNumber}/contracts",
-                "summary": "Verträge auslesen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/vertrge/listCancelledContractsByCustomer",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/customers/{customerNumber}/cancelledcontracts",
-                "summary": "Verträge eines Kunden, die sich aktuell im Kündigungsprozess befinden"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/vertrge/cancelContract",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/cancellations",
-                "summary": "Kündigung einleiten"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/vertrge/resendCancellationConfirmation",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/cancellations/{cancellationIdentifier}/actions/confirmationmail",
-                "summary": "Kündigungsbestätigung erneut senden"
               }
             }
           ]
@@ -784,32 +104,12 @@
           "items": [
             {
               "type": "doc",
-              "id": "reference/angebote/requestQuote",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/offers",
-                "summary": "Neues Angebot anfordern"
-              }
-            },
-            {
-              "type": "doc",
               "id": "reference/angebote/createQuoteFromCart",
               "className": "api-operation-post",
               "customProps": {
                 "method": "post",
                 "path": "/carts/{cartIdentifier}/actions/offer",
                 "summary": "Angebot versenden"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/angebote/shareCart",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/carts/{cartIdentifier}/actions/share",
-                "summary": "Warenkorbvorlage erstellen"
               }
             },
             {
@@ -831,75 +131,25 @@
                 "path": "/carts/{cartIdentifier}/actions/recommendation/verify",
                 "summary": "Überprüfe PIN-Code von Empfehlung"
               }
-            }
-          ]
-        },
-        {
-          "type": "category",
-          "label": "Bestellungen",
-          "link": {
-            "type": "doc",
-            "id": "reference/bestellungen/index"
-          },
-          "items": [
+            },
             {
               "type": "doc",
-              "id": "reference/bestellungen/orderPreUpgradeCheck",
-              "className": "api-operation-get",
+              "id": "reference/angebote/shareCart",
+              "className": "api-operation-post",
               "customProps": {
-                "method": "get",
-                "path": "/orders/preUpgradeCheck/{accountIdentifier}/{articleNumber}",
-                "summary": "Pre-Upgrade Check"
+                "method": "post",
+                "path": "/carts/{cartIdentifier}/actions/share",
+                "summary": "Warenkorbvorlage erstellen"
               }
             },
             {
               "type": "doc",
-              "id": "reference/bestellungen/orderPartnerProgram",
+              "id": "reference/angebote/requestQuote",
               "className": "api-operation-post",
               "customProps": {
                 "method": "post",
-                "path": "/orders/partnerprogram",
-                "summary": "Anmeldung am Partnerprogramm"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/bestellungen/orderPartnerBox",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/orders/partnerbox",
-                "summary": "Bestellung eines Partnerbox"
-              }
-            }
-          ]
-        },
-        {
-          "type": "category",
-          "label": "Partner",
-          "link": {
-            "type": "doc",
-            "id": "reference/partner/index"
-          },
-          "items": [
-            {
-              "type": "doc",
-              "id": "reference/partner/orderPartnerProgram",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/orders/partnerprogram",
-                "summary": "Anmeldung am Partnerprogramm"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/partner/orderPartnerBox",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/orders/partnerbox",
-                "summary": "Bestellung eines Partnerbox"
+                "path": "/offers",
+                "summary": "Neues Angebot anfordern"
               }
             }
           ]
@@ -956,210 +206,70 @@
         },
         {
           "type": "category",
-          "label": "Warenkorb",
+          "label": "Authentifizierung",
           "link": {
             "type": "doc",
-            "id": "reference/warenkorb/index"
+            "id": "reference/authentifizierung/index"
           },
           "items": [
             {
               "type": "doc",
-              "id": "reference/warenkorb/createCart",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/carts",
-                "summary": "Warenkorb erstellen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/warenkorb/getCart",
+              "id": "reference/authentifizierung/getAccessToken",
               "className": "api-operation-get",
               "customProps": {
                 "method": "get",
-                "path": "/carts/{cartIdentifier}",
-                "summary": "Warenkorb auslesen"
+                "path": "/authentication/accesstoken",
+                "summary": "get new access token"
               }
             },
             {
               "type": "doc",
-              "id": "reference/warenkorb/updateCart",
-              "className": "api-operation-put",
+              "id": "reference/authentifizierung/getUserName",
+              "className": "api-operation-get",
               "customProps": {
-                "method": "put",
-                "path": "/carts/{cartIdentifier}",
-                "summary": "Warenkorb bearbeiten"
+                "method": "get",
+                "path": "/authentication/self",
+                "summary": "User-Name des aktuellen Logins"
               }
             },
             {
               "type": "doc",
-              "id": "reference/warenkorb/createCartFromTemplate",
+              "id": "reference/authentifizierung/listApplicationTokens",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/authentication/tokens",
+                "summary": "Auslesen von erstellten Application-Tokens"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/authentifizierung/createApplicationToken",
               "className": "api-operation-post",
               "customProps": {
                 "method": "post",
-                "path": "/carts/{cartIdentifier}",
-                "summary": "Warenkorb aus Vorlage erstellen"
+                "path": "/authentication/tokens",
+                "summary": "Hinterlegen von neuen Application-Tokens"
               }
             },
             {
               "type": "doc",
-              "id": "reference/warenkorb/deleteCart",
+              "id": "reference/authentifizierung/deleteApplicationToken",
               "className": "api-operation-delete",
               "customProps": {
                 "method": "delete",
-                "path": "/carts/{cartIdentifier}",
-                "summary": "Warenkorb löschen"
+                "path": "/authentication/tokens/{uuid}",
+                "summary": "Löschen von Application-Tokens"
               }
             },
             {
               "type": "doc",
-              "id": "reference/warenkorb/addItemToCart",
+              "id": "reference/authentifizierung/verifyToken",
               "className": "api-operation-post",
               "customProps": {
                 "method": "post",
-                "path": "/carts/{cartIdentifier}/items",
-                "summary": "Warenkorb-Position hinzufügen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/warenkorb/deleteItemFromCart",
-              "className": "api-operation-delete",
-              "customProps": {
-                "method": "delete",
-                "path": "/carts/{cartIdentifier}/items/{itemIdentifier}",
-                "summary": "Warenkorb-Position löschen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/warenkorb/addDomainToCart",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/carts/{cartIdentifier}/domains",
-                "summary": "Warenkorb-Domainposition hinzufügen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/warenkorb/checkoutOrder",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/carts/{cartIdentifier}/actions/checkout",
-                "summary": "Bestellung abschließen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/warenkorb/createQuoteFromCart",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/carts/{cartIdentifier}/actions/offer",
-                "summary": "Angebot versenden"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/warenkorb/shareCart",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/carts/{cartIdentifier}/actions/share",
-                "summary": "Warenkorbvorlage erstellen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/warenkorb/recommendCart",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/carts/{cartIdentifier}/actions/recommend",
-                "summary": "Warenkorbvorlage für Account-Ausgliederung erstellen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/warenkorb/verifyRecommendCart",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/carts/{cartIdentifier}/actions/recommendation/verify",
-                "summary": "Überprüfe PIN-Code von Empfehlung"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/warenkorb/requestSMSVerification",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/carts/{cartIdentifier}/actions/requestverification",
-                "summary": "SMS-Verifizierung starten"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/warenkorb/confirmSMSVerification",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/carts/{cartIdentifier}/actions/verify",
-                "summary": "SMS-Verifizierung bestätigen"
-              }
-            }
-          ]
-        },
-        {
-          "type": "category",
-          "label": "PromotionCode",
-          "link": {
-            "type": "doc",
-            "id": "reference/promotioncode/index"
-          },
-          "items": [
-            {
-              "type": "doc",
-              "id": "reference/promotioncode/getPromotionCode",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/promotioncodes/{promotionCode}",
-                "summary": "Promotioncode auslesen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/promotioncode/verifyPromotionCode",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/promotioncodes/{promotionCode}/actions/validate",
-                "summary": "Promotioncode validieren"
-              }
-            }
-          ]
-        },
-        {
-          "type": "category",
-          "label": "Virt",
-          "link": {
-            "type": "doc",
-            "id": "reference/virt/index"
-          },
-          "items": [
-            {
-              "type": "doc",
-              "id": "reference/virt/listGuestOperatingSystems",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/virt/guestoperatingsystems",
-                "summary": "Root-Server Betriebssysteme"
+                "path": "/verify",
+                "summary": "Verify an existing authentication token"
               }
             }
           ]
@@ -1186,250 +296,285 @@
         },
         {
           "type": "category",
-          "label": "Webhooks",
+          "label": "Bestellungen",
           "link": {
             "type": "doc",
-            "id": "reference/webhooks/index"
+            "id": "reference/bestellungen/index"
           },
           "items": [
             {
               "type": "doc",
-              "id": "reference/webhooks/listWebhooks",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/webhooks",
-                "summary": "Liefert alle hinterlegten Webhooks"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/webhooks/createWebhook",
+              "id": "reference/bestellungen/orderPartnerBox",
               "className": "api-operation-post",
               "customProps": {
                 "method": "post",
-                "path": "/webhooks",
-                "summary": "Registriert einen neuen Webhook"
+                "path": "/orders/partnerbox",
+                "summary": "Bestellung eines Partnerbox"
               }
             },
             {
               "type": "doc",
-              "id": "reference/webhooks/getWebhook",
+              "id": "reference/bestellungen/orderPartnerProgram",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/orders/partnerprogram",
+                "summary": "Anmeldung am Partnerprogramm"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/bestellungen/orderPreUpgradeCheck",
               "className": "api-operation-get",
               "customProps": {
                 "method": "get",
-                "path": "/webhooks/{webhookIdentifier}",
-                "summary": "Liefert einen bestimmten Webhook"
+                "path": "/orders/preUpgradeCheck/{accountIdentifier}/{articleNumber}",
+                "summary": "Pre-Upgrade Check"
+              }
+            }
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Database",
+          "link": {
+            "type": "doc",
+            "id": "reference/database/index"
+          },
+          "items": [
+            {
+              "type": "doc",
+              "id": "reference/database/listDatabaseTypes",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/databasetypes",
+                "summary": "Datenbanktypen"
+              }
+            }
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Dateiupload",
+          "link": {
+            "type": "doc",
+            "id": "reference/dateiupload/index"
+          },
+          "items": [
+            {
+              "type": "doc",
+              "id": "reference/dateiupload/getAllowedFileTypes",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/daemoncloud/allowed"
               }
             },
             {
               "type": "doc",
-              "id": "reference/webhooks/updateWebhook",
+              "id": "reference/dateiupload/uploadFile",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/daemoncloud/files"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/dateiupload/getFile",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/daemoncloud/files/{fileId}"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/dateiupload/deleteFile",
+              "className": "api-operation-delete",
+              "customProps": {
+                "method": "delete",
+                "path": "/daemoncloud/files/{fileId}"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/dateiupload/getFileDetails",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/daemoncloud/files/{fileId}/details"
+              }
+            }
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Domains",
+          "link": {
+            "type": "doc",
+            "id": "reference/domains/index"
+          },
+          "items": [
+            {
+              "type": "doc",
+              "id": "reference/domains/getDnsOverview",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/accounts/{accountIdentifier}/dns",
+                "summary": "Get dns overview"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/domains/updateDnsRecords",
               "className": "api-operation-put",
               "customProps": {
                 "method": "put",
-                "path": "/webhooks/{webhookIdentifier}",
-                "summary": "Updated den gewünschten Webhook"
+                "path": "/accounts/{accountIdentifier}/dns/{domainIdentifier}",
+                "summary": "Update DNS information for a domain"
               }
             },
             {
               "type": "doc",
-              "id": "reference/webhooks/deleteWebhook",
+              "id": "reference/domains/getDomainOverview",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/accounts/{accountIdentifier}/domainOverview",
+                "summary": "Get domain overview"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/domains/listDomainsByAccount",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/accounts/{accountIdentifier}/domains",
+                "summary": "Domains eines Accounts auslesen"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/domains/registerNewDomain",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/accounts/{accountIdentifier}/domains",
+                "summary": "Domain registrieren/Transfer einleiten"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/domains/deleteDomain",
               "className": "api-operation-delete",
               "customProps": {
                 "method": "delete",
-                "path": "/webhooks/{webhookIdentifier}",
-                "summary": "Löscht einen Webhook"
-              }
-            }
-          ]
-        },
-        {
-          "type": "category",
-          "label": "Kündigung",
-          "link": {
-            "type": "doc",
-            "id": "reference/kndigung/index"
-          },
-          "items": [
-            {
-              "type": "doc",
-              "id": "reference/kndigung/cancelContract",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/cancellations",
-                "summary": "Kündigung einleiten"
+                "path": "/accounts/{accountIdentifier}/domains/{domainIdentifier}",
+                "summary": "Domain löschen/kündigen"
               }
             },
             {
               "type": "doc",
-              "id": "reference/kndigung/resendCancellationConfirmation",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/cancellations/{cancellationIdentifier}/actions/confirmationmail",
-                "summary": "Kündigungsbestätigung erneut senden"
-              }
-            }
-          ]
-        },
-        {
-          "type": "category",
-          "label": "DSGVO-Verträge",
-          "link": {
-            "type": "doc",
-            "id": "reference/dsgvoverträge/index"
-          },
-          "items": [
-            {
-              "type": "doc",
-              "id": "reference/dsgvoverträge/getGDPRPDFs",
+              "id": "reference/domains/getDomainAuthCode",
               "className": "api-operation-get",
               "customProps": {
                 "method": "get",
-                "path": "/gdpr/pdfs",
-                "summary": "PDF - Liefert die Daten der Vertrags-PDFs"
+                "path": "/accounts/{accountIdentifier}/domains/{domainIdentifier}/authcode",
+                "summary": "Auth-Code einer Domain auslesen"
               }
             },
             {
               "type": "doc",
-              "id": "reference/dsgvoverträge/uploadGDPRPDF",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/gdpr/pdfs",
-                "summary": "PDF - Vertrags-PDF hochladen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/dsgvoverträge/getGDPRPDF",
+              "id": "reference/domains/listSubdomainsByDomain",
               "className": "api-operation-get",
               "customProps": {
                 "method": "get",
-                "path": "/gdpr/pdfs/{pdfIdentifier}",
-                "summary": "PDF - Liefert ein bestimmtes Vertrags-PDF"
+                "path": "/accounts/{accountIdentifier}/domains/{domainIdentifier}/subdomains",
+                "summary": "Subdomains eines Accounts auslesen"
               }
             },
             {
               "type": "doc",
-              "id": "reference/dsgvoverträge/deleteGDPRPDF",
+              "id": "reference/domains/createSubdomain",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/accounts/{accountIdentifier}/domains/{domainIdentifier}/subdomains",
+                "summary": "Subdomain erstellen"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/domains/deleteSubdomain",
               "className": "api-operation-delete",
               "customProps": {
                 "method": "delete",
-                "path": "/gdpr/pdfs/{pdfIdentifier}",
-                "summary": "PDF - Löscht ein bestimmtes Vertrags-PDF"
+                "path": "/accounts/{accountIdentifier}/domains/{domainIdentifier}/subdomains",
+                "summary": "Subdomain löschen"
               }
             },
             {
               "type": "doc",
-              "id": "reference/dsgvoverträge/downloadGDPRPDF",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/gdpr/pdfs/{pdfIdentifier}/actions/download'",
-                "summary": "PDF - Stellt ein Vertrags-PDF zum Download bereit"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/dsgvoverträge/getGDPRContractPresets",
+              "id": "reference/domains/domainProxyList",
               "className": "api-operation-get",
               "customProps": {
                 "method": "get",
-                "path": "/gdpr/contract-presets",
-                "summary": "Vertragskonfiguration - Liefert alle gespeicherten Vertrags-Konfigurationen"
+                "path": "/accounts/{accountIdentifier}/domainsproxies",
+                "summary": "Domain Proxies eines Accounts"
               }
             },
             {
               "type": "doc",
-              "id": "reference/dsgvoverträge/createGDPRContractPresets",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/gdpr/contract-presets",
-                "summary": "Vertragskonfiguration - Speichert eine Vertrags-Konfiguration"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/dsgvoverträge/getGDPRContractPreset",
+              "id": "reference/domains/getAccountIpAddresses",
               "className": "api-operation-get",
               "customProps": {
                 "method": "get",
-                "path": "/gdpr/contract-presets/{contractPresetIdentifier}",
-                "summary": "Vertragskonfiguration - Liefert eine bestimmte Vertrags-Konfiguration"
+                "path": "/accounts/{accountIdentifier}/ip-addresses",
+                "summary": "IP Adressen des Accounts auslesen"
               }
             },
             {
               "type": "doc",
-              "id": "reference/dsgvoverträge/getGDPRContracts",
+              "id": "reference/domains/checkDomainAvailability",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/domains/{domainIdentifier}/actions/check",
+                "summary": "Domainverfügbarkeit prüfen"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/domains/listPublicToplevelDomains",
               "className": "api-operation-get",
               "customProps": {
                 "method": "get",
-                "path": "/gdpr/contracts",
-                "summary": "Vertrag - Liefert alle hinterlegten Verträge"
+                "path": "/public/topleveldomains",
+                "summary": "Öffentliche Toplevel-Domains auslesen"
               }
             },
             {
               "type": "doc",
-              "id": "reference/dsgvoverträge/createGDPRContract",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/gdpr/contracts",
-                "summary": "Vertrag - Vertrag anlegen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/dsgvoverträge/getGDPRContract",
+              "id": "reference/domains/listToplevelDomains",
               "className": "api-operation-get",
               "customProps": {
                 "method": "get",
-                "path": "/gdpr/contracts/{contractIdentifier}",
-                "summary": "Vertrag - Liefert einen bestimmten Vertrag"
+                "path": "/topleveldomains",
+                "summary": "Toplevel-Domains auslesen"
               }
             },
             {
               "type": "doc",
-              "id": "reference/dsgvoverträge/deleteGDPRContract",
-              "className": "api-operation-delete",
+              "id": "reference/domains/getToplevelDomain",
+              "className": "api-operation-get",
               "customProps": {
-                "method": "delete",
-                "path": "/gdpr/contracts/{contractIdentifier}",
-                "summary": "Vertrag - Löscht einen bestimmten Vertrag"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/dsgvoverträge/createGDPRContractPDF",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/gdpr/contracts/{contractIdentifier}/actions/pdf'",
-                "summary": "Vertrag - Liefert ein PDF zu einem bestimmten Vertrag"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/dsgvoverträge/sendGDPRContractMail",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/gdpr/contracts/{contractIdentifier}/actions/mail'",
-                "summary": "Vertrag - Verschickt eine E-Mail mit PDF an den Empfänger des Vertrags"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/dsgvoverträge/acceptGDPRContract",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/gdpr/contracts/{contractIdentifier}/actions/accept'",
-                "summary": "Vertrag - Akzeptiert den Vertrag"
+                "method": "get",
+                "path": "/topleveldomains/{topLevelDomainIdentifier}",
+                "summary": "Toplevel-Domain auslesen"
               }
             }
           ]
@@ -1516,80 +661,550 @@
         },
         {
           "type": "category",
-          "label": "Tickets",
+          "label": "DSGVO-Verträge",
           "link": {
             "type": "doc",
-            "id": "reference/tickets/index"
+            "id": "reference/dsgvoverträge/index"
           },
           "items": [
             {
               "type": "doc",
-              "id": "reference/tickets/listSupportTickets",
+              "id": "reference/dsgvoverträge/getGDPRContractPresets",
               "className": "api-operation-get",
               "customProps": {
                 "method": "get",
-                "path": "/customers/{customerNumber}/tickets",
-                "summary": "Support-Tickets auslesen"
+                "path": "/gdpr/contract-presets",
+                "summary": "Vertragskonfiguration - Liefert alle gespeicherten Vertrags-Konfigurationen"
               }
             },
             {
               "type": "doc",
-              "id": "reference/tickets/createSupportTicket",
+              "id": "reference/dsgvoverträge/createGDPRContractPresets",
               "className": "api-operation-post",
               "customProps": {
                 "method": "post",
-                "path": "/tickets",
-                "summary": "Neues Support-Ticket"
+                "path": "/gdpr/contract-presets",
+                "summary": "Vertragskonfiguration - Speichert eine Vertrags-Konfiguration"
               }
             },
             {
               "type": "doc",
-              "id": "reference/tickets/getSupportTicket",
+              "id": "reference/dsgvoverträge/getGDPRContractPreset",
               "className": "api-operation-get",
               "customProps": {
                 "method": "get",
-                "path": "/tickets/{ticketIdentifier}",
-                "summary": "Ticket auslesen"
+                "path": "/gdpr/contract-presets/{contractPresetIdentifier}",
+                "summary": "Vertragskonfiguration - Liefert eine bestimmte Vertrags-Konfiguration"
               }
             },
             {
               "type": "doc",
-              "id": "reference/tickets/listSupportTicketAnswers",
+              "id": "reference/dsgvoverträge/getGDPRContracts",
               "className": "api-operation-get",
               "customProps": {
                 "method": "get",
-                "path": "/tickets/{ticketIdentifier}/answers",
-                "summary": "Ticketantworten auslesen"
+                "path": "/gdpr/contracts",
+                "summary": "Vertrag - Liefert alle hinterlegten Verträge"
               }
             },
             {
               "type": "doc",
-              "id": "reference/tickets/answerSupportTicket",
+              "id": "reference/dsgvoverträge/createGDPRContract",
               "className": "api-operation-post",
               "customProps": {
                 "method": "post",
-                "path": "/tickets/{ticketIdentifier}/answers",
-                "summary": "Ticketantwort erstellen"
+                "path": "/gdpr/contracts",
+                "summary": "Vertrag - Vertrag anlegen"
               }
             },
             {
               "type": "doc",
-              "id": "reference/tickets/closeSupportTicket",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/tickets/{ticketIdentifier}/actions/close",
-                "summary": "Ticket schließen"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/tickets/listTicketCategories",
+              "id": "reference/dsgvoverträge/getGDPRContract",
               "className": "api-operation-get",
               "customProps": {
                 "method": "get",
-                "path": "/ticket-categories",
-                "summary": "Ticketkategorien auslesen"
+                "path": "/gdpr/contracts/{contractIdentifier}",
+                "summary": "Vertrag - Liefert einen bestimmten Vertrag"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/dsgvoverträge/deleteGDPRContract",
+              "className": "api-operation-delete",
+              "customProps": {
+                "method": "delete",
+                "path": "/gdpr/contracts/{contractIdentifier}",
+                "summary": "Vertrag - Löscht einen bestimmten Vertrag"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/dsgvoverträge/acceptGDPRContract",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/gdpr/contracts/{contractIdentifier}/actions/accept'",
+                "summary": "Vertrag - Akzeptiert den Vertrag"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/dsgvoverträge/sendGDPRContractMail",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/gdpr/contracts/{contractIdentifier}/actions/mail'",
+                "summary": "Vertrag - Verschickt eine E-Mail mit PDF an den Empfänger des Vertrags"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/dsgvoverträge/createGDPRContractPDF",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/gdpr/contracts/{contractIdentifier}/actions/pdf'",
+                "summary": "Vertrag - Liefert ein PDF zu einem bestimmten Vertrag"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/dsgvoverträge/getGDPRPDFs",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/gdpr/pdfs",
+                "summary": "PDF - Liefert die Daten der Vertrags-PDFs"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/dsgvoverträge/uploadGDPRPDF",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/gdpr/pdfs",
+                "summary": "PDF - Vertrags-PDF hochladen"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/dsgvoverträge/getGDPRPDF",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/gdpr/pdfs/{pdfIdentifier}",
+                "summary": "PDF - Liefert ein bestimmtes Vertrags-PDF"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/dsgvoverträge/deleteGDPRPDF",
+              "className": "api-operation-delete",
+              "customProps": {
+                "method": "delete",
+                "path": "/gdpr/pdfs/{pdfIdentifier}",
+                "summary": "PDF - Löscht ein bestimmtes Vertrags-PDF"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/dsgvoverträge/downloadGDPRPDF",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/gdpr/pdfs/{pdfIdentifier}/actions/download'",
+                "summary": "PDF - Stellt ein Vertrags-PDF zum Download bereit"
+              }
+            }
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Feedback",
+          "link": {
+            "type": "doc",
+            "id": "reference/feedback/index"
+          },
+          "items": [
+            {
+              "type": "doc",
+              "id": "reference/feedback/createFeedback",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/customers/{customerNumber}/feedback",
+                "summary": "Create feedback"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/feedback/getIsShowFeedback",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/customers/{customerNumber}/is-show-feedback",
+                "summary": "Gets the show feedback status"
+              }
+            }
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Kunden",
+          "link": {
+            "type": "doc",
+            "id": "reference/kunden/index"
+          },
+          "items": [
+            {
+              "type": "doc",
+              "id": "reference/kunden/getCurrentCustomer",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/customer",
+                "summary": "Details zu dem aktuellem Kunden"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/kunden/getCustomer",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/customers/{customerNumber}",
+                "summary": "Kundendetails auslesen"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/kunden/listAccountsByCustomer",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/customers/{customerNumber}/accounts",
+                "summary": "Accounts eines Kunden"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/kunden/getBenefitDetails",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/customers/{customerNumber}/benefits/{benefit}",
+                "summary": "Details zu einer gebuchten Leistung"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/kunden/getCustomerBillingRecipient",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/customers/{customerNumber}/billingrecipient",
+                "summary": "Rechungsempfänger auslesen"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/kunden/updateCustomerBillingRecipient",
+              "className": "api-operation-put",
+              "customProps": {
+                "method": "put",
+                "path": "/customers/{customerNumber}/billingrecipient",
+                "summary": "Rechnungsempfänger ändern"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/kunden/resetCustomerBillingRecipient",
+              "className": "api-operation-delete",
+              "customProps": {
+                "method": "delete",
+                "path": "/customers/{customerNumber}/billingrecipient",
+                "summary": "Rechnungsempfänger eines Kunden zurücksetzen"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/kunden/getCustomerBillingSettings",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/customers/{customerNumber}/billingsettings",
+                "summary": "Rechungseinstellungen auslesen"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/kunden/updateCustomerBillingSettings",
+              "className": "api-operation-put",
+              "customProps": {
+                "method": "put",
+                "path": "/customers/{customerNumber}/billingsettings",
+                "summary": "Rechnungseinstellungen ändern"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/kunden/getCustomerContactPerson",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/customers/{customerNumber}/contactperson",
+                "summary": "Ansprechpartner auslesen"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/kunden/updateCustomerContactPerson",
+              "className": "api-operation-put",
+              "customProps": {
+                "method": "put",
+                "path": "/customers/{customerNumber}/contactperson",
+                "summary": "Ansprechpartner ändern"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/kunden/getCustomerContractPartner",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/customers/{customerNumber}/contractpartner",
+                "summary": "Vertragspartner auslesen"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/kunden/updateCustomerContractPartner",
+              "className": "api-operation-put",
+              "customProps": {
+                "method": "put",
+                "path": "/customers/{customerNumber}/contractpartner",
+                "summary": "Vertragspartner ändern"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/kunden/getAvContractStatus",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/customers/{customerNumber}/dsgvocontractstatus",
+                "summary": "Status des AV-Vertrags eines Kunden mit mittwald"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/kunden/listInvoicesByCustomer",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/customers/{customerNumber}/invoices",
+                "summary": "Rechnungen eines Kunden"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/kunden/getCustomerPaymentSettings",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/customers/{customerNumber}/paymentsettings",
+                "summary": "Zahlungseinstellungen auslesen"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/kunden/updateCustomerPaymentSettings",
+              "className": "api-operation-put",
+              "customProps": {
+                "method": "put",
+                "path": "/customers/{customerNumber}/paymentsettings",
+                "summary": "Zahlungseinstellungen ändern"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/kunden/getCustomerSettings",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/customers/{customerNumber}/settings",
+                "summary": "Hole Einstellungen eines Kunden"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/kunden/setCustomerSettings",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/customers/{customerNumber}/settings",
+                "summary": "Setze Einstellungen des Kunden"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/kunden/getOwnCustomer",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/customers/self",
+                "summary": "Details zum aktuell eingeloggten Kunden"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/kunden/getFlag",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/flagging/flags/{flagId}",
+                "summary": "Flags (z.B. DSGVO)"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/kunden/getInvoice",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/invoices/{invoiceNumber}",
+                "summary": "Rechnung eines Kunden"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/kunden/getPaymentReceipts",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/invoices/{invoiceNumber}/paymentreceipts",
+                "summary": "Zahlungseingänge einer Rechnung"
+              }
+            }
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Kündigung",
+          "link": {
+            "type": "doc",
+            "id": "reference/kndigung/index"
+          },
+          "items": [
+            {
+              "type": "doc",
+              "id": "reference/kndigung/cancelContract",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/cancellations",
+                "summary": "Kündigung einleiten"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/kndigung/resendCancellationConfirmation",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/cancellations/{cancellationIdentifier}/actions/confirmationmail",
+                "summary": "Kündigungsbestätigung erneut senden"
+              }
+            }
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Mailadressen",
+          "link": {
+            "type": "doc",
+            "id": "reference/mailadressen/index"
+          },
+          "items": [
+            {
+              "type": "doc",
+              "id": "reference/mailadressen/listEmailAddressesByAccount",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/accounts/{accountIdentifier}/mailaddresses",
+                "summary": "Mailadressen eines Accounts auslesen"
+              }
+            }
+          ]
+        },
+        {
+          "type": "category",
+          "label": "mfa",
+          "link": {
+            "type": "doc",
+            "id": "reference/mfa/index"
+          },
+          "items": [
+            {
+              "type": "doc",
+              "id": "reference/mfa/getMfaStatus",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/mfa",
+                "summary": "Get your current multi factor auth status"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/mfa/resetRecoveryCodes",
+              "className": "api-operation-put",
+              "customProps": {
+                "method": "put",
+                "path": "/mfa",
+                "summary": "Reset the recovery codes for your multi factor authentication"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/mfa/deleteMfa",
+              "className": "api-operation-delete",
+              "customProps": {
+                "method": "delete",
+                "path": "/mfa",
+                "summary": "Disable Multi Factor Authentication"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/mfa/confirmMfa",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/mfa/actions/confirm",
+                "summary": "Confirm your new multi factor"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/mfa/initMfaAction",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/mfa/actions/init",
+                "summary": "Initiate a new MFA action"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/mfa/getMfaSecret",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/mfa/secret",
+                "summary": "Get your current multi factor auth secret"
               }
             }
           ]
@@ -1636,74 +1251,60 @@
         },
         {
           "type": "category",
-          "label": "Telefonverifizierung",
+          "label": "Notification",
           "link": {
             "type": "doc",
-            "id": "reference/telefonverifizierung/index"
+            "id": "reference/notification/index"
           },
           "items": [
             {
               "type": "doc",
-              "id": "reference/telefonverifizierung/getPhoneVerificationCode",
+              "id": "reference/notification/getNotifications",
               "className": "api-operation-get",
               "customProps": {
                 "method": "get",
-                "path": "/phoneVerification/{customernumber}"
+                "path": "/notifications",
+                "summary": "Notifications auslesen"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/notification/deleteNotifications",
+              "className": "api-operation-delete",
+              "customProps": {
+                "method": "delete",
+                "path": "/notifications",
+                "summary": "Notifications löschen"
               }
             }
           ]
         },
         {
           "type": "category",
-          "label": "Dateiupload",
+          "label": "Partner",
           "link": {
             "type": "doc",
-            "id": "reference/dateiupload/index"
+            "id": "reference/partner/index"
           },
           "items": [
             {
               "type": "doc",
-              "id": "reference/dateiupload/getAllowedFileTypes",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/daemoncloud/allowed"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/dateiupload/uploadFile",
+              "id": "reference/partner/orderPartnerBox",
               "className": "api-operation-post",
               "customProps": {
                 "method": "post",
-                "path": "/daemoncloud/files"
+                "path": "/orders/partnerbox",
+                "summary": "Bestellung eines Partnerbox"
               }
             },
             {
               "type": "doc",
-              "id": "reference/dateiupload/getFile",
-              "className": "api-operation-get",
+              "id": "reference/partner/orderPartnerProgram",
+              "className": "api-operation-post",
               "customProps": {
-                "method": "get",
-                "path": "/daemoncloud/files/{fileId}"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/dateiupload/deleteFile",
-              "className": "api-operation-delete",
-              "customProps": {
-                "method": "delete",
-                "path": "/daemoncloud/files/{fileId}"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/dateiupload/getFileDetails",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/daemoncloud/files/{fileId}/details"
+                "method": "post",
+                "path": "/orders/partnerprogram",
+                "summary": "Anmeldung am Partnerprogramm"
               }
             }
           ]
@@ -1740,100 +1341,499 @@
         },
         {
           "type": "category",
-          "label": "mfa",
+          "label": "PromotionCode",
           "link": {
             "type": "doc",
-            "id": "reference/mfa/index"
+            "id": "reference/promotioncode/index"
           },
           "items": [
             {
               "type": "doc",
-              "id": "reference/mfa/initMfaAction",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/mfa/actions/init",
-                "summary": "Initiate a new MFA action"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/mfa/confirmMfa",
-              "className": "api-operation-post",
-              "customProps": {
-                "method": "post",
-                "path": "/mfa/actions/confirm",
-                "summary": "Confirm your new multi factor"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/mfa/getMfaStatus",
+              "id": "reference/promotioncode/getPromotionCode",
               "className": "api-operation-get",
               "customProps": {
                 "method": "get",
-                "path": "/mfa",
-                "summary": "Get your current multi factor auth status"
+                "path": "/promotioncodes/{promotionCode}",
+                "summary": "Promotioncode auslesen"
               }
             },
             {
               "type": "doc",
-              "id": "reference/mfa/resetRecoveryCodes",
-              "className": "api-operation-put",
+              "id": "reference/promotioncode/verifyPromotionCode",
+              "className": "api-operation-post",
               "customProps": {
-                "method": "put",
-                "path": "/mfa",
-                "summary": "Reset the recovery codes for your multi factor authentication"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/mfa/deleteMfa",
-              "className": "api-operation-delete",
-              "customProps": {
-                "method": "delete",
-                "path": "/mfa",
-                "summary": "Disable Multi Factor Authentication"
-              }
-            },
-            {
-              "type": "doc",
-              "id": "reference/mfa/getMfaSecret",
-              "className": "api-operation-get",
-              "customProps": {
-                "method": "get",
-                "path": "/mfa/secret",
-                "summary": "Get your current multi factor auth secret"
+                "method": "post",
+                "path": "/promotioncodes/{promotionCode}/actions/validate",
+                "summary": "Promotioncode validieren"
               }
             }
           ]
         },
         {
           "type": "category",
-          "label": "Feedback",
+          "label": "Reseller",
           "link": {
             "type": "doc",
-            "id": "reference/feedback/index"
+            "id": "reference/reseller/index"
           },
           "items": [
             {
               "type": "doc",
-              "id": "reference/feedback/getIsShowFeedback",
+              "id": "reference/reseller/getReseller",
               "className": "api-operation-get",
               "customProps": {
                 "method": "get",
-                "path": "/customers/{customerNumber}/is-show-feedback",
-                "summary": "Gets the show feedback status"
+                "path": "/resellers/{resellerIdentifier}",
+                "summary": "Reseller auslesen"
+              }
+            }
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Software",
+          "link": {
+            "type": "doc",
+            "id": "reference/software/index"
+          },
+          "items": [
+            {
+              "type": "doc",
+              "id": "reference/software/listSoftwareInstallationsByAccount",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/accounts/{accountIdentifier}/installations",
+                "summary": "Softwareinstallationen auslesen"
               }
             },
             {
               "type": "doc",
-              "id": "reference/feedback/createFeedback",
+              "id": "reference/software/updatePhp",
               "className": "api-operation-post",
               "customProps": {
                 "method": "post",
-                "path": "/customers/{customerNumber}/feedback",
-                "summary": "Create feedback"
+                "path": "/accounts/{accountIdentifier}/installations/actions/update-php",
+                "summary": "PHP Updaten"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/software/getSoftwareInstallation",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/installations/{installationIdentifier}",
+                "summary": "Details einer Softwareinstallation auslesen"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/software/listSoftwareInstallationExtensions",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/installations/{installationIdentifier}/extensions",
+                "summary": "Extensions einer Softwareinstallation auslesen"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/software/listSoftwares",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/software",
+                "summary": "Unterstützte Software auslesen"
+              }
+            }
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Telefonverifizierung",
+          "link": {
+            "type": "doc",
+            "id": "reference/telefonverifizierung/index"
+          },
+          "items": [
+            {
+              "type": "doc",
+              "id": "reference/telefonverifizierung/getPhoneVerificationCode",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/phoneVerification/{customernumber}"
+              }
+            }
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Tickets",
+          "link": {
+            "type": "doc",
+            "id": "reference/tickets/index"
+          },
+          "items": [
+            {
+              "type": "doc",
+              "id": "reference/tickets/listSupportTickets",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/customers/{customerNumber}/tickets",
+                "summary": "Support-Tickets auslesen"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/tickets/listTicketCategories",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/ticket-categories",
+                "summary": "Ticketkategorien auslesen"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/tickets/createSupportTicket",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/tickets",
+                "summary": "Neues Support-Ticket"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/tickets/getSupportTicket",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/tickets/{ticketIdentifier}",
+                "summary": "Ticket auslesen"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/tickets/closeSupportTicket",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/tickets/{ticketIdentifier}/actions/close",
+                "summary": "Ticket schließen"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/tickets/listSupportTicketAnswers",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/tickets/{ticketIdentifier}/answers",
+                "summary": "Ticketantworten auslesen"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/tickets/answerSupportTicket",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/tickets/{ticketIdentifier}/answers",
+                "summary": "Ticketantwort erstellen"
+              }
+            }
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Verträge",
+          "link": {
+            "type": "doc",
+            "id": "reference/vertrge/index"
+          },
+          "items": [
+            {
+              "type": "doc",
+              "id": "reference/vertrge/cancelContract",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/cancellations",
+                "summary": "Kündigung einleiten"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/vertrge/resendCancellationConfirmation",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/cancellations/{cancellationIdentifier}/actions/confirmationmail",
+                "summary": "Kündigungsbestätigung erneut senden"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/vertrge/listCancelledContractsByCustomer",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/customers/{customerNumber}/cancelledcontracts",
+                "summary": "Verträge eines Kunden, die sich aktuell im Kündigungsprozess befinden"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/vertrge/listContractsByCustomer",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/customers/{customerNumber}/contracts",
+                "summary": "Verträge auslesen"
+              }
+            }
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Virt",
+          "link": {
+            "type": "doc",
+            "id": "reference/virt/index"
+          },
+          "items": [
+            {
+              "type": "doc",
+              "id": "reference/virt/listGuestOperatingSystems",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/virt/guestoperatingsystems",
+                "summary": "Root-Server Betriebssysteme"
+              }
+            }
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Warenkorb",
+          "link": {
+            "type": "doc",
+            "id": "reference/warenkorb/index"
+          },
+          "items": [
+            {
+              "type": "doc",
+              "id": "reference/warenkorb/createCart",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/carts",
+                "summary": "Warenkorb erstellen"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/warenkorb/getCart",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/carts/{cartIdentifier}",
+                "summary": "Warenkorb auslesen"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/warenkorb/createCartFromTemplate",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/carts/{cartIdentifier}",
+                "summary": "Warenkorb aus Vorlage erstellen"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/warenkorb/updateCart",
+              "className": "api-operation-put",
+              "customProps": {
+                "method": "put",
+                "path": "/carts/{cartIdentifier}",
+                "summary": "Warenkorb bearbeiten"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/warenkorb/deleteCart",
+              "className": "api-operation-delete",
+              "customProps": {
+                "method": "delete",
+                "path": "/carts/{cartIdentifier}",
+                "summary": "Warenkorb löschen"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/warenkorb/checkoutOrder",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/carts/{cartIdentifier}/actions/checkout",
+                "summary": "Bestellung abschließen"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/warenkorb/createQuoteFromCart",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/carts/{cartIdentifier}/actions/offer",
+                "summary": "Angebot versenden"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/warenkorb/recommendCart",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/carts/{cartIdentifier}/actions/recommend",
+                "summary": "Warenkorbvorlage für Account-Ausgliederung erstellen"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/warenkorb/verifyRecommendCart",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/carts/{cartIdentifier}/actions/recommendation/verify",
+                "summary": "Überprüfe PIN-Code von Empfehlung"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/warenkorb/requestSMSVerification",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/carts/{cartIdentifier}/actions/requestverification",
+                "summary": "SMS-Verifizierung starten"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/warenkorb/shareCart",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/carts/{cartIdentifier}/actions/share",
+                "summary": "Warenkorbvorlage erstellen"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/warenkorb/confirmSMSVerification",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/carts/{cartIdentifier}/actions/verify",
+                "summary": "SMS-Verifizierung bestätigen"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/warenkorb/addDomainToCart",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/carts/{cartIdentifier}/domains",
+                "summary": "Warenkorb-Domainposition hinzufügen"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/warenkorb/addItemToCart",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/carts/{cartIdentifier}/items",
+                "summary": "Warenkorb-Position hinzufügen"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/warenkorb/deleteItemFromCart",
+              "className": "api-operation-delete",
+              "customProps": {
+                "method": "delete",
+                "path": "/carts/{cartIdentifier}/items/{itemIdentifier}",
+                "summary": "Warenkorb-Position löschen"
+              }
+            }
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Webhooks",
+          "link": {
+            "type": "doc",
+            "id": "reference/webhooks/index"
+          },
+          "items": [
+            {
+              "type": "doc",
+              "id": "reference/webhooks/listWebhooks",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/webhooks",
+                "summary": "Liefert alle hinterlegten Webhooks"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/webhooks/createWebhook",
+              "className": "api-operation-post",
+              "customProps": {
+                "method": "post",
+                "path": "/webhooks",
+                "summary": "Registriert einen neuen Webhook"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/webhooks/getWebhook",
+              "className": "api-operation-get",
+              "customProps": {
+                "method": "get",
+                "path": "/webhooks/{webhookIdentifier}",
+                "summary": "Liefert einen bestimmten Webhook"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/webhooks/updateWebhook",
+              "className": "api-operation-put",
+              "customProps": {
+                "method": "put",
+                "path": "/webhooks/{webhookIdentifier}",
+                "summary": "Updated den gewünschten Webhook"
+              }
+            },
+            {
+              "type": "doc",
+              "id": "reference/webhooks/deleteWebhook",
+              "className": "api-operation-delete",
+              "customProps": {
+                "method": "delete",
+                "path": "/webhooks/{webhookIdentifier}",
+                "summary": "Löscht einen Webhook"
               }
             }
           ]

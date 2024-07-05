@@ -4,6 +4,7 @@ import $RefParser from "@apidevtools/json-schema-ref-parser";
 import { OpenAPIV3 } from "openapi-types";
 import * as url from "url";
 import * as yaml from "yaml";
+import compareOperation from "@site/src/openapi/compareOperation";
 
 type APIVersion = `v${number}`
 
@@ -163,10 +164,13 @@ async function renderAPIDocs(apiVersion: APIVersion, outputPath: string) {
 
   exportSpecToSource(originalSpec, apiVersion);
 
-  for (const { name, description } of spec.tags) {
+  const tags = (spec.tags ?? []).sort((a, b) => a.name.localeCompare(b.name));
+
+  for (const { name, description } of tags) {
     const slug = slugFromTagName(name);
     const operationsDir = path.join(outputPath, slug);
-    const sidebarItems = [];
+
+    let sidebarItems = [];
 
     fs.mkdirSync(operationsDir, { recursive: true });
 
@@ -202,6 +206,8 @@ async function renderAPIDocs(apiVersion: APIVersion, outputPath: string) {
         }
       }
     }
+
+    sidebarItems = sidebarItems.sort((a, b) => compareOperation(a.customProps, b.customProps));
 
     await renderTagIndexPage(apiVersion, name, description, operationsDir, sidebarItems);
 
