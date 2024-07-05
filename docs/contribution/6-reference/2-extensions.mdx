@@ -48,6 +48,47 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
         example:
           "Eine Beispiel Extension, die zeigen soll, welche Informationen benötigt werden, um eine Extension einzureichen",
       },
+      detailedDescriptions: {
+        type: "object",
+        description: "Ausführliche Beschreibungen der Extension in unterschiedlichen Sprachen",
+        required: ["de"],
+        properties: {
+          de: {
+            type: "object",
+            description: "Ausführliche Beschreibung der Extension in Deutsch",
+            required: ["markdown"],
+            properties: {
+              markdown: {
+                type: "string",
+                description: "Ein Beschreibungstext mit Markdown-Formatierungen",
+                minLength: 1,
+              },
+              plain: {
+                type: "string",
+                description: "Ein Beschreibungstext ohne Formatierungen",
+                minLength: 1,
+              },
+            }
+          },
+          en: {
+            type: "object",
+            description: "Ausführliche Beschreibung der Extension in Englisch",
+            required: ["markdown"],
+            properties: {
+              markdown: {
+                type: "string",
+                description: "Ein Beschreibungstext mit Markdown-Formatierungen",
+                minLength: 1,
+              },
+              plain: {
+                type: "string",
+                description: "Ein Beschreibungstext ohne Formatierungen",
+                minLength: 1,
+              },
+            }
+          }
+        }
+      },
       extensionContext: {
         type: "string",
         enum: ["project", "customer"],
