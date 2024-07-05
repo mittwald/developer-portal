@@ -60,7 +60,7 @@ function generateJavascriptCodeExample(
 import { assertStatus } from "@mittwald/api-client-commons";
   
 const client = MittwaldAPIClient.newWithToken(process.env.MITTWALD_API_TOKEN);
-const response = await mittwaldAPI.${tag}.${operationId}(${requestObjectJson});
+const response = await client.${tag}.${operationId}(${requestObjectJson});
 
 assertStatus(response, ${successfulStatus});
   `;
