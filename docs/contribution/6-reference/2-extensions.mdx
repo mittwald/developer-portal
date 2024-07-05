@@ -76,36 +76,60 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
             ],
             properties: {
               extensionAddedToContext: {
-                type: "string",
-                format: "uri",
-                description:
-                  "URL, die aufgerufen wird, wenn die Extension zu einem Extension Context hinzugefügt wird. Kann Platzhalter enthalten",
-                example:
-                  "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/added",
+                type: "object",
+                required: ["url"],
+                properties: {
+                  url: {
+                    type: "string",
+                    format: "uri",
+                    description:
+                      "URL, die aufgerufen wird, wenn die Extension zu einem Extension Context hinzugefügt wird. Kann Platzhalter enthalten",
+                    example:
+                      "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/added",
+                  },
+                },
               },
               extensionInstanceUpdated: {
-                type: "string",
-                format: "uri",
-                description:
-                  "URL, die aufgerufen wird, wenn eine Extension Instance aktualisiert wird. Kann Platzhalter enthalten",
-                example:
-                  "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/updated",
+                type: "object",
+                required: ["url"],
+                properties: {
+                  url: {
+                    type: "string",
+                    format: "uri",
+                    description:
+                      "URL, die aufgerufen wird, wenn eine Extension Instance aktualisiert wird. Kann Platzhalter enthalten",
+                    example:
+                      "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/updated",
+                  },
+                },
               },
               extensionInstanceSecretRotated: {
-                type: "string",
-                format: "uri",
-                description:
-                  "URL, die aufgerufen wird, wenn ein Secret einer Extension Instance rotiert wird. Kann Platzhalter enthalten",
-                example:
-                  "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/secret-rotated",
+                type: "object",
+                required: ["url"],
+                properties: {
+                  url: {
+                    type: "string",
+                    format: "uri",
+                    description:
+                      "URL, die aufgerufen wird, wenn das Secret einer Extension Instance rotiert wird. Kann Platzhalter enthalten",
+                    example:
+                      "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/secret-rotated",
+                  },
+                },
               },
               extensionInstanceRemovedFromContext: {
-                type: "string",
-                format: "uri",
-                description:
-                  "URL, die aufgerufen wird, wenn die Extension aus einem Extension Context entfernt wird. Kann Platzhalter enthalten",
-                example:
-                  "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/removed",
+                type: "object",
+                required: ["url"],
+                properties: {
+                  url: {
+                    type: "string",
+                    format: "uri",
+                    description:
+                      "URL, die aufgerufen wird, wenn die Extension aus einem Extension Context entfernt wird. Kann Platzhalter enthalten",
+                    example:
+                      "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/removed",
+                  },
+                },
               },
             },
           },
