@@ -13,15 +13,24 @@ function generateCurlCodeExample(
   const headers = parameters.filter((p) => p.in === "headers") ?? [];
 
   const headerArgs = headers.map(
-    (header) => `-H "${header.name}: ${header.description}"`,
+    (header) => `-H "${header.name}: ${generateSchemaExample((header.schema ?? { type: "string" }) as OpenAPIV3.NonArraySchemaObject)}"`,
   );
+
+  headerArgs.push(`-H "Authorization: Bearer $MITTWALD_API_TOKEN"`);
 
   const queryParamsSet = new URLSearchParams();
   for (const queryParam of queryParams) {
-    queryParamsSet.set(
-      queryParam.name,
-      generateSchemaExample(queryParam.schema as OpenAPIV3.SchemaObject),
-    );
+    let example = generateSchemaExample(queryParam.schema as OpenAPIV3.SchemaObject);
+
+    if (queryParam.name === "skip") {
+      continue;
+    } else if (queryParam.name === "limit") {
+      example = "50";
+    } else if (queryParam.name === "page") {
+      example = "1";
+    }
+
+    queryParamsSet.set(queryParam.name, example);
   }
 
   for (const pathParam of pathParams) {
@@ -34,7 +43,7 @@ function generateCurlCodeExample(
   const completeURL = new URL(url, baseURL);
   completeURL.search = queryParamsSet.toString();
 
-  const params = ["--fail"];
+  const params = ["--fail", "--location"];
 
   if (method !== "get") {
     params.push("-X " + method.toUpperCase());

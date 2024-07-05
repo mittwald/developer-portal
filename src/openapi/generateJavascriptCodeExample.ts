@@ -17,9 +17,11 @@ function generateJavascriptCodeExample(
     Object.keys(spec.responses).find((status) => status.startsWith("2")) ??
     "200";
 
+  const tagPrefixRegex = new RegExp(`^${spec.tags[0]}-`, 'i');
+
   const requestObject: any = {};
   const tag = camelcase(tsTypeName(spec.tags[0]));
-  const operationId = camelcase(tsTypeName(spec.operationId));
+  const operationId = camelcase(tsTypeName(spec.operationId.replace(tagPrefixRegex, "")));
 
   for (const pathParam of pathParams) {
     requestObject[pathParam.name] = generateSchemaExample(
@@ -39,9 +41,17 @@ function generateJavascriptCodeExample(
   if (queryParams.length > 0) {
     requestObject.queryParameters = {};
     for (const queryParam of queryParams) {
-      requestObject.queryParameters[queryParam.name] = generateSchemaExample(
-        queryParam.schema as OpenAPIV3.SchemaObject,
-      );
+      let example = generateSchemaExample(queryParam.schema as OpenAPIV3.SchemaObject);
+
+      if (queryParam.name === "skip") {
+        continue;
+      } else if (queryParam.name === "limit") {
+        example = 50;
+      } else if (queryParam.name === "page") {
+        example = 1;
+      }
+
+      requestObject.queryParameters[queryParam.name] = example;
     }
   }
 
@@ -60,7 +70,7 @@ function generateJavascriptCodeExample(
 import { assertStatus } from "@mittwald/api-client-commons";
   
 const client = MittwaldAPIClient.newWithToken(process.env.MITTWALD_API_TOKEN);
-const response = await mittwaldAPI.${tag}.${operationId}(${requestObjectJson});
+const response = await client.${tag}.${operationId}(${requestObjectJson});
 
 assertStatus(response, ${successfulStatus});
   `;
