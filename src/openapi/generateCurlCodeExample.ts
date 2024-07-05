@@ -13,8 +13,10 @@ function generateCurlCodeExample(
   const headers = parameters.filter((p) => p.in === "headers") ?? [];
 
   const headerArgs = headers.map(
-    (header) => `-H "${header.name}: ${header.description}"`,
+    (header) => `-H "${header.name}: ${generateSchemaExample((header.schema ?? { type: "string" }) as OpenAPIV3.NonArraySchemaObject)}"`,
   );
+
+  headerArgs.push(`-H "Authorization: Bearer $MITTWALD_API_TOKEN"`);
 
   const queryParamsSet = new URLSearchParams();
   for (const queryParam of queryParams) {
