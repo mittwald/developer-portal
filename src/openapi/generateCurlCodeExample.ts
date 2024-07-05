@@ -20,10 +20,17 @@ function generateCurlCodeExample(
 
   const queryParamsSet = new URLSearchParams();
   for (const queryParam of queryParams) {
-    queryParamsSet.set(
-      queryParam.name,
-      generateSchemaExample(queryParam.schema as OpenAPIV3.SchemaObject),
-    );
+    let example = generateSchemaExample(queryParam.schema as OpenAPIV3.SchemaObject);
+
+    if (queryParam.name === "skip") {
+      continue;
+    } else if (queryParam.name === "limit") {
+      example = "50";
+    } else if (queryParam.name === "page") {
+      example = "1";
+    }
+
+    queryParamsSet.set(queryParam.name, example);
   }
 
   for (const pathParam of pathParams) {
