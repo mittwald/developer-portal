@@ -23,59 +23,61 @@ Dies kann entweder im Namen des mStudio Users, der die Extension bedient oder im
 
 ## Aus welchen Informationen besteht eine Extension?
 
-Eine Extension besteht aus verschiedenen Informationen, die ebenfalls in der [Extension Referenz](../../reference/extensions) beschrieben sind.
-Die einzelnen Attribute werden im folgenden Abschnitt genauer erläutert.
+Eine Extension besteht aus verschiedenen Informationen, die in der [Extension Referenz](../../reference/extensions) im Detail beschrieben sind.
+Im Folgenden soll ein grober Überblick gegeben werden.
 
 ### Name und Beschreibung
 
-TODO
+Eine Extension enthält 3 Stufen von Beschreibung.
+Der Name und eine Kurzbeschreibung sind das erste, das ein Nutzer in der Übersicht von Extensions im Marktplatz sieht.
+Daneben gibt es eine ausführliche Beschreibung, die mehr Details zur Extension enthält und Formattierung anbietet.
+In dieser kann auf Features, Nutzungshinweise, weiterführende Links, einen Changelog und vieles mehr eingegangen werden.
 
 ### State
 
-TODO
+Um zu steuern, ob eine Extension im mStudio nutzbar sein soll, kann der State der Extension konfiguriert werden.
+Über den State kann sowohl die Sichtbarkeit als auch die Installierbarkeit von Extensions gesteuert werden.
 
 ### Tags
 
-TODO
+Tags sind eine Möglichkeit, Extensions zu kategorisieren.
+Sie werden im mStudio dazu genutzt, Extensions nach Anwendungsfall zu gruppieren.
+Dabei sollte darauf geachtet werden, dass die Tags aussagekräftig sind und eine klare Zuordnung zu den Features der Extension ermöglichen.
+Auch sollte darauf geachtet werden, dass sie in etwa dem entsprechen, wonach potenzielle Kunden der Extension suchen würden.
+Eine Kategorie, in der sich nur eine Extension befindet, bietet keinen Mehrwert in der Suche nach Extensions
+und verringert sowohl die Auffindbarkeit als auch die Vergleichbarkeit der Extensions.
 
 ### Support
 
-TODO
+Für den Support bei der Nutzung von Extensions ist der Contributor verantwortlich.
+Entsprechend benötigt der Nutzer einer Extension Informationen darüber, wie er Support erhalten kann.
+Dazu muss mindestens eine E-Mail-Adresse angegeben werden, an die sich Nutzer wenden können.
 
 ### Scopes
 
-TODO
+Eine Extension muss Berechtigungen anfragen, um Domain Actions im mStudio durchführen zu können.
+Dazu werden Scopes definiert, die die Berechtigungen der Extension beschreiben.
+Für weitere Informationen zum Thema Scopes siehe [Scopes Konzept](../concepts/scopes).
 
 ### Extension Context
 
-TODO
+Eine Extension kann entweder zu einem Projekt oder zu einer Organisation hinzugefügt werden.
+Ein Contributor muss sich während der Konzept- oder Entwicklungsphase entscheiden, welcher Extension Context für die Extension sinnvoll ist.
+Die Entscheidung hängt von mehreren Faktoren, wie der Zielgruppe, dem Anwendungsfall aber auch dem Geschäftsmodell, ab.
 
 ### Lifecycle Webhook Endpoints
 
-Eine Extension muss definieren, an welche URLs Lifecycle-Webhooks gesendet werden sollen. Über diese Webhooks wird der Extension mitgeteilt, welche Extension Instances existieren und in welchem Zustand sie sich befinden.
-Für jeden Lifecycle kann ein eigener Webhook-Endpoint konfiguriert werden. Für weitere Informationen zu Lifecycle-Webhooks siehe [Lifecycle Webhooks Konzept](../concepts/lifecycle-webhooks)
-
-In den URLs, an die Lifecycle-Webhooks gesendet werden, können optional verschiedene Platzhalter verwendet werden.
-Für weitere Informationen zum Templating siehe [Templating von Konfigurationswerten](../concepts/templating).
-Für eine Übersicht, welche Platzhalter für Lifecycle-Webhooks verwendet werden können, siehe [Lifecycle Webhooks Referenz](../../reference/webhooks)
+Eine Extension muss definieren, an welche URLs Lifecycle-Webhooks gesendet werden sollen.
+Über diese Webhooks wird der Extension mitgeteilt, welche Extension Instances existieren und in welchem Zustand sie sich befinden.
+Für jeden Lifecycle kann ein eigener Webhook-Endpoint konfiguriert werden.
+Für weitere Informationen zu Lifecycle-Webhooks siehe [Lifecycle Webhooks Konzept](../concepts/lifecycle-webhooks).
 
 ### External Frontend
 
 Eine Extension kann optional ein externes Frontend angeben, das dazu dient, einen Einstiegspunkt aus dem mStudio heraus in die Extension zu bieten.
 Das externe Frontend wird als URL angegeben und kann getemplated werden.
-Siehe dazu auch [Templating von Konfigurationswerten](../concepts/templating)
-
-Für das interne Routing sinnvolle Platzhalter sind:
-
-- `apiVersion` - API-Version des External Frontend URL Templates. Zu Beginn immer `v1`. Siehe auch [Versionierung von APIs](../concepts/api-versioning)
-- `contributorId` - Die ID des Contributors im UUID-Format
-- `extensionId` - Die ID der Extension im UUID-Format
-- `extensionInstanceId` - Die ID der Extension Instance im UUID-Format
-
-Um das Single Sign On-Feature mittels ATReK zu nutzen, müssen folgende Platzhalter in der URL definiert werden:
-
-- `accessTokenRetrievalKey`
-- `userId`
+Siehe dazu auch [Templating von Konfigurationswerten](../concepts/templating).
+Für weitere Informationen zum External Frontend siehe [External Frontend Konzept](../concepts/external-frontend).
 
 ## Versionierung von Extensions
 

@@ -1,0 +1,47 @@
+---
+title: External Frontend
+---
+
+Die Konfiguration eines External Frontends dient dazu,
+einen Einstiegspunkt aus dem mStudio heraus in die Extension zu bieten und ist optional.
+
+Dies bietet sich vor allem an, wenn die Extension eine eigene Benutzeroberfläche hat
+und der übliche Nutzerfluss aus dem mStudio entspringt.
+Es ergibt jedoch auch Sinn, ein External Frontend zu definieren,
+wenn die Extension auch ohne das mStudio genutzt werden kann, um einen vereinfachten Einstieg in diese zu bieten.
+
+Die Definition eines External Frontends ermöglicht die Nutzung des Single Sign On-Features mittels ATReK.
+Auch ermöglicht es die Nutzung des aktuellen Nutzer-Kontexts im mStudio in der Extension.
+
+## Konfiguration
+
+Das External Frontend wird als URL angegeben und kann getemplated werden.
+Siehe dazu auch [Templating von Konfigurationswerten](../templating).
+Das External Frontend wird in der Extension Definition unter `externalComponents.frontends` definiert.
+Siehe dazu auch [Extension Referenz](../../../reference/extensions).
+
+## Nutzung des ATReK
+
+Um das Single Sign On-Feature mittels ATReK zu nutzen, müssen folgende Platzhalter in der URL definiert werden:
+
+- `accessTokenRetrievalKey`
+- `userId`
+
+Die Extension kann nun beim Aufruf der URL den ATReK und die UserID auslesen und gegen ein Access Token eintauschen.
+Siehe dazu auch [Verwendung eines Access Token Retrieval Keys](../../../reference/api#verwendung-eines-access-token-retrieval-keys).
+
+## Nutzung des Nutzer-Kontexts
+
+Das External Frontend kann auch genutzt werden,
+um den aktuellen Nutzer-Kontext aus dem mStudio in die Extension zu übertragen.
+Dies kann sinnvoll sein, wenn ein User in einem konkreten Projekt die Extension aufruft
+und direkt das entsprechende Projekt in der Extension angezeigt werden soll.
+
+Für das interne Routing sinnvolle Platzhalter sind:
+
+- `apiVersion` - API-Version des External Frontend URL Templates. Zu Beginn immer `v1`. Siehe auch [Versionierung von APIs](../api-versioning)
+- `contributorId` - Die ID des Contributors im UUID-Format
+- `extensionId` - Die ID der Extension im UUID-Format
+- `extensionInstanceId` - Die ID der Extension Instance im UUID-Format
+- `context` - Der Extension Context Kind, zu dem die Extension Instance hinzugefügt wurde
+- `contextId` - Die ID des Extension Contexts, zu dem die Extension Instance hinzugefügt wurde
