@@ -63,5 +63,6 @@ async function generateAPIChangelog(apiVersion: APIVersion) {
 }
 
 (async () => {
+  await generateAPIChangelog("v1");
   await generateAPIChangelog("v2");
 })().catch(console.error);
