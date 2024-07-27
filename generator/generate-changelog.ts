@@ -47,8 +47,6 @@ async function generateAPIChangelog(apiVersion: APIVersion) {
   const today = new Date();
   const outputFile = path.join("changelog", `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}-api-changes-${apiVersion}.mdx`);
 
-  groupedChangelog.entries()
-
   const rendered = await ejs.renderFile(path.join("generator", "templates", "changelog.mdx.ejs"), {
     yaml,
     today,
