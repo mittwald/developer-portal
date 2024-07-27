@@ -1,0 +1,60 @@
+---
+<%- yaml.stringify({
+    title: (hasBreakingChanges ? "Breaking (!) " : "") + `API changes for ${apiVersion} API, ${today.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+    })}`,
+    tags: [
+      "api" + apiVersion,
+      hasBreakingChanges ? "breaking" : undefined,
+      ...(new Set(changelog.map(l => getOperationById(spec, l.operationId).operation.tags[0])))
+    ].filter(s => s !== undefined)
+}) %>
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This document contains a machine-generated summary of the API changes for <%= today.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+}) %>.
+The API changes are based on the diff between the OpenAPI schemas of the two versions.
+
+{/* truncate */}
+
+<% if (hasBreakingChanges) { %>
+
+:::caution Breaking changes
+
+This document contains breaking changes. Please review the changes carefully.
+
+:::
+
+<% } %>
+
+## Summary
+
+The following API endpoints have changed:
+
+<% for ([operationId, changes] of groupedChangelog.entries()) { %>
+<% if (changes.find(c => c.level === 3)) { %>
+- ⚠️ **Breaking changes** to the <OperationLink operation="<%= operationId %>" apiVersion="<%= apiVersion %>" /> endpoint.
+<% } else { %>
+- Changes to the <OperationLink operation="<%= operationId %>" apiVersion="<%= apiVersion %>" /> endpoint.
+<% } %>
+<% } %>
+
+<% for ([operationId, changes] of groupedChangelog.entries()) { %>
+
+## Changes in "<%- canonicalizeTitle(getOperationById(spec, operationId).operation.summary) %>"
+
+<% for (change of changes) { %>
+- <% if (change.level === 3) { %>⚠️ **Breaking:** <% } %><%- change.text %>
+<% } %>
+
+For details, refer to the <OperationLink operation="<%= operationId %>" apiVersion="<%= apiVersion %>" /> endpoint.
+
+<% } %>
