@@ -40,26 +40,28 @@ async function generateAPIChangelog(apiVersion: APIVersion) {
   const spec = await loadSpec(apiVersion);
   const base = path.join("generator", "specs", `openapi-${apiVersion}.json`);
   const head = `https://api.mittwald.de/${apiVersion}/openapi.json?withRedirects=false`;
-  const changelog = JSON.parse(execFileSync("oasdiff", ["changelog", "-fjson", base, head], { encoding: "utf-8" }));
+  const changelog: ChangelogEntry[] = JSON.parse(execFileSync("oasdiff", ["changelog", "-fjson", base, head], { encoding: "utf-8" }));
   const groupedChangelog = groupChangelogByOperation(changelog);
   const hasBreakingChanges = changelog.some((change: ChangelogEntry) => change.level === 3);
 
-  const today = new Date();
-  const outputFile = path.join("changelog", `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}-api-changes-${apiVersion}.mdx`);
+  if (changelog.length > 0) {
+    const today = new Date();
+    const outputFile = path.join("changelog", `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}-api-changes-${apiVersion}.mdx`);
 
-  const rendered = await ejs.renderFile(path.join("generator", "templates", "changelog.mdx.ejs"), {
-    yaml,
-    today,
-    apiVersion,
-    changelog,
-    groupedChangelog,
-    hasBreakingChanges,
-    spec,
-    getOperationById,
-    canonicalizeTitle,
-  });
+    const rendered = await ejs.renderFile(path.join("generator", "templates", "changelog.mdx.ejs"), {
+      yaml,
+      today,
+      apiVersion,
+      changelog,
+      groupedChangelog,
+      hasBreakingChanges,
+      spec,
+      getOperationById,
+      canonicalizeTitle,
+    });
 
-  await fs.writeFile(outputFile, rendered, { encoding: "utf-8" });
+    await fs.writeFile(outputFile, rendered, { encoding: "utf-8" });
+  }
 }
 
 (async () => {
