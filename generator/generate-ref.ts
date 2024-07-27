@@ -1,26 +1,14 @@
 import * as path from "path";
 import * as fs from "fs";
-import $RefParser from "@apidevtools/json-schema-ref-parser";
 import { OpenAPIV3 } from "openapi-types";
 import * as url from "url";
 import * as yaml from "yaml";
 import compareOperation from "@site/src/openapi/compareOperation";
 import * as ejs from "ejs";
+import { dereferenceSpec, loadSpec } from "@site/generator/util/spec";
 
 type APIVersion = `v${number}`
 
-async function loadSpec(apiVersion: APIVersion): Promise<OpenAPIV3.Document> {
-  const spec = await fetch(`https://api.mittwald.de/${apiVersion}/openapi.json?withRedirects=false`);
-  return await spec.json();
-}
-
-async function dereferenceSpec(spec: OpenAPIV3.Document): Promise<OpenAPIV3.Document> {
-  return await $RefParser.dereference(spec, {
-    dereference: {
-      circular: "ignore"
-    }
-  });
-}
 
 function determineServerURLAndBasePath(apiVersion: APIVersion, spec: OpenAPIV3.Document): [string, string] {
   let basePath = "";
