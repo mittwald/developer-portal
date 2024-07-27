@@ -5,12 +5,14 @@ import InlineAlert from "@mittwald/flow-react-components/InlineAlert";
 import Content from "@mittwald/flow-react-components/Content";
 import Heading from "@mittwald/flow-react-components/Heading";
 import styles from "./styles.module.css";
+import { APIVersion } from "@site/src/openapi/specs";
 
 export interface OperationHintProps {
   operation: string | string[];
+  apiVersion?: APIVersion;
 }
 
-export default function OperationHint({ operation }: OperationHintProps) {
+export default function OperationHint({ operation, apiVersion = "v2" }: OperationHintProps) {
   operation = Array.isArray(operation) ? operation : [operation];
 
   const heading = operation.length > 1 ?
@@ -22,7 +24,7 @@ export default function OperationHint({ operation }: OperationHintProps) {
       <Heading>{heading}:</Heading>
       <Content>
         <div className={styles.operations}>
-          {operation.map((o, idx) => <OperationDocCardById key={idx} apiVersion="v2" operationId={o} variant="compact" />)}
+          {operation.map((o, idx) => <OperationDocCardById key={idx} apiVersion={apiVersion} operationId={o} variant="compact" />)}
         </div>
       </Content>
     </InlineAlert>
