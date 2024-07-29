@@ -18,12 +18,13 @@ type ChangelogEntry = {
   "section": string
 }
 
-/**
- * changelog is a list of changes, with an operationId
- * group the changelog by operationId
- *
- * @param changelog
- */
+type GithubRelease = {
+  published_at: string;
+  html_url: string;
+  body: string;
+  name: string;
+}
+
 function groupChangelogByOperation(changelog: ChangelogEntry[]) {
   const grouped = new Map<string, ChangelogEntry[]>();
   for (const change of changelog) {
@@ -62,9 +63,34 @@ async function generateAPIChangelog(apiVersion: APIVersion) {
 
     await fs.writeFile(outputFile, rendered, { encoding: "utf-8" });
   }
+
+  // Write the current spec back into the repository, so that the next run can compare against it
+  await fs.writeFile(base, JSON.stringify(spec));
+}
+
+async function generateClientChangelog(name: string, repo: string) {
+  const url = `https://api.github.com/repos/mittwald/${repo}/releases`;
+  const releases: GithubRelease[] = await (await fetch(url)).json();
+
+  for (const release of releases) {
+    const date = new Date(release.published_at);
+    const outputFile = path.join("changelog", `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}-${repo}-${release.name}.mdx`);
+    const rendered = await ejs.renderFile(path.join("generator", "templates", "client-changelog.mdx.ejs"), {
+      release,
+      name,
+      repo,
+      yaml,
+    });
+
+    await fs.writeFile(outputFile, rendered, { encoding: "utf-8" });
+  }
 }
 
 (async () => {
   await generateAPIChangelog("v1");
   await generateAPIChangelog("v2");
+
+  // disabled for now
+  //await generateClientChangelog("mittwald PHP SDK", "api-client-php");
+  //await generateClientChangelog("mittwald JavaScript SDK", "api-client-js");
 })().catch(console.error);
