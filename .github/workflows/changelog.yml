@@ -18,6 +18,11 @@ jobs:
         run: npm ci
       - name: Generate code
         run: npm run generate
+      - name: Install oasdiff
+        run: |
+          wget https://github.com/Tufin/oasdiff/releases/download/v1.10.23/oasdiff_1.10.23_linux_amd64.tar.gz
+          tar xzf oasdiff_1.10.23_linux_amd64.tar.gz
+          mv oasdiff /usr/local/bin/oasdiff
       - name: Generate API changelogs
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
