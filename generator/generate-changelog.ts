@@ -5,6 +5,7 @@ import * as path from "path";
 import * as ejs from "ejs";
 import * as yaml from "yaml";
 import * as fs from "fs/promises";
+import * as fs2 from "fs";
 import { canonicalizeTitle } from "@site/generator/util/title";
 import OpenAI from "openai";
 
@@ -85,6 +86,11 @@ async function generateAPIChangelog(apiVersion: APIVersion) {
     "changelog",
     `${today.getFullYear()}-${month}-${day}-api-changes-${apiVersion}.mdx`,
   );
+
+  if (fs2.existsSync(outputFile)) {
+    console.log("API changelog for this date already exists; skipping");
+    return;
+  }
 
   if (changelog.length > 0) {
     const summary = await generateAPIChangeSummary(changelog);
