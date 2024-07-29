@@ -35,6 +35,7 @@ jobs:
         run: |
           if [ $(git status --porcelain . | wc -l) -gt 0 ] ; then
             git add changelog
-            git commit -m "Generate API changelog for $(date +%d-%m-%Y)";            
-            git push origin
+            git commit -m "Generate API changelog for $(date +%d-%m-%Y)";
+            git remote add publish "https://mittwald-machine:${{ secrets.RELEASE_USER_TOKEN }}@github.com/mittwald/developer-portal.git"
+            git push publish
           fi
