@@ -69,6 +69,18 @@ const config: Config = {
         },
       } satisfies ClientRedirectOptions,
     ],
+    [
+      '@docusaurus/plugin-content-blog',
+      {
+        id: 'changelog',
+        routeBasePath: 'changelog',
+        path: './changelog',
+        blogTitle: "Changelog",
+        blogDescription: "Changelog for the mittwald APIs and mittwald cloud platform",
+        blogSidebarTitle: 'All change notes',
+        blogSidebarCount: 'ALL',
+      },
+    ],
   ],
 
   presets: [

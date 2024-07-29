@@ -42,8 +42,6 @@ export function OperationUsage(props: OperationUsageProps) {
     );
   }
 
-  console.log(children);
-
   if (withJavascript && !children.some((i) => i.key === "javascript")) {
     children.unshift(
       <TabItem key="javascript" value="javascript" label="JavaScript SDK">

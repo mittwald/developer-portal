@@ -1,26 +1,15 @@
 import * as path from "path";
 import * as fs from "fs";
-import $RefParser from "@apidevtools/json-schema-ref-parser";
 import { OpenAPIV3 } from "openapi-types";
 import * as url from "url";
 import * as yaml from "yaml";
 import compareOperation from "@site/src/openapi/compareOperation";
 import * as ejs from "ejs";
+import { dereferenceSpec, loadSpec } from "@site/generator/util/spec";
+import { canonicalizeTitle } from "@site/generator/util/title";
 
 type APIVersion = `v${number}`
 
-async function loadSpec(apiVersion: APIVersion): Promise<OpenAPIV3.Document> {
-  const spec = await fetch(`https://api.mittwald.de/${apiVersion}/openapi.json?withRedirects=false`);
-  return await spec.json();
-}
-
-async function dereferenceSpec(spec: OpenAPIV3.Document): Promise<OpenAPIV3.Document> {
-  return await $RefParser.dereference(spec, {
-    dereference: {
-      circular: "ignore"
-    }
-  });
-}
 
 function determineServerURLAndBasePath(apiVersion: APIVersion, spec: OpenAPIV3.Document): [string, string] {
   let basePath = "";
@@ -54,48 +43,6 @@ function loadCodeExample(apiVersion: APIVersion, operationId: string, language: 
   return undefined;
 }
 
-function substituteInTitle(title: string|undefined): string|undefined {
-  if (!title) {
-    return title;
-  }
-
-  const replacements: [RegExp, string][] = [
-    [/['`]([^`]+)['`]/g, "$1"],
-    [/AppInstallation(s)?/, "app installation$1"],
-    [/AppVersion(s)?/, "app version$1"],
-    [/App(s)?/, "app$1"],
-    [/DatabaseUser(s)?/, "database user$1"],
-    [/MySQL-?Database(s)?/i, "MySQL database$1"],
-    [/MySQLUser(s)?/i, "MySQL user$1"],
-    [/MySQLVersion(s)?/i, "MySQL version$1"],
-    [/RedisDatabase(s)?/i, "Redis database$1"],
-    [/RedisVersion(s)?/i, "Redis database$1"],
-    [/SystemSoftwareVersion(s)?/, "system software version$1"],
-    [/SystemSoftware(s)?/, "system software$1"],
-    [/ProjectBackupSchedule(s)?/, "project backup schedule$1"],
-    [/BackupSchedule(s)?/, "backup schedule$1"],
-    [/ProjectBackupExport(s)?/, "project backup export$1"],
-    [/ProjectBackup(s)?/, "project backup$1"],
-    [/CronjobExecution(s)?/, "cronjob execution$1"],
-    [/Cronjob(s)?/, "cronjob$1"],
-    [/CustomerInvite(s)?/, "customer invite$1"],
-    [/CustomerMembership(s)?/, "customer membership$1"],
-    [/DNSZone(s)?/, "DNS Zone$1"],
-    [/DeliveryBox(es)?/, "delivery box$1"],
-    [/MailAddress(es)?/, "mail address$1"],
-    [/Email-?Address(es)?/, "mail address$1"],
-    [/ExtensionInstance(s)?/, "extension instance$1"],
-    [/Contributor(s)?/, "contributor$1"],
-    [/SSHUser(s)?/, "SSH user$1"],
-    [/SFTPUser(s)?/, "SFTP user$1"],
-  ]
-
-  for (const [pattern, replacement] of replacements) {
-    title = title.replace(pattern, replacement);
-  }
-
-  return title;
-}
 
 async function renderAPISpecToFile(
   operationFile: string,
@@ -106,7 +53,7 @@ async function renderAPISpecToFile(
   apiVersion: APIVersion,
 ) {
   const withSDKExamples = apiVersion !== "v1";
-  const summary: string = substituteInTitle(stripTrailingDot(spec.summary));
+  const summary: string = canonicalizeTitle(spec.summary);
 
   const descriptionOverridePre = loadDescriptionOverride(apiVersion, spec.operationId, "pre");
   const descriptionOverridePost = loadDescriptionOverride(apiVersion, spec.operationId, "post");
@@ -140,10 +87,6 @@ function exportSpecToSource(spec: OpenAPIV3.Document, apiVersion: APIVersion) {
 
 function slugFromTagName(tagName: string): string {
   return tagName.replace(/ /g, "").toLowerCase().replace(/[^a-z0-9]/, "");
-}
-
-function stripTrailingDot(str: string | undefined): string | undefined {
-  return str?.replace(/\.$/, "");
 }
 
 async function renderTagIndexPage(apiVersion: APIVersion, name: string, description: string, outputPath: string, sidebarItems: any[]): Promise<void> {
@@ -190,7 +133,7 @@ async function renderAPIDocs(apiVersion: APIVersion, outputPath: string) {
         const operation = operations[method];
         if (operation.tags.includes(name)) {
           // Strip trailing dot from summary because they are annoying in the sidebar
-          const summary: string = stripTrailingDot(operation.summary);
+          const summary: string = canonicalizeTitle(operation.summary);
           const operationFile = path.join(operationsDir, operation.operationId + ".mdx");
           const serializedSpec = JSON.stringify(operation);
 

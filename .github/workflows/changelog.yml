@@ -1,0 +1,31 @@
+name: Generate API changelogs
+on:
+  workflow_dispatch:
+  schedule:
+      - cron: '0 20 * * *'
+jobs:
+  generate-changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Generate API changelogs
+        run: npm run generate:changelog
+      - name: Git Identity 🪪
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+      - name: Commit and push changes
+        run: |
+          if [ $(git status --porcelain . | wc -l) -gt 0 ] ; then
+            git add .
+            git commit -m "Generate API changelog for $(date +%d-%m-%Y)";            
+            git push origin
+          fi
