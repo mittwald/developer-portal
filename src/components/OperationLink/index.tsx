@@ -10,29 +10,39 @@ export interface OperationLinkProps {
   apiVersion?: APIVersion;
 }
 
-export default function OperationLink(
-  {
-    operation,
-    apiVersion = "v2",
-    children
-  }: PropsWithChildren<OperationLinkProps>
-) {
+export default function OperationLink({
+  operation,
+  apiVersion = "v2",
+  children,
+}: PropsWithChildren<OperationLinkProps>) {
   const spec = useSpec(apiVersion);
   const operationSpec = getOperationById(spec, operation);
 
   if (!operationSpec) {
-    return <>unknown operation <code>{operation}</code></>;
+    return (
+      <>
+        unknown operation <code>{operation}</code>
+      </>
+    );
   }
 
   const tag = operationSpec.operation.tags[0];
-  const summary = operationSpec.operation.summary.replace(/\.$/, "");
+  if (!tag) {
+    return (
+      <>
+        <code>{operation}</code> (untagged)
+      </>
+    );
+  }
 
-  children = children || <span className={styles.operationLink}>
-    <HTTPMethod method={operationSpec.method} />
-    <code>
-      <OperationPath path={operationSpec.path} />
-    </code>
-  </span>;
+  children = children || (
+    <span className={styles.operationLink}>
+      <HTTPMethod method={operationSpec.method} />
+      <code>
+        <OperationPath path={operationSpec.path} />
+      </code>
+    </span>
+  );
 
   const url = `/docs/${apiVersion}/reference/${tag.toLowerCase()}/${operation}`;
   return <Link to={url}>{children}</Link>;
