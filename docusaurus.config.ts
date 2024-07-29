@@ -77,6 +77,8 @@ const config: Config = {
         path: './changelog',
         blogTitle: "Changelog",
         blogDescription: "Changelog for the mittwald APIs and mittwald cloud platform",
+        blogSidebarTitle: 'All change notes',
+        blogSidebarCount: 'ALL',
       },
     ],
   ],
