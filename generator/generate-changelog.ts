@@ -80,9 +80,11 @@ async function generateAPIChangelog(apiVersion: APIVersion) {
 
   if (changelog.length > 0) {
     const today = new Date();
+    const day = `${today.getDate()}`.padStart(2, "0");
+    const month = `${today.getMonth() + 1}`.padStart(2, "0");
     const outputFile = path.join(
       "changelog",
-      `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}-api-changes-${apiVersion}.mdx`,
+      `${today.getFullYear()}-${month}-${day}-api-changes-${apiVersion}.mdx`,
     );
 
     const summary = await generateAPIChangeSummary(changelog);
