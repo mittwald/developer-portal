@@ -78,29 +78,31 @@ async function generateAPIChangelog(apiVersion: APIVersion) {
     (change: ChangelogEntry) => change.level === 3,
   );
 
+  const today = new Date();
+  const day = `${today.getDate()}`.padStart(2, "0");
+  const month = `${today.getMonth() + 1}`.padStart(2, "0");
+  const outputFile = path.join(
+    "changelog",
+    `${today.getFullYear()}-${month}-${day}-api-changes-${apiVersion}.mdx`,
+  );
+
   if (changelog.length > 0) {
-    const today = new Date();
-    const day = `${today.getDate()}`.padStart(2, "0");
-    const month = `${today.getMonth() + 1}`.padStart(2, "0");
-    const outputFile = path.join(
-      "changelog",
-      `${today.getFullYear()}-${month}-${day}-api-changes-${apiVersion}.mdx`,
-    );
-
     const summary = await generateAPIChangeSummary(changelog);
-
-    const clientChangelogs = [
-      ...(await generateClientChangelog(
-        "mittwald PHP SDK",
-        "api-client-php",
-        baseDate,
-      )),
-      ...(await generateClientChangelog(
-        "mittwald JavaScript SDK",
-        "api-client-js",
-        baseDate,
-      )),
-    ];
+    const clientChangelogs =
+      apiVersion !== "v1"
+        ? [
+            ...(await generateClientChangelog(
+              "mittwald PHP SDK",
+              "api-client-php",
+              baseDate,
+            )),
+            ...(await generateClientChangelog(
+              "mittwald JavaScript SDK",
+              "api-client-js",
+              baseDate,
+            )),
+          ]
+        : [];
 
     const rendered = await ejs.renderFile(
       path.join("generator", "templates", "changelog.mdx.ejs"),
