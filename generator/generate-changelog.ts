@@ -6,24 +6,27 @@ import * as ejs from "ejs";
 import * as yaml from "yaml";
 import * as fs from "fs/promises";
 import { canonicalizeTitle } from "@site/generator/util/title";
+import OpenAI from "openai";
+
+const openai = new OpenAI();
 
 type ChangelogEntry = {
-  "id": string,
-  "text": string,
-  "level": 1|2|3,
-  "operation": string,
-  "operationId": string,
-  "path": string,
-  "source": string,
-  "section": string
-}
+  id: string;
+  text: string;
+  level: 1 | 2 | 3;
+  operation: string;
+  operationId: string;
+  path: string;
+  source: string;
+  section: string;
+};
 
 type GithubRelease = {
   published_at: string;
   html_url: string;
   body: string;
   name: string;
-}
+};
 
 function groupChangelogByOperation(changelog: ChangelogEntry[]) {
   const grouped = new Map<string, ChangelogEntry[]>();
@@ -37,29 +40,83 @@ function groupChangelogByOperation(changelog: ChangelogEntry[]) {
   return grouped;
 }
 
+async function generateAPIChangeSummary(
+  changelog: ChangelogEntry[],
+): Promise<string> {
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+      {
+        role: "system",
+        content:
+          "You will be provided a JSON document with a list of changes to the mittwald API. " +
+          "You will create a summary of the changes as a markdown formatted list. " +
+          "When multiple changes affect a single API operation, summarize them into a single list item. " +
+          "When an items `level` property is 3, also include a note that a breaking change has occurred. " +
+          "Form complete sentences. Do not include a heading.",
+      },
+      { role: "user", content: JSON.stringify(changelog) },
+    ],
+    temperature: 0,
+  });
+
+  return completion.choices[0].message.content;
+}
+
 async function generateAPIChangelog(apiVersion: APIVersion) {
   const spec = await loadSpec(apiVersion);
   const base = path.join("generator", "specs", `openapi-${apiVersion}.json`);
+  //const baseDate = (await fs.stat(base)).mtime;
+  const baseDate = new Date(new Date().getTime() - 86400_000 * 7);
   const head = `https://api.mittwald.de/${apiVersion}/openapi.json?withRedirects=false`;
-  const changelog: ChangelogEntry[] = JSON.parse(execFileSync("oasdiff", ["changelog", "-fjson", base, head], { encoding: "utf-8" }));
+  const changelog: ChangelogEntry[] = JSON.parse(
+    execFileSync("oasdiff", ["changelog", "-fjson", base, head], {
+      encoding: "utf-8",
+    }),
+  );
   const groupedChangelog = groupChangelogByOperation(changelog);
-  const hasBreakingChanges = changelog.some((change: ChangelogEntry) => change.level === 3);
+  const hasBreakingChanges = changelog.some(
+    (change: ChangelogEntry) => change.level === 3,
+  );
 
   if (changelog.length > 0) {
     const today = new Date();
-    const outputFile = path.join("changelog", `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}-api-changes-${apiVersion}.mdx`);
+    const outputFile = path.join(
+      "changelog",
+      `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}-api-changes-${apiVersion}.mdx`,
+    );
 
-    const rendered = await ejs.renderFile(path.join("generator", "templates", "changelog.mdx.ejs"), {
-      yaml,
-      today,
-      apiVersion,
-      changelog,
-      groupedChangelog,
-      hasBreakingChanges,
-      spec,
-      getOperationById,
-      canonicalizeTitle,
-    });
+    const summary = await generateAPIChangeSummary(changelog);
+
+    const clientChangelogs = [
+      ...(await generateClientChangelog(
+        "mittwald PHP SDK",
+        "api-client-php",
+        baseDate,
+      )),
+      ...(await generateClientChangelog(
+        "mittwald JavaScript SDK",
+        "api-client-js",
+        baseDate,
+      )),
+    ];
+
+    const rendered = await ejs.renderFile(
+      path.join("generator", "templates", "changelog.mdx.ejs"),
+      {
+        yaml,
+        today,
+        apiVersion,
+        changelog,
+        groupedChangelog,
+        hasBreakingChanges,
+        spec,
+        getOperationById,
+        canonicalizeTitle,
+        summary,
+        clientChangelogs,
+      },
+    );
 
     await fs.writeFile(outputFile, rendered, { encoding: "utf-8" });
   }
@@ -68,29 +125,40 @@ async function generateAPIChangelog(apiVersion: APIVersion) {
   await fs.writeFile(base, JSON.stringify(spec));
 }
 
-async function generateClientChangelog(name: string, repo: string) {
+async function generateClientChangelog(
+  name: string,
+  repo: string,
+  since: Date,
+): Promise<string[]> {
   const url = `https://api.github.com/repos/mittwald/${repo}/releases`;
   const releases: GithubRelease[] = await (await fetch(url)).json();
+  const output = [];
 
   for (const release of releases) {
     const date = new Date(release.published_at);
-    const outputFile = path.join("changelog", `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}-${repo}-${release.name}.mdx`);
-    const rendered = await ejs.renderFile(path.join("generator", "templates", "client-changelog.mdx.ejs"), {
-      release,
-      name,
-      repo,
-      yaml,
+    if (date < since) {
+      continue;
+    }
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: `You will be provided a JSON document describing a new release of the ${name}. Write a short markdown summary of this release. Make sure to include the link to the html_url in the summary. Begin with a h3 heading. Remain factual and concise, do not be overly emotional.`,
+        },
+        { role: "user", content: JSON.stringify(release) },
+      ],
+      temperature: 0.2,
     });
 
-    await fs.writeFile(outputFile, rendered, { encoding: "utf-8" });
+    output.push(completion.choices[0].message.content);
   }
+
+  return output;
 }
 
 (async () => {
   await generateAPIChangelog("v1");
   await generateAPIChangelog("v2");
-
-  // disabled for now
-  //await generateClientChangelog("mittwald PHP SDK", "api-client-php");
-  //await generateClientChangelog("mittwald JavaScript SDK", "api-client-js");
 })().catch(console.error);

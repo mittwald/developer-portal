@@ -37,6 +37,12 @@ This document contains breaking changes. Please review the changes carefully.
 
 ## Summary
 
+<% if (summary) { %>
+<%- summary %>
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+<% } else { %>
+
 The following API endpoints have changed:
 
 <% for ([operationId, changes] of groupedChangelog.entries()) { %>
@@ -47,9 +53,13 @@ The following API endpoints have changed:
 <% } %>
 <% } %>
 
+<% } %>
+
+## Detailed changes
+
 <% for ([operationId, changes] of groupedChangelog.entries()) { %>
 
-## Changes in "<%- canonicalizeTitle(getOperationById(spec, operationId).operation.summary) %>"
+### Changes in "<%- canonicalizeTitle(getOperationById(spec, operationId).operation.summary) %>"
 
 <% for (change of changes) { %>
 - <% if (change.level === 3) { %>⚠️ **Breaking:** <% } %><%- change.text %>
@@ -57,4 +67,12 @@ The following API endpoints have changed:
 
 For details, refer to the <OperationLink operation="<%= operationId %>" apiVersion="<%= apiVersion %>" /> endpoint.
 
+<% } %>
+
+<% if (clientChangelogs && clientChangelogs.length > 0) { %>
+## Client package releases
+
+<% for (const release of clientChangelogs) { %>
+<%- release %>
+<% } %>
 <% } %>
