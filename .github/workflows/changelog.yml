@@ -34,7 +34,7 @@ jobs:
       - name: Commit and push changes
         run: |
           if [ $(git status --porcelain . | wc -l) -gt 0 ] ; then
-            git add .
+            git add changelog
             git commit -m "Generate API changelog for $(date +%d-%m-%Y)";            
             git push origin
           fi
