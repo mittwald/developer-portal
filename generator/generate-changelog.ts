@@ -45,7 +45,7 @@ async function generateAPIChangeSummary(
   changelog: ChangelogEntry[],
 ): Promise<string> {
   const completion = await openai.chat.completions.create({
-    model: "gpt-4o",
+    model: "gpt-4o-mini",
     messages: [
       {
         role: "system",
@@ -53,13 +53,19 @@ async function generateAPIChangeSummary(
           "You will be provided a JSON document with a list of changes to the mittwald API. " +
           "You will create a summary of the changes as a markdown formatted list. " +
           "When multiple changes affect a single API operation, summarize them into a single list item. " +
+          "When an identical change affects multiple API operations, summarize them into a single list item. " +
           "When an items `level` property is 3, also include a note that a breaking change has occurred. " +
           "Form complete sentences. Do not include a heading.",
       },
       { role: "user", content: JSON.stringify(changelog) },
     ],
+    max_tokens: 4096 * 2,
     temperature: 0,
   });
+
+  if (completion.choices[0].finish_reason === "length") {
+    return `::: warning\nThe API change contained too many changes to summarize. Please refer to the detailed list below for details.\n:::`;
+  }
 
   return completion.choices[0].message.content;
 }
