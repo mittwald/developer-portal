@@ -8,6 +8,7 @@ import * as ejs from "ejs";
 import { dereferenceSpec, loadSpec } from "@site/generator/util/spec";
 import { canonicalizeTitle } from "@site/generator/util/title";
 import { slugFromTagName } from "@site/src/openapi/slugFromTagName";
+import HttpMethods = OpenAPIV3.HttpMethods;
 
 type APIVersion = `v${number}`;
 
@@ -184,7 +185,7 @@ async function renderAPIDocs(apiVersion: APIVersion, outputPath: string) {
       const operations = spec.paths[urlPath];
       const urlPathWithBase =
         basePath + urlPath.replace(new RegExp(`${basePath}/`), "/");
-      for (const method of Object.keys(operations)) {
+      for (const method of Object.keys(operations) as HttpMethods[]) {
         const operation = operations[method];
         if (operation.tags.includes(name)) {
           // Strip trailing dot from summary because they are annoying in the sidebar
@@ -227,13 +228,7 @@ async function renderAPIDocs(apiVersion: APIVersion, outputPath: string) {
       compareOperation(a.customProps, b.customProps),
     );
 
-    await renderTagIndexPage(
-      apiVersion,
-      name,
-      description,
-      operationsDir,
-      sidebarItems,
-    );
+    await renderTagIndexPage(apiVersion, name, description, operationsDir);
 
     sidebar.push({
       type: "category",
