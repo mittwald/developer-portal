@@ -4,6 +4,7 @@ import { APIVersion, getOperationById, useSpec } from "@site/src/openapi/specs";
 import HTTPMethod from "@site/src/components/openapi/HTTPMethod";
 import OperationPath from "@site/src/components/openapi/OperationPath";
 import styles from "./styles.module.css";
+import { slugFromTagName } from "@site/src/openapi/slugFromTagName";
 
 export interface OperationLinkProps {
   operation: string;
@@ -44,6 +45,6 @@ export default function OperationLink({
     </span>
   );
 
-  const url = `/docs/${apiVersion}/reference/${tag.toLowerCase()}/${operation}`;
+  const url = `/docs/${apiVersion}/reference/${slugFromTagName(tag)}/${operation}`;
   return <Link to={url}>{children}</Link>;
 }

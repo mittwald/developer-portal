@@ -7,14 +7,18 @@ import compareOperation from "@site/src/openapi/compareOperation";
 import * as ejs from "ejs";
 import { dereferenceSpec, loadSpec } from "@site/generator/util/spec";
 import { canonicalizeTitle } from "@site/generator/util/title";
+import { slugFromTagName } from "@site/src/openapi/slugFromTagName";
 
-type APIVersion = `v${number}`
+type APIVersion = `v${number}`;
 
-
-function determineServerURLAndBasePath(apiVersion: APIVersion, spec: OpenAPIV3.Document): [string, string] {
+function determineServerURLAndBasePath(
+  apiVersion: APIVersion,
+  spec: OpenAPIV3.Document,
+): [string, string] {
   let basePath = "";
 
-  const serverURL = spec.servers?.[0].url ?? `https://api.mittwald.de/${apiVersion}`;
+  const serverURL =
+    spec.servers?.[0].url ?? `https://api.mittwald.de/${apiVersion}`;
   if (serverURL) {
     const parsedServerURL = url.parse(serverURL);
     basePath = parsedServerURL.pathname;
@@ -23,26 +27,47 @@ function determineServerURLAndBasePath(apiVersion: APIVersion, spec: OpenAPIV3.D
   return [serverURL, basePath];
 }
 
-function loadDescriptionOverride(apiVersion: APIVersion, operationId: string, part: "pre"|"post"): string | undefined {
+function loadDescriptionOverride(
+  apiVersion: APIVersion,
+  operationId: string,
+  part: "pre" | "post",
+): string | undefined {
   const filename = part === "pre" ? "description.md" : "description-post.md";
-  const descriptionOverridePath = path.join("generator", "overlays", apiVersion, operationId, filename);
+  const descriptionOverridePath = path.join(
+    "generator",
+    "overlays",
+    apiVersion,
+    operationId,
+    filename,
+  );
   if (fs.existsSync(descriptionOverridePath)) {
     return fs.readFileSync(descriptionOverridePath, { encoding: "utf-8" });
   }
   if (fs.existsSync(descriptionOverridePath + "x")) {
-    return fs.readFileSync(descriptionOverridePath + "x", { encoding: "utf-8" });
+    return fs.readFileSync(descriptionOverridePath + "x", {
+      encoding: "utf-8",
+    });
   }
   return undefined;
 }
 
-function loadCodeExample(apiVersion: APIVersion, operationId: string, language: string): string | undefined {
-  const codeExamplePath = path.join("generator", "overlays", apiVersion, operationId, `example-${language}.md`);
+function loadCodeExample(
+  apiVersion: APIVersion,
+  operationId: string,
+  language: string,
+): string | undefined {
+  const codeExamplePath = path.join(
+    "generator",
+    "overlays",
+    apiVersion,
+    operationId,
+    `example-${language}.md`,
+  );
   if (fs.existsSync(codeExamplePath)) {
     return fs.readFileSync(codeExamplePath, { encoding: "utf-8" });
   }
   return undefined;
 }
-
 
 async function renderAPISpecToFile(
   operationFile: string,
@@ -55,44 +80,73 @@ async function renderAPISpecToFile(
   const withSDKExamples = apiVersion !== "v1";
   const summary: string = canonicalizeTitle(spec.summary);
 
-  const descriptionOverridePre = loadDescriptionOverride(apiVersion, spec.operationId, "pre");
-  const descriptionOverridePost = loadDescriptionOverride(apiVersion, spec.operationId, "post");
+  const descriptionOverridePre = loadDescriptionOverride(
+    apiVersion,
+    spec.operationId,
+    "pre",
+  );
+  const descriptionOverridePost = loadDescriptionOverride(
+    apiVersion,
+    spec.operationId,
+    "post",
+  );
 
   const exampleOverrides = [
     ["curl", "cURL", loadCodeExample(apiVersion, spec.operationId, "curl")],
-    ["javascript", "JavaScript SDK", loadCodeExample(apiVersion, spec.operationId, "javascript")],
+    [
+      "javascript",
+      "JavaScript SDK",
+      loadCodeExample(apiVersion, spec.operationId, "javascript"),
+    ],
     ["php", "PHP SDK", loadCodeExample(apiVersion, spec.operationId, "php")],
     ["cli", "mw CLI", loadCodeExample(apiVersion, spec.operationId, "cli")],
-  ].filter(([,, i]) => i !== undefined).map(([key, label, content]) => `<TabItem key="${key}" value="${key}" label="${label}">\n\n${content}\n\n</TabItem>`);
+  ]
+    .filter(([, , i]) => i !== undefined)
+    .map(
+      ([key, label, content]) =>
+        `<TabItem key="${key}" value="${key}" label="${label}">\n\n${content}\n\n</TabItem>`,
+    );
 
-  const rendered = await ejs.renderFile("generator/templates/operation.mdx.ejs", {
-    yaml,
-    summary,
-    descriptionOverridePre,
-    descriptionOverridePost,
-    urlPathWithBase,
-    method,
-    spec,
-    withSDKExamples,
-    exampleOverrides,
-    serverURL,
-  });
+  const rendered = await ejs.renderFile(
+    "generator/templates/operation.mdx.ejs",
+    {
+      yaml,
+      summary,
+      descriptionOverridePre,
+      descriptionOverridePost,
+      urlPathWithBase,
+      method,
+      spec,
+      withSDKExamples,
+      exampleOverrides,
+      serverURL,
+    },
+  );
 
   fs.writeFileSync(operationFile, rendered, { encoding: "utf-8" });
 }
 
 function exportSpecToSource(spec: OpenAPIV3.Document, apiVersion: APIVersion) {
-  fs.writeFileSync(`src/openapi/openapi-${apiVersion}.json`, JSON.stringify(spec, null, 2));
+  fs.writeFileSync(
+    `src/openapi/openapi-${apiVersion}.json`,
+    JSON.stringify(spec, null, 2),
+  );
 }
 
-function slugFromTagName(tagName: string): string {
-  return tagName.replace(/ /g, "").toLowerCase().replace(/[^a-z0-9]/, "");
-}
-
-async function renderTagIndexPage(apiVersion: APIVersion, name: string, description: string, outputPath: string, sidebarItems: any[]): Promise<void> {
+async function renderTagIndexPage(
+  apiVersion: APIVersion,
+  name: string,
+  description: string,
+  outputPath: string,
+): Promise<void> {
   const indexFile = path.join(outputPath, "index.mdx");
 
-  const overrideFile = path.join("generator", "overlays", apiVersion, slugFromTagName(name) + ".mdx");
+  const overrideFile = path.join(
+    "generator",
+    "overlays",
+    apiVersion,
+    slugFromTagName(name) + ".mdx",
+  );
   if (fs.existsSync(overrideFile)) {
     fs.copyFileSync(overrideFile, indexFile);
     return;
@@ -128,14 +182,17 @@ async function renderAPIDocs(apiVersion: APIVersion, outputPath: string) {
 
     for (const urlPath of Object.keys(spec.paths)) {
       const operations = spec.paths[urlPath];
-      const urlPathWithBase = basePath + urlPath.replace(new RegExp(`${basePath}/`), "/");
+      const urlPathWithBase =
+        basePath + urlPath.replace(new RegExp(`${basePath}/`), "/");
       for (const method of Object.keys(operations)) {
         const operation = operations[method];
         if (operation.tags.includes(name)) {
           // Strip trailing dot from summary because they are annoying in the sidebar
           const summary: string = canonicalizeTitle(operation.summary);
-          const operationFile = path.join(operationsDir, operation.operationId + ".mdx");
-          const serializedSpec = JSON.stringify(operation);
+          const operationFile = path.join(
+            operationsDir,
+            operation.operationId + ".mdx",
+          );
 
           const classNames = [`api-operation-${method}`];
           if (operation.deprecated) {
@@ -143,25 +200,40 @@ async function renderAPIDocs(apiVersion: APIVersion, outputPath: string) {
           }
 
           sidebarItems.push({
-            "type": "doc",
-            "id": `reference/${slug}/${operation.operationId}`,
-            "className": classNames.join(" "),
-            "customProps": {
+            type: "doc",
+            id: `reference/${slug}/${operation.operationId}`,
+            className: classNames.join(" "),
+            customProps: {
               method,
               path: urlPath,
               deprecated: operation.deprecated,
               summary,
-            }
+            },
           });
 
-          await renderAPISpecToFile(operationFile, urlPathWithBase, method, operation, serverURL, apiVersion);
+          await renderAPISpecToFile(
+            operationFile,
+            urlPathWithBase,
+            method,
+            operation,
+            serverURL,
+            apiVersion,
+          );
         }
       }
     }
 
-    sidebarItems = sidebarItems.sort((a, b) => compareOperation(a.customProps, b.customProps));
+    sidebarItems = sidebarItems.sort((a, b) =>
+      compareOperation(a.customProps, b.customProps),
+    );
 
-    await renderTagIndexPage(apiVersion, name, description, operationsDir, sidebarItems);
+    await renderTagIndexPage(
+      apiVersion,
+      name,
+      description,
+      operationsDir,
+      sidebarItems,
+    );
 
     sidebar.push({
       type: "category",
@@ -170,39 +242,48 @@ async function renderAPIDocs(apiVersion: APIVersion, outputPath: string) {
         type: "doc",
         id: `reference/${slug}/index`,
       },
-      items: sidebarItems
+      items: sidebarItems,
     });
   }
 
   if (apiVersion === "v2") {
-    fs.writeFileSync("sidebar.reference.json", JSON.stringify(sidebar, null, 2));
+    fs.writeFileSync(
+      "sidebar.reference.json",
+      JSON.stringify(sidebar, null, 2),
+    );
   }
 
   if (apiVersion === "v1") {
     const completeSidebar = {
-      "apiSidebar": [
+      apiSidebar: [
         {
-          "type": "doc",
-          "id": "intro"
+          type: "doc",
+          id: "intro",
         },
         {
-          "type": "category",
-          "label": "Reference (v1)",
+          type: "category",
+          label: "Reference (v1)",
           link: {
             type: "generated-index",
             title: "API Reference",
             slug: "/reference",
-            keywords: ["api-reference"]
+            keywords: ["api-reference"],
           },
-          "items": sidebar
-        }
-      ]
+          items: sidebar,
+        },
+      ],
     };
-    fs.writeFileSync(path.join("versioned_sidebars", `version-${apiVersion}-sidebars.json`), JSON.stringify(completeSidebar, null, 2));
+    fs.writeFileSync(
+      path.join("versioned_sidebars", `version-${apiVersion}-sidebars.json`),
+      JSON.stringify(completeSidebar, null, 2),
+    );
   }
 }
 
 (async () => {
-  await renderAPIDocs("v1", path.join("versioned_docs", "version-v1", "reference"));
+  await renderAPIDocs(
+    "v1",
+    path.join("versioned_docs", "version-v1", "reference"),
+  );
   await renderAPIDocs("v2", path.join("docs", "reference"));
 })().catch(console.error);
