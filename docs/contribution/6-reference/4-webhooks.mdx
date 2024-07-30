@@ -271,7 +271,7 @@ Folgende Platzhalter können verwendet werden:
   format="yaml"
   schema={{
     type: "object",
-    required: ["apiVersion", "kind", "id", "secret", "request"],
+    required: ["apiVersion", "context", "kind", "id", "secret", "request"],
     properties: {
       apiVersion: {
         type: "string",
@@ -285,6 +285,20 @@ Folgende Platzhalter können verwendet werden:
         type: "string",
         format: "uuid",
         example: "d990eb39-041b-40b4-abb9-7a39678a0464",
+      },
+      context: {
+        type: "object",
+        required: ["id", "kind"],
+        properties: {
+          id: {
+            type: "string",
+            format: "uuid",
+          },
+          kind: {
+            type: "string",
+            enum: ["customer", "project"],
+          },
+        },
       },
       secret: {
         type: "string",
