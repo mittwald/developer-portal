@@ -33,7 +33,7 @@ jobs:
           git config user.email "${{ github.actor }}@users.noreply.github.com"
       - name: Commit and push changes
         run: |
-          if [ $(git status --porcelain . | wc -l) -gt 0 ] ; then
+          if [ $(git status --porcelain changelog generator/specs | wc -l) -gt 0 ] ; then
             git add changelog generator/specs
             git commit -m "Generate API changelog for $(date +%d-%m-%Y)";
             git remote add publish "https://mittwald-machine:${{ secrets.RELEASE_USER_TOKEN }}@github.com/mittwald/developer-portal.git"
