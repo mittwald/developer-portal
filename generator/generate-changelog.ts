@@ -20,6 +20,7 @@ type ChangelogEntry = {
   path: string;
   source: string;
   section: string;
+  description?: string;
 };
 
 type GithubRelease = {
@@ -75,11 +76,14 @@ async function generateAPIChangelog(apiVersion: APIVersion) {
   const base = path.join("generator", "specs", `openapi-${apiVersion}.json`);
   const baseDate = (await fs.stat(base)).mtime;
   const head = `https://api.mittwald.de/${apiVersion}/openapi.json?withRedirects=false`;
-  const changelog: ChangelogEntry[] = JSON.parse(
+  const changelog: ChangelogEntry[] = (JSON.parse(
     execFileSync("oasdiff", ["changelog", "-fjson", base, head], {
       encoding: "utf-8",
     }),
-  );
+  ) as ChangelogEntry[]).map((change) => {
+    const operation = getOperationById(spec, change.operationId);
+    return { ...change, description: operation.operation.summary };
+  });
   const groupedChangelog = groupChangelogByOperation(changelog);
   const hasBreakingChanges = changelog.some(
     (change: ChangelogEntry) => change.level === 3,
