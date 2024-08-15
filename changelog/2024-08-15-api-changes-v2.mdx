@@ -1,0 +1,84 @@
+---
+title: API changes for v2 API, August 15, 2024
+authors:
+  - machine
+tags:
+  - apiv2
+  - Customer
+  - User
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This document contains a machine-generated summary of the API changes for August 15, 2024.
+The API changes are based on the diff between the OpenAPI schemas of the two versions.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- The `GET /v2/customers` operation has been updated to include a new optional request parameter called `search` and a new non-success response status of `400`.
+- The `GET /v2/user` operation has been enhanced with two new optional properties in the `200` status response: `mfa` and `passwordUpdatedAt`.
+- The `GET /v2/user/{userId}` operation now also includes the optional properties `mfa` and `passwordUpdatedAt` in the `200` status response.
+- The `GET /v2/users/{userId}` operation has been updated to add the optional properties `mfa` and `passwordUpdatedAt` to the `200` status response.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Get all customer profiles the authenticated user has access to"
+
+
+- added the new optional 'query' request parameter 'search'
+
+- added the non-success response with the status '400'
+
+
+For details, refer to the <OperationLink operation="customer-list-customers" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get profile information for the executing user"
+
+
+- added the optional property 'mfa' to the response with the '200' status
+
+- added the optional property 'passwordUpdatedAt' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="deprecated-user-service-user-get-own" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get profile information for the specified user if the user is related to the executing user"
+
+
+- added the optional property 'mfa' to the response with the '200' status
+
+- added the optional property 'passwordUpdatedAt' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="deprecated-user-service-user-get" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get profile information for a user"
+
+
+- added the optional property 'mfa' to the response with the '200' status
+
+- added the optional property 'passwordUpdatedAt' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="user-get-user" apiVersion="v2" /> endpoint.
+
+
+
