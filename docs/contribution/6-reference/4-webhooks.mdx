@@ -6,25 +6,6 @@ import SchemaWithExample from "../../../src/components/openapi/SchemaWithExample
 
 Lifecycle Events werden von mittwald genutzt, um die externe Anwendung über sie betreffende Ereignisse zu informieren.
 
-Abgesehen vom `ExtensionInstanceRemovedFromContext`-Webhook werden alle Webhooks `at least once` aufgerufen und sind somit so zu entwerfen, dass mehrfache Aufrufe nicht zu Fehlern führen.
-Die Webhooks werden synchron zu der sie auslösenden Aktion aufgerufen.
-Das bedeutet, dass die Aktion erst dann als erfolgreich abgeschlossen gilt, wenn der Webhook erfolgreich verarbeitet wurde.
-Beispielsweise wird eine Extension erst dann als zu einem Context hinzugefügt betrachtet,
-wenn der `ExtensionAddedToContext`-Webhook erfolgreich verarbeitet wurde.
-Aus diesem Grund sollte darauf verzichtet werden, in den Webhooks aufwendige Berechnungen durchzuführen.
-Dies würde sich unmittelbar auf die User-Experience auswirken.
-
-Abweichend davon gilt dies **nicht** für den `ExtensionInstanceRemovedFromContext`-Webhook.
-Um zu vermeiden, dass Nutzer von Extensions eine Extension nicht mehr entfernen können,
-wird der `ExtensionInstanceRemovedFromContext`-Webhook synchron aufgerufen, aber die Aktion trotzdem als erfolgreich betrachtet,
-wenn der Webhook nicht versendet werden konnte.
-Dies ist insbesondere wichtig, da mit dem Entfernen einer Extension aus einem Context auch die Berechtigungen der Extension entfernt werden.
-
-Aus demselben Grund kann während der Verarbeitung des `ExtensionInstanceRemovedFromContext`-Webhooks das Extension Secret
-nicht mehr verwendet werden, um die Extension zu authentifizieren.
-Extensions können also keine während der Laufzeit der Extension Instance durchgeführten Aktionen mehr rückgängig machen,
-nachdem sie vom Extension Context entfernt wurden.
-
 ## Templating von Webhook URLs
 
 Um die URL für die Webhooks zu konfigurieren, können Platzhalter verwendet werden.
@@ -39,7 +20,7 @@ Folgende Platzhalter können verwendet werden:
 - `contextId`: ID des Extension Contexts, bspw. die ProjectID
 - `context`: Der Extension Context Kind, zu dem die Extension Instance hinzugefügt wurde. Derzeit entweder `customer` oder `project`.
 
-## Webhook Example Payloads
+## Webhook Payloads
 
 ### ExtensionAddedToContext
 
