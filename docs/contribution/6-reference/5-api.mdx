@@ -2,10 +2,12 @@
 title: Relevante mStudio API-Endpunkte
 ---
 
+import OperationLink from "@site/src/components/OperationLink";
+
 ## Nutzung von Access Tokens zur Authentifizierung
 
 Access Tokens können verwendet werden, um sich gegenüber der mStudio API zu authentifizieren.
-Dazu wird das Access Token im `x-access-token` Header der HTTP Anfrage übermittelt.
+Die Verwendung von Access Tokens ist in [API-Anfragen authentifizieren](../../../api/intro#authenticating-requests) beschrieben.
 
 Um in Erfahrung zu bringen, welche Routen authentifiziert ausgeführt werden müssen,
 kann die jeweilige Operation in der [API Referenz](../../../reference/) aufgesucht werden.
@@ -25,7 +27,7 @@ Für weitere Informationen über die Webhooks siehe [Lifecycle Webhooks](../webh
 
 Das Secret kann aus der `secret` Property des Webhook Request Bodies entnommen werden.
 Dieses kann dann in Kombination mit der Extension Instance ID, die unter der Property `id` zu finden ist, verwendet werden, um ein Access Token zu beziehen.
-Dafür muss die [extension-authenticate-instance](../../../reference/marketplace/extension-authenticate-instance/)-Operation verwendet werden.
+Dafür muss die <OperationLink operation="extension-authenticate-instance" />-Operation verwendet werden.
 Die `extensionInstanceId` wird als Pfad-Parameter übergeben und das Secret im Request Body als `extensionInstanceSecret`-Property.
 
 Als Response wird der `publicToken`, der für die Authentifizierung gegenüber der mStudio API verwendet werden kann, zurückgegeben.
@@ -42,8 +44,8 @@ Unterstützt wird derzeit nur der Authorization Code Flow (mit PKCE).
 
 Die benötigten API-Endpunkte für den OAuth2 Flow sind:
 
-- [user-oauth-get-authorization](../../../reference/user/user-oauth-get-authorization)
-- [user-oauth-retrieve-access-token](../../../reference/user/user-oauth-retrieve-access-token)
+- <OperationLink operation="user-oauth-get-authorization" />
+- <OperationLink operation="user-oauth-retrieve-access-token" />
 
 Für die Implementierung des OAuth2 Clients empfiehlt mittwald die Verwendung einer OAuth2 Client Library,
 die mit [RFC 6749](https://tools.ietf.org/html/rfc6749) konform ist.
@@ -83,7 +85,7 @@ Hier wird der ATReK und die User ID als Query-Parameter übergeben.
 Prinzipiell kann auch jeder andere URI-Bestandteil verwendet werden, um die Informationen zu übergeben.
 Query-Parameter eignen sich jedoch am besten, weil diese meist nicht in Access Logs auftauchen.
 
-Die Extension kann den ATReK verwenden, indem die [user-authenticate-with-access-token-retrieval-key](../../../reference/user/user-authenticate-with-access-token-retrieval-key/) Route aufgerufen wird.
+Die Extension kann den ATReK verwenden, indem die <OperationLink operation="user-authenticate-with-access-token-retrieval-key" />-Route aufgerufen wird.
 
 Die Route benötigt als Parameter den ATReK und die User ID und antwortet bei Erfolg mit einem Access Token.
 Das resultierende Access Token ist automatisch mit den Scopes der Extension eingeschränkt.
@@ -106,7 +108,7 @@ sequenceDiagram
 ## Abruf von Webhook Signatur Public Keys
 
 Zur [Prüfung der Signatur eines Lifecycle Webhooks](../webhooks#validierung-von-lifecycle-webhooks) muss der öffentliche Schlüssel des mStudio bekannt sein.
-Dieser kann über die [extension-get-public-key](../../../reference/marketplace/extension-get-public-key) Route abgerufen werden.
+Dieser kann über die <OperationLink operation="extension-get-public-key" />-Route abgerufen werden.
 Dazu muss der Identifier des Public Keys, der sich hinter dem `X-Marketplace-Signature-Serial`-Header verbirgt als Pfad-Parameter übergeben werden.
 Der Public Key wird base64 kodiert im Response Body zurückgegeben.
 
