@@ -148,7 +148,11 @@ const config: Config = {
           position: "left",
           label: "Reference",
         },
-        //{to: '/blog', label: 'Blog', position: 'left'},
+        {
+          to: '/changelog',
+          label: 'Changelog',
+          position: 'left',
+        },
         {
           href: "https://github.com/mittwald/developer-portal",
           label: "GitHub",
