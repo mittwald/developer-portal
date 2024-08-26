@@ -106,7 +106,8 @@ async function generateAPIChangeSummary(
 async function generateAPIChangelog(apiVersion: APIVersion) {
   const spec = await loadSpec(apiVersion);
   const base = path.join("generator", "specs", `openapi-${apiVersion}.json`);
-  const baseDate = (await fs.stat(base)).mtime;
+  const baseDateUnix = parseInt(execFileSync("git", ["log", "-1", "--format=%cd", "--date=unix", base], {encoding: "utf-8"}), 10);
+  const baseDate = new Date(baseDateUnix * 1000);
   const head = `https://api.mittwald.de/${apiVersion}/openapi.json?withRedirects=false`;
   const changelog: ChangelogEntry[] = (JSON.parse(
     execFileSync("oasdiff", ["changelog", "-fjson", base, head], {
