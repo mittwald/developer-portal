@@ -90,7 +90,7 @@ function OperationParameterList({
   const hasRequired = params.some((param) => param.required);
 
   return (
-    <Accordion defaultExpanded={expanded}>
+    <Accordion defaultExpanded={expanded} variant="outlined" style={{marginBottom: "1em"}}>
       <Heading>
         <div style={{ flexGrow: 1 }}>{title}</div>{" "}
         {hasRequired ? <Required /> : undefined}
@@ -150,7 +150,7 @@ function OperationRequestBody({
 
   if ("application/json" in spec.content) {
     return (
-      <Accordion>
+      <Accordion variant="outlined" style={{marginBottom: "1em"}}>
         <Heading>
           <div style={{ flexGrow: 1 }}>{title}</div>
           {required}
@@ -306,7 +306,7 @@ export function OperationResponses({
   return (
     <>
       {responseCodes.map((status) => (
-        <Accordion key={status} defaultExpanded={status.startsWith("2")}>
+        <Accordion key={status} defaultExpanded={status.startsWith("2")} variant="outlined" style={{marginBottom: "1em"}}>
           <Heading>
             <HTTPResponseStatus code={status} />
           </Heading>
