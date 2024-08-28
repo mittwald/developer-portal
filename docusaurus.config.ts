@@ -6,7 +6,7 @@ import { themes } from "prism-react-renderer";
 import { Options, ThemeConfig } from "@docusaurus/preset-classic";
 import { Options as ClientRedirectOptions } from "@docusaurus/plugin-client-redirects";
 
-const lightCodeTheme = themes.github;
+const lightCodeTheme = themes.oneLight;
 const darkCodeTheme = themes.dracula;
 
 const config: Config = {
