@@ -1,0 +1,99 @@
+---
+title: Breaking (!) API changes for v2 API, July 29, 2024
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Domain
+  - App
+  - Article
+  - User
+  - Contract
+  - Marketplace
+  - Conversation
+  - Cronjob
+  - Customer
+  - Mail
+  - File
+  - Relocation
+  - Database
+  - Notification
+  - Page Insights
+  - Backup
+  - Project
+  - Project File System
+  - SSH/SFTP User
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This document contains a machine-generated summary of the API changes for July 29, 2024. The API changes are based on the diff between the OpenAPI schemas of the two versions.
+
+{/* truncate */}
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+## Summary
+
+- A `429 Too Many Requests` status code has been added to the specification of _every_ API endpoint. This status code is returned when the rate limit is exceeded. The rate limiting feature is not new, but the documentation has been updated to reflect this behavior. See the section on [API ratelimiting](../../../../../docs/v2/api/intro#rate-limiting) for more information.
+- Changed the way the request body of the <OperationLink operation="ingress-update-ingress-tls" apiVersion="v2" /> endpoint is defined (might potentially cause breaking changes in generated client code).
+
+## Detailed changes
+
+### Changes in "Update the tls settings of an Ingress"
+
+- ⚠️ **Breaking:** replaced '#/components/schemas/de.mittwald.v1.ingress.TlsAcme, #/components/schemas/de.mittwald.v1.ingress.TlsCertificate' from the request body 'oneOf' list, and substituted inline schemas. Note that this is not a breaking change when you are using the API directly, but it might cause breaking changes in code generated from the OpenAPI schema.
+
+For details, refer to the <OperationLink operation="ingress-update-ingress-tls" apiVersion="v2" /> endpoint.
+
+### Changes to _all_ API endpoints
+
+- added the non-success response with the status '429'
+
+### Changes in "Create an Order"
+
+- removed the non-success response with the status '403'
+
+For details, refer to the <OperationLink operation="order-create-order" apiVersion="v2" /> endpoint.
+
+### Changes in "Register with email and password"
+
+- removed the non-success response with the status '403'
+
+For details, refer to the <OperationLink operation="user-register" apiVersion="v2" /> endpoint.
+
+### Changes in "Resend the mail address verification email"
+
+- removed the non-success response with the status '403'
+
+For details, refer to the <OperationLink operation="deprecated-user-resend-verification-email" apiVersion="v2" /> endpoint.
+
+### Changes in "Initialize password reset process"
+
+- removed the non-success response with the status '403'
+
+For details, refer to the <OperationLink operation="deprecated-user-init-password-reset" apiVersion="v2" /> endpoint.
+
+### Changes in "Initialize password reset process"
+
+- removed the non-success response with the status '403'
+
+For details, refer to the <OperationLink operation="user-init-password-reset" apiVersion="v2" /> endpoint.
+
+## Client package releases
+
+### mittwald PHP SDK release release v2.1.42
+
+The mittwald PHP SDK v2.1.42 has been released, which reflects the changes in the API. You can find the release notes [here](https://github.com/mittwald/api-client-php/releases/tag/v2.1.42).
+
+### mittwald Javascript SDK release v4.42.0
+
+The mittwald JavaScript SDK v4.42.0 has been released, which reflects the changes in the API. You can find the release notes [here](https://github.com/mittwald/api-client-js/releases/tag/4.42.0).

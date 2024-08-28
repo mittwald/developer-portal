@@ -1,0 +1,186 @@
+---
+title: Breaking (!) API changes for v2 API, August 12, 2024
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Contract
+  - User
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This document contains a machine-generated summary of the API changes for August 12, 2024.
+The API changes are based on the diff between the OpenAPI schemas of the two versions.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The request property `orderData/oneOf[#/components/schemas/de.mittwald.v1.order.DomainOrderPreview]/projectId` has become required in the `POST /v2/order-previews` operation. This is a breaking change.
+- The type/format of the `userId` path request parameter has changed from `string/uuid` to `string/''` in the `DELETE /v2/user/{userId}/avatar` and `DELETE /v2/user/{userId}/phone` operations. This is a breaking change.
+- The type/format of the `userId` path request parameter has been generalized from `''/''` to `string/''` in the following operations:
+  - `GET /v2/users/{userId}` (Get profile information for a user)
+  - `PUT /v2/users/{userId}` (Change personal information)
+  - `POST /v2/users/{userId}/actions/verify-phone` (Verify phone number)
+  - `DELETE /v2/users/{userId}/avatar` (Remove Avatar)
+  - `POST /v2/users/{userId}/avatar` (Request a new avatar image upload)
+  - `GET /v2/users/{userId}/feedback` (Submitted feedback of the given user)
+  - `DELETE /v2/users/{userId}/phone` (Remove phone number)
+  - `POST /v2/users/{userId}/phone` (Add phone number and start verification process)
+  - `GET /v2/users/{userId}/settings` (Get personalized settings)
+  - `PUT /v2/users/{userId}/settings` (Update personalized GUI settings)
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Preview Order"
+
+
+- ⚠️ **Breaking:** the request property 'orderData/oneOf[#/components/schemas/de.mittwald.v1.order.DomainOrderPreview]/projectId' became required
+
+
+For details, refer to the <OperationLink operation="order-preview-order" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Remove Avatar"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'userId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="deprecated-user-service-avatar-remove" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "remove your PhoneNumber"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'userId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="deprecated-user-service-phone-number-remove" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get profile information for a user"
+
+
+- for the 'path' request parameter 'userId', the type/format was generalized from ''/'' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="user-get-user" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Change personal information"
+
+
+- for the 'path' request parameter 'userId', the type/format was generalized from ''/'' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="user-update-personal-information" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Verify phone number"
+
+
+- for the 'path' request parameter 'userId', the type/format was generalized from ''/'' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="user-verify-phone-number" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Remove Avatar"
+
+
+- for the 'path' request parameter 'userId', the type/format was generalized from ''/'' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="user-remove-avatar" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Request a new avatar image upload"
+
+
+- for the 'path' request parameter 'userId', the type/format was generalized from ''/'' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="user-request-avatar-upload" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Submitted feedback of the given user"
+
+
+- for the 'path' request parameter 'userId', the type/format was generalized from ''/'' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="user-list-feedback" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Remove phone number"
+
+
+- for the 'path' request parameter 'userId', the type/format was generalized from ''/'' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="user-remove-phone-number" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Add phone number and start verification process"
+
+
+- for the 'path' request parameter 'userId', the type/format was generalized from ''/'' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="user-add-phone-number" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get personalized settings"
+
+
+- for the 'path' request parameter 'userId', the type/format was generalized from ''/'' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="user-get-personalized-settings" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update personalized GUI settings"
+
+
+- for the 'path' request parameter 'userId', the type/format was generalized from ''/'' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="user-update-personalized-settings" apiVersion="v2" /> endpoint.
+
+
+

@@ -69,6 +69,20 @@ const config: Config = {
         },
       } satisfies ClientRedirectOptions,
     ],
+    [
+      '@docusaurus/plugin-content-blog',
+      {
+        id: 'changelog',
+        routeBasePath: 'changelog',
+        path: './changelog',
+        blogTitle: "Changelog",
+        blogDescription: "Changelog for the mittwald APIs and mittwald cloud platform",
+        blogSidebarTitle: 'All change notes',
+        blogSidebarCount: 'ALL',
+        showReadingTime: false,
+        onInlineTags: "ignore",
+      },
+    ],
   ],
 
   presets: [
@@ -96,11 +110,8 @@ const config: Config = {
           },
         },
         blog: {
-          showReadingTime: true,
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
+          showReadingTime: false,
+          onInlineTags: "ignore",
         },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
@@ -136,7 +147,11 @@ const config: Config = {
           position: "left",
           label: "Reference",
         },
-        //{to: '/blog', label: 'Blog', position: 'left'},
+        {
+          to: '/changelog',
+          label: 'Changelog',
+          position: 'left',
+        },
         {
           href: "https://github.com/mittwald/developer-portal",
           label: "GitHub",

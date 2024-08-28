@@ -1,0 +1,224 @@
+---
+title: Breaking (!) API changes for v2 API, August 22, 2024
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Contract
+  - Domain
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+On August 22, 2024, the mittwald API introduced several enhancements, including the addition of default values and minimum constraints for request parameters in the invoice listing endpoint, the introduction of multiple new endpoints for managing certificates and ingresses, and updates to response statuses for ingress updates.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- For the `GET /v2/customers/{customerId}/invoices` operation, the following changes were made:
+  - The default value for the `query` request parameter `limit` was added, set to `1000.00`.
+  - The default value for the `query` request parameter `skip` was added, set to `0.00`.
+  - The minimum value for the `query` request parameter `limit` was set to `1.00`.
+  - The minimum value for the `query` request parameter `page` was set to `1.00`. Note that these changes are breaking changes.
+
+- The following endpoints were added:
+  - `POST /v2/actions/list-ingresses-compatible-with-certificate` for listing ingresses compatible with a certificate.
+  - `DELETE /v2/certificate-request/{certificateRequestId}` for deleting a CertificateRequest.
+  - `GET /v2/certificate-requests` for listing CertificateRequests belonging to a Project or an Ingress.
+  - `POST /v2/certificate-requests` for creating a CertificateRequest.
+  - `GET /v2/certificate-requests/{certificateRequestId}` for getting a CertificateRequest.
+  - `DELETE /v2/certificate/{certificateId}` for deleting a Certificate.
+  - `GET /v2/certificates` for listing Certificates belonging to a Project or an Ingress.
+  - `GET /v2/certificates/{certificateId}` for getting a Certificate.
+  - `PUT /v2/certificates/{certificateId}` for updating a Certificate.
+  - `POST /v2/certificates/{certificateId}/actions/check-replace-certificate` for checking the replacement of a Certificate.
+  - `GET /v2/certificates/{certificateId}/contract` for returning the Contract for the given Certificate.
+
+- For the `GET /v2/ingresses` operation, the following new optional `query` request parameters were added:
+  - `certificateId`
+  - `limit`
+  - `page`
+  - `skip`
+
+- For the `PATCH /v2/ingresses/{ingressId}/tls` operation, the following non-success responses were added:
+  - A response with the status `403`.
+  - A response with the status `412`.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "List Invoices of a Customer"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', default value '1000.00' was added
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'skip', default value '0.00' was added
+
+- for the 'query' request parameter 'limit', the min was set to '1.00'
+
+- for the 'query' request parameter 'page', the min was set to '1.00'
+
+
+For details, refer to the <OperationLink operation="invoice-list-customer-invoices" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Ingresses compatible with a certificate"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ingress-list-ingresses-compatible-with-certificate" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Delete a CertificateRequest"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ssl-delete-certificate-request" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List CertificateRequests belonging to a Project or an Ingress"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ssl-list-certificate-requests" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a CertificateRequest"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ssl-create-certificate-request" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a CertificateRequest"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ssl-get-certificate-request" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Delete a Certificate"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ssl-delete-certificate" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Certificates belonging to a Project or an Ingress"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ssl-list-certificates" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Certificate"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ssl-get-certificate" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a Certificate"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ssl-replace-certificate" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Check the replacement of a Certificate"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ssl-check-replace-certificate" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the Contract for the given Certificate"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-certificate" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Ingresses"
+
+
+- added the new optional 'query' request parameter 'certificateId'
+
+- added the new optional 'query' request parameter 'limit'
+
+- added the new optional 'query' request parameter 'page'
+
+- added the new optional 'query' request parameter 'skip'
+
+
+For details, refer to the <OperationLink operation="ingress-list-ingresses" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update the tls settings of an Ingress"
+
+
+- added the non-success response with the status '403'
+
+- added the non-success response with the status '412'
+
+
+For details, refer to the <OperationLink operation="ingress-update-ingress-tls" apiVersion="v2" /> endpoint.
+
+
+

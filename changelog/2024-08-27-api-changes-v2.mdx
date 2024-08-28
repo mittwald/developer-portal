@@ -1,0 +1,69 @@
+---
+title: API changes for v2 API, August 27, 2024
+authors:
+  - machine
+tags:
+  - apiv2
+  - Misc
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+On August 27, 2024, the mittwald API introduced a new 'Misc' tag to enhance the organization of its endpoints, specifically for the service token authentication operation.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- A new API tag 'Misc' has been added to the `POST /v2/services/{accessKeyId}/actions/authenticate` operation, which is used to obtain a service token.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Obtain a service token"
+
+
+- api tag 'Misc' added
+
+
+For details, refer to the <OperationLink operation="servicetoken-authenticate-service" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### Mittwald PHP SDK Release v2.1.53
+
+The latest release of the Mittwald PHP SDK, version [v2.1.53](https://github.com/mittwald/api-client-php/releases/tag/v2.1.53), introduces several new features, breaking changes, enhancements, and code cleanup improvements.
+
+#### Features
+- **Removed Metrics Client**: The `MetricsClient` and its implementation have been completely removed.
+- **Service Token Authenticate Service**: 
+  - Introduced a new service for obtaining a service token, including necessary request and response models.
+  - Detailed handling for responses, including proper error handling for too many requests.
+
+#### Breaking Changes
+- **MetricsClient Removal**: All references and usage of `MetricsClient` have been eliminated, requiring updates to any dependent code.
+
+#### Enhancements
+- **Order Create Order Request and Body**: Added example values for fields in `OrderCreateOrderRequest` and `OrderCreateOrderRequestBody` to improve documentation clarity.
+- **Misc Client Update**: 
+  - Updated `MiscClient` to include a new method for the service token authentication process.
+  - Included error handling and validation processes for service token requests.
+
+#### Code Cleanup
+- Removed unused imports and functions related to the now-defunct metrics API, streamlining the codebase for better maintainability.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.53).
+

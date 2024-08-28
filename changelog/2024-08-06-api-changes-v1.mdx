@@ -1,0 +1,207 @@
+---
+title: API changes for v1 API, August 6, 2024
+authors:
+  - machine
+tags:
+  - apiv1
+  - Cronjob
+  - Accounts
+  - Domains
+  - Software
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This document contains a machine-generated summary of the API changes for August 6, 2024.
+The API changes are based on the diff between the OpenAPI schemas of the two versions.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- New endpoints have been added to the API:
+  - `GET /accounts/{accountIdentifier}/cronjobs`: Retrieve cronjobs for an account.
+  - `POST /accounts/{accountIdentifier}/cronjobs`: Create a new cronjob.
+  - `GET /accounts/{accountIdentifier}/cronjobs/benefits`: Retrieve cronjob benefits for an account.
+  - `GET /accounts/{accountIdentifier}/cronjobs/{cronjobIdentifier}`: Retrieve a specific cronjob for an account.
+  - `GET /accounts/{accountIdentifier}/directories`: Retrieve the directory structure for an account.
+  - `GET /cronjobs/interpreter`: Retrieve interpreters for cronjobs.
+  - `GET /cronjobs/intervaltemplates`: Retrieve interval templates for cronjobs.
+  - `GET /cronjobs/softwaretemplates`: Retrieve cronjob software templates.
+  - `DELETE /cronjobs/{cronjobIdentifier}`: Delete a cronjob.
+  - `PUT /cronjobs/{cronjobIdentifier}`: Update a specific cronjob for an account.
+
+- The response properties for the `GET /accounts/{accountIdentifier}/domains` operation have been updated to require the following properties for a status of '200':
+  - `/items/fullname`
+  - `/items/name`
+  - `/items/tld`
+
+- The response properties for the `POST /accounts/{accountIdentifier}/domains` operation have been updated to require the following properties for a status of '201':
+  - `/items/fullname`
+  - `/items/name`
+  - `/items/tld`
+
+- The `GET /accounts/{accountIdentifier}/installations` operation now includes an optional property `/items/archiveFrom` in the response for a status of '200'.
+
+- The `GET /installations/{installationIdentifier}` operation also includes an optional property `archiveFrom` in the response for a status of '200'.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "cronjobs eines Accounts auslesen"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="listCronjobsByAccount" apiVersion="v1" /> endpoint.
+
+
+
+### Changes in "Neuen cronjob anlegen"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="createCronjob" apiVersion="v1" /> endpoint.
+
+
+
+### Changes in "cronjob-Benefits eines Accounts auslesen"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="getCronjobBenefitsByAccount" apiVersion="v1" /> endpoint.
+
+
+
+### Changes in "Spezifischen cronjob eines Accounts auslesen"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="getCronjob" apiVersion="v1" /> endpoint.
+
+
+
+### Changes in "Verzeichnisstruktur eines Accounts auslesen"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="listDirectoriesByAccount" apiVersion="v1" /> endpoint.
+
+
+
+### Changes in "Domains eines Accounts auslesen"
+
+
+- the response property '/items/fullname' became required for the status '200'
+
+- the response property '/items/name' became required for the status '200'
+
+- the response property '/items/tld' became required for the status '200'
+
+
+For details, refer to the <OperationLink operation="listDomainsByAccount" apiVersion="v1" /> endpoint.
+
+
+
+### Changes in "Domain registrieren/Transfer einleiten"
+
+
+- the response property '/items/fullname' became required for the status '201'
+
+- the response property '/items/name' became required for the status '201'
+
+- the response property '/items/tld' became required for the status '201'
+
+
+For details, refer to the <OperationLink operation="registerNewDomain" apiVersion="v1" /> endpoint.
+
+
+
+### Changes in "Softwareinstallationen auslesen"
+
+
+- added the optional property '/items/archiveFrom' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="listSoftwareInstallationsByAccount" apiVersion="v1" /> endpoint.
+
+
+
+### Changes in "Interpreter für cronjobs auslesen"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="getCronjobInterpreters" apiVersion="v1" /> endpoint.
+
+
+
+### Changes in "Intervalltemplates für cronjobs auslesen"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="getCronjobIntervaltemplates" apiVersion="v1" /> endpoint.
+
+
+
+### Changes in "cronjob-Softwaretemplates auslesen"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="getCronjobSoftwaretemplates" apiVersion="v1" /> endpoint.
+
+
+
+### Changes in "cronjob löschen"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="deleteCronjob" apiVersion="v1" /> endpoint.
+
+
+
+### Changes in "Spezifischen cronjob eines Accounts bearbeiten"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="updateCronjob" apiVersion="v1" /> endpoint.
+
+
+
+### Changes in "Details einer Softwareinstallation auslesen"
+
+
+- added the optional property 'archiveFrom' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="getSoftwareInstallation" apiVersion="v1" /> endpoint.
+
+
+

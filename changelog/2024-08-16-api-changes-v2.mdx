@@ -1,0 +1,183 @@
+---
+title: API changes for v2 API, August 16, 2024
+authors:
+  - machine
+tags:
+  - apiv2
+  - Conversation
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This document contains a machine-generated summary of the API changes for August 16, 2024.
+The API changes are based on the diff between the OpenAPI schemas of the two versions.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- The optional property `/items/lastMessage` has been added to the response for the `GET /v2/conversations/{conversationId}` operation with a `200` status.
+- The optional property `/items/lastMessage` has been added to the response for the `GET /v2/conversations` operation with a `200` status.
+- The `dataCenter`, `infra`, `marketing`, `network`, `security`, and `software` enum values have been removed from the `/items/createdBy/department`, `/items/lastMessageBy/department`, and `/items/mainUser/department` response properties for the `GET /v2/conversations` operation with a `200` status.
+- The `dataCenter`, `infra`, `marketing`, `network`, `security`, and `software` enum values have been removed from the `createdBy/department`, `lastMessageBy/department`, and `mainUser/department` response properties for the `GET /v2/conversations/{conversationId}` operation with a `200` status.
+- The `dataCenter`, `infra`, `marketing`, `network`, `security`, and `software` enum values have been removed from the `/items/allOf[#/components/schemas/de.mittwald.v1.conversation.User]/department` response property for the `GET /v2/conversations/{conversationId}/members` operation with a `200` status.
+- The `dataCenter`, `infra`, `marketing`, `network`, `security`, and `software` enum values have been removed from the `/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.Message]/createdBy/department` and `/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.StatusUpdate]/meta/user/department` response properties for the `GET /v2/conversations/{conversationId}/messages` operation with a `200` status.
+
+Note: The removal of enum values from the response properties constitutes a breaking change for the affected operations.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Get all conversation the authenticated user has created or has access to"
+
+
+- added the optional property '/items/lastMessage' to the response with the '200' status
+
+- removed the 'dataCenter' enum value from the '/items/createdBy/department' response property for the response status '200'
+
+- removed the 'dataCenter' enum value from the '/items/lastMessageBy/department' response property for the response status '200'
+
+- removed the 'dataCenter' enum value from the '/items/mainUser/department' response property for the response status '200'
+
+- removed the 'infra' enum value from the '/items/createdBy/department' response property for the response status '200'
+
+- removed the 'infra' enum value from the '/items/lastMessageBy/department' response property for the response status '200'
+
+- removed the 'infra' enum value from the '/items/mainUser/department' response property for the response status '200'
+
+- removed the 'marketing' enum value from the '/items/createdBy/department' response property for the response status '200'
+
+- removed the 'marketing' enum value from the '/items/lastMessageBy/department' response property for the response status '200'
+
+- removed the 'marketing' enum value from the '/items/mainUser/department' response property for the response status '200'
+
+- removed the 'network' enum value from the '/items/createdBy/department' response property for the response status '200'
+
+- removed the 'network' enum value from the '/items/lastMessageBy/department' response property for the response status '200'
+
+- removed the 'network' enum value from the '/items/mainUser/department' response property for the response status '200'
+
+- removed the 'security' enum value from the '/items/createdBy/department' response property for the response status '200'
+
+- removed the 'security' enum value from the '/items/lastMessageBy/department' response property for the response status '200'
+
+- removed the 'security' enum value from the '/items/mainUser/department' response property for the response status '200'
+
+- removed the 'software' enum value from the '/items/createdBy/department' response property for the response status '200'
+
+- removed the 'software' enum value from the '/items/lastMessageBy/department' response property for the response status '200'
+
+- removed the 'software' enum value from the '/items/mainUser/department' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="conversation-list-conversations" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a support conversation"
+
+
+- added the optional property 'lastMessage' to the response with the '200' status
+
+- removed the 'dataCenter' enum value from the 'createdBy/department' response property for the response status '200'
+
+- removed the 'dataCenter' enum value from the 'lastMessageBy/department' response property for the response status '200'
+
+- removed the 'dataCenter' enum value from the 'mainUser/department' response property for the response status '200'
+
+- removed the 'infra' enum value from the 'createdBy/department' response property for the response status '200'
+
+- removed the 'infra' enum value from the 'lastMessageBy/department' response property for the response status '200'
+
+- removed the 'infra' enum value from the 'mainUser/department' response property for the response status '200'
+
+- removed the 'marketing' enum value from the 'createdBy/department' response property for the response status '200'
+
+- removed the 'marketing' enum value from the 'lastMessageBy/department' response property for the response status '200'
+
+- removed the 'marketing' enum value from the 'mainUser/department' response property for the response status '200'
+
+- removed the 'network' enum value from the 'createdBy/department' response property for the response status '200'
+
+- removed the 'network' enum value from the 'lastMessageBy/department' response property for the response status '200'
+
+- removed the 'network' enum value from the 'mainUser/department' response property for the response status '200'
+
+- removed the 'security' enum value from the 'createdBy/department' response property for the response status '200'
+
+- removed the 'security' enum value from the 'lastMessageBy/department' response property for the response status '200'
+
+- removed the 'security' enum value from the 'mainUser/department' response property for the response status '200'
+
+- removed the 'software' enum value from the 'createdBy/department' response property for the response status '200'
+
+- removed the 'software' enum value from the 'lastMessageBy/department' response property for the response status '200'
+
+- removed the 'software' enum value from the 'mainUser/department' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="conversation-get-conversation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get members of a support conversation"
+
+
+- removed the 'dataCenter' enum value from the '/items/allOf[#/components/schemas/de.mittwald.v1.conversation.User]/department' response property for the response status '200'
+
+- removed the 'infra' enum value from the '/items/allOf[#/components/schemas/de.mittwald.v1.conversation.User]/department' response property for the response status '200'
+
+- removed the 'marketing' enum value from the '/items/allOf[#/components/schemas/de.mittwald.v1.conversation.User]/department' response property for the response status '200'
+
+- removed the 'network' enum value from the '/items/allOf[#/components/schemas/de.mittwald.v1.conversation.User]/department' response property for the response status '200'
+
+- removed the 'security' enum value from the '/items/allOf[#/components/schemas/de.mittwald.v1.conversation.User]/department' response property for the response status '200'
+
+- removed the 'software' enum value from the '/items/allOf[#/components/schemas/de.mittwald.v1.conversation.User]/department' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="conversation-get-conversation-members" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all message of the conversation"
+
+
+- removed the 'dataCenter' enum value from the '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.Message]/createdBy/department' response property for the response status '200'
+
+- removed the 'dataCenter' enum value from the '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.StatusUpdate]/meta/user/department' response property for the response status '200'
+
+- removed the 'infra' enum value from the '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.Message]/createdBy/department' response property for the response status '200'
+
+- removed the 'infra' enum value from the '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.StatusUpdate]/meta/user/department' response property for the response status '200'
+
+- removed the 'marketing' enum value from the '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.Message]/createdBy/department' response property for the response status '200'
+
+- removed the 'marketing' enum value from the '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.StatusUpdate]/meta/user/department' response property for the response status '200'
+
+- removed the 'network' enum value from the '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.Message]/createdBy/department' response property for the response status '200'
+
+- removed the 'network' enum value from the '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.StatusUpdate]/meta/user/department' response property for the response status '200'
+
+- removed the 'security' enum value from the '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.Message]/createdBy/department' response property for the response status '200'
+
+- removed the 'security' enum value from the '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.StatusUpdate]/meta/user/department' response property for the response status '200'
+
+- removed the 'software' enum value from the '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.Message]/createdBy/department' response property for the response status '200'
+
+- removed the 'software' enum value from the '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.StatusUpdate]/meta/user/department' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="conversation-list-messages-by-conversation" apiVersion="v2" /> endpoint.
+
+
+
