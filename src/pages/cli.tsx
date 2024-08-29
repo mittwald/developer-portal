@@ -3,7 +3,12 @@ import clsx from "clsx";
 import Link from "@docusaurus/Link";
 import Layout from "@theme/Layout";
 import Icon from "@mittwald/flow-react-components/Icon";
-import { IconBrandGithub, IconRocket, IconNotebook } from "@tabler/icons-react";
+import {
+  IconBrandGithub,
+  IconRocket,
+  IconNotebook,
+  IconScript,
+} from "@tabler/icons-react";
 
 import styles from "./cli.module.css";
 import demo from "@site/static/img/cli-demo.png";
@@ -16,9 +21,24 @@ function CLIPageHeader() {
     <header className={clsx("hero hero--primary", styles.heroBanner)}>
       <div className="container">
         <h1 className="hero__title">
-          <code>mw</code> – <Translate id={"cli.title"}>the mittwald command-line tool</Translate>
+          <code>mw</code> –{" "}
+          <Translate id={"cli.title"}>the mittwald command-line tool</Translate>
         </h1>
-        <img src={demo} />
+        <p className={styles.heroDescription}>
+          <Translate id={"cli.description"}>
+            The mittwald CLI is a powerful, easy-to-use tool for managing your
+            mittwald products and services. It allows you to interact with our
+            API, manage your resources and automate your workflows.
+          </Translate>
+          <img
+            src={demo}
+            alt={translate({
+              id: "cli.img.alt",
+              message:
+                "An example usage of the mittwald CLI. The screenshot shows how to list projects and how to install a new Wordpress instance using the CLI.",
+            })}
+          />
+        </p>
         <div className={styles.buttons}>
           <Link
             className="button button--success button--lg"
@@ -60,7 +80,7 @@ export default function Home() {
       description={translate({
         id: "cli.description",
         message:
-          "The mittwald Developer Portal provides developers with the resources they need to integrate mittwald products into their own applications using our API."
+          "The mittwald Developer Portal provides developers with the resources they need to integrate mittwald products into their own applications using our API.",
       })}
     >
       <div className={styles.wrapper}>
