@@ -136,6 +136,11 @@ const config: Config = {
           label: "API Docs",
         },
         {
+          to: "/cli",
+          position: "left",
+          label: "CLI",
+        },
+        {
           type: "doc",
           docId: "/category/platform",
           position: "left",
