@@ -47,13 +47,13 @@ C4Context
     UpdateLayoutConfig($c4ShapeInRow="2", $c4BoundaryInRow="1")
 ```
 
-## Prototypische Architektur einer Extension
+## Prototypical Architecture of an Extension
 
-Eine Extension muss zwingend eine REST-API für Lifecycle Webhooks bereitstellen, um funktionsfähig zu sein.
-Diese wird genutzt, um die Extension über erstellte Extension Instances zu informieren und deren Lebenszyklus zu steuern.
+An extension must provide a REST API for lifecycle webhooks to function.
+The mStudio uses this to inform the extension about created extension instances and their lifecycle.
 
-Davon abgesehen ist der Aufbau einer Extension flexibel und kann je nach Anforderungen des Contributors variieren.
-Eine typische Architektur könnte wie folgt aussehen:
+Besides this hard requirement, the extension architecture is flexible and can vary based on your requirements.
+A typical architecture may look as follows:
 
 ```mermaid
 block-beta
@@ -61,9 +61,9 @@ block-beta
   frontend["Extension Frontend"]
   mstudio["mStudio"]
   space:2
-  businessapi["Extension API"] webhooks["Webhook REST-API"]
+  businessapi["Extension API"] webhooks["Webhook REST API"]
 
-  business["Geschäftslogik"]:2
+  business["Business Logic"]:2
   model["Repository"]:2
   space:2
   database[("Database")]:2
