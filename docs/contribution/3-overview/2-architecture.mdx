@@ -1,32 +1,33 @@
 ---
-title: Architektur einer Extension
+title: Architecture of an Extension
 ---
 
-## Systemkontext aus Sicht der Extension
+## System Context from the Perspective of an Extension
 
-Eine Extension ist eine eigenständige Applikation, die außerhalb des mStudio betrieben wird.
-In den meisten Fällen benötigt eine Extension eine Persistenzschicht, wie beispielsweise eine Datenbank, um Daten zu speichern und zu verwalten.
+An extension is an independent application operated separately from the mStudio.
+In most cases, it needs a persistence mechanism to store and manage data, such as a database.
 
-Es gibt verschiedene Akteure, die mit einer Extension interagieren können:
+Different actors may interact with an extension:
 
-- mStudio Nutzer: mStudio Benutzer, die über mStudio auf die Extension weitergeleitet werden.
-- Extension Nutzer: Benutzer, die dem mStudio nicht bekannt sind und über eine eigene Nutzerverwaltung der Extension direkt mit dieser interagieren.
+- mStudio users: mStudio users that are directed to the extension via the mStudio.
+- Extension users: Users that are not known to the mStudio and interact with the extension via its separate user management.
 
-Wenn die Extension über ein Frontend verfügt, können Nutzer auf unterschiedliche Weise darauf zugreifen:
+If an extension has a frontend, users can access it via different methods:
 
-- Über das mStudio: Nutzer können aus dem mStudio zur Extension navigieren.
-- Direktzugriff: Nutzer können die Extension über ein Bookmark oder einen direkten Link aufrufen.
+- Via the mStudio: Users can navigate to the extension via the mStudio.
+- Direktzugriff: Users can navigate to the extension via a bookmark or a direct link.
 
-Um sich mit dem mStudio zu integrieren, muss eine Extension einen API-Endpunkt bereitstellen, den das mStudio für [Lifecycle Webhooks](../concepts/lifecycle-webhooks) aufrufen kann.
-Außerdem kann die Extension die mStudio API verwenden, um ihre Funktionalitäten bereitzustellen und die Integration mit dem mStudio zu ermöglichen.
+An extension must provide an API endpoint the mStudio can access for [lifecycle webhooks](../concepts/lifecycle-webhooks).
+Otherwise, it can not be integrated into the mStudio.
+The extension may use the mStudio API to provide functionality and facilitate the integration into the mStudio.
 
 ```mermaid
 C4Context
-    Person(extensionUser, "Extension Nutzer")
-    Person_Ext(mstudioUser, "mStudio Nutzer")
+    Person(extensionUser, "Extension User")
+    Person_Ext(mstudioUser, "mStudio User")
 
     Enterprise_Boundary(contributor, "Contributor") {
-      SystemDb(persistency, "Datenbank")
+      SystemDb(persistency, "Database")
       System(extension, "Extension")
     }
 
