@@ -17,13 +17,14 @@ These webhooks are used by the mStudio to inform the extension about the state o
 The extensions also provide various [athentication and authorization strategies](../concepts/authentication) to perform authenticated [domain actions](../../glossary#domain-action) in the mStudio.
 These domain actions can occur in the name of the mStudio user using the extension or in the name of the extension itself.
 
-## Aus welchen Informationen besteht eine Extension?
+## Which information does an extension consist of?
 
-Eine Extension besteht aus verschiedenen Informationen, die in der [Extension Referenz](../../reference/extensions) im Detail beschrieben sind.
-Im Folgenden soll ein grober Überblick gegeben werden.
+An extension consists of various pieces of information described in detail in the [extension reference](../../reference/extensions).
+The following is an overview.
 
-### Name und Beschreibung
+### Name and Description
 
+<<<<<<< HEAD
 Eine Extension enthält drei verschiedene Beschreibungsfelder.
 
 Der **Name** und eine **Kurzbeschreibung** sind das erste, das ein Nutzer in der Extension-Übersicht im Marktplatz sieht.
@@ -34,47 +35,63 @@ In dieser kann auf Features, Nutzungshinweise, weiterführende Links, einen Chan
 
 Der **State** der Extension definiert, ob sie im mStudio sicht- und nutzbar sein soll.
 Das umfasst beispielsweise (jeweils unabhängig voneinander), ob sie generell aktiv ist, im Marktplatz angezeigt wird und ob sie zu einem Extension Context hinzugefügt werden kann.
+=======
+An extension has 3 levels of description.
+The first things a user sees of the extension in the marketplace are the name and the short description.
+Additionally, there is a long description containing more details for the extension and allows for formatting.
+Here, you can include descriptions of features, instructions for use, links for further reading, a changelog, and much more.
+
+### State
+
+To manage whether an extension is available in the mStudio you can configure its state.
+You can configure the extension's visibility and installability.
+>>>>>>> 943c726 (extension information overview)
 
 ### Tags
 
-Tags sind eine Möglichkeit, Extensions zu kategorisieren.
-Sie werden im mStudio dazu genutzt, Extensions nach Anwendungsfall zu gruppieren.
-Dabei sollte darauf geachtet werden, dass die Tags aussagekräftig sind und eine klare Zuordnung zu den Features der Extension ermöglichen.
-Auch sollte darauf geachtet werden, dass sie in etwa dem entsprechen, wonach potenzielle Kunden der Extension suchen würden.
-Eine Kategorie, in der sich nur eine Extension befindet, bietet keinen Mehrwert in der Suche nach Extensions
-und verringert sowohl die Auffindbarkeit als auch die Vergleichbarkeit der Extensions.
+Tags provide a way to categorize extensions.
+The mStudio uses them to group extensions based on their use case.
+You should ensure the tags are meaningful and allow an unambiguous mapping to the extension features.
+You also should ensure the tags match terms potential users might use to search for the extension.
+A category with only one extension does not provide value when searching for extensions.
+It reduces the ability to find and compare extensions.
 
 ### Support
 
-Für den Support bei der Nutzung von Extensions ist der Contributor verantwortlich.
-Entsprechend benötigt der Nutzer einer Extension Informationen darüber, wie er Support erhalten kann.
-Dazu muss mindestens eine E-Mail-Adresse angegeben werden, an die sich Nutzer wenden können.
+The contributor is responsible for the support of the use of its extensions.
+Therefore, the extension users need information about how to request support.
+You have to provide at least an E-Mail address where users can contact you.
 
 ### Scopes
 
+<<<<<<< HEAD
 Um über die REST-API des mStudios zugreifen, und dort **Domain Actions** durchführen zu können, benötigt eine Extension Berechtigungen, die vom Nutzer während der Installation bestätigt werden müssen.
 
 Diese Berechtigungen sind in Form von [**Scopes**](../concepts/scopes) definiert. Die Extension-Definition enthält eine Liste von Scopes, die die Berechtigungen der Extension beschreiben.
+=======
+An extension has to request privileges to be able to perform domain actions in the mStudio.
+Scopes are defined to define the privileges of an extension.
+For further information, see [scopes concept](../concepts/scopes).
+>>>>>>> 943c726 (extension information overview)
 
 ### Extension Context
 
-Eine Extension kann entweder zu einem Projekt oder zu einer Organisation hinzugefügt werden.
-Ein Contributor muss sich während der Konzept- oder Entwicklungsphase entscheiden, welcher Extension Context für die Extension sinnvoll ist.
-Die Entscheidung hängt von mehreren Faktoren, wie der Zielgruppe, dem Anwendungsfall aber auch dem Geschäftsmodell, ab.
+Users can add an extension either to a project or an organization.
+As the contributor, you must decide which extension context makes sense for your extension.
+This decision depends on multiple factors, such as the target audience, use case, or business model.
 
 ### Lifecycle Webhook Endpoints
 
-Eine Extension muss definieren, an welche URLs Lifecycle-Webhooks gesendet werden sollen.
-Über diese Webhooks teilt das mStudio der Extension mit, welche Extension Instances existieren und in welchem Zustand sie sich befinden.
-Für jedes Lifecycle-Event kann ein eigener Webhook-Endpoint konfiguriert werden.
-Für weitere Informationen zu Lifecycle-Webhooks siehe [Lifecycle Webhooks Konzept](../concepts/lifecycle-webhooks).
+An extension must define which URLs should be used by the mStudio to send lifecycle webhooks.
+The mStudio uses these webhooks to inform the extension about the existence and state of its extension instances.
+You can configure a separate webhook endpoint for each lifecycle.
+For further information, see [lifecycle webhook concept](../concepts/lifecycle-webhooks).
 
 ### External Frontend
 
-Eine Extension kann optional ein externes Frontend angeben, das dazu dient, einen Einstiegspunkt aus dem mStudio heraus in die Extension zu bieten.
-Das externe Frontend wird als URL angegeben und kann getemplated werden.
-Siehe dazu auch [Templating von Konfigurationswerten](../concepts/templating).
-Für weitere Informationen zum External Frontend siehe [External Frontend Konzept](../concepts/external-frontend).
+Optionally, an extension may define an external frontend that functions as an entry point to the extension.
+You configure the external frontend as a URL, for which you may use templating.
+For further information, see [templating of configuration values](../concepts/templating) and [lifecycle webhook concept](../concepts/lifecycle-webhooks).
 
 ## Versionierung von Extensions
 
