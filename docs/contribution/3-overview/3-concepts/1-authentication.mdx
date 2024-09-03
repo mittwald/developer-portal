@@ -35,24 +35,22 @@ It also ensures that an extension does not have more permissions than requested 
 
 ## Extension Instance Secret
 
-Um autark und ohne Nutzerinteraktion agieren zu können, erhält die Extension ein eigenes Secret pro Extension Instance.
-Dieses wird der externen Anwendung mittels Lifecycle Webhooks übermittelt.
-Siehe dazu auch [Lifecycle Webhooks](../lifecycle-webhooks).
-Mit der Extension Instance ID und diesem Secret kann ein Extension Access Token abgerufen werden.
-Dabei sind die Berechtigungen anhand der Scopes der Extension eingeschränkt.
+The extension receives a secret per extension instance to act without further user interaction.
+It is sent to the external application via lifecycle webhooks.
+You can request an access token for the extension with the secret and the extension instance ID.
+The permissions of this access token are limited by the scopes of the extension.
 
-Für weitere Informationen über die Informationen, die in Lifecycle Webhooks mitgeschickt werden, siehe [Lifecycle Webhooks](../../../reference/webhooks).
-Für weitere Informationen darüber, wie ein Extension Secret gegen ein Access Token ausgetauscht wird, siehe [Extension Secret Referenz](../../../reference/api#authentifizierung-mittels-extension-instance-secret)
+For more information about the information transmitted via lifecycle webhooks, see [lifecycle webhooks](../../../reference/webhooks).
+For more information about exchanging an extension secret against an access token, see [extension secret reference](../../../reference/api#authenticating-with-the-extension-instance-secret).
 
-Mit dieser Methode kann ebenfalls eine eigene Nutzerverwaltung bereitgestellt werden.
-Nutzer, die von der externen Anwendung registriert werden,
-kommunizieren alle im Namen der Extension Instance und teilen sich unterliegend dasselbe Extension Secret.
+An extension can implement its user management with this method.
+Users registered with the external application all interact with the public mStudio API on behalf of the extension and share one secret.
 
-## Abfragen von Anmeldeinformationen des mStudio Nutzers
+## Prompting Login Information of the mStudio User
 
-Das direkte Abfragen der mStudio-Anmeldeinformationen ist keine akzeptable Methode,
-da der Nutzer nicht dazu konditioniert werden soll, seine Anmeldeinformationen an eine Drittanbieteranwendung weiterzugeben.
+The prompting for login information by the external application is not an accepted method.
+This is because the user should not be conditioned to enter their login credentials to a third-party application.
 
-## Nutzung des erhaltenen Access Tokens
+## Using the Received Access Token
 
-Für eine Beschreibung, wie das erhaltene Access Token verwendet werden kann, siehe [Nutzung von Access Tokens zur Authentifizierung](../../../reference/api#nutzung-von-access-tokens-zur-authentifizierung).
+For more information on using the received access token, see [Nutzung von Access Tokens zur Authentifizierung](../../../reference/api#using-access-tokens-to-authenticate).
