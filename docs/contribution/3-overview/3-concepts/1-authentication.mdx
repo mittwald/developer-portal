@@ -1,37 +1,37 @@
 ---
-title: Authentifizierung
+title: Authentication
 ---
 
 ## OAuth2
 
-mittwald unterstützt OAuth 2.0 als Authentifizierungsmechanismus für die öffentliche API. Dieser Mechanismus ist in dem [RFC 6749](https://tools.ietf.org/html/rfc6749) spezifiziert. Unterstützt werden die folgenden OAuth 2.0 Flows:
+mittwald supports the authentication mechanism OAuth 2.0 for its public API.
+[RFC 6749](https://tools.ietf.org/html/rfc6749) specifies this mechanism.
+OAuth2 supports the following flows:
 
 - Authorization Code Grant
 - Authorization Code Grant with PKCE
 
-Um OAuth2 nutzen zu können, muss ein [OAuth2 Client angelegt werden](../../../how-to/create-extension#erstellen-eines-oauth2-clients),
-der die notwendigen Scopes für die Domain Actions anfragt.
-Dieser Client kann verwendet werden, um OAuth 2.0 Authentifizierungsabläufe durchzuführen.
-Für weitere Informationen über die notwendigen API-Endpunkte für den OAuth2 Flow siehe [OAuth2 Endpunkte](../../../reference/api#oauth2)
+To use OAuth2, you have to [create an OAuth2 client](../../../how-to/create-extension#creating-an-oauth2-client) that requests the required scopes.
+You can use this client to execute OAuth 2.0 authentication procedures.
+For further information on the necessary API endpoints for the OAuth2 flow, see [OAuth2 endpoints](../../../reference/api#oauth2).
 
 ## Access Token Retrieval Key
 
-Um mStudio Benutzern einen bequemen Einstieg in die externe Anwendung zu ermöglichen,
-bietet das mStudio einen Single Sign On (SSO) Mechanismus an.
-Per Knopfdruck im mStudio wird der Benutzer zur externen Anwendung weitergeleitet und ist authentifiziert.
+The mStudio provides a single sign-on (SSO) mechanism to allow its users convenient access to extensions.
+The user is redirected to the external application and authenticated at the click of a button in the mStudio.
 
-Dazu generiert das mStudio einen Access Token Retrieval Key (ATReK) und übermittelt diesen beim Click an das Frontend der Extension.
-Dies geschieht nur, wenn die Extension ein URL-Template bereitstellt, das den ATReK und die UserID als Platzhalter enthält.
-Siehe dazu auch [Extension External Frontend](../../extensions#external-frontend).
+To do this, the mStudio generates an access token retrieval key (ATReK) and sends it to the frontend of the extension when the button is clicked.
+This only happens, if the extension provides a URL template that contains the ATReK and the UserID as placeholders.
+For further information, see [extension external frontend](../../extensions#external-frontend).
 
-Der ATReK ist sehr kurzlebig und nur einmalig gültig.
-Aufgrund der Kurzlebigkeit des ATReKs ist es wichtig, dass die externe Anwendung den ATReK sofort verwendet, um ein Access Token zu beziehen.
-Für weitere Informationen darüber, wie ein ATReK gegen ein Access Token ausgetauscht wird, siehe [Access Token Retrieval Key Referenz](../../../reference/api#verwendung-eines-access-token-retrieval-keys)
+The validity of the ATReK is short and expires after one use.
+For this reason, the external application must use the ATReK immediately to obtain an access token.
+For further information on how an ATReK is exchanged for an access token, see [access token retrieval key reference](../../../reference/api#using-an-access-token-retrieval-key)
 
-Das Access Token, das durch einen ATReK ausgestellt wird, repräsentiert den ausstellenden mStudio-User.
-Sie sind auf die Scopes der Extension und die Rechte des mStudio Nutzers eingeschränkt.
-Dadurch wird sichergestellt, dass der mStudio Nutzer nur die Domain Actions ausführen kann, die er auch im mStudio ausführen könnte.
-Gleichzeitig wird sichergestellt, dass eine Extension durch die Rechte des mStudio Nutzers nicht mehr Rechte erhält, als die Extension angefragt hat.
+The access token created from an ATReK represents the executing mStudio user.
+Its permissions are limited by the scopes of the extension and the permissions of the mStudio user.
+This ensures that the extension user can only perform those domain actions that they are allowed to perform in the mStudio.
+It also ensures that an extension does not have more permissions than requested by the extension.
 
 ## Extension Instance Secret
 
