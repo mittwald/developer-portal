@@ -102,11 +102,12 @@ In this case, we revoke all permissions of the `extension instance` and invalida
 Nonetheless, the mStudio tries to execute the webhook to achieve a consistent state of the mStudio and extension data.
 :::
 
-## Verifizierung der Sender-Identität von Webhooks
+## Verifying the Identity of the Sender of Webhooks
 
-Um sicherzustellen, dass der Webhook von mittwald ausging, wird die Möglichkeit geboten, die Identität des Senders und den Inhalt des Request Bodys zu verifizieren.
-Neben dem Request Body, der den Webhook Payload enthält, wird in Request Headern eine Signatur inklusive der Meta-Informationen über diese versendet.
+We provide the possibility to verify the identity of the sender and the integrity of the request body content.
+This way, you can ensure that the webhook call originated from mittwald.
+We include a signature and additional metadata about this signature in the request headers of webhooks.
 
-Dies ist aus Sicht des Contributors und der Extension wichtig, da somit sichergestellt werden kann, dass der Webhook-Call wirklich von mittwald stammt.
-Ohne eine funktionierende Webhook Validierung besteht das Risiko, dass ein potenzieller Angreifer nur die URL kennen muss, um falsche Extension Instances vorzutäuschen oder bestehende zu korrumpieren.
-Für weitere Informationen dazu, wie Webhooks auf ihre Echtheit überprüft werden können, siehe [Validierung von Lifecycle Webhooks Referenz](../../../reference/webhooks#validierung-von-lifecycle-webhooks).
+This is important from the contributor's perspective because you can ensure that the webhook call originated from mittwald.
+Without such a webhook validation, there is a risk that a potential bad actor only needs to know the webhook URL to fake extension instances or corrupt existing ones.
+For more information about how to validate webhooks, see [validation of lifecycle webhook reference](../../../reference/webhooks#validation-of-lifecycle-webhooks).
