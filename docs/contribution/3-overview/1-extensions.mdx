@@ -5,15 +5,15 @@ title: Extensions
 ## What is an extension?
 
 From a domain perspective, an extension is an extension of the mStudio that provides additional functionality for the mStudio.
-It is made available in the mStudio and can be added to an [extension context](../../glossary/#extension-context) by potential users.
-When added to an extension context, an [extension instance](../../glossary#extension-instance) is created.
+It is [made available](../../how-to/create-extension) in the mStudio and can be added to an [extension context](../../glossary/#extension-context) by potential users.
+When a user adds an extension to an extension context (for example, a project or organization), the mStudio creates an [extension instance](../../glossary#extension-instance).
 Therefore, the extension describes an extension that can be added to an extension context.
 The extension instance is a concrete manifestation of an extension in an extension context.
 
-From a technical perspective, an extension is an application operated separately from the mStudio and integrated with the mStudio via REST-APIs.
+From a technical perspective, an extension is a separate and independent application that communicates with the mStudio via REST APIs.
 An extension must provide a public backend and may provide a frontend if it makes sense for its usage.
-The backend of an extension handles [lifecycle webhooks](../concepts/lifecycle-webhooks).
-These webhooks are used by the mStudio to inform the extension about the state of its extension instances.
+If extension instances are created or deleted, for example, the mStudio notifies the extension backend via a [lifecycle webhook](../concepts/lifecycle-webhooks).
+
 The extensions also provide various [athentication and authorization strategies](../concepts/authentication) to perform authenticated [domain actions](../../glossary#domain-action) in the mStudio.
 These domain actions can occur in the name of the mStudio user using the extension or in the name of the extension itself.
 
@@ -24,15 +24,16 @@ The following is an overview.
 
 ### Name and Description
 
-An extension has 3 levels of description.
-The first things a user sees of the extension in the marketplace are the name and the short description.
-Additionally, there is a long description containing more details for the extension and allows for formatting.
+An extension has 3 different describing fields.
+
+The first things a user sees in the extension overview in the marketplace are the **name** and a **short description**.
+Additionally, it has a **long description** containing more details for the extension and allows for formatting.
 Here, you can include descriptions of features, instructions for use, links for further reading, a changelog, and much more.
 
 ### State
 
-To manage whether an extension is available in the mStudio you can configure its state.
-You can configure the extension's visibility and installability.
+The **state** of an extension defines whether the extension should be visible or usable in the mStudio.
+This includes, for example, whether it is generally active, displayed in the marketplace, and can be added to an extension context.
 
 ### Tags
 
@@ -51,9 +52,11 @@ You have to provide at least an E-Mail address where users can contact you.
 
 ### Scopes
 
-An extension has to request privileges to be able to perform domain actions in the mStudio.
-Scopes are defined to define the privileges of an extension.
-For further information, see [scopes concept](../concepts/scopes).
+An extension needs privileges to access the REST API of the mStudio and execute **domain actions**.
+These have to be accepted by the user when installing the extension.
+
+These privileges are defined by [**scopes**](../concepts/scopes).
+The extension definition contains a list of scopes describing the extensions permissions.
 
 ### Extension Context
 
@@ -64,8 +67,8 @@ This decision depends on multiple factors, such as the target audience, use case
 ### Lifecycle Webhook Endpoints
 
 An extension must define which URLs should be used by the mStudio to send lifecycle webhooks.
-The mStudio uses these webhooks to inform the extension about the existence and state of its extension instances.
-You can configure a separate webhook endpoint for each lifecycle.
+The mStudio uses these webhooks to notify the extension of the existence and state of its extension instances.
+You can configure a separate webhook endpoint for each lifecycle event.
 For more information, see [lifecycle webhook concept](../concepts/lifecycle-webhooks).
 
 ### External Frontend
