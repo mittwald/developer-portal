@@ -1,0 +1,102 @@
+---
+title: API changes for v2 API, September 4, 2024
+authors:
+  - machine
+tags:
+  - apiv2
+  - Mail
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+On September 4, 2024, the mittwald API introduced new optional query parameters 'limit', 'page', and 'skip' for the GET operations on both the delivery boxes and mail addresses endpoints, enhancing the ability to paginate and manage results effectively.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- The `GET /v2/projects/{projectId}/delivery-boxes` operation has been updated to include three new optional query request parameters: `limit`, `page`, and `skip`.
+- The `GET /v2/projects/{projectId}/mail-addresses` operation has also been updated to include three new optional query request parameters: `limit`, `page`, and `skip`.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "List delivery boxes belonging to a Project"
+
+
+- added the new optional 'query' request parameter 'limit'
+
+- added the new optional 'query' request parameter 'page'
+
+- added the new optional 'query' request parameter 'skip'
+
+
+For details, refer to the <OperationLink operation="mail-list-delivery-boxes" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List mail addresses belonging to a Project"
+
+
+- added the new optional 'query' request parameter 'limit'
+
+- added the new optional 'query' request parameter 'page'
+
+- added the new optional 'query' request parameter 'skip'
+
+
+For details, refer to the <OperationLink operation="mail-list-mail-addresses" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK v2.1.57 Release
+
+[Release v2.1.57](https://github.com/mittwald/api-client-php/releases/tag/v2.1.57) of the mittwald PHP SDK includes several important bug fixes and improvements:
+
+#### Bugfixes
+
+- **Pagination Parameters in Requests**: Default values for pagination parameters (`limit`, `skip`, `page`) have been added to restore backwards compatibility.
+  - **InvoiceListCustomerInvoicesRequest**: `limit` set to 1000, `skip` to 0.
+  - **ListCustomersRequest**: `limit` set to 1000, `skip` to 0.
+  - **IngressListIngressesRequest**: `limit` set to 10000, `skip` to 0.
+  - **SuggestRequest**: `domainCount` defaults to 6.
+  - **ListDeliveryBoxesRequest**: `limit` set to 10000, `skip` to 0, `page` to null.
+  - **ListMailAddressesRequest**: Similar pagination defaults.
+  - **ListProjectsRequest**: `limit` set to 10000, `skip` to 0.
+  - **ListServersRequest**: `limit` set to 10000, `skip` to 0, `page` to 1.
+
+#### Updated Constructors
+
+- Constructors have been updated to handle pagination parameters automatically with default values.
+
+#### Improved Readability & Safety
+
+- Internal flags such as `disabled`, `pendingInstallation`, and `pendingRemoval` are now set to `false` by default.
+
+#### New Methods for Pagination
+
+- New methods (`withLimit`, `withSkip`, `withPage`) have been added to facilitate easy and safe parameter modifications with validation.
+
+These updates provide a more user-friendly API and better default behavior for developers working with client requests in this library.
+
+### mittwald JavaScript SDK Release 4.58.0
+
+The mittwald JavaScript SDK version 4.58.0 has been released. This update includes the following feature:
+
+- **Client:** Re-export all from commons ([commit 9bd6a8b](https://github.com/mittwald/api-client-js/commit/9bd6a8bd07154763043d2ac235c4f6445cc4f7b3))
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.58.0).
+
