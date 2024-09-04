@@ -64,43 +64,42 @@ You should always see the mStudio as the single source of truth.
 If the format of extension instance IDs changes, for example, we will document and announce this.
 If you miss this information, the extension instance ID format validation presents an unnecessary risk.
 
-## Typen von Lifecycle Webhooks
+## Types of Lifecycle Webhooks
 
 ### ExtensionAddedToContext
 
-Dieses Event dient dazu, externen Anwendungen mitzuteilen, dass die Extension zu einem neuen Kontext hinzugefügt wurde.
-Im Rahmen dieses Prozesses werden die Extension Instance ID und das Extension Instance Secret erstmalig übermittelt.
+This webhook communicates that an extension was added to a new context.
+During this process, the extension instance ID and the extension instance secret are transmitted for the first time.
 
-Das Extension Instance Secret kann nicht im Handler selbst direkt verwendet werden.
-Siehe dazu auch [Secrets in Webhooks](#secrets-in-webhooks).
+You can't immediately use the extension instance secret in the webhook handler.
+The reason is described above in [secrets in webhooks](#secrets-in-webhooks).
 
 ### ExtensionInstanceUpdated
 
-In diesem Event wird der externen Anwendung eine Zustandsänderung der `Extension Instance` mitgeteilt.
-Der externen Anwendung wird dabei immer der gesamte neue Zustand mitgeteilt.
+This webhook communicates a change in the state of the `extension instance`.
+It always includes the whole new state of the `extension instance`.
 
-Das kann beispielsweise die De-/Aktivierung der `Extension Instance` sein.
+The activation and deactivation of the `extension instance` are an example of this.
 
 ### ExtensionInstanceSecretRotated
 
-Aus Sicherheitsgründen wird das Extension Instance Secret regelmäßig rotiert.
-Das neue Secret wird über diesen Webhook mitgeteilt.
-Das vorherige Secret ist ab diesem Zeitpunkt nicht mehr gültig.
-Analog zum [ExtensionAddedToContext](#extensionaddedtocontext)-Webhook kann auch hier das Secret nicht direkt im Handler verwendet werden.
-Siehe dazu auch [Secrets in Webhooks](#secrets-in-webhooks).
+The extension instance secret is rotated regularly for security resons.
+This webhook communicates the new secret to the external application.
+The old secret is no longer valid at this point in time.
+You can't immediately use the new secrete in the webhook handler, analogously to the [ExtensionAddedToContext](#extensionaddedtocontext) webhook.
+For more information, see [secrets in webhooks](#secrets-in-webhooks).
 
 ### ExtensionInstanceRemovedFromContext
 
-Dieser Webhook drückt aus, dass eine `Extension Instance` aus einem Context entfernt wurde.
-Datenschutzrelevante Konsequenzen, wie die Löschung von personenbezogenen Daten, sollten an dieser Stelle berücksichtigt werden.
+This webhook communicates the removal of an `extension instance` from a context.
+You should ensure compliance with data privacy laws at this point and delete personal data for example.
 
 :::note
-Für den `ExtensionInstanceRemovedFromContext`-Webhook wird eine spezielle Behandlung hinsichtlich der QoS vorgenommen.
-Falls die Webhook Handler nicht erreichbar sind, besteht die Möglichkeit, das Entfernen der Extension zu forcieren.
-In diesem Fall werden die Rechte der Extension Instance entzogen und bestehende Access Tokens invalidiert.
+We treat the `ExtensionInstanceRemovedFromContext` webhook differently regarding the QoS.
+It is possible to force remove the extension if the webhook handler is unreachable.
+In this case, we revoke all permissions of the `extension instance` and invalidate existing access tokens.
 
-Das mStudio versucht dennoch weiterhin, den Webhook zu versenden,
-um schlussendlich einen konsistenten Zustand zwischen mStudio- und Extension Datenbestand zu erreichen.
+Nonetheless, the mStudio tries to execute the webhook to achieve a consistent state of the mStudio and extension data.
 :::
 
 ## Verifizierung der Sender-Identität von Webhooks
