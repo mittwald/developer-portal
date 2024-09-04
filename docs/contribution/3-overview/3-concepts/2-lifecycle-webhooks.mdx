@@ -41,30 +41,28 @@ This leads to cold starts, which are included in the processing time from the pe
 
 ## Secrets in Webhooks
 
-Secrets, die in Webhooks übermittelt werden, sind erst gültig, wenn der Webhook erfolgreich verarbeitet wurde.
-Danach sollte zusätzlich mit einer undefinierbaren Verzögerung, maximal im Sekundenbereich, gerechnet werden, bis das Secret schlussendlich gültig ist.
-Dies stellt einen weiteren Grund dar, Initialisierungsprozesse, die durch Webhooks ausgelöst werden, nachgelagert zu starten
-und im Webhook Handler hauptsächlich die Verarbeitung der Daten zu übernehmen.
+The secrets that the mStudio communicates via webhook calls are valid as soon as the webhook call is processed successfully.
+You should expect an additional indefinite delay of less than a few seconds until the secret is valid.
+This is an additional reason to start initializing processes triggered by webhooks asynchronously and only process and store the transmitted data in the webhook handler.
 
-Für weitere Informationen dazu, wie das Extension Instance Secret verwendet werden kann, siehe [Authentifizierung](../authentication#extension-instance-secret).
+For more information about how to use the extension instance secret, see [authentication](../authentication#extension-instance-secret).
 
-## Primary Key / Identifier von Extension Instances
+## Primary Key / Identifier of Extension Instances
 
-Jede Extension Instance erhält systembedingt eine eigene Extension Instance ID.
-Wenn Extension Instances von einer Extension persistiert werden sollen,
-**sollte diese ID als Primary Key oder Unique Identifier verwendet werden** und nicht die Context ID.
-Der Grund dafür ist, dass die Webhooks asynchron ausgeführt werden.
-Ein gefährliches Szenario für die Context ID als Primary Key stellt sich wie folgt dar:
-Eine Extension wird von einem Context entfernt und anschließend direkt wieder hinzugefügt (bspw. um mit frischer Konfiguration erneut zu starten).
-Wenn der `ExtensionInstanceAddedToContext`-Webhook der neuen Extension Instance vor dem `ExtensionInstanceRemovedFromContext`-Webhook der alten Extension Instance verarbeitet wird,
-könnte es dazu führen, dass alle Extension Instances des Context gelöscht wurden, obwohl eigentlich eine Extension Instance für diesen Context existieren sollte.
+Every extension instance gets a unique extension instance ID.
+If you want to persist extension instances, you **should use the extension instance ID as the primary key or unique identifier** instead of the context ID.
+The following dangerous scenario that can occur due to the asynchronous nature of the webhook call executions is the reason for this recommendation.
+An extension is removed from a context and immediately added to the same context (for example, to start again with a clean configuration).
+If the `ExtensionInstanceAddedToContext`-webhook call of the new extension instance is processed before the `ExtensionInstanceRemovedFromContext` webhook of the old instance,
+this may lead to the deletion of all extension instances of that context.
+This includes the newly created extension instance that should exist.
 
-## Validierung von Webhook Daten
+## Validation of Webhook Data
 
-Es wird nicht empfohlen, Webhooks aufgrund von Validierungs-Fehlern von Daten abzulehnen, die nicht zwingend für den Programmablauf der Extension benötigt werden.
-Das mStudio sollte stets als Single Source of Truth betrachtet werden.
-Wenn bspw. das Format von Extension Instance IDs geändert wird, dann wird dies dokumentiert und angekündigt.
-Wenn diese Information jedoch übersehen wird, wird mit der Validierung des Formats der Extension Instance ID ein unnötiges Risiko eingegangen.
+We do not recommend validating the data communicated by webhook calls and rejecting them in case of a validation error if this is not necessary for the execution of your extension.
+You should always see the mStudio as the single source of truth.
+If the format of extension instance IDs changes, for example, we will document and announce this.
+If you miss this information, the extension instance ID format validation presents an unnecessary risk.
 
 ## Typen von Lifecycle Webhooks
 
