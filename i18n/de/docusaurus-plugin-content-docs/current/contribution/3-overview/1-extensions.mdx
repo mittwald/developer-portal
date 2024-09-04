@@ -2,20 +2,24 @@
 title: Extensions
 ---
 
-## What is an extension?
+## Was ist eine Extension?
 
-From a domain perspective, an extension is an extension of the mStudio that provides additional functionality for the mStudio.
-It is made available in the mStudio and can be added to an [extension context](../../glossary/#extension-context) by potential users.
-When added to an extension context, an [extension instance](../../glossary#extension-instance) is created.
-Therefore, the extension describes an extension that can be added to an extension context.
-The extension instance is a concrete manifestation of an extension in an extension context.
+Aus fachlicher Sicht ist eine Extension eine Erweiterung des mStudio, die es ermöglicht,
+zusätzliche Funktionalitäten für das mStudio bereitzustellen.
+Sie wird dem mStudio bekannt gemacht und kann von potenziellen Nutzern zu einem [Extension Context](../../glossary#extension-context) hinzugefügt werden.
+Beim Hinzufügen einer Extension zu einem Extension Context wird eine [Extension Instance](../../glossary#extension-instance) erstellt.
+Die Extension ist also die Beschreibung einer Erweiterung, die zu einem Extension Context hinzugefügt werden kann.
+Die Extension Instance ist die konkrete Ausprägung einer Extension in einem Extension Context.
 
-From a technical perspective, an extension is an application operated separately from the mStudio and integrated with the mStudio via REST-APIs.
-An extension must provide a public backend and may provide a frontend if it makes sense for its usage.
-The backend of an extension handles [lifecycle webhooks](../concepts/lifecycle-webhooks).
-These webhooks are used by the mStudio to inform the extension about the state of its extension instances.
-The extensions also provide various [athentication and authorization strategies](../concepts/authentication) to perform authenticated [domain actions](../../glossary#domain-action) in the mStudio.
-These domain actions can occur in the name of the mStudio user using the extension or in the name of the extension itself.
+Aus technischer Sicht ist eine Extension eine außerhalb des mStudio betriebene Applikation,
+die über REST-APIs mit dem mStudio integriert wird.
+Eine Extension muss ein öffentlich erreichbares Backend bereitstellen und kann optional ein Frontend bereitstellen,
+wenn es für die Nutzung der Extension sinnvoll ist.
+Das Backend einer Extension verarbeitet [Lifecycle Webhooks](../concepts/lifecycle-webhooks),
+über die das mStudio die Extension über den Zustand ihrer Extension Instances informiert.
+Außerdem bieten Extensions verschiedene [Authentifizierungs- und Authorisierungsstrategien](../concepts/authentication),
+um authentifizierte [Domain Actions](../../glossary#domain-action) im mStudio durchführen zu können.
+Dies kann entweder im Namen des mStudio Users, der die Extension bedient oder im Namen der Extension selbst geschehen.
 
 ## Aus welchen Informationen besteht eine Extension?
 
@@ -24,16 +28,15 @@ Im Folgenden soll ein grober Überblick gegeben werden.
 
 ### Name und Beschreibung
 
-Eine Extension enthält drei verschiedene Beschreibungsfelder.
-
-Der **Name** und eine **Kurzbeschreibung** sind das erste, das ein Nutzer in der Extension-Übersicht im Marktplatz sieht.
-Daneben gibt es eine **ausführliche Beschreibung**, die mehr Details zur Extension enthält und Formatierung anbietet.
+Eine Extension enthält 3 Stufen von Beschreibung.
+Der Name und eine Kurzbeschreibung sind das erste, das ein Nutzer in der Übersicht von Extensions im Marktplatz sieht.
+Daneben gibt es eine ausführliche Beschreibung, die mehr Details zur Extension enthält und Formattierung anbietet.
 In dieser kann auf Features, Nutzungshinweise, weiterführende Links, einen Changelog und vieles mehr eingegangen werden.
 
 ### State
 
-Der **State** der Extension definiert, ob sie im mStudio sicht- und nutzbar sein soll.
-Das umfasst beispielsweise (jeweils unabhängig voneinander), ob sie generell aktiv ist, im Marktplatz angezeigt wird und ob sie zu einem Extension Context hinzugefügt werden kann.
+Um zu steuern, ob eine Extension im mStudio nutzbar sein soll, kann der State der Extension konfiguriert werden.
+Über den State kann sowohl die Sichtbarkeit als auch die Installierbarkeit von Extensions gesteuert werden.
 
 ### Tags
 
@@ -52,9 +55,9 @@ Dazu muss mindestens eine E-Mail-Adresse angegeben werden, an die sich Nutzer we
 
 ### Scopes
 
-Um über die REST-API des mStudios zugreifen, und dort **Domain Actions** durchführen zu können, benötigt eine Extension Berechtigungen, die vom Nutzer während der Installation bestätigt werden müssen.
-
-Diese Berechtigungen sind in Form von [**Scopes**](../concepts/scopes) definiert. Die Extension-Definition enthält eine Liste von Scopes, die die Berechtigungen der Extension beschreiben.
+Eine Extension muss Berechtigungen anfragen, um Domain Actions im mStudio durchführen zu können.
+Dazu werden Scopes definiert, die die Berechtigungen der Extension beschreiben.
+Für weitere Informationen zum Thema Scopes siehe [Scopes Konzept](../concepts/scopes).
 
 ### Extension Context
 
@@ -65,8 +68,8 @@ Die Entscheidung hängt von mehreren Faktoren, wie der Zielgruppe, dem Anwendung
 ### Lifecycle Webhook Endpoints
 
 Eine Extension muss definieren, an welche URLs Lifecycle-Webhooks gesendet werden sollen.
-Über diese Webhooks teilt das mStudio der Extension mit, welche Extension Instances existieren und in welchem Zustand sie sich befinden.
-Für jedes Lifecycle-Event kann ein eigener Webhook-Endpoint konfiguriert werden.
+Über diese Webhooks wird der Extension mitgeteilt, welche Extension Instances existieren und in welchem Zustand sie sich befinden.
+Für jeden Lifecycle kann ein eigener Webhook-Endpoint konfiguriert werden.
 Für weitere Informationen zu Lifecycle-Webhooks siehe [Lifecycle Webhooks Konzept](../concepts/lifecycle-webhooks).
 
 ### External Frontend
