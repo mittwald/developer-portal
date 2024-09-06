@@ -39,52 +39,49 @@ This way, the mStudio ignores failures of the webhook calls and the mStudio resp
 If you plan to implement the authentication using the extension instance secret later, this method is especially useful.
 Additionally, you can test initialization processes executed after webhook calls with a working secret without creating a new extension instance in the mStudio for every attempt.
 
-### ...mittels OAuth2
+### ...via OAuth2
 
-Wenn die Authentifizierung und Ausführung von Domain Actions über OAuth2 getestet werden soll,
-empfiehlt es sich, im OAuth2-Client eine lokale Redirect URI einzurichten.
-Dies kann entweder localhost oder eine Domain sein, für die ein lokaler Host-Eintrag existiert.
-Es sollte darauf geachtet werden, dass bei Verwendung eines Host-Eintrags keine potenziell öffentlich auflösbare Domain verwendet wird,
-die nicht unter der Kontrolle des Entwicklers steht, um Sicherheitsrisiken zu vermeiden.
+If you want to test the authentication and execution of domain actions per OAuth2, we recommend setting up a local redirect URI in the OAuth2 client.
+This can either be the localhost or a domain with an entry to your local host configuration.
+You should ensure that no public domain is used as an entry to your local host configuration that is not in your control to mitigate security risk.
 
-## Testen der Lifecycle Webhooks
+## Testing Lifecycle Webhooks
 
-### ...mittels lokalem Development Server
+### ...via the Local Development Server
 
-Auf Github existiert das [marketplace-local-dev-server](https://github.com/mittwald/marketplace-local-dev-server)-Repository,
-welches dafür gedacht ist, lokal Lifecycle Webhooks samt Verifizierung der Sender-Identität zu testen.
+You can use the GitHub repository [marketplace-local-dev-server](https://github.com/mittwald/marketplace-local-dev-server) to locally test lifecycle webhooks, including the verification of the sender identity.
 
 :::note
 
-Zum aktuellen Zeitpunkt ist der Marktplatz und die Contribution noch nicht für die Allgemeinheit offen.
-Um Zugriff auf das Repository zu erhalten, kontaktiere bitte deinen Ansprechpartner bei mittwald.
+Currently, the marketplace and contributions are not public.
+To get access to the repository, please reach out to your contact at mittwald.
 
 :::
 
-Es enthält eine Docker-Compose-Konfiguration, die einen lokalen Server startet, der Lifecycle Webhooks versenden kann.
-Dazu wird eine API angeboten, mit der Lifecycle Webhooks angefragt werden können.
-Die Werte, die in den Webhooks enthalten sind, können dabei frei gewählt werden.
-Falls Werte nicht gesetzt sind, werden sie zufällig generiert.
+The repository contains a `docker-compose` configuration that starts a local server.
+This server can send lifecycle webhooks.
+For this, it provides an API you can use to request lifecycle webhooks.
+You can freely choose the values transmitted by the webhooks.
+If you don't set some values, the server randomly generates those values.
 
-Wenn bspw. die Extension Instance ID selbst vergeben wird, können so auch ganze Lebenszyklen von Extension Instances simuliert werden,
-indem für verschiedene Webhooks eine stabile Extension Instance ID verwendet wird.
+If, for example, you set the extension instance IDs of the requested lifecycle webhooks and use a consistent ID, you can simulate complete lifecycles of extension instances.
 
-### ...mittels Dry Run Webhooks
+### ...via Dry Run Webhooks
 
-Mithilfe der <OperationLink operation="extension-dry-run-webhook" />-Operation können Lifecycle Webhooks auch über das mStudio Backend simuliert werden.
-Dabei wird der angefragte Lifecycle Webhook an die an der Extension konfigurierten URL gesendet.
-Dry Run Webhooks können nur für Extension Instances des Contributors ausgeführt werden.
-Sie können genau wie beim lokalen Development Server mit beliebigen Werten gefüllt werden oder zufällige Werte enthalten.
-Für eine Übersicht, welche Werte statisch gesetzt werden können, siehe in der verlinkten Operation.
+You can use the mStudio backend to simulate lifecycle webhooks by using the <OperationLink operation="extension-dry-run-webhook" /> operation.
+The mStudio will send the requested lifecycle webhook to the URL configured for the extension.
+You can only execute dry-run webhooks for extension instances belonging to you, the contributor.
+Similarly to the local development server, you can specify values for the content of the lifecycle webhooks or let the mStudio backend generate random values.
+For an overview of the values you can statically specify, see the linked operation.
 
-Das Ergebnis samt Response Body, Headern und Status Code wird dabei als Antwort auf die Operation zurückgegeben.
+The mStudio returns the result of the executed webhook containing the response body, headers, and status code as a response to the dry-run webhook request.
 
 :::caution
-Um den Webhook als Dry Run erkennbar zu machen, wird dem Webhook der Query-Parameter `dry-run=true` hinzugefügt.
-Es sollte darauf geachtet werden, dass in Produktivsystemen keine Webhooks mit diesem Parameter verarbeitet und persistiert werden,
-da es sich um eine Simulation handelt und so die Daten inkonsistent werden könnten.
+The mStudio adds the parameter `dry-run=true` to the webhook to make it identifiable as a dry-run.
+You should ensure that your production systems do not process and persist webhooks with this parameter.
+Processing such webhooks could lead to data inconsistencies since they are simulated.
 :::
 
-Zu Dokumentationszwecken kann zusätzlich der `executing-user-id` Query-Parameter ausgewertet werden.
-Dieser wird ebenfalls automatisch jedem Dry Run Webhook beigefügt.
-Er enthält die ID des Benutzers, der den Dry Run Webhook ausgelöst hat.
+You can additionally process the `executing-user-id` parameter for documentation purposes.
+This parameter is additionally added to every dry-run webhook automatically.
+It contains the user ID of the user who requested the dry-run webhook.
