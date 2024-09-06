@@ -1,32 +1,33 @@
 ---
-title: Architektur einer Extension
+title: Architecture of an Extension
 ---
 
-## Systemkontext aus Sicht der Extension
+## System Context from the Perspective of an Extension
 
-Eine Extension ist eine eigenständige Applikation, die außerhalb des mStudio betrieben wird.
-In den meisten Fällen benötigt eine Extension eine Persistenzschicht, wie beispielsweise eine Datenbank, um Daten zu speichern und zu verwalten.
+An extension is an independent application operated separately from the mStudio.
+In most cases, it needs a persistence mechanism to store and manage data, such as a database.
 
-Es gibt verschiedene Akteure, die mit einer Extension interagieren können:
+Different actors may interact with an extension:
 
-- mStudio Nutzer: mStudio Benutzer, die über mStudio auf die Extension weitergeleitet werden.
-- Extension Nutzer: Benutzer, die dem mStudio nicht bekannt sind und über eine eigene Nutzerverwaltung der Extension direkt mit dieser interagieren.
+- mStudio users: mStudio users that are directed to the extension via the mStudio.
+- Extension users: Users that are not known to the mStudio and interact with the extension via its separate user management.
 
-Wenn die Extension über ein Frontend verfügt, können Nutzer auf unterschiedliche Weise darauf zugreifen:
+If an extension has a frontend, users can access it via different methods:
 
-- Über das mStudio: Nutzer können aus dem mStudio zur Extension navigieren.
-- Direktzugriff: Nutzer können die Extension über ein Bookmark oder einen direkten Link aufrufen.
+- Via the mStudio: Users can navigate to the extension via the mStudio.
+- Direktzugriff: Users can navigate to the extension via a bookmark or a direct link.
 
-Um sich mit dem mStudio zu integrieren, muss eine Extension einen API-Endpunkt bereitstellen, den das mStudio für [Lifecycle Webhooks](../concepts/lifecycle-webhooks) aufrufen kann.
-Außerdem kann die Extension die mStudio API verwenden, um ihre Funktionalitäten bereitzustellen und die Integration mit dem mStudio zu ermöglichen.
+An extension must provide an API endpoint the mStudio can access for [lifecycle webhooks](../concepts/lifecycle-webhooks).
+Otherwise, it can not be integrated into the mStudio.
+The extension may use the mStudio API to provide functionality and facilitate the integration into the mStudio.
 
 ```mermaid
 C4Context
-    Person(extensionUser, "Extension Nutzer")
-    Person_Ext(mstudioUser, "mStudio Nutzer")
+    Person(extensionUser, "Extension User")
+    Person_Ext(mstudioUser, "mStudio User")
 
     Enterprise_Boundary(contributor, "Contributor") {
-      SystemDb(persistency, "Datenbank")
+      SystemDb(persistency, "Database")
       System(extension, "Extension")
     }
 
@@ -46,13 +47,13 @@ C4Context
     UpdateLayoutConfig($c4ShapeInRow="2", $c4BoundaryInRow="1")
 ```
 
-## Prototypische Architektur einer Extension
+## Prototypical Architecture of an Extension
 
-Eine Extension muss zwingend eine REST-API für Lifecycle Webhooks bereitstellen, um funktionsfähig zu sein.
-Diese wird genutzt, um die Extension über erstellte Extension Instances zu informieren und deren Lebenszyklus zu steuern.
+An extension must provide a REST API for lifecycle webhooks to function.
+The mStudio uses this to inform the extension about created extension instances and their lifecycle.
 
-Davon abgesehen ist der Aufbau einer Extension flexibel und kann je nach Anforderungen des Contributors variieren.
-Eine typische Architektur könnte wie folgt aussehen:
+Besides this hard requirement, the extension architecture is flexible and can vary based on your requirements.
+A typical architecture may look as follows:
 
 ```mermaid
 block-beta
@@ -60,9 +61,9 @@ block-beta
   frontend["Extension Frontend"]
   mstudio["mStudio"]
   space:2
-  businessapi["Extension API"] webhooks["Webhook REST-API"]
+  businessapi["Extension API"] webhooks["Webhook REST API"]
 
-  business["Geschäftslogik"]:2
+  business["Business Logic"]:2
   model["Repository"]:2
   space:2
   database[("Database")]:2
@@ -72,25 +73,24 @@ block-beta
   model-->database
 ```
 
-Diese Architektur ist typisch für eine Extension, die Zusatzfunktionalität für das mStudio bereitstellen soll
-und dessen Daseinsberechtigung in der Integration mit dem mStudio liegt.
-Sie sieht eine klare Trennung von Frontend, API-Schicht, Geschäftslogik und Datenbank vor.
-Eine Single-Page-Applikation kommuniziert über eine REST-API mit der Geschäftslogik, die wiederum auf eine Datenbank zugreift.
+This architecture is typical for an extension that provides additional functionality for the mStudio.
+It has a clear separation of the frontend, API layer, business logic, and database.
+A single-page application communicates with the business logic via a REST API.
+The business logic then accesses a database.
 
-Dieser Ansatz stellt nur einen Vorschlag dar.
-Beispielsweise können die APIs für die Geschäftslogik der Extension und die Lifecycle Webhooks in einem gemeinsamen API-Service konsolidiert werden.
-Außerdem kann die Extension statt einer Single-Page-Applikation
-auch ein Server-Side gerendertes Frontend, eine CLI oder gar kein Frontend verwenden.
+This approach is just a suggestion.
+It is also viable to consolidate the APIs for the business logic of the extension and the lifecycle webhooks together in an API service, for example.
+Also, the extension may use a server-side rendered frontend, a CLI, or no frontend instead of a single-page application.
 
-## Deployment Model einer Extension
+## Deployment Model of an Extension
 
-Eine Extension wird nicht durch mittwald betrieben, sondern durch den Contributor.
-Das ist dadurch bedingt, dass eine Extension eine eigenständige Applikation ist, die unabhängig vom mStudio betrieben wird.
+An extension is operated by the contributor, not by mittwald.
+This is because an extension is a separate application that runs independently of the mStudio.
 
-Support und Betrieb liegen in der Verantwortung des Contributors.
-Der Vorteil liegt darin, dass der Contributor die volle Kontrolle über die Extension hat
-und diese nach seinen eigenen Anforderungen, wie dem Technologie-Stack oder der Deployment-Strategie betreiben kann.
-Außerdem ist der Contributor so nicht gezwungen, mittwald den Code der Extension oder eingesetzter privater Libraries offenzulegen.
+The contributor is responsible for the operation and support of his extension.
+This is advantageous for the contributor because they have complete control over the extension.
+Therefore, the contributor can operate the extension according to their requirements, such as the technology stack or deployment strategy.
+In addition, the contributor is not forced to disclose the code of their extension or any private libraries used.
 
 ```mermaid
 C4Deployment
@@ -99,12 +99,12 @@ C4Deployment
   }
   Deployment_Node(contributor, "Contributor") {
     Container(extension, "Extension")
-    Container(db, "Datenbank")
+    Container(db, "Database")
   }
 ```
 
-Es ist jedoch durchaus denkbar, die Extension auf einem Produkt der mittwald Plattform zu betreiben.
-Der Unterschied liegt darin, dass nun das Deployment, der Betrieb und das Operating weiterhin durch den Contributor erfolgen kann.
+However, it is conceivable that an extension runs on a product of the mittwald Plattform.
+In that case, the contributor still manages the deployment and operation.
 
 ```mermaid
 C4Deployment
@@ -116,8 +116,8 @@ C4Deployment
       Deployment_Node(apps, "Managed Apps") {
         Container(extension, "Extension")
       }
-      Deployment_Node(dbs, "Managed Datenbanken") {
-        Container(db, "Datenbank")
+      Deployment_Node(dbs, "Managed Databases") {
+        Container(db, "Database")
       }
     }
   }

@@ -1,0 +1,96 @@
+---
+title: Extensions
+---
+
+## Was ist eine Extension?
+
+Aus fachlicher Sicht ist eine Extension eine Erweiterung des mStudio, die es ermöglicht,
+zusätzliche Funktionalitäten für das mStudio bereitzustellen.
+Extensions werden dem mStudio [bekannt gemacht](../../how-to/create-extension), und potenzielle Nutzer können sie von dort aus in einem [Extension Context](../../glossary#extension-context) (beispielsweise also einem Projekt oder einer Organisation) installieren.
+Wenn ein Nutzer eine Extension zu einem Extension Context hinzufügt, erstellt das mStudio eine [Extension Instance](../../glossary#extension-instance) für diese Extension.
+Die Extension ist also die Beschreibung einer Erweiterung, die zu einem Extension Context hinzugefügt werden kann.
+Die Extension Instance ist die konkrete Ausprägung einer Extension in einem Extension Context.
+
+Aus technischer Sicht ist eine Extension eine separate und unabhängige Applikation, die über REST-APIs mit dem mStudio kommuniziert.
+die über REST-APIs mit dem mStudio integriert wird.
+Eine Extension muss ein öffentlich erreichbares Backend bereitstellen und kann optional ein Frontend bereitstellen,
+wenn es für die Nutzung der Extension sinnvoll ist.
+Wenn Extension Instances beispielsweise erstellt oder gelöscht werden, benachrichtigt das mStudio das Backend der Extension über einen [Lifecycle Webhook](../concepts/lifecycle-webhooks).
+
+Außerdem bieten Extensions verschiedene [Authentifizierungs- und Authorisierungsstrategien](../concepts/authentication),
+um authentifizierte [Domain Actions](../../glossary#domain-action) im mStudio durchführen zu können.
+Dies kann entweder im Namen des mStudio Users, der die Extension bedient oder im Namen der Extension selbst geschehen.
+
+## Aus welchen Informationen besteht eine Extension?
+
+Eine Extension besteht aus verschiedenen Informationen, die in der [Extension Referenz](../../reference/extensions) im Detail beschrieben sind.
+Im Folgenden soll ein grober Überblick gegeben werden.
+
+### Name und Beschreibung
+
+Eine Extension enthält drei verschiedene Beschreibungsfelder.
+
+Der **Name** und eine **Kurzbeschreibung** sind das erste, das ein Nutzer in der Extension-Übersicht im Marktplatz sieht.
+Daneben gibt es eine **ausführliche Beschreibung**, die mehr Details zur Extension enthält und Formatierung anbietet.
+In dieser kann auf Features, Nutzungshinweise, weiterführende Links, einen Changelog und vieles mehr eingegangen werden.
+
+### State
+
+Der **State** der Extension definiert, ob sie im mStudio sicht- und nutzbar sein soll.
+Das umfasst beispielsweise (jeweils unabhängig voneinander), ob sie generell aktiv ist, im Marktplatz angezeigt wird und ob sie zu einem Extension Context hinzugefügt werden kann.
+
+### Tags
+
+Tags sind eine Möglichkeit, Extensions zu kategorisieren.
+Sie werden im mStudio dazu genutzt, Extensions nach Anwendungsfall zu gruppieren.
+Dabei sollte darauf geachtet werden, dass die Tags aussagekräftig sind und eine klare Zuordnung zu den Features der Extension ermöglichen.
+Auch sollte darauf geachtet werden, dass sie in etwa dem entsprechen, wonach potenzielle Kunden der Extension suchen würden.
+Eine Kategorie, in der sich nur eine Extension befindet, bietet keinen Mehrwert in der Suche nach Extensions
+und verringert sowohl die Auffindbarkeit als auch die Vergleichbarkeit der Extensions.
+
+### Support
+
+Für den Support bei der Nutzung von Extensions ist der Contributor verantwortlich.
+Entsprechend benötigt der Nutzer einer Extension Informationen darüber, wie er Support erhalten kann.
+Dazu muss mindestens eine E-Mail-Adresse angegeben werden, an die sich Nutzer wenden können.
+
+### Scopes
+
+Um über die REST-API des mStudios zugreifen, und dort **Domain Actions** durchführen zu können, benötigt eine Extension Berechtigungen, die vom Nutzer während der Installation bestätigt werden müssen.
+
+Diese Berechtigungen sind in Form von [**Scopes**](../concepts/scopes) definiert. Die Extension-Definition enthält eine Liste von Scopes, die die Berechtigungen der Extension beschreiben.
+
+### Extension Context
+
+Eine Extension kann entweder zu einem Projekt oder zu einer Organisation hinzugefügt werden.
+Ein Contributor muss sich während der Konzept- oder Entwicklungsphase entscheiden, welcher Extension Context für die Extension sinnvoll ist.
+Die Entscheidung hängt von mehreren Faktoren, wie der Zielgruppe, dem Anwendungsfall aber auch dem Geschäftsmodell, ab.
+
+### Lifecycle Webhook Endpoints
+
+Eine Extension muss definieren, an welche URLs Lifecycle-Webhooks gesendet werden sollen.
+Über diese Webhooks wird der Extension mitgeteilt, welche Extension Instances existieren und in welchem Zustand sie sich befinden.
+Für jeden Lifecycle kann ein eigener Webhook-Endpoint konfiguriert werden.
+Für weitere Informationen zu Lifecycle-Webhooks siehe [Lifecycle Webhooks Konzept](../concepts/lifecycle-webhooks).
+
+### External Frontend
+
+Eine Extension kann optional ein externes Frontend angeben, das dazu dient, einen Einstiegspunkt aus dem mStudio heraus in die Extension zu bieten.
+Das externe Frontend wird als URL angegeben und kann getemplated werden.
+Siehe dazu auch [Templating von Konfigurationswerten](../concepts/templating).
+Für weitere Informationen zum External Frontend siehe [External Frontend Konzept](../concepts/external-frontend).
+
+## Versionierung von Extensions
+
+Das mStudio sieht kein Konzept für die Versionierung von Extensions vor.
+Extensions sind eigenständige Applikationen, die zur Laufzeit in der Verantwortung des Contributors liegen
+und nur per API mit dem mStudio integriert sind.
+Deshalb kann mittwald keinen verlässlichen Einfluss auf die Versionierung und Stabilität von Versionen der Extensions nehmen.
+
+Falls eine Extension den Anwendungsfall hat, Funktionalität in verschiedenen Versionen bereitzustellen,
+erfolgt die Versionierung von Extensions unabhängig vom mStudio in Eigenimplementierung.
+Der Contributor ist für die Versionierung der Extension verantwortlich und kann dabei eigene Regeln und Konventionen festlegen.
+
+Falls die Extension selbst eine API bereitstellt, die von externen Applikationen genutzt wird,
+wird empfohlen auf Versionierung und Stabilität dieser API zu achten.
+Hierbei können gängige Konventionen und Best Practices für API-Versionierung angewendet werden.
