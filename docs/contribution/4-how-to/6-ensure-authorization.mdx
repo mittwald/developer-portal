@@ -40,7 +40,6 @@ For this, it can use the operations [project-get-project-membership](../../../re
 Those routes return the current membership to an extension context of the user.
 This contains the roles of the user in that context, among other things.
 
-
 By validating the user's role, the extension can display a warning to the user, that they do not have the required permissions to execute the domain action and should contact the context administrator to get the missing permissions.
 
 ```mermaid
@@ -51,40 +50,37 @@ sequenceDiagram
 
   User->>Extension: Open
   Extension->>mStudio: project-get-project-membership
-  mStudio-->>Extension: Organisation accountant
+  mStudio-->>Extension: Organization accountant
   Extension-->>User: Warning regarding missing permissions
 ```
 
-Dem Contributor bleibt dabei die Flexibilität, ob er die Extension für mStudio Benutzer mit eingeschränkten Rechten vollständig sperrt, wie im Beispiel oben,
-oder nur für die entsprechenden Features.
+The contributor still has the flexibility to decide whether to block the extension for users with insufficient permissions completely, as in the above example, or only specific features.
 
 ```mermaid
 sequenceDiagram
-  participant User as mStudio Benutzer
+  participant User as mStudio User
   participant Extension
   participant mStudio
 
-  User->>Extension: Öffnen
+  User->>Extension: Open
   Extension-->>User: 200 OK
-  User->>Extension: Navigiere zu Feature foo
+  User->>Extension: Navigate zu Feature foo
   Extension->>mStudio: project-get-project-membership
-  mStudio-->>Extension: Organisationsbuchhalter
-  Extension-->>User: Hinweis auf fehlende Berechtigung
-  User->>Extension: Navigiere zu Feature bar
+  mStudio-->>Extension: Organization accountant
+  Extension-->>User: Warning regarding missing permissions
+  User->>Extension: Navigate to Feature bar
   Extension->>mStudio: project-get-project-membership
-  mStudio-->>Extension: Organisationsbuchhalter
+  mStudio-->>Extension: Organization accountant
   Extension-->>User: 200 OK
-  User->>Extension: Nutze Feature bar
+  User->>Extension: Use Feature bar
   Extension->>mStudio: Domain Action bar
   mStudio-->>Extension: 200 OK
   Extension-->>User: 200 OK
 ```
-Rein technisch stellt es eine Alternative dar, die Domain Actions im Namen der Extension auszuführen.
-Dafür muss die Extension das [Extension Instance Secret](../../overview/concepts/authentication#extension-instance-secret) verwenden,
-um ein Access Token zu beziehen.
-In diesem Fall wird die Domain Action mit den Rechten der Extension ausgeführt.
-Dies hat jedoch den Nachteil, dass Organisationsinhaber und Project Administratoren nicht mehr über die Vergabe von Rollen steuern können,
-welche Benutzer welche Domain Actions ausführen dürfen, was eine Sicherheitslücke darstellen
-und zu einer Verschlechterung der User-Experience führen kann.
 
-
+Alternatively, you can execute the domain actions on behalf of the extension.
+For this, the extension has to use the [extension instance secret](../../overview/concepts/authentication#extension-instance-secret) to request an access token.
+Then the domain action is executed with the permissions of the extension.
+However, this has a downside.
+Organization owners and project administrators can no longer manage which domain actions users can perform by distributing roles.
+This can lead to a worse user experience.
