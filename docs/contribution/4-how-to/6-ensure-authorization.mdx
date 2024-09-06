@@ -34,27 +34,25 @@ sequenceDiagram
   Extension-->>User: 403 Forbidden
 ```
 
-Um eine gute User-Experience zu gewährleisten, sollte die Extension die benötigten Rechte im Vorfeld prüfen.
-Dazu kann die Extension die [project-get-project-membership](../../../reference/project/project-get-project-membership)-Operation,
-bzw. die [customer-get-customer-membership](../../../reference/customer/customer-get-customer-membership)-Operation verwenden.
+The extension should validate the required permissions in advance to provide a good user experience.
+For this, it can use the operations [project-get-project-membership](../../../reference/project/project-get-project-membership) or [customer-get-customer-membership](../../../reference/customer/customer-get-customer-membership).
 
-Diese Routen geben die aktuelle Mitgliedschaft des Benutzers zu einem Extension Context zurück.
-Unter anderem enthält sie, welche Rolle der Benutzer in dem Context hat.
+Those routes return the current membership to an extension context of the user.
+This contains the roles of the user in that context, among other things.
 
-Indem die Rolle des Benutzers geprüft wird, kann nun vor dem eintretenden Fehlerfall ein entsprechender Hinweis an den Benutzer gegeben werden,
-dass er nicht die notwendigen Rechte hat, um die Domain Action auszuführen und den Context Administrator kontaktieren muss,
-um die Rechte zu erhalten.
+
+By validating the user's role, the extension can display a warning to the user, that they do not have the required permissions to execute the domain action and should contact the context administrator to get the missing permissions.
 
 ```mermaid
 sequenceDiagram
-  participant User as mStudio Benutzer
+  participant User as mStudio User
   participant Extension
   participant mStudio
 
-  User->>Extension: Öffnen
+  User->>Extension: Open
   Extension->>mStudio: project-get-project-membership
-  mStudio-->>Extension: Organisationsbuchhalter
-  Extension-->>User: Hinweis auf fehlende Berechtigung
+  mStudio-->>Extension: Organisation accountant
+  Extension-->>User: Warning regarding missing permissions
 ```
 
 Dem Contributor bleibt dabei die Flexibilität, ob er die Extension für mStudio Benutzer mit eingeschränkten Rechten vollständig sperrt, wie im Beispiel oben,
