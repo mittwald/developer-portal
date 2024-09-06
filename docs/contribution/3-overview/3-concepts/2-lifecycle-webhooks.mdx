@@ -22,10 +22,10 @@ The request is then signed and resubmitted.
 These retries are delayed with a capped exponential backoff to limit the number of requests.
 
 The mStudio will retry a webhook call until it receives a response that the extension processed the call successfully.
-It also ensures that the webhooks are in the correct order per **extension instance**.
+It also ensures that the webhooks are in the correct order **per extension instance**.
 The only exception to this rule is the removal of extensions from a context.
 In that case, the mStudio aborts all inactive or pending webhook calls.
-Only the `ExtensionInstanceRemovedFromContext` webhook call is executed and retried until the extension processed the call successfully or the extension is from the marketplace.
+Only the `ExtensionInstanceRemovedFromContext` webhook call is executed and retried until the extension processes the call successfully or the extension is removed from the marketplace.
 
 :::caution
 If the mStudio backend does not receive a response from the extension webhook handler **within 6 seconds**, it interprets this as a **timeout**, and the webhook call execution fails.
@@ -83,10 +83,10 @@ The activation and deactivation of the `extension instance` are an example of th
 
 ### ExtensionInstanceSecretRotated
 
-The extension instance secret is rotated regularly for security resons.
+The extension instance secret is rotated regularly for security reasons.
 This webhook communicates the new secret to the external application.
 The old secret is no longer valid at this point in time.
-You can't immediately use the new secrete in the webhook handler, analogously to the [ExtensionAddedToContext](#extensionaddedtocontext) webhook.
+You can't immediately use the new secret in the webhook handler, analogously to the [ExtensionAddedToContext](#extensionaddedtocontext) webhook.
 For more information, see [secrets in webhooks](#secrets-in-webhooks).
 
 ### ExtensionInstanceRemovedFromContext
