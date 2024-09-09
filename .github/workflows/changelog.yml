@@ -23,19 +23,29 @@ jobs:
           wget https://github.com/Tufin/oasdiff/releases/download/v1.10.23/oasdiff_1.10.23_linux_amd64.tar.gz
           tar xzf oasdiff_1.10.23_linux_amd64.tar.gz
           mv oasdiff /usr/local/bin/oasdiff
+      - name: Git Identity 🪪
+        run: |
+          git config user.name "mittwald-machine"
+          git config user.email "mittwald-machine@users.noreply.github.com"
       - name: Generate API changelogs
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: npm run generate:changelog
-      - name: Git Identity 🪪
         run: |
-          git config user.name "${{ github.actor }}"
-          git config user.email "${{ github.actor }}@users.noreply.github.com"
-      - name: Commit and push changes
-        run: |
+          npm run generate:changelog
+          
           if [ $(git status --porcelain changelog generator/specs | wc -l) -gt 0 ] ; then
             git add changelog generator/specs
             git commit -m "Generate API changelog for $(date +%d-%m-%Y)";
-            git remote add publish "https://mittwald-machine:${{ secrets.RELEASE_USER_TOKEN }}@github.com/mittwald/developer-portal.git"
-            git push publish
           fi
+      - name: Synchronize CLI docs
+        run: |
+          npm run generate:cli
+          
+          if [ $(git status --porcelain docs/cli | wc -l) -gt 0 ] ; then
+            git add docs/cli
+            git commit -m "Synchronize CLI documentation from mittwald/cli";
+          fi
+      - name: Push changes
+        run: |
+          git remote add publish "https://mittwald-machine:${{ secrets.RELEASE_USER_TOKEN }}@github.com/mittwald/developer-portal.git"
+          git push publish
