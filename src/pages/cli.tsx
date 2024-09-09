@@ -3,7 +3,7 @@ import clsx from "clsx";
 import Link from "@docusaurus/Link";
 import Layout from "@theme/Layout";
 import Icon from "@mittwald/flow-react-components/Icon";
-import { IconBrandGithub, IconRocket, IconNotebook } from "@tabler/icons-react";
+import { IconBrandGithub, IconNotebook, IconRocket } from "@tabler/icons-react";
 
 import styles from "./cli.module.css";
 import demo from "@site/static/img/cli-demo.png";
@@ -72,11 +72,7 @@ export default function Home() {
   return (
     <Layout
       title="mittwald CLI"
-      description={translate({
-        id: "cli.description",
-        message:
-          "The mittwald Developer Portal provides developers with the resources they need to integrate mittwald products into their own applications using our API.",
-      })}
+      description={translate({ id: "cli.description" })}
     >
       <div className={styles.wrapper}>
         <CLIPageHeader />
