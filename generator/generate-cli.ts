@@ -34,7 +34,7 @@ async function downloadDocsFromRelease(release: GithubRelease) {
   }
 }
 
-(async() => {
+(async () => {
   const latestRelease = await getLatestCLIRelease();
   console.log(`downloading docs from ${latestRelease.tag_name}`);
 
