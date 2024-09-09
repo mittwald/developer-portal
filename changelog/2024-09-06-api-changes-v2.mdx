@@ -7,7 +7,6 @@ tags:
   - breaking
   - Mail
   - File
-
 ---
 
 import OperationHint from "@site/src/components/OperationHint";
@@ -17,8 +16,6 @@ On September 6, 2024, the mittwald API introduced several changes, including upd
 
 {/* truncate */}
 
-
-
 :::caution Breaking changes
 
 This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
@@ -27,142 +24,108 @@ While we generally strive to avoid breaking changes in accordance with our [API 
 
 :::
 
-
-
 ## Summary
 
+- The type/format of the 'path' request parameter 'projectId' has been changed from 'string' to 'string'/'uuid' for the following operations:
 
-- The type/format of the 'path' request parameter 'projectId' has been changed from 'string' to 'string'/'uuid' for the following operations: 
-  - GET /v2/projects/{projectId}/delivery-boxes (List DeliveryBoxes belonging to a Project) 
-  - GET /v2/projects/{projectId}/mail-addresses (List MailAddresses belonging to a Project). **This is a breaking change.**
+  - `GET /v2/projects/{projectId}/delivery-boxes` (List DeliveryBoxes belonging to a Project)
+  - `GET /v2/projects/{projectId}/mail-addresses` (List MailAddresses belonging to a Project). **This is a breaking change.**
 
 - The required property 'maxSizeInKb' has been added to the response with the '200' status for the following operations:
-  - GET /v2/file-token-rules/{token} (Get a Token's upload rules)
-  - GET /v2/file-type-rules/{name} (Get a Type's upload rules)
-  - GET /v2/file-upload-tokens/{fileUploadToken}/rules (Get a FileUploadToken's rules)
-  - GET /v2/file-upload-types/{fileUploadType}/rules (Get a FileUploadType's rules).
+
+  - `GET /v2/file-token-rules/{token}` (Get a Token's upload rules)
+  - `GET /v2/file-type-rules/{name}` (Get a Type's upload rules)
+  - `GET /v2/file-upload-tokens/{fileUploadToken}/rules` (Get a FileUploadToken's rules)
+  - `GET /v2/file-upload-types/{fileUploadType}/rules` (Get a FileUploadType's rules).
 
 - The required property 'friendlyUrl' has been added to the response for the following operations:
-  - POST /v2/files (Create a File) with the '201' status
-  - GET /v2/files/{fileId}/meta (Get a File's meta) with the '200' status.
+
+  - `POST /v2/files` (Create a File) with the '201' status
+  - `GET /v2/files/{fileId}/meta` (Get a File's meta) with the '200' status.
 
 - A new optional 'query' request parameter 'search' has been added for the following operations:
-  - GET /v2/projects/{projectId}/delivery-boxes (List DeliveryBoxes belonging to a Project)
-  - GET /v2/projects/{projectId}/mail-addresses (List MailAddresses belonging to a Project).
+  - `GET /v2/projects/{projectId}/delivery-boxes` (List DeliveryBoxes belonging to a Project)
+  - `GET /v2/projects/{projectId}/mail-addresses` (List MailAddresses belonging to a Project).
 
 _Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
 
-
 ## Detailed changes
-
-
 
 ### Changes in "List delivery boxes belonging to a Project"
 
-
 - ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'' to 'string'/'uuid'
 
 - added the new optional 'query' request parameter 'search'
-
 
 For details, refer to the <OperationLink operation="mail-list-delivery-boxes" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "List mail addresses belonging to a Project"
-
 
 - ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'' to 'string'/'uuid'
 
 - added the new optional 'query' request parameter 'search'
 
-
 For details, refer to the <OperationLink operation="mail-list-mail-addresses" apiVersion="v2" /> endpoint.
-
-
 
 ### Changes in "Get a Token's upload rules"
 
-
 - added the required property 'maxSizeInKb' to the response with the '200' status
-
 
 For details, refer to the <OperationLink operation="deprecated-file-get-file-token-rules" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get a Type's upload rules"
 
-
 - added the required property 'maxSizeInKb' to the response with the '200' status
-
 
 For details, refer to the <OperationLink operation="deprecated-file-get-file-type-rules" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get a FileUploadToken's rules"
 
-
 - added the required property 'maxSizeInKb' to the response with the '200' status
-
 
 For details, refer to the <OperationLink operation="file-get-file-upload-token-rules" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get a FileUploadType's rules"
-
 
 - added the required property 'maxSizeInKb' to the response with the '200' status
 
-
 For details, refer to the <OperationLink operation="file-get-file-upload-type-rules" apiVersion="v2" /> endpoint.
-
-
 
 ### Changes in "Create a File"
 
-
 - added the required property 'friendlyUrl' to the response with the '201' status
-
 
 For details, refer to the <OperationLink operation="file-create-file" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get a File's meta"
-
 
 - added the required property 'friendlyUrl' to the response with the '200' status
 
-
 For details, refer to the <OperationLink operation="file-get-file-meta" apiVersion="v2" /> endpoint.
 
-
-
-
 ## Client package releases
-
 
 ### mittwald PHP SDK v2.1.59 Release Summary
 
 The mittwald PHP SDK has been updated to version 2.1.59. This release includes several new features, enhancements, changes, and bug fixes aimed at improving the usability and functionality of the SDK.
 
 #### Features Added
+
 - **User-Friendly File Retrieval**: The method description for retrieving files now specifies support for user-friendly URLs, enhancing clarity on file access.
 
 #### Enhancements
+
 - **UUID Format for Project IDs**: The `projectId` field in `ListDeliveryBoxesRequest` and `ListMailAddressesRequest` now includes a UUID format, improving structure and validation.
 - **Search Functionality**: A `search` parameter has been introduced in `ListDeliveryBoxesRequest` and `ListMailAddressesRequest`, enabling users to filter results based on a search query.
 
 #### Changes
+
 - **FileMeta Property Update**: The `friendlyURL` property is now deprecated in favor of `friendlyUrl`, promoting a clearer naming convention.
 - **Deprecation Handling**: Several properties, such as `maxSizeInKb` in `FileUploadRules`, have been marked as deprecated to promote future-proofing and standardization.
 
 #### Bug Fixes
+
 - **Consistent Method Naming**: Method names within `FileMeta` have been updated for consistent casing and naming conventions, improving code readability.
 - **Property Behavior Fixes**: Getters and setters now properly reflect the current state of properties, especially with search functionality.
 
 For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.59).
-
