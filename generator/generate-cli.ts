@@ -8,8 +8,12 @@ async function getLatestCLIRelease(): Promise<GithubRelease> {
 }
 
 async function downloadDocsFromRelease(release: GithubRelease) {
-  const url = `https://api.github.com/repos/mittwald/cli/contents/docs?ref=${release.tag_name}`
-  const tree: GithubContentObject = await (await fetch(url)).json();
+  const url = `https://api.github.com/repos/mittwald/cli/contents/docs?ref=${release.tag_name}`;
+  const tree: GithubContentObject = await (
+    await fetch(url, {
+      headers: { Accept: "application/vnd.github.object+json" },
+    })
+  ).json();
 
   if (tree.type !== "dir") {
     throw new Error("expected a directory");
