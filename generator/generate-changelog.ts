@@ -8,6 +8,7 @@ import * as fs from "fs/promises";
 import * as fs2 from "fs";
 import { canonicalizeTitle } from "@site/generator/util/title";
 import OpenAI from "openai";
+import { GithubRelease } from "@site/generator/util/github";
 
 const openai = new OpenAI();
 
@@ -21,13 +22,6 @@ type ChangelogEntry = {
   source: string;
   section: string;
   description?: string;
-};
-
-type GithubRelease = {
-  published_at: string;
-  html_url: string;
-  body: string;
-  name: string;
 };
 
 function groupChangelogByOperation(changelog: ChangelogEntry[]) {
