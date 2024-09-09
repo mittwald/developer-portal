@@ -4,9 +4,9 @@ title: Extensions
 
 import SchemaWithExample from "../../../src/components/openapi/SchemaWithExample";
 
-Extensions werden derzeit über statische YAML-Dokumente definiert.
-Die benötigten und erlaubten Attribute sind in folgendem Schema beschrieben.
-Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Informationen besteht eine Extension?](../../overview/extensions#aus-welchen-informationen-besteht-eine-extension)
+Currently, we define extensions with static YAML documents.
+The following schema describes the allowed and the required values.
+For more information about the individual attributes, see [which information an extension consists of](../../overview/extensions#which-information-does-an-extension-consist-of).
 
 <SchemaWithExample
   withRawJSONSchema
@@ -28,46 +28,46 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
       id: {
         type: "string",
         format: "uuid",
-        description: "Global einheitlicher Identifier der Extension",
+        description: "Globally unique identifier of the extension",
       },
       contributorId: {
         type: "string",
         format: "uuid",
         description:
-          "Identifier des Contributors. Entspricht dem identifier des Customers/der Organisation im mStudio",
+          "Identifier of the contributor. Identical to the identifier of the customer/organization in the mStudio",
       },
       name: {
         type: "string",
-        description: "Name der Extension",
+        description: "Name of the extension",
         example: "Example Extension",
       },
       description: {
         type: "string",
         description:
-          "Kurzbeschreibung der Extension. Sollte möglichst kurz und prägnant die Extension erklären",
+          "Short description of the extension. It should explain the extension concisely",
         example:
-          "Eine Beispiel Extension, die zeigen soll, welche Informationen benötigt werden, um eine Extension einzureichen",
+          "An example extension to show which information is needed to create an extension",
       },
       detailedDescriptions: {
         type: "object",
-        description: "Ausführliche Beschreibungen der Extension in unterschiedlichen Sprachen",
+        description: "Detailed description of the extension in different languages",
         required: ["de"],
         properties: {
           de: {
             type: "object",
-            description: "Ausführliche Beschreibung der Extension in Deutsch",
+            description: "Detailed description of the extension in german",
             required: ["markdown"],
             properties: {
               markdown: {
                 type: "string",
-                description: "Ein Beschreibungstext mit Markdown-Formatierungen",
+                description: "A markdown text description",
                 minLength: 1,
                 example: 
                   "# Ein Beispiel\nDies ist eine Beispiel Extension-Beschreibung.\n## Weitere Informationen\nHier könnten **weitere** Informationen stehen.",
               },
               plain: {
                 type: "string",
-                description: "Ein Beschreibungstext ohne Formatierungen",
+                description: "A plain text description",
                 minLength: 1,
                 example:
                   "Eine ausführliche Besipiel Extension-Beschreibung. Diese enthält keine Formatierungen."
@@ -76,19 +76,19 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
           },
           en: {
             type: "object",
-            description: "Ausführliche Beschreibung der Extension in Englisch",
+            description: "Detailed description of the extension in english",
             required: ["markdown"],
             properties: {
               markdown: {
                 type: "string",
-                description: "Ein Beschreibungstext mit Markdown-Formatierungen",
+                description: "A markdown text description",
                 minLength: 1,
                 example: 
                   "# An example\nThis is an example extension description.\n## Further informations\nHere could be **further** informations.",
               },
               plain: {
                 type: "string",
-                description: "Ein Beschreibungstext ohne Formatierungen",
+                description: "A plain text description",
                 minLength: 1,
                 exmple:
                   "A detailed example extension description. This does not contain any formatting."
@@ -101,7 +101,7 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
         type: "string",
         enum: ["project", "customer"],
         description:
-          "Gibt an, ob die Extension zu einem Projekt oder zu einer Organisation hinzugefügt werden kann",
+          "Defines, whether the extension may be added to a project or an organization",
       },
       requiredScopes: {
         type: "array",
@@ -109,7 +109,7 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
           type: "string",
           example: "project:read",
         },
-        description: "Berechtigungen, die die Extension benötigt",
+        description: "Permissions, the extension requires",
       },
       externalComponents: {
         type: "object",
@@ -132,7 +132,7 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
                     type: "string",
                     format: "uri",
                     description:
-                      "URL, die aufgerufen wird, wenn die Extension zu einem Extension Context hinzugefügt wird. Kann Platzhalter enthalten",
+                      "The URL that the mStudio calls when the extension is added to an extension context. May contain placeholders",
                     example:
                       "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/added",
                   },
@@ -146,7 +146,7 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
                     type: "string",
                     format: "uri",
                     description:
-                      "URL, die aufgerufen wird, wenn eine Extension Instance aktualisiert wird. Kann Platzhalter enthalten",
+                      "The URL that the mStudio calls when the extension instance is updated. May contain placeholders",
                     example:
                       "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/updated",
                   },
@@ -160,7 +160,7 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
                     type: "string",
                     format: "uri",
                     description:
-                      "URL, die aufgerufen wird, wenn das Secret einer Extension Instance rotiert wird. Kann Platzhalter enthalten",
+                      "The URL that the mStudio calls when the extension instance secret is rotated. May contain placeholders",
                     example:
                       "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/secret-rotated",
                   },
@@ -174,7 +174,7 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
                     type: "string",
                     format: "uri",
                     description:
-                      "URL, die aufgerufen wird, wenn die Extension aus einem Extension Context entfernt wird. Kann Platzhalter enthalten",
+                      "The URL that the mStudio calls when the extension instance secret is removed from a context. May contain placeholders",
                     example:
                       "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/removed",
                   },
@@ -193,7 +193,7 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
                     type: "string",
                     format: "uri",
                     description:
-                      "URL, die aufgerufen wird, wenn die Extension im mStudio aufgerufen wird. Kann Platzhalter enthalten",
+                      "The URL that the user is directed to when they open the extension in the mStudio. May contain placeholders",
                     example: "https://example.org/:extensionInstanceId",
                   },
                 },
@@ -210,13 +210,14 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
             type: "string",
             format: "email",
             description:
-              "E-Mail-Adresse, die für Supportanfragen genutzt werden kann",
+              "Email address that may be used for support requests",
           },
           phone: {
             type: "string",
             format: "phone",
             description:
-              "Telefonnummer, die für Supportanfragen genutzt werden kann",
+              "Phone number that may be used for support requests",
+            example: "+49 170 123456",
           },
         },
       },
@@ -226,24 +227,24 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
           type: "string",
           example: "mail",
         },
-        description: "Tags, die die Extension beschreiben",
+        description: "Tags that describe the extension",
       },
       state: {
         type: "object",
         properties: {
           hidden: {
             type: "boolean",
-            description: "Gibt an, ob die Extension im mStudio sichtbar ist",
+            description: "Defines, whether this extension is visible in the mStudio",
           },
           disabled: {
             type: "boolean",
             description:
-              "Gibt an, ob Extension Instances für diese Extension existieren dürfen",
+              "Defines, whether instances of this extension may exist",
           },
           blocked: {
             type: "boolean",
             description:
-              "Gibt an, ob die Extension zu einem Extension Context hinzugefügt werden kann",
+              "Defines, whether this extension may be added to a context",
           },
         },
       },
