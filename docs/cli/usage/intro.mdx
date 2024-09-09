@@ -14,7 +14,7 @@ See the [installation guide](./install.md) for instructions on how to install th
 
 ### API access
 
-To use the CLI, you first need to authenticate your client using an API token. Have a look at the ["Obtaining an API token" section](../../intro#obtaining-an-api-token) of the introduction for details on how to obtain an API token.
+To use the CLI, you first need to authenticate your client using an API token. Have a look at the ["Obtaining an API token" section](../../../api/intro#obtaining-an-api-token) of the introduction for details on how to obtain an API token.
 
 :::note
 
@@ -44,13 +44,13 @@ A few commands (like `mw [app|project] download`, `mw [app|project] ssh` and som
 
 ```
 $ mw user ssh-key import
-   ```
+```
 
 2. **To create and import a new SSH keypair**, you can use the following command:
 
 ```
 $ mw user ssh-key create
-   ```
+```
 
 Usually, the key pair should be used automatically by the CLI. To explicitly specify the key pair to use (for example, if you receive a `too many authentication failures` error), you have a few options:
 
@@ -59,23 +59,23 @@ Usually, the key pair should be used automatically by the CLI. To explicitly spe
 ```txt title="~/.ssh/config"
 Host *.project.host
   IdentityFile ~/.ssh/mstudio-cli
-   ```
+```
 
 2. Alternatively, all commands that require an SSH connection accept a `--ssh-identity-file` flag that you can use to specify the key to use:
 
 ```
 $ mw app download ... --ssh-identity-file="~/.ssh/mstudio-cli"
-   ```
+```
 
 3. Instead of the `--ssh-identity-file` flag, you can also set the `MITTWALD_SSH_IDENTITY_FILE` environment variable to specify the key to use:
 
 ```
 $ export MITTWALD_SSH_IDENTITY_FILE=~/.ssh/mstudio-cli
 $ mw app download ...
-   ```
+```
 
 You can also set the `MITTWALD_SSH_IDENTITY_FILE` environment variable in your shell profile (`~/.zshrc` or `~/.bashrc`) to make it available in every shell session:
 
 ```
 $ echo 'export MITTWALD_SSH_IDENTITY_FILE=~/.ssh/mstudio-cli' >> ~/.zshrc
-   ```
+```

@@ -133,8 +133,8 @@ To circumvent this issue, you can manually configure your SSH keys inside the DD
    $ ddev config --web-environment-add MITTWALD_SSH_IDENTITY_FILE=~/.ssh/mstudio
    ```
 
-[cli]: /docs/v2/api/sdks/cli
-[cli-ssh]: /docs/v2/api/sdks/cli/#ssh
+[cli]: /cli
+[cli-ssh]: /docs/v2/cli/usage/intro/#ssh
 [apitoken]: /docs/v2/api/intro
 [ddev-addon]: https://github.com/mittwald/ddev
 
