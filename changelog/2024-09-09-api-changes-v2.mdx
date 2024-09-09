@@ -1,0 +1,145 @@
+---
+title: Breaking (!) API changes for v2 API, September 9, 2024
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Conversation
+  - Mail
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+On September 9, 2024, the mittwald API underwent several changes, including the removal of an API path without deprecation, modifications to request parameter types, the addition of new enum values in response properties, and the introduction of a new endpoint for file upload requests.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The API path for the `POST /v2/conversations/{conversationId}/files` operation has been removed without deprecation, which is a breaking change.
+- The type/format of the 'path' request parameter 'projectId' has been changed from 'string'/'uuid' to 'string'/'', affecting both the `GET /v2/projects/{projectId}/delivery-boxes` and `GET /v2/projects/{projectId}/mail-addresses` operations. This is a breaking change.
+- The new 'extensionInstance' enum value has been added to the response property for the following operations:
+  - `GET /v2/conversation-categories` (response status '200')
+  - `GET /v2/conversation-categories/{categoryId}` (response status '200')
+  - `GET /v2/conversations` (response status '200')
+  - `GET /v2/conversations/{conversationId}` (response status '200')
+  
+  Note that adding new enum values to responses could be unexpected for clients; it is recommended to use `x-extensible-enum` instead.
+- An endpoint has been added for the `POST /internal-v2/conversations/{conversationId}/files` operation to request a file upload token for the conversation.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Request a file upload token for the conversation"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="conversation-request-file-upload" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List delivery boxes belonging to a Project"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="mail-list-delivery-boxes" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List mail addresses belonging to a Project"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="mail-list-mail-addresses" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all conversation categories"
+
+
+- added the new 'extensionInstance' enum value to the '/items/referenceType/items/' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="conversation-list-categories" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a specific conversation category"
+
+
+- added the new 'extensionInstance' enum value to the 'referenceType/items/' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="conversation-get-category" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all conversation the authenticated user has created or has access to"
+
+
+- added the new 'extensionInstance' enum value to the '/items/category/referenceType/items/' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="conversation-list-conversations" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a support conversation"
+
+
+- added the new 'extensionInstance' enum value to the 'category/referenceType/items/' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="conversation-get-conversation" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK Release v2.1.60
+
+The mittwald PHP SDK has been updated to version 2.1.60. This release includes several bug fixes, improvements, and new features.
+
+#### Changes
+
+##### Bug Fixes
+- Updated the file upload endpoint in `RequestFileUploadRequest.php` to change the URL from `/v2/conversations/{conversationId}/files` to `/internal-v2/conversations/{conversationId}/files`.
+
+##### Improvements
+- Removed the `format` attribute for the `projectId` property in the request schemas for both `ListDeliveryBoxesRequest.php` and `ListMailAddressesRequest.php`. This change simplifies the schema by specifying just the `type` as `string`.
+
+##### Features
+- Added a new case `extensionInstance` to the `CategoryReferenceTypeItem` enum in `CategoryReferenceTypeItem.php`, expanding the classification options available in conversations.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.60).
+
