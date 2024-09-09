@@ -119,7 +119,7 @@ function PlatformTools() {
               </Translate>
             }
             links={[
-              <Link to="/docs/v2/api/sdks/cli">CLI</Link>,
+              <Link to="/cli">CLI</Link>,
               <Link to="/docs/v2/platform/development/ddev">
                 DDEV <NewBadge />
               </Link>,
