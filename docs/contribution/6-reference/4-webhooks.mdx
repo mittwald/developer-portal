@@ -4,21 +4,21 @@ title: Lifecycle Webhooks
 import OperationLink from "@site/src/components/OperationLink";
 import SchemaWithExample from "../../../src/components/openapi/SchemaWithExample";
 
-Lifecycle Events werden von mittwald genutzt, um die externe Anwendung über sie betreffende Ereignisse zu informieren.
+mittwald uses lifecycle events to notify the the external application of events that concern it.
 
 ## Templating of Webhook URLs
 
-Um die URL für die Webhooks zu konfigurieren, können Platzhalter verwendet werden.
-Diese werden durch die Werte der Attribute des Webhook-Payloads ersetzt.
+You may use placeholders when configuring the URL of webhooks.
+The mStudio replaces them with the values of the attributes of the webhook payload.
 
-Folgende Platzhalter können verwendet werden:
+You may use the following placeholders:
 
-- `apiVersion`: Die API-Version, die für den Webhook verwendet wird. Derzeit immer `v1`. Siehe auch [API Versioning](../../overview/concepts/api-versioning).
-- `contributorId`: ID des Contributors
-- `extensionId`: ID der Extension
-- `extensionInstanceId`: ID der Extension Instance
-- `contextId`: ID des Extension Contexts, bspw. die ProjectID
-- `context`: Der Extension Context Kind, zu dem die Extension Instance hinzugefügt wurde. Derzeit entweder `customer` oder `project`.
+- `apiVersion`: The API version used for the webhook. Currently always `v1`. See [API versioning](../../overview/concepts/api-versioning).
+- `contributorId`: ID of the contributor
+- `extensionId`: ID of the extension
+- `extensionInstanceId`: ID of the extension instance
+- `contextId`: ID of the extension context, eg. the ProjectID
+- `context`: Der extension context kind the extension instance was added to. Currently one of `customer` and `project`.
 
 ## Webhook Payloads
 
