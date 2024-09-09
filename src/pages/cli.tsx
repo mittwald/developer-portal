@@ -3,18 +3,14 @@ import clsx from "clsx";
 import Link from "@docusaurus/Link";
 import Layout from "@theme/Layout";
 import Icon from "@mittwald/flow-react-components/Icon";
-import {
-  IconBrandGithub,
-  IconRocket,
-  IconNotebook,
-  IconScript,
-} from "@tabler/icons-react";
+import { IconBrandGithub, IconRocket, IconNotebook } from "@tabler/icons-react";
 
 import styles from "./cli.module.css";
 import demo from "@site/static/img/cli-demo.png";
 import Translate, { translate } from "@docusaurus/Translate";
 import APIFeature from "@site/src/components/HomepageFeatures/APIFeature";
 import PlatformFeature from "@site/src/components/HomepageFeatures/PlatformFeature";
+import ScriptingFeature from "@site/src/components/CLIFeatures/ScriptingFeature";
 
 function CLIPageHeader() {
   return (
@@ -86,8 +82,7 @@ export default function Home() {
       <div className={styles.wrapper}>
         <CLIPageHeader />
         <main className={"index"}>
-          <PlatformFeature />
-          <APIFeature />
+          <ScriptingFeature />
         </main>
       </div>
     </Layout>
