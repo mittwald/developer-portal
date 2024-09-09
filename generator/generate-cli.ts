@@ -20,7 +20,7 @@ async function downloadDocsFromRelease(release: GithubRelease) {
   }
 
   for (const entry of tree.entries) {
-    if (entry.type !== "file") {
+    if (entry.type !== "file" || !entry.name.endsWith(".md")) {
       continue;
     }
 
