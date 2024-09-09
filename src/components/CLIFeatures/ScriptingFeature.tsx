@@ -6,6 +6,8 @@ import Intro, { IntroHeader } from "@site/src/components/Intro";
 import Icon from "@mittwald/flow-react-components/Icon";
 import { IconScript } from "@tabler/icons-react";
 import Translate from "@docusaurus/Translate";
+import Link from "@docusaurus/Link";
+import CodeBlock from "@theme/CodeBlock";
 
 function ScriptingIntro() {
   return (
@@ -33,15 +35,23 @@ function ScriptingDocumentation() {
   return (
     <>
       <h3>
-        <Translate id="index.reference.title">API documentation</Translate>
+        <Translate id="cli.scripting.usecases.title">
+          Scripting use cases
+        </Translate>
       </h3>
       <p>
-        <Translate id={"index.reference.body"}>
-          All endpoints and parameters of our API at a glance, including human
-          readable references and machine readable specifications in the OpenAPI
-          format.
+        <Translate id={"cli.scripting.usecases.body"}>
+          By using the CLI in your scripts, you can easily automate repetitive
+          tasks without the need to interact with the web interface or knowing
+          your way around the API. Typical use cases include:
         </Translate>
       </p>
+      <ul>
+        <li>Batch processing</li>
+        <li>Data import/export</li>
+        <li>Project bootstrapping</li>
+        <li>CI/CD integration</li>
+      </ul>
     </>
   );
 }
@@ -49,15 +59,20 @@ function ScriptingDocumentation() {
 function ScriptingExample() {
   return (
     <>
-      <h3>
-        <Translate id="index.reference.title">API documentation</Translate>
-      </h3>
-      <p>
-        <Translate id={"index.reference.body"}>
-          All endpoints and parameters of our API at a glance, including human
-          readable references and machine readable specifications in the OpenAPI
-          format.
-        </Translate>
+      <CodeBlock language="shell" showLineNumbers>{`emails=(
+  "alice@mittwald.example"
+  "bob@mittwald.example"
+)
+
+for t in \${emails[@]} ; do
+  mw mail address create -q \\
+    --address \$t \\
+    --random-password
+done`}</CodeBlock>
+      <p className="padding--md">
+        <Link to="/docs/v2/category/cli-examples">
+          <Translate id={"cli.scripting.examples"}>More examples</Translate>
+        </Link>
       </p>
     </>
   );
@@ -77,7 +92,7 @@ export default function ScriptingFeature() {
             </div>
           </div>
           <div className={clsx("col col--4")}>
-            <div className={clsx("padding--md", styles.feature)}>
+            <div className={clsx(styles.feature)}>
               <ScriptingExample />
             </div>
           </div>

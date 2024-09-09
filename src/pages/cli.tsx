@@ -8,9 +8,8 @@ import { IconBrandGithub, IconRocket, IconNotebook } from "@tabler/icons-react";
 import styles from "./cli.module.css";
 import demo from "@site/static/img/cli-demo.png";
 import Translate, { translate } from "@docusaurus/Translate";
-import APIFeature from "@site/src/components/HomepageFeatures/APIFeature";
-import PlatformFeature from "@site/src/components/HomepageFeatures/PlatformFeature";
 import ScriptingFeature from "@site/src/components/CLIFeatures/ScriptingFeature";
+import DevelopmentFeature from "@site/src/components/CLIFeatures/DevelopmentFeature";
 
 function CLIPageHeader() {
   return (
@@ -83,6 +82,7 @@ export default function Home() {
         <CLIPageHeader />
         <main className={"index"}>
           <ScriptingFeature />
+          <DevelopmentFeature />
         </main>
       </div>
     </Layout>
