@@ -36,30 +36,29 @@ When an extension is removed from a context or an extension instance is deactiva
 
 ## OAuth2
 
-Das mStudio implementiert konform zu [RFC 6749](https://tools.ietf.org/html/rfc6749) OAuth2 als Authentifizierungsmechanismus für die öffentliche API.
-Unterstützt wird derzeit nur der Authorization Code Flow (mit PKCE).
+The mStudio implements OAuth2 as an authentication mechanism for the public API according to [RFC 6749](https://tools.ietf.org/html/rfc6749).
+Currently, we only support the authorization code flow (with PKCE).
 
-Die benötigten API-Endpunkte für den OAuth2 Flow sind:
+The required API endpoints for the OAuth2 flow are:
 
 - <OperationLink operation="user-oauth-get-authorization" />
 - <OperationLink operation="user-oauth-retrieve-access-token" />
 
-Für die Implementierung des OAuth2 Clients empfiehlt mittwald die Verwendung einer OAuth2 Client Library,
-die mit [RFC 6749](https://tools.ietf.org/html/rfc6749) konform ist.
+mittwald recommends using a OAuth2 client library that conforms to [RFC 6749](https://tools.ietf.org/html/rfc6749) to implement OAuth2 clients.
 
-Im Folgenden ist der Ablauf des Authorization Code Flows grob skizziert:
+The following is a rough sketch of the authorization code flow process:
 
 ```mermaid
 sequenceDiagram
 
 Client->>mStudio API: GET /oauth2/authorize
-mStudio API-->>mStudio Frontend: Redirect zu Login
+mStudio API-->>mStudio Frontend: Redirect to Login
 mStudio Frontend->>mStudio API: POST /authenticate
 mStudio API-->>mStudio Frontend: Resource Owner Access Token
 mStudio Frontend->>mStudio API: GET /oauth2/authorize
-mStudio API-->>mStudio Frontend: Redirect zu Consent
+mStudio API-->>mStudio Frontend: Redirect to Consent
 mStudio Frontend->>mStudio API: Consent
-mStudio API-->>Client: Redirect zu Client mit Authorization Code
+mStudio API-->>Client: Redirect to Client with Authorization Code
 Client->>mStudio API: POST /oauth2/token
 mStudio API-->>Client: OAuth2 Access Token
 
