@@ -42,9 +42,9 @@ $ mw --help
 
 :::important
 
-Please note that this method of installation will use the mw CLI with whatever version of Node.js you have installed on your local system. We cannot guarantee full compatibility with all Node.js versions, as the CLI is currently only tested against Node.js version 20.
+Please note that this method of installation will use the mw CLI with whatever version of Node.js you have installed on your local system. We cannot guarantee full compatibility with all Node.js versions, as the CLI is currently only tested against Node.js versions 18 and 20.
 
-If you encounter any issues with a Node.js version greater than 20, please [file a bug report](https://github.com/mittwald/cli/issues) so we can fix it for future releases. 
+If you encounter any issues with a Node.js version greater than 20, please [file a bug report](https://github.com/mittwald/cli/issues) so we can fix it for future releases.
 
 :::
 
