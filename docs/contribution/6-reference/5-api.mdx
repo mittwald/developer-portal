@@ -101,15 +101,16 @@ sequenceDiagram
 
 ```
 
-## Abruf von Webhook Signatur Public Keys
+## Getting Webhook Signature Public Keys
 
-Zur [Prüfung der Signatur eines Lifecycle Webhooks](../webhooks#validierung-von-lifecycle-webhooks) muss der öffentliche Schlüssel des mStudio bekannt sein.
-Dieser kann über die <OperationLink operation="extension-get-public-key" />-Route abgerufen werden.
-Dazu muss der Identifier des Public Keys, der sich hinter dem `X-Marketplace-Signature-Serial`-Header verbirgt als Pfad-Parameter übergeben werden.
-Der Public Key wird base64 kodiert im Response Body zurückgegeben.
+If you want to [verify the signature of a lifecycle webhook](../webhooks#validierung-von-lifecycle-webhooks), you must know the public key of the mStudio.
+You can request this key with the operation <OperationLink operation="extension-get-public-key" />.
+For this, you must pass the identifier of the public key as a path parameter to the operation.
+The header field `X-Marketplace-Signature-Serial` of the webhook request contains the identifier of the public key.
+The mStudio returns the public key in the response body encoded in base64.
 
-Für eine bestimmte Signature-Serial wird ein stabiler Public Key garantiert.
-Das bedeutet, dass der Public Key gecacht oder persistiert werden kann.
-Erst wenn sich die Signature-Serial ändert, muss der neue Public Key abgerufen werden.
-Dies wird nicht im Voraus angekündigt.
-Es sollte also bei jedem Lifecycle-Webhook die Signature-Serial geprüft und ggf. automatisiert der neue Public Key abgerufen werden.
+We guarantee a stable public key for a signature serial.
+Therefore, the extension may cache or persist the public keys.
+The extension must only request a new public key when the mStudio uses a new signature serial.
+We announce this in advance.
+The extension should check the signature serial for every lifecycle webhook and perhaps automatically request the new public key.
