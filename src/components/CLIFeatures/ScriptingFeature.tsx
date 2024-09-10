@@ -47,10 +47,24 @@ function ScriptingDocumentation() {
         </Translate>
       </p>
       <ul>
-        <li>Batch processing</li>
-        <li>Data import/export</li>
-        <li>Project bootstrapping</li>
-        <li>CI/CD integration</li>
+        <li>
+          <Translate id="cli.scripting.batchprocessing">
+            Batch processing
+          </Translate>
+        </li>
+        <li>
+          <Translate id="cli.scripting.import-export">
+            Data import/export
+          </Translate>
+        </li>
+        <li>
+          <Translate id="cli.scripting.bootstrapping">
+            Project bootstrapping
+          </Translate>
+        </li>
+        <li>
+          <Translate id="cli.scripting.cicd">CI/CD integration</Translate>
+        </li>
       </ul>
     </>
   );

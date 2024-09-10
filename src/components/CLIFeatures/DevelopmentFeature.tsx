@@ -46,9 +46,21 @@ function DevelopmentDocumentation() {
         </Translate>
       </p>
       <ul>
-        <li>Bootstrapping new projects on the mittwald platform</li>
-        <li>Setting up local development environments</li>
-        <li>Supporting operational tasks</li>
+        <li>
+          <Translate id="cli.dev.features.bootstrapping">
+            Bootstrapping new projects on the mittwald platform
+          </Translate>
+        </li>
+        <li>
+          <Translate id="cli.dev.features.localdev">
+            Setting up local development environments
+          </Translate>
+        </li>
+        <li>
+          <Translate id="cli.dev.features.operations">
+            Supporting operational tasks
+          </Translate>
+        </li>
       </ul>
     </>
   );
