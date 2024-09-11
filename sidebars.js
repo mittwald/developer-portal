@@ -25,12 +25,10 @@ const sidebars = {
   cliSidebar: [
     {
       type: "category",
-      label: "Using the CLI",
+      label: "Using the mittwald CLI",
       link: {
-        type: "generated-index",
-        title: "Using the CLI",
-        slug: "/category/cli",
-        keywords: [],
+        type: "doc",
+        id: "cli/index",
       },
       items: [
         {

@@ -46,7 +46,7 @@ function CLIPageHeader() {
           </Link>
           <Link
             className="button button--secondary button--lg"
-            to="/docs/v2/category/cli"
+            to="/docs/v2/cli"
           >
             <Icon>
               <IconNotebook />
