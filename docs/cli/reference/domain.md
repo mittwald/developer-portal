@@ -3,15 +3,15 @@
 
 Manage domains, virtual hosts and DNS settings in your projects
 
-* [`mw domain dnszone get DNSZONE-ID`](#mw-domain-dnszone-get-dnszone-id)
-* [`mw domain dnszone list`](#mw-domain-dnszone-list)
-* [`mw domain dnszone update DNSZONE-ID RECORD-SET`](#mw-domain-dnszone-update-dnszone-id-record-set)
-* [`mw domain get DOMAIN-ID`](#mw-domain-get-domain-id)
-* [`mw domain list`](#mw-domain-list)
-* [`mw domain virtualhost create`](#mw-domain-virtualhost-create)
-* [`mw domain virtualhost delete VIRTUAL-HOST-ID`](#mw-domain-virtualhost-delete-virtual-host-id)
-* [`mw domain virtualhost get INGRESS-ID`](#mw-domain-virtualhost-get-ingress-id)
-* [`mw domain virtualhost list`](#mw-domain-virtualhost-list)
+
+
+
+
+
+
+
+
+
 
 ## `mw domain dnszone get DNSZONE-ID`
 

@@ -3,16 +3,16 @@
 
 Manage cronjobs of your projects
 
-* [`mw cronjob create`](#mw-cronjob-create)
-* [`mw cronjob delete CRONJOB-ID`](#mw-cronjob-delete-cronjob-id)
-* [`mw cronjob execute CRONJOB-ID`](#mw-cronjob-execute-cronjob-id)
-* [`mw cronjob execution abort CRONJOB-ID EXECUTION-ID`](#mw-cronjob-execution-abort-cronjob-id-execution-id)
-* [`mw cronjob execution get CRONJOB-ID EXECUTION-ID`](#mw-cronjob-execution-get-cronjob-id-execution-id)
-* [`mw cronjob execution list`](#mw-cronjob-execution-list)
-* [`mw cronjob execution logs CRONJOB-ID EXECUTION-ID`](#mw-cronjob-execution-logs-cronjob-id-execution-id)
-* [`mw cronjob get CRONJOB-ID`](#mw-cronjob-get-cronjob-id)
-* [`mw cronjob list`](#mw-cronjob-list)
-* [`mw cronjob update CRONJOB-ID`](#mw-cronjob-update-cronjob-id)
+
+
+
+
+
+
+
+
+
+
 
 ## `mw cronjob create`
 

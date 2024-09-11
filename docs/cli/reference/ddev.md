@@ -3,8 +3,8 @@
 
 Integrate your mittwald projects with DDEV
 
-* [`mw ddev init [INSTALLATION-ID]`](#mw-ddev-init-installation-id)
-* [`mw ddev render-config [INSTALLATION-ID]`](#mw-ddev-render-config-installation-id)
+
+
 
 ## `mw ddev init [INSTALLATION-ID]`
 

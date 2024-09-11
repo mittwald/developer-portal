@@ -3,10 +3,10 @@
 
 Manage SFTP users of your projects
 
-* [`mw sftp-user create`](#mw-sftp-user-create)
-* [`mw sftp-user delete SFTP-USER-ID`](#mw-sftp-user-delete-sftp-user-id)
-* [`mw sftp-user list`](#mw-sftp-user-list)
-* [`mw sftp-user update SFTP-USER-ID`](#mw-sftp-user-update-sftp-user-id)
+
+
+
+
 
 ## `mw sftp-user create`
 

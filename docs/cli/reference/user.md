@@ -3,18 +3,18 @@
 
 Manage your own user account
 
-* [`mw user api-token create`](#mw-user-api-token-create)
-* [`mw user api-token get TOKEN-ID`](#mw-user-api-token-get-token-id)
-* [`mw user api-token list`](#mw-user-api-token-list)
-* [`mw user api-token revoke ID`](#mw-user-api-token-revoke-id)
-* [`mw user get USER-ID`](#mw-user-get-user-id)
-* [`mw user session get TOKEN-ID`](#mw-user-session-get-token-id)
-* [`mw user session list`](#mw-user-session-list)
-* [`mw user ssh-key create`](#mw-user-ssh-key-create)
-* [`mw user ssh-key delete ID`](#mw-user-ssh-key-delete-id)
-* [`mw user ssh-key get KEY-ID`](#mw-user-ssh-key-get-key-id)
-* [`mw user ssh-key import`](#mw-user-ssh-key-import)
-* [`mw user ssh-key list`](#mw-user-ssh-key-list)
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## `mw user api-token create`
 

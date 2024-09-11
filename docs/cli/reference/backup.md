@@ -3,15 +3,15 @@
 
 Manage backups of your projects
 
-* [`mw backup create`](#mw-backup-create)
-* [`mw backup delete BACKUP-ID`](#mw-backup-delete-backup-id)
-* [`mw backup download BACKUP-ID`](#mw-backup-download-backup-id)
-* [`mw backup get BACKUP-ID`](#mw-backup-get-backup-id)
-* [`mw backup list`](#mw-backup-list)
-* [`mw backup schedule create`](#mw-backup-schedule-create)
-* [`mw backup schedule delete BACKUP-SCHEDULE-ID`](#mw-backup-schedule-delete-backup-schedule-id)
-* [`mw backup schedule list`](#mw-backup-schedule-list)
-* [`mw backup schedule update BACKUP-SCHEDULE-ID`](#mw-backup-schedule-update-backup-schedule-id)
+
+
+
+
+
+
+
+
+
 
 ## `mw backup create`
 

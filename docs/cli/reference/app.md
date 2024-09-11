@@ -3,39 +3,39 @@
 
 Manage apps, and app installations in your projects
 
-* [`mw app copy [INSTALLATION-ID]`](#mw-app-copy-installation-id)
-* [`mw app create node`](#mw-app-create-node)
-* [`mw app create php`](#mw-app-create-php)
-* [`mw app create python`](#mw-app-create-python)
-* [`mw app create static`](#mw-app-create-static)
-* [`mw app dependency list`](#mw-app-dependency-list)
-* [`mw app dependency update [INSTALLATION-ID]`](#mw-app-dependency-update-installation-id)
-* [`mw app dependency versions SYSTEMSOFTWARE`](#mw-app-dependency-versions-systemsoftware)
-* [`mw app download [INSTALLATION-ID]`](#mw-app-download-installation-id)
-* [`mw app get [INSTALLATION-ID]`](#mw-app-get-installation-id)
-* [`mw app install contao`](#mw-app-install-contao)
-* [`mw app install drupal`](#mw-app-install-drupal)
-* [`mw app install grav`](#mw-app-install-grav)
-* [`mw app install humhub`](#mw-app-install-humhub)
-* [`mw app install joomla`](#mw-app-install-joomla)
-* [`mw app install magento2`](#mw-app-install-magento2)
-* [`mw app install matomo`](#mw-app-install-matomo)
-* [`mw app install moodle`](#mw-app-install-moodle)
-* [`mw app install neos`](#mw-app-install-neos)
-* [`mw app install nextcloud`](#mw-app-install-nextcloud)
-* [`mw app install prestashop`](#mw-app-install-prestashop)
-* [`mw app install shopware5`](#mw-app-install-shopware5)
-* [`mw app install shopware6`](#mw-app-install-shopware6)
-* [`mw app install typo3`](#mw-app-install-typo3)
-* [`mw app install wordpress`](#mw-app-install-wordpress)
-* [`mw app list`](#mw-app-list)
-* [`mw app list-upgrade-candidates [INSTALLATION-ID]`](#mw-app-list-upgrade-candidates-installation-id)
-* [`mw app ssh [INSTALLATION-ID]`](#mw-app-ssh-installation-id)
-* [`mw app uninstall [INSTALLATION-ID]`](#mw-app-uninstall-installation-id)
-* [`mw app update [INSTALLATION-ID]`](#mw-app-update-installation-id)
-* [`mw app upgrade [INSTALLATION-ID]`](#mw-app-upgrade-installation-id)
-* [`mw app upload [INSTALLATION-ID]`](#mw-app-upload-installation-id)
-* [`mw app versions [APP]`](#mw-app-versions-app)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## `mw app copy [INSTALLATION-ID]`
 

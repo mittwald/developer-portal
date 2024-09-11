@@ -3,27 +3,27 @@
 
 Manage databases (like MySQL and Redis) in your projects
 
-* [`mw database mysql charsets`](#mw-database-mysql-charsets)
-* [`mw database mysql create`](#mw-database-mysql-create)
-* [`mw database mysql delete DATABASE-ID`](#mw-database-mysql-delete-database-id)
-* [`mw database mysql dump DATABASE-ID`](#mw-database-mysql-dump-database-id)
-* [`mw database mysql get DATABASE-ID`](#mw-database-mysql-get-database-id)
-* [`mw database mysql import DATABASE-ID`](#mw-database-mysql-import-database-id)
-* [`mw database mysql list`](#mw-database-mysql-list)
-* [`mw database mysql phpmyadmin DATABASE-ID`](#mw-database-mysql-phpmyadmin-database-id)
-* [`mw database mysql port-forward DATABASE-ID`](#mw-database-mysql-port-forward-database-id)
-* [`mw database mysql shell DATABASE-ID`](#mw-database-mysql-shell-database-id)
-* [`mw database mysql user create`](#mw-database-mysql-user-create)
-* [`mw database mysql user delete USER-ID`](#mw-database-mysql-user-delete-user-id)
-* [`mw database mysql user get ID`](#mw-database-mysql-user-get-id)
-* [`mw database mysql user list`](#mw-database-mysql-user-list)
-* [`mw database mysql user update USER-ID`](#mw-database-mysql-user-update-user-id)
-* [`mw database mysql versions`](#mw-database-mysql-versions)
-* [`mw database redis create`](#mw-database-redis-create)
-* [`mw database redis get ID`](#mw-database-redis-get-id)
-* [`mw database redis list`](#mw-database-redis-list)
-* [`mw database redis shell DATABASE-ID`](#mw-database-redis-shell-database-id)
-* [`mw database redis versions`](#mw-database-redis-versions)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## `mw database mysql charsets`
 

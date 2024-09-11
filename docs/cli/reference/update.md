@@ -3,7 +3,7 @@
 
 update the mw CLI
 
-* [`mw update [CHANNEL]`](#mw-update-channel)
+
 
 ## `mw update [CHANNEL]`
 

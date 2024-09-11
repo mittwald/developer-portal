@@ -3,7 +3,7 @@
 
 Display autocomplete installation instructions.
 
-* [`mw autocomplete [SHELL]`](#mw-autocomplete-shell)
+
 
 ## `mw autocomplete [SHELL]`
 

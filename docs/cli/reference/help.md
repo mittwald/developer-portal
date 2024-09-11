@@ -3,7 +3,7 @@
 
 Display help for mw.
 
-* [`mw help [COMMAND]`](#mw-help-command)
+
 
 ## `mw help [COMMAND]`
 

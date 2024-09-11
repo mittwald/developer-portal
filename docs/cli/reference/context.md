@@ -3,9 +3,9 @@
 
 Save certain environment parameters for later use
 
-* [`mw context get`](#mw-context-get)
-* [`mw context reset`](#mw-context-reset)
-* [`mw context set`](#mw-context-set)
+
+
+
 
 ## `mw context get`
 

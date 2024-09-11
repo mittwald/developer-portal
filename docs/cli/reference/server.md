@@ -3,8 +3,8 @@
 
 Manage your servers
 
-* [`mw server get [SERVER-ID]`](#mw-server-get-server-id)
-* [`mw server list`](#mw-server-list)
+
+
 
 ## `mw server get [SERVER-ID]`
 

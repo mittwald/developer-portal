@@ -30,8 +30,18 @@ async function downloadDocsFromRelease(release: GithubRelease) {
     const targetPath = path.join("docs", "cli", "reference", entry.name);
     console.log(`writing ${targetPath}`);
 
-    await fs.writeFile(targetPath, buffer);
+    const sanitizedMarkdown = preprocessCommandReference(buffer);
+
+    await fs.writeFile(targetPath, sanitizedMarkdown);
   }
+}
+
+function preprocessCommandReference(content: Buffer): string {
+  let markdown = content.toString("utf-8");
+
+  // Remove the TOC, because Docusaurus will render its own, anyway
+  markdown = markdown.replace(/^\* \[`mw.*$/gm, "");
+  return markdown;
 }
 
 (async () => {

@@ -3,16 +3,16 @@
 
 Manage your organizations, and also any kinds of user memberships concerning these organizations.
 
-* [`mw org delete [ORG-ID]`](#mw-org-delete-org-id)
-* [`mw org get [ORG-ID]`](#mw-org-get-org-id)
-* [`mw org invite`](#mw-org-invite)
-* [`mw org invite list`](#mw-org-invite-list)
-* [`mw org invite list-own`](#mw-org-invite-list-own)
-* [`mw org invite revoke INVITE-ID`](#mw-org-invite-revoke-invite-id)
-* [`mw org list`](#mw-org-list)
-* [`mw org membership list`](#mw-org-membership-list)
-* [`mw org membership list-own`](#mw-org-membership-list-own)
-* [`mw org membership revoke MEMBERSHIP-ID`](#mw-org-membership-revoke-membership-id)
+
+
+
+
+
+
+
+
+
+
 
 ## `mw org delete [ORG-ID]`
 

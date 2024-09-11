@@ -3,10 +3,10 @@
 
 Manage SSH users of your projects
 
-* [`mw ssh-user create`](#mw-ssh-user-create)
-* [`mw ssh-user delete SSH-USER-ID`](#mw-ssh-user-delete-ssh-user-id)
-* [`mw ssh-user list`](#mw-ssh-user-list)
-* [`mw ssh-user update SSH-USER-ID`](#mw-ssh-user-update-ssh-user-id)
+
+
+
+
 
 ## `mw ssh-user create`
 

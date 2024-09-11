@@ -3,9 +3,9 @@
 
 Manage your client authentication
 
-* [`mw login reset`](#mw-login-reset)
-* [`mw login status`](#mw-login-status)
-* [`mw login token`](#mw-login-token)
+
+
+
 
 ## `mw login reset`
 
