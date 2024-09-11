@@ -1,16 +1,17 @@
 ---
-title: API Versionierung
+title: API Versioning
 ---
 
-Um flexibel auf nicht abwärtskompatible Änderungen (Breaking Changes) eingehen zu können, wird an verschiedenen Stellen eine Versionierung von APIs vorgenommen.
-Als Beispiele können hier die Webhook Datenschemas oder Templates für Konfigurationswerte genannt werden.
+We implement API versioning at various points to act flexibly in the face of breaking changes.
+The webhook data schemas or templates for configuration values are examples where we implement this.
 
-Grundsätzlich wird versucht, Breaking Changes zu vermeiden. Wenn jedoch ein Breaking Change eingeführt werden muss, wird mittwald dies mit ausreichend Vorlauf ankündigen und die nötigen Änderungen dokumentieren.
-Mit dem Livegang eines Breaking Change wird die neue API-Version wie angekündigt verwendet.
+We generally try to avoid breaking changes.
+However, if we have to release a breaking change, we will announce this sufficiently ahead of time and document the required changes.
+When we deploy a breaking change, the new API version is used from that point in time as announced.
 
-Bis zu diesem Zeitpunkt kann die Extension anhand des Migrationsguides in der Dokumentation auf das neue Verhalten umgestellt werden.
-Dabei kann die mitgeschickte API-Version als Weiche betrachtet werden, um das alternative Verhalten zu implementieren.
-So kann die Extension auf die neue API-Version vorbereitet werden, ohne dass das alte Verhalten verloren geht oder seitens des Contributors ein zeitlich abgestimmter Livegang notwendig ist.
+Until that point, you can update the extension for the new behaviour with the help of the migration guide in the documentation.
+You can use the transmitted API version as junction to implement the new behavior.
+This way, you can prepare the extension for the new API version without losing the old behavior or the need to deploy the new version of the extension synchronously with our deployment of the new API version.
 
 Der Ablauf kann somit wie folgt aussehen:
 
@@ -21,8 +22,8 @@ sequenceDiagram
     participant mStudio
     participant Extension
 
-    mittwald->>Contributor: API-Version 2 wird angekündigt
-    Contributor->>Extension: API-Version 2 wird innerhalb einer Weiche implementiert
-    mittwald->>mStudio: Livegang API-Version 2
-    Contributor->>Extension: Optional: Entfernen von API-Version 1 und der Weiche
+    mittwald->>Contributor: API version 2 is announced
+    Contributor->>Extension: API version 2 is implemented using a junction
+    mittwald->>mStudio: Deployment API version 2
+    Contributor->>Extension: Optional: Removal of API version 1 and the junction
 ```

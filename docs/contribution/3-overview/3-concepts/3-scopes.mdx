@@ -4,39 +4,37 @@ title: Scopes
 
 import OperationLink from "@site/src/components/OperationLink";
 
-Scopes sind ein Konzept, um die Zugriffsrechte auf die mStudio Public API zu gruppieren und einzuschränken.
-Ein Scope ist ein Satz an Berechtigungen, der es einem Benutzer oder einer Anwendung erlaubt, auf bestimmte Operationen von Ressourcen zuzugreifen.
+Scopes are a concept that groups and limits the access permissions of the mStudio public API.
+A scope is a set of permissions that allow a user or application to access specific operations of resources.
 
-Scopes wirken sich immer einschränkend auf die Zugriffsrechte aus.
-Das bedeutet, dass ein Scope nie mehr Rechte einräumen kann,
-als ohne Scope bereits vorhanden sind.
-Ein Scope kann jedoch Rechte entziehen, die ohne durch Scopes eingeschränkt zu sein, vorhanden wären.
+Scopes always act limiting for access permissions.
+Therefore, a scope cannot grant more permissions than are already available without said scope.
+However, a scope can deny permissions that are available without said scope.
 
-## Scopes in der mStudio Public API
+## Scopes of the mStudio Public API
 
-Die Scopes in der mStudio API sind in der Regel nach den fachlichen Domänen benannt, auf die sie sich beziehen.
-So gibt es beispielsweise die fachlichen Domänen `project`, `app` oder `database`, für die jeweils Scopes existieren.
-Für die fachlichen Domänen sind die Scopes jeweils aufgeteilt in lesenden, schreibenden und löschenden Zugriff.
-Für die `project`-Domäne gibt es demzufolge die Scopes `project:read`, `project:write` und `project:delete`.
+We generally name the scopes of the mStudio public API according to their conceptual domain.
+Such domains are, for example, `project`, `app`, or `database`.
+We split the scopes for each domain into reading, writing, and deleting access.
+So for the `project` domain, the scopes `project:read`, `project:write`, and `project:delete` exist.
 
-## Ermittlung von benötigten Scopes
+## Identifying Required Scopes
 
-Die benötigten Scopes für eine bestimmte Operation können in der Regel aus der [API Referenz](../../../../reference) der mStudio Public API entnommen werden.
-Auf oberster Ebene sind alle fachlichen Domänen in Form von OpenAPI Tags definiert.
-Innerhalb der Tags sind die einzelnen Operationen beschrieben.
-Für die jeweilige Operation ergibt sich in der Regel also der benötigte Scope aus dem Tag und der Methode der Operation.
+You can generally identify the required scopes for an operation from the [API reference](../../../../reference) of the mStudio public API.
+It defines all professional domains as OpenAPI tags at the root level and describes the individual operations inside the tags.
+Usually, the scope required for the respective operation is derived from the tag and the method of the operation.
 
-Die fachliche Domäne ist ebenfalls aus der Operation ID ersichtlich, da sie durch die fachliche Domäne gepräfixt ist.
-Auf jeder Detailansicht einer Operation, die in der API Referenz beschrieben ist, wird die ID dieser Operation angezeigt.
+We prefix the operation ID of operations with the corresponding professional domain.
+Therefore, you can identify the professional domain from the operation ID.
+The API reference displays the operation ID in the detail view of the operation.
 
-In einzelnen Fällen kann es vorkommen, dass eine Operation technisch bedingt mehrere Scopes benötigt
-oder der Scope nicht direkt aus der Operation abgeleitet werden kann.
-In diesen Fällen die benötigten Scopes explizit in der Beschreibung der Operation angegeben.
+In some cases, an operation may require multiple scopes or the scopes can't be derived directly from the operation for technical reasons.
+In those cases, the reference lists the required scopes explicitly in the description of the operation.
 
-### Verfügbarkeit von Scopes
+### Availability of Scopes
 
-Derzeit sind noch nicht alle Scopes für die mStudio API implementiert.
-Die derzeit verfügbaren Scopes sind:
+At this point, not all scopes for the mStudio API are implemented.
+These are the currently available scopes:
 
 - Customer
 
@@ -92,18 +90,17 @@ Die derzeit verfügbaren Scopes sind:
   - `app:write`
   - `app:delete`
 
-mittwald arbeitet daran, weitere Scopes zu implementieren und die Verfügbarkeit der Scopes zu erweitern.
-Wenn ein Scope benötigt wird, der nicht in dieser Liste aufgeführt ist, kann dieser [bei mittwald angefragt werden](../../../how-to/support/).
-Es wird sich darum bemüht, den Scope zeitnah zur Verfügung zu stellen.
+mittwald works on implementing more scopes to expand the list of available scopes.
+If you need a scope that is not available yet, you can [ask us](../../../how-to/support/) for it.
+We strive to deliver the scope promtly.
 
-### Beispiel
+### Example
 
-Die <OperationLink operation="project-get-project" />
-Operation hat die ID `project-get-project` und den OpenAPI Tag `Project`.
-Außerdem hat die Operation die HTTP-Methode `GET`.
-Daraus ergibt sich, dass für diese Operation der Scope `project:read` benötigt wird.
+The <OperationLink operation="project-get-project" /> operation has the ID `project-get-project` and the OpenAPI tag `Project`.
+It also has the HTTP method `GET`.
+This results in the required scope `project:read`.
 
-### Ausblick
+### Outlook
 
-In Zukunft ist es geplant, direkt aus der API Referenz die benötigten Scopes für eine Operation ermitteln zu können oder ggf. zu dokumentieren,
-dass eine bestimmte Operation nicht für die Nutzung durch OAuth2 oder Extensions vorgesehen ist.
+We plan to enable users to immediately identify required scopes from the API reference.
+We also plan to document the cases where the operation is not intended for use via OAuth2 or extensions.
