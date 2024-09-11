@@ -70,15 +70,16 @@ const config: Config = {
       } satisfies ClientRedirectOptions,
     ],
     [
-      '@docusaurus/plugin-content-blog',
+      "@docusaurus/plugin-content-blog",
       {
-        id: 'changelog',
-        routeBasePath: 'changelog',
-        path: './changelog',
+        id: "changelog",
+        routeBasePath: "changelog",
+        path: "./changelog",
         blogTitle: "Changelog",
-        blogDescription: "Changelog for the mittwald APIs and mittwald cloud platform",
-        blogSidebarTitle: 'All change notes',
-        blogSidebarCount: 'ALL',
+        blogDescription:
+          "Changelog for the mittwald APIs and mittwald cloud platform",
+        blogSidebarTitle: "All change notes",
+        blogSidebarCount: "ALL",
         showReadingTime: false,
         onInlineTags: "ignore",
       },
@@ -106,7 +107,7 @@ const config: Config = {
               label: "API v1",
               path: "v1",
               banner: "unmaintained",
-            }
+            },
           },
         },
         blog: {
@@ -136,7 +137,8 @@ const config: Config = {
           label: "API Docs",
         },
         {
-          to: "/cli",
+          type: "doc",
+          docId: "cli/index",
           position: "left",
           label: "CLI",
         },
@@ -153,9 +155,9 @@ const config: Config = {
           label: "Reference",
         },
         {
-          to: '/changelog',
-          label: 'Changelog',
-          position: 'left',
+          to: "/changelog",
+          label: "Changelog",
+          position: "left",
         },
         {
           href: "https://github.com/mittwald/developer-portal",
