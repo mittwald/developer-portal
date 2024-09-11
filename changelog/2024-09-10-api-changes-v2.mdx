@@ -1,88 +1,51 @@
 ---
-title: Breaking (!) API changes for v2 API, September 10, 2024
+title: API changes for v2 API, September 10, 2024
 authors:
   - machine
 tags:
   - apiv2
-  - breaking
   - Conversation
-
 ---
 
 import OperationHint from "@site/src/components/OperationHint";
 import OperationLink from "@site/src/components/OperationLink";
 
-On September 10, 2024, the mittwald API introduced a new endpoint for file uploads, added a new subschema to the 'sharedWith' request property, and removed an existing file upload path without deprecation.
+On September 10, 2024, the mittwald API added a new subschema to the 'sharedWith' request property of conversations.
 
 {/* truncate */}
 
-
-
-:::caution Breaking changes
-
-This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
-
-While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
-
-:::
-
-
-
 ## Summary
 
-
-- The API path for the operation `POST /internal-v2/conversations/{conversationId}/files` has been removed without deprecation, which is a breaking change.
-- The operation `POST /v2/conversations` has had a new property added to the `oneOf` list for the `sharedWith` request property, specifically 'subschema #6'.
-- An endpoint has been added for the operation `POST /v2/conversations/{conversationId}/files`, allowing users to request a file upload token for the conversation.
-
-_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
-
+- The operation `POST /v2/conversations` has had a new property added to the `oneOf` list for the `sharedWith` request property, allowing users to share conversations with extension instances.
 
 ## Detailed changes
 
-
-
-### Changes in "Request a file upload token for the conversation"
-
-
-- ⚠️ **Breaking:** api path removed without deprecation
-
-- endpoint added
-
-
-For details, refer to the <OperationLink operation="conversation-request-file-upload" apiVersion="v2" /> endpoint.
-
-
-
 ### Changes in "Create a conversation"
-
 
 - added 'subschema #6' to the 'sharedWith' request property 'oneOf' list
 
-
 For details, refer to the <OperationLink operation="conversation-create-conversation" apiVersion="v2" /> endpoint.
 
-
-
-
 ## Client package releases
-
 
 ### mittwald PHP SDK v2.1.61 Release
 
 [Release v2.1.61](https://github.com/mittwald/api-client-php/releases/tag/v2.1.61)
 
 #### Summary of Changes
+
 This release introduces enhancements to the API for file uploads, including a corrected endpoint, and adds support for specifying the project environment in the app installation schema.
 
 #### Features
 
 **Improved File Upload Endpoint**
+
 - The endpoint for uploading files has been updated to:  
   `/v2/conversations/{conversationId}/files`  
   This change ensures consistency with the API's versioning.
 
 **Project Environment Support**
+
 - Added a new `projectEnvironment` field to the `AppInstallationInternal` schema, which allows specifying the environment in which the project is running.
 - New methods have been introduced to handle the project environment:
   - `getProjectEnvironment()`: Retrieves the project environment.
@@ -90,8 +53,8 @@ This release introduces enhancements to the API for file uploads, including a co
   - `withoutProjectEnvironment()`: Removes the project environment from the instance.
 
 #### Code Changes
+
 - File upload endpoint modified in `RequestFileUploadRequest.php`.
 - New property and methods added to `AppInstallationInternal.php` to support project environment functionality, including:
   - Addition of `projectEnvironment` property.
   - Getter and setter methods for project environment.
-
