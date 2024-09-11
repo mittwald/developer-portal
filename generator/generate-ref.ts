@@ -3,10 +3,10 @@ import * as fs from "fs";
 import { OpenAPIV3 } from "openapi-types";
 import * as url from "url";
 import * as yaml from "yaml";
-import compareOperation from "@site/src/openapi/compareOperation";
+import compareOperation from "../src/openapi/compareOperation";
 import * as ejs from "ejs";
-import { dereferenceSpec, loadSpec } from "@site/generator/util/spec";
-import { canonicalizeTitle } from "@site/generator/util/title";
+import { dereferenceSpec, loadSpec } from "./util/spec";
+import { canonicalizeTitle } from "./util/title";
 import { slugFromTagName } from "@site/src/openapi/slugFromTagName";
 import HttpMethods = OpenAPIV3.HttpMethods;
 

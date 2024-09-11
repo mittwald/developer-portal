@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import styles from "@site/src/components/HomepageFeatures/styles.module.css";
-import FeatureRow from "./FeatureRow";
-import Intro, { IntroHeader } from "./Intro";
+import FeatureRow from "../FeatureRow";
+import Intro, { IntroHeader } from "../Intro";
 import Translate, { translate } from "@docusaurus/Translate";
 import Link from "@docusaurus/Link";
 import React, { ReactNode } from "react";
@@ -139,7 +139,7 @@ function APILibraries() {
       </p>
       <ul>
         <li>
-          <Link to="/docs/v2/api/sdks/cli">mittwald CLI</Link>
+          <Link to="/cli">mittwald CLI</Link>
         </li>
         <li>
           <Link to="/docs/v2/api/sdks/php">mittwald PHP SDK</Link>
