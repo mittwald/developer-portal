@@ -37,6 +37,7 @@ Manage apps, and app installations in your projects
 
 
 
+
 ## `mw app copy [INSTALLATION-ID]`
 
 Copy an app within a project
@@ -1807,6 +1808,25 @@ FLAGS
 
 DESCRIPTION
   List upgrade candidates for an app installation.
+```
+
+## `mw app open [INSTALLATION-ID]`
+
+Open an app installation in the browser.
+
+```
+USAGE
+  $ mw app open [INSTALLATION-ID]
+
+ARGUMENTS
+  INSTALLATION-ID  ID or short ID of an app installation; this argument is optional if a default app installation is set
+                   in the context.
+
+DESCRIPTION
+  Open an app installation in the browser.
+
+  This command opens an app installation in the browser. For this to work, there needs to be at least one virtual host
+  linked to the app installation.
 ```
 
 ## `mw app ssh [INSTALLATION-ID]`
