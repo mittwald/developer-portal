@@ -1,96 +1,87 @@
 ---
-title: Wie entwickle und teste ich lokal?
+title: How to Develop and Test Locally
 ---
 
 import OperationLink from "@site/src/components/OperationLink";
 import SchemaWithExample from "../../../src/components/openapi/SchemaWithExample";
 
-Die lokale Entwicklung von Extensions, die sich stark mit dem mStudio integrieren, kann eine Herausforderung sein,
-da keine Möglichkeit besteht, das mStudio lokal oder in einer DEV Umgebung zu starten.
-Neben der Möglichkeit, die mStudio API zu mocken, was sich ohne Kenntnisse der API als schwierig erweisen kann,
-existieren dennoch Mittel und Wege, um die lokale Entwicklung von Extensions zu erleichtern.
-Diese werden im Folgenden vorgestellt.
+There is no way to start the mStudio public API locally.
+This makes the local development of extensions challenging if the extension heavily integrates with the mStudio.
+However, there are ways to assist the local extension development besides mocking the mStudio API, which might be difficult without deep knowledge of the API.
+We will explore these in the rest of this page.
 
-## Authentifizierte Domain Actions
+## Authenticated Domain Actions
 
-Um die Geschäftslogik im Zusammenspiel mit dem mStudio effektiv zu testen, ist es am einfachsten,
-die mStudio API direkt zu verwenden.
-Dabei ist es in der Regel erforderlich, sich gegen die API zu authentifizieren.
+The easiest way to effectively test the interaction of your business logic and the mStudio is to use the mStudio public API directly.
+It is usually necessary to authenticate against the API.
 
-### ...mittels persönlichem API-Token
+### ...via a Personal API Token
 
-In einer frühen Phase, in der die Geschäftsidee noch geprüft und an einem Proof of Concept gearbeitet wird,
-bietet es sich an, einen persönlichen API-Token zu verwenden.
-Dieser Token kann für die lokale Entwicklung genutzt werden.
-Es ist jedoch wichtig, darauf zu achten, dass **API-Tokens nicht in Versionskontrollsysteme** wie Git gelangen
-und diese Lösung nur für die lokale Entwicklung gedacht ist.
+It is a good idea to use your personal API token during the early development of your extension, while you evaluate your business idea and work on a proof of concept.
+You can use this token for local development.
+However, it is important that you **do not check in API tokens into version control systems** like Git.
 
-Weitere Informationen zur Erzeugung eines persönlichen API-Tokens sind zu finden unter [Ein API-Token beziehen](../../../api/intro#obtain-an-api-token)
+For more information about obtaining an API token, see [obtaining an API token](../../../api/intro#obtaining-an-api-token).
 
-### ...mittels Extension Instance Secret Rotation
+### ...via Extension Instance Secret Rotation
 
-Eine weitere Möglichkeit, die mStudio API authentifiziert zu nutzen, ohne die Authentifizierungsmethoden vollständig zu implementieren,
-ist die Rotation eines Extension Instance Secrets.
-Hierfür wird die <OperationLink operation="contributor-rotate-secret-for-extension-instance" />-Operation verwendet.
-Das neue Secret wird per Webhook übermittelt, aber auch als Antwort auf den Request zurückgegeben.
-Das so erhaltene Secret kann nun sicher hinterlegt werden, ähnlich wie ein persönlicher API-Token,
-um ein Access Token beziehen zu können, wie unter [Authentifizierung mittels Extension Instance Secret](../../reference/api#authentifizierung-mittels-extension-instance-secret) beschrieben.
-Bei Nutzung dieser Route wird der Lifecycle Webhook synchron ausgeführt.
-Bei Fehlschlag wird der Webhook nicht erneut versendet.
-Außerdem wird das Secret nicht gültig, wenn der Webhook fehlschlägt.
-Um ohne funktionierende Webhooks dennoch testen zu können, kann der Route im Request Body `"allowWebhookFailure": true` hinzugefügt werden.
-Der Fehler des Lifecycle Webhooks wird dann ignoriert und das Secret samt Antwort des Extension-Backends trotzdem zurückgegeben.
+Rotating the extension instance secret is another possibility for using the mStudio public API authenticated without implementing the authentication methods intended for extensions.
+For this, you can use the <OperationLink operation="contributor-rotate-secret-for-extension-instance" /> operation.
+The mStudio returns the new extension secret in the response and transfers it to the extension per webhook.
+We recommend you store the obtained secret securely, similar to personal API tokens.
+In the future, you can use this secret to obtain access tokens, as described in [authenticating with the extension instance secret](../../reference/api#authenticating-with-the-extension-instance-secret).
+When using this route, the mStudio executes the webhook call synchronously.
+If the webhook call fails, it is not sent again.
+Also, the new secret is not valid if the webhook call failes.
+To test without a working webhook handler, you can add `"allowWebhookFailure": true` to the request body.
+This way, the mStudio ignores failures of the webhook calls and the mStudio responds to the request with the new secret.
 
-Diese Methode ist besonders nützlich, wenn die Authentifizierung später ebenfalls über das Extension Instance Secret erfolgen soll.
-Zudem können Initialisierungsprozesse, die anschließend zu den Lifecycle Webhooks ausgeführt werden würden,
-mit einem funktionierenden Secret getestet werden, ohne im mStudio für jeden Versuch eine neue Extension Instance erstellen zu müssen.
+If you plan to implement the authentication using the extension instance secret later, this method is especially useful.
+Additionally, you can test initialization processes executed after webhook calls with a working secret without creating a new extension instance in the mStudio for every attempt.
 
-### ...mittels OAuth2
+### ...via OAuth2
 
-Wenn die Authentifizierung und Ausführung von Domain Actions über OAuth2 getestet werden soll,
-empfiehlt es sich, im OAuth2-Client eine lokale Redirect URI einzurichten.
-Dies kann entweder localhost oder eine Domain sein, für die ein lokaler Host-Eintrag existiert.
-Es sollte darauf geachtet werden, dass bei Verwendung eines Host-Eintrags keine potenziell öffentlich auflösbare Domain verwendet wird,
-die nicht unter der Kontrolle des Entwicklers steht, um Sicherheitsrisiken zu vermeiden.
+If you want to test the authentication and execution of domain actions per OAuth2, we recommend setting up a local redirect URI in the OAuth2 client.
+This can either be the localhost or a domain with an entry to your local host configuration.
+You should ensure that no public domain is used as an entry to your local host configuration that is not in your control to mitigate security risk.
 
-## Testen der Lifecycle Webhooks
+## Testing Lifecycle Webhooks
 
-### ...mittels lokalem Development Server
+### ...via the Local Development Server
 
-Auf Github existiert das [marketplace-local-dev-server](https://github.com/mittwald/marketplace-local-dev-server)-Repository,
-welches dafür gedacht ist, lokal Lifecycle Webhooks samt Verifizierung der Sender-Identität zu testen.
+You can use the GitHub repository [marketplace-local-dev-server](https://github.com/mittwald/marketplace-local-dev-server) to locally test lifecycle webhooks, including the verification of the sender identity.
 
 :::note
 
-Zum aktuellen Zeitpunkt ist der Marktplatz und die Contribution noch nicht für die Allgemeinheit offen.
-Um Zugriff auf das Repository zu erhalten, kontaktiere bitte deinen Ansprechpartner bei mittwald.
+Currently, the marketplace and contributions are not public.
+To get access to the repository, please reach out to your contact at mittwald.
 
 :::
 
-Es enthält eine Docker-Compose-Konfiguration, die einen lokalen Server startet, der Lifecycle Webhooks versenden kann.
-Dazu wird eine API angeboten, mit der Lifecycle Webhooks angefragt werden können.
-Die Werte, die in den Webhooks enthalten sind, können dabei frei gewählt werden.
-Falls Werte nicht gesetzt sind, werden sie zufällig generiert.
+The repository contains a `docker-compose` configuration that starts a local server.
+This server can send lifecycle webhooks.
+For this, it provides an API you can use to request lifecycle webhooks.
+You can freely choose the values transmitted by the webhooks.
+If you don't set some values, the server randomly generates those values.
 
-Wenn bspw. die Extension Instance ID selbst vergeben wird, können so auch ganze Lebenszyklen von Extension Instances simuliert werden,
-indem für verschiedene Webhooks eine stabile Extension Instance ID verwendet wird.
+If, for example, you set the extension instance IDs of the requested lifecycle webhooks and use a consistent ID, you can simulate complete lifecycles of extension instances.
 
-### ...mittels Dry Run Webhooks
+### ...via Dry Run Webhooks
 
-Mithilfe der <OperationLink operation="extension-dry-run-webhook" />-Operation können Lifecycle Webhooks auch über das mStudio Backend simuliert werden.
-Dabei wird der angefragte Lifecycle Webhook an die an der Extension konfigurierten URL gesendet.
-Dry Run Webhooks können nur für Extension Instances des Contributors ausgeführt werden.
-Sie können genau wie beim lokalen Development Server mit beliebigen Werten gefüllt werden oder zufällige Werte enthalten.
-Für eine Übersicht, welche Werte statisch gesetzt werden können, siehe in der verlinkten Operation.
+You can use the mStudio backend to simulate lifecycle webhooks by using the <OperationLink operation="extension-dry-run-webhook" /> operation.
+The mStudio will send the requested lifecycle webhook to the URL configured for the extension.
+You can only execute dry-run webhooks for extension instances belonging to you, the contributor.
+Similarly to the local development server, you can specify values for the content of the lifecycle webhooks or let the mStudio backend generate random values.
+For an overview of the values you can statically specify, see the linked operation.
 
-Das Ergebnis samt Response Body, Headern und Status Code wird dabei als Antwort auf die Operation zurückgegeben.
+The mStudio returns the result of the executed webhook containing the response body, headers, and status code as a response to the dry-run webhook request.
 
 :::caution
-Um den Webhook als Dry Run erkennbar zu machen, wird dem Webhook der Query-Parameter `dry-run=true` hinzugefügt.
-Es sollte darauf geachtet werden, dass in Produktivsystemen keine Webhooks mit diesem Parameter verarbeitet und persistiert werden,
-da es sich um eine Simulation handelt und so die Daten inkonsistent werden könnten.
+The mStudio adds the parameter `dry-run=true` to the webhook to make it identifiable as a dry-run.
+You should ensure that your production systems do not process and persist webhooks with this parameter.
+Processing such webhooks could lead to data inconsistencies since they are simulated.
 :::
 
-Zu Dokumentationszwecken kann zusätzlich der `executing-user-id` Query-Parameter ausgewertet werden.
-Dieser wird ebenfalls automatisch jedem Dry Run Webhook beigefügt.
-Er enthält die ID des Benutzers, der den Dry Run Webhook ausgelöst hat.
+You can additionally process the `executing-user-id` parameter for documentation purposes.
+This parameter is additionally added to every dry-run webhook automatically.
+It contains the user ID of the user who requested the dry-run webhook.
