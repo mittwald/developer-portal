@@ -6,8 +6,8 @@ title: OAuth2 Clients
 
 import SchemaWithExample from "../../../src/components/openapi/SchemaWithExample";
 
-OAuth2 Clients werden derzeit über statische YAML-Dokumente definiert.
-Die benötigten und erlaubten Attribute sind in folgendem Schema beschrieben.
+Currently, we define OAuth2 clients with static YAML documents.
+The following schema describes the allowed and the required values.
 
 <SchemaWithExample
   withRawJSONSchema
@@ -26,12 +26,12 @@ Die benötigten und erlaubten Attribute sind in folgendem Schema beschrieben.
         type: "string",
         format: "uuid",
         description:
-          "ID des OAuth2 Clients, muss eindeutig sein und mit der Extension ID übereinstimmen",
+          "The ID of the OAuth2 client. It has to be unique and identical to the extension ID",
       },
       humanReadableName: {
         type: "string",
         description:
-          "Name des OAuth2 Clients, sollte mit dem Namen der Extension übereinstimmen",
+          "Name of the OAuth2 client. It should be identical to the extension name",
       },
       allowedGrantTypes: {
         type: "array",
@@ -40,14 +40,14 @@ Die benötigten und erlaubten Attribute sind in folgendem Schema beschrieben.
           enum: ["authorization_code"],
         },
         description:
-          "Erlaubte OAuth2 Grant Types, derzeit ist nur authorization_code (mit PKCE Verfahren) erlaubt",
+          "Allowed OAuth2 grant types. Currently, only authorization_code (with PKCE flow) is allowed",
       },
       allowedScopes: {
         type: "array",
         items: {
           type: "string",
         },
-        description: "Erlaubte Scopes, die der Client anfordern kann.",
+        description: "Allowed scopes, the client can request.",
         example: ["mail:read", "mail:write", "project:read"],
       },
       allowedRedirectURIs: {
@@ -56,7 +56,7 @@ Die benötigten und erlaubten Attribute sind in folgendem Schema beschrieben.
           type: "string",
           format: "uri",
         },
-        description: "Erlaubte Redirect URIs, die der Client verwenden kann.",
+        description: "Allowed redirect URIs, the client is allowed to use.",
         example: [
           "https://example.com/oauth2/callback",
           "http://localhost:3000/oauth2/callback",
@@ -64,7 +64,7 @@ Die benötigten und erlaubten Attribute sind in folgendem Schema beschrieben.
       },
       hashedSecret: {
         type: "string",
-        description: "Argon2id gehashtes Secret des OAuth2 Clients.",
+        description: "Argon2id hashed secret of the OAuth2 client.",
       },
     },
   }}
@@ -72,45 +72,41 @@ Die benötigten und erlaubten Attribute sind in folgendem Schema beschrieben.
 
 ### allowedScopes
 
-Die Scopes, die der Client anfragen _kann_.
-Der Client muss nicht alle Scopes anfragen.
-Außerdem müssen die Scopes des OAuth2 Clients nicht zwingend mit denen der Extension übereinstimmen.
-In vielen Fällen kann es Sinn ergeben, dass die Scopes abweichen.
+The scopes that the client _may_ request.
+The client does not have to request all scopes.
+Additionally, the scopes of the OAuth2 client don't have to be identical to the scopes of the extension.
+In many cases, it makes sense that the scopes differ.
 
-Ein Beispiel für Abweichungen wäre, dass die Extension ohne Nutzinteraktionen keine schreibenden Operationen durchführt,
-sondern lediglich gewisse notwendige Daten ausliest
-und alle schreibenden Operationen über einen mStudio Nutzer und OAuth2 durchgeführt werden.
+For example, one such case is that an extension might only do reading and not writing operations without user interaction.
+The writing operations are then executed by a mStudio user using the extension with the help of OAuth2.
 
 ### allowedRedirectURIs
 
-Die Redirect URIs, die der Client verwenden _kann_.
-Wie im [RFC 6749](https://datatracker.ietf.org/doc/html/rfc6749#section-3.1.2.3) beschrieben,
-muss der Client keine `redirect_uri` beim Authorization Request angeben, wenn der Authorization Server nur eine Redirect URI erlaubt.
-Wenn jedoch mehrere Redirect URIs erlaubt sind, muss der Client eine `redirect_uri` angeben,
-die vollständig mit einer der erlaubten URIs übereinstimmt.
+The redirect URIs that the client _may_ use.
+If the authorization server allows only one redirect URI, the client does not have to specify a `redirect_uri`,
+as describen in [RFC 6749](https://datatracker.ietf.org/doc/html/rfc6749#section-3.1.2.3).
+However, if the authorization server allows multiple redirect URIs, the client must specify a `redirect_uri` that is identical to one of the allowed URIs.
 
-Für die Redirect URIs wird ausdrücklich kein Templating unterstützt, um gängige Lücken in OAuth2 Implementierungen zu vermeiden.
-Zur Prüfung, ob eine URI erlaubt ist, wird ein einfacher String-Vergleich durchgeführt.
-Dieser beinhaltet das Protokoll, die vollständige Domain, den Port und den Pfad der URI.
+Templating is not supported for the redirect URIs to avoid common gaps in the OAuth2 implementation.
+The mStudio makes a simple string comparison to validate, whether an URI is allowed.
+The URI string contains the protocol, the complete domain, the port, and the path of the URI.
 
-Für lokale Testzwecke kann es sinnvoll sein, `http://localhost` als Redirect URI zu erlauben.
-Dabei muss darauf geachtet werden, dass, wie bereits erwähnt, der Port ebenfalls übereinstimmen muss.
+It makes sense to allow `http://localhost` as redirect URI to make local testing possible.
+You have to ensure that the correct port is configured, as mentioned above.
 
 ### hashedSecret
 
-In seltenen Fällen ist es möglich, dass kein [PKCE Verfahren](https://datatracker.ietf.org/doc/html/rfc7636) genutzt werden kann.
-In diesem Fall besteht die Möglichkeit, einen sogenannten Private Client zu erstellen.
-Dieser sieht ein Client Secret vor.
+In some rare cases, it might be impossible to use the [PKCE flow](https://datatracker.ietf.org/doc/html/rfc7636).
+However, it is possible to create a so-called private client.
+For this, you need a client secret.
 
-Zu bedenken ist, dass Client Secrets sicherheitsrelevante Themen aufwerfen, die mit dem PKCE Verfahren umgegangen werden können.
-Beispielsweise sollte ein Private Client nicht verwendet werden, um den OAuth2 Authorization Code Flow im Browser, einer nativen App,
-oder einer anderen Umgebung zu verwenden, in der das Client Secret nicht sicher aufbewahrt werden kann,
-da es sonst leicht abgegriffen werden kann.
+Keep in mind that client secrets raise security-relevant issues you can avoid by using PKCE.
+For example, you should not use the private client to implement the OAuth2 authorization code flow in the browser, a native app, or some other easily accessible environment.
+The client's secret is not stored securely in such environments and can be extracted easily by bad actors.
 
-**Deshalb wird ausdrücklich empfohlen, das PKCE Verfahren zu nutzen, wenn möglich.**
+**Therefore, we explicitly recommend using the PKCE flow if possible.**
 
-Wenn ein Client Secret genutzt werden soll, muss dieses vorher mit Argon2id gehasht werden.
-Siehe dazu auch die [Argon2id auf Wikipedia](https://de.wikipedia.org/wiki/Argon2), insbesondere [Konkrete Instanzen](https://de.wikipedia.org/wiki/Argon2#Konkrete_Instanzen).
-Außerdem sei auf die [Argon2id Referenz](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-argon2-13) verwiesen.
+If you want to use a client secret, you have to hash it with Argon2id beforehand.
+For more information, see [Argon2id on wikipedia](https://en.wikipedia.org/wiki/Argon2) and [the Argon2id reference](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-argon2-13).
 
-Wenn kein Client Secret angegeben ist, wird automatisch das PKCE Verfahren vorausgesetzt.
+If you do not define a client secret, the PKCE flow is used automatically,

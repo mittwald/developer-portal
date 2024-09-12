@@ -1,68 +1,64 @@
 ---
-title: Relevante mStudio API-Endpunkte
+title: Relevant mStudio API endpoints
 ---
 
 import OperationLink from "@site/src/components/OperationLink";
 
 ## Using Access Tokens to Authenticate
 
-Access Tokens können verwendet werden, um sich gegenüber der mStudio API zu authentifizieren.
-Die Verwendung von Access Tokens ist in [API-Anfragen authentifizieren](../../../api/intro#authenticating-requests) beschrieben.
+You can use access tokens to authenticate against the mStudio API.
+[Authenticating API requests](../../../api/intro#authenticating-requests) describes the use of access tokens.
 
-Um in Erfahrung zu bringen, welche Routen authentifiziert ausgeführt werden müssen,
-kann die jeweilige Operation in der [API Referenz](../../../reference/) aufgesucht werden.
+You can consult the operations in the [API reference](../../../reference/) to determine whether you need to be authenticated to execute those routes.
 
-Beachte, dass, aufgrund von CORS-Einschränkungen, das Aufrufen der mStudio API aus einer externen Applikation heraus
-derzeit nur über ein externes **Backend** möglich ist.
+Note, that the mStudio API is only accessible via an external **backend** because of CORS limitations.
 
 ## Authenticating with the Extension Instance Secret
 
-Jede Extension erhält über Lifecycle Webhooks ein Secret, das für die Authentifizierung gegenüber der mStudio API verwendet werden kann.
-Initial wird das Secret über den `ExtensionAddedToContext`-Webhook übermittelt.
-Das mStudio rotiert automatisiert regelmäßig das Secret.
-über den `ExtensionInstanceSecretRotated`-Webhook wird das neue Secret dann übermittelt.
-Das alte Secret ist in diesem Moment invalidiert.
+Every extension receives an extension secret via lifecycle webhooks.
+The extension can then use this secret to authenticate against the mStudio API.
+Initially, the mStudio transmits the secret via the `ExtensionAddedToContext` webhook.
+Periodically, it rotates the secret and then sends the new secret via the `ExtensionsInstanceSecretRotated` webhook.
+At that point, the old secret is no longer valid.
 
-Für weitere Informationen über die Webhooks siehe [Lifecycle Webhooks](../webhooks).
+For more information about the webhooks, see [Lifecycle Webhooks](../webhooks).
 
-Das Secret kann aus der `secret` Property des Webhook Request Bodies entnommen werden.
-Dieses kann dann in Kombination mit der Extension Instance ID, die unter der Property `id` zu finden ist, verwendet werden, um ein Access Token zu beziehen.
-Dafür muss die <OperationLink operation="extension-authenticate-instance" />-Operation verwendet werden.
-Die `extensionInstanceId` wird als Pfad-Parameter übergeben und das Secret im Request Body als `extensionInstanceSecret`-Property.
+You can extract the secret from the `secret` property of the webhook request body.
+Use the operation <OperationLink operation="extension-authenticate-instance" /> to request an access token.
+Additionally to the secret, this operation needs the extension instance id, which is the property `id` in the webhook request body.
+The `extensionInstanceId` is a path parameter, and the secret is the request body property `extensionInstanceSecret`.
 
-Als Response wird der `publicToken`, der für die Authentifizierung gegenüber der mStudio API verwendet werden kann, zurückgegeben.
-Außerdem wird eine `expiry` Property zurückgegeben, die den Zeitpunkt angibt, an dem das Token abläuft.
-Ein Extension Access Token ist kurzlebig und kann nicht verlängert werden.
-Wenn das Token abgelaufen ist, muss ein neues Token bezogen werden.
-Wenn eine Extension von einem Context entfernt wird oder eine Extension Instance deaktiviert wird,
-werden alle Access Tokens automatisch invalidiert.
+The mStudio API returns a `publicToken` that can be used to authenticate against the mStudio API.
+Additionally, it returns an `expiry` property, which defines the date the token expires.
+An extension access token is short-lived and cannot be extended.
+If a token expires, you have to request a new token.
+When an extension is removed from a context or an extension instance is deactivated, all access tokens are invalidated automatically.
 
 ## OAuth2
 
-Das mStudio implementiert konform zu [RFC 6749](https://tools.ietf.org/html/rfc6749) OAuth2 als Authentifizierungsmechanismus für die öffentliche API.
-Unterstützt wird derzeit nur der Authorization Code Flow (mit PKCE).
+The mStudio implements OAuth2 as an authentication mechanism for the public API according to [RFC 6749](https://tools.ietf.org/html/rfc6749).
+Currently, we only support the authorization code flow (with PKCE).
 
-Die benötigten API-Endpunkte für den OAuth2 Flow sind:
+The required API endpoints for the OAuth2 flow are:
 
 - <OperationLink operation="user-oauth-get-authorization" />
 - <OperationLink operation="user-oauth-retrieve-access-token" />
 
-Für die Implementierung des OAuth2 Clients empfiehlt mittwald die Verwendung einer OAuth2 Client Library,
-die mit [RFC 6749](https://tools.ietf.org/html/rfc6749) konform ist.
+mittwald recommends using a OAuth2 client library that conforms to [RFC 6749](https://tools.ietf.org/html/rfc6749) to implement OAuth2 clients.
 
-Im Folgenden ist der Ablauf des Authorization Code Flows grob skizziert:
+The following is a rough sketch of the authorization code flow process:
 
 ```mermaid
 sequenceDiagram
 
 Client->>mStudio API: GET /oauth2/authorize
-mStudio API-->>mStudio Frontend: Redirect zu Login
+mStudio API-->>mStudio Frontend: Redirect to Login
 mStudio Frontend->>mStudio API: POST /authenticate
 mStudio API-->>mStudio Frontend: Resource Owner Access Token
 mStudio Frontend->>mStudio API: GET /oauth2/authorize
-mStudio API-->>mStudio Frontend: Redirect zu Consent
+mStudio API-->>mStudio Frontend: Redirect to Consent
 mStudio Frontend->>mStudio API: Consent
-mStudio API-->>Client: Redirect zu Client mit Authorization Code
+mStudio API-->>Client: Redirect to Client with Authorization Code
 Client->>mStudio API: POST /oauth2/token
 mStudio API-->>Client: OAuth2 Access Token
 
@@ -70,50 +66,51 @@ mStudio API-->>Client: OAuth2 Access Token
 
 ## Using an Access Token Retrieval Key
 
-Um den ATReK und die User ID in einer Extension verwenden zu können, muss ein Template für das Extension Frontend verwendet werden.
-Das mStudio fügt diese Informationen beim Navigieren zur Extension in das Template ein.
+To use the ATReK and the user ID in an extension, you must define a template for the extension frontend.
+The mSudio inserts this information when redirecting to the extension frontend.
 
-Ein solches Template kann bspw. so aussehen:
+The following is an example of how such a template may look:
 
 ```
 https://example.com?atrek=:accessTokenRetrievalKey&userId=:userId
 ```
 
-Für weitere Informationen über die Verwendung von Templates siehe [Templating von Konfigurationswerten](../../overview/concepts/templating)
+For more information about the use of templates, see [templating of configuration values](../../overview/concepts/templating).
 
-Hier wird der ATReK und die User ID als Query-Parameter übergeben.
-Prinzipiell kann auch jeder andere URI-Bestandteil verwendet werden, um die Informationen zu übergeben.
-Query-Parameter eignen sich jedoch am besten, weil diese meist nicht in Access Logs auftauchen.
+Here, the mStudio passes the ATReK and the user ID as query parameters.
+In principle, you can also use any other part of the URI to pass this information.
+Query parameters are the best option since they often are not included in access logs.
 
-Die Extension kann den ATReK verwenden, indem die <OperationLink operation="user-authenticate-with-access-token-retrieval-key" />-Route aufgerufen wird.
+The extension can use the ATReK by calling the route <OperationLink operation="user-authenticate-with-access-token-retrieval-key" />.
 
-Die Route benötigt als Parameter den ATReK und die User ID und antwortet bei Erfolg mit einem Access Token.
-Das resultierende Access Token ist automatisch mit den Scopes der Extension eingeschränkt.
+This route requires the ATReK and the user ID as parameters and responds with an access token on success.
+The returned access token is automatically limited by the scopes of the extension.
 
-Der Ablauf ist in folgendem Diagram visualisiert:
+The following diagram visualizes this process:
 
 ```mermaid
 sequenceDiagram
     participant mStudio
     participant Extension
 
-    mStudio->>mStudio: Generiere ATReK
-    mStudio->>Extension: Öffne und übermittel ATReK sowie User ID
-    Extension->>mStudio: Stelle Access Token aus
+    mStudio->>mStudio: Generate ATReK
+    mStudio->>Extension: Open and transmit ATReK and user ID
+    Extension->>mStudio: Create Access Token
     mStudio-->>Extension: Access Token
-    Extension->>mStudio: Führe Domain Actions aus
+    Extension->>mStudio: Execute a Domain Action
 
 ```
 
-## Abruf von Webhook Signatur Public Keys
+## Getting Webhook Signature Public Keys
 
-Zur [Prüfung der Signatur eines Lifecycle Webhooks](../webhooks#validierung-von-lifecycle-webhooks) muss der öffentliche Schlüssel des mStudio bekannt sein.
-Dieser kann über die <OperationLink operation="extension-get-public-key" />-Route abgerufen werden.
-Dazu muss der Identifier des Public Keys, der sich hinter dem `X-Marketplace-Signature-Serial`-Header verbirgt als Pfad-Parameter übergeben werden.
-Der Public Key wird base64 kodiert im Response Body zurückgegeben.
+If you want to [verify the signature of a lifecycle webhook](../webhooks#validierung-von-lifecycle-webhooks), you must know the public key of the mStudio.
+You can request this key with the operation <OperationLink operation="extension-get-public-key" />.
+For this, you must pass the identifier of the public key as a path parameter to the operation.
+The header field `X-Marketplace-Signature-Serial` of the webhook request contains the identifier of the public key.
+The mStudio returns the public key in the response body encoded in base64.
 
-Für eine bestimmte Signature-Serial wird ein stabiler Public Key garantiert.
-Das bedeutet, dass der Public Key gecacht oder persistiert werden kann.
-Erst wenn sich die Signature-Serial ändert, muss der neue Public Key abgerufen werden.
-Dies wird nicht im Voraus angekündigt.
-Es sollte also bei jedem Lifecycle-Webhook die Signature-Serial geprüft und ggf. automatisiert der neue Public Key abgerufen werden.
+We guarantee a stable public key for a signature serial.
+Therefore, the extension may cache or persist the public keys.
+The extension must only request a new public key when the mStudio uses a new signature serial.
+We announce this in advance.
+The extension should check the signature serial for every lifecycle webhook and perhaps automatically request the new public key.

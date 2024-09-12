@@ -4,8 +4,8 @@ title: Contributoren
 
 import SchemaWithExample from "../../../src/components/openapi/SchemaWithExample";
 
-Contributoren werden derzeit über statische YAML-Dokumente definiert.
-Die benötigten und erlaubten Attribute sind in folgendem Schema beschrieben.
+Currently, we define contributors with static YAML documents.
+The following schema describes the allowed and the required values.
 
 <SchemaWithExample
   withRawJSONSchema
@@ -17,42 +17,42 @@ Die benötigten und erlaubten Attribute sind in folgendem Schema beschrieben.
       id: {
         type: "string",
         format: "uuid",
-        description: "ID des Contributoren. Muss global eindeutig sein.",
+        description: "ID of the contributor. It has to be globally unique.",
       },
       name: {
         type: "string",
-        description: "Name des Contributoren.",
+        description: "Name of the contributor.",
       },
       customerId: {
         type: "string",
         format: "uuid",
         description:
-          "ID der Organisation im mStudio, zu der der Contributor gehört. Ein Contributor hat ein 1:1 Verhältnis zu einer Organisation",
+          "ID of the organization in the mStudio, the contributor belongs to. The mapping of contributors to organizations is 1:1.",
       },
       state: {
         type: "object",
-        description: "Status des Contributoren.",
-	example: {
-	  disabled: false,
-	},
-	properties: {
-	  disabled: {
-	    type: "boolean",
-	  },
-	},
+        description: "State of the Contributor.",
+        example: {
+          disabled: false,
+        },
+        properties: {
+          disabled: {
+            type: "boolean",
+	      },
+	    },
       },
       email: {
         type: "string",
         format: "email",
         description:
-          "E-Mail-Adresse des Contributoren, die für Support Zwecke genutzt werden kann.",
+          "Email address of the contributor for support.",
       },
       phone: {
         type: "string",
         format: "phone",
         example: "+491701234567",
         description:
-          "Telefonnummer des Contributoren, die für Support Zwecke genutzt werden kann.",
+          "Phone number of the contributor for support.",
       },
     },
   }}

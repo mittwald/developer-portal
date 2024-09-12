@@ -4,21 +4,21 @@ title: Lifecycle Webhooks
 import OperationLink from "@site/src/components/OperationLink";
 import SchemaWithExample from "../../../src/components/openapi/SchemaWithExample";
 
-Lifecycle Events werden von mittwald genutzt, um die externe Anwendung über sie betreffende Ereignisse zu informieren.
+mittwald uses lifecycle events to notify the the external application of events that concern it.
 
 ## Templating of Webhook URLs
 
-Um die URL für die Webhooks zu konfigurieren, können Platzhalter verwendet werden.
-Diese werden durch die Werte der Attribute des Webhook-Payloads ersetzt.
+You may use placeholders when configuring the URL of webhooks.
+The mStudio replaces them with the values of the attributes of the webhook payload.
 
-Folgende Platzhalter können verwendet werden:
+You may use the following placeholders:
 
-- `apiVersion`: Die API-Version, die für den Webhook verwendet wird. Derzeit immer `v1`. Siehe auch [API Versioning](../../overview/concepts/api-versioning).
-- `contributorId`: ID des Contributors
-- `extensionId`: ID der Extension
-- `extensionInstanceId`: ID der Extension Instance
-- `contextId`: ID des Extension Contexts, bspw. die ProjectID
-- `context`: Der Extension Context Kind, zu dem die Extension Instance hinzugefügt wurde. Derzeit entweder `customer` oder `project`.
+- `apiVersion`: The API version used for the webhook. Currently always `v1`. See [API versioning](../../overview/concepts/api-versioning).
+- `contributorId`: ID of the contributor
+- `extensionId`: ID of the extension
+- `extensionInstanceId`: ID of the extension instance
+- `contextId`: ID of the extension context, eg. the ProjectID
+- `context`: The extension context kind the extension instance was added to. Currently one of `customer` and `project`.
 
 ## Webhook Payloads
 
@@ -429,94 +429,94 @@ Folgende Platzhalter können verwendet werden:
   }}
 />
 
-## Erläuterung der einzelnen Attribute
+## Explanation of the Individual Attributes
 
 ### apiVersion
 
-Die API-Version, die für den Webhook verwendet wird.
-Derzeit immer `v1`.
-Ermöglicht zukünftige Breaking Changes an dem Payload.
-Siehe auch [API Versioning](../../overview/concepts/api-versioning).
+The API version that is used for the webhook call.
+Currently always `v1`.
+Enables breaking changes of the payload in the future.
+For more information, see [api versioning](../../overview/concepts/api-versioning).
 
 ### kind
 
-Art des Lifecycle-Webhooks.
-Mögliche Werte sind:
+The lifecycle webhook kind.
+Possible values:
 
 - `ExtensionAddedToContext`
 - `ExtensionInstanceUpdated`
 - `ExtensionInstanceSecretRotated`
 - `ExtensionInstanceRemovedFromContext`
 
-Je nach Anforderungen kann dadurch die URL für alle Webhooks identisch sein und die Art des Webhooks anhand des `kind`-Attributs unterschieden werden
-oder alternativ für jeden Lifecycle ein eigener Webhook-Endpoint konfiguriert und der `kind` ignoriert werden.
-Für weitere Erläuterungen zu der semantischen Bedeutung der einzelnen Lifecycle-Webhooks siehe [Lifecycle Webhooks Konzept](../../overview/concepts/lifecycle-webhooks).
+Depending on requirements, you can use the same URL for all webhooks and use this attribute to discern the different kinds of webhooks.
+Alternatively, you can use different webhook endpoints for each kind of webhook and ignore this attribute.
+For more information about the semantics of the individual lifecycle webhooks, see [lifecycle webhooks concept](../../overview/concepts/lifecycle-webhooks).
 
 ### id
 
-Der global eindeutige Identifier der Extension Instance.
-Dies ist nicht zu verwechseln mit der Extension ID, die die Extension als Ganzes identifiziert.
-Auch darf diese ID nicht mit der `request.id` verwechselt werden, die den Request identifiziert und dafür genutzt werden kann, um Replay-Attacken zu verhindern.
-Siehe dazu auch [Request Meta Informationen](#request).
+The globally unique identifier of the extension instance.
+Don't confuse this with the extension ID that identifies the extension as a whole.
+Also, you must not confuse this ID with the `request.id` that identifies the request and can be used to mitigate replay attacks.
+For more information, see [request meta information](#request).
 
 ### context
 
-Informationen über den Extension Context, zu dem die Extension Instance gehört.
-Derzeit sind zwei Arten von Extension Contexts möglich:
+Information about the extension context, the extension instance belongs to.
+Currently, the two possible extension contexts are:
 
 - `customer`
 - `project`
 
-Zusätzlich zu dem `context.kind` wird auch die `context.id` übermittelt.
-Dies ist die ID des Extension Contexts, also bspw. des Projektes.
+Additionally to the `context.kind`, the mStudio transmits the `context.id`.
+This is the ID of the extension context, so the ID of a project, for example.
 
 ### consentedScopes
 
-Die Berechtigungen, denen der Nutzer der Extension beim Hinzufügen zu einem Extension Context zugestimmt hat.
-Wenn einer Extension nachträglich zusätzliche Scopes hinzugefügt wurden, muss ein Nutzer diesen erst noch zustimmen,
-bevor die Extension diese für die Extension Instance verwenden kann.
+The scopes the user consented to when they added the extension to an extension context.
+If the contributor of an extension adds additional scopes to it later, the user has to consent to those scopes before the extension can use those scopes for that extension instance.
 
-Anhand der `consentedScopes` kann die Extension prüfen, ob die benötigten Berechtigungen vorhanden sind.
-Deswegen wird empfohlen, die `consentedScopes` zu persistieren.
+The extension can check whether the required scopes are available using the `consentedScopes`.
+For this reason, we recommend persisting the `consentedScopes`.
 
 ### state
 
-Der aktuelle Zustand der Extension Instance.
-Über die Lifecycle-Webhooks wird derzeit lediglich über den Zustand von `enabled` informiert.
-Darüber kann die Extension in Erfahrung bringen, ob die Extension Instance aktiv oder inaktiv ist und somit, ob sie ihre Funktionalität bereitstellen kann.
-Für eine deaktivierte Extension Instance funktionieren bspw. die Authentifizierungs- und Autorisierungsmechanismen nicht.
-Somit würden auch Domain Actions für eine deaktivierte Extension Instance nicht akzeptiert werden.
+The current state of the extension instance.
+The mStudio currently only informs the external application of the state of `enabled` via the lifecycle webhooks.
+This tells the extension whether an extension instance is active and, therefore, whether it should function.
+The authentication and authorization mechanisms don't work for deactivated extension instances.
+In that case, domain actions of that extension instance are not accepted.
 
 ### meta
 
-Meta-Informationen über die Extension Instance. Derzeit wird lediglich der Erstellungszeitpunkt der Extension Instance übermittelt.
-Dies ist nicht zu verwechseln mit den Request Meta Informationen, die Aufschluss über den Webhook an sich geben.
+Meta information about the extension instance.
+Currently, the mStudio only sends the creation date of the extension instance.
+This should not be confused with the request meta information which describes the webhook call.
 
 ### secret
 
-Das Secret, das für die Authentifizierung der Extension Instance verwendet wird. Dieses kann verwendet werden, um nutzerunabhängige Authentifizierung zu implementieren.
-Für weitere Informationen siehe [Authentifizierung von Extension Instances](../../overview/concepts/authentication#extension-instance-secret).
+The secret that is used for the authentication of the extension instance.
+You may use this to implement user-independent authentication.
+For more information, see [authentication of extension instances](../../overview/concepts/authentication#extension-instance-secret).
 
 ### request
 
-Meta-Informationen über den Lifecycle-Webhook-Request.
+Meta information about the lifecycle webhook request.
 
-Angriffsvektoren, wie [Replay-](https://csrc.nist.gov/glossary/term/replay_attack) oder Forward Replay Attacks,
-können ausgeschlossen werden, indem die `request`-Property validiert wird.
+You can mitigate attack vectors such as [replay](https://csrc.nist.gov/glossary/term/replay_attack) or forward replay attacks by validating the `request` property.
 
-Um denselben Request nur einmalig zu akzeptieren, kann die `request.id` persistiert und abgeglichen werden.
-Das mStudio schickt niemals Requests mit derselben `request.id` mehrfach.
+You can persist the `request.id` and compare it with the IDs of future lifecycle webhooks to only accept the same request once.
+The mStudio never sends requests with the same `request.id` multiple times.
 
-Um zu überprüfen, ob der Request den richtigen Empfänger erreicht, kann das Feld `request.target.url` überprüft werden.
-Dadurch kann verhindert werden, dass ein Angreifer den signierten Request an eine andere Extension weiterleitet.
+You can validate the field `request.target.url` to check whether the request reached the correct receiver.
+This way, you can avoid processing signed requests that an attacker forwarded to another extension.
 
-Um veraltete Requests erkennen zu können, bietet das Feld `request.createdAt` einen Anhaltspunkt.
-Es sollte jedoch beachtet werden, dass das mStudio die Webhooks potenziell asynchron versendet
-und somit die Zeitdifferenz zwischen dem Erstellen des Requests und dem Empfangen des Webhooks variieren kann.
+You can validate the field `request.createdAt` to identify old requests.
+Keep in mind that the mStudio potentially sends webhooks asynchronously and the time difference between the webhook creation and receiving the webhook may vary.
 
 ## Validation of Lifecycle Webhooks
 
-Um sicherzustellen, dass der Webhook von mittwald ausging, bieten wir die Möglichkeit, die Identität des Senders und den Inhalt des Request Bodys zu verifizieren. Dazu signieren wir den versendeten Request Body und schicken die Signatur inklusive der Meta-Informationen darüber in Request-Headern mit.
+We offer the possibility to confirm that mittwald sent the webhook and nobody corrupted the request body.
+For this, we sign the request body and send the signature, including meta information in the request headers.
 
 ```
 X-Marketplace-Signature-Serial: 7f640dcf-c5fb-4e79-bc4b-99a30e50fcc5
@@ -526,17 +526,23 @@ X-Marketplace-Signature: HKdS7xD...qQMN94HINte7Dlof+9V/PQ6gW0C5uBOz+9F6YNOLE6vdb
 
 ### X-Marketplace-Signature-Serial
 
-Eindeutige ID des zur Überprüfung der Signatur zu nutzenden Public Keys. Wir garantieren für eine Public Key ID einen stabilen Public Key. Dadurch kann der Public Key gecached werden. Ist eine ID unbekannt, kann der Key mit der Operation <OperationLink operation="extension-get-public-key" /> über die mittwald-API bezogen werden.
+Unique ID of the public key you must use to verify the signature.
+We guarantee one stable public key for every public key ID.
+Therefore, you may cache the public key.
+You can get the public keys with the operation <OperationLink operation="extension-get-public-key" />.
 
 ### X-Marketplace-Signature-Algorithm
 
-Algorithmus, der zum Erzeugen der Signatur verwendet wurde, derzeit immer [`Ed25519`](https://datatracker.ietf.org/doc/html/rfc8032).
+Algorithm, the mStudio used to generate the signature.
+Currently always [`Ed25519`](https://datatracker.ietf.org/doc/html/rfc8032).
 
 ### X-Marketplace-Signature
 
-[DSA-Signatur](https://www.rfc-editor.org/rfc/rfc6605.html) in Base64 codiert.
+[DSA signature](https://www.rfc-editor.org/rfc/rfc6605.html) encoded in base64.
 
-Um die Signatur zu prüfen, kann eine übliche kryptographische Library in der gewählten Programmiersprache verwendet werden. Dazu wird mithilfe der `verify`-Methode der gesamte, unverarbeitete Request Body geprüft. Damit ist sichergestellt, dass der übermittelte Request Body unmodifiziert von mittwald übertragen wurde.
+You can use common cryptographic libraries in your preferred programming language to verify the signature.
+The complete and unprocessed request body has to be verified using the `verify` method.
+This ensures that the request body was transmitted by mittwald and was not modified by a third party.
 
 ```go
 bodyBytes, err := io.ReadAll(body)
@@ -549,6 +555,6 @@ if !ed25519.Verify(publicKey, bodyBytes, signature) {
 }
 ```
 
-### Referenzimplementierungen für die Validierung von Lifecycle Webhooks
+### Reference Implementations of the Validation of Lifecycle Webhooks
 
 TODO
