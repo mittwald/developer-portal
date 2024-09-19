@@ -1,0 +1,81 @@
+---
+title: Breaking (!) API changes for v2 API, September 19, 2024
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Relocation
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+On September 19, 2024, the mittwald API introduced three new required request properties—'additionalServices', 'articleType', and 'prices'—for the POST operation on the /v2/relocation endpoint, enhancing the relocation process for external projects.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The `POST /v2/relocation` operation has been updated to include three new required request properties: `additionalServices`, `articleType`, and `prices`. This is a breaking change.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Relocate an external Project to mittwald"
+
+
+- ⚠️ **Breaking:** added the new required request property 'additionalServices'
+
+- ⚠️ **Breaking:** added the new required request property 'articleType'
+
+- ⚠️ **Breaking:** added the new required request property 'prices'
+
+
+For details, refer to the <OperationLink operation="relocation-create-relocation" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK Release v2.1.64
+
+[Release v2.1.64](https://github.com/mittwald/api-client-php/releases/tag/v2.1.64) introduces several new features, bug fixes, and improvements to the mittwald PHP SDK.
+
+#### Features
+- **Enhanced Create Relocation Capabilities**: The Create Relocation process now supports additional services and detailed pricing structures, enhancing client flexibility during relocation. Users can specify the type of article being relocated and detail specific services like data comparison.
+
+#### Bug Fixes
+- Corrected examples for `errorMessage` in `ExtensionDryRunWebhookOKResponse` and `ExtensionDryRunWebhookOKResponseBody` classes to ensure consistency.
+
+#### Improvements
+- **CreateRelocationRequest Enhancements**:
+  - Added `additionalServices` with a `dataCompare` option to facilitate service selection.
+  - Introduced `articleType` to represent the type of article being relocated, with enumerations for valid types.
+  - Integrated detailed `prices` structure allowing for specific items and total pricing, ensuring clients can specify costs precisely.
+- **Data Validation Enhancements**:
+  - Implemented validation for `disabledAt` and `disabledBy` fields in `UserInternal` schema to maintain data integrity when dealing with user states.
+- Improved cloning methods across various classes to ensure deep copies are created where necessary.
+
+This release brings significant enhancements to the relocation process, making it more robust while addressing prior inconsistencies in code documentation and data representation.
+
