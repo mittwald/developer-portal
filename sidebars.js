@@ -89,10 +89,15 @@ const sidebars = {
       link: {
         type: "doc",
         id: "reference/index",
-        // type: "generated-index",
-        // title: "API Reference",
-        // slug: "/reference",
-        // keywords: ["api-reference"]
+      },
+    },
+    {
+      type: "category",
+      label: "API Preview",
+      items: require("./sidebar.preview.json"),
+      link: {
+        type: "doc",
+        id: "preview/index",
       },
     },
   ],

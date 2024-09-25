@@ -5,9 +5,20 @@ import * as url from "url";
 import * as yaml from "yaml";
 import compareOperation from "../src/openapi/compareOperation";
 import * as ejs from "ejs";
-import { dereferenceSpec, loadSpec } from "./util/spec";
+import {
+  dereferenceSpec,
+  loadSpec,
+  loadSpecPreview,
+  SpecLoader,
+  versionedOutputPath,
+} from "./util/spec";
 import { canonicalizeTitle } from "./util/title";
 import { slugFromTagName } from "@site/src/openapi/slugFromTagName";
+import {
+  exportCompleteSidebar,
+  exportSidebarItemsAsJson,
+  SidebarRenderer,
+} from "@site/generator/util/sidebar";
 import HttpMethods = OpenAPIV3.HttpMethods;
 
 type APIVersion = `v${number}`;
@@ -163,122 +174,166 @@ async function renderTagIndexPage(
   fs.writeFileSync(indexFile, content, { encoding: "utf-8" });
 }
 
-async function renderAPIDocs(apiVersion: APIVersion, outputPath: string) {
-  const sidebar = [];
-  const originalSpec = await loadSpec(apiVersion);
-  const spec = await dereferenceSpec(originalSpec);
-  const [serverURL, basePath] = determineServerURLAndBasePath(apiVersion, spec);
+class APIDocRenderer {
+  private specLoader: SpecLoader = loadSpec;
+  private tagFilter: (tag: OpenAPIV3.TagObject) => boolean = () => true;
+  private outputPath: (apiVersion: APIVersion, path: string) => string;
+  private exportSpecToSource: boolean = true;
 
-  exportSpecToSource(originalSpec, apiVersion);
+  constructor(outputPath: (apiVersion: APIVersion, path: string) => string) {
+    this.outputPath = outputPath;
+  }
 
-  const tags = (spec.tags ?? []).sort((a, b) => a.name.localeCompare(b.name));
+  public withSpecLoader(specLoader: SpecLoader): APIDocRenderer {
+    const renderer = new APIDocRenderer(this.outputPath);
+    renderer.specLoader = specLoader;
+    renderer.tagFilter = this.tagFilter;
+    renderer.exportSpecToSource = this.exportSpecToSource;
+    return renderer;
+  }
 
-  for (const { name, description } of tags) {
-    const slug = slugFromTagName(name);
-    const operationsDir = path.join(outputPath, slug);
+  public withTagFilter(
+    tagFilter: (tag: OpenAPIV3.TagObject) => boolean,
+  ): APIDocRenderer {
+    const renderer = new APIDocRenderer(this.outputPath);
+    renderer.specLoader = this.specLoader;
+    renderer.tagFilter = tagFilter;
+    renderer.exportSpecToSource = this.exportSpecToSource;
+    return renderer;
+  }
 
-    let sidebarItems = [];
+  public withOutputPath(
+    outputPath: (apiVersion: APIVersion) => string,
+  ): APIDocRenderer {
+    const renderer = new APIDocRenderer(outputPath);
+    renderer.specLoader = this.specLoader;
+    renderer.tagFilter = this.tagFilter;
+    renderer.exportSpecToSource = this.exportSpecToSource;
+    return renderer;
+  }
 
-    fs.mkdirSync(operationsDir, { recursive: true });
+  public withoutExportSpecToSource(): APIDocRenderer {
+    const renderer = new APIDocRenderer(this.outputPath);
+    renderer.specLoader = this.specLoader;
+    renderer.tagFilter = this.tagFilter;
+    renderer.exportSpecToSource = false;
+    return renderer;
+  }
 
-    for (const urlPath of Object.keys(spec.paths)) {
-      const operations = spec.paths[urlPath];
-      const urlPathWithBase =
-        basePath + urlPath.replace(new RegExp(`${basePath}/`), "/");
-      for (const method of Object.keys(operations) as HttpMethods[]) {
-        const operation = operations[method];
-        if (operation.tags.includes(name)) {
-          // Strip trailing dot from summary because they are annoying in the sidebar
-          const summary: string = canonicalizeTitle(operation.summary);
-          const operationFile = path.join(
-            operationsDir,
-            operation.operationId + ".mdx",
-          );
+  public async renderAPIDocs(
+    apiVersion: APIVersion,
+    outputPathInDocs: string,
+    sidebarRenderer: SidebarRenderer,
+  ) {
+    const sidebar = [];
+    const originalSpec = await this.specLoader(apiVersion);
+    const spec = await dereferenceSpec(originalSpec);
+    const outputPath = this.outputPath(apiVersion, outputPathInDocs);
+    const [serverURL, basePath] = determineServerURLAndBasePath(
+      apiVersion,
+      spec,
+    );
 
-          const classNames = [`api-operation-${method}`];
-          if (operation.deprecated) {
-            classNames.push("api-operation-deprecated");
-          }
-
-          sidebarItems.push({
-            type: "doc",
-            id: `reference/${slug}/${operation.operationId}`,
-            className: classNames.join(" "),
-            customProps: {
-              method,
-              path: urlPath,
-              deprecated: operation.deprecated,
-              summary,
-            },
-          });
-
-          await renderAPISpecToFile(
-            operationFile,
-            urlPathWithBase,
-            method,
-            operation,
-            serverURL,
-            apiVersion,
-          );
-        }
-      }
+    if (this.exportSpecToSource) {
+      exportSpecToSource(originalSpec, apiVersion);
     }
 
-    sidebarItems = sidebarItems.sort((a, b) =>
-      compareOperation(a.customProps, b.customProps),
-    );
+    const tags = (spec.tags ?? [])
+      .filter(this.tagFilter)
+      .sort((a, b) => a.name.localeCompare(b.name));
 
-    await renderTagIndexPage(apiVersion, name, description, operationsDir);
+    for (const { name, description } of tags) {
+      const slug = slugFromTagName(name);
+      const operationsDir = path.join(outputPath, slug);
 
-    sidebar.push({
-      type: "category",
-      label: name,
-      link: {
-        type: "doc",
-        id: `reference/${slug}/index`,
-      },
-      items: sidebarItems,
-    });
-  }
+      let sidebarItems = [];
 
-  if (apiVersion === "v2") {
-    fs.writeFileSync(
-      "sidebar.reference.json",
-      JSON.stringify(sidebar, null, 2),
-    );
-  }
+      fs.mkdirSync(operationsDir, { recursive: true });
 
-  if (apiVersion === "v1") {
-    const completeSidebar = {
-      apiSidebar: [
-        {
+      for (const urlPath of Object.keys(spec.paths)) {
+        const operations = spec.paths[urlPath];
+        const urlPathWithBase =
+          basePath + urlPath.replace(new RegExp(`${basePath}/`), "/");
+        for (const method of Object.keys(operations) as HttpMethods[]) {
+          const operation = operations[method];
+          if (operation.tags.includes(name)) {
+            // Strip trailing dot from summary because they are annoying in the sidebar
+            const summary: string = canonicalizeTitle(operation.summary);
+            const operationFile = path.join(
+              operationsDir,
+              operation.operationId + ".mdx",
+            );
+
+            const classNames = [`api-operation-${method}`];
+            if (operation.deprecated) {
+              classNames.push("api-operation-deprecated");
+            }
+
+            sidebarItems.push({
+              type: "doc",
+              id: `${outputPathInDocs}/${slug}/${operation.operationId}`,
+              className: classNames.join(" "),
+              customProps: {
+                method,
+                path: urlPath,
+                deprecated: operation.deprecated,
+                summary,
+              },
+            });
+
+            await renderAPISpecToFile(
+              operationFile,
+              urlPathWithBase,
+              method,
+              operation,
+              serverURL,
+              apiVersion,
+            );
+          }
+        }
+      }
+
+      sidebarItems = sidebarItems.sort((a, b) =>
+        compareOperation(a.customProps, b.customProps),
+      );
+
+      await renderTagIndexPage(apiVersion, name, description, operationsDir);
+
+      sidebar.push({
+        type: "category",
+        label: name,
+        link: {
           type: "doc",
-          id: "intro",
+          id: `${outputPathInDocs}/${slug}/index`,
         },
-        {
-          type: "category",
-          label: "Reference (v1)",
-          link: {
-            type: "generated-index",
-            title: "API Reference",
-            slug: "/reference",
-            keywords: ["api-reference"],
-          },
-          items: sidebar,
-        },
-      ],
-    };
-    fs.writeFileSync(
-      path.join("versioned_sidebars", `version-${apiVersion}-sidebars.json`),
-      JSON.stringify(completeSidebar, null, 2),
-    );
+        items: sidebarItems,
+      });
+    }
+
+    await sidebarRenderer(sidebar);
   }
 }
 
 (async () => {
-  await renderAPIDocs(
+  const prodRenderer = new APIDocRenderer(versionedOutputPath("v2"));
+  const previewRenderer = prodRenderer
+    .withSpecLoader(loadSpecPreview)
+    .withTagFilter((t) => t.name === "Container")
+    .withoutExportSpecToSource();
+
+  await prodRenderer.renderAPIDocs(
     "v1",
-    path.join("versioned_docs", "version-v1", "reference"),
+    "reference",
+    exportCompleteSidebar("versioned_sidebars/version-v1-sidebars.json"),
   );
-  await renderAPIDocs("v2", path.join("docs", "reference"));
+  await prodRenderer.renderAPIDocs(
+    "v2",
+    "reference",
+    exportSidebarItemsAsJson("sidebar.reference.json"),
+  );
+  await previewRenderer.renderAPIDocs(
+    "v2",
+    "preview",
+    exportSidebarItemsAsJson("sidebar.preview.json"),
+  );
 })().catch(console.error);
