@@ -1,8 +1,11 @@
 ---
 title: Lifecycle Webhooks
 ---
+
 import OperationLink from "@site/src/components/OperationLink";
 import SchemaWithExample from "../../../src/components/openapi/SchemaWithExample";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
 
 mittwald uses lifecycle events to notify the the external application of events that concern it.
 
@@ -544,6 +547,9 @@ You can use common cryptographic libraries in your preferred programming languag
 The complete and unprocessed request body has to be verified using the `verify` method.
 This ensures that the request body was transmitted by mittwald and was not modified by a third party.
 
+<Tabs>
+  <TabItem value="go" label="Go">
+
 ```go
 bodyBytes, err := io.ReadAll(body)
 if err != nil {
@@ -554,6 +560,28 @@ if !ed25519.Verify(publicKey, bodyBytes, signature) {
    panic("invalid signature")
 }
 ```
+
+  </TabItem>
+  <TabItem value="php" label="PHP">
+
+```php
+$req  = new ExtensionGetPublicKeyRequest($serial);
+$resp = $apiClient->marketplace()->extensionGetPublicKey($req);
+$key = $resp->getBody()->getKey();
+
+$valid = sodium_crypto_sign_verify_detached(
+    base64_decode($signature),
+    $request->getContent(),
+    base64_decode($key),
+);
+
+if (!$valid) {
+    throw new \Exception('invalid request signature');
+}
+```
+
+  </TabItem>
+</Tabs>
 
 ### Reference Implementations of the Validation of Lifecycle Webhooks
 
