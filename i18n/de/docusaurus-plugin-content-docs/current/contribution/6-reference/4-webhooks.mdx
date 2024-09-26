@@ -1,8 +1,11 @@
 ---
 title: Lifecycle Webhooks
 ---
+
 import OperationLink from "@site/src/components/OperationLink";
 import SchemaWithExample from "../../../../../../src/components/openapi/SchemaWithExample";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
 
 Lifecycle Events werden von mittwald genutzt, um die externe Anwendung über sie betreffende Ereignisse zu informieren.
 
@@ -538,16 +541,41 @@ Algorithmus, der zum Erzeugen der Signatur verwendet wurde, derzeit immer [`Ed25
 
 Um die Signatur zu prüfen, kann eine übliche kryptographische Library in der gewählten Programmiersprache verwendet werden. Dazu wird mithilfe der `verify`-Methode der gesamte, unverarbeitete Request Body geprüft. Damit ist sichergestellt, dass der übermittelte Request Body unmodifiziert von mittwald übertragen wurde.
 
-```go
+<Tabs>
+  <TabItem value="go" label="Go">
+
+````go
 bodyBytes, err := io.ReadAll(body)
 if err != nil {
-   return err
+  return err
 }
 
 if !ed25519.Verify(publicKey, bodyBytes, signature) {
-   panic("invalid signature")
+  panic("invalid signature")
 }
-```
+    ```
+
+  </TabItem>
+  <TabItem value="php" label="PHP">
+
+```php
+$req  = new ExtensionGetPublicKeyRequest($serial);
+$resp = $apiClient->marketplace()->extensionGetPublicKey($req);
+$key = $resp->getBody()->getKey();
+
+$valid = sodium_crypto_sign_verify_detached(
+    base64_decode($signature),
+    $request->getContent(),
+    base64_decode($key),
+);
+
+if (!$valid) {
+    throw new \Exception('invalid request signature');
+}
+````
+
+  </TabItem>
+</Tabs>
 
 ### Referenzimplementierungen für die Validierung von Lifecycle Webhooks
 
