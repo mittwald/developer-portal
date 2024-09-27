@@ -33,8 +33,8 @@ jobs:
         run: |
           npm run generate:changelog
           
-          if [ $(git status --porcelain changelog generator/specs | wc -l) -gt 0 ] ; then
-            git add changelog generator/specs
+          if [ $(git status --porcelain changelog static/specs | wc -l) -gt 0 ] ; then
+            git add changelog static/specs
             git commit -m "Generate API changelog for $(date +%d-%m-%Y)";
           fi
       - name: Synchronize CLI docs
