@@ -1,0 +1,257 @@
+---
+title: Breaking (!) API changes for v2 API, September 27, 2024
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - App
+  - Article
+  - Domain
+  - Marketplace
+  - User
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+On September 27, 2024, the mittwald API introduced several enhancements, including the addition of default values for request parameters, increased minimum values for pagination parameters, and new optional properties in responses across various endpoints.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- For the `GET /v2/app-installations` operation, the following changes were made:
+  - The default value of the `query` request parameter `skip` was added, set to `0.00`.
+  - The minimum value of the `query` request parameter `limit` was increased from `0.00` to `1.00`.
+  - The minimum value of the `query` request parameter `page` was increased from `0.00` to `1.00`. **(Breaking change)**
+
+- For the `GET /v2/apps` operation, the following changes were made:
+  - The default value of the `query` request parameter `skip` was added, set to `0.00`.
+  - The minimum value of the `query` request parameter `limit` was increased from `0.00` to `1.00`.
+  - The minimum value of the `query` request parameter `page` was increased from `0.00` to `1.00`. **(Breaking change)**
+
+- For the `GET /v2/articles` operation, the following changes were made:
+  - The default value of the `query` request parameter `limit` was added, set to `1000.00`.
+  - The default value of the `query` request parameter `skip` was added, set to `0.00`.
+  - The minimum value of the `query` request parameter `limit` was increased from `0.00` to `1.00`.
+  - The minimum value of the `query` request parameter `page` was increased from `0.00` to `1.00`. **(Breaking change)**
+
+- For the `GET /v2/projects/{projectId}/app-installations` operation, the following changes were made:
+  - The default value of the `query` request parameter `skip` was added, set to `0.00`.
+  - The minimum value of the `query` request parameter `limit` was increased from `0.00` to `1.00`. **(Breaking change)**
+
+- For the `GET /v2/system-softwares` operation, the following changes were made:
+  - The default value of the `query` request parameter `skip` was added, set to `0.00`.
+  - The minimum value of the `query` request parameter `limit` was increased from `0.00` to `1.00`.
+  - The minimum value of the `query` request parameter `page` was increased from `0.00` to `1.00`. **(Breaking change)**
+
+- For the `GET /v2/domains` operation, the following changes were made:
+  - A new optional `query` request parameter `contactHash` was added.
+  - An optional property `/items/contactHash` was added to the response with the `200` status.
+
+- For the `GET /v2/domains/{domainId}` operation, an optional property `contactHash` was added to the response with the `200` status.
+
+- For the `GET /v2/extensions/{extensionId}` operation, a non-success response with the status `404` was added.
+
+- For the `GET /v2/projects/{projectId}/domains` operation, an optional property `/items/contactHash` was added to the response with the `200` status.
+
+- For the `GET /v2/user` operation, the following optional properties were added to the response with the `200` status:
+  - `customerMemberships`
+  - `projectMemberships`
+
+- For the `GET /v2/user/{userId}` operation, the following optional properties were added to the response with the `200` status:
+  - `customerMemberships`
+  - `projectMemberships`
+
+- For the `GET /v2/users/{userId}` operation, the following optional properties were added to the response with the `200` status:
+  - `customerMemberships`
+  - `projectMemberships`
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "List app installations that a user has access to"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'skip', default value '0.00' was added
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', the min was increased from '0.00' to '1.00'
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'page', the min was increased from '0.00' to '1.00'
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations-for-user" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List apps"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'skip', default value '0.00' was added
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', the min was increased from '0.00' to '1.00'
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'page', the min was increased from '0.00' to '1.00'
+
+
+For details, refer to the <OperationLink operation="app-list-apps" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Articles"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', default value '1000.00' was added
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'skip', default value '0.00' was added
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', the min was increased from '0.00' to '1.00'
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'page', the min was increased from '0.00' to '1.00'
+
+
+For details, refer to the <OperationLink operation="article-list-articles" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app installations belonging to a Project"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'skip', default value '0.00' was added
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', the min was increased from '0.00' to '1.00'
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List system softwares"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'skip', default value '0.00' was added
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', the min was increased from '0.00' to '1.00'
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'page', the min was increased from '0.00' to '1.00'
+
+
+For details, refer to the <OperationLink operation="app-list-systemsoftwares" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Domains"
+
+
+- added the new optional 'query' request parameter 'contactHash'
+
+- added the optional property '/items/contactHash' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="domain-list-domains" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Domain"
+
+
+- added the optional property 'contactHash' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="domain-get-domain" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an Extension"
+
+
+- added the non-success response with the status '404'
+
+
+For details, refer to the <OperationLink operation="extension-get-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Domains belonging to a Project"
+
+
+- added the optional property '/items/contactHash' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="domain-list-domains-v2-deprecated" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get profile information for the executing user"
+
+
+- added the optional property 'customerMemberships' to the response with the '200' status
+
+- added the optional property 'projectMemberships' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="deprecated-user-service-user-get-own" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get profile information for the specified user if the user is related to the executing user"
+
+
+- added the optional property 'customerMemberships' to the response with the '200' status
+
+- added the optional property 'projectMemberships' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="deprecated-user-service-user-get" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get profile information for a user"
+
+
+- added the optional property 'customerMemberships' to the response with the '200' status
+
+- added the optional property 'projectMemberships' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="user-get-user" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK v2.1.67 Release
+
+The mittwald PHP SDK has been updated to version 2.1.67. This release introduces new features and important changes to improve error handling and backend component management.
+
+#### Added
+- **ExtensionGetExtensionNotFoundResponse**: A new response class to handle 404 errors specifically when an extension cannot be found.
+- **BackendComponent**: A new schema representing backend components with URL validation.
+- **BackendComponents**: A new schema that encapsulates multiple backend component instances, supporting various operations on extensions, including addition, update, and removal events.
+
+#### Changes
+- Updated the **MarketplaceClientImpl** class to throw a `404` error using the new `ExtensionGetExtensionNotFoundResponse` when an extension is requested but not found.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.67).
+
