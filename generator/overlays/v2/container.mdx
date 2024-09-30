@@ -1,0 +1,52 @@
+---
+title: Containers
+description: The containers API allows you to run and manage custom containers on the platform.
+displayed_sidebar: apiSidebar
+---
+
+import OperationDocCardList from "@site/src/components/openapi/OperationDocCardList";
+import OperationLink from "@site/src/components/OperationLink";
+
+# Containers
+
+The containers API allows you to run and manage custom containers on the platform.
+
+:::warning Technology Preview
+
+Please note that the documentation for the Containers API is provided as a preview. The API is not yet generally available and may be subject to change.
+
+:::
+
+## First steps
+
+### Configuring your container registry
+
+To run images from a private container registry, you need to configure the registry in the platform. You can do this by creating a new container registry resource in the platform and providing the necessary credentials.
+
+You can use the following API operations to manage container registries:
+
+<!-- prettier-ignore -->
+- <OperationLink operation="container-create-registry" apiVersion="v2-preview" /> to create a new container registry
+- <OperationLink operation="container-update-registry" apiVersion="v2-preview" /> to update a container registry
+- <OperationLink operation="container-delete-registry" apiVersion="v2-preview" /> to delete a registry
+
+After a container registry is configured for a project, you can simply use it **within that project** by prefixing the image name, just as you would with a `docker run` command.
+
+### Starting and updating container stacks
+
+Containers are run as part of a container stack. A container stack is a collection of containers and volumes that are run together. You can use the following API operations to manage container stacks:
+
+<!-- prettier-ignore -->
+- <OperationLink operation="container-list-stacks" apiVersion="v2-preview" /> to list available stacks (use the `default` stack)
+- <OperationLink operation="container-declare-stack" apiVersion="v2-preview" /> to declare the desired state of a container stack; this operation is idempotent and can be used to add/update or remove containers and volumes from a stack
+
+## Operational tasks
+
+To manage a container stack's lifecycle, you can use the following API operations:
+
+<!-- prettier-ignore -->
+- <OperationLink operation="container-stop-service" apiVersion="v2-preview" /> to stop a service in a container stack
+- <OperationLink operation="container-start-service" apiVersion="v2-preview" /> to start a service in a container stack
+- <OperationLink operation="container-get-service-logs" apiVersion="v2-preview" /> to access the STDOUT stream of a service in a container stack
+
+<OperationDocCardList apiVersion="v2-preview" tag="Container" />

@@ -1,4 +1,3 @@
-import { APIVersion } from "@site/src/openapi/specs";
 import { OpenAPIV3 } from "openapi-types";
 
 function slugFromTagName(tagName: string): string {

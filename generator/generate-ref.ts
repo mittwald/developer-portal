@@ -20,8 +20,7 @@ import {
   SidebarRenderer,
 } from "@site/generator/util/sidebar";
 import HttpMethods = OpenAPIV3.HttpMethods;
-
-type APIVersion = `v${number}`;
+import { APIVersion } from "@site/src/openapi/specs";
 
 function determineServerURLAndBasePath(
   apiVersion: APIVersion,
@@ -138,9 +137,13 @@ async function renderAPISpecToFile(
   fs.writeFileSync(operationFile, rendered, { encoding: "utf-8" });
 }
 
-function exportSpecToSource(spec: OpenAPIV3.Document, apiVersion: APIVersion) {
+function exportSpecToSource(
+  spec: OpenAPIV3.Document,
+  apiVersion: APIVersion,
+  suffix: string = "",
+) {
   fs.writeFileSync(
-    `src/openapi/openapi-${apiVersion}.json`,
+    `src/openapi/openapi-${apiVersion}${suffix}.json`,
     JSON.stringify(spec, null, 2),
   );
 }
@@ -178,7 +181,6 @@ class APIDocRenderer {
   private specLoader: SpecLoader = loadSpec;
   private tagFilter: (tag: OpenAPIV3.TagObject) => boolean = () => true;
   private outputPath: (apiVersion: APIVersion, path: string) => string;
-  private exportSpecToSource: boolean = true;
 
   constructor(outputPath: (apiVersion: APIVersion, path: string) => string) {
     this.outputPath = outputPath;
@@ -188,7 +190,6 @@ class APIDocRenderer {
     const renderer = new APIDocRenderer(this.outputPath);
     renderer.specLoader = specLoader;
     renderer.tagFilter = this.tagFilter;
-    renderer.exportSpecToSource = this.exportSpecToSource;
     return renderer;
   }
 
@@ -198,7 +199,6 @@ class APIDocRenderer {
     const renderer = new APIDocRenderer(this.outputPath);
     renderer.specLoader = this.specLoader;
     renderer.tagFilter = tagFilter;
-    renderer.exportSpecToSource = this.exportSpecToSource;
     return renderer;
   }
 
@@ -208,15 +208,6 @@ class APIDocRenderer {
     const renderer = new APIDocRenderer(outputPath);
     renderer.specLoader = this.specLoader;
     renderer.tagFilter = this.tagFilter;
-    renderer.exportSpecToSource = this.exportSpecToSource;
-    return renderer;
-  }
-
-  public withoutExportSpecToSource(): APIDocRenderer {
-    const renderer = new APIDocRenderer(this.outputPath);
-    renderer.specLoader = this.specLoader;
-    renderer.tagFilter = this.tagFilter;
-    renderer.exportSpecToSource = false;
     return renderer;
   }
 
@@ -234,9 +225,11 @@ class APIDocRenderer {
       spec,
     );
 
-    if (this.exportSpecToSource) {
-      exportSpecToSource(originalSpec, apiVersion);
-    }
+    exportSpecToSource(
+      originalSpec,
+      apiVersion,
+      outputPathInDocs === "preview" ? "-preview" : "",
+    );
 
     const tags = (spec.tags ?? [])
       .filter(this.tagFilter)
@@ -318,8 +311,7 @@ class APIDocRenderer {
   const prodRenderer = new APIDocRenderer(versionedOutputPath("v2"));
   const previewRenderer = prodRenderer
     .withSpecLoader(loadSpecPreview)
-    .withTagFilter((t) => t.name === "Container")
-    .withoutExportSpecToSource();
+    .withTagFilter((t) => t.name === "Container");
 
   await prodRenderer.renderAPIDocs(
     "v1",
