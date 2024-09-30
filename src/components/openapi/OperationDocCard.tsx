@@ -21,6 +21,10 @@ export default function OperationDocCard(p: Props) {
   const deprecated = isDeprecated(operation);
   const docId = buildDocumentId(operation);
 
+  const url = apiVersion.endsWith("-preview")
+    ? `/docs/${apiVersion.replace("-preview", "")}/preview/${docId.replace("reference/", "")}`
+    : `/docs/${apiVersion}/reference/${docId.replace("reference/", "")}`;
+
   return (
     <div
       className={clsx(
@@ -28,10 +32,10 @@ export default function OperationDocCard(p: Props) {
         variant === "compact" ? "margin-bottom--xs" : "margin-bottom--md",
         styles.card,
         deprecated ? styles.deprecated : null,
-        variant === "compact" ? styles.compact : null
+        variant === "compact" ? styles.compact : null,
       )}
     >
-      <Link to={`/docs/${apiVersion}/${docId}`}>
+      <Link to={url}>
         <div className={styles.header}>
           <HTTPMethod method={method} deprecated={deprecated} />
           <div className={styles.headerText}>

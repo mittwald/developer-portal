@@ -45,6 +45,11 @@ export default function OperationLink({
     </span>
   );
 
+  if (apiVersion.endsWith("-preview")) {
+    const url = `/docs/${apiVersion.replace("-preview", "")}/preview/${slugFromTagName(tag)}/${operation}`;
+    return <Link to={url}>{children}</Link>;
+  }
+
   const url = `/docs/${apiVersion}/reference/${slugFromTagName(tag)}/${operation}`;
   return <Link to={url}>{children}</Link>;
 }

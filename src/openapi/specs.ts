@@ -1,8 +1,9 @@
 import { OpenAPIV3 } from "openapi-types";
 import specv1 from "./openapi-v1.json";
 import specv2 from "./openapi-v2.json";
+import specv2preview from "./openapi-v2-preview.json";
 
-export type APIVersion = `v${number}`;
+export type APIVersion = `v${number}` | `v${number}-preview`;
 
 export type OperationWithMeta = {
   path: string;
@@ -13,6 +14,7 @@ export type OperationWithMeta = {
 export const specs: Record<APIVersion, OpenAPIV3.Document> = {
   v1: specv1 as OpenAPIV3.Document,
   v2: specv2 as OpenAPIV3.Document,
+  "v2-preview": specv2preview as OpenAPIV3.Document,
 };
 
 export function useSpec(version: APIVersion) {
