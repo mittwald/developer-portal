@@ -1,0 +1,87 @@
+---
+title: Breaking (!) API changes for v2 API, September 30, 2024
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - User
+  - App
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+On September 30, 2024, the mittwald API introduced several important changes, including the requirement of 'email' and 'password' properties for the MFA authentication request, a decrease in the minimum value for the 'page' query parameter, and the addition of required response properties for specific user account operations.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The request properties 'email' and 'password' have both become required for the `POST` operation `user-authenticate-mfa` at the path `/v2/authenticate-mfa`. This is a breaking change.
+- The minimum value for the 'query' request parameter 'page' has been decreased from '1.00' to '0.00' for the `GET` operation `app-list-appinstallations` at the path `/v2/projects/{projectId}/app-installations`.
+- The response property '/allOf[subschema #2]/name' has become required for the status '202' in both the `DELETE` operation `user-delete-user` at the path `/v2/users/self` and the `PUT` operation `user-change-password` at the path `/v2/users/self/credentials/password`.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Validate your second factor"
+
+
+- ⚠️ **Breaking:** the request property 'email' became required
+
+- ⚠️ **Breaking:** the request property 'password' became required
+
+
+For details, refer to the <OperationLink operation="user-authenticate-mfa" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app installations belonging to a Project"
+
+
+- for the 'query' request parameter 'page', the min was decreased from '1.00' to '0.00'
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Delete your account and all your personal data"
+
+
+- the response property '/allOf[subschema #2]/name' became required for the status '202'
+
+
+For details, refer to the <OperationLink operation="user-delete-user" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Change your password"
+
+
+- the response property '/allOf[subschema #2]/name' became required for the status '202'
+
+
+For details, refer to the <OperationLink operation="user-change-password" apiVersion="v2" /> endpoint.
+
+
+
