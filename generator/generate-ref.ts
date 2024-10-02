@@ -89,7 +89,6 @@ async function renderAPISpecToFile(
   apiVersion: APIVersion,
 ) {
   const withSDKExamples = apiVersion !== "v1";
-  const serializedSpec = JSON.stringify(spec);
   const summary: string = canonicalizeTitle(spec.summary);
 
   const descriptionOverridePre = loadDescriptionOverride(

@@ -21,6 +21,23 @@ export function useSpec(version: APIVersion) {
   return specs[version];
 }
 
+export function getOperationById(
+  spec: OpenAPIV3.Document,
+  operationId: string,
+): OperationWithMeta | undefined {
+  for (const path of Object.keys(spec.paths)) {
+    for (const method of Object.keys(spec.paths[path])) {
+      const operation = spec.paths[path][method];
+
+      if (operation.operationId === operationId) {
+        return { path, method, operation };
+      }
+    }
+  }
+
+  return undefined;
+}
+
 export function getOperationByTag(
   spec: OpenAPIV3.Document,
   tag: string,

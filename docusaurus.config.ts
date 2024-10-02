@@ -15,7 +15,7 @@ const config: Config = {
   favicon: "img/favicon.ico",
 
   // Set the production url of your site here
-  url: "https://contributor.mittwald.de",
+  url: "https://developer.mittwald.de",
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: "/",
@@ -23,7 +23,7 @@ const config: Config = {
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: "mittwald", // Usually your GitHub org/user name.
-  projectName: "contributor-portal", // Usually your repo name.
+  projectName: "developer-portal", // Usually your repo name.
 
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "throw",
@@ -94,8 +94,7 @@ const config: Config = {
           sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl:
-            "https://github.com/mittwald/contributor-portal/tree/master/",
+          editUrl: "https://github.com/mittwald/developer-portal/tree/master/",
           lastVersion: "current",
           versions: {
             current: {
@@ -167,7 +166,7 @@ const config: Config = {
           position: "left",
         },
         {
-          href: "https://github.com/mittwald/contributor-portal",
+          href: "https://github.com/mittwald/developer-portal",
           label: "GitHub",
           position: "right",
         },
@@ -205,7 +204,7 @@ const config: Config = {
           items: [
             {
               label: "Feedback",
-              href: "https://github.com/mittwald/contributor-portal/issues",
+              href: "https://github.com/mittwald/developer-portal/issues",
             },
             {
               label: "Agency Hub (german)",
