@@ -1,0 +1,59 @@
+---
+title: Contributoren
+---
+
+import SchemaWithExample from "../../../src/components/openapi/SchemaWithExample";
+
+Currently, we define contributors with static YAML documents.
+The following schema describes the allowed and the required values.
+
+<SchemaWithExample
+  withRawJSONSchema
+  format="yaml"
+  schema={{
+    type: "object",
+    required: ["id", "name", "customerId", "state", "email"],
+    properties: {
+      id: {
+        type: "string",
+        format: "uuid",
+        description: "ID of the contributor. It has to be globally unique.",
+      },
+      name: {
+        type: "string",
+        description: "Name of the contributor.",
+      },
+      customerId: {
+        type: "string",
+        format: "uuid",
+        description:
+          "ID of the organization in the mStudio, the contributor belongs to. The mapping of contributors to organizations is 1:1.",
+      },
+      state: {
+        type: "object",
+        description: "State of the Contributor.",
+        example: {
+          disabled: false,
+        },
+        properties: {
+          disabled: {
+            type: "boolean",
+	      },
+	    },
+      },
+      email: {
+        type: "string",
+        format: "email",
+        description:
+          "Email address of the contributor for support.",
+      },
+      phone: {
+        type: "string",
+        format: "phone",
+        example: "+491701234567",
+        description:
+          "Phone number of the contributor for support.",
+      },
+    },
+  }}
+/>

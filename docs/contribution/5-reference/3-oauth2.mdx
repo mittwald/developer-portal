@@ -1,0 +1,112 @@
+---
+title: OAuth2 Clients
+---
+
+## Schema der OAuth2 Clients
+
+import SchemaWithExample from "../../../src/components/openapi/SchemaWithExample";
+
+Currently, we define OAuth2 clients with static YAML documents.
+The following schema describes the allowed and the required values.
+
+<SchemaWithExample
+  withRawJSONSchema
+  format="yaml"
+  schema={{
+    type: "object",
+    required: [
+      "id",
+      "humanReadableName",
+      "allowedGrantTypes",
+      "allowedScopes",
+      "allowedRedirectURIs",
+    ],
+    properties: {
+      id: {
+        type: "string",
+        format: "uuid",
+        description:
+          "The ID of the OAuth2 client. It has to be unique and identical to the extension ID",
+      },
+      humanReadableName: {
+        type: "string",
+        description:
+          "Name of the OAuth2 client. It should be identical to the extension name",
+      },
+      allowedGrantTypes: {
+        type: "array",
+        items: {
+          type: "string",
+          enum: ["authorization_code"],
+        },
+        description:
+          "Allowed OAuth2 grant types. Currently, only authorization_code (with PKCE flow) is allowed",
+      },
+      allowedScopes: {
+        type: "array",
+        items: {
+          type: "string",
+        },
+        description: "Allowed scopes, the client can request.",
+        example: ["mail:read", "mail:write", "project:read"],
+      },
+      allowedRedirectURIs: {
+        type: "array",
+        items: {
+          type: "string",
+          format: "uri",
+        },
+        description: "Allowed redirect URIs, the client is allowed to use.",
+        example: [
+          "https://example.com/oauth2/callback",
+          "http://localhost:3000/oauth2/callback",
+        ],
+      },
+      hashedSecret: {
+        type: "string",
+        description: "Argon2id hashed secret of the OAuth2 client.",
+      },
+    },
+  }}
+/>
+
+### allowedScopes
+
+The scopes that the client _may_ request.
+The client does not have to request all scopes.
+Additionally, the scopes of the OAuth2 client don't have to be identical to the scopes of the extension.
+In many cases, it makes sense that the scopes differ.
+
+For example, one such case is that an extension might only do reading and not writing operations without user interaction.
+The writing operations are then executed by an mStudio User using the extension with the help of OAuth2.
+
+### allowedRedirectURIs
+
+The redirect URIs that the client _may_ use.
+If the authorization server allows only one redirect URI, the client does not have to specify a `redirect_uri`,
+as describen in [RFC 6749](https://datatracker.ietf.org/doc/html/rfc6749#section-3.1.2.3).
+However, if the authorization server allows multiple redirect URIs, the client must specify a `redirect_uri` that is identical to one of the allowed URIs.
+
+Templating is not supported for the redirect URIs to avoid common gaps in the OAuth2 implementation.
+The mStudio makes a simple string comparison to validate, whether an URI is allowed.
+The URI string contains the protocol, the complete domain, the port, and the path of the URI.
+
+It makes sense to allow `http://localhost` as redirect URI to make local testing possible.
+You have to ensure that the correct port is configured, as mentioned above.
+
+### hashedSecret
+
+In some rare cases, it might be impossible to use the [PKCE flow](https://datatracker.ietf.org/doc/html/rfc7636).
+However, it is possible to create a so-called private client.
+For this, you need a client secret.
+
+Keep in mind that client secrets raise security-relevant issues you can avoid by using PKCE.
+For example, you should not use the private client to implement the OAuth2 authorization code flow in the browser, a native app, or some other easily accessible environment.
+The client's secret is not stored securely in such environments and can be extracted easily by bad actors.
+
+**Therefore, we explicitly recommend using the PKCE flow if possible.**
+
+If you want to use a client secret, you have to hash it with Argon2id beforehand.
+For more information, see [Argon2id on wikipedia](https://en.wikipedia.org/wiki/Argon2) and [the Argon2id reference](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-argon2-13).
+
+If you do not define a client secret, the PKCE flow is used automatically,

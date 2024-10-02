@@ -1,0 +1,91 @@
+---
+title: Extensions
+---
+
+## What is an extension?
+
+From a domain perspective, an extension is an expansion of the mStudio providing additional functionality.
+It is [made available](../../how-to/create-extension) in the mStudio and can be added to an [extension context](../../glossary/#extension-context) by potential users.
+When a user adds an extension to an extension context (for example, a project or organization), the mStudio creates an [extension instance](../../glossary#extension-instance).
+Therefore, the extension describes an expansion that can be added to an extension context.
+The extension instance is a concrete manifestation of an extension in an extension context.
+
+From a technical perspective, an extension is a separate and independent application that communicates with the mStudio via REST APIs.
+An extension must provide a public backend and may provide a frontend if it makes sense for its usage.
+If extension instances are created or deleted, for example, the mStudio notifies the extension backend via a [lifecycle webhook](../concepts/lifecycle-webhooks).
+
+The extensions also provide various [authentication and authorization strategies](../concepts/authentication) to perform authenticated [domain actions](../../glossary#domain-action) in the mStudio.
+These domain actions can occur in the name of the mStudio user using the extension or in the name of the extension itself.
+
+## Which information does an extension consist of?
+
+An extension consists of various pieces of information described in detail in the [extension reference](../../reference/extensions).
+The following is an overview.
+
+### Name and Description
+
+An extension has 3 different describing fields.
+
+The first things a user sees in the extension overview in the marketplace are the **name** and a **short description**.
+Additionally, it has a **long description** containing more details for the extension and allowing formatting.
+Here, you can include descriptions of features, instructions for use, links for further reading, a changelog, and much more.
+
+### State
+
+The **state** of an extension defines whether the extension should be visible or usable in the mStudio.
+This includes, for example, whether it is generally active, displayed in the marketplace, and can be added to an extension context.
+
+### Tags
+
+Tags provide a way to categorize extensions.
+The mStudio uses them to group extensions based on their use case.
+You should ensure the tags are meaningful and allow an unambiguous mapping to the extension features.
+You also should ensure the tags match terms potential users might use to search for the extension.
+A category with only one extension does not provide value when searching for extensions.
+It reduces the ability to find and compare extensions.
+
+### Support
+
+It is the responsibility of the contributor to support the users of their extensions.
+Therefore, the extension users need information about how to request support.
+You have to provide at least an E-Mail address where users can contact you.
+
+### Scopes
+
+An extension needs permissions to access the REST API of the mStudio and execute **domain actions**.
+These have to be accepted by the user when installing the extension.
+
+These permissions are defined by [**scopes**](../concepts/scopes).
+The extension definition contains a list of scopes describing the extensions permissions.
+
+### Extension Context
+
+Users can add an extension either to a project or an organization.
+As a contributor, you must decide which extension context makes sense for your extension.
+This decision depends on multiple factors, such as the target audience, use case, or business model.
+
+### Lifecycle Webhook Endpoints
+
+An extension must define which URLs should be used by the mStudio to send lifecycle webhooks.
+The mStudio uses these webhooks to notify the extension of the existence and state of its extension instances.
+You can configure a separate webhook endpoint for each lifecycle event.
+For more information, see [lifecycle webhook concept](../concepts/lifecycle-webhooks).
+
+### External Frontend
+
+Optionally, an extension may define an external frontend that functions as an entry point to the extension.
+You configure the external frontend as a URL, for which you may use templating.
+For more information, see [templating of configuration values](../concepts/templating) and [lifecycle webhook concept](../concepts/lifecycle-webhooks).
+
+## Versioning of Extensions
+
+The mStudio does not provide a concept for the versioning of extensions.
+Extensions are separate applications the corresponding contributor is responsible for, integrated with the mStudio only via the public REST API.
+Therefore, mittwald can not reliably manage the versioning and stability of versions of extensions.
+
+The use case of an extension may require providing functionality in different versions.
+You can implement this versioning independently of the mStudio.
+You are responsible for versioning your extensions and may introduce individual rules and conventions.
+
+If the extension provides an API used by external applications, you should ensure its stability.
+To this end, you may use commonplace conventions and best practices for API versioning.

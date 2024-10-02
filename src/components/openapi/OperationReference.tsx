@@ -23,10 +23,19 @@ import ReferenceObject = OpenAPIV3.ReferenceObject;
 import ResponseObject = OpenAPIV3.ResponseObject;
 import SchemaWithExample from "@site/src/components/openapi/SchemaWithExample";
 
-function OutlinedAccordion({children, defaultExpanded}: PropsWithChildren<{defaultExpanded?: boolean}>) {
-  return <Accordion defaultExpanded={defaultExpanded} variant="outlined" style={{marginBottom: "1em"}}>
-    {children}
-  </Accordion>
+function OutlinedAccordion({
+  children,
+  defaultExpanded,
+}: PropsWithChildren<{ defaultExpanded?: boolean }>) {
+  return (
+    <Accordion
+      defaultExpanded={defaultExpanded}
+      variant="outlined"
+      style={{ marginBottom: "1em" }}
+    >
+      {children}
+    </Accordion>
+  );
 }
 
 function OperationParameter({ param }: { param: ParameterObject }) {
@@ -165,7 +174,10 @@ function OperationRequestBody({
           <p>
             Format: <code>application/json</code>
           </p>
-          <SchemaWithExample schema={spec.content["application/json"].schema} withRawJSONSchema />
+          <SchemaWithExample
+            schema={spec.content["application/json"].schema}
+            withRawJSONSchema
+          />
         </Content>
       </OutlinedAccordion>
     );
@@ -209,7 +221,10 @@ function OperationResponseBody({ spec }: { spec?: OpenAPIV3.ResponseObject }) {
           </LabeledValue>
         </ColumnLayout>
 
-        <SchemaWithExample schema={spec.content["application/json"].schema} withRawJSONSchema />
+        <SchemaWithExample
+          schema={spec.content["application/json"].schema}
+          withRawJSONSchema
+        />
       </>
     );
   }
@@ -312,7 +327,10 @@ export function OperationResponses({
   return (
     <>
       {responseCodes.map((status) => (
-        <OutlinedAccordion key={status} defaultExpanded={status.startsWith("2")}>
+        <OutlinedAccordion
+          key={status}
+          defaultExpanded={status.startsWith("2")}
+        >
           <Heading>
             <HTTPResponseStatus code={status} />
           </Heading>

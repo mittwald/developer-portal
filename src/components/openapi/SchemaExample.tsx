@@ -22,7 +22,11 @@ export type ExampleFormat = "json" | "yaml";
  * @param title Optional title for the example
  * @param format Optional format for the example (json or yaml; will default to json)
  */
-export default function SchemaExample({ schema, title, format = "json" }: Props) {
+export default function SchemaExample({
+  schema,
+  title,
+  format = "json",
+}: Props) {
   if (schema.oneOf) {
     return schema.oneOf.map((s, idx) => (
       <SchemaExample
@@ -34,7 +38,10 @@ export default function SchemaExample({ schema, title, format = "json" }: Props)
   }
 
   const example = generateSchemaExample(schema);
-  const rendered = format === "yaml" ? yaml.stringify(example) : JSON.stringify(example, null, 2);
+  const rendered =
+    format === "yaml"
+      ? yaml.stringify(example)
+      : JSON.stringify(example, null, 2);
 
   return (
     <CodeBlock showLineNumbers={true} language="yaml" title={title}>

@@ -1,0 +1,116 @@
+---
+title: OAuth2 Clients
+---
+
+## Schema der OAuth2 Clients
+
+import SchemaWithExample from "../../../../../../src/components/openapi/SchemaWithExample";
+
+OAuth2 Clients werden derzeit über statische YAML-Dokumente definiert.
+Die benötigten und erlaubten Attribute sind in folgendem Schema beschrieben.
+
+<SchemaWithExample
+  withRawJSONSchema
+  format="yaml"
+  schema={{
+    type: "object",
+    required: [
+      "id",
+      "humanReadableName",
+      "allowedGrantTypes",
+      "allowedScopes",
+      "allowedRedirectURIs",
+    ],
+    properties: {
+      id: {
+        type: "string",
+        format: "uuid",
+        description:
+          "ID des OAuth2 Clients, muss eindeutig sein und mit der Extension ID übereinstimmen",
+      },
+      humanReadableName: {
+        type: "string",
+        description:
+          "Name des OAuth2 Clients, sollte mit dem Namen der Extension übereinstimmen",
+      },
+      allowedGrantTypes: {
+        type: "array",
+        items: {
+          type: "string",
+          enum: ["authorization_code"],
+        },
+        description:
+          "Erlaubte OAuth2 Grant Types, derzeit ist nur authorization_code (mit PKCE Verfahren) erlaubt",
+      },
+      allowedScopes: {
+        type: "array",
+        items: {
+          type: "string",
+        },
+        description: "Erlaubte Scopes, die der Client anfordern kann.",
+        example: ["mail:read", "mail:write", "project:read"],
+      },
+      allowedRedirectURIs: {
+        type: "array",
+        items: {
+          type: "string",
+          format: "uri",
+        },
+        description: "Erlaubte Redirect URIs, die der Client verwenden kann.",
+        example: [
+          "https://example.com/oauth2/callback",
+          "http://localhost:3000/oauth2/callback",
+        ],
+      },
+      hashedSecret: {
+        type: "string",
+        description: "Argon2id gehashtes Secret des OAuth2 Clients.",
+      },
+    },
+  }}
+/>
+
+### allowedScopes
+
+Die Scopes, die der Client anfragen _kann_.
+Der Client muss nicht alle Scopes anfragen.
+Außerdem müssen die Scopes des OAuth2 Clients nicht zwingend mit denen der Extension übereinstimmen.
+In vielen Fällen kann es Sinn ergeben, dass die Scopes abweichen.
+
+Ein Beispiel für Abweichungen wäre, dass die Extension ohne Nutzinteraktionen keine schreibenden Operationen durchführt,
+sondern lediglich gewisse notwendige Daten ausliest
+und alle schreibenden Operationen über einen mStudio Nutzer und OAuth2 durchgeführt werden.
+
+### allowedRedirectURIs
+
+Die Redirect URIs, die der Client verwenden _kann_.
+Wie im [RFC 6749](https://datatracker.ietf.org/doc/html/rfc6749#section-3.1.2.3) beschrieben,
+muss der Client keine `redirect_uri` beim Authorization Request angeben, wenn der Authorization Server nur eine Redirect URI erlaubt.
+Wenn jedoch mehrere Redirect URIs erlaubt sind, muss der Client eine `redirect_uri` angeben,
+die vollständig mit einer der erlaubten URIs übereinstimmt.
+
+Für die Redirect URIs wird ausdrücklich kein Templating unterstützt, um gängige Lücken in OAuth2 Implementierungen zu vermeiden.
+Zur Prüfung, ob eine URI erlaubt ist, wird ein einfacher String-Vergleich durchgeführt.
+Dieser beinhaltet das Protokoll, die vollständige Domain, den Port und den Pfad der URI.
+
+Für lokale Testzwecke kann es sinnvoll sein, `http://localhost` als Redirect URI zu erlauben.
+Dabei muss darauf geachtet werden, dass, wie bereits erwähnt, der Port ebenfalls übereinstimmen muss.
+
+### hashedSecret
+
+In seltenen Fällen ist es möglich, dass kein [PKCE Verfahren](https://datatracker.ietf.org/doc/html/rfc7636) genutzt werden kann.
+In diesem Fall besteht die Möglichkeit, einen sogenannten Private Client zu erstellen.
+Dieser sieht ein Client Secret vor.
+
+Zu bedenken ist, dass Client Secrets sicherheitsrelevante Themen aufwerfen, die mit dem PKCE Verfahren umgegangen werden können.
+Beispielsweise sollte ein Private Client nicht verwendet werden, um den OAuth2 Authorization Code Flow im Browser, einer nativen App,
+oder einer anderen Umgebung zu verwenden, in der das Client Secret nicht sicher aufbewahrt werden kann,
+da es sonst leicht abgegriffen werden kann.
+
+**Deshalb wird ausdrücklich empfohlen, das PKCE Verfahren zu nutzen, wenn möglich.**
+
+Wenn ein Client Secret genutzt werden soll, muss dieses vorher mit Argon2id gehasht werden.
+Siehe dazu auch die [Argon2id auf Wikipedia](https://de.wikipedia.org/wiki/Argon2), insbesondere [Konkrete Instanzen](https://de.wikipedia.org/wiki/Argon2#Konkrete_Instanzen).
+Außerdem sei auf die [Argon2id Referenz](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-argon2-13) verwiesen.
+
+Wenn kein Client Secret angegeben ist, wird automatisch das PKCE Verfahren vorausgesetzt.

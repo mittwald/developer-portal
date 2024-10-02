@@ -19,24 +19,32 @@ export default function OperationExample(p: Props) {
   const operation = getOperationById(spec, p.operation);
   const headers = {
     Host: "api.mittwald.de",
-    ...p.headers || {},
-  }
+    ...(p.headers || {}),
+  };
 
   if (p.example) {
     headers["Content-Type"] = "application/json";
   }
 
   const requestLine = `${operation.method.toUpperCase()} ${operation.path} HTTP/1.1\n`;
-  const headerLines = Object.keys(headers).map((key) => `${key}: ${headers[key]}`).join("\n");
+  const headerLines = Object.keys(headers)
+    .map((key) => `${key}: ${headers[key]}`)
+    .join("\n");
 
-  const body = p.example ?
-    requestLine + headerLines + `\n\n` + JSON.stringify(p.example, null, 2) :
-    requestLine + headerLines;
+  const body = p.example
+    ? requestLine + headerLines + `\n\n` + JSON.stringify(p.example, null, 2)
+    : requestLine + headerLines;
 
-  const link = <>See full request reference at: <OperationLink operation={p.operation} /></>;
+  const link = (
+    <>
+      See full request reference at: <OperationLink operation={p.operation} />
+    </>
+  );
 
-  return <>
-    <CodeBlock language="yaml">{body}</CodeBlock>
-    {withoutLink || <div className={clsx(styles.reference)}>{link}</div>}
-  </>
+  return (
+    <>
+      <CodeBlock language="yaml">{body}</CodeBlock>
+      {withoutLink || <div className={clsx(styles.reference)}>{link}</div>}
+    </>
+  );
 }

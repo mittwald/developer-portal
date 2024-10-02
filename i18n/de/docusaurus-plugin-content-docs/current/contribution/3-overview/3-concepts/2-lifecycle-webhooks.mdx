@@ -1,0 +1,116 @@
+---
+title: Lifecycle Webhooks
+---
+
+## Was sind Lifecycle Webhooks?
+
+Lifecycle Events werden von mittwald genutzt, um die externe Anwendung über sie betreffende Ereignisse zu informieren.
+Sie werden anhand von URLs in der Extension Konfiguration definiert und an diese per POST-Request gesendet.
+
+In den URLs, an die Lifecycle Webhooks gesendet werden, können optional verschiedene Platzhalter verwendet werden.
+Für weitere Informationen zum Templating siehe [Templating von Konfigurationswerten](../templating).
+Für eine Übersicht, welche Platzhalter für Lifecycle Webhooks verwendet werden können, siehe [Templating von Webhook URLs](../../../reference/webhooks#templating-von-webhook-urls).
+
+## Quality of Service (QoS) für die Zustellung von Lifecycle Webhooks
+
+Alle Webhooks werden `at least once` aufgerufen und sind somit so zu entwerfen, dass mehrfache Aufrufe nicht zu Fehlern führen.
+Die Webhooks werden asynchron zu der Aktion, die diese ausgelöst hat, ausgeführt.
+Bei Fehlschlägen wird der Webhook-Payload erneut gebaut, der Request neu signiert und versendet.
+Dabei wird mit einem gedeckelten exponentiellen Backoff gearbeitet, um die Anzahl der Versuche zu begrenzen.
+
+Das mStudio versucht so lange, Webhooks zuzustellen, bis der Webhook erfolgreich verarbeitet und entsprechend geantwortet wurde.
+Auch wird sichergestellt, dass Webhooks **pro Extension Instance** stets in der richtigen Reihenfolge zugestellt werden.
+Die einzige Ausnahme stellt das Entfernen der Extension vom Context dar.
+In diesem Fall werden alle nicht aktiven und noch ausstehenden Webhooks Calls abgebrochen
+und nur noch der `ExtensionInstanceRemovedFromContext`-Webhook versendet, dies jedoch solange bis dieser erfolgreich verarbeitet wurde
+oder die Extension selbst aus dem Marktplatz entfernt wird.
+
+:::caution
+Wenn das mStudio Backend nicht innerhalb von **6 Sekunden** eine Antwort vom Webhook Handler erhalten hat,
+wird dies als **Timeout** interpretiert und der Webhook gilt als fehlgeschlagen.
+Auch in diesem Fall wird der Webhook erneut versendet.
+Für den Fall, dass ein Webhook in einen Timeout läuft und der Webhook Handler dennoch die Verarbeitung gestartet hat,
+muss sichergestellt werden, dass die Verarbeitung nicht mehrfach durchgeführt wird oder idempotent gestaltet ist.
+
+Es wird ausdrücklich empfohlen, im Webhook Handler **keine aufwändigen Berechnungen oder Prozesse synchron durchzuführen**,
+die dazu führen könnten, dass der Webhook nicht innerhalb von 6 Sekunden verarbeitet werden kann.
+
+Sollte die Extension in einer **Cloud Umgebung** betrieben werden, sollte darauf geachtet werden,
+dass die Webhook Handler **nicht vollständig herunterskalieren** und somit einem Kaltstart ausgesetzt sind.
+Die Verarbeitungszeit inkludiert Netzwerklatenzen, die durch Kaltstarts entstehen können.
+:::
+
+## Secrets in Webhooks
+
+Secrets, die in Webhooks übermittelt werden, sind erst gültig, wenn der Webhook erfolgreich verarbeitet wurde.
+Danach sollte zusätzlich mit einer undefinierbaren Verzögerung, maximal im Sekundenbereich, gerechnet werden, bis das Secret schlussendlich gültig ist.
+Dies stellt einen weiteren Grund dar, Initialisierungsprozesse, die durch Webhooks ausgelöst werden, nachgelagert zu starten
+und im Webhook Handler hauptsächlich die Verarbeitung der Daten zu übernehmen.
+
+Für weitere Informationen dazu, wie das Extension Instance Secret verwendet werden kann, siehe [Authentifizierung](../authentication#extension-instance-secret).
+
+## Primary Key / Identifier von Extension Instances
+
+Jede Extension Instance erhält systembedingt eine eigene Extension Instance ID.
+Wenn Extension Instances von einer Extension persistiert werden sollen,
+**sollte diese ID als Primary Key oder Unique Identifier verwendet werden** und nicht die Context ID.
+Der Grund dafür ist, dass die Webhooks asynchron ausgeführt werden.
+Ein gefährliches Szenario für die Context ID als Primary Key stellt sich wie folgt dar:
+Eine Extension wird von einem Context entfernt und anschließend direkt wieder hinzugefügt (bspw. um mit frischer Konfiguration erneut zu starten).
+Wenn der `ExtensionInstanceAddedToContext`-Webhook der neuen Extension Instance vor dem `ExtensionInstanceRemovedFromContext`-Webhook der alten Extension Instance verarbeitet wird,
+könnte es dazu führen, dass alle Extension Instances des Context gelöscht wurden, obwohl eigentlich eine Extension Instance für diesen Context existieren sollte.
+
+## Validierung von Webhook Daten
+
+Es wird nicht empfohlen, Webhooks aufgrund von Validierungs-Fehlern von Daten abzulehnen, die nicht zwingend für den Programmablauf der Extension benötigt werden.
+Das mStudio sollte stets als Single Source of Truth betrachtet werden.
+Wenn bspw. das Format von Extension Instance IDs geändert wird, dann wird dies dokumentiert und angekündigt.
+Wenn diese Information jedoch übersehen wird, wird mit der Validierung des Formats der Extension Instance ID ein unnötiges Risiko eingegangen.
+
+## Typen von Lifecycle Webhooks
+
+### ExtensionAddedToContext
+
+Dieser Webhook dient dazu, externen Anwendungen mitzuteilen, dass die Extension zu einem neuen Kontext hinzugefügt wurde.
+Im Rahmen dieses Prozesses werden die Extension Instance ID und das Extension Instance Secret erstmalig übermittelt.
+
+Das Extension Instance Secret kann nicht im Handler selbst direkt verwendet werden.
+Siehe dazu auch [Secrets in Webhooks](#secrets-in-webhooks).
+
+### ExtensionInstanceUpdated
+
+In diesem Webhook wird der externen Anwendung eine Zustandsänderung der `Extension Instance` mitgeteilt.
+Der externen Anwendung wird dabei immer der gesamte neue Zustand mitgeteilt.
+
+Das kann beispielsweise die De-/Aktivierung der `Extension Instance` sein.
+
+### ExtensionInstanceSecretRotated
+
+Aus Sicherheitsgründen wird das Extension Instance Secret regelmäßig rotiert.
+Das neue Secret wird über diesen Webhook mitgeteilt.
+Das vorherige Secret ist ab diesem Zeitpunkt nicht mehr gültig.
+Analog zum [ExtensionAddedToContext](#extensionaddedtocontext)-Webhook kann auch hier das Secret nicht direkt im Handler verwendet werden.
+Siehe dazu auch [Secrets in Webhooks](#secrets-in-webhooks).
+
+### ExtensionInstanceRemovedFromContext
+
+Dieser Webhook drückt aus, dass eine `Extension Instance` aus einem Context entfernt wurde.
+Datenschutzrelevante Konsequenzen, wie die Löschung von personenbezogenen Daten, sollten an dieser Stelle berücksichtigt werden.
+
+:::note
+Für den `ExtensionInstanceRemovedFromContext`-Webhook wird eine spezielle Behandlung hinsichtlich der QoS vorgenommen.
+Falls die Webhook Handler nicht erreichbar sind, besteht die Möglichkeit, das Entfernen der Extension zu forcieren.
+In diesem Fall werden die Rechte der Extension Instance entzogen und bestehende Access Tokens invalidiert.
+
+Das mStudio versucht dennoch weiterhin, den Webhook zu versenden,
+um schlussendlich einen konsistenten Zustand zwischen mStudio- und Extension Datenbestand zu erreichen.
+:::
+
+## Verifizierung der Sender-Identität von Webhooks
+
+Um sicherzustellen, dass der Webhook von mittwald ausging, wird die Möglichkeit geboten, die Identität des Senders und den Inhalt des Request Bodys zu verifizieren.
+Neben dem Request Body, der den Webhook Payload enthält, wird in Request Headern eine Signatur inklusive der Meta-Informationen über diese versendet.
+
+Dies ist aus Sicht des Contributors und der Extension wichtig, da somit sichergestellt werden kann, dass der Webhook-Call wirklich von mittwald stammt.
+Ohne eine funktionierende Webhook Validierung besteht das Risiko, dass ein potenzieller Angreifer nur die URL kennen muss, um falsche Extension Instances vorzutäuschen oder bestehende zu korrumpieren.
+Für weitere Informationen dazu, wie Webhooks auf ihre Echtheit überprüft werden können, siehe [Validierung von Lifecycle Webhooks Referenz](../../../reference/webhooks#validierung-von-lifecycle-webhooks).

@@ -1,0 +1,588 @@
+---
+title: Lifecycle Webhooks
+---
+
+import OperationLink from "@site/src/components/OperationLink";
+import SchemaWithExample from "../../../src/components/openapi/SchemaWithExample";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+mittwald uses lifecycle events to notify the the external application of events that concern it.
+
+## Templating of Webhook URLs
+
+You may use placeholders when configuring the URL of webhooks.
+The mStudio replaces them with the values of the attributes of the webhook payload.
+
+You may use the following placeholders:
+
+- `apiVersion`: The API version used for the webhook. Currently always `v1`. See [API versioning](../../overview/concepts/api-versioning).
+- `contributorId`: ID of the contributor
+- `extensionId`: ID of the extension
+- `extensionInstanceId`: ID of the extension instance
+- `contextId`: ID of the extension context, eg. the ProjectID
+- `context`: The extension context kind the extension instance was added to. Currently one of `customer` and `project`.
+
+## Webhook Payloads
+
+### ExtensionAddedToContext
+
+<SchemaWithExample
+  withRawJSONSchema
+  format="yaml"
+  schema={{
+    type: "object",
+    required: [
+      "apiVersion",
+      "kind",
+      "id",
+      "context",
+      "consentedScopes",
+      "state",
+      "meta",
+      "secret",
+      "request",
+    ],
+    properties: {
+      apiVersion: {
+        type: "string",
+        example: "v1",
+      },
+      kind: {
+        type: "string",
+        enum: ["ExtensionAddedToContext"],
+      },
+      id: {
+        type: "string",
+        format: "uuid",
+        example: "d990eb39-041b-40b4-abb9-7a39678a0464",
+      },
+      context: {
+        type: "object",
+        required: ["id", "kind"],
+        properties: {
+          id: {
+            type: "string",
+            format: "uuid",
+          },
+          kind: {
+            type: "string",
+            enum: ["customer", "project"],
+          },
+        },
+      },
+      consentedScopes: {
+        type: "array",
+        example: ["mail:read", "mail:write", "domain:read"],
+        items: {
+          type: "string",
+        },
+      },
+      state: {
+        type: "object",
+        example: {
+          enabled: true,
+        },
+        properties: {
+          enabled: {
+            type: "boolean",
+          },
+        },
+      },
+      meta: {
+        type: "object",
+        required: ["createdAt"],
+        properties: {
+          createdAt: {
+            type: "string",
+            format: "date-time",
+            example: "2024-03-14T11:36:21Z",
+          },
+        },
+      },
+      secret: {
+        type: "string",
+        example: "ROFLieg83rjfdoi9lLIifdlfi399fndLKFHj39fjdlr",
+      },
+      request: {
+        type: "object",
+        required: ["id", "createdAt", "target"],
+        properties: {
+          id: {
+            type: "string",
+            format: "uuid",
+            example: "018e60ef-ad4d-78d5-97c0-e0405b48ad89",
+          },
+          createdAt: {
+            type: "string",
+            format: "date-time",
+            example: "2024-03-14T11:36:24Z",
+          },
+          target: {
+            type: "object",
+            required: ["method", "url"],
+            properties: {
+              method: {
+                type: "string",
+                example: "POST",
+              },
+              url: {
+                type: "string",
+                format: "uri",
+                example: "https://example.com/v1/webhook/...",
+              },
+            },
+          },
+        },
+      },
+    },
+  }}
+/>
+
+### ExtensionInstanceUpdated
+
+<SchemaWithExample
+  withRawJSONSchema
+  format="yaml"
+  schema={{
+    type: "object",
+    required: [
+      "apiVersion",
+      "kind",
+      "id",
+      "context",
+      "consentedScopes",
+      "state",
+      "meta",
+      "request",
+    ],
+    properties: {
+      apiVersion: {
+        type: "string",
+        example: "v1",
+      },
+      kind: {
+        type: "string",
+        enum: ["ExtensionInstanceUpdated"],
+      },
+      id: {
+        type: "string",
+        format: "uuid",
+        example: "d990eb39-041b-40b4-abb9-7a39678a0464",
+      },
+      context: {
+        type: "object",
+        required: ["id", "kind"],
+        properties: {
+          id: {
+            type: "string",
+            format: "uuid",
+          },
+          kind: {
+            type: "string",
+            enum: ["customer", "project"],
+          },
+        },
+      },
+      consentedScopes: {
+        type: "array",
+        example: ["mail:read", "mail:write", "domain:read"],
+        items: {
+          type: "string",
+        },
+      },
+      state: {
+        type: "object",
+        example: {
+          enabled: true,
+        },
+        properties: {
+          enabled: {
+            type: "boolean",
+          },
+        },
+      },
+      meta: {
+        type: "object",
+        required: ["createdAt"],
+        properties: {
+          createdAt: {
+            type: "string",
+            format: "date-time",
+            example: "2024-03-14T11:36:21Z",
+          },
+        },
+      },
+      request: {
+        type: "object",
+        required: ["id", "createdAt", "target"],
+        properties: {
+          id: {
+            type: "string",
+            format: "uuid",
+            example: "018e60ef-ad4d-78d5-97c0-e0405b48ad89",
+          },
+          createdAt: {
+            type: "string",
+            format: "date-time",
+            example: "2024-03-14T11:36:24Z",
+          },
+          target: {
+            type: "object",
+            required: ["method", "url"],
+            properties: {
+              method: {
+                type: "string",
+                example: "POST",
+              },
+              url: {
+                type: "string",
+                format: "uri",
+                example: "https://example.com/v1/webhook/...",
+              },
+            },
+          },
+        },
+      },
+    },
+  }}
+/>
+
+### ExtensionInstanceSecretRotated
+
+<SchemaWithExample
+  withRawJSONSchema
+  format="yaml"
+  schema={{
+    type: "object",
+    required: ["apiVersion", "context", "kind", "id", "secret", "request"],
+    properties: {
+      apiVersion: {
+        type: "string",
+        example: "v1",
+      },
+      kind: {
+        type: "string",
+        enum: ["ExtensionInstanceSecretRotated"],
+      },
+      id: {
+        type: "string",
+        format: "uuid",
+        example: "d990eb39-041b-40b4-abb9-7a39678a0464",
+      },
+      context: {
+        type: "object",
+        required: ["id", "kind"],
+        properties: {
+          id: {
+            type: "string",
+            format: "uuid",
+          },
+          kind: {
+            type: "string",
+            enum: ["customer", "project"],
+          },
+        },
+      },
+      secret: {
+        type: "string",
+        example: "ROFLieg83rjfdoi9lLIifdlfi399fndLKFHj39fjdlr",
+      },
+      request: {
+        type: "object",
+        required: ["id", "createdAt", "target"],
+        properties: {
+          id: {
+            type: "string",
+            format: "uuid",
+            example: "018e60ef-ad4d-78d5-97c0-e0405b48ad89",
+          },
+          createdAt: {
+            type: "string",
+            format: "date-time",
+            example: "2024-03-14T11:36:24Z",
+          },
+          target: {
+            type: "object",
+            required: ["method", "url"],
+            properties: {
+              method: {
+                type: "string",
+                example: "POST",
+              },
+              url: {
+                type: "string",
+                format: "uri",
+                example: "https://example.com/v1/webhook/...",
+              },
+            },
+          },
+        },
+      },
+    },
+  }}
+/>
+
+### ExtensionInstanceRemovedFromContext
+
+<SchemaWithExample
+  withRawJSONSchema
+  format="yaml"
+  schema={{
+    type: "object",
+    required: [
+      "apiVersion",
+      "kind",
+      "id",
+      "context",
+      "consentedScopes",
+      "state",
+      "meta",
+      "request",
+    ],
+    properties: {
+      apiVersion: {
+        type: "string",
+        example: "v1",
+      },
+      kind: {
+        type: "string",
+        enum: ["ExtensionInstanceUpdated"],
+      },
+      id: {
+        type: "string",
+        format: "uuid",
+        example: "d990eb39-041b-40b4-abb9-7a39678a0464",
+      },
+      context: {
+        type: "object",
+        required: ["id", "kind"],
+        properties: {
+          id: {
+            type: "string",
+            format: "uuid",
+          },
+          kind: {
+            type: "string",
+            enum: ["customer", "project"],
+          },
+        },
+      },
+      consentedScopes: {
+        type: "array",
+        example: ["mail:read", "mail:write", "domain:read"],
+        items: {
+          type: "string",
+        },
+      },
+      state: {
+        type: "object",
+        example: {
+          enabled: true,
+        },
+        properties: {
+          enabled: {
+            type: "boolean",
+          },
+        },
+      },
+      meta: {
+        type: "object",
+        required: ["createdAt"],
+        properties: {
+          createdAt: {
+            type: "string",
+            format: "date-time",
+            example: "2024-03-14T11:36:21Z",
+          },
+        },
+      },
+      request: {
+        type: "object",
+        required: ["id", "createdAt", "target"],
+        properties: {
+          id: {
+            type: "string",
+            format: "uuid",
+            example: "018e60ef-ad4d-78d5-97c0-e0405b48ad89",
+          },
+          createdAt: {
+            type: "string",
+            format: "date-time",
+            example: "2024-03-14T11:36:24Z",
+          },
+          target: {
+            type: "object",
+            required: ["method", "url"],
+            properties: {
+              method: {
+                type: "string",
+                example: "POST",
+              },
+              url: {
+                type: "string",
+                format: "uri",
+                example: "https://example.com/v1/webhook/...",
+              },
+            },
+          },
+        },
+      },
+    },
+  }}
+/>
+
+## Explanation of the Individual Attributes
+
+### apiVersion
+
+The API version that is used for the webhook call.
+Currently always `v1`.
+Enables breaking changes of the payload in the future.
+For more information, see [api versioning](../../overview/concepts/api-versioning).
+
+### kind
+
+The lifecycle webhook kind.
+Possible values:
+
+- `ExtensionAddedToContext`
+- `ExtensionInstanceUpdated`
+- `ExtensionInstanceSecretRotated`
+- `ExtensionInstanceRemovedFromContext`
+
+Depending on requirements, you can use the same URL for all webhooks and use this attribute to discern the different kinds of webhooks.
+Alternatively, you can use different webhook endpoints for each kind of webhook and ignore this attribute.
+For more information about the semantics of the individual lifecycle webhooks, see [lifecycle webhooks concept](../../overview/concepts/lifecycle-webhooks).
+
+### id
+
+The globally unique identifier of the extension instance.
+Don't confuse this with the extension ID that identifies the extension as a whole.
+Also, you must not confuse this ID with the `request.id` that identifies the request and can be used to mitigate replay attacks.
+For more information, see [request meta information](#request).
+
+### context
+
+Information about the extension context, the extension instance belongs to.
+Currently, the two possible extension contexts are:
+
+- `customer`
+- `project`
+
+Additionally to the `context.kind`, the mStudio transmits the `context.id`.
+This is the ID of the extension context, so the ID of a project, for example.
+
+### consentedScopes
+
+The scopes the user consented to when they added the extension to an extension context.
+If the contributor of an extension adds additional scopes to it later, the user has to consent to those scopes before the extension can use those scopes for that extension instance.
+
+The extension can check whether the required scopes are available using the `consentedScopes`.
+For this reason, we recommend persisting the `consentedScopes`.
+
+### state
+
+The current state of the extension instance.
+The mStudio currently only informs the external application of the state of `enabled` via the lifecycle webhooks.
+This tells the extension whether an extension instance is active and, therefore, whether it should function.
+The authentication and authorization mechanisms don't work for deactivated extension instances.
+In that case, domain actions of that extension instance are not accepted.
+
+### meta
+
+Meta information about the extension instance.
+Currently, the mStudio only sends the creation date of the extension instance.
+This should not be confused with the request meta information which describes the webhook call.
+
+### secret
+
+The secret that is used for the authentication of the extension instance.
+You may use this to implement user-independent authentication.
+For more information, see [authentication of extension instances](../../overview/concepts/authentication#extension-instance-secret).
+
+### request
+
+Meta information about the lifecycle webhook request.
+
+You can mitigate attack vectors such as [replay](https://csrc.nist.gov/glossary/term/replay_attack) or forward replay attacks by validating the `request` property.
+
+You can persist the `request.id` and compare it with the IDs of future lifecycle webhooks to only accept the same request once.
+The mStudio never sends requests with the same `request.id` multiple times.
+
+You can validate the field `request.target.url` to check whether the request reached the correct receiver.
+This way, you can avoid processing signed requests that an attacker forwarded to another extension.
+
+You can validate the field `request.createdAt` to identify old requests.
+Keep in mind that the mStudio potentially sends webhooks asynchronously and the time difference between the webhook creation and receiving the webhook may vary.
+
+## Validation of Lifecycle Webhooks
+
+We offer the possibility to confirm that mittwald sent the webhook and nobody corrupted the request body.
+For this, we sign the request body and send the signature, including meta information in the request headers.
+
+```
+X-Marketplace-Signature-Serial: 7f640dcf-c5fb-4e79-bc4b-99a30e50fcc5
+X-Marketplace-Signature-Algorithm: Ed25519
+X-Marketplace-Signature: HKdS7xD...qQMN94HINte7Dlof+9V/PQ6gW0C5uBOz+9F6YNOLE6vdb2ybVwRH23GAg==
+```
+
+### X-Marketplace-Signature-Serial
+
+Unique ID of the public key you must use to verify the signature.
+We guarantee one stable public key for every public key ID.
+Therefore, you may cache the public key.
+You can get the public keys with the operation <OperationLink operation="extension-get-public-key" />.
+
+### X-Marketplace-Signature-Algorithm
+
+Algorithm, the mStudio used to generate the signature.
+Currently always [`Ed25519`](https://datatracker.ietf.org/doc/html/rfc8032).
+
+### X-Marketplace-Signature
+
+[DSA signature](https://www.rfc-editor.org/rfc/rfc6605.html) encoded in base64.
+
+You can use common cryptographic libraries in your preferred programming language to verify the signature.
+The complete and unprocessed request body has to be verified using the `verify` method.
+This ensures that the request body was transmitted by mittwald and was not modified by a third party.
+
+<Tabs>
+  <TabItem value="go" label="Go">
+
+```go
+bodyBytes, err := io.ReadAll(body)
+if err != nil {
+   return err
+}
+
+if !ed25519.Verify(publicKey, bodyBytes, signature) {
+   panic("invalid signature")
+}
+```
+
+  </TabItem>
+  <TabItem value="php" label="PHP">
+
+```php
+$req  = new ExtensionGetPublicKeyRequest($serial);
+$resp = $apiClient->marketplace()->extensionGetPublicKey($req);
+$key = $resp->getBody()->getKey();
+
+$valid = sodium_crypto_sign_verify_detached(
+    base64_decode($signature),
+    $request->getContent(),
+    base64_decode($key),
+);
+
+if (!$valid) {
+    throw new \Exception('invalid request signature');
+}
+```
+
+  </TabItem>
+</Tabs>
+
+### Reference Implementations of the Validation of Lifecycle Webhooks
+
+TODO

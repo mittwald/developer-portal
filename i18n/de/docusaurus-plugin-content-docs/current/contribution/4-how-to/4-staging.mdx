@@ -1,0 +1,17 @@
+---
+title: Wie setze ich eine Staging Umgebung auf?
+---
+
+import OperationLink from "@site/src/components/OperationLink";
+
+Extensions unterstützen keine unterschiedlichen Umgebungen.
+Wenn zu Test- und Entwicklungszwecken eine dedizierte Umgebung eingerichtet werden soll,
+kann dies in einer separaten Extension geschehen.
+
+So kann bspw. eine Extension `My Extension` registriert werden und zusätzlich eine `My Extension - Staging` Extension.
+Diese sollte dann auf `hidden` gesetzt werden.
+Siehe dazu auch [Extension Referenz](../../reference/extensions).
+Dadurch wird die Extension nicht im mStudio angezeigt, kann aber dennoch über die API zu einem Context hinzugefügt werden.
+Um eine Extension über die API zu einem Context hinzuzufügen, kann die <OperationLink operation="extension-create-extension-instance" /> Operation verwendet werden.
+
+Wenn die versteckte Extension zu einem Context hinzugefügt wurde, wird sie im mStudio im jeweiligen Context als installierte Extension angezeigt.

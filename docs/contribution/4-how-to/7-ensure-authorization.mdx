@@ -1,0 +1,86 @@
+---
+title: How to Ensure Authorization
+---
+
+If the extension interacts with the mStudio API on behalf of an mStudio user, this may lead to insufficient permissions.
+An extension acts on behalf of an mStudio User, if it uses the [access token retrieval key](../../overview/concepts/authentication#access-token-retrieval-key)
+or [OAuth2](../../overview/concepts/authentication#oauth2) for the authentication.
+
+The mStudio ensures that an mStudio User never has more permissions using an extension than they have using the mStudio directly.
+Additionally, it ensures that an mStudio User using an extension only has the permissions they accepted when installing the extension.
+
+However, it does not ensure that the mStudio user using an extension has all the permissions required for executing the domain actions necessary for the extension.
+This is due to the system of rights and roles of the mStudio that defines different roles for organizations and projects.
+Therefore, an extension may execute a domain action the user is not permitted to perform.
+This leads to an error message.
+
+So for example, if an extension should create projects via the [project-create-project](../../../reference/project/project-create-project) operation
+and the user only has the role "Organization accountant", they will encounter an error message when using the extension because the role does not permit creating projects.
+
+
+```mermaid
+sequenceDiagram
+  participant User as mStudio User
+  participant Extension
+  participant mStudio
+
+  User->>Extension: Open
+  Extension-->>User: 200 OK
+  User->>Extension: Navigate to Feature foo
+  Extension-->>User: 200 OK
+  User->>Extension: Use Feature foo
+  Extension->>mStudio: Domain Action foo
+  mStudio-->>Extension: 403 Forbidden
+  Extension-->>User: 403 Forbidden
+```
+
+The extension should validate the required permissions in advance to provide a good user experience.
+For this, it can use the operations [project-get-project-membership](../../../reference/project/project-get-project-membership) or [customer-get-customer-membership](../../../reference/customer/customer-get-customer-membership).
+
+Those routes return the current membership to an extension context of the user.
+This contains the roles of the user in that context, among other things.
+
+By validating the users role, the extension can display a warning to the user, that they do not have the required permissions to execute the domain action and should contact the context administrator to get the missing permissions.
+
+```mermaid
+sequenceDiagram
+  participant User as mStudio User
+  participant Extension
+  participant mStudio
+
+  User->>Extension: Open
+  Extension->>mStudio: project-get-project-membership
+  mStudio-->>Extension: Organization accountant
+  Extension-->>User: Warning regarding missing permissions
+```
+
+The contributor still has the flexibility to decide whether to block the extension for users with insufficient permissions completely, as in the above example, or only specific features.
+
+```mermaid
+sequenceDiagram
+  participant User as mStudio User
+  participant Extension
+  participant mStudio
+
+  User->>Extension: Open
+  Extension-->>User: 200 OK
+  User->>Extension: Navigate zu Feature foo
+  Extension->>mStudio: project-get-project-membership
+  mStudio-->>Extension: Organization accountant
+  Extension-->>User: Warning regarding missing permissions
+  User->>Extension: Navigate to Feature bar
+  Extension->>mStudio: project-get-project-membership
+  mStudio-->>Extension: Organization accountant
+  Extension-->>User: 200 OK
+  User->>Extension: Use Feature bar
+  Extension->>mStudio: Domain Action bar
+  mStudio-->>Extension: 200 OK
+  Extension-->>User: 200 OK
+```
+
+Alternatively, you can execute the domain actions on behalf of the extension.
+For this, the extension has to use the [extension instance secret](../../overview/concepts/authentication#extension-instance-secret) to request an access token.
+Then, the domain action is executed with the permissions of the extension.
+However, this has a downside.
+Organization owners and project administrators can no longer manage which domain actions users can perform by distributing roles.
+This can lead to a worse user experience.
