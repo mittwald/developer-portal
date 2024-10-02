@@ -46,6 +46,7 @@ jobs:
           name: build
           path: build
           retention-days: 1
+          include-hidden-files: 'true'
 
   # Deployment job
   deploy:
@@ -54,6 +55,7 @@ jobs:
     concurrency:
       group: "deploy"
       cancel-in-progress: false
+
     environment:
       name: production
       url: https://developer.mittwald.de
@@ -61,20 +63,17 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
       - name: Download a single artifact
         uses: actions/download-artifact@v4
         with:
           name: build
           path: build
       - name: Deploy to mittwald space
-        uses: ./.github/actions/mittwald-deploy-action
+        uses: burnett01/rsync-deployments@7.0.1
         with:
-          app-id: ${{ vars.MITTWALD_APP_ID }}
-          domain: ${{ vars.MITTWALD_DOMAIN }}
-          ssh-private-key: ${{ secrets.MITTWALD_SSH_PRIVATE_KEY }}
-          ssh-public-key: ${{ vars.MITTWALD_SSH_PUBLIC_KEY }}
-          local-dir: build/
-        env:
-          MITTWALD_API_TOKEN: ${{ secrets.MITTWALD_API_TOKEN }}
+          switches: -avzr --delete
+          path: build/
+          remote_path: /html/developer-portal-cutl1
+          remote_host: ${{ secrets.DEPLOY_HOST }}
+          remote_user: ${{ secrets.DEPLOY_USER }}
+          remote_key: ${{ secrets.DEPLOY_PRIVATE_KEY }}
