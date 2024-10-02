@@ -1,0 +1,70 @@
+---
+title: Breaking (!) API changes for v2 API, October 2, 2024
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - App
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+On October 2, 2024, the mittwald API updated the 'query' request parameter 'page' for the List AppInstallations endpoint, increasing its minimum value from '0.00' to '1.00'.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The minimum value for the 'query' request parameter 'page' in the `GET /v2/projects/{projectId}/app-installations` operation has been increased from '0.00' to '1.00'. This is a breaking change.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "List app installations belonging to a Project"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'page', the min was increased from '0.00' to '1.00'
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK v2.1.69 Release
+
+The mittwald PHP SDK has been updated to version 2.1.69. This release includes several important changes to the `ListAppinstallationsRequest` class, specifically regarding the handling of the `page` parameter:
+
+- **Removals**: The `page` property was temporarily removed from the schema and various methods.
+- **Re-additions**: The `page` property has been reintroduced with correct validations in the relevant methods (`withPage`, `getPage`, and serialization).
+- The `withPage` method now correctly allows setting a `page` number with validations.
+- The `withLimit` method was corrected to set the `limit` property instead of `page`, with the logic moved to the `withPage` method.
+- Redundant logic for setting `page` in class methods was corrected to ensure the integrity of the request model.
+
+These changes enhance the API request capabilities, ensuring robust support for pagination through the `page` and `limit` properties, leading to improved efficiency in querying installed applications.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.69).
+
