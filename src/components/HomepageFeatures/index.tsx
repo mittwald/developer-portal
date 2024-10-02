@@ -181,7 +181,7 @@ interface FeatureProps {
 
 function Feature({ title, description }: FeatureProps) {
   return (
-    <div className={clsx("col col--6 margin-bottom--lg")}>
+    <div className={clsx("col col--4")}>
       <div className={clsx("padding--md", styles.feature)}>
         <h3>{title}</h3>
         {description}
