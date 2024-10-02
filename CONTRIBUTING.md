@@ -25,9 +25,31 @@ You can use the following commands to build this project locally:
 
 ## How-Tos
 
+### Working with the changelog
+
+#### Adding a new changelog entry
+
+The changelog is built using [Docusaurus' blog feature][docu-blog]. You can add a new changelog entry by creating a new markdown file in the `changelog/` directory. The file name should follow the pattern `YYYY-MM-DD-<name>.mdx`. The file should contain a frontmatter section with the following fields:
+
+```yaml
+title: Example changelog entry
+authors: your-name # see changelog/authors.yml
+tags: [apiv2] # see changelog/tags.yml
+```
+
+#### Automatic API changelog entries
+
+There is also a Gitlab CI job that will automatically create a changelog entry each day when the OpenAPI specification changed (both v1 and v2 are checked for changes). This job will create a new changelog entry in the `changelog/` directory with the name `YYYY-MM-DD-api-changes-vX.mdx`. To track the API changes, the _last_ OpenAPI specification is saved in the `generator/specs` directory, which will then be compared to the _current_ OpenAPI specification. The comparison is done using the [`oasdiff` tool](https://www.oasdiff.com).
+
+To run the automatic changelog generation locally, you can run the `npm run generate:changelog` command. Note that the changelog generator relies on some AI features for text generation, to you will need a valid OpenAI API key in the `OPENAI_API_KEY` environment variable.
+
+#### Customizing generated changelog entries
+
+Automatically generated changelog entries will **NOT** be changed after they are created (they are identified uniquely by the date and the affected API version). This means that you (as a developer) are free to edit the automatically generated changelog entries to your liking (pay special attention to the AI-generated summary, which may or may not be correct).
+
 ### Updating translation files
 
-Translation of components is done using [Docuraurus' built-in translation file handling][docu-i18n]. To update the translation files, you can use the following steps:
+Translation of components is done using [Docusaurus' built-in translation file handling][docu-i18n]. To update the translation files, you can use the following steps:
 
 ```
 $ npm run docusaurus write-translations
@@ -50,5 +72,6 @@ The usage examples for OpenAPI operations are generated from the OpenAPI specifi
 [mdx]: https://mdxjs.com
 [docu-md]: https://docusaurus.io/docs/markdown-features
 [docu-i18n]: https://docusaurus.io/docs/i18n/introduction
+[docu-blog]: https://docusaurus.io/docs/blog
 [docs-en]: https://github.com/mittwald/developer-portal/tree/master/docs
 [docs-de]: https://github.com/mittwald/developer-portal/tree/master/i18n/de/docusaurus-plugin-content-docs/current

@@ -52,7 +52,7 @@ Have a look at our collection of [deployment guides](/docs/v2/category/deploymen
 
 PHP comes with a built-in opcode cache called OPCache. OPCache is enabled by default, and will cache the compiled PHP code in memory to improve performance. Depending on your configuration, it may take a while for the cache to be updated when you deploy new code.
 
-To force a refresh the OPCache, for example, after a deployment, you can use tools like [CacheTool](https://github.com/gordalina/cachetool) to connect to the PHP-FPM socket and clear the cache (refer to CacheTool's installation instructions for more information on how to install it). For example, you can run the following command to clear the PHP OPCache:
+To force a refresh of the OPCache (for example, after a deployment), you can use tools like [CacheTool](https://github.com/gordalina/cachetool) to connect to the PHP-FPM socket and clear the cache (refer to CacheTool's installation instructions for more information on how to install it). For example, you can run the following command to clear the PHP OPCache:
 
 ```bash
 $ php ./cachetool.phar opcache:reset --fcgi=127.0.0.1:9000

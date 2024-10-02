@@ -4,7 +4,7 @@ import styles from "./styles.module.css";
 import Translate from "@docusaurus/Translate";
 import Link from "@docusaurus/Link";
 import { NewBadge } from "../NewBadge";
-import FeatureRow from "@site/src/components/HomepageFeatures/FeatureRow";
+import FeatureRow from "@site/src/components/FeatureRow";
 
 const issueTrackerURL =
   "https://github.com/mittwald/developer-portal/issues/new?assignees=&labels=suggestion&projects=&template=suggestion.md";
@@ -193,7 +193,7 @@ const FeatureList = [
           <li>
             <Link to="https://mittwald.github.io/flow">
               <Translate id="index.contributing.flow">
-                Use Flow, the mittwald design system, to develop frontends                
+                Use Flow, the mittwald design system, to develop frontends
               </Translate>
             </Link>
           </li>

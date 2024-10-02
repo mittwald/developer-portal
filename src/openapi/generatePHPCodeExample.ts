@@ -51,9 +51,16 @@ function generatePHPCodeExample(
 
   if (queryParams.length > 0) {
     for (const queryParam of queryParams) {
-      constructorModifiers[queryParam.name] = JSON.stringify(
-        generateSchemaExample(queryParam.schema as OpenAPIV3.SchemaObject),
-      );
+      let example = generateSchemaExample(queryParam.schema as OpenAPIV3.SchemaObject);
+      if (queryParam.name === "skip") {
+        continue;
+      } else if (queryParam.name === "limit") {
+        example = 50;
+      } else if (queryParam.name === "page") {
+        example = 1;
+      }
+
+      constructorModifiers[queryParam.name] = JSON.stringify(example);
     }
   }
 
@@ -76,11 +83,12 @@ function generatePHPCodeExample(
 
   let bodyConstructor = "";
   if (bodyClassName) {
-    bodyConstructor = `// TODO: Please consult the properties and constructor signature of\n// ${bodyClassName} to learn how to construct a valid instance\n$body = new ${bodyClassName}(/* TODO: ... */);\n`;
+    bodyConstructor = `\n// TODO: Please consult the properties and constructor signature of\n// ${bodyClassName} to learn how to construct a valid instance\n$body = new ${bodyClassName}(/* TODO: ... */);\n`;
   }
 
   return `${uses.map((use) => `use ${use};`).join("\n")}
-
+  
+$client = MittwaldAPIClient::newWithToken(getenv('MITTWALD_API_TOKEN'));
 ${bodyConstructor}
 $request = (new ${operationId}Request(${constructorParamsCode}))${constructorModifiersCode};
 $response = $client->${camelcase(tag)}()->${camelcase(operationId)}($request);

@@ -6,7 +6,7 @@ import { themes } from "prism-react-renderer";
 import { Options, ThemeConfig } from "@docusaurus/preset-classic";
 import { Options as ClientRedirectOptions } from "@docusaurus/plugin-client-redirects";
 
-const lightCodeTheme = themes.github;
+const lightCodeTheme = themes.oneLight;
 const darkCodeTheme = themes.dracula;
 
 const config: Config = {
@@ -69,6 +69,21 @@ const config: Config = {
         },
       } satisfies ClientRedirectOptions,
     ],
+    [
+      "@docusaurus/plugin-content-blog",
+      {
+        id: "changelog",
+        routeBasePath: "changelog",
+        path: "./changelog",
+        blogTitle: "Changelog",
+        blogDescription:
+          "Changelog for the mittwald APIs and mittwald cloud platform",
+        blogSidebarTitle: "All change notes",
+        blogSidebarCount: "ALL",
+        showReadingTime: false,
+        onInlineTags: "ignore",
+      },
+    ],
   ],
 
   presets: [
@@ -92,15 +107,12 @@ const config: Config = {
               label: "API v1",
               path: "v1",
               banner: "unmaintained",
-            }
+            },
           },
         },
         blog: {
-          showReadingTime: true,
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
+          showReadingTime: false,
+          onInlineTags: "ignore",
         },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
@@ -126,6 +138,12 @@ const config: Config = {
         },
         {
           type: "doc",
+          docId: "cli/index",
+          position: "left",
+          label: "CLI",
+        },
+        {
+          type: "doc",
           docId: "/category/platform",
           position: "left",
           label: "Platform",
@@ -142,7 +160,11 @@ const config: Config = {
           position: "left",
           label: "Reference",
         },
-        //{to: '/blog', label: 'Blog', position: 'left'},
+        {
+          to: "/changelog",
+          label: "Changelog",
+          position: "left",
+        },
         {
           href: "https://github.com/mittwald/contributor-portal",
           label: "GitHub",

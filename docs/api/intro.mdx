@@ -19,6 +19,10 @@ You can find the full API specification in the [OpenAPI 3.0 format](https://spec
 1. [OpenAPI 3.0 specification](https://api.mittwald.de/openapi) (machine-readable)
 2. [Rendered HTML documentation](../../reference) (human-readable)
 
+## Changelog
+
+Changes to the API are documented in the [changelog](/changelog/tags/apiv2/). Changelog entries are generated automatically at the end of each day. If you wand to be notified about changes to the API, you can subscribe to the [RSS feed](https://developer.mittwald.de/changelog/rss.xml).
+
 ## Authentication
 
 ### Obtaining an API token
@@ -28,11 +32,15 @@ To authenticate to the API, you will need an **API Token**. You can obtain one e
 1. **In the UI**, go to your user profile and choose the [API tokens](https://studio.mittwald.de/app/profile/api-tokens) menu item.
 2. Alternatively, **via the API**, use the <OperationLink operation="user-create-api-token" /> endpoint. This requires you to already have an existing API token:
 
-   <OperationExample operation="user-create-api-token" headers={{"Authorization": "Bearer <EXISTING_API_TOKEN>"}} example={{
-     description: "My API token",
-     expiresAt: "2021-12-31T23:59:59+00:00",
-     roles: ["api_read", "api_write"]
-   }} />
+   <OperationExample
+     operation="user-create-api-token"
+     headers={{ Authorization: "Bearer <EXISTING_API_TOKEN>" }}
+     example={{
+       description: "My API token",
+       expiresAt: "2021-12-31T23:59:59+00:00",
+       roles: ["api_read", "api_write"],
+     }}
+   />
 
    The response will contain a JSON document with a `token` key. This is your API token.
 

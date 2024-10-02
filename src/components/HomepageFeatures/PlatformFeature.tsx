@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import styles from "@site/src/components/HomepageFeatures/styles.module.css";
-import FeatureRow from "./FeatureRow";
-import Intro, { IntroHeader } from "./Intro";
+import FeatureRow from "../FeatureRow";
+import Intro, { IntroHeader } from "../Intro";
 import Translate from "@docusaurus/Translate";
 import Link from "@docusaurus/Link";
 import React from "react";
@@ -119,8 +119,8 @@ function PlatformTools() {
               </Translate>
             }
             links={[
-              <Link to="/docs/v2/api/sdks/cli">CLI</Link>,
-              <Link href="https://github.com/mittwald/ddev">
+              <Link to="/cli">CLI</Link>,
+              <Link to="/docs/v2/platform/development/ddev">
                 DDEV <NewBadge />
               </Link>,
             ]}

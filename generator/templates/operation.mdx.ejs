@@ -1,0 +1,54 @@
+---
+<%- yaml.stringify({
+    title: summary ?? spec.operationId,
+    description: spec.description ?? "",
+    openapi: {
+        method
+    }
+}) %>
+---
+
+import {OperationRequest, OperationResponses} from "@site/src/components/openapi/OperationReference";
+import {OperationMetadata} from "@site/src/components/openapi/OperationMetadata";
+import {OperationUsage} from "@site/src/components/openapi/OperationUsage";
+import OperationDocCardById from "@site/src/components/openapi/OperationDocCardById";
+import OperationLink from "@site/src/components/OperationLink";
+import OperationHint from "@site/src/components/OperationHint";
+import OperationExample from "@site/src/components/OperationExample";
+import TabItem from "@theme/TabItem";
+
+<% const serializedSpec = JSON.stringify(spec); -%>
+
+<OperationMetadata
+    path="<%- urlPathWithBase _%>"
+    method="<%- method _%>"
+    spec={<%- serializedSpec %>}
+    withDescription={<%- descriptionOverridePre === undefined %>} />
+
+<% if (descriptionOverridePre) { %>
+<%- descriptionOverridePre %>
+<% } %>
+
+## Request
+
+<OperationRequest spec={<%- serializedSpec %>} />
+
+## Responses
+
+<OperationResponses spec={<%- serializedSpec %>} />
+
+## Usage examples
+
+<OperationUsage
+    method="<%- method _%>"
+    url="<%- urlPathWithBase _%>"
+    spec={<%- serializedSpec %>}
+    baseURL="<%- serverURL %>"
+    withJavascript={<%- withSDKExamples %>}
+    withPHP={<%- withSDKExamples %>}>
+    <%- exampleOverrides.join("\n\n") %>
+</OperationUsage>
+
+<% if (descriptionOverridePost) { %>
+<%- descriptionOverridePost %>
+<% } %>

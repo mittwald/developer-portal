@@ -1,5 +1,5 @@
 import styles from "./OperationReference.module.css";
-import { Fragment } from "react";
+import { Fragment, PropsWithChildren } from "react";
 import Markdown from "react-markdown";
 import CodeBlock from "@theme/CodeBlock";
 import { OpenAPIV3 } from "openapi-types";
@@ -22,6 +22,21 @@ import ParameterObject = OpenAPIV3.ParameterObject;
 import ReferenceObject = OpenAPIV3.ReferenceObject;
 import ResponseObject = OpenAPIV3.ResponseObject;
 import SchemaWithExample from "@site/src/components/openapi/SchemaWithExample";
+
+function OutlinedAccordion({
+  children,
+  defaultExpanded,
+}: PropsWithChildren<{ defaultExpanded?: boolean }>) {
+  return (
+    <Accordion
+      defaultExpanded={defaultExpanded}
+      variant="outlined"
+      style={{ marginBottom: "1em" }}
+    >
+      {children}
+    </Accordion>
+  );
+}
 
 function OperationParameter({ param }: { param: ParameterObject }) {
   const body = [];
@@ -90,7 +105,7 @@ function OperationParameterList({
   const hasRequired = params.some((param) => param.required);
 
   return (
-    <Accordion defaultExpanded={expanded}>
+    <OutlinedAccordion defaultExpanded={expanded}>
       <Heading>
         <div style={{ flexGrow: 1 }}>{title}</div>{" "}
         {hasRequired ? <Required /> : undefined}
@@ -102,7 +117,7 @@ function OperationParameterList({
           ))}
         </ul>
       </Content>
-    </Accordion>
+    </OutlinedAccordion>
   );
 }
 
@@ -150,7 +165,7 @@ function OperationRequestBody({
 
   if ("application/json" in spec.content) {
     return (
-      <Accordion>
+      <OutlinedAccordion>
         <Heading>
           <div style={{ flexGrow: 1 }}>{title}</div>
           {required}
@@ -159,9 +174,12 @@ function OperationRequestBody({
           <p>
             Format: <code>application/json</code>
           </p>
-          <SchemaWithExample schema={spec.content["application/json"].schema} withRawJSONSchema />
+          <SchemaWithExample
+            schema={spec.content["application/json"].schema}
+            withRawJSONSchema
+          />
         </Content>
-      </Accordion>
+      </OutlinedAccordion>
     );
   }
 }
@@ -203,7 +221,10 @@ function OperationResponseBody({ spec }: { spec?: OpenAPIV3.ResponseObject }) {
           </LabeledValue>
         </ColumnLayout>
 
-        <SchemaWithExample schema={spec.content["application/json"].schema} withRawJSONSchema />
+        <SchemaWithExample
+          schema={spec.content["application/json"].schema}
+          withRawJSONSchema
+        />
       </>
     );
   }
@@ -306,7 +327,10 @@ export function OperationResponses({
   return (
     <>
       {responseCodes.map((status) => (
-        <Accordion key={status} defaultExpanded={status.startsWith("2")}>
+        <OutlinedAccordion
+          key={status}
+          defaultExpanded={status.startsWith("2")}
+        >
           <Heading>
             <HTTPResponseStatus code={status} />
           </Heading>
@@ -317,7 +341,7 @@ export function OperationResponses({
               response={spec.responses[status] as ResponseObject}
             />
           </Content>
-        </Accordion>
+        </OutlinedAccordion>
       ))}
     </>
   );
