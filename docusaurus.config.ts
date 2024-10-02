@@ -94,7 +94,8 @@ const config: Config = {
           sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl: "https://github.com/mittwald/contributor-portal/tree/master/",
+          editUrl:
+            "https://github.com/mittwald/contributor-portal/tree/master/",
           lastVersion: "current",
           versions: {
             current: {
@@ -124,7 +125,7 @@ const config: Config = {
   themeConfig: {
     navbar: {
       // style: 'primary',
-      title: "Contributor Portal",
+      title: "Developer Portal",
       logo: {
         alt: "mittwald",
         src: "img/mittwald-logo.svg",
@@ -232,12 +233,6 @@ const config: Config = {
       ],
       copyright: `Copyright © ${new Date().getFullYear()} Mittwald CM Service GmbH & Co. KG. Built with Docusaurus.`,
     },
-    announcementBar: {
-      content: "This site is a <b>private preview</b> for the mittwald contributor portal. The documentation provided on this site is a work in progress and <b>confidential</b>.",
-      isCloseable: false,
-      backgroundColor: "#ff9343",
-      textColor: "#fff"
-    },
     prism: {
       theme: lightCodeTheme,
       darkTheme: darkCodeTheme,
@@ -247,7 +242,7 @@ const config: Config = {
   markdown: {
     mermaid: true,
   },
-  themes: ['@docusaurus/theme-mermaid']
+  themes: ["@docusaurus/theme-mermaid"],
 };
 
 module.exports = config;
