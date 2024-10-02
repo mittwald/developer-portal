@@ -172,50 +172,6 @@ const FeatureList = [
       </>
     ),
   },
-  {
-    title: <Translate id="index.getting-started.title">Contributor</Translate>,
-    description: (
-      <>
-        <p>
-          <Translate id={"index.contributing.body"}>
-            Read our documentation about contributing content to the mStudio
-            Store
-          </Translate>
-        </p>
-        <ul>
-          <li>
-            <Link to={"/docs/v2/contributing/extensions"}>
-              <Translate id="index.contributing.extensions">
-                Develop Extensions
-              </Translate>
-            </Link>
-          </li>
-          <li>
-            <Link to="https://mittwald.github.io/flow">
-              <Translate id="index.contributing.flow">
-                Use Flow, the mittwald design system, to develop frontends
-              </Translate>
-            </Link>
-          </li>
-        </ul>
-        <p>
-          <strong>
-            <Translate id={"index.contributing.missing"}>
-              Missing something?
-            </Translate>
-          </strong>{" "}
-          <Translate id="index.contributing.more-soon">
-            More Contribution Possibilities are coming soon.
-          </Translate>{" "}
-          <Link href={issueTrackerURL}>
-            <Translate id="index.getting-started.missing.cta">
-              Use this project's issue tracker to leave a suggestion.
-            </Translate>
-          </Link>
-        </p>
-      </>
-    ),
-  },
 ];
 
 interface FeatureProps {
