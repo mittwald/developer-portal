@@ -1,7 +1,7 @@
-import Intro, { IntroHeader } from "@site/src/components/HomepageFeatures/Intro";
+import Intro, { IntroHeader } from "../Intro";
 import Translate from "@docusaurus/Translate";
 import React from "react";
-import FeatureRow from "@site/src/components/HomepageFeatures/FeatureRow";
+import FeatureRow from "../FeatureRow";
 import clsx from "clsx";
 import styles from "@site/src/components/HomepageFeatures/styles.module.css";
 import Icon from "@mittwald/flow-react-components/Icon";
@@ -37,7 +37,9 @@ function ExtensionsFeature() {
   return (
     <>
       <h3>
-        <Translate id="index.contribution.extensions.title">Integrating extensions</Translate>
+        <Translate id="index.contribution.extensions.title">
+          Integrating extensions
+        </Translate>
       </h3>
       <p>
         <Translate id={"index.contribution.extensions.body"}>
@@ -86,7 +88,9 @@ function ToolsFeature() {
   return (
     <>
       <h3>
-        <Translate id="index.contribution.tools.title">Contributor tools</Translate>
+        <Translate id="index.contribution.tools.title">
+          Contributor tools
+        </Translate>
       </h3>
       <p>
         <Translate id={"index.contribution.tools.body"}>
@@ -96,19 +100,13 @@ function ToolsFeature() {
       </p>
       <ul>
         <li>
-          <strong>
-            Flow
-          </strong>:{" "}
+          <strong>Flow</strong>:{" "}
           <Translate id="index.contribution.tools.flow">
             The mittwald design system and React component library.
           </Translate>
           <br />
-          <Link href="https://github.com/mittwald/flow">
-            GitHub
-          </Link> |{" "}
-          <Link href="https://mittwald.github.io/flow">
-            Documentation
-          </Link>
+          <Link href="https://github.com/mittwald/flow">GitHub</Link> |{" "}
+          <Link href="https://mittwald.github.io/flow">Documentation</Link>
         </li>
       </ul>
       <p>
@@ -118,11 +116,10 @@ function ToolsFeature() {
       </p>
       <ul>
         <li>
-          <strong>
-            Extension Deployment Manager
-          </strong>:{" "}
+          <strong>Extension Deployment Manager</strong>:{" "}
           <Translate id="index.contribution.tools.edm">
-            A utility application to help you implement the required extension webhooks and manage the lifecycle of your extension installations.
+            A utility application to help you implement the required extension
+            webhooks and manage the lifecycle of your extension installations.
           </Translate>
         </li>
       </ul>
