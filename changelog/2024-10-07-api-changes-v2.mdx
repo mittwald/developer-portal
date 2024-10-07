@@ -1,0 +1,144 @@
+---
+title: API changes for v2 API, October 7, 2024
+authors:
+  - machine
+tags:
+  - apiv2
+  - Contract
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+On October 7, 2024, the mittwald API underwent several changes, including the removal of optional properties for first and last names from various order-related responses, while simultaneously adding new optional properties for first and last names in the response and introducing new optional request properties for order creation.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- The optional properties `/items/profile/first_name` and `/items/profile/last_name` have been removed from the response with the '200' status for the following operations:
+  - `GET /v2/customers/{customerId}/orders`
+  - `GET /v2/orders`
+  - `GET /v2/orders/{orderId}`
+  - `GET /v2/projects/{projectId}/orders`
+
+- The optional properties `/items/profile/firstName` and `/items/profile/lastName` have been added to the response with the '200' status for the following operations:
+  - `GET /v2/customers/{customerId}/orders`
+  - `GET /v2/orders`
+  - `GET /v2/orders/{orderId}`
+  - `GET /v2/projects/{projectId}/orders`
+
+- The new optional request property `orderData/oneOf[#/components/schemas/de.mittwald.v1.order.ProjectHostingOrder]/recommendationCode` has been added to the `POST /v2/orders` operation.
+
+- The new optional request property `orderData/oneOf[#/components/schemas/de.mittwald.v1.order.ServerOrder]/recommendationCode` has also been added to the `POST /v2/orders` operation.
+
+- A breaking change has occurred due to the removal of the optional properties `/items/profile/first_name` and `/items/profile/last_name` from the response for the operations listed above.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Get list of Orders of a Customer"
+
+
+- removed the optional property '/items/profile/first_name' from the response with the '200' status
+
+- removed the optional property '/items/profile/last_name' from the response with the '200' status
+
+- added the optional property '/items/profile/firstName' to the response with the '200' status
+
+- added the optional property '/items/profile/lastName' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="order-list-customer-orders" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get list of Orders"
+
+
+- removed the optional property '/items/profile/first_name' from the response with the '200' status
+
+- removed the optional property '/items/profile/last_name' from the response with the '200' status
+
+- added the optional property '/items/profile/firstName' to the response with the '200' status
+
+- added the optional property '/items/profile/lastName' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="order-list-orders" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get Order for Customer"
+
+
+- removed the optional property 'profile/first_name' from the response with the '200' status
+
+- removed the optional property 'profile/last_name' from the response with the '200' status
+
+- added the optional property 'profile/firstName' to the response with the '200' status
+
+- added the optional property 'profile/lastName' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="order-get-order" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get list of Orders of a Project"
+
+
+- removed the optional property '/items/profile/first_name' from the response with the '200' status
+
+- removed the optional property '/items/profile/last_name' from the response with the '200' status
+
+- added the optional property '/items/profile/firstName' to the response with the '200' status
+
+- added the optional property '/items/profile/lastName' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="order-list-project-orders" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create an Order"
+
+
+- added the new optional request property 'orderData/oneOf[#/components/schemas/de.mittwald.v1.order.ProjectHostingOrder]/recommendationCode'
+
+- added the new optional request property 'orderData/oneOf[#/components/schemas/de.mittwald.v1.order.ServerOrder]/recommendationCode'
+
+
+For details, refer to the <OperationLink operation="order-create-order" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK Release v2.1.70
+
+The mittwald PHP SDK has been updated to version 2.1.70. This release includes several changes and new features aimed at improving code consistency and enhancing order processes.
+
+#### Changes
+- Variable names in the `Profile` class have been updated from snake_case to camelCase for consistency:
+  - `first_name` is now `firstName`
+  - `last_name` is now `lastName`
+
+- The `ProjectHostingOrder` and `ServerOrder` schemas have been enhanced to include a `recommendationCode`, allowing users to specify a recommendation during the order process.
+
+#### New Features
+- A `getRecommendationCode` method has been introduced in both `ProjectHostingOrder` and `ServerOrder` classes for retrieving the recommendation code.
+- New methods `withRecommendationCode` and `withoutRecommendationCode` have been added to both `ProjectHostingOrder` and `ServerOrder` classes, enabling users to add or remove a recommendation code from their orders.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.70).
+
