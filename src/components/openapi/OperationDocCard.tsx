@@ -4,7 +4,7 @@ import styles from "./OperationDocCard.module.css";
 import clsx from "clsx";
 import OperationPath from "@site/src/components/openapi/OperationPath";
 import Markdown from "react-markdown";
-import StatusBadge from "@mittwald/flow-react-components/StatusBadge";
+import AlertBadge from "@mittwald/flow-react-components/AlertBadge";
 import { APIVersion, OperationWithMeta } from "@site/src/openapi/specs";
 import isDeprecated from "@site/src/openapi/isDeprecated";
 import buildDocumentId from "@site/src/openapi/buildDocumentId";
@@ -47,7 +47,7 @@ export default function OperationDocCard(p: Props) {
             </div>
           </div>
           {deprecated ? (
-            <StatusBadge status="warning">deprecated!</StatusBadge>
+            <AlertBadge status="warning">deprecated!</AlertBadge>
           ) : null}
         </div>
       </Link>
