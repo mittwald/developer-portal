@@ -13,7 +13,6 @@ import {
 import { Heading } from "@mittwald/flow-react-components/Heading";
 import { Text } from "@mittwald/flow-react-components/Text";
 import { Button } from "@mittwald/flow-react-components/Button";
-import InlineAlert from "@mittwald/flow-react-components/InlineAlert";
 import styles from "./OperationMetadata.module.css";
 import Translate from "@docusaurus/Translate";
 import Admonition from "@theme/Admonition";

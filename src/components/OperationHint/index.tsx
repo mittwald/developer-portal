@@ -1,7 +1,7 @@
 import React from "react";
 import Translate from "@docusaurus/Translate";
 import OperationDocCardById from "@site/src/components/openapi/OperationDocCardById";
-import InlineAlert from "@mittwald/flow-react-components/InlineAlert";
+import Alert from "@mittwald/flow-react-components/Alert";
 import Content from "@mittwald/flow-react-components/Content";
 import Heading from "@mittwald/flow-react-components/Heading";
 import styles from "./styles.module.css";
@@ -26,7 +26,7 @@ export default function OperationHint({
     );
 
   return (
-    <InlineAlert status="info">
+    <Alert status="info">
       <Heading>{heading}:</Heading>
       <Content>
         <div className={styles.operations}>
@@ -40,6 +40,6 @@ export default function OperationHint({
           ))}
         </div>
       </Content>
-    </InlineAlert>
+    </Alert>
   );
 }

@@ -1,9 +1,9 @@
-import StatusBadge from "@mittwald/flow-react-components/StatusBadge";
+import AlertBadge from "@mittwald/flow-react-components/AlertBadge";
 
 export function Required() {
-  return <StatusBadge status="warning">required</StatusBadge>;
+  return <AlertBadge status="warning">required</AlertBadge>;
 }
 
 export function Optional() {
-  return <StatusBadge status="info">optional</StatusBadge>;
+  return <AlertBadge status="info">optional</AlertBadge>;
 }

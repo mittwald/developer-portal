@@ -1,7 +1,7 @@
 import React from "react";
 import type AdmonitionType from "@theme/Admonition";
 import type { WrapperProps } from "@docusaurus/types";
-import InlineAlert from "@mittwald/flow-react-components/InlineAlert";
+import Alert from "@mittwald/flow-react-components/Alert";
 import Heading from "@mittwald/flow-react-components/Heading";
 import Content from "@mittwald/flow-react-components/Content";
 import { translate } from "@docusaurus/Translate";
@@ -16,7 +16,7 @@ export default function AdmonitionWrapper(props: Props): JSX.Element {
   };
 
   return (
-    <InlineAlert status={status[props.type]}>
+    <Alert status={status[props.type]}>
       <Heading>
         {props.title ??
           translate({
@@ -25,7 +25,7 @@ export default function AdmonitionWrapper(props: Props): JSX.Element {
           })}
       </Heading>
       <Content>{props.children}</Content>
-    </InlineAlert>
+    </Alert>
   );
 
   // return (
