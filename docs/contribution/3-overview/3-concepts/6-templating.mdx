@@ -1,17 +1,18 @@
 ---
-title: Templating von Konfigurationswerten
+title: Templating of Configuration Values
 ---
 
-An verschiedenen Stellen kann statt einem statischen Wert auch ein Template, also ein Wert mit Platzhaltern verwendet werden.
-Dazu wird an entsprechender Stelle in der Dokumentation festgehalten, welche Parameter verwendet werden können.
-An sämtlichen Stellen, an denen Templating verwendet werden kann, wird dies explizit erwähnt.
+You can use templates instead of static values at various points of the extension configuration.
+Templates are strings with placeholders.
+The documentation specifies which placeholders you can use for the corresponding configuration values.
+If you can use templating for a configuration value, the documentation explicitly mentions that.
 
-Wenn für einen Konfigurationswert ein Template verwendet werden soll, werden die Platzhalter stets in der Form `:parameterName` angegeben.
+If you want to use a template for a configuration value, use `:parameterName` as the format for placeholders.
 
-Für eine URL würde ein Template also wie folgt aussehen:
+A template for a URL, for example, looks like this:
 
 `https://example.com/sso/:apiVersion/extensions/:extensionId?userId=:userId&accessTokenRetrievalKey=:accessTokenRetrievalKey`
 
-Wobei in diesem Beispiel `:apiVersion`, `:extensionId`, `:userId` und `:accessTokenRetrievalKey` die Platzhalter sind und automatisch durch die entsprechenden Werte ersetzt werden.
+In this example, `:apiVersion`, `:extensionId`, `:userId`, and `:accessTokenRetrievalKey` are the placeholders and are automatically replaced by the corresponding values.
 
-Unbekannte Parameter werden von der Template-Engine ignoriert und nicht ersetzt.
+The template engine does not replace unknown parameters.
