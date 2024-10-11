@@ -580,3 +580,57 @@ if (!$valid) {
 ### Referenzimplementierungen für die Validierung von Lifecycle Webhooks
 
 TODO
+
+## Dry Running Webhooks
+
+Um die Entwicklung einer Extension zu erleichtern, kann ein Entwickler einer Extension einen Webhook im Dry Run Modus aufrufen lassen.
+Bei einer Dry Run webhook execution wird ein [Webhook-Kind](#kind) definiert und anschließend der entprechende Webhook der Extension aufgerufen.
+Der Webhook-Endpoint wird hierbei mit [Demo-Werten](#demo-werte) aufgerufen.\
+Nach dem Dry Run wird das Ergebnis der webhook execution in der [APIResponse](https://api.mittwald.de/v2/docs/#/Marketplace/extension-dry-run-webhook) zurück gegeben.
+Inklusive response-body, response-headers und allgemeinen Fehlern.\
+Um die Dry Run webhook calls zu identifizieren wird in den Query-Parametern der Wert `dry-run=true` mitgeliefert.
+Ist der `dry-run` Query-Parameter auf `true` gesetzt, sollte das Extension-Backend diesen Call auch als solchen behandeln und daher den Aufruf als reinen Test interpretieren.
+Zudem wird vom mStudio auch der Query-Parameter `executing-user-id` gesetzt.
+
+Die `extensionInstanceId` hat bei einem Dry Run keinerlei Relevanz für echte Entitäten im mStudio.
+
+Nur Benutzer, die zu einem Contributor gehören dürfen Webhooks als Dry Run ausführen.
+
+### Demo-Werte
+
+Die Demo-Werte können als Testdaten genutzt werden, um die interne Logik der Extension zu testen.\
+Sind diese Werte nicht gesetzt, werden sie aus der Extension abgeleitet oder zufällig generiert.
+
+<SchemaWithExample
+  withRawJSONSchema
+  format="json"
+  schema={{
+    type: "object",
+    required: [],
+    properties: {
+      contextId: {
+        type: "string",
+        example: "518d4760-93bf-4ec0-9311-7a1343bc26d5",
+      },
+      scopes: {
+        type: "array",
+        example: ["mail:read", "mail:write", "domain:read"],
+        items: {
+          type: "string",
+        },
+      },
+      instandeDisabled: {
+        type: "boolean",
+      },
+      createdAt: {
+        type: "string",
+        format: "date-time",
+        example: "2024-03-14T11:36:24Z",
+      },
+      secret: {
+        type: "string",
+        example: "<<SECRET>>"
+      }
+    },
+  }}
+/>
