@@ -543,8 +543,7 @@ Um die Signatur zu prüfen, kann eine übliche kryptographische Library in der g
 
 <Tabs>
   <TabItem value="go" label="Go">
-
-````go
+```go
 bodyBytes, err := io.ReadAll(body)
 if err != nil {
   return err
@@ -553,11 +552,9 @@ if err != nil {
 if !ed25519.Verify(publicKey, bodyBytes, signature) {
   panic("invalid signature")
 }
-    ```
-
+```
   </TabItem>
   <TabItem value="php" label="PHP">
-
 ```php
 $req  = new ExtensionGetPublicKeyRequest($serial);
 $resp = $apiClient->marketplace()->extensionGetPublicKey($req);
@@ -572,8 +569,7 @@ $valid = sodium_crypto_sign_verify_detached(
 if (!$valid) {
     throw new \Exception('invalid request signature');
 }
-````
-
+```
   </TabItem>
 </Tabs>
 
