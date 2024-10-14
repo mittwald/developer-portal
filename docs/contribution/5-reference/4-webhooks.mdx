@@ -586,3 +586,57 @@ if (!$valid) {
 ### Reference Implementations of the Validation of Lifecycle Webhooks
 
 TODO
+
+## Dry Running Webhooks
+
+An extension developer can trigger a webhook in dry run mode to make the extension development easier.
+The developer defines the [webhook kind](#kind) for the dry run webhook execution, and the mStudio then calls the corresponding extension webhook.
+The mStudio calls the webhook endpoint with [demo values](#demo-values).\
+After the dry run webhook call is completed, the mStudio returns the result of the webhook call in the [API response](../../../reference/marketplace/extension-dry-run-webhook).
+This includes the response body, the response headers, and general errors.\
+The mStudio includes the query parameter `dry-run=true` in dry-run webhook calls so that extensions can identify them.
+If the `dry-run` query parameter is set to `true` in a webhook call, the extension backend should handle the webhook call as such and interpret the webhook as a test.
+The mStudio additionally sets the query parameter `executing-user-id` for dry run webhook calls.
+
+For dry run webhook calls, the `extensionInstanceId` does not have any relevant meaning for real entities in the mStudio.
+
+Only users that belong to a contributor are allowed to trigger dry run webhooks.
+
+### Demo Values
+
+You can use the demo values as test data to test the internal logic of your extension by sending the following JSON object in the body.
+If the values are not set, the mStudio derives them from the extension or generates random values.
+
+<SchemaWithExample
+  withRawJSONSchema
+  format="json"
+  schema={{
+    type: "object",
+    required: [],
+    properties: {
+      contextId: {
+        type: "string",
+        example: "518d4760-93bf-4ec0-9311-7a1343bc26d5",
+      },
+      scopes: {
+        type: "array",
+        example: ["mail:read", "mail:write", "domain:read"],
+        items: {
+          type: "string",
+        },
+      },
+      instandeDisabled: {
+        type: "boolean",
+      },
+      createdAt: {
+        type: "string",
+        format: "date-time",
+        example: "2024-03-14T11:36:24Z",
+      },
+      secret: {
+        type: "string",
+        example: "<<SECRET>>"
+      }
+    },
+  }}
+/>
