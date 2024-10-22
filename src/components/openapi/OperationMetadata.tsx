@@ -17,6 +17,7 @@ import styles from "./OperationMetadata.module.css";
 import Translate from "@docusaurus/Translate";
 import Admonition from "@theme/Admonition";
 import isDeprecated from "@site/src/openapi/isDeprecated";
+import HTTPMethod from "@site/src/components/openapi/HTTPMethod";
 
 function OperationIdHelp() {
   return (
@@ -52,22 +53,52 @@ function DeprecationNotice() {
   );
 }
 
+function OperationPathHeader({
+  method,
+  path,
+  baseURL,
+}: {
+  method: string;
+  path: string;
+  baseURL: string;
+}) {
+  const parsedBaseURL = new URL(baseURL);
+  if (path.startsWith(parsedBaseURL.pathname)) {
+    path = path.substring(parsedBaseURL.pathname.length);
+  }
+
+  return (
+    <pre className={styles.meta}>
+      <HTTPMethod method={method} />
+      <span>
+        <OperationPath path={path} />
+      </span>
+      <CopyButton
+        text={baseURL + path}
+        size="m"
+        variant="plain"
+        style={{ marginTop: -8, marginBottom: -8 }}
+      />
+    </pre>
+  );
+}
+
 export function OperationMetadata({
   method,
   path,
   spec,
+  baseURL,
   withDescription = true,
 }: {
   path: string;
   method: string;
   spec: OpenAPIV3.OperationObject;
+  baseURL: string;
   withDescription?: boolean;
 }) {
   return (
     <>
-      <pre>
-        {method.toUpperCase()} <OperationPath path={path} />
-      </pre>
+      <OperationPathHeader method={method} path={path} baseURL={baseURL} />
 
       {isDeprecated(spec) && <DeprecationNotice />}
 
