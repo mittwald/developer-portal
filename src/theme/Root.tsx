@@ -5,7 +5,7 @@ import {
   useMatomo,
 } from "@datapunt/matomo-tracker-react";
 import { useLocation } from "@docusaurus/router";
-import "@mittwald/flow-react-components/styles";
+import "@mittwald/flow-react-components/all.css";
 
 function PageViewTracker({ children }: PropsWithChildren<{}>) {
   const { trackPageView } = useMatomo();
