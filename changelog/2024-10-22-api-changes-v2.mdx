@@ -1,0 +1,97 @@
+---
+title: API changes for v2 API, October 22, 2024
+authors:
+  - machine
+tags:
+  - apiv2
+  - Contract
+  - Marketplace
+  - Notification
+  - User
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+On October 22, 2024, the mittwald API introduced several enhancements, including the addition of non-success response statuses, optional properties in responses, and new optional request parameters for improved functionality across various endpoints.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- The DELETE operation for canceling contract termination now includes a non-success response with the status '412'.
+- The GET operation for listing extensions has been updated to include an optional property '/items/deprecation' in the response with the '200' status.
+- The GET operation for retrieving a specific extension now includes an optional property 'deprecation' in the response with the '200' status.
+- The POST operation for marking all notifications as read has been enhanced with several new optional query request parameters: 'referenceAggregate', 'referenceDomain', 'referenceId', and 'severities'.
+- The POST operation for marking all notifications as read now includes a required property 'updatedCount' in the response with the '200' status.
+- The DELETE operation for removing a user's phone number now includes a non-success response with the status '412'.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Cancel the Termination for the referred Contract"
+
+
+- added the non-success response with the status '412'
+
+
+For details, refer to the <OperationLink operation="contract-cancel-contract-termination" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Extensions"
+
+
+- added the optional property '/items/deprecation' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-list-extensions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an Extension"
+
+
+- added the optional property 'deprecation' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Mark all notifications as read"
+
+
+- added the new optional 'query' request parameter 'referenceAggregate'
+
+- added the new optional 'query' request parameter 'referenceDomain'
+
+- added the new optional 'query' request parameter 'referenceId'
+
+- added the new optional 'query' request parameter 'severities'
+
+- added the required property 'updatedCount' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="notifications-read-all-notifications" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Remove phone number"
+
+
+- added the non-success response with the status '412'
+
+
+For details, refer to the <OperationLink operation="user-remove-phone-number" apiVersion="v2" /> endpoint.
+
+
+
