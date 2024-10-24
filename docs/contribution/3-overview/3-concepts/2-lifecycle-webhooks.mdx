@@ -16,6 +16,7 @@ For an overview of the possible placeholders available in lifecycle webhook URL 
 
 The mStudio executes all webhook calls `at least once`.
 Therefore, you must design the webhook endpoints so that multiple calls do not result in errors.
+Every status code less than `200` or greater than or equal `300` is considered a failure.
 The webhook calls are executed asynchronously to the action that triggered them.
 If a webhook call fails, the webhook payload is rebuilt.
 The request is then signed and resubmitted.
