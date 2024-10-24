@@ -1,5 +1,5 @@
 import styles from "./OperationReference.module.css";
-import { Fragment, PropsWithChildren } from "react";
+import { PropsWithChildren } from "react";
 import Markdown from "react-markdown";
 import CodeBlock from "@theme/CodeBlock";
 import { OpenAPIV3 } from "openapi-types";
@@ -22,6 +22,7 @@ import ParameterObject = OpenAPIV3.ParameterObject;
 import ReferenceObject = OpenAPIV3.ReferenceObject;
 import ResponseObject = OpenAPIV3.ResponseObject;
 import SchemaWithExample from "@site/src/components/openapi/SchemaWithExample";
+import SchemaObject = OpenAPIV3.SchemaObject;
 
 function OutlinedAccordion({
   children,
@@ -30,7 +31,7 @@ function OutlinedAccordion({
   return (
     <Accordion
       defaultExpanded={defaultExpanded}
-      variant="outlined"
+      variant="outline"
       style={{ marginBottom: "1em" }}
     >
       {children}
@@ -175,7 +176,7 @@ function OperationRequestBody({
             Format: <code>application/json</code>
           </p>
           <SchemaWithExample
-            schema={spec.content["application/json"].schema}
+            schema={spec.content["application/json"].schema as SchemaObject}
             withRawJSONSchema
           />
         </Content>
@@ -222,7 +223,7 @@ function OperationResponseBody({ spec }: { spec?: OpenAPIV3.ResponseObject }) {
         </ColumnLayout>
 
         <SchemaWithExample
-          schema={spec.content["application/json"].schema}
+          schema={spec.content["application/json"].schema as SchemaObject}
           withRawJSONSchema
         />
       </>
@@ -291,10 +292,8 @@ export function OperationRequest({
 }
 
 function OperationResponse({
-  status,
   response,
 }: {
-  status: string;
   response: OpenAPIV3.ResponseObject;
 }) {
   return (
@@ -306,14 +305,7 @@ function OperationResponse({
         })}
         headers={response.headers as Record<string, OpenAPIV3.HeaderObject>}
       />
-      <OperationResponseBody
-        title={translate({
-          id: "openapi.operation.response.body",
-          message: "Response body",
-        })}
-        spec={response}
-        code={status}
-      />
+      <OperationResponseBody spec={response} />
     </>
   );
 }
@@ -337,7 +329,6 @@ export function OperationResponses({
           <Content>
             <OperationResponse
               key={status}
-              status={status}
               response={spec.responses[status] as ResponseObject}
             />
           </Content>
@@ -351,14 +342,21 @@ function OperationReference({
   path,
   method,
   spec,
+  baseURL,
 }: {
   path: string;
   method: string;
   spec: OpenAPIV3.OperationObject;
+  baseURL: string;
 }) {
   return (
     <>
-      <OperationMetadata path={path} method={method} spec={spec} />
+      <OperationMetadata
+        path={path}
+        method={method}
+        spec={spec}
+        baseURL={baseURL}
+      />
       <OperationRequest spec={spec} />
       <OperationResponses spec={spec} />
 
