@@ -91,10 +91,7 @@ You may use the following placeholders:
       },
       meta: {
         type: "object",
-        required: [
-            "extensionId",
-            "contributorId"
-        ],
+        required: ["extensionId", "contributorId"],
         properties: {
           extensionId: {
             type: "string",
@@ -212,10 +209,7 @@ You may use the following placeholders:
       },
       meta: {
         type: "object",
-        required: [
-            "extensionId",
-            "contributorId"
-        ],
+        required: ["extensionId", "contributorId"],
         properties: {
           extensionId: {
             type: "string",
@@ -271,7 +265,15 @@ You may use the following placeholders:
   format="yaml"
   schema={{
     type: "object",
-    required: ["apiVersion", "context", "kind", "id", "secret", "request"],
+    required: [
+      "apiVersion",
+      "context",
+      "kind",
+      "id",
+      "meta",
+      "secret",
+      "request",
+    ],
     properties: {
       apiVersion: {
         type: "string",
@@ -297,6 +299,22 @@ You may use the following placeholders:
           kind: {
             type: "string",
             enum: ["customer", "project"],
+          },
+        },
+      },
+      meta: {
+        type: "object",
+        required: ["extensionId", "contributorId"],
+        properties: {
+          extensionId: {
+            type: "string",
+            format: "uuid",
+            example: "c593348d-f594-492a-8185-2b89848a4160",
+          },
+          contributorId: {
+            type: "string",
+            format: "uuid",
+            example: "680ba069-7465-4932-8b23-e73914b2e051",
           },
         },
       },
@@ -404,10 +422,7 @@ You may use the following placeholders:
       },
       meta: {
         type: "object",
-        required: [
-            "extensionId",
-            "contributorId"
-        ],
+        required: ["extensionId", "contributorId"],
         properties: {
           extensionId: {
             type: "string",
@@ -515,9 +530,12 @@ In that case, domain actions of that extension instance are not accepted.
 
 ### meta
 
-Meta information about the extension instance.
-Currently, the mStudio only sends the creation date of the extension instance.
-This should not be confused with the request meta information which describes the webhook call.
+Meta information about the extension (instance).
+This includes the extensionID and the contributorID.
+
+These information should be used to ensure that the webhook not only originates from mittwald, but is also intended for the own extension.
+This prevents forward replay attacks.
+This should not be confused with the request meta information which describes the webhook call itself.
 
 ### secret
 
@@ -659,8 +677,8 @@ If the values are not set, the mStudio derives them from the extension or genera
       },
       secret: {
         type: "string",
-        example: "<<SECRET>>"
-      }
+        example: "<<SECRET>>",
+      },
     },
   }}
 />

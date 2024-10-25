@@ -91,10 +91,7 @@ Folgende Platzhalter können verwendet werden:
       },
       meta: {
         type: "object",
-        required: [
-            "extensionId",
-            "contributorId"
-        ],
+        required: ["extensionId", "contributorId"],
         properties: {
           extensionId: {
             type: "string",
@@ -212,10 +209,7 @@ Folgende Platzhalter können verwendet werden:
       },
       meta: {
         type: "object",
-        required: [
-            "extensionId",
-            "contributorId"
-        ],
+        required: ["extensionId", "contributorId"],
         properties: {
           extensionId: {
             type: "string",
@@ -271,7 +265,15 @@ Folgende Platzhalter können verwendet werden:
   format="yaml"
   schema={{
     type: "object",
-    required: ["apiVersion", "context", "kind", "id", "secret", "request"],
+    required: [
+      "apiVersion",
+      "context",
+      "kind",
+      "id",
+      "meta",
+      "secret",
+      "request",
+    ],
     properties: {
       apiVersion: {
         type: "string",
@@ -297,6 +299,22 @@ Folgende Platzhalter können verwendet werden:
           kind: {
             type: "string",
             enum: ["customer", "project"],
+          },
+        },
+      },
+      meta: {
+        type: "object",
+        required: ["extensionId", "contributorId"],
+        properties: {
+          extensionId: {
+            type: "string",
+            format: "uuid",
+            example: "c593348d-f594-492a-8185-2b89848a4160",
+          },
+          contributorId: {
+            type: "string",
+            format: "uuid",
+            example: "680ba069-7465-4932-8b23-e73914b2e051",
           },
         },
       },
@@ -404,10 +422,7 @@ Folgende Platzhalter können verwendet werden:
       },
       meta: {
         type: "object",
-        required: [
-            "extensionId",
-            "contributorId"
-        ],
+        required: ["extensionId", "contributorId"],
         properties: {
           extensionId: {
             type: "string",
@@ -516,7 +531,12 @@ Somit würden auch Domain Actions für eine deaktivierte Extension Instance nich
 
 ### meta
 
-Meta-Informationen über die Extension Instance. Derzeit wird lediglich der Erstellungszeitpunkt der Extension Instance übermittelt.
+Meta-Informationen über die Extension (Instance).
+Diese beinhalten die IDs der Extension und des Contributors.
+
+Diese Informationen sollten bspw. verwendet werden, um sicherzustellen, dass der Webhook nicht nur ursprünglich von mittwald stammt,
+sondern auch für die eigene Extension bestimmt ist.
+Dies beugt Forward-Replay-Attacken vor.
 Dies ist nicht zu verwechseln mit den Request Meta Informationen, die Aufschluss über den Webhook an sich geben.
 
 ### secret
@@ -576,7 +596,8 @@ if err != nil {
 if !ed25519.Verify(publicKey, bodyBytes, signature) {
   panic("invalid signature")
 }
-```
+
+````
   </TabItem>
   <TabItem value="php" label="PHP">
 ```php
@@ -593,7 +614,8 @@ $valid = sodium_crypto_sign_verify_detached(
 if (!$valid) {
     throw new \Exception('invalid request signature');
 }
-```
+````
+
   </TabItem>
 </Tabs>
 
@@ -649,8 +671,8 @@ Sind diese Werte nicht gesetzt, werden sie aus der Extension abgeleitet oder zuf
       },
       secret: {
         type: "string",
-        example: "<<SECRET>>"
-      }
+        example: "<<SECRET>>",
+      },
     },
   }}
 />
