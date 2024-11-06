@@ -119,7 +119,7 @@ async function generateAPIChangelog(apiVersion: APIVersion) {
     ) as ChangelogEntry[]
   ).map((change) => {
     const operation = getOperationById(spec, change.operationId);
-    return { ...change, description: operation.operation.summary };
+    return { ...change, description: operation?.operation.summary };
   });
   const groupedChangelog = groupChangelogByOperation(changelog);
   const hasBreakingChanges = changelog.some(
