@@ -219,4 +219,7 @@ async function generateClientChangelog(
 (async () => {
   await generateAPIChangelog("v1");
   await generateAPIChangelog("v2");
-})().catch(console.error);
+})().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
