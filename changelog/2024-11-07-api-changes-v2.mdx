@@ -1,0 +1,213 @@
+---
+title: Breaking (!) API changes for v2 API, November 7, 2024
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Customer
+  - Marketplace
+  - File
+  - Project
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+On November 7, 2024, the mittwald API underwent significant changes, including the removal of several API paths without deprecation, the addition of new endpoints for address and company verification, and updates to security requirements and response properties.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The API path for replacing invoice settings (`PUT /internal-v2/customers/{customerId}/invoice-settings`) has been removed without deprecation, which is a breaking change.
+- The API path for leaving a customer (`POST /v2/customer/{customerId}/actions/leave`) has been removed without deprecation.
+- The API path for creating a customer invite (`POST /v2/customer/{customerId}/invites`) has been removed without deprecation.
+- A new endpoint has been added to verify an address (`POST /v2/actions/verify-address`).
+- A new endpoint has been added to verify a company (`POST /v2/actions/verify-company`).
+- The security scheme `de.mittwald.v1.commons.AccessToken` has been removed from the following endpoints:
+  - List Contributors (`GET /v2/contributors`)
+  - Get a Contributor (`GET /v2/contributors/{contributorId}`)
+  - List Extensions (`GET /v2/extensions`)
+  - Get an Extension (`GET /v2/extensions/{extensionId}`)
+  - Get the public key to verify the webhook signature (`GET /v2/webhook-public-keys/{serial}`)
+- New optional request parameters have been added to the following operations for getting a file:
+  - `accept` and `content-disposition` for `GET /v2/files/{fileId}`
+  - `accept` and `content-disposition` for `GET /v2/files/{fileId}/{fileName}`
+- Required properties have been added to the response with a `200` status for the following operations:
+  - `backupStorageUsageInBytes` and `backupStorageUsageInBytesSetAt` for listing projects (`GET /v2/projects`)
+  - `backupStorageUsageInBytes` and `backupStorageUsageInBytesSetAt` for getting a project (`GET /v2/projects/{projectId}`)
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "invoice-replace-invoice-settings"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+
+For details, refer to the <OperationLink operation="invoice-replace-invoice-settings" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Leave a Customer"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="customer-leave-customer" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a customer invite"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="customer-create-customer-invite" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Check if an address exists"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="verification-verify-address" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Check if a company exists"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="verification-verify-company" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List contributors"
+
+
+- the endpoint scheme security 'de.mittwald.v1.commons.AccessToken' was removed from the API
+
+
+For details, refer to the <OperationLink operation="extension-list-contributors" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a contributor"
+
+
+- the endpoint scheme security 'de.mittwald.v1.commons.AccessToken' was removed from the API
+
+
+For details, refer to the <OperationLink operation="extension-get-contributor" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Extensions"
+
+
+- the endpoint scheme security 'de.mittwald.v1.commons.AccessToken' was removed from the API
+
+
+For details, refer to the <OperationLink operation="extension-list-extensions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an Extension"
+
+
+- the endpoint scheme security 'de.mittwald.v1.commons.AccessToken' was removed from the API
+
+
+For details, refer to the <OperationLink operation="extension-get-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a File"
+
+
+- added the new optional 'query' request parameter 'accept'
+
+- added the new optional 'query' request parameter 'content-disposition'
+
+
+For details, refer to the <OperationLink operation="file-get-file" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a File with user-friendly url"
+
+
+- added the new optional 'query' request parameter 'accept'
+
+- added the new optional 'query' request parameter 'content-disposition'
+
+
+For details, refer to the <OperationLink operation="file-get-file-with-name" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Projects belonging to the executing user"
+
+
+- added the required property '/items/backupStorageUsageInBytes' to the response with the '200' status
+
+- added the required property '/items/backupStorageUsageInBytesSetAt' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-list-projects" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Project"
+
+
+- added the required property 'backupStorageUsageInBytes' to the response with the '200' status
+
+- added the required property 'backupStorageUsageInBytesSetAt' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-get-project" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the public key to verify the webhook signature"
+
+
+- the endpoint scheme security 'de.mittwald.v1.commons.AccessToken' was removed from the API
+
+
+For details, refer to the <OperationLink operation="extension-get-public-key" apiVersion="v2" /> endpoint.
+
+
+
