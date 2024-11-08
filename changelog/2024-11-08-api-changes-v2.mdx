@@ -1,0 +1,164 @@
+---
+title: Breaking (!) API changes for v2 API, November 8, 2024
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Conversation
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+On November 8, 2024, the mittwald API underwent significant changes, including updates to response property types, the removal of required properties, and the introduction of new optional properties across various endpoints related to conversations.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The property type/format for '/items/relatedTo' and '/items/sharedWith' in the response for the GET operation on '/v2/conversations' has changed from 'object' to an unspecified type for status '200'. This is a breaking change.
+- The required properties '/items/relatedTo/aggregate', '/items/relatedTo/domain', '/items/relatedTo/id', '/items/sharedWith/aggregate', '/items/sharedWith/domain', and '/items/sharedWith/id' have been removed from the response for the GET operation on '/v2/conversations'. This is a breaking change.
+- The optional property '/items/notificationRoles' has been added to the response for the GET operation on '/v2/conversations'.
+- The 'oneOf' list for the '/items/sharedWith' response property has been updated to include new subschemas for the GET operation on '/v2/conversations'.
+- The 'oneOf' list for the '/items/relatedTo' response property has been updated to include new subschemas for the GET operation on '/v2/conversations'.
+- The 'relatedTo' request property type/format has changed from 'object' to an unspecified type for the POST operation on '/v2/conversations'. This is a breaking change.
+- The required properties 'relatedTo/aggregate', 'relatedTo/domain', and 'relatedTo/id' have been removed from the request for the POST operation on '/v2/conversations'.
+- The optional request property 'notificationRoles' has been added for the POST operation on '/v2/conversations'.
+- The 'oneOf' list for the 'relatedTo' request property has been updated to include new subschemas for the POST operation on '/v2/conversations'.
+- The 'relatedTo' request property type/format has changed from 'object' to an unspecified type for the PUT operation on '/v2/conversations/{conversationId}'. This is a breaking change.
+- The required properties 'relatedTo/aggregate', 'relatedTo/domain', and 'relatedTo/id' have been removed from the request for the PUT operation on '/v2/conversations/{conversationId}'.
+- The optional property '/items/notificationRoles' has been added to the response for the GET operation on '/v2/conversations/{conversationId}'.
+- The 'oneOf' list for the 'sharedWith' response property has been updated to include new subschemas for the GET operation on '/v2/conversations/{conversationId}'.
+- The 'oneOf' list for the 'relatedTo' response property has been updated to include new subschemas for the GET operation on '/v2/conversations/{conversationId}'. 
+- The 'oneOf' list for the 'relatedTo' request property has been updated to include new subschemas for the PUT operation on '/v2/conversations/{conversationId}'.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Get all conversation the authenticated user has created or has access to"
+
+
+- ⚠️ **Breaking:** the '/items/relatedTo' response's property type/format changed from 'object'/'' to ''/'' for status '200'
+
+- ⚠️ **Breaking:** the '/items/sharedWith' response's property type/format changed from 'object'/'' to ''/'' for status '200'
+
+- ⚠️ **Breaking:** removed the required property '/items/relatedTo/aggregate' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property '/items/relatedTo/domain' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property '/items/relatedTo/id' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property '/items/sharedWith/aggregate' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property '/items/sharedWith/domain' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property '/items/sharedWith/id' from the response with the '200' status
+
+- added the optional property '/items/notificationRoles' to the response with the '200' status
+
+- added 'subschema #1, subschema #2, subschema #3, subschema #4' to the '/items/sharedWith' response property 'oneOf' list for the response status '200'
+
+- added 'subschema #1, subschema #2, subschema #3, subschema #4, subschema #5, subschema #6' to the '/items/relatedTo' response property 'oneOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="conversation-list-conversations" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a conversation"
+
+
+- ⚠️ **Breaking:** removed 'subschema #4, subschema #6' from the 'sharedWith' request property 'oneOf' list
+
+- ⚠️ **Breaking:** the 'relatedTo' request property type/format changed from 'object'/'' to ''/''
+
+- removed the request property 'relatedTo/aggregate'
+
+- removed the request property 'relatedTo/domain'
+
+- removed the request property 'relatedTo/id'
+
+- added the new optional request property 'notificationRoles'
+
+- added 'subschema #1, subschema #2, subschema #3, subschema #4, subschema #5, subschema #6' to the 'relatedTo' request property 'oneOf' list
+
+
+For details, refer to the <OperationLink operation="conversation-create-conversation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a support conversation"
+
+
+- ⚠️ **Breaking:** the 'relatedTo' response's property type/format changed from 'object'/'' to ''/'' for status '200'
+
+- ⚠️ **Breaking:** the 'sharedWith' response's property type/format changed from 'object'/'' to ''/'' for status '200'
+
+- ⚠️ **Breaking:** removed the required property 'relatedTo/aggregate' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'relatedTo/domain' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'relatedTo/id' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'sharedWith/aggregate' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'sharedWith/domain' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'sharedWith/id' from the response with the '200' status
+
+- added the optional property 'notificationRoles' to the response with the '200' status
+
+- added 'subschema #1, subschema #2, subschema #3, subschema #4' to the 'sharedWith' response property 'oneOf' list for the response status '200'
+
+- added 'subschema #1, subschema #2, subschema #3, subschema #4, subschema #5, subschema #6' to the 'relatedTo' response property 'oneOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="conversation-get-conversation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update the basic properties of the conversation"
+
+
+- ⚠️ **Breaking:** the 'relatedTo' request property type/format changed from 'object'/'' to ''/''
+
+- removed the request property 'relatedTo/aggregate'
+
+- removed the request property 'relatedTo/domain'
+
+- removed the request property 'relatedTo/id'
+
+- added 'subschema #1, subschema #2, subschema #3, subschema #4, subschema #5, subschema #6' to the 'relatedTo' request property 'oneOf' list
+
+
+For details, refer to the <OperationLink operation="conversation-update-conversation" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald JavaScript SDK Release 4.70.0
+
+The mittwald JavaScript SDK has been updated to version 4.70.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details on the changes, you can view the release on GitHub: [mittwald JavaScript SDK 4.70.0](https://github.com/mittwald/api-client-js/releases/tag/4.70.0).
+
