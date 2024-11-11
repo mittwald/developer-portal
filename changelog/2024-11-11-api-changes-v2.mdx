@@ -1,0 +1,61 @@
+---
+title: API changes for v2 API, November 11, 2024
+authors:
+  - machine
+tags:
+  - apiv2
+  - Database
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+On November 11, 2024, the mittwald API introduced required properties 'externalHostname' and '/items/externalHostname' to the responses of the GET operations for retrieving a specific MySQL database and listing MySQL databases within a project, respectively.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- The required property 'externalHostname' has been added to the response with the '200' status for the following operations:
+  - GET /v2/mysql-databases/{mysqlDatabaseId} (Get a MySQLDatabase)
+  - GET /v2/projects/{projectId}/mysql-databases (List MySQLDatabases belonging to a Project)
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Get a MySQL database"
+
+
+- added the required property 'externalHostname' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="database-get-mysql-database" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List MySQL databases belonging to a Project"
+
+
+- added the required property '/items/externalHostname' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="database-list-mysql-databases" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald JavaScript SDK Release 4.71.0
+
+The mittwald JavaScript SDK has been updated to version 4.71.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.71.0](https://github.com/mittwald/api-client-js/releases/tag/4.71.0).
+
