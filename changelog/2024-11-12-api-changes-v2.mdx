@@ -1,0 +1,97 @@
+---
+title: API changes for v2 API, November 12, 2024
+authors:
+  - machine
+tags:
+  - apiv2
+  - Marketplace
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+On November 12, 2024, the mittwald API introduced several enhancements, including the addition of required properties to responses for various endpoints and the introduction of a new endpoint to retrieve health information for extensions associated with contributors.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- The required property '/items/description' has been added to the response with the '200' status for the `GET /v2/contributors` operation (List Contributors).
+- The required property 'description' has been added to the response with the '200' status for the `GET /v2/contributors/{contributorId}` operation (Get a Contributor).
+- The required property '/items/published' has been added to the response with the '200' status for the `GET /v2/extensions` operation (List Extensions).
+- The required property 'published' has been added to the response with the '200' status for the `GET /v2/extensions/{extensionId}` operation (Get an Extension).
+- A new endpoint has been added for the `GET /v2/marketplace/{contributorId}/extensionshealth` operation (Get all extensions and instances health for the contributor).
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "List contributors"
+
+
+- added the required property '/items/description' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-list-contributors" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a contributor"
+
+
+- added the required property 'description' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-contributor" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Extensions"
+
+
+- added the required property '/items/published' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-list-extensions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an Extension"
+
+
+- added the required property 'published' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all extensions and instances health for the contributor"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="marketplace-get-extensionshealth" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald JavaScript SDK Release 4.72.0
+
+The mittwald JavaScript SDK has been updated to version 4.72.0. This release includes the following feature:
+
+- Updated the generated client to enhance functionality and performance ([commit ea96785](https://github.com/mittwald/api-client-js/commit/ea967857c449ebfabfbdc66e5b9a472cce3859f5)).
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.72.0).
+
