@@ -1,0 +1,129 @@
+---
+title: Breaking (!) API changes for v2 API, November 19, 2024
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Project
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+On November 19, 2024, the mittwald API introduced several new endpoints for managing storage space notifications and statistics, while also removing an existing API path without prior deprecation.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The API path for the operation `GET marketplace-get-extensionshealth` at `/v2/marketplace/{contributorId}/extensionshealth` has been removed without deprecation, which is a breaking change.
+- A new endpoint has been added to update a project's storage space notification threshold with the operation `PUT storagespace-replace-project-notification-threshold` at `/v2/projects/{projectId}/storage-space-notification-threshold`.
+- A new endpoint has been added to get storage space statistics belonging to a project with the operation `GET storagespace-get-project-statistics` at `/v2/projects/{projectId}/storage-space-statistics`.
+- A new endpoint has been added to update a server's storage space notification threshold with the operation `PUT storagespace-replace-server-notification-threshold` at `/v2/servers/{serverId}/storage-space-notification-threshold`.
+- A new endpoint has been added to get storage space statistics belonging to a server with the operation `GET storagespace-get-server-statistics` at `/v2/servers/{serverId}/storage-space-statistics`.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "marketplace-get-extensionshealth"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+
+For details, refer to the <OperationLink operation="marketplace-get-extensionshealth" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a Project's storage space notification threshold"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="storagespace-replace-project-notification-threshold" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get storage space Statistics belonging to a Project"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="storagespace-get-project-statistics" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a Server's storage space notification threshold"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="storagespace-replace-server-notification-threshold" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get storage space Statistics belonging to a Server"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="storagespace-get-server-statistics" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### Release Summary: mittwald PHP SDK v2.1.82
+
+The latest release of the mittwald PHP SDK, version [v2.1.82](https://github.com/mittwald/api-client-php/releases/tag/v2.1.82), introduces several new features and improvements aimed at enhancing project resource management and streamlining the API.
+
+#### Key Features and Changes:
+- **MarketplaceClient Updates**: The `getExtensionshealth` method has been removed, simplifying the API by focusing on alternative functionalities for managing extension lists.
+  
+- **ProjectClient Enhancements**: New functionalities have been added to manage storage space statistics and notification thresholds, including:
+  - `storagespaceGetProjectStatistics`
+  - `storagespaceGetServerStatistics`
+  - `storagespaceReplaceProjectNotificationThreshold`
+  - `storagespaceReplaceServerNotificationThreshold`
+
+- **New Data Models**: Introduction of data models such as `Statistics`, `StatisticsCategory`, and `StatisticsResource` to support statistics-related functionalities.
+
+- **Validation Improvements**: Enhanced validation logic across various classes to ensure data integrity and robustness in API request and response handling.
+
+#### Breaking Changes:
+- The removal of the `getExtensionshealth` method requires existing clients to refactor their implementations accordingly.
+
+#### New Classes:
+- Several new classes have been added to support the new functionalities, including those for retrieving statistics and managing storage space.
+
+These updates collectively enhance the API's capabilities in managing storage and project resources while phasing out outdated methods. For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.82).
+
+### mittwald JavaScript SDK Release 4.75.0
+
+The mittwald JavaScript SDK has been updated to version 4.75.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.75.0](https://github.com/mittwald/api-client-js/releases/tag/4.75.0).
+
