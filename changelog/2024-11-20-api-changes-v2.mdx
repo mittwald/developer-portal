@@ -1,0 +1,78 @@
+---
+title: API changes for v2 API, November 20, 2024
+authors:
+  - machine
+tags:
+  - apiv2
+  - Marketplace
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+On November 20, 2024, the mittwald API was updated to include the optional property 'logoRefId' in the responses for both the List Extensions and Get an Extension endpoints.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- The optional property '/items/logoRefId' has been added to the response with the '200' status for the `GET /v2/extensions` operation, which lists extensions.
+- The optional property 'logoRefId' has been added to the response with the '200' status for the `GET /v2/extensions/{extensionId}` operation, which retrieves a specific extension.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "List Extensions"
+
+
+- added the optional property '/items/logoRefId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-list-extensions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an Extension"
+
+
+- added the optional property 'logoRefId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-extension" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK Release v2.1.83
+
+The latest release of the mittwald PHP SDK, version v2.1.83, introduces new features and updates to enhance functionality and data handling.
+
+#### New Features
+- **Logo Reference ID**: A new property `logoRefId` has been added to the `Extension` class. This allows clients to specify a logo using a file ID, facilitating easier association of logos with extensions.
+
+#### Changes
+- **Schema Update**: The OpenAPI schema for the `Extension` class now includes the `logoRefId` property, formatted as a UUID.
+- **Class Properties**: A new private property `?string $logoRefId = null;` has been introduced to store the logo reference ID.
+- **Getters and Setters**:
+  - `getLogoRefId()`: Retrieves the logo reference ID.
+  - `withLogoRefId(string $logoRefId)`: Sets the logo reference ID with validation.
+  - `withoutLogoRefId()`: Unsets the logo reference ID.
+- **Data Handling**: Methods for data mapping have been updated to incorporate the `logoRefId` field, ensuring proper management during object initialization and serialization.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.83).
+
+### mittwald JavaScript SDK Release 4.76.0
+
+The mittwald JavaScript SDK has been updated to version 4.76.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.76.0).
+
