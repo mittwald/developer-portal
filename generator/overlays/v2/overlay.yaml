@@ -16,7 +16,7 @@ actions:
         example: "203.0.113.123/32"
   - target: $.components.schemas['de.mittwald.v1.database.CreateMySqlUserWithDatabase'].properties.accessIpMask
     remove: true
-  - target: $.components.schemas['de.mittwald.v1.database.CreateMySqlUserWithDatabase'].properties.accessIpMask
+  - target: $.components.schemas['de.mittwald.v1.database.CreateMySqlUserWithDatabase'].properties
     update:
       externalAccess:
         description: >
@@ -30,3 +30,45 @@ actions:
       collation:
         description: A valid MySQL collation
         example: utf8mb4_general_ci
+
+  - target: $.paths['/v2/dns-zones/{dnsZoneId}/record-sets/{recordSet}'].put.parameters[?(@.name=="recordSet")]
+    update:
+      description: >
+        The record set to be updated. AAAA records are updated as part of the A record; so use `"a"` as value
+        if you want to update your AAAA records. Please also note that the request body schema varies depending on
+        which value you provide here.
+  - target: $.paths['/v2/dns/zones/{zoneId}/recordset/acombined/custom'].put
+    update:
+      summary: Updates A records for a specific zone
+      description: >
+        This operation is deprecated. Use the `PUT /v2/dns/zones/{zoneId}/record-sets/{recordSet}/` endpoint instead.
+  - target: $.paths['/v2/dns/zones/{zoneId}/recordset/cname'].put
+    update:
+      summary: Updates CNAME records for a specific zone
+      description: >
+        This operation is deprecated. Use the `PUT /v2/dns/zones/{zoneId}/record-sets/{recordSet}/` endpoint instead.
+  - target: $.paths['/v2/dns/zones/{zoneId}/recordset/mx/custom'].put
+    update:
+      summary: Updates MX records for a specific zone
+      description: >
+        This operation is deprecated. Use the `PUT /v2/dns/zones/{zoneId}/record-sets/{recordSet}/` endpoint instead.
+  - target: $.paths['/v2/dns/zones/{zoneId}/recordset/srv'].put
+    update:
+      summary: Updates SRV records for a specific zone
+      description: >
+        This operation is deprecated. Use the `PUT /v2/dns/zones/{zoneId}/record-sets/{recordSet}/` endpoint instead.
+  - target: $.paths['/v2/dns/zones/{zoneId}/recordset/txt'].put
+    update:
+      summary: Updates TXT records for a specific zone
+      description: >
+        This operation is deprecated. Use the `PUT /v2/dns/zones/{zoneId}/record-sets/{recordSet}/` endpoint instead.
+  - target: $.paths['/v2/dns/zones/{zoneId}/recordset/acombined/managed/ingress'].post
+    update:
+      summary: Resets A records to managed for a specific zone
+      description: >
+        This operation is deprecated. Use the `POST /v2/dns/zones/{zoneId}/record-sets/{recordSet}/actions/set-managed` endpoint instead.
+  - target: $.paths['/v2/dns/zones/{zoneId}/recordset/mx/managed'].post
+    update:
+      summary: Resets A records to managed for a specific zone
+      description: >
+        This operation is deprecated. Use the `POST /v2/dns/zones/{zoneId}/record-sets/{recordSet}/actions/set-managed` endpoint instead.

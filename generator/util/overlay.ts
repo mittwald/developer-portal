@@ -56,6 +56,11 @@ export function applyOverlay(
         delete parent[toRemove];
       }
     } else {
+      const path = jsonpath.paths(overlayedSpec, action.target);
+      if (path.length === 0) {
+        throw new Error(`target ${action.target} did not match anything`);
+      }
+
       // It must be an update
       if (action.target === "$") {
         overlayedSpec = merger(action.update)(overlayedSpec);

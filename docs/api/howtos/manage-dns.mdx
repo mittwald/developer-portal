@@ -1,0 +1,86 @@
+---
+sidebar_label: Managing DNS records
+sidebar_position: 20
+title: Managing DNS records over the API
+description: This article explains how to manage different kinds of DNS records via the API
+tags:
+  - DNS
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+import OperationExample from "@site/src/components/OperationExample";
+
+:::note
+
+In the following examples, substitute `PROJECT_ID` with your actual project ID. Please note that this needs to be the
+**full id** (formatted as a UUID), and **not** the short ID (formatted as `p-XXXXX`).
+
+:::
+
+## Setting a A/AAAA record for a domain or subdomain
+
+To modify the A or AAAA records of an existing domain or subdomain, you first need to obtain its DNS zone id. For this,
+list the project's DNS zones by using the <OperationLink operation="dns-list-dns-zones" /> endpoint. In the following
+examples, this zone ID will be referred to as `ZONE_ID`.
+
+You can then modify your A and AAAA records using the <OperationLink operation="dns-update-record-set" /> operation.
+Note that this operation is used for modifying _both_ A and AAAA records (even though the `recordSet` path parameter
+should always be set to `"a"`):
+
+<OperationExample
+  operation="dns-update-record-set"
+  pathParameters={{ recordSet: "a", dnsZoneId: "ZONE_ID" }}
+  example={{
+    a: ["203.0.113.1", "203.0.113.2"],
+    aaaa: ["2001:0DB8::1", "2001:0DB8::2"],
+    settings: { ttl: { auto: true } },
+  }}
+/>
+
+## Setting a CNAME record for a subdomain
+
+### Optional: Creating a subdomain first
+
+If the subdomain does not already exist, you need to create it first:
+
+<OperationExample
+  operation="ingress-create-ingress"
+  example={{
+    hostname: "subdomain.domain.example",
+    paths: [{ path: "/", target: { useDefaultPage: true } }],
+    projectId: "PROJECT_ID",
+  }}
+/>
+
+In this case, the `paths` property is largely irrelevant (since you'll be setting a custom CNAME record anyway), but
+it still is required by the API. Use the `useDefaultPage` target from the example if you do not want to explicitly
+define a domain target.
+
+### Setting the CNAME record
+
+When the subdomain exists, you first need to obtain its DNS zone id. For this, list the project's DNS zones by
+using the <OperationLink operation="dns-list-dns-zones" /> endpoint.
+
+Given the zone ID (referenced as `ZONE_ID` in subsequent examples), you can then set or modify the CNAME record:
+
+<OperationExample
+  operation="dns-update-record-set"
+  pathParameters={{ recordSet: "cname", dnsZoneId: "ZONE_ID" }}
+  example={{
+    fqdn: "your-cname-target.example",
+    settings: { ttl: { auto: true } },
+  }}
+/>
+
+## Resetting custom A/AAAA/MX records
+
+Typically, A, AAAA and MX records are managed by the mittwald platform, which you can override by setting custom records
+using the methods explained above. If you want to reset a record set to being managed by the mittwald platform, use
+the <OperationLink operation="dns-set-record-set-managed" /> operation.
+
+<OperationExample
+  operation="dns-set-record-set-managed"
+  pathParameters={{ recordSet: "a", dnsZoneId: "ZONE_ID" }}
+  example={{}}
+/>

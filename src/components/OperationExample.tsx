@@ -2,7 +2,6 @@ import { APIVersion, getOperationById, useSpec } from "@site/src/openapi/specs";
 import CodeBlock from "@theme/CodeBlock";
 import OperationLink from "@site/src/components/OperationLink";
 import styles from "./OperationExample.module.css";
-import OperationDocCardById from "@site/src/components/openapi/OperationDocCardById";
 import clsx from "clsx";
 
 interface Props {
@@ -10,14 +9,19 @@ interface Props {
   operation: string;
   example: any;
   headers?: Record<string, string>;
+  pathParameters?: Record<string, string>;
   withoutLink?: boolean;
 }
 
 export default function OperationExample(p: Props) {
-  const { apiVersion = "v2" as APIVersion, withoutLink = false } = p;
+  const {
+    apiVersion = "v2" as APIVersion,
+    withoutLink = false,
+    pathParameters = {},
+  } = p;
   const spec = useSpec(apiVersion);
   const operation = getOperationById(spec, p.operation);
-  const headers = {
+  const headers: Record<string, string> = {
     Host: "api.mittwald.de",
     ...(p.headers || {}),
   };
@@ -26,7 +30,12 @@ export default function OperationExample(p: Props) {
     headers["Content-Type"] = "application/json";
   }
 
-  const requestLine = `${operation.method.toUpperCase()} ${operation.path} HTTP/1.1\n`;
+  let path = operation.path;
+  for (const param of Object.keys(pathParameters)) {
+    path = path.replace(`{${param}}`, pathParameters[param]);
+  }
+
+  const requestLine = `${operation.method.toUpperCase()} ${path} HTTP/1.1\n`;
   const headerLines = Object.keys(headers)
     .map((key) => `${key}: ${headers[key]}`)
     .join("\n");

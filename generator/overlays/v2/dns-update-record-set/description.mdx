@@ -1,0 +1,88 @@
+This operation can be used to update and replace individual DNS record sets.
+
+## Usage for different record types
+
+### Setting A and AAAA records
+
+A and AAAA records can be set in a single request by providing `"a"` as `recordSet` parameter:
+
+<OperationExample
+  operation="dns-update-record-set"
+  pathParameters={{ recordSet: "a" }}
+  example={{
+    a: ["203.0.113.1", "203.0.113.2"],
+    aaaa: ["2001:0DB8::1", "2001:0DB8::2"],
+    settings: { ttl: { auto: true } },
+  }}
+/>
+
+Setting an A and/or AAAA record will override the default DNS records provided by the mittwald platform. To reset
+the records to being managed by the platform, use the <OperationLink operation="dns-set-record-set-managed" /> operation.
+
+### Setting CNAME records
+
+CNAME records can be set as follows:
+
+<OperationExample
+  operation="dns-update-record-set"
+  pathParameters={{ recordSet: "cname" }}
+  example={{
+    fqdn: "your-cname-target.example",
+    settings: { ttl: { auto: true } },
+  }}
+/>
+
+### Setting MX records
+
+MX records can be set as follows:
+
+<OperationExample
+  operation="dns-update-record-set"
+  pathParameters={{ recordSet: "mx" }}
+  example={{
+    records: [
+      {
+        fqdn: "mx01.your-mailserver.example",
+        priority: 10,
+      },
+      {
+        fqdn: "mx02.your-mailserver.example",
+        priority: 10,
+      },
+    ],
+    settings: { ttl: { auto: true } },
+  }}
+/>
+
+### Setting TXT records
+
+TXT records can be set as follows:
+
+<OperationExample
+  operation="dns-update-record-set"
+  pathParameters={{ recordSet: "txt" }}
+  example={{
+    entries: ["foo", "bar"],
+    settings: { ttl: { auto: true } },
+  }}
+/>
+
+### Setting SRV records
+
+SRV records can be set as follows:
+
+<OperationExample
+  operation="dns-update-record-set"
+  pathParameters={{ recordSet: "txt" }}
+  example={{
+    records: [
+      {
+        fqdn: "service.your-domain.example",
+        port: 8080,
+        priority: 10,
+        weight: 10,
+      },
+    ],
+    settings: { ttl: { auto: true } },
+  }}
+/>
