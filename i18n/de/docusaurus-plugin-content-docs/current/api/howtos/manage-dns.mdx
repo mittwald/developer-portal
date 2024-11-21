@@ -1,0 +1,77 @@
+---
+sidebar_label: Verwaltung von DNS-Einträgen
+sidebar_position: 20
+title: Verwaltung von DNS-Einträgen über die API
+description: Dieser Artikel erklärt, wie verschiedene Arten von DNS-Einträgen über die API verwaltet werden können.
+tags:
+  - DNS
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+import OperationExample from "@site/src/components/OperationExample";
+
+:::note
+
+Ersetze in den folgenden Beispielen `PROJECT_ID` durch deine tatsächliche Projekt-ID. Bitte beachte, dass dies die
+**vollständige ID** (im UUID-Format) sein muss und **nicht** die kurze ID (im Format `p-XXXXX`).
+
+:::
+
+## Einrichten eines A/AAAA-Eintrags für eine Domain oder Subdomain
+
+Um die A- oder AAAA-Einträge einer bestehenden Domain oder Subdomain zu ändern, musst du zuerst die DNS-Zonen-ID ermitteln. Dazu kannst du die DNS-Zonen des Projekts über den Endpunkt <OperationLink operation="dns-list-dns-zones" /> auflisten. In den folgenden Beispielen wird diese Zonen-ID als `ZONE_ID` bezeichnet.
+
+Anschließend kannst du deine A- und AAAA-Einträge mit der <OperationLink operation="dns-update-record-set" />-Operation ändern. Beachte, dass diese Operation zum Ändern von _sowohl_ A- als auch AAAA-Einträgen verwendet wird (auch wenn der Pfadparameter `recordSet` immer auf `"a"` gesetzt werden sollte):
+
+<OperationExample
+  operation="dns-update-record-set"
+  pathParameters={{ recordSet: "a", dnsZoneId: "ZONE_ID" }}
+  example={{
+    a: ["203.0.113.1", "203.0.113.2"],
+    aaaa: ["2001:0DB8::1", "2001:0DB8::2"],
+    settings: { ttl: { auto: true } },
+  }}
+/>
+
+## Einrichten eines CNAME-Eintrags für eine Subdomain
+
+### Optional: Zuerst eine Subdomain erstellen
+
+Falls die Subdomain noch nicht existiert, musst du sie zuerst erstellen:
+
+<OperationExample
+  operation="ingress-create-ingress"
+  example={{
+    hostname: "subdomain.domain.example",
+    paths: [{ path: "/", target: { useDefaultPage: true } }],
+    projectId: "PROJECT_ID",
+  }}
+/>
+
+In diesem Fall ist die Eigenschaft `paths` weitgehend irrelevant (da du ohnehin einen benutzerdefinierten CNAME-Eintrag setzen wirst), ist aber dennoch ein Pflichtfeld. Verwende das `useDefaultPage`-Ziel aus dem Beispiel, wenn du kein spezifisches Domain-Ziel definieren möchtest.
+
+### Den CNAME-Eintrag setzen
+
+Sobald die Subdomain existiert, musst du zuerst die DNS-Zonen-ID ermitteln. Dazu kannst du die DNS-Zonen des Projekts über den Endpunkt <OperationLink operation="dns-list-dns-zones" /> auflisten.
+
+Mit der Zonen-ID (in den weiteren Beispielen als `ZONE_ID` referenziert) kannst du dann den CNAME-Eintrag setzen oder ändern:
+
+<OperationExample
+  operation="dns-update-record-set"
+  pathParameters={{ recordSet: "cname", dnsZoneId: "ZONE_ID" }}
+  example={{
+    fqdn: "your-cname-target.example",
+    settings: { ttl: { auto: true } },
+  }}
+/>
+
+## Zurücksetzen von benutzerdefinierten A/AAAA/MX-Einträgen
+
+In der Regel werden A-, AAAA- und MX-Einträge von der mittwald-Plattform verwaltet, die du durch die oben erklärten Methoden mit benutzerdefinierten Einträgen überschreiben kannst. Wenn du die DNS-Records zurücksetzen möchtest, damit sie wieder von der mittwald-Plattform verwaltet werden, verwende die <OperationLink operation="dns-set-record-set-managed" />-Operation.
+
+<OperationExample
+  operation="dns-set-record-set-managed"
+  pathParameters={{ recordSet: "a", dnsZoneId: "ZONE_ID" }}
+  example={{}}
+/>
