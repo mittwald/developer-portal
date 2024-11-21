@@ -3,6 +3,8 @@ import $RefParser from "@apidevtools/json-schema-ref-parser";
 import { APIVersion } from "@site/src/openapi/specs";
 import { readFile } from "fs/promises";
 import * as path from "path";
+import * as yaml from "yaml";
+import { applyOverlay, OverlaySpec } from "@site/generator/util/overlay";
 
 export type SpecLoader = (
   apiVersion: APIVersion,
@@ -15,6 +17,29 @@ export async function loadSpec(
     `https://api.mittwald.de/${apiVersion}/openapi.json?withRedirects=false`,
   );
   return await spec.json();
+}
+
+export async function applyOverlayToSpec(
+  spec: OpenAPIV3.Document,
+  apiVersion: APIVersion,
+): Promise<OpenAPIV3.Document> {
+  const overlayPath = path.join(
+    "generator",
+    "overlays",
+    apiVersion,
+    "overlay.yaml",
+  );
+  try {
+    const overlayYaml = await readFile(overlayPath, { encoding: "utf-8" });
+    const overlay = yaml.parse(overlayYaml);
+
+    return applyOverlay(spec, overlay as unknown as OverlaySpec);
+  } catch (err) {
+    if (err.code === "ENOENT") {
+      return spec;
+    }
+    throw err;
+  }
 }
 
 export async function loadSpecPreview(
