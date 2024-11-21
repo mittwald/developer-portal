@@ -16,7 +16,7 @@ actions:
         example: "203.0.113.123/32"
   - target: $.components.schemas['de.mittwald.v1.database.CreateMySqlUserWithDatabase'].properties.accessIpMask
     remove: true
-  - target: $.components.schemas['de.mittwald.v1.database.CreateMySqlUserWithDatabase'].properties.accessIpMask
+  - target: $.components.schemas['de.mittwald.v1.database.CreateMySqlUserWithDatabase'].properties
     update:
       externalAccess:
         description: >
@@ -30,6 +30,13 @@ actions:
       collation:
         description: A valid MySQL collation
         example: utf8mb4_general_ci
+
+  - target: $.paths['/v2/dns-zones/{dnsZoneId}/record-sets/{recordSet}'].put.parameters[?(@.name=="recordSet")]
+    update:
+      description: >
+        The record set to be updated. AAAA records are updated as part of the A record; so use `"a"` as value
+        if you want to update your AAAA records. Please also note that the request body schema varies depending on
+        which value you provide here.
   - target: $.paths['/v2/dns/zones/{zoneId}/recordset/acombined/custom'].put
     update:
       summary: Updates A records for a specific zone
