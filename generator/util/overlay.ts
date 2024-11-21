@@ -22,6 +22,16 @@ interface OverlayAction {
   remove?: boolean;
 }
 
+/**
+ * This function was largely inspired by [1].
+ *
+ * [1]: https://github.com/lornajane/openapi-overlays-js
+ *
+ * @license Apache-2.0
+ * @author @lornajane <https://github.com/lornajane>
+ * @param spec
+ * @param overlay
+ */
 export function applyOverlay(
   spec: OpenAPIV3.Document,
   overlay: OverlaySpec,
