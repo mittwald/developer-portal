@@ -100,8 +100,6 @@ export function OperationMetadata({
     <>
       <OperationPathHeader method={method} path={path} baseURL={baseURL} />
 
-      {isDeprecated(spec) && <DeprecationNotice />}
-
       <ColumnLayout m={[1, 1, 2]}>
         <LabeledValue>
           <Label>API version</Label>
@@ -123,6 +121,13 @@ export function OperationMetadata({
           </Content>
         </LabeledValue>
       </ColumnLayout>
+
+      {isDeprecated(spec) && (
+        <div className="margin-top--md">
+          <DeprecationNotice />
+        </div>
+      )}
+
       <hr />
       {spec.description && withDescription ? (
         <Markdown>{spec.description}</Markdown>
