@@ -6,6 +6,7 @@ import * as yaml from "yaml";
 import compareOperation from "../src/openapi/compareOperation";
 import * as ejs from "ejs";
 import {
+  applyOverlayToSpec,
   dereferenceSpec,
   loadSpec,
   loadSpecPreview,
@@ -218,12 +219,15 @@ class APIDocRenderer {
   ) {
     const sidebar = [];
     const originalSpec = await this.specLoader(apiVersion);
-    const spec = await dereferenceSpec(originalSpec);
+    const overlayedSpec = await applyOverlayToSpec(originalSpec, apiVersion);
+    const spec = await dereferenceSpec(overlayedSpec);
     const outputPath = this.outputPath(apiVersion, outputPathInDocs);
     const [serverURL, basePath] = determineServerURLAndBasePath(
       apiVersion,
       spec,
     );
+
+    console.log("generating API for ", spec.info.title);
 
     exportSpecToSource(
       originalSpec,

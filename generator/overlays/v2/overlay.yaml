@@ -1,0 +1,32 @@
+overlay: 1.0.0
+info:
+  title: Augment documentation
+actions:
+  - target: $.components.schemas['de.mittwald.v1.database.CreateMySqlDatabase'].properties
+    update:
+      version:
+        description: >
+          The MySQL version number for this database, in `<major>.<minor>` format. Use the
+          `GET /v2/mysql-version` endpoint to query available versions.
+        example: "8.0"
+  - target: $.components.schemas['de.mittwald.v1.database.CreateMySqlUser'].properties
+    update:
+      accessIpMask:
+        description: An IP range (in CIDR notation) for which access should be allowed.
+        example: "203.0.113.123/32"
+  - target: $.components.schemas['de.mittwald.v1.database.CreateMySqlUserWithDatabase'].properties.accessIpMask
+    remove: true
+  - target: $.components.schemas['de.mittwald.v1.database.CreateMySqlUserWithDatabase'].properties.accessIpMask
+    update:
+      externalAccess:
+        description: >
+          Describes if users should be able to connection to this database from external
+          sources. Defaults to `false` when not set.
+  - target: $.components.schemas['de.mittwald.v1.database.characterSettings'].properties
+    update:
+      characterSet:
+        description: A valid MySQL character set
+        example: utf8mb4
+      collation:
+        description: A valid MySQL collation
+        example: utf8mb4_general_ci

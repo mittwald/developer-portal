@@ -56,6 +56,13 @@ $ npm run docusaurus write-translations
 $ npm run docusaurus write-translations -- -l de
 ```
 
+### Overriding OpenAPI definitions
+
+To override specific parts of an OpenAPI definition, you can provide an override document which follows the [OpenAPI Overlay Specification][overlay]. The generator will look for overlay files in `./generator/overlays/<api-version>/overlay.yaml`.
+
+> [!NOTE]
+> Always prefer modifying the source OpenAPI specification directly, instead of using an overlay. Only use overlays if you need it **immediately** (regardless of the release cycle of the backend services providing the actual specs), or for changes that explicitly should not affect the spec, but **only** the documentation generated from it (use your own judgement).
+
 ### Provide a custom description for an OpenAPI operation
 
 By default, the OpenAPI description pages use the OpenAPI `.description` field of the respective resource. You can override the description with a custom markdown document by placing it in `generator/overlays/<apiVersion>/<operation-id>/description.md`. Please note that you will need to run `npm run generate` for changes to take effect.
@@ -75,3 +82,4 @@ The usage examples for OpenAPI operations are generated from the OpenAPI specifi
 [docu-blog]: https://docusaurus.io/docs/blog
 [docs-en]: https://github.com/mittwald/developer-portal/tree/master/docs
 [docs-de]: https://github.com/mittwald/developer-portal/tree/master/i18n/de/docusaurus-plugin-content-docs/current
+[overlay]: https://spec.openapis.org/overlay/latest.html
