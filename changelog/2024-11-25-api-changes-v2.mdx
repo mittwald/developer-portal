@@ -1,0 +1,78 @@
+---
+title: API changes for v2 API, November 25, 2024
+authors:
+  - machine
+tags:
+  - apiv2
+  - Domain
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+On November 25, 2024, the mittwald API introduced a new non-success response status '412' for both the DELETE operation to remove a domain and the POST operation to resend a domain email.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- The DELETE operation for deleting a domain now includes a non-success response with the status '412'.
+- The POST operation for resending a domain email also includes a non-success response with the status '412'.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Delete a Domain"
+
+
+- added the non-success response with the status '412'
+
+
+For details, refer to the <OperationLink operation="domain-delete-domain" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Resend a Domain email"
+
+
+- added the non-success response with the status '412'
+
+
+For details, refer to the <OperationLink operation="domain-resend-domain-email" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK v2.1.84 Release Summary
+
+The mittwald PHP SDK has been updated to version v2.1.84. This release introduces new response classes and enhancements to improve error handling in domain operations.
+
+#### Added
+- **New Response Classes for Domain Operations**:
+  - `DeleteDomainPreconditionFailedResponse`: Manages scenarios where domain deletion fails due to unmet preconditions, utilizing the `Error` schema for detailed error information.
+  - `ResendDomainEmailPreconditionFailedResponse`: Handles cases where resending a domain email fails due to unmet conditions, also using the `Error` schema for comprehensive error reporting.
+
+#### Changed
+- Updates to `DomainClientImpl`:
+  - Added handling for `DeleteDomainPreconditionFailedResponse` to manage HTTP 412 responses during domain deletion.
+  - Included handling for `ResendDomainEmailPreconditionFailedResponse` for HTTP 412 responses when resending domain emails.
+
+These updates enhance the robustness and user-friendliness of the API client by providing clearer feedback during domain management operations.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.84).
+
+### mittwald JavaScript SDK Release 4.78.0
+
+The mittwald JavaScript SDK has been updated to version 4.78.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.78.0).
+
