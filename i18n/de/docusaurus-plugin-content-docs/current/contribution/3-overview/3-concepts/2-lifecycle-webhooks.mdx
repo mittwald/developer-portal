@@ -13,7 +13,7 @@ Für eine Übersicht, welche Platzhalter für Lifecycle Webhooks verwendet werde
 
 ## Quality of Service (QoS) für die Zustellung von Lifecycle Webhooks
 
-Alle Webhooks werden `at least once` aufgerufen und sind somit so zu entwerfen, dass mehrfache Aufrufe nicht zu Fehlern führen.
+Alle Webhooks werden _at least once_ aufgerufen und sind somit so zu entwerfen, dass mehrfache Aufrufe nicht zu Fehlern führen.
 Jeder Statuscode kleiner als `200` oder größer gleich `300` wird als fehlgeschlagen interpretiert.
 Die Webhooks werden asynchron zu der Aktion, die diese ausgelöst hat, ausgeführt.
 Bei Fehlschlägen wird der Webhook-Payload erneut gebaut, der Request neu signiert und versendet.
@@ -83,10 +83,10 @@ Siehe dazu auch [Secrets in Webhooks](#secrets-in-webhooks).
 
 ### ExtensionInstanceUpdated
 
-In diesem Webhook wird der externen Anwendung eine Zustandsänderung der `Extension Instance` mitgeteilt.
+In diesem Webhook wird der externen Anwendung eine Zustandsänderung der Extension Instance mitgeteilt.
 Der externen Anwendung wird dabei immer der gesamte neue Zustand mitgeteilt.
 
-Das kann beispielsweise die De-/Aktivierung der `Extension Instance` sein.
+Das kann beispielsweise die De-/Aktivierung der Extension Instance sein.
 
 ### ExtensionInstanceSecretRotated
 
@@ -98,7 +98,7 @@ Siehe dazu auch [Secrets in Webhooks](#secrets-in-webhooks).
 
 ### ExtensionInstanceRemovedFromContext
 
-Dieser Webhook drückt aus, dass eine `Extension Instance` aus einem Context entfernt wurde.
+Dieser Webhook drückt aus, dass eine Extension Instance aus einem Context entfernt wurde.
 Datenschutzrelevante Konsequenzen, wie die Löschung von personenbezogenen Daten, sollten an dieser Stelle berücksichtigt werden.
 
 :::note

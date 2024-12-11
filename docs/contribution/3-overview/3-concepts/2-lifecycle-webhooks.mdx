@@ -14,7 +14,7 @@ For an overview of the possible placeholders available in lifecycle webhook URL 
 
 ## Quality of Service (QoS) for the Delivery of Lifecycle Webhooks
 
-The mStudio executes all webhook calls `at least once`.
+The mStudio executes all webhook calls _at least once_.
 Therefore, you must design the webhook endpoints so that multiple calls do not result in errors.
 Every status code less than `200` or greater than or equal `300` is considered a failure.
 The webhook calls are executed asynchronously to the action that triggered them.
@@ -80,10 +80,10 @@ The reason is described above in [secrets in webhooks](#secrets-in-webhooks).
 
 ### ExtensionInstanceUpdated
 
-This webhook communicates a change in the state of the `extension instance`.
-It always includes the whole new state of the `extension instance`.
+This webhook communicates a change in the state of the extension instance.
+It always includes the whole new state of the extension instance.
 
-The activation and deactivation of the `extension instance` are an example of this.
+The activation and deactivation of the extension instance are an example of this.
 
 ### ExtensionInstanceSecretRotated
 
@@ -95,13 +95,13 @@ For more information, see [secrets in webhooks](#secrets-in-webhooks).
 
 ### ExtensionInstanceRemovedFromContext
 
-This webhook communicates the removal of an `extension instance` from a context.
+This webhook communicates the removal of an extension instance from a context.
 You should ensure compliance with data privacy laws at this point and delete personal data for example.
 
 :::note
 We treat the `ExtensionInstanceRemovedFromContext` webhook differently regarding the QoS.
 It is possible to force remove the extension if the webhook handler is unreachable.
-In this case, we revoke all permissions of the `extension instance` and invalidate existing access tokens.
+In this case, we revoke all permissions of the extension instance and invalidate existing access tokens.
 
 Nonetheless, the mStudio tries to execute the webhook to achieve a consistent state of the mStudio and extension data.
 :::
