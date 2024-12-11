@@ -1,0 +1,97 @@
+overlay: 1.0.0
+info:
+  title: Augment documentation
+actions:
+  - target: $.paths['/v2/stacks/{stackId}'].put.requestBody.content['application/json'].schema.properties.services
+    update: &serviceList
+      description: >
+        A set of containers that should be started in this stack. The key is relevant for
+        network connectivity between containers, because you can use it as DNS name to
+        resolve this containers from other containers running in the same project (or from
+        managed apps running in the same project).
+      x-example-key: mysql
+  - target: $.paths['/v2/stacks/{stackId}'].put.requestBody.content['application/json'].schema.properties.volumes
+    update:
+      example:
+        data:
+          name: mysql-volume
+
+  - target: $.components.schemas['de.mittwald.v1.container.ServiceDeclareRequest'].properties.volumes
+    update: &volumes
+      description: >
+        Volume mounts for this container. These items always follow the format `<volume>:<mountpoint>`.
+        The `<volume>` may either be a named volume, or a file path in the (always present) project
+        file system (which is shared among containers and managed apps within a project).
+      example: # caution, this is APPENDED to the existing examples
+        - "/home/p-XXXXX/html:/var/www"
+  - target: $.components.schemas['de.mittwald.v1.container.ServiceDeclareRequest'].properties.ports
+    update: &ports
+      description: >
+        Exposed ports. Follows the format `<public-port>:<container-port>/<protocol>`. Exposed ports
+        can be accessed from other containers (or managed apps) within the same project. To expose
+        a port publicly, connect it with an ingress resource.
+  - target: $.components.schemas['de.mittwald.v1.container.ServiceDeclareRequest'].properties.image
+    update: &image
+      description: >
+        The image to run, in the usual format also used by `docker run` and `docker compose`. When
+        the image is pulled from a private registry, make sure to create it first, using the
+        `container-create-registry` endpoint. The appropriate registry is matched
+        by hostname.
+  - target: $.components.schemas['de.mittwald.v1.container.ServiceDeclareRequest'].properties.envs
+    update: &envs
+      description: >
+        Key-value map of environment variables that should be passed into the container.
+  - target: $.components.schemas['de.mittwald.v1.container.ServiceDeclareRequest'].properties.entrypoint
+    update: &entrypoint
+      description: >
+        The container entrypoint (equivalent to the [Docker entrypoint](https://docs.docker.com/reference/dockerfile/#entrypoint)).
+        When omitted, this defaults to the entrypoint defined in the image.
+  - target: $.components.schemas['de.mittwald.v1.container.ServiceDeclareRequest'].properties.command
+    update: &command
+      description: >
+        The container command (equivalent to the [Docker cmd](https://docs.docker.com/reference/dockerfile/#cmd)).
+        When omitted, this defaults to the command defined in the image.
+        
+
+  - target: $.components.schemas['de.mittwald.v1.container.StackResponse'].properties.services
+    update: *serviceList
+  - target: $.components.schemas['de.mittwald.v1.container.ServiceResponse'].properties.deployedState
+    update:
+      description: >
+        The actual state of the container that is currently deployed.
+  - target: $.components.schemas['de.mittwald.v1.container.ServiceResponse'].properties.pendingState
+    update:
+      description: >
+        The desired state that is waiting to be reconciled.
+  - target: $.components.schemas['de.mittwald.v1.container.ServiceState'].properties.command
+    update:
+      <<: *command
+      example: ["mysqld"]
+  - target: $.components.schemas['de.mittwald.v1.container.ServiceState'].properties.entrypoint
+    update:
+      <<: *entrypoint
+      example: ["docker-entrypoint.sh"]
+  - target: $.components.schemas['de.mittwald.v1.container.ServiceState'].properties.envs
+    update:
+      <<: *envs
+      example: {
+        "MYSQL_DATABASE": "my_db",
+        "MYSQL_PASSWORD": "my_password",
+        "MYSQL_ROOT_PASSWORD": "my_root_password",
+        "MYSQL_USER": "my_user"
+      }
+  - target: $.components.schemas['de.mittwald.v1.container.ServiceState'].properties.image
+    update:
+      <<: *image
+      example: "mysql:8.0"
+  - target: $.components.schemas['de.mittwald.v1.container.ServiceState'].properties.ports
+    update:
+      <<: *ports
+      example: ["3306:3306/tcp"]
+  - target: $.components.schemas['de.mittwald.v1.container.ServiceState'].properties.volumes
+    update:
+      <<: *volumes
+      example: [
+        "data:/var/lib/mysql",
+        "/home/p-XXXXX/html:/var/www"
+      ]

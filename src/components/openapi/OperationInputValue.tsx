@@ -26,7 +26,11 @@ export function AlternativeValue({
 }
 
 export function ArrayValue({ schema }: { schema: OpenAPIV3.SchemaObject }) {
-  const body = [];
+  let body: ReactNode;
+
+  if (schema.description) {
+    body = <Markdown>{schema.description}</Markdown>;
+  }
 
   return (
     <li>
@@ -58,7 +62,8 @@ export function PropertyValue({
     body = <Markdown>{schema.description}</Markdown>;
   }
 
-  const hasSubSchema = schema.properties || schema.additionalProperties || schema.items;
+  const hasSubSchema =
+    schema.properties || schema.additionalProperties || schema.items;
 
   return (
     <li key={name}>

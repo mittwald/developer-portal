@@ -22,16 +22,17 @@ export async function loadSpec(
 export async function applyOverlayToSpec(
   spec: OpenAPIV3.Document,
   apiVersion: APIVersion,
+  overlaySuffix?: string,
 ): Promise<OpenAPIV3.Document> {
   const overlayPath = path.join(
     "generator",
     "overlays",
     apiVersion,
-    "overlay.yaml",
+    overlaySuffix ? `overlay-${overlaySuffix}.yaml` : "overlay.yaml",
   );
   try {
     const overlayYaml = await readFile(overlayPath, { encoding: "utf-8" });
-    const overlay = yaml.parse(overlayYaml);
+    const overlay = yaml.parse(overlayYaml, { merge: true });
 
     return applyOverlay(spec, overlay as unknown as OverlaySpec);
   } catch (err) {

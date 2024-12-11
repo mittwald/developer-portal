@@ -52,16 +52,9 @@ function ObjectSchema({ schema }: Props) {
 function ArraySchema({ schema }: Props<OpenAPIV3.ArraySchemaObject>) {
   return (
     <ul className={styles.parameterList}>
-      <ArrayValue
-        schema={schema.items as OpenAPIV3.SchemaObject}
-        required={false}
-      />
+      <ArrayValue schema={schema.items as OpenAPIV3.SchemaObject} />
     </ul>
   );
-}
-
-function UnknownSchema({ schema }: Props) {
-  return <div>Unknown schema type: {JSON.stringify(schema)}</div>;
 }
 
 function OneOfSchema({ schema }: Props) {
