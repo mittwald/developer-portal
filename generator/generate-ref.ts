@@ -219,7 +219,11 @@ class APIDocRenderer {
   ) {
     const sidebar = [];
     const originalSpec = await this.specLoader(apiVersion);
-    const overlayedSpec = await applyOverlayToSpec(originalSpec, apiVersion);
+    const overlayedSpec = await applyOverlayToSpec(
+      originalSpec,
+      apiVersion,
+      outputPathInDocs === "preview" ? "preview" : undefined,
+    );
     const spec = await dereferenceSpec(overlayedSpec);
     const outputPath = this.outputPath(apiVersion, outputPathInDocs);
     const [serverURL, basePath] = determineServerURLAndBasePath(

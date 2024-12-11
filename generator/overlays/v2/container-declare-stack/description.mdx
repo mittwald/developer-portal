@@ -15,3 +15,10 @@ Every mStudio project comes with a default stack named `default`. You can obtain
 ### Creating new stacks
 
 Creating new stacks is not supported at this time. You can only manage the `default` stack.
+
+## Managing volumes
+
+You have two options for managing storage for your container stacks:
+
+- Explicitly declare volumes, using the `$.volumes` property of this request. Volumes are referenced by name, and can be mounted into the container by referencing them in the `$.services[*].volumes` property in the format `<volume-name>:<mount-path>`.
+- Use the project volume; this volume is shared among all managed apps and containers of a project. In order to mount the project volume, specify a file path instead of a volume name when mounting the volume (example `/home/p-XXXXX/html:/var/html`).

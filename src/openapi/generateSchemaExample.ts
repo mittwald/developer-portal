@@ -19,7 +19,13 @@ export function generateSchemaExample(schema: OpenAPIV3.SchemaObject): any {
       });
     }
     if (schema.additionalProperties) {
-      example["string"] = generateSchemaExample(
+      let exampleKey = "string";
+
+      if ("x-example-key" in schema) {
+        exampleKey = schema["x-example-key"] as string;
+      }
+
+      example[exampleKey] = generateSchemaExample(
         schema.additionalProperties as OpenAPIV3.SchemaObject,
       );
     }
