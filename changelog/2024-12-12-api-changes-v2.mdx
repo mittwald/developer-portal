@@ -1,0 +1,74 @@
+---
+title: API changes for v2 API, December 12, 2024
+authors:
+  - machine
+tags:
+  - apiv2
+  - Marketplace
+  - Relocation
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+On 12/12/2024, the mittwald API introduced two new endpoints for retrieving extension instances for customers and projects, along with an optional 'userId' request property for the relocation operation.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- Two new endpoints have been added:
+  - A GET operation to retrieve the ExtensionInstance for a specific customer at the path `/v2/customers/{customerId}/extensions/{extensionId}`.
+  - A GET operation to retrieve the ExtensionInstance for a specific project at the path `/v2/projects/{projectId}/extensions/{extensionId}`.
+  
+- An optional request property named 'userId' has been added to the POST operation for creating a relocation at the path `/v2/relocation`.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Get the extension instance of a specific customer and extension, if existing"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="extension-get-extension-instance-for-customer" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the extension instance of a specific project and extension, if existing"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="extension-get-extension-instance-for-project" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Relocate an external Project to mittwald"
+
+
+- added the new optional request property 'userId'
+
+
+For details, refer to the <OperationLink operation="relocation-create-relocation" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald JavaScript SDK Release 4.83.0
+
+The mittwald JavaScript SDK has been updated to version 4.83.0. This release includes an update to the generated client, enhancing its functionality. For more details, you can view the release on GitHub: [mittwald/api-client-js 4.83.0](https://github.com/mittwald/api-client-js/releases/tag/4.83.0).
+
