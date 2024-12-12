@@ -8,6 +8,7 @@ import AlertBadge from "@mittwald/flow-react-components/AlertBadge";
 import { APIVersion, OperationWithMeta } from "@site/src/openapi/specs";
 import isDeprecated from "@site/src/openapi/isDeprecated";
 import buildDocumentId from "@site/src/openapi/buildDocumentId";
+import OperationLink from "@site/src/components/openapi/OperationLink";
 
 interface Props {
   apiVersion: APIVersion;
@@ -19,11 +20,6 @@ export default function OperationDocCard(p: Props) {
   const { apiVersion, variant } = p;
   const { operation, method, path } = p.operation;
   const deprecated = isDeprecated(operation);
-  const docId = buildDocumentId(operation);
-
-  const url = apiVersion.endsWith("-preview")
-    ? `/docs/${apiVersion.replace("-preview", "")}/preview/${docId.replace("reference/", "")}`
-    : `/docs/${apiVersion}/reference/${docId.replace("reference/", "")}`;
 
   return (
     <div
@@ -35,7 +31,7 @@ export default function OperationDocCard(p: Props) {
         variant === "compact" ? styles.compact : null,
       )}
     >
-      <Link to={url}>
+      <OperationLink apiVersion={apiVersion} operation={p.operation}>
         <div className={styles.header}>
           <HTTPMethod method={method} deprecated={deprecated} />
           <div className={styles.headerText}>
@@ -50,7 +46,7 @@ export default function OperationDocCard(p: Props) {
             <AlertBadge status="warning">deprecated!</AlertBadge>
           ) : null}
         </div>
-      </Link>
+      </OperationLink>
     </div>
   );
 }
