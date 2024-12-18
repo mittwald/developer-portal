@@ -15,7 +15,9 @@ import Avatar from "@mittwald/flow-react-components/Avatar";
 import styles from "@site/src/components/openapi/OperationDocCardList.module.css";
 import clsx from "clsx";
 import AlertBadge from "@mittwald/flow-react-components/AlertBadge";
-import OperationLink from "@site/src/components/openapi/OperationLink";
+import OperationLink, {
+  buildOperationUrl,
+} from "@site/src/components/openapi/OperationLink";
 
 interface Props {
   apiVersion: APIVersion;
@@ -30,10 +32,12 @@ const OperationList = typedList<EnrichedOperation>();
 
 export default function OperationDocCardList(p: Props) {
   const spec = useSpec(p.apiVersion);
+
   const operations: EnrichedOperation[] = getOperationByTag(spec, p.tag)
     .sort(compareOperation)
     .map((o) => ({
       ...o,
+      ...o.operation,
       deprecationState: o.operation.deprecated
         ? "deprecated"
         : "not deprecated",
@@ -42,7 +46,7 @@ export default function OperationDocCardList(p: Props) {
   return (
     <OperationList.List batchSize={100}>
       <OperationList.StaticData data={operations} />
-      <OperationList.Search />
+      <OperationList.Search autoSubmit />
       <OperationList.Sorting property="method" name="Method" />
       <OperationList.Sorting property="path" name="Path" defaultEnabled />
       <OperationList.Filter property="method" mode="some" name="Method" />
@@ -50,10 +54,11 @@ export default function OperationDocCardList(p: Props) {
         property="deprecationState"
         mode="some"
         name="Deprecation"
-        /*TODO: https://github.com/mittwald/flow/issues/1075*/
-        /*defaultSelected={["not deprecated"]}*/
+        defaultSelected={["not deprecated"]}
       />
-      <OperationList.Item>
+      <OperationList.Item
+        href={(op) => buildOperationUrl(p.apiVersion, op.operation)}
+      >
         {(op) => (
           <OperationList.ItemView>
             <Avatar
@@ -62,9 +67,7 @@ export default function OperationDocCardList(p: Props) {
               {op.method}
             </Avatar>
             <Heading>
-              <OperationLink apiVersion={p.apiVersion} operation={op}>
-                {op.operation.summary}
-              </OperationLink>
+              {op.operation.summary}
               {op.operation.deprecated && (
                 <AlertBadge status="warning">deprecated</AlertBadge>
               )}
