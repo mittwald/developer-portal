@@ -1,0 +1,140 @@
+---
+title: API changes for v2 API, December 16, 2024
+authors:
+  - machine
+tags:
+  - apiv2
+  - App
+  - Contract
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+On December 16, 2024, the mittwald API underwent significant changes, including the removal of specific schemas and security endpoints, as well as the addition of several optional properties related to contract termination across various response paths.
+
+{/* truncate */}
+
+## Summary
+
+- The schema `de.mittwald.v1.app.AppInstallationInternal` has been removed from the API.
+- The endpoint scheme security `de.mittwald.v1.commons.AccessToken` was removed from the `GET /v2/apps` operation, which lists apps.
+- The following optional properties have been added to the response with the `200` status for the operation `GET /v2/certificates/{certificateId}/contract`:
+  - `additionalItems/items/termination/cancellationForbidden`
+  - `baseItem/termination/cancellationForbidden`
+  - `termination/cancellationForbidden`
+- The following optional properties have been added to the response with the `200` status for the operation `GET /v2/contracts/{contractId}`:
+  - `additionalItems/items/termination/cancellationForbidden`
+  - `baseItem/termination/cancellationForbidden`
+  - `termination/cancellationForbidden`
+- The optional property `termination/cancellationForbidden` has been added to the response with the `200` status for the following operations:
+  - `GET /v2/contracts/{contractId}/base-items`
+  - `GET /v2/contracts/{contractId}/items/{contractItemId}`
+- The following optional properties have been added to the response with the `200` status for the operation `GET /v2/customers/{customerId}/contracts`:
+  - `/items/additionalItems/items/termination/cancellationForbidden`
+  - `/items/baseItem/termination/cancellationForbidden`
+  - `/items/termination/cancellationForbidden`
+- The following optional properties have been added to the response with the `200` status for the operation `GET /v2/domains/{domainId}/contract`:
+  - `additionalItems/items/termination/cancellationForbidden`
+  - `baseItem/termination/cancellationForbidden`
+  - `termination/cancellationForbidden`
+- The following optional properties have been added to the response with the `200` status for the operation `GET /v2/projects/{projectId}/contract`:
+  - `additionalItems/items/termination/cancellationForbidden`
+  - `baseItem/termination/cancellationForbidden`
+  - `termination/cancellationForbidden`
+- The following optional properties have been added to the response with the `200` status for the operation `GET /v2/servers/{serverId}/contract`:
+  - `additionalItems/items/termination/cancellationForbidden`
+  - `baseItem/termination/cancellationForbidden`
+  - `termination/cancellationForbidden`
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+## Detailed changes
+
+### Changes in schemas
+
+- removed the schema `de.mittwald.v1.app.AppInstallationInternal`
+
+### Changes in "List apps"
+
+- the endpoint scheme security `de.mittwald.v1.commons.AccessToken` was removed from the API
+
+For details, refer to the <OperationLink operation="app-list-apps" apiVersion="v2" /> endpoint.
+
+### Changes in "Return the Contract for the given Certificate"
+
+- added the optional property `additionalItems/items/termination/cancellationForbidden` to the response with the `200` status
+
+- added the optional property `baseItem/termination/cancellationForbidden` to the response with the `200` status
+
+- added the optional property `termination/cancellationForbidden` to the response with the `200` status
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-certificate" apiVersion="v2" /> endpoint.
+
+### Changes in "Returns the Contract with the given ID"
+
+- added the optional property `additionalItems/items/termination/cancellationForbidden` to the response with the `200` status
+
+- added the optional property `baseItem/termination/cancellationForbidden` to the response with the `200` status
+
+- added the optional property `termination/cancellationForbidden` to the response with the `200` status
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract" apiVersion="v2" /> endpoint.
+
+### Changes in "Return the BaseItem of the Contract with the given ID"
+
+- added the optional property `termination/cancellationForbidden` to the response with the `200` status
+
+For details, refer to the <OperationLink operation="contract-get-base-item-of-contract" apiVersion="v2" /> endpoint.
+
+### Changes in "Get the ContractItem with the given ID"
+
+- added the optional property `termination/cancellationForbidden` to the response with the `200` status
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-item" apiVersion="v2" /> endpoint.
+
+### Changes in "Return a list of Contracts for the given Customer"
+
+- added the optional property `/items/additionalItems/items/termination/cancellationForbidden` to the response with the `200` status
+
+- added the optional property `/items/baseItem/termination/cancellationForbidden` to the response with the `200` status
+
+- added the optional property `/items/termination/cancellationForbidden` to the response with the `200` status
+
+For details, refer to the <OperationLink operation="contract-list-contracts" apiVersion="v2" /> endpoint.
+
+### Changes in "Return the Contract for the given Domain"
+
+- added the optional property `additionalItems/items/termination/cancellationForbidden` to the response with the `200` status
+
+- added the optional property `baseItem/termination/cancellationForbidden` to the response with the `200` status
+
+- added the optional property `termination/cancellationForbidden` to the response with the `200` status
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-domain" apiVersion="v2" /> endpoint.
+
+### Changes in "Return the Contract for the given Project"
+
+- added the optional property `additionalItems/items/termination/cancellationForbidden` to the response with the `200` status
+
+- added the optional property `baseItem/termination/cancellationForbidden` to the response with the `200` status
+
+- added the optional property `termination/cancellationForbidden` to the response with the `200` status
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-project" apiVersion="v2" /> endpoint.
+
+### Changes in "Return the Contract for the given Server"
+
+- added the optional property `additionalItems/items/termination/cancellationForbidden` to the response with the `200` status
+
+- added the optional property `baseItem/termination/cancellationForbidden` to the response with the `200` status
+
+- added the optional property `termination/cancellationForbidden` to the response with the `200` status
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-server" apiVersion="v2" /> endpoint.
+
+## Client package releases
+
+### mittwald JavaScript SDK Release 4.86.0
+
+The mittwald JavaScript SDK has been updated to version 4.86.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.86.0).
