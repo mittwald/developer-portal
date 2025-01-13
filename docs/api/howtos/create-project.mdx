@@ -15,7 +15,7 @@ import OperationHint from "@site/src/components/OperationHint";
 There are different ways to deploy a new project:
 
 1. When you have access to a **server** (which you will get for example when using the "Space Server" plan[^1]), you can create a new project on that server. Any projects deployed on a server will utilize the same shared resource pool. Since you pay for the server, you can deploy as many projects as resource utilization allows, without additional costs.
-2. For the future, we reserve the option to offer the creation of **stand-alone projects**. These will be projects that are _not_ part of a server, and will be deployed on a shared resource pool. You will pay for the resources used by the project, and you will be able to deploy as many projects as you want.
+2. You can use the _proSpace_[^2] plan. The project is then allocated its own resources. Each project is billed individually.
 
 ## Creating a project…
 
@@ -25,7 +25,7 @@ To create a project on an existing server, you will require that server’s ID. 
 
 To create a new project, send a request to the <OperationLink operation="project-create-project" /> endpoint. The request body must contain a JSON object with the following properties:
 
-- `description` should contain a human-readable description of the project. This is a required value.
+- `description` (String, mandatory field) should contain a human-readable description of the project. This is a required value.
 
 The response, when successful, will contain a JSON object with the following properties:
 
@@ -33,13 +33,25 @@ The response, when successful, will contain a JSON object with the following pro
 
 <OperationHint operation="project-create-project" />
 
-### …as a stand-alone project
+### ...as a stand alone project
 
-:::note
+To be able to create a stand alone project, you must be authorised to carry out chargeable actions in an organisation. Then use the endpoint <OperationLink operation="order-create-order" /> to order a new project for a fee.
 
-Creating stand-alone projects is not supported, as of yet.
+The request body must contain a JSON object with the following properties:
 
-:::
+- `orderType`: `"projectHosting"` indicates that we want to create a new project
+- `orderData`: Object describing the order. Should contain at least the following properties:
+  - `customerId`: (String, mandatory field) ID of the organisation that will pay for the project
+  - `description`: (String, mandatory field) human-readable description of the project
+  - `diskspaceInGiB`: (Number, mandatory field) storage space to be booked for the project. At least 20 GiB, the value must be a multiple of 20
+  - `spec`:
+    - `machineType`: (String, mandatory field) defines which resources (CPU, RAM) are to be made available to the project. You can obtain possible values via the endpoint <OperationLink operation="article-list-articles" />.
+
+The response, when successful, will contain a JSON object with the following properties:
+
+- `id` is the ID of the newly created order.
+
+<OperationHint operation="order-create-order" />
 
 ## Observing project readiness
 
@@ -48,3 +60,4 @@ A newly created project will not be available immediately (however, it should be
 <OperationHint tag="Project" operation="project-get-project" />
 
 [^1]: https://www.mittwald.de/space-server
+[^2]: https://www.mittwald.de/prospace
