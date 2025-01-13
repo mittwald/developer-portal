@@ -63,7 +63,10 @@ export function PropertyValue({
   }
 
   const hasSubSchema =
-    schema.properties || schema.additionalProperties || schema.items;
+    schema.properties ||
+    schema.additionalProperties ||
+    schema.items ||
+    schema.oneOf;
 
   return (
     <li key={name}>
