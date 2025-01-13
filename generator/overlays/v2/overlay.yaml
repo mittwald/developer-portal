@@ -72,3 +72,59 @@ actions:
       summary: Resets A records to managed for a specific zone
       description: >
         This operation is deprecated. Use the `POST /v2/dns/zones/{zoneId}/record-sets/{recordSet}/actions/set-managed` endpoint instead.
+
+  - target: $.paths['/v2/ingresses'].post.requestBody.content['application/json'].schema.properties.paths
+    update:
+      example:
+        - path: /
+          target:
+            useDefaultPage: true
+        - path: /redirect
+          target:
+            url: https://some-redirect.example
+        - path: /path-to-dir
+          target:
+            directory: /public
+        - path: /path-to-app
+          target:
+            installationId: e1ccfde2-8983-4529-ae66-23a7e34c1177
+        - path: /path-to-container
+          target:
+            container:
+              id: ead3223c-6f23-4eaf-8250-392f10b49a35
+              portProtocol: 80/tcp
+  - target: $.components.schemas['de.mittwald.v1.ingress.TargetDirectory']
+    update:
+      description: Serve files from a specific directory
+      properties:
+        directory:
+          description: The directory from which to serve files.
+          example: /public
+  - target: $.components.schemas['de.mittwald.v1.ingress.TargetUrl']
+    update:
+      description: Redirect requests to this path to another URL
+      properties:
+        url:
+          description: The URL to which requests should be forwarded.
+          example: https://redirect-target.example
+  - target: $.components.schemas['de.mittwald.v1.ingress.TargetInstallation']
+    update:
+      description: Serve a specific app installation
+      properties:
+        installationId:
+          description: The ID of an app installation within the same project to which requests should be forwarded.
+  - target: $.components.schemas['de.mittwald.v1.ingress.TargetUseDefaultPage']
+    update:
+      description: Serve a generic default page
+      properties:
+        useDefaultPage:
+          description: Set this to `true` to serve a generic default site at this path.
+  - target: $.components.schemas['de.mittwald.v1.ingress.TargetContainer']
+    update:
+      description: Forward requests to this path to a specific container.
+      properties:
+        container:
+          descriptions: References a specific port/container combination within the same project.
+          properties:
+            portProtocol:
+              example: 80/tcp
