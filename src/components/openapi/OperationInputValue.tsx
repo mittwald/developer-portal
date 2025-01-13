@@ -14,12 +14,19 @@ export function AlternativeValue({
 }: {
   schema: OpenAPIV3.SchemaObject;
 }) {
+  let body: ReactNode;
+
+  if (schema.description) {
+    body = <Markdown>{schema.description}</Markdown>;
+  }
+
   return (
     <li>
       <div className={styles.parameterListHeader}>
         <span className={styles.parameterAlternative}>Alternative</span>
         <Type className={styles.parameterType} schema={schema} />
       </div>
+      {body && <div className={styles.parameterListBody}>{body}</div>}
       <Schema schema={schema} />
     </li>
   );

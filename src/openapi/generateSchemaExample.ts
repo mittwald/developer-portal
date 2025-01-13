@@ -43,6 +43,8 @@ export function generateSchemaExample(schema: OpenAPIV3.SchemaObject): any {
       return "email@mittwald.example";
     } else if (schema.format === "uuid") {
       return "f0f86186-0a5a-45b2-aa33-502777496347";
+    } else if (schema.format === "idn-hostname") {
+      return "some-hostname.example";
     }
 
     if (schema.enum !== undefined) {
