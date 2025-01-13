@@ -7,17 +7,14 @@ tags:
   - breaking
   - Conversation
   - Marketplace
-
 ---
 
 import OperationHint from "@site/src/components/OperationHint";
 import OperationLink from "@site/src/components/OperationLink";
 
-On January 9, 2025, the mittwald API introduced several changes, including the removal of the 'project_email_admin' enum value from various properties, the addition of the 'project_emailadmin' enum value, the removal of a schema, and the introduction of a new endpoint for listing extensions of a contributor.
+On January 9, 2025, the mittwald API introduced several changes, including the removal of the `project_email_admin` enum value from various properties, the addition of the `project_emailadmin` enum value, the removal of a schema, and the introduction of a new endpoint for listing extensions of a contributor.
 
 {/* truncate */}
-
-
 
 :::caution Breaking changes
 
@@ -27,95 +24,57 @@ While we generally strive to avoid breaking changes in accordance with our [API 
 
 :::
 
-
-
 ## Summary
 
-
-- The enum value 'project_email_admin' has been removed from the request property 'notificationRoles/items/' in the POST operation for creating a conversation. This is a breaking change.
-- A new enum value 'project_emailadmin' has been added to the response property 'notificationRoles/items/' for the GET operation to list all conversations and for the GET operation to get a specific conversation.
-- The enum value 'project_email_admin' has been removed from the response property 'notificationRoles/items/' for the GET operations to list all conversations and to get a specific conversation.
-- A new enum value 'project_emailadmin' has been added to the request property 'notificationRoles/items/' in the POST operation for creating a conversation.
-- The schema 'de.mittwald.v1.conversation.DepartmentWithStatus' has been removed from the API schema.
-- A new endpoint has been added to list extensions of a contributor with the GET operation at the path '/v2/contributors/{contributorId}/extensions'.
-- The response property 'oneOf' list for the response status '200' has been updated to include '#/components/schemas/de.mittwald.v1.conversation.ServiceRequest' in the GET operation to list messages by conversation.
+- The enum value `project_email_admin` has been removed from the request property `notificationRoles/items/` in the POST operation for creating a conversation. This is a breaking change.
+- A new enum value `project_emailadmin` has been added to the response property `notificationRoles/items/` for the GET operation to list all conversations and for the GET operation to get a specific conversation.
+- The enum value `project_email_admin` has been removed from the response property `notificationRoles/items/` for the GET operations to list all conversations and to get a specific conversation.
+- A new enum value `project_emailadmin` has been added to the request property `notificationRoles/items/` in the POST operation for creating a conversation.
+- The schema `de.mittwald.v1.conversation.DepartmentWithStatus` has been removed from the API schema.
+- A new endpoint has been added to list extensions of a contributor with the GET operation at the path `/v2/contributors/{contributorId}/extensions`.
+- The response property `oneOf` list for the response status `200` has been updated to include `#/components/schemas/de.mittwald.v1.conversation.ServiceRequest` in the GET operation to list messages by conversation.
 
 _Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
 
-
 ## Detailed changes
-
-
 
 ### Changes in "Create a conversation"
 
+- ⚠️ **Breaking:** removed the enum value `project_email_admin` of the request property `notificationRoles/items/`
 
-- ⚠️ **Breaking:** removed the enum value 'project_email_admin' of the request property 'notificationRoles/items/'
-
-- added the new 'project_emailadmin' enum value to the request property 'notificationRoles/items/'
-
+- added the new `project_emailadmin` enum value to the request property `notificationRoles/items/`
 
 For details, refer to the <OperationLink operation="conversation-create-conversation" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get all conversation the authenticated user has created or has access to"
 
+- added the new `project_emailadmin` enum value to the `/items/notificationRoles/items/` response property for the response status `200`
 
-- added the new 'project_emailadmin' enum value to the '/items/notificationRoles/items/' response property for the response status '200'
-
-- removed the 'project_email_admin' enum value from the '/items/notificationRoles/items/' response property for the response status '200'
-
+- removed the `project_email_admin` enum value from the `/items/notificationRoles/items/` response property for the response status `200`
 
 For details, refer to the <OperationLink operation="conversation-list-conversations" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get a support conversation"
 
+- added the new `project_emailadmin` enum value to the `notificationRoles/items/` response property for the response status `200`
 
-- added the new 'project_emailadmin' enum value to the 'notificationRoles/items/' response property for the response status '200'
-
-- removed the 'project_email_admin' enum value from the 'notificationRoles/items/' response property for the response status '200'
-
+- removed the `project_email_admin` enum value from the `notificationRoles/items/` response property for the response status `200`
 
 For details, refer to the <OperationLink operation="conversation-get-conversation" apiVersion="v2" /> endpoint.
 
-
-
-### Changes in ""
-
-
-- removed the schema 'de.mittwald.v1.conversation.DepartmentWithStatus'
-
-
-For details, refer to the <OperationLink operation="" apiVersion="v2" /> endpoint.
-
-
-
 ### Changes in "List Extensions of own contributor"
-
 
 - endpoint added
 
-
 For details, refer to the <OperationLink operation="extension-list-own-extensions" apiVersion="v2" /> endpoint.
-
-
 
 ### Changes in "Get all message of the conversation"
 
-
-- added '#/components/schemas/de.mittwald.v1.conversation.ServiceRequest' to the '/items/' response property 'oneOf' list for the response status '200'
-
+- added `#/components/schemas/de.mittwald.v1.conversation.ServiceRequest` to the `/items/` response property `oneOf` list for the response status `200`
 
 For details, refer to the <OperationLink operation="conversation-list-messages-by-conversation" apiVersion="v2" /> endpoint.
 
-
-
-
 ## Client package releases
-
 
 ### mittwald PHP SDK Release v2.1.90
 
@@ -124,6 +83,7 @@ The mittwald PHP SDK has been updated to version v2.1.90. This release introduce
 #### Added Features
 
 - **New API Request and Response Handling for Listing Own Extensions**:
+
   - Implemented a client for fetching a contributor's extensions, including:
     - `ExtensionListOwnExtensionsRequest`: A request object for listing extensions with pagination and limit parameters.
     - `ExtensionListOwnExtensionsOKResponse`: A successful response containing an array of `OwnExtension` objects.
@@ -148,4 +108,3 @@ For more details, visit the [release page](https://github.com/mittwald/api-clien
 ### mittwald JavaScript SDK Release 4.90.0
 
 The mittwald JavaScript SDK has been updated to version 4.90.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.90.0](https://github.com/mittwald/api-client-js/releases/tag/4.90.0).
-
