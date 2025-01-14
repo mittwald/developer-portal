@@ -1,0 +1,94 @@
+---
+title: API changes for v2 API, January 14, 2025
+authors:
+  - machine
+tags:
+  - apiv2
+  - Cronjob
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+On January 14, 2025, the mittwald API introduced several enhancements, including the addition of required properties to the responses of various endpoints related to cronjobs and their executions.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- The required property 'latestExecution/cronjobId' has been added to the response with the '200' status for the GET operation on the path `/v2/cronjobs/{cronjobId}` (Get a Cronjob).
+- The required property '/items/cronjobId' has been added to the response with the '200' status for the GET operation on the path `/v2/cronjobs/{cronjobId}/executions` (List CronjobExecutions belonging to a Cronjob).
+- The required property 'cronjobId' has been added to the response with the '200' status for the GET operation on the path `/v2/cronjobs/{cronjobId}/executions/{executionId}` (Get a CronjobExecution).
+- The required property '/items/latestExecution/cronjobId' has been added to the response with the '200' status for the GET operation on the path `/v2/projects/{projectId}/cronjobs` (List Cronjobs belonging to a Project).
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Get a cronjob"
+
+
+- added the required property 'latestExecution/cronjobId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="cronjob-get-cronjob" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List cronjob executions belonging to a cronjob"
+
+
+- added the required property '/items/cronjobId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="cronjob-list-executions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a cronjob execution"
+
+
+- added the required property 'cronjobId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="cronjob-get-execution" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List cronjobs belonging to a Project"
+
+
+- added the required property '/items/latestExecution/cronjobId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="cronjob-list-cronjobs" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK Release v2.1.91
+
+The mittwald PHP SDK has been updated to version 2.1.91. This release introduces several enhancements to the `CronjobExecution` class:
+
+- A new property `cronjobId` has been added, allowing each cron job execution to be associated with a unique identifier.
+- The constructor of the `CronjobExecution` class now accepts `cronjobId` as a parameter.
+- A new getter method `getCronjobId()` has been implemented to retrieve the `cronjobId`.
+- A method `withCronjobId()` has been added to enable fluent updates of `cronjobId` with input validation.
+- Serialization and deserialization methods have been adjusted to include `cronjobId` in their processes.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.91).
+
+### mittwald JavaScript SDK Release 4.92.0
+
+The mittwald JavaScript SDK has been updated to version 4.92.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.92.0).
+
