@@ -1,0 +1,90 @@
+---
+title: Security Policy for Extensions in the mStudio marketplace
+sidebar_label: Security policy
+---
+
+This security policy defines the requirements and standards that contributors must adhere to in order to ensure the security and integrity of extensions in the mStudio Marketplace. The goal is to protect the data and systems of users and ensure maximum trust in the marketplace and its extensions.
+
+## General Security Principles
+
+### No Harm to Users
+
+Extensions must not cause harm to the user or their data in any way. Any actions that could endanger the user or their systems are strictly prohibited.
+
+### Transparency of Functionality
+
+Extensions must only perform the functions described in their documentation. Hidden, undocumented, surprising or deceitful functionalities are not allowed.
+
+### Principle of Minimal Permissions
+
+Extensions must request only the minimal permissions necessary to perform their function.
+
+### No Privilege Escalation or Circumvention
+
+Extensions must not use mechanisms to escalate or circumvent access controls. An extension should not grant a user any access privileges that are not already granted by the mStudio itself. They must strictly adhere to the security policies and permissions defined by the marketplace.
+
+### Defensive Approach to Modifications
+
+When an extension accesses or modifies the contents of a user's hosting environment (e.g., web environment content, configurations), a defensive approach must be taken. If there is any doubt about the success or safety of an action, it must be aborted, and the user must be informed. For example:
+
+- Inconsistencies in data.
+- Risks to system integrity or availability.
+
+The principle of "better safe than sorry" must always be followed.
+
+## Security Standards
+
+### Compliance with OWASP Top 10
+
+Contributors must ensure that their extensions comply with the recommendations of the OWASP Top 10, addressing risks such as injection attacks, authentication vulnerabilities, and insecure data transmission.
+
+### Mandatory Use of TLS
+
+All data transmissions between the extension, the marketplace, and external services must be encrypted. TLS is mandatory and cannot be disabled under any circumstances.
+
+### Protection Against Cross-Site Scripting (XSS)
+
+Extensions must be protected against Cross-Site Scripting (XSS) attacks. Input from users or other sources must be validated, filtered, and properly encoded before being processed or displayed.
+
+### Secure Handling of Tokens and Passwords
+
+Tokens and passwords must be securely generated, using cryptographically secure random number generators. They must never be stored or transmitted in plain text.
+
+### Secure Storage of Secrets
+
+All sensitive data (e.g., API keys, secrets, or credentials) must be securely stored using encrypted methods. Sensitive data must also be kept separate from executable code.
+
+## Use of External Resources
+
+### Trusted Sources
+
+When using external libraries or software, they must come exclusively from trusted sources, such as official repositories or websites. Contributors must regularly check these dependencies for security updates and ensure they remain up to date.
+
+### Regular Updates and Maintenance
+
+Extensions must be actively maintained to address evolving security challenges and compatibility with the marketplace environment. Contributors are required to:
+
+- Provide timely security updates for identified vulnerabilities.
+- Monitor dependencies and update external libraries or software components regularly to maintain security.
+- Test updates thoroughly to avoid introducing new vulnerabilities or breaking existing functionality.
+- Communicate changes clearly to users with a detailed changelog.
+
+## Development and Publication
+
+### Code Reviews
+
+Before releasing an extension, its code must be thoroughly reviewed to ensure compliance with all security standards.
+
+### Testing
+
+Extensions must be thoroughly tested to ensure they function as expected and do not expose any unforeseen vulnerabilities.
+
+## Consequences of Non-Compliance
+
+Extensions that violate this security policy:
+
+- Will be removed from the marketplace.
+- May result in the contributor’s account being banned.
+- Could lead to legal action, particularly in cases of intentional or grossly negligent harm to users.
+
+By adhering to this policy, contributors and the marketplace work together to create a secure and trustworthy environment for all users.
