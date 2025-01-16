@@ -44,7 +44,7 @@ $ mw --help
 
 Beachte bitte, dass diese Installationsmethode die mittwald CLI mit der auf deinem lokalen System installierten Node.js-Version verwendet. Wir können keine vollständige Kompatibilität mit allen Node.js-Versionen garantieren, da die CLI derzeit nur gegen Node.js-Version 18 und 20 getestet wird.
 
-If you encounter any issues with a Node.js version greater than 20, please [file a bug report](https://github.com/mittwald/cli/issues) so we can fix it for future releases.
+Wenn Du Probleme mit einer Node.js-Version über 20 hast, [sende bitte einen Fehlerbericht](https://github.com/mittwald/cli/issues), damit wir das Problem in zukünftigen Versionen beheben können.
 
 :::
 
