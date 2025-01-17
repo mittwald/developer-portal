@@ -37,6 +37,7 @@ function groupChangelogByOperation(changelog: ChangelogEntry[]) {
 }
 
 async function generateAPIChangeIntroduction(
+  since: Date,
   changelog: ChangelogEntry[],
 ): Promise<string | undefined> {
   const now = new Date();
@@ -46,7 +47,9 @@ async function generateAPIChangeIntroduction(
       {
         role: "system",
         content:
-          "You are an API changelog generator. Your task is to generate an introduction to a changelog entry for the mittwald API, dated " +
+          "You are an API changelog generator. Your task is to generate an introduction to a changelog entry for the mittwald API, dated for the week from " +
+          since.toLocaleDateString() +
+          " until " +
           now.toLocaleDateString() +
           "You will be provided a JSON document with a list of changes to the mittwald API. " +
           "You will output an introductory sentence for a changelog entry, summarizing the API changes in a single sentence, formatted in markdown." +
@@ -59,13 +62,18 @@ async function generateAPIChangeIntroduction(
   });
 
   if (completion.choices[0].finish_reason === "length") {
-    const formattedDate = now.toLocaleDateString("en-US", {
+    const formatDateOpts: Intl.DateTimeFormatOptions = {
       year: "numeric",
       month: "long",
       day: "numeric",
-    });
+    };
+    const formattedDateSince = since.toLocaleDateString(
+      "en-US",
+      formatDateOpts,
+    );
+    const formattedDateNow = now.toLocaleDateString("en-US", formatDateOpts);
 
-    return `This document contains a machine-generated summary of the API changes for ${formattedDate}. The API changes are based on the diff between the OpenAPI schemas of the two versions.`;
+    return `This document contains a machine-generated summary of the API changes for ${formattedDateSince} until ${formattedDateNow}. The API changes are based on the diff between the OpenAPI schemas of the two versions.`;
   }
 
   return completion.choices[0].message.content;
@@ -140,7 +148,10 @@ async function generateAPIChangelog(apiVersion: APIVersion) {
   }
 
   if (changelog.length > 0) {
-    const introduction = await generateAPIChangeIntroduction(changelog);
+    const introduction = await generateAPIChangeIntroduction(
+      baseDate,
+      changelog,
+    );
     const summary = await generateAPIChangeSummary(changelog);
     const clientChangelogs =
       apiVersion !== "v1"
@@ -162,6 +173,7 @@ async function generateAPIChangelog(apiVersion: APIVersion) {
       path.join("generator", "templates", "changelog.mdx.ejs"),
       {
         yaml,
+        since: baseDate,
         today,
         apiVersion,
         changelog,
