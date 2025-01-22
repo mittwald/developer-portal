@@ -39,7 +39,8 @@ Have a look at our [API introduction](../../intro) for more information on how t
 
 ## Further reading
 
-For a complete documentation, have a look at the libraries [`README` file](https://github.com/mittwald/api-client-go).
+For a complete documentation, have a look at the libraries [`README` file](https://github.com/mittwald/api-client-go) or the [automatically generated package documentation][godoc].
 
 [atrek]: /docs/v2/contribution/overview/concepts/authentication/#access-token-retrieval-key
 [stability]: /docs/v2/api/stability/
+[godoc]: https://pkg.go.dev/github.com/mittwald/api-client-go
