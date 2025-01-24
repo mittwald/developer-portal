@@ -1,0 +1,384 @@
+---
+title: API changes for v2 API, 1/24/2025 to January 24
+authors:
+  - machine
+tags:
+  - apiv2
+  - App
+  - Database
+  - User
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week's update to the mittwald API includes the removal of deprecated schemas and operation IDs, the addition of required properties to various responses, and the introduction of optional properties to enhance data retrieval.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- The schema 'de.mittwald.v1.user.UserInternal' has been removed from the API components.
+- The required property '/items/createdAt' has been added to the response with the '200' status for the following operations:
+  - `GET /v2/app-installations` (List AppInstallations that a user has access to)
+  - `GET /v2/projects/{projectId}/app-installations` (List AppInstallations belonging to a Project)
+- The required property 'createdAt' has been added to the response with the '200' status for the operation `GET /v2/app-installations/{appInstallationId}` (Get an AppInstallation).
+- The API operation id 'mail-deliverybox-update-description-deprecated' has been removed and replaced with 'deprecated-mail-deliverybox-update-description' for the operation `PUT /v2/deliveryboxes/{id}/description`.
+- The API operation id 'mail-deliverybox-update-password-deprecated' has been removed and replaced with 'deprecated-mail-deliverybox-update-password' for the operation `PUT /v2/deliveryboxes/{id}/password`.
+- The API operation id 'domain-check-domain-registrability-v2-deprecated' has been removed and replaced with 'deprecated-domain-check-domain-registrability' for the operation `POST /v2/domains`.
+- The API operation id 'domain-get-handle-fields-v2-deprecated' has been removed and replaced with 'deprecated-domain-get-handle-fields' for the operation `GET /v2/domains/handle-schema/{domainName}`.
+- The API operation id 'domain-declare-process-change-authcode-v2-deprecated' has been removed and replaced with 'deprecated-domain-declare-process-change-authcode' for the operation `PUT /v2/domains/{domainId}/declarations/authcode`.
+- The API operation id 'domain-declare-process-change-handles-v2-deprecated' has been removed and replaced with 'deprecated-domain-declare-process-change-handles' for the operation `PUT /v2/domains/{domainId}/declarations/handles`.
+- The API operation id 'domain-change-ownerc-of-domain-v2-deprecated' has been removed and replaced with 'deprecated-domain-change-ownerc-of-domain' for the operation `PUT /v2/domains/{domainId}/handles/ownerc`.
+- The API operation id 'domain-declare-nameservers-v2-deprecated' has been removed and replaced with 'deprecated-domain-declare-nameservers' for the operation `PUT /v2/domains/{domainId}/nameservers`.
+- The API operation id 'domain-change-project-of-domain-v2-deprecated' has been removed and replaced with 'deprecated-domain-change-project-of-domain' for the operation `PUT /v2/domains/{domainId}/projectId`.
+- The API operation id 'ingress-paths-deprecated' has been removed and replaced with 'deprecated-ingress-paths' for the operation `PUT /v2/ingresses/{ingressId}/paths`.
+- The API operation id 'ingress-tls-deprecated' has been removed and replaced with 'deprecated-ingress-tls' for the operation `PUT /v2/ingresses/{ingressId}/tls`.
+- The API operation id 'mail-update-mail-address-autoresponder-v2-deprecated' has been removed and replaced with 'deprecated-mail-update-mail-address-autoresponder' for the operation `PUT /v2/mail-addresses/{mailAddressId}/autoresponder`.
+- The API operation id 'mail-update-mail-address-catchall-v2-deprecated' has been removed and replaced with 'deprecated-mail-update-mail-address-catchall' for the operation `PUT /v2/mail-addresses/{mailAddressId}/catchall`.
+- The API operation id 'mail-update-mail-address-forward-addresses-v2-deprecated' has been removed and replaced with 'deprecated-mail-update-mail-address-forward-addresses' for the operation `PUT /v2/mail-addresses/{mailAddressId}/forward-addresses`.
+- The API operation id 'mail-update-mail-address-password-v2-deprecated' has been removed and replaced with 'deprecated-mail-update-mail-address-password' for the operation `PUT /v2/mail-addresses/{mailAddressId}/password`.
+- The API operation id 'mail-update-mail-address-quota-v2-deprecated' has been removed and replaced with 'deprecated-mail-update-mail-address-quota' for the operation `PUT /v2/mail-addresses/{mailAddressId}/quota`.
+- The API operation id 'mail-update-mail-address-spam-protection-v2-deprecated' has been removed and replaced with 'deprecated-mail-update-mail-address-spam-protection' for the operation `PUT /v2/mail-addresses/{mailAddressId}/spam-protection`.
+- The API operation id 'mail-mailaddress-update-address-deprecated' has been removed and replaced with 'deprecated-mail-mailaddress-update-address' for the operation `PUT /v2/mailaddresses/{id}/address`.
+- The optional property 'mainUser' has been added to the response with the '200' status for the operation `GET /v2/mysql-databases/{mysqlDatabaseId}` (Get a MySQLDatabase).
+- The optional property '/items/mainUser' has been added to the response with the '200' status for the operation `GET /v2/projects/{projectId}/mysql-databases` (List MySQLDatabases belonging to a Project).
+- The API operation id 'domain-list-domains-v2-deprecated' has been removed and replaced with 'deprecated-domain-list-domains' for the operation `GET /v2/projects/{projectId}/domains`.
+- The API operation id 'ingress-list-ingresses-v2-deprecated' has been removed and replaced with 'deprecated-ingress-list-ingresses' for the operation `GET /v2/projects/{projectId}/ingresses`.
+- The API operation id 'mail-update-project-mail-setting-v2-deprecated' has been removed and replaced with 'deprecated-mail-update-project-mail-setting' for the operation `PUT /v2/projects/{projectId}/mail-settings/{setting}`.
+- The API operation id 'mail-projectsetting-update-blacklist-deprecated' has been removed and replaced with 'deprecated-mail-projectsetting-update-blacklist' for the operation `PUT /v2/projects/{projectId}/mailsettings/blacklist`.
+- The API operation id 'mail-projectsetting-update-whitelist-deprecated' has been removed and replaced with 'deprecated-mail-projectsetting-update-whitelist' for the operation `PUT /v2/projects/{projectId}/mailsettings/whitelist`.
+- The API operation id 'user-get-own-account' has been removed and replaced with 'deprecated-user-get-own-account' for the operation `GET /v2/users/self/personal-information`.
+- The required property 'rules/maxSizeInBytes' has been added to the response with the '200' status for the operation `POST /v2/users/{userId}/avatar` (Request a new avatar image upload). 
+
+Note: Several operation IDs have been deprecated and replaced, indicating a breaking change in the API.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in ""
+
+
+- removed the schema 'de.mittwald.v1.user.UserInternal'
+
+
+For details, refer to the <OperationLink operation="" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app installations that a user has access to"
+
+
+- added the required property '/items/createdAt' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations-for-user" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an app installation"
+
+
+- added the required property 'createdAt' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-get-appinstallation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "mail-deliverybox-update-description-deprecated"
+
+
+- api operation id 'mail-deliverybox-update-description-deprecated' removed and replaced with 'deprecated-mail-deliverybox-update-description'
+
+
+For details, refer to the <OperationLink operation="mail-deliverybox-update-description-deprecated" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "mail-deliverybox-update-password-deprecated"
+
+
+- api operation id 'mail-deliverybox-update-password-deprecated' removed and replaced with 'deprecated-mail-deliverybox-update-password'
+
+
+For details, refer to the <OperationLink operation="mail-deliverybox-update-password-deprecated" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "domain-check-domain-registrability-v2-deprecated"
+
+
+- api operation id 'domain-check-domain-registrability-v2-deprecated' removed and replaced with 'deprecated-domain-check-domain-registrability'
+
+
+For details, refer to the <OperationLink operation="domain-check-domain-registrability-v2-deprecated" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "domain-get-handle-fields-v2-deprecated"
+
+
+- api operation id 'domain-get-handle-fields-v2-deprecated' removed and replaced with 'deprecated-domain-get-handle-fields'
+
+
+For details, refer to the <OperationLink operation="domain-get-handle-fields-v2-deprecated" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "domain-declare-process-change-authcode-v2-deprecated"
+
+
+- api operation id 'domain-declare-process-change-authcode-v2-deprecated' removed and replaced with 'deprecated-domain-declare-process-change-authcode'
+
+
+For details, refer to the <OperationLink operation="domain-declare-process-change-authcode-v2-deprecated" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "domain-declare-process-change-handles-v2-deprecated"
+
+
+- api operation id 'domain-declare-process-change-handles-v2-deprecated' removed and replaced with 'deprecated-domain-declare-process-change-handles'
+
+
+For details, refer to the <OperationLink operation="domain-declare-process-change-handles-v2-deprecated" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "domain-change-ownerc-of-domain-v2-deprecated"
+
+
+- api operation id 'domain-change-ownerc-of-domain-v2-deprecated' removed and replaced with 'deprecated-domain-change-ownerc-of-domain'
+
+
+For details, refer to the <OperationLink operation="domain-change-ownerc-of-domain-v2-deprecated" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "domain-declare-nameservers-v2-deprecated"
+
+
+- api operation id 'domain-declare-nameservers-v2-deprecated' removed and replaced with 'deprecated-domain-declare-nameservers'
+
+
+For details, refer to the <OperationLink operation="domain-declare-nameservers-v2-deprecated" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "domain-change-project-of-domain-v2-deprecated"
+
+
+- api operation id 'domain-change-project-of-domain-v2-deprecated' removed and replaced with 'deprecated-domain-change-project-of-domain'
+
+
+For details, refer to the <OperationLink operation="domain-change-project-of-domain-v2-deprecated" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "ingress-paths-deprecated"
+
+
+- api operation id 'ingress-paths-deprecated' removed and replaced with 'deprecated-ingress-paths'
+
+
+For details, refer to the <OperationLink operation="ingress-paths-deprecated" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "ingress-tls-deprecated"
+
+
+- api operation id 'ingress-tls-deprecated' removed and replaced with 'deprecated-ingress-tls'
+
+
+For details, refer to the <OperationLink operation="ingress-tls-deprecated" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "mail-update-mail-address-autoresponder-v2-deprecated"
+
+
+- api operation id 'mail-update-mail-address-autoresponder-v2-deprecated' removed and replaced with 'deprecated-mail-update-mail-address-autoresponder'
+
+
+For details, refer to the <OperationLink operation="mail-update-mail-address-autoresponder-v2-deprecated" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "mail-update-mail-address-catchall-v2-deprecated"
+
+
+- api operation id 'mail-update-mail-address-catchall-v2-deprecated' removed and replaced with 'deprecated-mail-update-mail-address-catchall'
+
+
+For details, refer to the <OperationLink operation="mail-update-mail-address-catchall-v2-deprecated" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "mail-update-mail-address-forward-addresses-v2-deprecated"
+
+
+- api operation id 'mail-update-mail-address-forward-addresses-v2-deprecated' removed and replaced with 'deprecated-mail-update-mail-address-forward-addresses'
+
+
+For details, refer to the <OperationLink operation="mail-update-mail-address-forward-addresses-v2-deprecated" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "mail-update-mail-address-password-v2-deprecated"
+
+
+- api operation id 'mail-update-mail-address-password-v2-deprecated' removed and replaced with 'deprecated-mail-update-mail-address-password'
+
+
+For details, refer to the <OperationLink operation="mail-update-mail-address-password-v2-deprecated" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "mail-update-mail-address-quota-v2-deprecated"
+
+
+- api operation id 'mail-update-mail-address-quota-v2-deprecated' removed and replaced with 'deprecated-mail-update-mail-address-quota'
+
+
+For details, refer to the <OperationLink operation="mail-update-mail-address-quota-v2-deprecated" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "mail-update-mail-address-spam-protection-v2-deprecated"
+
+
+- api operation id 'mail-update-mail-address-spam-protection-v2-deprecated' removed and replaced with 'deprecated-mail-update-mail-address-spam-protection'
+
+
+For details, refer to the <OperationLink operation="mail-update-mail-address-spam-protection-v2-deprecated" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "mail-mailaddress-update-address-deprecated"
+
+
+- api operation id 'mail-mailaddress-update-address-deprecated' removed and replaced with 'deprecated-mail-mailaddress-update-address'
+
+
+For details, refer to the <OperationLink operation="mail-mailaddress-update-address-deprecated" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a MySQL database"
+
+
+- added the optional property 'mainUser' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="database-get-mysql-database" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app installations belonging to a Project"
+
+
+- added the required property '/items/createdAt' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "domain-list-domains-v2-deprecated"
+
+
+- api operation id 'domain-list-domains-v2-deprecated' removed and replaced with 'deprecated-domain-list-domains'
+
+
+For details, refer to the <OperationLink operation="domain-list-domains-v2-deprecated" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "ingress-list-ingresses-v2-deprecated"
+
+
+- api operation id 'ingress-list-ingresses-v2-deprecated' removed and replaced with 'deprecated-ingress-list-ingresses'
+
+
+For details, refer to the <OperationLink operation="ingress-list-ingresses-v2-deprecated" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "mail-update-project-mail-setting-v2-deprecated"
+
+
+- api operation id 'mail-update-project-mail-setting-v2-deprecated' removed and replaced with 'deprecated-mail-update-project-mail-setting'
+
+
+For details, refer to the <OperationLink operation="mail-update-project-mail-setting-v2-deprecated" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "mail-projectsetting-update-blacklist-deprecated"
+
+
+- api operation id 'mail-projectsetting-update-blacklist-deprecated' removed and replaced with 'deprecated-mail-projectsetting-update-blacklist'
+
+
+For details, refer to the <OperationLink operation="mail-projectsetting-update-blacklist-deprecated" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "mail-projectsetting-update-whitelist-deprecated"
+
+
+- api operation id 'mail-projectsetting-update-whitelist-deprecated' removed and replaced with 'deprecated-mail-projectsetting-update-whitelist'
+
+
+For details, refer to the <OperationLink operation="mail-projectsetting-update-whitelist-deprecated" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List MySQL databases belonging to a Project"
+
+
+- added the optional property '/items/mainUser' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="database-list-mysql-databases" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "user-get-own-account"
+
+
+- api operation id 'user-get-own-account' removed and replaced with 'deprecated-user-get-own-account'
+
+
+For details, refer to the <OperationLink operation="user-get-own-account" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Request a new avatar image upload"
+
+
+- added the required property 'rules/maxSizeInBytes' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="user-request-avatar-upload" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald JavaScript SDK Release 4.97.0
+
+The mittwald JavaScript SDK has been updated to version 4.97.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.97.0).
+
