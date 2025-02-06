@@ -595,11 +595,11 @@ This ensures that the request body was transmitted by mittwald and was not modif
 ```go
 bodyBytes, err := io.ReadAll(body)
 if err != nil {
-   return err
+    return err
 }
 
 if !ed25519.Verify(publicKey, bodyBytes, signature) {
-   panic("invalid signature")
+    panic("invalid signature")
 }
 ```
 
