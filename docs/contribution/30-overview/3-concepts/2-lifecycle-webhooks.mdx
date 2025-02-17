@@ -26,7 +26,7 @@ The mStudio will retry a webhook call until it receives a response that the exte
 It also ensures that the webhooks are in the correct order **per extension instance**.
 The only exception to this rule is the removal of extensions from a context.
 In that case, the mStudio aborts all inactive or pending webhook calls.
-Only the `ExtensionInstanceRemovedFromContext` webhook call is executed and retried until the extension processes the call successfully or the extension is removed from the marketplace.
+Only the `InstanceRemovedFromContext` webhook call is executed and retried until the extension processes the call successfully or the extension is removed from the marketplace.
 
 :::caution
 If the mStudio backend does not receive a response from the extension webhook handler **within 6 seconds**, it interprets this as a **timeout**, and the webhook call execution fails.
@@ -54,7 +54,7 @@ Every extension instance gets a unique extension instance ID.
 If you want to persist extension instances, you **should use the extension instance ID as the primary key or unique identifier** instead of the context ID.
 The following dangerous scenario that can occur due to the asynchronous nature of the webhook call executions is the reason for this recommendation.
 An extension is removed from a context and immediately added to the same context (for example, to start again with a clean configuration).
-If the `ExtensionInstanceAddedToContext`-webhook call of the new extension instance is processed before the `ExtensionInstanceRemovedFromContext` webhook of the old instance,
+If the `ExtensionInstanceAddedToContext`-webhook call of the new extension instance is processed before the `InstanceRemovedFromContext` webhook of the old instance,
 this may lead to the deletion of all extension instances of that context.
 This includes the newly created extension instance that should exist.
 
@@ -78,14 +78,14 @@ During this process, the extension instance ID and the extension instance secret
 You can't immediately use the extension instance secret in the webhook handler.
 The reason is described above in [secrets in webhooks](#secrets-in-webhooks).
 
-### ExtensionInstanceUpdated
+### InstanceUpdated
 
 This webhook communicates a change in the state of the extension instance.
 It always includes the whole new state of the extension instance.
 
 The activation and deactivation of the extension instance are an example of this.
 
-### ExtensionInstanceSecretRotated
+### SecretRotated
 
 The extension instance secret is rotated regularly for security reasons.
 This webhook communicates the new secret to the external application.
@@ -93,13 +93,13 @@ The old secret is no longer valid at this point in time.
 You can't immediately use the new secret in the webhook handler, analogously to the [ExtensionAddedToContext](#extensionaddedtocontext) webhook.
 For more information, see [secrets in webhooks](#secrets-in-webhooks).
 
-### ExtensionInstanceRemovedFromContext
+### InstanceRemovedFromContext
 
 This webhook communicates the removal of an extension instance from a context.
 You should ensure compliance with data privacy laws at this point and delete personal data for example.
 
 :::note
-We treat the `ExtensionInstanceRemovedFromContext` webhook differently regarding the QoS.
+We treat the `InstanceRemovedFromContext` webhook differently regarding the QoS.
 It is possible to force remove the extension if the webhook handler is unreachable.
 In this case, we revoke all permissions of the extension instance and invalidate existing access tokens.
 
