@@ -16,9 +16,9 @@ $ composer require mittwald/api-client
 
 To use the client, import the `Mittwald\ApiClient\MittwaldAPIV2Client` class, and instantiate it via one of the factory functions:
 
-- `MittwaldAPIClient::newUnauthenticated()`
-- `MittwaldAPIClient::newWithToken(string $apiToken)` (recommended)
-- `MittwaldAPIClient::newWithCredentials(string $email, string $password)` (does actually perform a login in the background; does not work when using 2FA)
+- `MittwaldAPIV2Client::newUnauthenticated()`
+- `MittwaldAPIV2Client::newWithToken(string $apiToken)` (recommended)
+- `MittwaldAPIV2Client::newWithCredentials(string $email, string $password)` (does actually perform a login in the background; does not work when using 2FA)
 
 Have a look at our [API introduction](../../intro) for more information on how to obtain an API token and how to get started with the API.
 
