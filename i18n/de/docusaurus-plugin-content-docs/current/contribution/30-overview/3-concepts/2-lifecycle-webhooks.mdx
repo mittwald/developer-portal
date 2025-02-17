@@ -23,7 +23,7 @@ Das mStudio versucht so lange, Webhooks zuzustellen, bis der Webhook erfolgreich
 Auch wird sichergestellt, dass Webhooks **pro Extension Instance** stets in der richtigen Reihenfolge zugestellt werden.
 Die einzige Ausnahme stellt das Entfernen der Extension vom Context dar.
 In diesem Fall werden alle nicht aktiven und noch ausstehenden Webhooks Calls abgebrochen
-und nur noch der `ExtensionInstanceRemovedFromContext`-Webhook versendet, dies jedoch solange bis dieser erfolgreich verarbeitet wurde
+und nur noch der `InstanceRemovedFromContext`-Webhook versendet, dies jedoch solange bis dieser erfolgreich verarbeitet wurde
 oder die Extension selbst aus dem Marktplatz entfernt wird.
 
 :::caution
@@ -58,7 +58,7 @@ Wenn Extension Instances von einer Extension persistiert werden sollen,
 Der Grund dafür ist, dass die Webhooks asynchron ausgeführt werden.
 Ein gefährliches Szenario für die Context ID als Primary Key stellt sich wie folgt dar:
 Eine Extension wird von einem Context entfernt und anschließend direkt wieder hinzugefügt (bspw. um mit frischer Konfiguration erneut zu starten).
-Wenn der `ExtensionInstanceAddedToContext`-Webhook der neuen Extension Instance vor dem `ExtensionInstanceRemovedFromContext`-Webhook der alten Extension Instance verarbeitet wird,
+Wenn der `ExtensionInstanceAddedToContext`-Webhook der neuen Extension Instance vor dem `InstanceRemovedFromContext`-Webhook der alten Extension Instance verarbeitet wird,
 könnte es dazu führen, dass alle Extension Instances des Context gelöscht wurden, obwohl eigentlich eine Extension Instance für diesen Context existieren sollte.
 
 ## Validierung von Webhook Daten
@@ -102,7 +102,7 @@ Dieser Webhook drückt aus, dass eine Extension Instance aus einem Context entfe
 Datenschutzrelevante Konsequenzen, wie die Löschung von personenbezogenen Daten, sollten an dieser Stelle berücksichtigt werden.
 
 :::note
-Für den `ExtensionInstanceRemovedFromContext`-Webhook wird eine spezielle Behandlung hinsichtlich der QoS vorgenommen.
+Für den `InstanceRemovedFromContext`-Webhook wird eine spezielle Behandlung hinsichtlich der QoS vorgenommen.
 Falls die Webhook Handler nicht erreichbar sind, besteht die Möglichkeit, das Entfernen der Extension zu forcieren.
 In diesem Fall werden die Rechte der Extension Instance entzogen und bestehende Access Tokens invalidiert.
 
