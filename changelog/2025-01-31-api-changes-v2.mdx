@@ -1,5 +1,5 @@
 ---
-title: Breaking (!) API changes for v2 API, January 31 to January 31
+title: Breaking (!) API changes for v2 API, January 24 to January 31
 authors:
   - machine
 tags:
@@ -7,7 +7,6 @@ tags:
   - breaking
   - Marketplace
   - Domain
-
 ---
 
 import OperationHint from "@site/src/components/OperationHint";
@@ -17,8 +16,6 @@ This week, the mittwald API introduces several updates, including optional respo
 
 {/* truncate */}
 
-
-
 :::caution Breaking changes
 
 This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
@@ -27,10 +24,7 @@ While we generally strive to avoid breaking changes in accordance with our [API 
 
 :::
 
-
-
 ## Summary
-
 
 - The response property '/items/description' has become optional for the status '200' in both the "List Contributors" and "Get a Contributor" operations. This is a breaking change.
 - The optional properties '/items/deprecation/note' and '/items/deprecation/successorId' have been added to the response with the '200' status in the "List Extensions of own contributor" operation.
@@ -43,96 +37,60 @@ While we generally strive to avoid breaking changes in accordance with our [API 
 
 _Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
 
-
 ## Detailed changes
-
-
 
 ### Changes in "List contributors"
 
-
 - ⚠️ **Breaking:** the response property '/items/description' became optional for the status '200'
-
 
 For details, refer to the <OperationLink operation="extension-list-contributors" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get a contributor"
-
 
 - ⚠️ **Breaking:** the response property 'description' became optional for the status '200'
 
-
 For details, refer to the <OperationLink operation="extension-get-contributor" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "List Extensions of own contributor"
-
 
 - added the optional property '/items/deprecation/note' to the response with the '200' status
 
 - added the optional property '/items/deprecation/successorId' to the response with the '200' status
 
-
 For details, refer to the <OperationLink operation="extension-list-own-extensions" apiVersion="v2" /> endpoint.
-
-
 
 ### Changes in "Get a DNS Zone"
 
-
 - added the required property 'recordSet/caa' to the response with the '200' status
-
 
 For details, refer to the <OperationLink operation="dns-get-dns-zone" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Update a record set on a DNS Zone"
-
 
 - added '#/components/schemas/de.mittwald.v1.dns.RecordCAAComponent' to the request body 'oneOf' list
 
 - added the new enum value 'caa' to the 'path' request parameter 'recordSet'
 
-
 For details, refer to the <OperationLink operation="dns-update-record-set" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "List Extensions"
-
 
 - added the optional property '/items/deprecation/note' to the response with the '200' status
 
 - added the optional property '/items/deprecation/successorId' to the response with the '200' status
 
-
 For details, refer to the <OperationLink operation="extension-list-extensions" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get an Extension"
-
 
 - added the optional property 'deprecation/note' to the response with the '200' status
 
 - added the optional property 'deprecation/successorId' to the response with the '200' status
 
-
 For details, refer to the <OperationLink operation="extension-get-extension" apiVersion="v2" /> endpoint.
-
-
 
 ### Changes in "List DNS Zones belonging to a Project"
 
-
 - added the required property '/items/recordSet/caa' to the response with the '200' status
 
-
 For details, refer to the <OperationLink operation="dns-list-dns-zones" apiVersion="v2" /> endpoint.
-
-
-

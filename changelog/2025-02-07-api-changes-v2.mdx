@@ -1,12 +1,11 @@
 ---
-title: API changes for v2 API, February 7 to February 7
+title: API changes for v2 API, January 31 to February 7
 authors:
   - machine
 tags:
   - apiv2
   - Marketplace
   - Conversation
-
 ---
 
 import OperationHint from "@site/src/components/OperationHint";
@@ -16,10 +15,7 @@ This week, the mittwald API introduces several enhancements, including the addit
 
 {/* truncate */}
 
-
-
 ## Summary
-
 
 - The `GET /v2/contributors/{contributorId}/extensions` operation now includes an optional property `/items/subTitle` and a required property `/items/statistics` in the response with a `200` status.
 - The `GET /v2/conversations` operation has two new optional query request parameters: `order` and `sort`.
@@ -36,147 +32,100 @@ This week, the mittwald API introduces several enhancements, including the addit
 
 _Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
 
-
 ## Detailed changes
 
-
-
 ### Changes in "List Extensions of own contributor"
-
 
 - added the optional property '/items/subTitle' to the response with the '200' status
 
 - added the required property '/items/statistics' to the response with the '200' status
 
-
 For details, refer to the <OperationLink operation="extension-list-own-extensions" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get all conversation the authenticated user has created or has access to"
-
 
 - added the new optional 'query' request parameter 'order'
 
 - added the new optional 'query' request parameter 'sort'
 
-
 For details, refer to the <OperationLink operation="conversation-list-conversations" apiVersion="v2" /> endpoint.
-
-
 
 ### Changes in "dns-record-a-set-custom-deprecated"
 
-
 - api operation id 'dns-record-a-set-custom-deprecated' removed and replaced with 'deprecated-dns-record-a-set-custom'
-
 
 For details, refer to the <OperationLink operation="dns-record-a-set-custom-deprecated" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "dns-record-a-set-managed-by-ingress-deprecated"
-
 
 - api operation id 'dns-record-a-set-managed-by-ingress-deprecated' removed and replaced with 'deprecated-dns-record-a-set-managed-by-ingress'
 
-
 For details, refer to the <OperationLink operation="dns-record-a-set-managed-by-ingress-deprecated" apiVersion="v2" /> endpoint.
-
-
 
 ### Changes in "dns-record-cname-set-deprecated"
 
-
 - api operation id 'dns-record-cname-set-deprecated' removed and replaced with 'deprecated-dns-record-cname-set'
-
 
 For details, refer to the <OperationLink operation="dns-record-cname-set-deprecated" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "dns-record-mx-set-custom-deprecated"
-
 
 - api operation id 'dns-record-mx-set-custom-deprecated' removed and replaced with 'deprecated-dns-record-mx-set-custom'
 
-
 For details, refer to the <OperationLink operation="dns-record-mx-set-custom-deprecated" apiVersion="v2" /> endpoint.
-
-
 
 ### Changes in "dns-record-mx-set-managed-deprecated"
 
-
 - api operation id 'dns-record-mx-set-managed-deprecated' removed and replaced with 'deprecated-dns-record-mx-set-managed'
-
 
 For details, refer to the <OperationLink operation="dns-record-mx-set-managed-deprecated" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "dns-record-srv-set-deprecated"
-
 
 - api operation id 'dns-record-srv-set-deprecated' removed and replaced with 'deprecated-dns-record-srv-set'
 
-
 For details, refer to the <OperationLink operation="dns-record-srv-set-deprecated" apiVersion="v2" /> endpoint.
-
-
 
 ### Changes in "dns-record-txt-set-deprecated"
 
-
 - api operation id 'dns-record-txt-set-deprecated' removed and replaced with 'deprecated-dns-record-txt-set'
-
 
 For details, refer to the <OperationLink operation="dns-record-txt-set-deprecated" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "List Extensions"
-
 
 - added the required property '/items/statistics' to the response with the '200' status
 
 - added the required property '/items/subTitle' to the response with the '200' status
 
-
 For details, refer to the <OperationLink operation="extension-list-extensions" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get an Extension"
-
 
 - added the required property 'statistics' to the response with the '200' status
 
 - added the required property 'subTitle' to the response with the '200' status
 
-
 For details, refer to the <OperationLink operation="extension-get-extension" apiVersion="v2" /> endpoint.
 
-
-
-
 ## Client package releases
-
 
 ### mittwald PHP SDK Release v2.1.103
 
 The mittwald PHP SDK has been updated to version v2.1.103. This release introduces several enhancements and changes:
 
 #### Added
+
 - **ExtensionStatistics**: A new class has been introduced to represent extension statistics, which includes:
+
   - **amountOfInstances**: An integer indicating the number of instances of an extension.
 
 - **Statistics Field in Extensions**: The `Extension` and `OwnExtension` classes now include a `statistics` field that refers to the `ExtensionStatistics` class.
 
 #### Changed
+
 - The constructors for `Extension` and `OwnExtension` have been updated to accept an `ExtensionStatistics` object, ensuring proper initialization of statistics.
 - New methods `getStatistics()` and `withStatistics()` have been added to the `Extension` and `OwnExtension` classes for accessing and modifying the statistics property.
 - Serialization logic for these classes has been updated to incorporate statistics in the JSON output.
 
 For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.103).
-
