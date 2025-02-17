@@ -81,14 +81,14 @@ Im Rahmen dieses Prozesses werden die Extension Instance ID und das Extension In
 Das Extension Instance Secret kann nicht im Handler selbst direkt verwendet werden.
 Siehe dazu auch [Secrets in Webhooks](#secrets-in-webhooks).
 
-### ExtensionInstanceUpdated
+### InstanceUpdated
 
 In diesem Webhook wird der externen Anwendung eine Zustandsänderung der Extension Instance mitgeteilt.
 Der externen Anwendung wird dabei immer der gesamte neue Zustand mitgeteilt.
 
 Das kann beispielsweise die De-/Aktivierung der Extension Instance sein.
 
-### ExtensionInstanceSecretRotated
+### SecretRotated
 
 Aus Sicherheitsgründen wird das Extension Instance Secret regelmäßig rotiert.
 Das neue Secret wird über diesen Webhook mitgeteilt.
@@ -96,7 +96,7 @@ Das vorherige Secret ist ab diesem Zeitpunkt nicht mehr gültig.
 Analog zum [ExtensionAddedToContext](#extensionaddedtocontext)-Webhook kann auch hier das Secret nicht direkt im Handler verwendet werden.
 Siehe dazu auch [Secrets in Webhooks](#secrets-in-webhooks).
 
-### ExtensionInstanceRemovedFromContext
+### InstanceRemovedFromContext
 
 Dieser Webhook drückt aus, dass eine Extension Instance aus einem Context entfernt wurde.
 Datenschutzrelevante Konsequenzen, wie die Löschung von personenbezogenen Daten, sollten an dieser Stelle berücksichtigt werden.

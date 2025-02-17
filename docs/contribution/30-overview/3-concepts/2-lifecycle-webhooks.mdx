@@ -78,14 +78,14 @@ During this process, the extension instance ID and the extension instance secret
 You can't immediately use the extension instance secret in the webhook handler.
 The reason is described above in [secrets in webhooks](#secrets-in-webhooks).
 
-### ExtensionInstanceUpdated
+### InstanceUpdated
 
 This webhook communicates a change in the state of the extension instance.
 It always includes the whole new state of the extension instance.
 
 The activation and deactivation of the extension instance are an example of this.
 
-### ExtensionInstanceSecretRotated
+### SecretRotated
 
 The extension instance secret is rotated regularly for security reasons.
 This webhook communicates the new secret to the external application.
@@ -93,7 +93,7 @@ The old secret is no longer valid at this point in time.
 You can't immediately use the new secret in the webhook handler, analogously to the [ExtensionAddedToContext](#extensionaddedtocontext) webhook.
 For more information, see [secrets in webhooks](#secrets-in-webhooks).
 
-### ExtensionInstanceRemovedFromContext
+### InstanceRemovedFromContext
 
 This webhook communicates the removal of an extension instance from a context.
 You should ensure compliance with data privacy laws at this point and delete personal data for example.
