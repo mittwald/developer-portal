@@ -1,0 +1,202 @@
+---
+title: Breaking (!) API changes for v2 API, February 14 to February 21
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Contract
+  - Marketplace
+  - File
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API introduces several enhancements, including default values for the 'limit' and 'skip' parameters, minimum value constraints for 'limit' and 'page', new security measures, and multiple required and optional properties added to responses across various endpoints.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- For the `GET /v2/customers/{customerId}/contracts` operation, the following changes were made:
+  - The default value of the `query` request parameter `limit` was added, set to `1000.00`.
+  - The default value of the `query` request parameter `skip` was added, set to `0.00`.
+  - The minimum value for the `query` request parameter `limit` was set to `1.00`.
+  - The minimum value for the `query` request parameter `page` was set to `1.00`. 
+  - Note that these changes are breaking changes due to the level 3 updates.
+
+- For the `GET /v2/contributors/{contributorId}/extensions` operation, the following changes were made:
+  - The endpoint scheme security `de.mittwald.v1.commons.AccessToken` was added to the API.
+  - The optional property `/items/externalFrontends` was added to the response with the `200` status.
+  - The optional property `/items/webhookUrls` was added to the response with the `200` status.
+  - The response properties `/items/requestedChanges/webhookUrls/extensionAddedToContext`, `/items/requestedChanges/webhookUrls/extensionInstanceRemovedFromContext`, `/items/requestedChanges/webhookUrls/extensionInstanceSecretRotated`, and `/items/requestedChanges/webhookUrls/extensionInstanceUpdated` became required for the `200` status.
+  - The required property `/items/assets` was added to the response with the `200` status.
+
+- For the `GET /v2/extensions` operation, the following changes were made:
+  - The optional property `/items/externalFrontends` was added to the response with the `200` status.
+  - The required property `/items/assets` was added to the response with the `200` status.
+
+- For the `GET /v2/extensions/{extensionId}` operation, the following changes were made:
+  - The optional property `externalFrontends` was added to the response with the `200` status.
+  - The required property `assets` was added to the response with the `200` status.
+
+- For the `GET /v2/file-upload-types/{fileUploadType}/rules` operation, the following changes were made:
+  - The new enum value `extensionAssetImage` was added to the `path` request parameter `fileUploadType`.
+  - The new enum value `extensionAssetVideo` was added to the `path` request parameter `fileUploadType`.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Return a list of Contracts for the given Customer"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', default value '1000.00' was added
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'skip', default value '0.00' was added
+
+- for the 'query' request parameter 'limit', the min was set to '1.00'
+
+- for the 'query' request parameter 'page', the min was set to '1.00'
+
+
+For details, refer to the <OperationLink operation="contract-list-contracts" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Extensions of own contributor"
+
+
+- the endpoint scheme security 'de.mittwald.v1.commons.AccessToken' was added to the API
+
+- added the optional property '/items/externalFrontends' to the response with the '200' status
+
+- added the optional property '/items/webhookUrls' to the response with the '200' status
+
+- the response property '/items/requestedChanges/webhookUrls/extensionAddedToContext' became required for the status '200'
+
+- the response property '/items/requestedChanges/webhookUrls/extensionInstanceRemovedFromContext' became required for the status '200'
+
+- the response property '/items/requestedChanges/webhookUrls/extensionInstanceSecretRotated' became required for the status '200'
+
+- the response property '/items/requestedChanges/webhookUrls/extensionInstanceUpdated' became required for the status '200'
+
+- added the required property '/items/assets' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-list-own-extensions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Extensions"
+
+
+- added the optional property '/items/externalFrontends' to the response with the '200' status
+
+- added the required property '/items/assets' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-list-extensions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an Extension"
+
+
+- added the optional property 'externalFrontends' to the response with the '200' status
+
+- added the required property 'assets' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a FileUploadType's rules"
+
+
+- added the new enum value 'extensionAssetImage' to the 'path' request parameter 'fileUploadType'
+
+- added the new enum value 'extensionAssetVideo' to the 'path' request parameter 'fileUploadType'
+
+
+For details, refer to the <OperationLink operation="file-get-file-upload-type-rules" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### Release Summary: mittwald PHP SDK v2.1.107
+
+The mittwald PHP SDK has been updated to version v2.1.107. This release introduces several important changes:
+
+#### Deprecations
+- The method for leaving a Customer has been deprecated. It is now replaced by `DELETE /v2/customer-memberships/{customerMembershipId}`.
+- The method for leaving a Project has been deprecated. It is now replaced by `DELETE /v2/project-memberships/{projectMembershipId}`.
+
+#### New Features
+- New file upload types have been added to the API, including:
+  - `extensionAssetImage`
+  - `extensionAssetVideo`
+
+These updates enhance the API's file handling capabilities, supporting a wider range of media types for uploads.
+
+For more details, please visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.107).
+
+### Release Summary: mittwald PHP SDK v2.1.106
+
+The mittwald PHP SDK has been updated to version v2.1.106. This release introduces several new features and changes aimed at enhancing functionality and improving integration capabilities.
+
+#### Features
+- **Enhanced Contract Listing Request**: Default values for `limit` and `skip` are now included in the `ListContractsRequest`, ensuring more consistent request handling.
+- **Extension Schema Updates**: New properties `assets` and `externalFrontends` have been added to the `Extension` schema to improve management of media and components.
+- **Webhook Support**: Introduction of `WebhookUrl` and `WebhookUrls` classes to facilitate event-driven integrations for extension lifecycle management.
+
+#### Changes
+- **ListContractsRequest**: 
+  - Default `limit` set to 1000 (minimum 1) and `skip` set to 0.
+  - `getLimit` and `getSkip` methods now return non-nullable integers.
+  - `withoutLimit` and `withoutSkip` methods removed.
+  
+- **BackendComponent and BackendComponents**: Marked as deprecated.
+
+- **Extension**: 
+  - New properties `assets` and `externalFrontends` introduced.
+  - `frontendComponents` property deprecated.
+
+- **New Classes**:
+  - `ExtensionAsset` and `ExtensionAssetAssetType` for managing extension assets.
+  - `WebhookUrl` and `WebhookUrls` for handling webhook events.
+
+- **OwnExtension**: Updated to support new `assets` and `externalFrontends` properties with corresponding methods.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.106).
+
+### mittwald JavaScript SDK Release 4.108.0
+
+The mittwald JavaScript SDK has been updated to version 4.108.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.108.0](https://github.com/mittwald/api-client-js/releases/tag/4.108.0).
+
+### mittwald JavaScript SDK Release 4.107.0
+
+The mittwald JavaScript SDK has been updated to version 4.107.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.107.0).
+
