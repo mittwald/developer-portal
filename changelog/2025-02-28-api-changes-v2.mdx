@@ -1,0 +1,96 @@
+---
+title: API changes for v2 API, February 21 to February 28
+authors:
+  - machine
+tags:
+  - apiv2
+  - Backup
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API has removed two schemas and introduced two new optional request parameters for the backup listing endpoint.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- The schema 'de.mittwald.v1.project.Scaling' has been removed from the API components.
+- The schema 'de.mittwald.v1.project.ServerInternal' has also been removed from the API components.
+- The 'GET /v2/projects/{projectId}/backups' operation has been updated to include two new optional query request parameters: 'sortOrder' and 'withExportsOnly'.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in ""
+
+
+- removed the schema 'de.mittwald.v1.project.Scaling'
+
+- removed the schema 'de.mittwald.v1.project.ServerInternal'
+
+
+For details, refer to the <OperationLink operation="" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Backups belonging to a Project"
+
+
+- added the new optional 'query' request parameter 'sortOrder'
+
+- added the new optional 'query' request parameter 'withExportsOnly'
+
+
+For details, refer to the <OperationLink operation="backup-list-project-backups" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### Release Summary: mittwald PHP SDK v2.1.109
+
+The mittwald PHP SDK has been updated to version v2.1.109. This release introduces new features and changes to enhance the flexibility and customization of backup retrieval processes.
+
+#### Added Features
+- **ListProjectBackupsRequest Enhancements**: New parameters have been added to allow filtering of backups with exports only and to specify sorting preferences.
+- **BackupSortOrder Enum**: A new enum has been implemented to standardize sorting options, providing `oldestFirst` and `newestFirst` as choices.
+
+#### Changes
+- **ListProjectBackupsRequest.php**:
+  - Introduced a `withExportsOnly` boolean parameter for filtering.
+  - Added a `sortOrder` parameter linked to the `BackupSortOrder` enum.
+  - Included getter methods for the new parameters.
+  - Implemented methods to set and unset these parameters for better request customization.
+  - Updated input and output handling to support the new parameters.
+
+- **BackupSortOrder.php**:
+  - Created a new enum `BackupSortOrder` to ensure type-safe sorting preferences.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.109).
+
+### mittwald PHP SDK Release v2.1.108
+
+The latest release of the mittwald PHP SDK, version v2.1.108, introduces significant changes to the API client structure. Notably, this release removes the `Scaling` and `ServerInternal` classes. The `Scaling` class, which managed scaling parameters such as `maximum` and `minimum` limits, has been eliminated. Similarly, the `ServerInternal` class, which included properties and functions related to the internal server object model, has also been removed. These changes suggest a shift towards a potentially simpler or different model for managing server and scaling details.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.108).
+
+### mittwald JavaScript SDK Release 4.110.0
+
+The mittwald JavaScript SDK version 4.110.0 has been released. This update includes a feature enhancement with an updated generated client. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.110.0).
+
+### mittwald JavaScript SDK Release 4.109.0
+
+The mittwald JavaScript SDK has been updated to version 4.109.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.109.0).
+
