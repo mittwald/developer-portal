@@ -35,6 +35,32 @@ Here, you can include descriptions of features, instructions for use, links for 
 The **state** of an extension defines whether the extension should be visible or usable in the mStudio.
 This includes, for example, whether it is generally active, displayed in the marketplace, and can be added to an extension context.
 
+#### Overview
+
+```mermaid
+---
+title: Extension State
+---
+stateDiagram-v2
+  direction TB
+  InDevelopment: In Development
+  InReview: In Review
+  Verified: Verified
+  Published: Published
+  Deprecated: Deprecated
+  Removed: Removed
+  [*] --> InDevelopment:Registered by the Contributor
+  InDevelopment --> InReview:Verification requested by the Contributor
+  InReview --> InDevelopment:Feedback provided by mittwald
+  InReview --> Verified:Verified by mittwald
+  Verified --> Published:Published by the Contributor
+  Published --> Verified:Withdrawn by the Contributor
+  Published --> Deprecated:Deprecated by the Contributor
+  Deprecated --> Removed:Automatically removed after the <br> deprecation period by mittwald
+  Published --> Removed:Removed by the Contributor
+  Removed --> [*]
+```
+
 ### Tags
 
 Tags provide a way to categorize extensions.

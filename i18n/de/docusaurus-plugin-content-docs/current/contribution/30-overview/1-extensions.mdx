@@ -39,6 +39,32 @@ In dieser kann auf Features, Nutzungshinweise, weiterführende Links, einen Chan
 Der **State** der Extension definiert, ob sie im mStudio sicht- und nutzbar sein soll.
 Das umfasst beispielsweise (jeweils unabhängig voneinander), ob sie generell aktiv ist, im Marktplatz angezeigt wird und ob sie zu einem Extension Context hinzugefügt werden kann.
 
+#### Overview
+
+```mermaid
+---
+title: Extension State
+---
+stateDiagram-v2
+  direction TB
+  InDevelopment: In Entwicklung
+  InReview: In Überprüfung
+  Verified: Verifiziert
+  Published: Veröffentlicht
+  Deprecated: Ausgemustert
+  Removed: Entfernt
+  [*] --> InDevelopment:Registriert durch den Contriubotr
+  InDevelopment --> InReview:Verifizierung angefragt durch den Contributor
+  InReview --> InDevelopment:Feedback zurück gegeben durch mittwald
+  InReview --> Verified:Verifiziert durch mittwald
+  Verified --> Published:Veröffentlicht durch den Contributor
+  Published --> Verified:Zurückgezogen durch den Contributor
+  Published --> Deprecated:Ausmusterung durch den Contributor
+  Deprecated --> Removed:Automatisch nach der Ausmusterungsphase <br> gelöscht von mittwald
+  Published --> Removed:Löschung durch den Contributor
+  Removed --> [*]
+```
+
 ### Tags
 
 Tags sind eine Möglichkeit, Extensions zu kategorisieren.
