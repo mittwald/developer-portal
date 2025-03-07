@@ -82,45 +82,51 @@ Für weitere Informationen zum External Frontend siehe [External Frontend Konzep
 
 ## Lebenszyklus einer Extension
 
-Nachdem eine Extension registriert wurde, kann die Verifizierung beantragt werden.
-Dafür muss ein einzigartiger Name gesetzt sein.
-Die Scopes, der Kontext sowie Support-Kontaktdaten müssen ebenfalls gesetzt sein.
-Wenn die Extension nicht kostenlos angeboten werden soll, werden zudem Webhook-URLs benötigt.
+### Registrierung und Verifizierung
 
-Die Verifizierung kann wieder vom Contributor abgebrochen werden.
+Nach der Registrierung einer Erweiterung kann eine Verifizierung beantragt werden.
+Dazu müssen folgende Informationen bereitgestellt werden:
 
-Die Extension wird nun von mittwald geprüft und im Anschluss zur Veröffentlichung freigegeben.
-Nur ein Contributor kann eine Extension veröffentlichen.
+- Ein eindeutiger Name für die Erweiterung.
+- Definierte Scopes und Kontext.
+- Support-Kontaktdaten.
+- Falls die Erweiterung kostenpflichtig ist, müssen auch webhookUrls angegeben werden.
 
-### Nach der Veröffentlichung 
+Beitragende haben jederzeit die Möglichkeit, den Verifizierungsprozess abzubrechen.
+Nach der Einreichung wird die Erweiterung von mittwald überprüft und verifiziert.
+Wenn keine Rückmeldungen erforderlich sind und alle Anforderungen erfüllt wurden, kann die Erweiterung veröffentlicht werden.
+Nur die beitragende Person hat die Berechtigung, eine Erweiterung zu veröffentlichen.
 
-Nach der Veröffentlichung kann eine Extension wieder zurück gezogen werden.
-Dadurch werden die bestehenden Instances der Extension deaktiviert.
-Dies kann nützlich sein, um Wartungen durchzuführen.
+## Nach der Veröffentlichung
 
-Die Extension kann ohne erneute Verifizierung wieder veröffentlicht werden.
+Nach der Veröffentlichung kann eine Erweiterung von der beitragenden Person zurückgezogen werden.
+Dies verhindert die Erstellung neuer Instanzen und deaktiviert bestehende Instanzen, was für Wartungszwecke nützlich sein kann.
+Die Erweiterung kann später erneut veröffentlicht werden, ohne eine erneute Verifizierung zu benötigen.
 
-### Änderungen an der Extension
+### Änderungen an einer Erweiterung
 
-Änderungen an den Scopes und den Webhook-URLs bedürfen einer erneuten Verifizierung durch mittwald.
-Mit der Bestätigung dieser Änderungen werden sie automatisch angewendet.
+Änderungen an den Scopes oder webhookUrls müssen von mittwald verifiziert werden.
+Sobald diese akzeptiert wurden, treten die Änderungen sofort in Kraft.
 
-Der Context einer Extension kann nach dem Anfragen der Verifizierung nicht mehr geändert werden.
-Während der Entwicklung der Extension kann der Context frei geändert werden.
-Dabei werden alle Extension-Instances gelöscht.
+- Der Kontext einer Erweiterung kann nur geändert werden, bevor die erste Verifizierungsanfrage gestellt wurde.
+- Während der Entwicklung kann der Kontext frei geändert werden, allerdings werden dabei alle bestehenden Erweiterungsinstanzen entfernt.
 
-### Wann kann wer die Extension zu einem Context hinzufügen?
+### Hinzufügen von Erweiterungs Instanzen zu einem Kontext
 
-Es muss mindestens der Context einer Extension gesetzt sein.
-Vor der Veröffentlichung kann die Extension nur zu Kontexten des Kontributors selbst hinzugefügt werden.
-Danach kann jeder die Extension zu Kontexten hinzufügen.
+Um eine Erweiterungs Instanz zu einem Kontext hinzuzufügen, muss der Kontext zunächst gesetzt sein.
 
-### Löschung der Extension
+- Vor der Veröffentlichung kann nur die beitragende Person Instanzen innerhalb der eigenen Organisation oder Projekte erstellen.
+- Nach der Veröffentlichung kann jeder Erweiterungs Instanzen erstellen.
 
-Um eine Extension schonend zu löschen, kann eine Deprecation-Phase definiert werden.
-Hier kann ein Enddatum und ein Nachfolger für die Extension gewählt werden.
+### Löschen einer Erweiterung
 
-Die Löschung der Extension passiert asynchron, weil alle Extension-Instances vorab gelöscht werden.
+Um eine Erweiterung geordnet zu entfernen, sollte ein Deprecation-Prozess definiert werden.
+Dieser Prozess umfasst:
+
+- Die Festlegung eines Abschaltdatums.
+- Die Definition eines Nachfolgers, falls zutreffend.
+
+Erweiterungen werden asynchron gelöscht, da zuvor alle zugehörigen Instanzen entfernt werden müssen.
 
 ## Versionierung von Extensions
 

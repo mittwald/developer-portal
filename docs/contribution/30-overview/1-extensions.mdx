@@ -79,45 +79,50 @@ For more information, see [templating of configuration values](../concepts/templ
 
 ## Lifecycle of an Extension
 
-After registering an Extension the verification can be requested.
-To do so a unique name has to be set. 
-Also the scopes, context and support contact information have to be set.
-If your extension is not free the webhookUrls are also required.
+### Registration and Verification
 
-The verification can be aborted by the contributor.
+After registering an Extension, verification can be requested.
+To initiate this process, the following information must be provided:
 
-The extension will now be reviewed and verified by mittwald.
-If everything checks out and no feedback is provided the extension can be published.
-Only the contributor can publish the extension.
+- A unique name for the Extension.
+- Defined scopes and context.
+- Support contact details.
+- If the Extension is not free, webhookUrls must also be specified.
+
+Contributors have the option to abort the verification process at any time.\
+Once submitted, the Extension will be reviewed and verified by mittwald.
+If no feedback is provided and the Extension meets all requirements, it can be published.
+Only the Contributor has the authority to publish an Extension.
 
 ### After Publication
 
-The extension can be withdrawn again by the contributor.
-This prevents new ExtensionInstances from being created and disables already existing instances.
-This can be useful for performing maintenance.
-Afterwards the Extension can be published again without requesting a new verification.
+Once published, an Extension can be withdrawn by the Contributor.
+This action prevents new Extension Instances from being created and disables existing Extenion Instances, which is useful for maintenance.
+The extension can be republished later without requiring a new verification.
 
-### Changing the Extension
+### Modifying an Extension
 
-Changes of the scopes or the webhookUrls need to be verified by mittwald.
-After these changes have been accepted, the changes apply instantly.
+Changes to scopes or webhookUrls require verification by mittwald.
+Once accepted, these changes take effect immediately.
 
-The context of an extension can only be changed before the initial verification has been requested.
-During the development of the extension the context can be changed freely.
-This will remove all extension-instances.
+- The Context of an Extension can only be modified before the initial verification request.
+- During development, the Context can be changed freely, but this will remove all existing Extension Instances.
 
-### When can extension instances be added to a context
+### Adding Extension Instances to a Context
 
-At least the context has to be set to add an extension to a context.
-Before the publishing of an extension only the contributor can create instances in their own organization or projects.
-Afterward everyone can create extension-instances.
+To add an Extension Instance to a Context, the context must first be set.
 
-### Deletion of an Extension
+- Before publication, only the contributor can create Extension Instances within their own organization or projects.
+- After publication, anyone can create Extension Instances.
 
-A graceful deletion of the extension can be realized through defining a deprecation.
-The Deprecation defines a shut down date as well as a successor.
+### Deleting an Extension
 
-The extension is deleted asynchronously because all extension instances are deleted beforehand.
+To gracefully remove an extension, a deprecation process should be defined. This process includes:
+
+- Specifying a shutdown date.
+- Defining a successor, if applicable.
+
+Extensions are deleted asynchronously, as all associated instances must be removed beforehand.
 
 ## Versioning of Extensions
 
