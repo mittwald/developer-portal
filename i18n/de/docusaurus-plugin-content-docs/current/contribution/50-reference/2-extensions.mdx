@@ -17,6 +17,7 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
       "id",
       "contributorId",
       "name",
+      "subTitle",
       "description",
       "support",
       "state",
@@ -40,6 +41,23 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
         type: "string",
         description: "Name der Extension",
         example: "Example Extension",
+      },
+      subTitle: {
+        type: "object",
+        description: "Ein paar Worte um die Extension zu bewerben.",
+        required: ["de"],
+        properties: {
+          de: {
+            type: "string",
+            maxLength: 40,
+            example: "Erweitere das mStudio"
+          },
+          en: {
+            type: "string",
+            maxLength: 40,
+            example: "Extend the mStudio"
+          }
+        },
       },
       description: {
         type: "string",

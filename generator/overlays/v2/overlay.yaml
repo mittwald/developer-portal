@@ -14,6 +14,14 @@ actions:
       accessIpMask:
         description: An IP range (in CIDR notation) for which access should be allowed.
         example: "203.0.113.123/32"
+      externalAccess:
+        description: >
+          Describes if users should be able to connection to this database from external
+          sources. Defaults to `false` when not set.
+      password:
+        description: >
+          The password for the database user. This password has to comply with the password
+          policy specified for MySQL users in the [password security specification](/docs/v2/api/security/passwords#mysql).
   - target: $.components.schemas['de.mittwald.v1.database.CreateMySqlUserWithDatabase'].properties.accessIpMask
     remove: true
   - target: $.components.schemas['de.mittwald.v1.database.CreateMySqlUserWithDatabase'].properties
@@ -22,6 +30,10 @@ actions:
         description: >
           Describes if users should be able to connection to this database from external
           sources. Defaults to `false` when not set.
+      password:
+        description: >
+          The password for the database user. This password has to comply with the password
+          policy specified for MySQL users in the [password security specification](/docs/v2/api/security/passwords#mysql).
   - target: $.components.schemas['de.mittwald.v1.database.characterSettings'].properties
     update:
       characterSet:
@@ -30,6 +42,11 @@ actions:
       collation:
         description: A valid MySQL collation
         example: utf8mb4_general_ci
+  - target: $.paths['/v2/mysql-users/{mysqlUserId}/password'].patch.requestBody.content['application/json'].schema.properties.password
+    update:
+      description: >
+        The password for the database user. This password has to comply with the password
+        policy specified for MySQL users in the [password security specification](/docs/v2/api/security/passwords#mysql).
 
   - target: $.paths['/v2/dns-zones/{dnsZoneId}/record-sets/{recordSet}'].put.parameters[?(@.name=="recordSet")]
     update:

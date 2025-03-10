@@ -1,0 +1,239 @@
+---
+title: Breaking (!) API changes for v2 API, February 28 to March 7
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Contract
+  - Marketplace
+  - Cronjob
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API introduces several updates including changes to response property types, the addition of new endpoints, optional request parameters, and modifications to existing response properties.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The property type of 'terminationTargetDate' in the response for the POST operation to terminate a contract has changed from 'string'/'date' to 'string'/'date-time'. This is a breaking change.
+- The response property '/items/statistics/amountOfInstances' has become optional for the status '200' in both the GET operations to list own extensions and to list extensions.
+- The response property 'statistics/amountOfInstances' has also become optional for the status '200' in the GET operation to get an extension.
+- The media type 'application/json' has been removed from the response with the status '204' for the PATCH operation to consent to extension scopes. This is a breaking change.
+- A required property '/items/secrets' has been added to the response with the status '200' for the GET operation to list own extensions.
+- Three new endpoints have been added: 
+  - A POST operation to register an extension.
+  - A GET operation to get an extension of the own contributor.
+  - A PATCH operation to patch an extension.
+- Two new optional query request parameters, 'sortOrder' and 'triggeredByUser', have been added to the GET operation to list cronjob executions.
+- Non-success responses with the statuses '404' and '412' have been added for the POST operation to create an extension instance.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Schedule the Termination of a Contract"
+
+
+- ⚠️ **Breaking:** the 'terminationTargetDate' response's property type/format changed from 'string'/'date' to 'string'/'date-time' for status '201'
+
+
+For details, refer to the <OperationLink operation="contract-terminate-contract" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Extensions of own contributor"
+
+
+- ⚠️ **Breaking:** the response property '/items/statistics/amountOfInstances' became optional for the status '200'
+
+- added the required property '/items/secrets' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-list-own-extensions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Consent to extension scopes"
+
+
+- ⚠️ **Breaking:** removed the media type 'application/json' for the response with the status '204'
+
+
+For details, refer to the <OperationLink operation="extension-consent-to-extension-scopes" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Extensions"
+
+
+- ⚠️ **Breaking:** the response property '/items/statistics/amountOfInstances' became optional for the status '200'
+
+
+For details, refer to the <OperationLink operation="extension-list-extensions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an Extension"
+
+
+- ⚠️ **Breaking:** the response property 'statistics/amountOfInstances' became optional for the status '200'
+
+
+For details, refer to the <OperationLink operation="extension-get-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Register an Extension"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="extension-register-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get Extension of own contributor"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="extension-get-own-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Patch Extension"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="extension-patch-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List cronjob executions belonging to a cronjob"
+
+
+- added the new optional 'query' request parameter 'sortOrder'
+
+- added the new optional 'query' request parameter 'triggeredByUser'
+
+
+For details, refer to the <OperationLink operation="cronjob-list-executions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create an extension instance"
+
+
+- added the non-success response with the status '404'
+
+- added the non-success response with the status '412'
+
+
+For details, refer to the <OperationLink operation="extension-create-extension-instance" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK v2.1.112 Release
+
+The mittwald PHP SDK has been updated to version v2.1.112. This release introduces new functionality to enhance the handling of marketplace extensions. 
+
+#### Key Updates:
+
+- **Extension Get Own Extension**: 
+  - New functionality allows users to retrieve their own extensions, improving the API client's capabilities.
+  - Introduced new classes to support this feature:
+    - **ExtensionGetOwnExtensionRequest**: For requests to fetch a user's own extension, requiring `contributorId` and `extensionId`.
+    - **ExtensionGetOwnExtensionOKResponse**: Manages successful responses with extension data.
+    - **ExtensionGetOwnExtensionNotFoundResponse**: Handles cases where the extension is not found.
+    - **ExtensionGetOwnExtensionTooManyRequestsResponse**: Manages rate limit errors with appropriate messages.
+    - **ExtensionGetOwnExtensionDefaultResponse**: Provides a generic response for other request failures.
+
+- **Marketplace Client Updates**:
+  - The `MarketplaceClient` interface and its implementation (`MarketplaceClientImpl`) have been updated to include the new `extensionGetOwnExtension` method, utilizing the newly introduced request and response classes for effective API communication.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.112).
+
+### Release Summary: mittwald PHP SDK v2.1.111
+
+The latest release of the mittwald PHP SDK, version v2.1.111, introduces several updates and changes aimed at improving the handling of contract termination dates and schema definitions.
+
+#### Features
+- **Updated Termination Target Date Format**: The `terminationTargetDate` field now uses the `date-time` format instead of the previous `date` format.
+- **Type Change for Termination Target Date**: The `terminationTargetDate` is now a nullable `DateTime` object instead of a nullable string in the `TerminateContractCreatedResponseBody` class.
+
+#### Changes
+- **TerminateContractCreatedResponse**: The `terminationTargetDate` format has been updated to `date-time`.
+- **TerminateContractCreatedResponseBody**: 
+  - The `terminationTargetDate` is now a `DateTime` object.
+  - The `getTerminationTargetDate` method returns a `DateTime` object.
+  - The `withTerminationTargetDate` method now accepts a `DateTime` object, with string validation removed.
+  - Parsing and serialization of `terminationTargetDate` have been adjusted to use `DateTime` objects and output in `DateTime::ATOM` format.
+  - Cloning capabilities for `terminationTargetDate` have been added.
+
+- **ExtensionStatistics Schema**: The `required` array has been removed from the schema definition, indicating a change in field requirements within the `ExtensionStatistics` class.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.111).
+
+### Release Summary: mittwald PHP SDK v2.1.110
+
+The mittwald PHP SDK has been updated to version v2.1.110. This release introduces several new features and notable changes aimed at enhancing functionality and improving error handling.
+
+#### Added Features
+- **ListExecutionsRequest Enhancements**: New fields for filtering and sorting cronjob executions have been added, including `triggeredByUser` and `sortOrder` using the `CronjobExecutionSortOrder` enumerator.
+- **New Error Responses**: Two new response classes have been introduced to handle specific error conditions during extension creation:
+  - `ExtensionCreateExtensionInstanceNotFoundResponse` for 404 errors.
+  - `ExtensionCreateExtensionInstancePreconditionFailedResponse` for 412 errors.
+- **Marketplace Client Modifications**: The `MarketplaceClient` now returns an `EmptyResponse` type for the `extensionConsentToExtensionScopes` method.
+
+#### Notable Changes
+- **CronjobExecutionSortOrder Enum**: A new enum has been introduced to define sorting options for cronjob executions.
+- **AuthenticateWithAccessTokenRetrievalKey Changes**: The `refreshToken` is no longer a required field in the request model.
+- **ExtensionStatistics Schema**: Adjustments have been made to the `ExtensionStatistics` class, including making `amountOfInstances` nullable and adding a description.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.110).
+
+### mittwald JavaScript SDK Release 4.114.0
+
+The mittwald JavaScript SDK has been updated to version 4.114.0. This release includes a feature update with an updated generated client. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.114.0](https://github.com/mittwald/api-client-js/releases/tag/4.114.0).
+
+### mittwald JavaScript SDK Release 4.113.0
+
+The mittwald JavaScript SDK has been updated to version 4.113.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.113.0](https://github.com/mittwald/api-client-js/releases/tag/4.113.0).
+
+### mittwald JavaScript SDK Release 4.112.0
+
+The mittwald JavaScript SDK has been updated to version 4.112.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.112.0).
+
+### mittwald JavaScript SDK Release 4.111.0
+
+The mittwald JavaScript SDK has been updated to version 4.111.0. This release includes a feature update with an updated generated client. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.111.0).
+

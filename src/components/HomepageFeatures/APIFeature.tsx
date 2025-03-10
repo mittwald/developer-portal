@@ -9,6 +9,7 @@ import { IssueTrackerLink } from "@site/src/components/IssueTrackerLink";
 import LinkGroup from "@site/src/components/LinkGroup";
 import Icon from "@mittwald/flow-react-components/Icon";
 import { IconPlugConnected } from "@tabler/icons-react";
+import { NewBadge } from "@site/src/components/NewBadge";
 
 interface ReferenceLinkProps {
   version: string;
@@ -148,14 +149,9 @@ function APILibraries() {
           <Link to="/docs/v2/api/sdks/javascript">mittwald JavaScript SDK</Link>{" "}
           (Node.js + browser)
         </li>
-      </ul>
-      <p>
-        <strong>
-          <Translate id={"index.sdks.coming-soon"}>Coming soon</Translate>: 🪄
-        </strong>
-      </p>
-      <ul>
-        <li>mittwald Go SDK</li>
+        <li>
+          <Link to="/docs/v2/api/sdks/go">mittwald Go SDK</Link> <NewBadge />
+        </li>
       </ul>
       <p>
         <strong>

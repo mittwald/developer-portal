@@ -17,6 +17,7 @@ For more information about the individual attributes, see [which information an 
       "id",
       "contributorId",
       "name",
+      "subTitle",
       "description",
       "support",
       "state",
@@ -40,6 +41,23 @@ For more information about the individual attributes, see [which information an 
         type: "string",
         description: "Name of the extension",
         example: "Example Extension",
+      },
+      subTitle: {
+        type: "object",
+        description: "A few words to promote your extension.",
+        required: ["de"],
+        properties: {
+          de: {
+            type: "string",
+            maxLength: 40,
+            example: "Erweitere das mStudio"
+          },
+          en: {
+            type: "string",
+            maxLength: 40,
+            example: "Extend the mStudio"
+          }
+        }
       },
       description: {
         type: "string",
@@ -70,7 +88,7 @@ For more information about the individual attributes, see [which information an 
                 description: "A plain text description",
                 minLength: 1,
                 example:
-                  "Eine ausführliche Besipiel Extension-Beschreibung. Diese enthält keine Formatierungen."
+                  "Eine ausführliche Beispiel Extension-Beschreibung. Diese enthält keine Formatierungen."
               },
             }
           },
@@ -84,7 +102,7 @@ For more information about the individual attributes, see [which information an 
                 description: "A markdown text description",
                 minLength: 1,
                 example: 
-                  "# An example\nThis is an example extension description.\n## Further informations\nHere could be **further** informations.",
+                  "# An example\nThis is an example extension description.\n## Further information\nHere could be **further** information.",
               },
               plain: {
                 type: "string",
