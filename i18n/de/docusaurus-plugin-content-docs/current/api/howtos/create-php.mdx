@@ -1,0 +1,78 @@
+---
+sidebar_label: Installieren einer PHP-Anwendung
+title: Installieren einer PHP-Anwendung über die API
+description: Erfahre, wie du eine PHP-Anwendung über die mStudio API installierst
+tags:
+  - PHP
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+import OperationExample from "@site/src/components/OperationExample";
+
+## Voraussetzungen
+
+Um eine PHP-Anwendung zu installieren, benötigst du Folgendes:
+
+- Die Projekt-ID eines bestehenden Projekts ([wie man ein Projekt erstellt](../create-project))
+- Die Anwendungs- und Versions-ID der generischen benutzerdefinierten PHP-Anwendung (siehe nächsten Abschnitt)
+
+## Bestimme die Anwendungs- und Versions-ID
+
+Bevor du eine PHP-Anwendung installierst, musst du die Anwendungs-ID und die Versions-ID der generischen benutzerdefinierten PHP-Anwendung ermitteln. Alternativ kannst du, wenn du einen [PHP-Worker][php-worker] starten möchtest (der entweder headless läuft oder einen eigenen Webserver mitbringt), die PHP-Worker-Anwendungs-ID und Versions-ID verwenden.
+
+Rufe dazu den <OperationLink operation="app-list-apps" />-Endpunkt auf und suche nach der „PHP“-Anwendung (bzw. der „PHP-Worker“-Anwendung). Anschließend kannst du diese ID verwenden, um die empfohlene Version dieser Anwendung zu ermitteln, indem du den <OperationLink operation="app-list-appversions" />-Endpunkt aufrufst. Du kannst die zurückgegebenen Versionen nach der `recommended`-Eigenschaft filtern.
+
+Die PHP- oder PHP-Worker-Anwendungen haben jeweils folgende IDs:
+
+- PHP: `34220303-cb87-4592-8a95-2eb20a97b2ac`
+- PHP-Worker: `fcac178a-e606-4460-a5fd-b3ad0ae7a3cc`
+
+Beachte, dass die tatsächliche Version eher nebensächlich ist, da sie sich nur auf die Startervorlage bezieht, die zur Erstellung der Anwendung verwendet wurde. Die tatsächliche Version der Anwendung wird durch deinen eigenen Code bestimmt.
+
+## Installiere eine verwaltete PHP-Anwendung
+
+Um deine Anwendung bereitzustellen, musst du den <OperationLink operation="app-request-appinstallation" />-Endpunkt aufrufen. Die relevanten Felder sind:
+
+- `appVersionId` muss die in den vorherigen Schritten ermittelte Anwendungsversions-ID sein.
+- `updatePolicy` muss auf `none` gesetzt werden, da du deine Anwendung in der Regel selbst aktualisieren möchtest.
+
+Die vollständige HTTP-Anfrage sollte folgendermaßen aussehen:
+
+<OperationExample
+  operation="app-request-appinstallation"
+  example={{
+    appVersionId: "ff45ad04-8589-46d7-a645-0566be3eaeec",
+    description: "Deine PHP-App",
+    updatePolicy: "none",
+  }}
+/>
+
+Die Antwort enthält die Installations-ID, die du anschließend verwenden kannst, um auf deine Anwendung zuzugreifen.
+
+<OperationHint tag="App" operation="app-request-appinstallation" />
+
+Um den Installationsstatus zu überprüfen, kannst du den <OperationLink operation="app-get-appinstallation" />-Endpunkt aufrufen. Achte besonders auf das Feld `installationPath`; dieses enthält das Verzeichnis in deinem Projektdateisystem, in das du deine Anwendung bereitstellen solltest.
+
+## Installiere einen PHP-Worker
+
+Die Installation einer PHP-Worker-Anwendung funktioniert fast genauso wie die Installation einer PHP-Anwendung. Der einzige Unterschied besteht darin, dass du die PHP-Worker-Anwendungs-ID und Versions-ID verwenden und einen Entrypoint-Befehl angeben musst, der deinen PHP-Worker startet.
+
+Die vollständige HTTP-Anfrage sollte folgendermaßen aussehen:
+
+<OperationExample
+  operation="app-request-appinstallation"
+  example={{
+    appVersionId: "41f7c7f6-abbb-4d0c-9227-3ca749bce64f",
+    description: "Dein PHP-Worker",
+    updatePolicy: "none",
+    userInputs: [
+      {
+        name: "entrypoint",
+        value: "php server.php",
+      },
+    ],
+  }}
+/>
+
+[php-worker]: /docs/v2/platform/workloads/php-worker

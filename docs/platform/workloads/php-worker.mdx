@@ -1,0 +1,185 @@
+---
+title: Managing and deploying PHP workers
+sidebar_label: PHP workers
+sidebar_position: 11
+description: Learn how to deploy and manage PHP workers and PHP applications with embedded webservers.
+tags:
+  - PHP
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+A "PHP worker" in this context is a PHP application that is _not_ served by a webserver like Apache. Instead, it is a standalone PHP application that runs in the background and either
+
+1. performs tasks like processing messages from a queue, or handling background tasks.
+2. ships its own webserver to serve HTTP requests.
+
+## Starting a PHP worker
+
+<Tabs groupId="access-mode">
+  <TabItem value="gui" label="mStudio UI">
+    To start a PHP worker from the mStudio, follow these steps:
+
+    1. Navigate to the project that you want to create the application in.
+    2. Select the "Apps" menu item in the sidebar.
+    3. Click the "Create App" button and select "Custom PHP worker".
+    4. In the installation wizard, select the entrypoint command that should be used to start your application and complete the wizard.
+
+    After the installation has completed, observe the installation directory in the UI.
+
+  </TabItem>
+  <TabItem value="cli" label="CLI">
+    To start a PHP application from the CLI, run the following command:
+
+    ```bash
+    $ mw app create php-worker --wait --entrypoint "php server.php"
+    ```
+
+    The `--wait` flag will cause the CLI to wait until the installation has completed. The `--entrypoint` flag will cause the CLI to configure the specified entrypoint command as the command that should be used to start your application. If omitted, the default entrypoint command `php server.php` will be used.
+
+    After the installation has completed, use the `mw app get` command to observe the installation directory.
+
+  </TabItem>
+  <TabItem value="api" label="API">
+    To learn how to deploy a PHP application via the API, read the article ["Starting a PHP application"](../../../api/howtos/create-php).
+  </TabItem>
+</Tabs>
+
+## Deploying your app
+
+After you have created your PHP worker, you can deploy your code by moving it into the designated application directory. You may use any method that you prefer to deploy your code, such as a local Git clone, rsync or SFTP.
+
+Have a look at our collection of [deployment guides][deployment] for more information on how to deploy your code.
+
+:::info
+
+Since the deployment of your application is optimized for production usage, the platform will **NOT** automatically restart your application on code changes. You will need to restart your application manually after you have deployed your code. See the section on [managing your process lifecycle](#managing-your-process-lifecycle) for more information.
+
+:::
+
+## Making your app accessible via HTTP
+
+See our guide on [Running Webservers](../webservers#making-your-app-accessible-via-http) to learn how to make your PHP worker accessible via HTTP.
+
+## Managing your process lifecycle
+
+See our guide on [Running Webservers](../webservers/#managing-your-process-lifecycle) to learn how to manage the process lifecycle of your PHP worker.
+
+## Example applications
+
+### ReactPHP
+
+The following code snippets show a minimal example of a [ReactPHP](https://reactphp.org) application that listens on the port specified in the `PORT` environment variable.
+
+Start by creating a PHP worker app, for example using the CLI:
+
+```shellsession title="Local shell session"
+$ mw app create php-worker --wait --entrypoint "php server.php"
+```
+
+After the app has been installed, initialize a new Composer project in the app's root directory and install ReactPHP as dependency.
+
+Alternatively, start with a local project and the [deploy][deployment] it into the application directory.
+
+```shellsession title="SSH shell session"
+$ composer init --require=react/http --require=react/socket
+```
+
+After that, create a `server.php` with the following contents:
+
+```php title="server.php"
+<?php
+
+require __DIR__ . '/../vendor/autoload.php';
+
+$http = new React\Http\HttpServer(function (Psr\Http\Message\ServerRequestInterface $request) {
+    return React\Http\Message\Response::plaintext(
+        "Hello World!\n"
+    );
+});
+
+$PORT = getenv('PORT');
+if($PORT === false) {
+    throw new Exception("PORT environment variable not set");
+}
+
+$socket = new React\Socket\SocketServer('0.0.0.0:' . $PORT);
+$http->listen($socket);
+
+echo "PHP Worker sample app is running" . PHP_EOL;
+```
+
+As soon as you connect a domain to your application, the ReactPHP server will be accessible via HTTP.
+
+### Laravel Reverb
+
+To start a [Laravel Reverb](https://reverb.laravel.com) application, create a PHP worker with the following arguments:
+
+```shellsession title="Local shell session"
+$ mw app create php-worker --wait --entrypoint "bash -c 'php artisan serve --port $PORT'"
+```
+
+### Symfony Messenger
+
+To start a [Symfony Messenger](https://symfony.com/doc/current/messenger.html) worker, create a PHP worker with the following arguments:
+
+```shellsession title="Local shell session"
+$ mw app create php-worker --wait --entrypoint "bash -c 'php bin/console messenger:consume async'"
+```
+
+## Other tutorials
+
+### Running commands from a different directory
+
+Oftentimes, you may already have an existing application (running as a regular PHP app), and want to start a worker process in that same directory.
+
+Currently, the worker process is always started from its own directory, which may not be the same as the directory of the main application. To work around this, you can create a small shell script that changes the directory before starting the worker process, and use that script as the entrypoint:
+
+```shell
+#!/bin/bash
+cd /html/actual-installation-directory
+exec php artisan serve --port $PORT
+```
+
+### Running multiple worker instances
+
+Sometimes, you may want to run multiple worker instances of the same application. While this can be achieved by creating multiple PHP worker apps, you can also run multiple worker instances within the same PHP worker app using a process manager like [pm2](https://pm2.keymetrics.io).
+
+To do this, add Node.js as a dependency to your PHP worker app:
+
+```shellsession title="Local shell session"
+$ mw app dependency update <app-id> --set node=~22.0
+```
+
+Then, install PM2 via NPM:
+
+```shellsession title="SSH shell session"
+$ npm install -g pm2
+```
+
+In your application directory, create an ecosystem configuration file `ecosystem.config.js`:
+
+```javascript title="ecosystem.config.js"
+module.exports = {
+  apps: [
+    {
+      name: "test-app",
+      instances: 2,
+      script: "bin/console",
+      args: "messenger:consume async",
+      watch: ["src"],
+      interpreter: "php",
+      cwd: "/html/actual-installation-directory", // optional
+    },
+  ],
+};
+```
+
+Finally, assert that the `pm2` command is used as the entrypoint for your PHP worker app:
+
+```shellsession title="Local shell session"
+$ mw app update <app-id> --entrypoint "pm2 start ecosystem.config.js --no-daemon"
+```
+
+[deployment]: /docs/v2/category/deployment-guides
