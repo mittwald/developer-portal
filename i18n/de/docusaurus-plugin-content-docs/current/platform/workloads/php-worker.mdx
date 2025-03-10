@@ -1,0 +1,185 @@
+---
+title: Verwaltung und Bereitstellung von PHP-Workern
+sidebar_label: PHP-Worker
+sidebar_position: 11
+description: Erfahre, wie du PHP-Worker und PHP-Anwendungen mit eingebetteten Webservern bereitstellst und verwaltest.
+tags:
+  - PHP
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+Ein "PHP-Worker" in diesem Kontext ist eine PHP-Anwendung, die _nicht_ von einem Webserver wie Apache bereitgestellt wird. Stattdessen handelt es sich um eine eigenständige PHP-Anwendung, die im Hintergrund läuft und entweder:
+
+1. Aufgaben wie das Verarbeiten von Nachrichten aus einer Warteschlange oder das Bearbeiten von Hintergrundprozessen übernimmt.
+2. Einen eigenen Webserver mitbringt, um HTTP-Anfragen zu bedienen.
+
+## Starten eines PHP-Workers
+
+<Tabs groupId="access-mode">
+  <TabItem value="gui" label="mStudio UI">
+    Um einen PHP-Worker über das mStudio zu starten, befolge diese Schritte:
+
+    1. Navigiere zu dem Projekt, in dem du die Anwendung erstellen möchtest.
+    2. Wähle im Seitenmenü den Menüpunkt „Apps“ aus.
+    3. Klicke auf die Schaltfläche „App erstellen“ und wähle „Benutzerdefinierter PHP-Worker“.
+    4. Wähle im Installationsassistenten den Entrypoint-Befehl aus, mit dem deine Anwendung gestartet werden soll, und schließe den Assistenten ab.
+
+    Nach Abschluss der Installation kannst du das Installationsverzeichnis in der UI einsehen.
+
+  </TabItem>
+  <TabItem value="cli" label="CLI">
+    Um eine PHP-Anwendung über die CLI zu starten, führe folgenden Befehl aus:
+
+    ```bash
+    $ mw app create php-worker --wait --entrypoint "php server.php"
+    ```
+
+    Die Option `--wait` sorgt dafür, dass die CLI wartet, bis die Installation abgeschlossen ist. Die Option `--entrypoint` legt den angegebenen Entrypoint-Befehl als Startbefehl für deine Anwendung fest. Falls diese Option weggelassen wird, wird standardmäßig `php server.php` als Entrypoint verwendet.
+
+    Nach Abschluss der Installation kannst du das Installationsverzeichnis mit dem Befehl `mw app get` einsehen.
+
+  </TabItem>
+  <TabItem value="api" label="API">
+    Um zu erfahren, wie du eine PHP-Anwendung über die API bereitstellst, lies den Artikel ["Starten einer PHP-Anwendung"](../../../api/howtos/create-php).
+  </TabItem>
+</Tabs>
+
+## Bereitstellung deiner Anwendung
+
+Nachdem du deinen PHP-Worker erstellt hast, kannst du deinen Code bereitstellen, indem du ihn in das vorgesehene Anwendungsverzeichnis verschiebst. Du kannst dazu jede bevorzugte Methode nutzen, z. B. ein lokales Git-Repository, `rsync` oder SFTP.
+
+Schau dir unsere Sammlung von [Bereitstellungsanleitungen][deployment] an, um mehr über die Bereitstellung deines Codes zu erfahren.
+
+:::info
+
+Da die Bereitstellung deiner Anwendung für den Produktivbetrieb optimiert ist, wird die Plattform deine Anwendung **NICHT** automatisch neu starten, wenn du den Code änderst. Du musst deine Anwendung nach der Bereitstellung manuell neu starten. Sieh dir den Abschnitt zur [Verwaltung des Prozesslebenszyklus](#managing-your-process-lifecycle) an, um mehr darüber zu erfahren.
+
+:::
+
+## Deine Anwendung über HTTP zugänglich machen
+
+Lies unseren Leitfaden zu [Webservern](../webservers#making-your-app-accessible-via-http), um zu erfahren, wie du deinen PHP-Worker über HTTP erreichbar machst.
+
+## Verwaltung des Prozesslebenszyklus
+
+Lies unseren Leitfaden zu [Webservern](../webservers/#managing-your-process-lifecycle), um zu erfahren, wie du den Prozesslebenszyklus deines PHP-Workers verwalten kannst.
+
+## Beispielanwendungen
+
+### ReactPHP
+
+Die folgenden Code-Snippets zeigen ein minimales Beispiel einer [ReactPHP](https://reactphp.org)-Anwendung, die auf dem Port lauscht, der in der Umgebungsvariable `PORT` definiert ist.
+
+Beginne mit der Erstellung einer PHP-Worker-App, zum Beispiel über die CLI:
+
+```shellsession title="Lokale Shell-Sitzung"
+$ mw app create php-worker --wait --entrypoint "php server.php"
+```
+
+Nach der Installation initialisiere ein neues Composer-Projekt im Wurzelverzeichnis der Anwendung und installiere ReactPHP als Abhängigkeit.
+
+Alternativ kannst du mit einem lokalen Projekt starten und es dann in das Anwendungsverzeichnis [deployen][deployment].
+
+```shellsession title="SSH-Shell-Sitzung"
+$ composer init --require=react/http --require=react/socket
+```
+
+Erstelle anschließend eine `server.php` mit folgendem Inhalt:
+
+```php title="server.php"
+<?php
+
+require __DIR__ . '/../vendor/autoload.php';
+
+$http = new React\Http\HttpServer(function (Psr\Http\Message\ServerRequestInterface $request) {
+    return React\Http\Message\Response::plaintext(
+        "Hallo Welt!\n"
+    );
+});
+
+$PORT = getenv('PORT');
+if($PORT === false) {
+    throw new Exception("PORT-Umgebungsvariable nicht gesetzt");
+}
+
+$socket = new React\Socket\SocketServer('0.0.0.0:' . $PORT);
+$http->listen($socket);
+
+echo "PHP-Worker-Beispielanwendung läuft" . PHP_EOL;
+```
+
+Sobald du eine Domain mit deiner Anwendung verbindest, sollte der ReactPHP-Server über HTTP erreichbar sein.
+
+### Laravel Reverb
+
+Um eine [Laravel Reverb](https://reverb.laravel.com)-Anwendung zu starten, erstelle einen PHP-Worker mit den folgenden Argumenten:
+
+```shellsession title="Lokale Shell-Sitzung"
+$ mw app create php-worker --wait --entrypoint "bash -c 'php artisan serve --port $PORT'"
+```
+
+### Symfony Messenger
+
+Um einen [Symfony Messenger](https://symfony.com/doc/current/messenger.html)-Worker zu starten, erstelle einen PHP-Worker mit den folgenden Argumenten:
+
+```shellsession title="Lokale Shell-Sitzung"
+$ mw app create php-worker --wait --entrypoint "bash -c 'php bin/console messenger:consume async'"
+```
+
+## Weitere Tutorials
+
+### Befehle aus einem anderen Verzeichnis ausführen
+
+Oft hast du bereits eine bestehende Anwendung (die als reguläre PHP-App läuft) und möchtest in demselben Verzeichnis einen Worker-Prozess starten.
+
+Der Worker-Prozess wird derzeit immer aus seinem eigenen Verzeichnis gestartet, das möglicherweise nicht mit dem Verzeichnis der Hauptanwendung übereinstimmt. Um dies zu umgehen, kannst du ein kleines Shell-Skript erstellen, das das Verzeichnis wechselt, bevor es den Worker-Prozess startet. Verwende dann dieses Skript als Entrypoint:
+
+```shell
+#!/bin/bash
+cd /html/actual-installation-directory
+exec php artisan serve --port $PORT
+```
+
+### Mehrere Worker-Instanzen ausführen
+
+Manchmal möchtest du mehrere Worker-Instanzen derselben Anwendung ausführen. Während dies durch das Erstellen mehrerer PHP-Worker-Apps möglich ist, kannst du auch mehrere Worker-Instanzen innerhalb derselben PHP-Worker-App mit einem Prozessmanager wie [pm2](https://pm2.keymetrics.io) betreiben.
+
+Dazu füge Node.js als Abhängigkeit zu deiner PHP-Worker-App hinzu:
+
+```shellsession title="Lokale Shell-Sitzung"
+$ mw app dependency update <app-id> --set node=~22.0
+```
+
+Dann installiere PM2 über NPM:
+
+```shellsession title="SSH-Shell-Sitzung"
+$ npm install -g pm2
+```
+
+Erstelle im Anwendungsverzeichnis eine `ecosystem.config.js`-Datei:
+
+```javascript title="ecosystem.config.js"
+module.exports = {
+  apps: [
+    {
+      name: "test-app",
+      instances: 2,
+      script: "bin/console",
+      args: "messenger:consume async",
+      watch: ["src"],
+      interpreter: "php",
+      cwd: "/html/actual-installation-directory", // optional
+    },
+  ],
+};
+```
+
+Stelle sicher, dass `pm2` als Entrypoint für deine PHP-Worker-App verwendet wird:
+
+```shellsession title="Lokale Shell-Sitzung"
+$ mw app update <app-id> --entrypoint "pm2 start ecosystem.config.js --no-daemon"
+```
+
+[deployment]: /docs/v2/category/deployment-guides
