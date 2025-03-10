@@ -43,6 +43,32 @@ Hier können Funktionen erläutert, Anleitungen bereitgestellt, weiterführende 
 Der **State** der Extension definiert, ob sie im mStudio sicht- und nutzbar sein soll.
 Das umfasst beispielsweise (jeweils unabhängig voneinander), ob sie generell aktiv ist, im Marktplatz angezeigt wird und ob sie zu einem Extension Context hinzugefügt werden kann.
 
+#### Overview
+
+```mermaid
+---
+title: Extension State
+---
+stateDiagram-v2
+  direction TB
+  InDevelopment: In Entwicklung
+  InReview: In Überprüfung
+  Verified: Verifiziert
+  Published: Veröffentlicht
+  Deprecated: Ausgemustert
+  Removed: Entfernt
+  [*] --> InDevelopment:Registriert durch den Contriubotr
+  InDevelopment --> InReview:Verifizierung angefragt durch den Contributor
+  InReview --> InDevelopment:Feedback zurück gegeben durch mittwald
+  InReview --> Verified:Verifiziert durch mittwald
+  Verified --> Published:Veröffentlicht durch den Contributor
+  Published --> Verified:Zurückgezogen durch den Contributor
+  Published --> Deprecated:Ausmusterung durch den Contributor
+  Deprecated --> Removed:Automatisch nach der Ausmusterungsphase <br> gelöscht von mittwald
+  Published --> Removed:Löschung durch den Contributor
+  Removed --> [*]
+```
+
 ### Tags
 
 Tags sind eine Möglichkeit, Extensions zu kategorisieren.
@@ -98,3 +124,52 @@ Der Contributor ist für die Versionierung der Extension verantwortlich und kann
 Falls die Extension selbst eine API bereitstellt, die von externen Applikationen genutzt wird,
 wird empfohlen auf Versionierung und Stabilität dieser API zu achten.
 Hierbei können gängige Konventionen und Best Practices für API-Versionierung angewendet werden.
+
+## Eine Extension zu einem Context hinzufügen
+
+1. Ein Contributor veröffentlicht eine Erweiterung.
+2. Ein Endnutzer fügt die Extension zu seinem Context hinzu. Und erstellt so eine ExtensionInstance.
+3. Wenn die Extension Kostenlos ist wird sie sofort Benutzbar.
+4. Wenn sie nicht Kostenlos ist muss ein Checkout per Stripe vollzogen werden.
+   - Es gibt eine Karenzzeit, nach der die Instance deaktiviert wird, bis der Nutzer den Kauf abschließt und die Instance reaktiviert wird.
+5. Nach dem Kauf kann der Nutzer die Erweiterung verwenden.
+
+Wird eine bereits veröffentlichte Extension mit einem Preis versehen startet die Karenzzeit für den Kunden den checkout zu vollziehen sofort.
+
+```mermaid
+---
+title: Eine Extension zu einem Context hinzufügen
+---
+sequenceDiagram
+  actor C as Contributor
+  participant Extension as Extension
+  C ->> Extension: veröffentlichen
+  create participant Instance as Extensio Instance
+  actor U as End User
+  U ->> Instance: Extension zu einem Context hinzugügen
+  alt Extension ist kostenlos
+  Instance -->>+ Extension: überprüfen, ob ein Preis gesetzt ist
+  Extension -->>- Instance: es ist kein Preis gesetzt
+  else Extension ist nicht kostenlos
+    C ->> Extension: setze Preis
+    Note right of C: idealler weise passiert dieser Schritt vor der Veröffentlichung
+    Instance -->>+ Extension: überprüfen, ob ein Preis gesetzt ist
+    Extension -->>- Instance: es ist ein Preis gesetzt
+    alt sofortiger Kauf
+       U ->>+ Instance: Kaufprozess absolvieren
+       deactivate Instance
+    else verspäteter Kauf
+       activate Instance
+       Instance -->> Instance: Karenzzeit abwarten
+       Instance ->> Instance: deaktivieren 
+       deactivate Instance
+       U ->>+ Instance: Kaufprozess absolvieren
+       Instance ->> Instance: reaktivieren
+       deactivate Instance
+    end
+  end
+  activate Instance
+  Instance-->> Instance: setze Benutzbar Status
+  deactivate Instance
+  U ->> Instance: benutze Extension Instance
+```
