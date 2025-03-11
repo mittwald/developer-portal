@@ -5,16 +5,16 @@ import {
   useSpec,
 } from "@site/src/openapi/specs";
 import OperationDocCard from "@site/src/components/openapi/OperationDocCard";
-import ColumnLayout from "@mittwald/flow-react-components/ColumnLayout";
+import { ColumnLayout } from "@mittwald/flow-react-components";
 import compareOperation from "@site/src/openapi/compareOperation";
-import { typedList } from "@mittwald/flow-react-components/List";
-import Heading from "@mittwald/flow-react-components/Heading";
-import Text from "@mittwald/flow-react-components/Text";
+import { typedList } from "@mittwald/flow-react-components";
+import { Heading } from "@mittwald/flow-react-components";
+import { Text } from "@mittwald/flow-react-components";
 import HTTPMethod from "@site/src/components/openapi/HTTPMethod";
-import Avatar from "@mittwald/flow-react-components/Avatar";
+import { Avatar } from "@mittwald/flow-react-components";
 import styles from "@site/src/components/openapi/OperationDocCardList.module.css";
 import clsx from "clsx";
-import AlertBadge from "@mittwald/flow-react-components/AlertBadge";
+import { AlertBadge } from "@mittwald/flow-react-components";
 import OperationLink, {
   buildOperationUrl,
 } from "@site/src/components/openapi/OperationLink";

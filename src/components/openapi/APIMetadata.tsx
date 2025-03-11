@@ -1,7 +1,7 @@
-import Content from "@mittwald/flow-react-components/Content";
-import LabeledValue from "@mittwald/flow-react-components/LabeledValue";
-import Label from "@mittwald/flow-react-components/Label";
-import ColumnLayout from "@mittwald/flow-react-components/ColumnLayout";
+import { Content } from "@mittwald/flow-react-components";
+import { LabeledValue } from "@mittwald/flow-react-components";
+import { Label } from "@mittwald/flow-react-components";
+import { ColumnLayout } from "@mittwald/flow-react-components";
 
 export default function APIMetadata({
   version,

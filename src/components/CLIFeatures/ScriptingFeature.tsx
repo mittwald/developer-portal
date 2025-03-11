@@ -3,7 +3,7 @@ import clsx from "clsx";
 import styles from "@site/src/components/HomepageFeatures/styles.module.css";
 import React from "react";
 import Intro, { IntroHeader } from "@site/src/components/Intro";
-import Icon from "@mittwald/flow-react-components/Icon";
+import { Icon } from "@mittwald/flow-react-components";
 import { IconScript } from "@tabler/icons-react";
 import Translate from "@docusaurus/Translate";
 import Link from "@docusaurus/Link";

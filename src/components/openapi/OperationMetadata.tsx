@@ -1,18 +1,18 @@
 import { OpenAPIV3 } from "openapi-types";
 import OperationPath from "@site/src/components/openapi/OperationPath";
 import Markdown from "react-markdown";
-import Content from "@mittwald/flow-react-components/Content";
-import LabeledValue from "@mittwald/flow-react-components/LabeledValue";
-import Label from "@mittwald/flow-react-components/Label";
-import ColumnLayout from "@mittwald/flow-react-components/ColumnLayout";
-import CopyButton from "@mittwald/flow-react-components/CopyButton";
+import { Content } from "@mittwald/flow-react-components";
+import { LabeledValue } from "@mittwald/flow-react-components";
+import { Label } from "@mittwald/flow-react-components";
+import { ColumnLayout } from "@mittwald/flow-react-components";
+import { CopyButton } from "@mittwald/flow-react-components";
 import {
   ContextualHelp,
   ContextualHelpTrigger,
-} from "@mittwald/flow-react-components/ContextualHelp";
-import { Heading } from "@mittwald/flow-react-components/Heading";
-import { Text } from "@mittwald/flow-react-components/Text";
-import { Button } from "@mittwald/flow-react-components/Button";
+} from "@mittwald/flow-react-components";
+import { Heading } from "@mittwald/flow-react-components";
+import { Text } from "@mittwald/flow-react-components";
+import { Button } from "@mittwald/flow-react-components";
 import styles from "./OperationMetadata.module.css";
 import Translate from "@docusaurus/Translate";
 import Admonition from "@theme/Admonition";

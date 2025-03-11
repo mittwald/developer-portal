@@ -4,7 +4,7 @@ import React from "react";
 import FeatureRow from "../FeatureRow";
 import clsx from "clsx";
 import styles from "@site/src/components/HomepageFeatures/styles.module.css";
-import Icon from "@mittwald/flow-react-components/Icon";
+import { Icon } from "@mittwald/flow-react-components";
 import { IconHeartHandshake } from "@tabler/icons-react";
 import Link from "@docusaurus/Link";
 
