@@ -7,7 +7,7 @@ import Link from "@docusaurus/Link";
 import React, { ReactNode } from "react";
 import { IssueTrackerLink } from "@site/src/components/IssueTrackerLink";
 import LinkGroup from "@site/src/components/LinkGroup";
-import Icon from "@mittwald/flow-react-components/Icon";
+import { Icon } from "@mittwald/flow-react-components";
 import { IconPlugConnected } from "@tabler/icons-react";
 import { NewBadge } from "@site/src/components/NewBadge";
 

@@ -1,9 +1,9 @@
 import React from "react";
 import Translate from "@docusaurus/Translate";
 import OperationDocCardById from "@site/src/components/openapi/OperationDocCardById";
-import Alert from "@mittwald/flow-react-components/Alert";
-import Content from "@mittwald/flow-react-components/Content";
-import Heading from "@mittwald/flow-react-components/Heading";
+import { Alert } from "@mittwald/flow-react-components";
+import { Content } from "@mittwald/flow-react-components";
+import { Heading } from "@mittwald/flow-react-components";
 import styles from "./styles.module.css";
 import { APIVersion } from "@site/src/openapi/specs";
 

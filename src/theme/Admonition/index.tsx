@@ -1,9 +1,9 @@
 import React from "react";
 import type AdmonitionType from "@theme/Admonition";
 import type { WrapperProps } from "@docusaurus/types";
-import Alert from "@mittwald/flow-react-components/Alert";
-import Heading from "@mittwald/flow-react-components/Heading";
-import Content from "@mittwald/flow-react-components/Content";
+import { Alert } from "@mittwald/flow-react-components";
+import { Heading } from "@mittwald/flow-react-components";
+import { Content } from "@mittwald/flow-react-components";
 import { translate } from "@docusaurus/Translate";
 
 type Props = WrapperProps<typeof AdmonitionType>;

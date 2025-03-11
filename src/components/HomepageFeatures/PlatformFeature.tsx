@@ -7,7 +7,7 @@ import Link from "@docusaurus/Link";
 import React from "react";
 import LinkGroup from "@site/src/components/LinkGroup";
 import { NewBadge } from "@site/src/components/NewBadge";
-import Icon from "@mittwald/flow-react-components/Icon";
+import { Icon } from "@mittwald/flow-react-components";
 import { IconCloudNetwork } from "@tabler/icons-react";
 
 function PlatformIntro() {
