@@ -1,8 +1,6 @@
 import React, { FC } from "react";
 import Translate from "@docusaurus/Translate";
-import Alert from "@mittwald/flow-react-components/Alert";
-import Heading from "@mittwald/flow-react-components/Heading";
-import Content from "@mittwald/flow-react-components/Content";
+import { Alert, Content, Heading } from "@mittwald/flow-react-components";
 import clsx from "clsx";
 import styles from "@site/src/components/TerraformResourceHint.module.css";
 import { IconBrandTerraform } from "@tabler/icons-react";
