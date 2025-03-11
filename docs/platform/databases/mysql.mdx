@@ -8,6 +8,8 @@ description: |
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import OperationHint from "@site/src/components/OperationHint";
+import TerraformExample from "@site/docs/platform/databases/examples/_mysql-terraform.md";
+import TerraformResourceHint from "@site/src/components/TerraformResourceHint";
 
 ## Creating a MySQL database
 
@@ -27,13 +29,13 @@ import OperationHint from "@site/src/components/OperationHint";
   <TabItem value="cli" label="CLI">
     To create a MySQL database from the CLI, run the following commands:
 
-    ```bash
+    ```shellsession
     $ mw database mysql create --description "My MySQL database" --version 8.0
     ```
 
     This command will prompt you to enter a password for the database user. To skip the prompt, use the `--password` option (be careful, because this will store the password in your shell history), or set the `MYSQL_PWD` environment variable, first:
 
-    ```bash
+    ```shellsession
     $ read -s MYSQL_PWD
     $ export MYSQL_PWD
     $ mw database mysql create ...
@@ -46,6 +48,19 @@ import OperationHint from "@site/src/components/OperationHint";
     - `--user-external` allows you to create a user that can connect from outside the mittwald cloud platform. This is disabled by default.
 
     After the installation has completed, use the `mw database mysql get` command to observe the connection information.
+
+  </TabItem>
+  <TabItem value="terraform" label="Terraform">
+    To create a MySQL database using Terraform, you can use the following example:
+
+    <TerraformExample />
+
+    After creating the resource, you can extract the following additional properties from the resource state:
+
+    - `mittwald_mysql_database.[name].host` refers to the hostname of the MySQL database.
+    - `mittwald_mysql_database.[name].user.name` refers to the (created) username
+
+    <TerraformResourceHint resource="mysql_database" />
 
   </TabItem>
   <TabItem value="api" label="API">

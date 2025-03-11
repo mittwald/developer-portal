@@ -8,6 +8,8 @@ description: |
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import OperationHint from "@site/src/components/OperationHint";
+import TerraformExample from "@site/docs/platform/databases/examples/_mysql-terraform.md";
+import TerraformResourceHint from "@site/src/components/TerraformResourceHint";
 
 ## Eine MySQL-Datenbank erstellen
 
@@ -45,6 +47,19 @@ import OperationHint from "@site/src/components/OperationHint";
     - `--user-external` erlaubt dir, einen Benutzer zu erstellen, der sich von außerhalb der mittwald-Plattform verbinden kann. Dies ist standardmäßig deaktiviert.
 
     Nachdem die Installation abgeschlossen ist, verwende den Befehl `mw database mysql get`, um die Verbindungsinformationen zu beobachten.
+
+  </TabItem>
+  <TabItem value="terraform" label="Terraform">
+    Um eine MySQL-Datenbank mit Terraform zu erstellen, kannst du das folgende Beispiel verwenden:
+
+    <TerraformExample />
+
+    Nachdem du die Ressource erstellt hast, kannst du die folgenden zusätzlichen Eigenschaften aus dem Ressourcenstatus extrahieren:
+
+    - `mittwald_mysql_database.[name].host` enthält den Hostnamen der MySQL-Datenbank.
+    - `mittwald_mysql_database.[name].user.name` enthält den (erstellten) Benutzernamen
+
+    <TerraformResourceHint resource="mysql_database" />
 
   </TabItem>
   <TabItem value="api" label="API">

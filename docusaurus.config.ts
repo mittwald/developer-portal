@@ -235,7 +235,7 @@ const config: Config = {
     prism: {
       theme: lightCodeTheme,
       darkTheme: darkCodeTheme,
-      additionalLanguages: ["php", "shell-session"],
+      additionalLanguages: ["php", "shell-session", "hcl"],
     },
   } satisfies ThemeConfig,
   markdown: {
