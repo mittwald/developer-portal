@@ -4,7 +4,7 @@ import styles from "./OperationDocCard.module.css";
 import clsx from "clsx";
 import OperationPath from "@site/src/components/openapi/OperationPath";
 import Markdown from "react-markdown";
-import AlertBadge from "@mittwald/flow-react-components/AlertBadge";
+import { AlertBadge } from "@mittwald/flow-react-components";
 import { APIVersion, OperationWithMeta } from "@site/src/openapi/specs";
 import isDeprecated from "@site/src/openapi/isDeprecated";
 import buildDocumentId from "@site/src/openapi/buildDocumentId";

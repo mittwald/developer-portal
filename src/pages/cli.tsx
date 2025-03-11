@@ -2,7 +2,7 @@ import React from "react";
 import clsx from "clsx";
 import Link from "@docusaurus/Link";
 import Layout from "@theme/Layout";
-import Icon from "@mittwald/flow-react-components/Icon";
+import { Icon } from "@mittwald/flow-react-components";
 import { IconBrandGithub, IconNotebook, IconRocket } from "@tabler/icons-react";
 
 import styles from "./cli.module.css";
