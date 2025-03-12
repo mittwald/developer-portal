@@ -220,6 +220,30 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
           },
         },
       },
+      statistics: {
+        type: "object",
+        properties: {
+          amountOfInstances: {
+            type: "integer",
+            example: 200
+            },
+            description: "Die Anzahl an Extension Instances dieser Extension. Für den Contributor genau, öffentlich wird der Wert auf den nächst kleineren Hunderter gerundet."
+        }
+      },
+      pricing: {
+         oneOf: [
+         {
+          type: "object",
+          properties: {
+            price: {
+              type: "integer",
+              description: "Der Preis der Extension in Euro Cent pro Monat.",
+              example: 100
+            }
+          }
+         }
+         ]
+      },
       support: {
         type: "object",
         required: ["email"],
