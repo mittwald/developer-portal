@@ -1,0 +1,229 @@
+---
+title: Breaking (!) API changes for v2 API, March 7 to March 14
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Marketplace
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API introduces several changes, including the addition of a new endpoint for generating session keys and updates that make the response property 'fileName' optional across multiple extension-related endpoints.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The response property `/items/assets/items/fileName` became optional for the status '200' in the following operations: 
+  - GET `/v2/contributors/{contributorId}/extensions` (List Extensions of own contributor)
+  - GET `/v2/extensions` (List Extensions)
+  
+- The response property `assets/items/fileName` became optional for the status '200' in the following operations:
+  - GET `/v2/contributors/{contributorId}/extensions/{extensionId}` (Get Extension of own contributor)
+  - PATCH `/v2/contributors/{contributorId}/extensions/{extensionId}` (Patch Extension)
+  - GET `/v2/extensions/{extensionId}` (Get an Extension)
+
+Note: The changes regarding the optional response properties are breaking changes.
+
+- An endpoint has been added: 
+  - POST `/v2/extension-instances/{extensionInstanceId}/session/{sessionId}` (Generate a session key to transmit it to the extensions frontend fragment).
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "List Extensions of own contributor"
+
+
+- ⚠️ **Breaking:** the response property '/items/assets/items/fileName' became optional for the status '200'
+
+
+For details, refer to the <OperationLink operation="extension-list-own-extensions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get Extension of own contributor"
+
+
+- ⚠️ **Breaking:** the response property 'assets/items/fileName' became optional for the status '200'
+
+
+For details, refer to the <OperationLink operation="extension-get-own-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Patch Extension"
+
+
+- ⚠️ **Breaking:** the response property 'assets/items/fileName' became optional for the status '200'
+
+
+For details, refer to the <OperationLink operation="extension-patch-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Extensions"
+
+
+- ⚠️ **Breaking:** the response property '/items/assets/items/fileName' became optional for the status '200'
+
+
+For details, refer to the <OperationLink operation="extension-list-extensions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an Extension"
+
+
+- ⚠️ **Breaking:** the response property 'assets/items/fileName' became optional for the status '200'
+
+
+For details, refer to the <OperationLink operation="extension-get-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Generate a session key to transmit it to the extensions frontend fragment"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="extension-generate-session-key" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### Release Summary: mittwald PHP SDK v2.1.117
+
+The mittwald PHP SDK has released version v2.1.117, which introduces several changes aimed at improving the flexibility and maintainability of the SDK. 
+
+#### Key Updates:
+- **Deprecated Features**: 
+  - The `fileName` property and its associated method `getFileName()` have been deprecated. The method will now return `null` if the filename is not set.
+  - A new method `withoutFileName()` has been added to manage the removal of the `fileName` attribute explicitly.
+
+- **Class Structure Changes**:
+  - The `fileName` attribute is no longer a required parameter in the constructor.
+  - The class now treats `fileName` as a nullable attribute, setting it only when provided.
+
+These updates are designed to enhance the flexibility of the `ExtensionAsset` class and prepare for the future removal of deprecated features. The introduction of nullable types and explicit removal methods contributes to a cleaner and more extensible class design.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.117).
+
+### Release Summary: mittwald PHP SDK v2.1.116
+
+The mittwald PHP SDK has been updated to version 2.1.116. This release introduces new features and classes aimed at enhancing session key generation capabilities. Key highlights include:
+
+- **Session Key Generation**: A new feature allowing the generation of session keys for secure transmission to the extensions' frontend fragment.
+
+#### New Classes
+- `ExtensionGenerateSessionKeyRequest`: Facilitates requests for session key generation.
+- `ExtensionGenerateSessionKeyOKResponse`: Handles successful session key generation responses, including JWT.
+- `ExtensionGenerateSessionKeyBadRequestResponse`: Manages responses for requests with validation errors.
+- `ExtensionGenerateSessionKeyNotFoundResponse`: Handles scenarios where the requested resource is not found.
+- `ExtensionGenerateSessionKeyDefaultResponse`: Provides default error responses for session key generation.
+- `ExtensionGenerateSessionKeyTooManyRequestsResponse`: Manages responses when request limits are exceeded.
+- `ExtensionGenerateSessionKeyTooManyRequestsResponseBody`: Contains additional information for Too Many Requests responses.
+- `ExtensionGenerateSessionKeyOKResponseBody`: Contains the session key JWT.
+
+#### Modified MarketplaceClient
+- The `MarketplaceClient` now includes the `extensionGenerateSessionKey` method, with its implementation in `MarketplaceClientImpl`, to facilitate session key generation.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.116).
+
+### mittwald PHP SDK Release v2.1.115
+
+The latest release of the mittwald PHP SDK, version 2.1.115, introduces significant enhancements to extension management within the Marketplace API. This update includes new classes and methods that facilitate the retrieval, registration, and modification of extensions, with a focus on comprehensive validation and response handling.
+
+#### New Features and Additions:
+- **Extension Management Enhancements**: 
+  - New classes and methods for managing extensions, including `ExtensionGetOwnExtension`, `ExtensionPatchExtension`, and `ExtensionRegisterExtension`.
+  - Enhanced `MarketplaceClient` with methods for efficient API interactions.
+  - New schemas such as `ExtensionSecret` and updates to `OwnExtension`.
+
+#### Changes:
+- The `OwnExtension` schema now includes a `secrets` property to manage sensitive details.
+
+These improvements aim to enhance the developer experience by providing detailed error handling and response management for various operational scenarios.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.115).
+
+### Release Summary: mittwald PHP SDK v2.1.114
+
+The mittwald PHP SDK has been updated to version v2.1.114. This release includes significant changes, primarily focusing on the removal of certain endpoints and associated classes. 
+
+#### Breaking Changes
+- The following endpoints have been removed:
+  - `extensionGetOwnExtension`
+  - `extensionPatchExtension`
+  - `extensionRegisterExtension`
+- All related response and request classes have also been deleted.
+
+#### Features Removed
+- The removal of these classes results in a more streamlined API client interface, reducing potential errors from unused code.
+
+#### Summary of Changes
+This update involves a major refactor of the API client by eliminating endpoints related to handling own extensions and extension registration. This change simplifies the API, requiring users to adjust their implementations accordingly.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.114).
+
+### mittwald PHP SDK v2.1.113 Release Summary
+
+The latest release of the mittwald PHP SDK, version 2.1.113, introduces significant enhancements to the API's capabilities, particularly in managing the lifecycle of extensions. Key updates include:
+
+- **New Features**:
+  - **Patch Extension**: A new endpoint for patching existing extensions, with comprehensive response handling for various scenarios such as bad requests, conflicts, and successful operations.
+  - **Register Extension**: An endpoint for registering new extensions, supporting responses for malformed requests, successful registrations, and other errors.
+
+- **Interface and Implementation Changes**:
+  - The `MarketplaceClient` interface and its implementation have been updated to incorporate methods for the new patch and register functionalities, along with improved error handling.
+
+- **Schema Updates**:
+  - Introduction of the `ExtensionSecret` schema to manage extension secrets, including fields for `secretId` and `usableUntil`.
+  - Updates to the `OwnExtension` schema to include an array of `ExtensionSecret` objects.
+
+These updates aim to enhance the management of extensions and secure information associated with them. For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.113).
+
+### mittwald JavaScript SDK Release 4.118.0
+
+The mittwald JavaScript SDK has been updated to version 4.118.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.118.0](https://github.com/mittwald/api-client-js/releases/tag/4.118.0).
+
+### mittwald JavaScript SDK Release 4.117.0
+
+The mittwald JavaScript SDK version 4.117.0 has been released. This update includes a feature enhancement with an updated generated client. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.117.0).
+
+### mittwald JavaScript SDK Release 4.116.0
+
+The mittwald JavaScript SDK version 4.116.0 has been released. This update includes a feature enhancement with an updated generated client. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.116.0](https://github.com/mittwald/api-client-js/releases/tag/4.116.0).
+
+### mittwald JavaScript SDK Release 4.115.1
+
+The mittwald JavaScript SDK has been updated to version 4.115.1. This release includes a version bump for the package root, with no additional changes or new features introduced. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.115.1).
+
+### mittwald JavaScript SDK Release 4.115.0
+
+The mittwald JavaScript SDK has been updated to version 4.115.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.115.0).
+
