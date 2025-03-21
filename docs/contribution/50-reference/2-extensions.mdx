@@ -247,6 +247,30 @@ For more information about the individual attributes, see [which information an 
         },
         description: "Tags that describe the extension",
       },
+      statistics: {
+        type: "object",
+        properties: {
+          amountOfInstances: {
+            type: "integer",
+              example: 200
+            },
+            description: "The amount of instances for this extension. Accurate for the Contributor. Publicly rounded to the next lower hundred."
+        }
+      },
+      pricing: {
+         oneOf: [
+         {
+          type: "object",
+          properties: {
+            price: {
+              type: "integer",
+              description: "The price in Euro Cent per month per month",
+              example: 100
+            }
+          }
+         }
+        ]
+      },
       state: {
         type: "object",
         properties: {
