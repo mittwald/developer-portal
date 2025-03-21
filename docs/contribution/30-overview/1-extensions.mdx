@@ -2,6 +2,8 @@
 title: Extensions
 ---
 
+import OperationLink from "@site/src/components/OperationLink";
+
 ## What is an extension?
 
 From a domain perspective, an extension is an expansion of the mStudio providing additional functionality.
@@ -32,8 +34,16 @@ Here, you can include descriptions of features, instructions for use, links for 
 
 ### State
 
-The **state** of an extension defines whether the extension should be visible or usable in the mStudio.
-This includes, for example, whether it is generally active, displayed in the marketplace, and can be added to an extension context.
+Due to api stability guarantees the `state` field is deprecated.
+The fields `disabled`, `published`, `verifcatonRequested`, `deprecated`, `functional` and `verified` of the `OwnExtension`,
+as found at <OperationLink operation="extension-get-own-extension" />; display the state of the Extension.
+
+- `disbled`: The extension is disabled. No new **ExtensionInstances** can be created.
+- `published`: Everyone can now add the extension to their own **Context**.
+- `verifcatonRequested`: mittwald is verifying the **Extension**.
+- `deprecated`: The **Extension** is deprecated by the **Contributor**.
+- `functional`: The **Extension** operates as expected.
+- `verified`: The Extension has been verified by mittwald and can now be published.
 
 #### Overview
 

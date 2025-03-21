@@ -2,6 +2,8 @@
 title: Extensions
 ---
 
+import OperationLink from "@site/src/components/OperationLink";
+
 ## Was ist eine Extension?
 
 Aus fachlicher Sicht ist eine Extension eine Erweiterung des mStudio, die es ermöglicht,
@@ -36,8 +38,16 @@ In dieser kann auf Features, Nutzungshinweise, weiterführende Links, einen Chan
 
 ### State
 
-Der **State** der Extension definiert, ob sie im mStudio sicht- und nutzbar sein soll.
-Das umfasst beispielsweise (jeweils unabhängig voneinander), ob sie generell aktiv ist, im Marktplatz angezeigt wird und ob sie zu einem Extension Context hinzugefügt werden kann.
+Aufgrund von api-Stabilitätsgarantien ist das Feld `state` deprecated.
+Die Felder `disabled`, `published`, `verifcatonRequested`, `deprecated`, `functional` und `verified` der `OwnExtension`,
+wie sie unter <OperationLink operation="extension-get-own-extension" />; zu finden sind, zeigen den Zustand der Extension an.
+
+- `disbled`: Die Erweiterung ist deaktiviert. Es können keine neuen **ExtensionInstances** erstellt werden.
+- `published`: Jeder kann nun die Erweiterung zu seinem eigenen **Kontext** hinzufügen.
+- `verifcatonRequested`: mittwald verifiziert die **Erweiterung**.
+- `deprecated`: Die **Erweiterung** ist durch den **Beitragenden** veraltet.
+- `funcional`: Die **Erweiterung** funktioniert wie erwartet.
+- `verified`: Die Erweiterung wurde von mittwald verifiziert und kann nun veröffentlicht werden.
 
 #### Overview
 
