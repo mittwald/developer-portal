@@ -123,49 +123,18 @@ Hierbei können gängige Konventionen und Best Practices für API-Versionierung 
 
 ## Eine Extension zu einem Context hinzufügen
 
-1. Ein Contributor veröffentlicht eine Erweiterung.
-2. Ein Endnutzer fügt die Extension zu seinem Context hinzu. Und erstellt so eine ExtensionInstance.
-3. Wenn die Extension Kostenlos ist wird sie sofort Benutzbar.
-4. Wenn sie nicht Kostenlos ist muss ein Checkout per Stripe vollzogen werden.
-   - Es gibt eine Karenzzeit, nach der die Instance deaktiviert wird, bis der Nutzer den Kauf abschließt und die Instance reaktiviert wird.
-5. Nach dem Kauf kann der Nutzer die Erweiterung verwenden.
-
-Wird eine bereits veröffentlichte Extension mit einem Preis versehen startet die Karenzzeit für den Kunden den checkout zu vollziehen sofort.
-
 ```mermaid
 ---
 title: Eine Extension zu einem Context hinzufügen
 ---
-sequenceDiagram
-  actor C as Contributor
-  participant Extension as Extension
-  C ->> Extension: veröffentlichen
-  create participant Instance as Extensio Instance
-  actor U as End User
-  U ->> Instance: Extension zu einem Context hinzugügen
-  alt Extension ist kostenlos
-  Instance -->>+ Extension: überprüfen, ob ein Preis gesetzt ist
-  Extension -->>- Instance: es ist kein Preis gesetzt
-  else Extension ist nicht kostenlos
-    C ->> Extension: setze Preis
-    Note right of C: idealler weise passiert dieser Schritt vor der Veröffentlichung
-    Instance -->>+ Extension: überprüfen, ob ein Preis gesetzt ist
-    Extension -->>- Instance: es ist ein Preis gesetzt
-    alt sofortiger Kauf
-       U ->>+ Instance: Kaufprozess absolvieren
-       deactivate Instance
-    else verspäteter Kauf
-       activate Instance
-       Instance -->> Instance: Karenzzeit abwarten
-       Instance ->> Instance: deaktivieren 
-       deactivate Instance
-       U ->>+ Instance: Kaufprozess absolvieren
-       Instance ->> Instance: reaktivieren
-       deactivate Instance
-    end
-  end
-  activate Instance
-  Instance-->> Instance: setze Benutzbar Status
-  deactivate Instance
-  U ->> Instance: benutze Extension Instance
+stateDiagram
+A: ExtensionInstanceAddedToContext
+B: ExtensionInstanceActivated
+C: ExtensionInstanceDeactivated
+D: ExtensionInstanceRemoved
+A --> B
+C --> D
+C --> B: Extension Kaufprozess abgeschlossen
+B --> D: Durch einen Nutzer entfernt
+B --> C: Extension wurde kostenpflichtig
 ```

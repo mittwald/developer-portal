@@ -118,50 +118,18 @@ To this end, you may use commonplace conventions and best practices for API vers
 
 ## Adding an extension to a Context
 
-1. A **Contributor** publishes an extension.
-2. An end user adds the **Extension** to a **Context**, creating an **ExtensionInstance**.
-3. If the **Extension** is free, it becomes usable immediately.
-4. If it is not free, a checkout via Stripe must be completed.
-  - There is a grace period after which the **ExtensionInstance** is deactivated until the user completes the purchase and the **ExtensionInstance** reactivates itself.
-    After the purchase, the user can use the **Extension**.
-5. If an already published **Extension** is assigned a price, the grace period for the customer to complete the checkout starts immediately.
-
-If an already published extension is assigned a price, the grace period for the customer to complete the checkout starts immediately.
-
 ```mermaid
 ---
 title: Adding an Extension to a Context
 ---
-sequenceDiagram
-  actor C as Contributor
-  participant Extension as Extension
-  C ->> Extension: publish
-  create participant Instance as Extensio Instance
-  actor U as End User
-  U ->> Instance: add Extension to Context
-  alt Extension is free
-  Instance -->>+ Extension: check if price is set
-  Extension -->>- Instance: price is not set
-  else Extension is not free
-    C ->> Extension: set price
-    Note right of C: ideally this happens before publishing
-    Instance -->>+ Extension: check if price is set
-    Extension -->>- Instance: price is set
-    alt instant checkout
-       U ->>+ Instance: perform checkout
-       deactivate Instance
-    else delayed checkout
-       activate Instance
-       Instance -->> Instance: waiting period
-       Instance ->> Instance: deactivate 
-       deactivate Instance
-       U ->>+ Instance: perform checkout
-       Instance ->> Instance: reactivate 
-       deactivate Instance
-    end
-  end
-  activate Instance
-  Instance-->> Instance: set usabel state
-  deactivate Instance
-  U ->> Instance: use Extension Instance
+stateDiagram
+A: ExtensionInstanceAddedToContext
+B: ExtensionInstanceActivated
+C: ExtensionInstanceDeactivated
+D: ExtensionInstanceRemoved
+A --> B
+C --> D
+B --> D: Removed by end user
+C --> B: Extension chechout perfomed
+B --> C: Extension became costly
 ```
