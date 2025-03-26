@@ -1,0 +1,148 @@
+---
+title: Breaking (!) API changes for v2 API, March 19 to March 26
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Marketplace
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API has introduced several new endpoints for session management and extension handling, while also removing existing paths without deprecation.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The API path for the `POST` operation `extension-generate-session-key` at `/v2/extension-instances/{extensionInstanceId}/session/{sessionId}` has been removed without deprecation. This is a breaking change.
+- The API path for the `GET` operation `extension-get-public-key` at `/v2/webhook-public-keys/{serial}` has been removed without deprecation. This is a breaking change.
+- A new `POST` endpoint `extension-authenticate-with-session-token` has been added at `/v2/authenticate-session-token`, allowing authentication of external applications using the extensionInstanceSecret.
+- A new `DELETE` endpoint `extension-delete-extension` has been added at `/v2/contributors/{contributorId}/extensions/{extensionId}`, enabling the deletion of an extension.
+- A new `POST` endpoint `extension-generate-session-token` has been added at `/v2/extension-instances/{extensionInstanceId}/sessions/{sessionId}`, which generates a session token for transmission to the extensions frontend fragment.
+- A new `GET` endpoint `extension-get-public-key` has been added at `/v2/public-keys/{serial}`, allowing retrieval of the public key to verify the webhook signature.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "extension-generate-session-key"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+
+For details, refer to the <OperationLink operation="extension-generate-session-key" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the public key to verify the webhook signature"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="extension-get-public-key" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Authenticate your external application using the extensionInstanceSecret"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="extension-authenticate-with-session-token" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Delete an extension"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="extension-delete-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Generate a session token to transmit it to the extensions frontend fragment"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="extension-generate-session-token" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK v2.1.121 Release Summary
+
+The mittwald PHP SDK has released version 2.1.121, introducing several new features, breaking changes, and improvements. 
+
+#### Added Features
+- The `ListProjectBackupsRequest` class now supports search functionality and pagination with new parameters: `searchTerm`, `limit`, `skip`, and `page`.
+- The `CreateCustomer` and `UpdateCustomer` response schemas have been updated to limit the `name` field to a maximum of 80 characters.
+- New schema elements have been added to the `Customer` class, including `flags` for customer attributes and `levelOfUndeliverableDunningNotice` for dunning notice levels.
+
+#### Breaking Changes
+- The `Customer` class now includes additional properties (`flags` and `levelOfUndeliverableDunningNotice`), which may impact customer creation and updating processes.
+
+#### Bug Fixes and Improvements
+- Validation logic in `ListProjectBackupsRequest` has been improved to ensure correct validation of new properties.
+- Backward compatibility has been enhanced, maintaining existing method functionality while integrating new features.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.121).
+
+### mittwald PHP SDK v2.1.120 Release Summary
+
+The latest release of the mittwald PHP SDK, version 2.1.120, introduces several new features and improvements aimed at enhancing asset management for extensions. Key updates include:
+
+- **New Methods for Asset Management**:
+  - `extensionRemoveAsset`: Allows the removal of assets from extensions.
+  - `extensionRequestAssetUpload`: Facilitates the request for uploading assets associated with an extension.
+  - `extensionRequestLogoUpload`: Enables requests for logo uploads for extensions.
+
+- **Details**:
+  - The new `extensionRemoveAsset` method includes comprehensive request and response handling for various scenarios such as success, not found, and too many requests.
+  - The asset upload process now includes request validation and response handling.
+  - The logo upload functionality provides improved management of extension assets.
+
+- **Deprecation Notice**:
+  - The `externalFrontend` field in `ExtensionRegisterExtensionRequest` and `ExtensionRegisterExtensionRequestBody` is now deprecated. Users are encouraged to use `externalFrontends` instead.
+
+For more details, please visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.120).
+
+### mittwald JavaScript SDK Release 4.122.0
+
+The mittwald JavaScript SDK has been updated to version 4.122.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.122.0).
+
+### mittwald JavaScript SDK Release 4.121.0
+
+The mittwald JavaScript SDK has been updated to version 4.121.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.121.0](https://github.com/mittwald/api-client-js/releases/tag/4.121.0).
+
