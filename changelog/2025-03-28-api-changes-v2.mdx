@@ -1,0 +1,189 @@
+---
+title: API changes for v2 API, March 21 to March 28
+authors:
+  - machine
+tags:
+  - apiv2
+  - File
+  - User
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API introduces several enhancements, including the addition of the required 'maxNameLength' property to multiple response objects and new optional query parameters 'limit', 'page', and 'skip' for various user-related endpoints.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- The required property 'maxNameLength' has been added to the response with the '200' status for the following operations:
+  - `GET /v2/file-token-rules/{token}` (Get a Token's upload rules)
+  - `GET /v2/file-type-rules/{name}` (Get a Type's upload rules)
+  - `GET /v2/file-upload-tokens/{fileUploadToken}/rules` (Get a FileUploadToken's rules)
+  - `GET /v2/file-upload-types/{fileUploadType}/rules` (Get a FileUploadType's rules)
+
+- New optional query request parameters have been added to the following operations:
+  - `GET /v2/users/self/api-tokens` (List all of your ApiTokens):
+    - 'limit'
+    - 'page'
+    - 'skip'
+  - `GET /v2/users/self/sessions` (List all sessions):
+    - 'limit'
+    - 'page'
+    - 'skip'
+  - `GET /v2/users/self/ssh-keys` (Get your stored ssh-keys):
+    - 'limit'
+    - 'page'
+    - 'skip'
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Get a Token's upload rules"
+
+
+- added the required property 'maxNameLength' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="deprecated-file-get-file-token-rules" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Type's upload rules"
+
+
+- added the required property 'maxNameLength' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="deprecated-file-get-file-type-rules" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a FileUploadToken's rules"
+
+
+- added the required property 'maxNameLength' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="file-get-file-upload-token-rules" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a FileUploadType's rules"
+
+
+- added the required property 'maxNameLength' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="file-get-file-upload-type-rules" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List all of your ApiTokens"
+
+
+- added the new optional 'query' request parameter 'limit'
+
+- added the new optional 'query' request parameter 'page'
+
+- added the new optional 'query' request parameter 'skip'
+
+
+For details, refer to the <OperationLink operation="user-list-api-tokens" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List all sessions"
+
+
+- added the new optional 'query' request parameter 'limit'
+
+- added the new optional 'query' request parameter 'page'
+
+- added the new optional 'query' request parameter 'skip'
+
+
+For details, refer to the <OperationLink operation="user-list-sessions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get your stored ssh-keys"
+
+
+- added the new optional 'query' request parameter 'limit'
+
+- added the new optional 'query' request parameter 'page'
+
+- added the new optional 'query' request parameter 'skip'
+
+
+For details, refer to the <OperationLink operation="user-list-ssh-keys" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK Release v2.1.123
+
+The latest release of the mittwald PHP SDK, [v2.1.123](https://github.com/mittwald/api-client-php/releases/tag/v2.1.123), introduces several new features and enhancements aimed at improving resource retrieval and file upload configurations.
+
+#### Added Features
+
+- **Pagination Parameters for API Token and Session Retrieval**: 
+  - The `ListApiTokensRequest`, `ListSessionsRequest`, and `ListSshKeysRequest` classes now support pagination with `limit`, `skip`, and `page` query parameters. This allows for more controlled and efficient data retrieval, especially useful for large datasets.
+
+- **File Upload Rules Enhancements**:
+  - The `FileUploadRules` class now includes a `maxNameLength` property, allowing users to define the maximum allowed name length for uploaded files. A method `withMaxNameLength` is also provided for setting this property with validation.
+
+#### Changes Summary
+
+- **ListApiTokensRequest, ListSessionsRequest, ListSshKeysRequest**:
+  - Added `limit`, `skip`, and `page` properties.
+  - Introduced validation methods for these properties.
+  - Updated input parsing and JSON serialization to include pagination parameters.
+
+- **FileUploadRules**:
+  - Introduced `maxNameLength` property.
+  - Updated constructor and added methods for setting and validating `maxNameLength`.
+
+These updates enhance the SDK's functionality, providing better performance and control over data handling and file uploads. For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.123).
+
+### mittwald PHP SDK Release v2.1.122
+
+The latest release of the mittwald PHP SDK, version v2.1.122, introduces several new features and improvements to enhance user authentication and extension management capabilities. 
+
+#### New Features
+- **Extension Authentication with Session Token**: A new API allows external applications to authenticate using a session token, providing a public token with expiry for further domain actions.
+- **Extension Management**: A new API for deleting extensions asynchronously, which also removes associated ExtensionInstances.
+
+#### Added Classes
+- **ExtensionAuthenticateWithSessionToken**: Includes classes for handling various response types during session token authentication.
+- **ExtensionDeleteExtension**: Provides classes for managing requests and responses related to extension deletion.
+- **ExtensionGenerateSessionToken**: Contains classes for handling session token generation responses and errors.
+
+#### Changes in Existing Classes
+- **MarketplaceClient Interface and Implementation**: Updated to support new methods for extension session authentication and deletion.
+- **API Response Handling**: Enhanced to accommodate new request types and responses for improved error handling.
+- **Modified DTOs**: The `PublicKey` schema now supports multiple key formats for greater flexibility.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.122).
+
+### mittwald JavaScript SDK Release 4.124.0
+
+The mittwald JavaScript SDK has been updated to version 4.124.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.124.0).
+
+### mittwald JavaScript SDK Release 4.123.0
+
+The mittwald JavaScript SDK has been updated to version 4.123.0. This release includes an update to the generated client, enhancing its functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.123.0](https://github.com/mittwald/api-client-js/releases/tag/4.123.0).
+
