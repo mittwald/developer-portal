@@ -1,0 +1,218 @@
+---
+title: Breaking (!) API changes for v2 API, March 28 to April 4
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Domain
+  - Marketplace
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week's changelog for the mittwald API includes the removal of the `de.mittwald.v1.ingress.TargetDirectory` schema from various request and response properties, the addition of new endpoints for changing extension contexts and removing extension logos, and the introduction of a non-success response status for ACME certificate issuance requests.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The schema `de.mittwald.v1.ingress.TargetDirectory` has been removed from the `oneOf` list in the request property for the `POST` operation `ingress-create-ingress` at the path `/v2/ingresses`. This is a breaking change.
+- The schema `de.mittwald.v1.ingress.TargetDirectory` has also been removed from the `oneOf` list in the request property for the `PATCH` operation `ingress-update-ingress-paths` at the path `/v2/ingresses/{ingressId}/paths`. This is a breaking change.
+- Additionally, the schema `de.mittwald.v1.ingress.TargetDirectory` has been removed from the `oneOf` list in the request property for the `PUT` operation `deprecated-ingress-paths` at the path `/v2/ingresses/{ingressId}/paths`. This is a breaking change.
+- The schema `de.mittwald.v1.ingress.TargetDirectory` has been removed entirely from the API schema.
+- The schema `de.mittwald.v1.ingress.TargetDirectory` has been removed from the `oneOf` list in the response property for the `POST` operation `ingress-list-ingresses-compatible-with-certificate` at the path `/v2/actions/list-ingresses-compatible-with-certificate` for the response status `200`.
+- The schema `de.mittwald.v1.ingress.TargetDirectory` has been removed from the `oneOf` list in the response property for the `GET` operation `ingress-list-ingresses` at the path `/v2/ingresses` for the response status `200`.
+- The schema `de.mittwald.v1.ingress.TargetDirectory` has been removed from the `oneOf` list in the response property for the `GET` operation `ingress-get-ingress` at the path `/v2/ingresses/{ingressId}` for the response status `200`.
+- A non-success response with the status `412` has been added for the `POST` operation `ingress-request-ingress-acme-certificate-issuance` at the path `/v2/ingresses/{ingressId}/actions/request-acme-certificate-issuance`.
+- A new endpoint has been added for the `PUT` operation `extension-change-context` at the path `/v2/contributors/{contributorId}/extensions/{extensionId}/context`.
+- A new endpoint has been added for the `DELETE` operation `extension-remove-logo` at the path `/v2/contributors/{contributorId}/extensions/{extensionId}/logo`.
+- The schema `de.mittwald.v1.ingress.TargetDirectory` has been removed from the `oneOf` list in the response property for the `GET` operation `deprecated-ingress-list-ingresses` at the path `/v2/projects/{projectId}/ingresses` for the response status `200`.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Create an Ingress"
+
+
+- ⚠️ **Breaking:** removed '#/components/schemas/de.mittwald.v1.ingress.TargetDirectory' from the 'paths/items/target' request property 'oneOf' list
+
+
+For details, refer to the <OperationLink operation="ingress-create-ingress" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update the paths of an Ingress"
+
+
+- ⚠️ **Breaking:** removed '#/components/schemas/de.mittwald.v1.ingress.TargetDirectory' from the '/items/target' request property 'oneOf' list
+
+
+For details, refer to the <OperationLink operation="ingress-update-ingress-paths" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update an Ingresses paths"
+
+
+- ⚠️ **Breaking:** removed '#/components/schemas/de.mittwald.v1.ingress.TargetDirectory' from the '/items/target' request property 'oneOf' list
+
+
+For details, refer to the <OperationLink operation="deprecated-ingress-paths" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in ""
+
+
+- removed the schema 'de.mittwald.v1.ingress.TargetDirectory'
+
+
+For details, refer to the <OperationLink operation="" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Ingresses compatible with a certificate"
+
+
+- removed '#/components/schemas/de.mittwald.v1.ingress.TargetDirectory' from the '/items/paths/items/target' response property 'oneOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="ingress-list-ingresses-compatible-with-certificate" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Change the context of an Extension"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="extension-change-context" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Remove the logo of an extension"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="extension-remove-logo" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Ingresses"
+
+
+- removed '#/components/schemas/de.mittwald.v1.ingress.TargetDirectory' from the '/items/paths/items/target' response property 'oneOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="ingress-list-ingresses" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an Ingress"
+
+
+- removed '#/components/schemas/de.mittwald.v1.ingress.TargetDirectory' from the 'paths/items/target' response property 'oneOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="ingress-get-ingress" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Request the ACME certificate issuance of an Ingress"
+
+
+- added the non-success response with the status '412'
+
+
+For details, refer to the <OperationLink operation="ingress-request-ingress-acme-certificate-issuance" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Ingresses belonging to a project"
+
+
+- removed '#/components/schemas/de.mittwald.v1.ingress.TargetDirectory' from the '/items/paths/items/target' response property 'oneOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="deprecated-ingress-list-ingresses" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### Release Summary: mittwald PHP SDK v2.1.126
+
+The latest release of the mittwald PHP SDK, version v2.1.126, introduces significant changes by removing several classes and methods related to the customer agency verification feature. This update suggests a refactoring or a change in approach for handling agency verification within the API client.
+
+#### Key Changes:
+- **Deleted Classes**: Multiple classes associated with aborting, creating, and retrieving agency verifications have been removed.
+- **Interface Changes**: Methods `abortAgencyVerification`, `createAgencyVerification`, and `getOpenAgencyVerification` have been removed from the `CustomerClient` interface.
+- **Implementation Changes**: Related implementations in `CustomerClientImpl` have been removed.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.126).
+
+### Release v2.1.125 of Mittwald PHP SDK
+
+The latest release of the Mittwald PHP SDK, [v2.1.125](https://github.com/mittwald/api-client-php/releases/tag/v2.1.125), introduces several new features and improvements focused on agency verification processes and context manipulation.
+
+#### Added Features
+
+- **Abort Agency Verification**: A new endpoint allows users to abort an open agency verification process, with various response types for different HTTP status codes, including successful and error responses.
+  
+- **Create Agency Verification**: New classes have been added to handle the creation of agency verification requests, along with comprehensive error handling for different scenarios.
+
+- **Get Open Agency Verification**: An endpoint to retrieve the status of an agency verification request has been implemented, complete with detailed response classes for both successful and error outcomes.
+
+#### Changes in Classes
+
+- The `TargetDirectory` class has been refactored into `AbortAgencyVerificationOKResponseBody` and `ExtensionChangeContextOKResponseBody` to better handle specific responses.
+  
+- New functionality for `ExtensionChangeContext` has been introduced, including request handling and error response classes.
+
+This release enhances the SDK's capabilities in managing agency verification and context changes, providing robust error handling and improved user interaction. For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.125).
+
+### mittwald PHP SDK Release v2.1.124
+
+The mittwald PHP SDK has released version [v2.1.124](https://github.com/mittwald/api-client-php/releases/tag/v2.1.124). This release introduces enhancements and changes focused on improving request handling and error management.
+
+#### New Features
+
+- **Ingress Request Handling Enhancements**: The `DomainClientImpl` class now supports handling the `412 Precondition Failed` response. This enhancement allows the API client to effectively manage scenarios where request preconditions are not met.
+
+#### Changes
+
+- A new class, `IngressRequestIngressAcmeCertificateIssuancePreconditionFailedResponse`, has been introduced. This class encapsulates the structure of the `412` response, facilitating improved error handling and clearer response management. It includes methods for validation and JSON serialization.
+
+### mittwald JavaScript SDK Release 4.126.0
+
+The mittwald JavaScript SDK has been updated to version 4.126.0. This release includes an update to the generated client, enhancing its functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.126.0).
+
+### mittwald JavaScript SDK Release 4.125.0
+
+The mittwald JavaScript SDK has been updated to version 4.125.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.125.0).
+
