@@ -317,9 +317,9 @@ class APIDocRenderer {
 
 (async () => {
   const prodRenderer = new APIDocRenderer(versionedOutputPath("v2"));
-  const previewRenderer = prodRenderer
-    .withSpecLoader(loadSpecPreview)
-    .withTagFilter((t) => t.name === "Container");
+  // const previewRenderer = prodRenderer
+  //   .withSpecLoader(loadSpecPreview)
+  //   .withTagFilter((t) => t.name === "Container");
 
   await prodRenderer.renderAPIDocs(
     "v1",
@@ -331,11 +331,11 @@ class APIDocRenderer {
     "reference",
     exportSidebarItemsAsJson("sidebar.reference.json"),
   );
-  await previewRenderer.renderAPIDocs(
-    "v2",
-    "preview",
-    exportSidebarItemsAsJson("sidebar.preview.json"),
-  );
+  // await previewRenderer.renderAPIDocs(
+  //   "v2",
+  //   "preview",
+  //   exportSidebarItemsAsJson("sidebar.preview.json"),
+  // );
 })().catch((err) => {
   console.error(err);
   process.exit(1);

@@ -108,15 +108,15 @@ const sidebars = {
         id: "reference/index",
       },
     },
-    {
-      type: "category",
-      label: "API Preview",
-      items: require("./sidebar.preview.json"),
-      link: {
-        type: "doc",
-        id: "preview/index",
-      },
-    },
+    // {
+    //   type: "category",
+    //   label: "API Preview",
+    //   items: require("./sidebar.preview.json"),
+    //   link: {
+    //     type: "doc",
+    //     id: "preview/index",
+    //   },
+    // },
   ],
 };
 
