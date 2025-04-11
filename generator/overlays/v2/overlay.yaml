@@ -138,6 +138,13 @@ actions:
           properties:
             portProtocol:
               example: 80/tcp
+
+  - target: $.paths['/v2/stacks/{stackId}/services/{serviceId}/actions/pull'].post
+    update:
+      summary: Pull image and recreate
+      description: >
+        Pulls the image for this container and recreates it. This is equivalent to running
+        `docker-compose pull` and `docker-compose up -d` on the command line.
   - target: $.paths['/v2/stacks/{stackId}'].put.requestBody.content['application/json'].schema.properties.services
     update: &serviceList
       description: >
@@ -146,11 +153,20 @@ actions:
         resolve this containers from other containers running in the same project (or from
         managed apps running in the same project).
       x-example-key: mysql
+  - target: $.paths['/v2/stacks/{stackId}'].patch.requestBody.content['application/json'].schema.properties.services
+    update: *serviceList
+
   - target: $.paths['/v2/stacks/{stackId}'].put.requestBody.content['application/json'].schema.properties.volumes
-    update:
+    update: &volumeList
+      description: >
+        A set of named volumes that should be created for this stack. Removing a volume
+        from this set will not delete the volume (for safety), but only detach it from the
+        stack. To delete a volume, use the `DELETE /stacks/{stackId}/volumes/{volumeId}` endpoint.
       example:
         data:
           name: mysql-volume
+  - target: $.paths['/v2/stacks/{stackId}'].patch.requestBody.content['application/json'].schema.properties.volumes
+    update: *volumeList
 
   - target: $.components.schemas['de.mittwald.v1.container.ServiceDeclareRequest'].properties.volumes
     update: &volumes
@@ -160,12 +176,18 @@ actions:
         file system (which is shared among containers and managed apps within a project).
       example: # caution, this is APPENDED to the existing examples
         - "/home/p-XXXXX/html:/var/www"
+  - target: $.components.schemas['de.mittwald.v1.container.ServiceRequest'].properties.volumes
+    update: *volumes
+
   - target: $.components.schemas['de.mittwald.v1.container.ServiceDeclareRequest'].properties.ports
     update: &ports
       description: >
         Exposed ports. Follows the format `<public-port>:<container-port>/<protocol>`. Exposed ports
         can be accessed from other containers (or managed apps) within the same project. To expose
         a port publicly, connect it with an ingress resource.
+  - target: $.components.schemas['de.mittwald.v1.container.ServiceRequest'].properties.ports
+    update: *ports
+
   - target: $.components.schemas['de.mittwald.v1.container.ServiceDeclareRequest'].properties.image
     update: &image
       description: >
@@ -173,24 +195,38 @@ actions:
         the image is pulled from a private registry, make sure to create it first, using the
         `container-create-registry` endpoint. The appropriate registry is matched
         by hostname.
+  - target: $.components.schemas['de.mittwald.v1.container.ServiceRequest'].properties.image
+    update: *image
+
   - target: $.components.schemas['de.mittwald.v1.container.ServiceDeclareRequest'].properties.envs
     update: &envs
       description: >
         Key-value map of environment variables that should be passed into the container.
+  - target: $.components.schemas['de.mittwald.v1.container.ServiceRequest'].properties.envs
+    update: *envs
+
   - target: $.components.schemas['de.mittwald.v1.container.ServiceDeclareRequest'].properties.entrypoint
     update: &entrypoint
       description: >
         The container entrypoint (equivalent to the [Docker entrypoint](https://docs.docker.com/reference/dockerfile/#entrypoint)).
         When omitted, this defaults to the entrypoint defined in the image.
+  - target: $.components.schemas['de.mittwald.v1.container.ServiceRequest'].properties.entrypoint
+    update: *entrypoint
+
   - target: $.components.schemas['de.mittwald.v1.container.ServiceDeclareRequest'].properties.command
     update: &command
       description: >
         The container command (equivalent to the [Docker cmd](https://docs.docker.com/reference/dockerfile/#cmd)).
         When omitted, this defaults to the command defined in the image.
+  - target: $.components.schemas['de.mittwald.v1.container.ServiceRequest'].properties.command
+    update: *command
 
+  #- target: $.components.schemas['de.mittwald.v1.container.StackResponse'].properties
+  #  update:
 
   - target: $.components.schemas['de.mittwald.v1.container.StackResponse'].properties.services
     update: *serviceList
+
   - target: $.components.schemas['de.mittwald.v1.container.ServiceResponse'].properties.deployedState
     update:
       description: >
@@ -199,6 +235,21 @@ actions:
     update:
       description: >
         The desired state that is waiting to be reconciled.
+  - target: $.components.schemas['de.mittwald.v1.container.ServiceResponse'].properties
+    update:
+      message:
+        description: >
+          Message explaining the current state of the container. This may contain information about
+          the current state of the container, or errors that occurred during deployment.
+      shortId:
+        description: >
+          A short ID of the container. This is a unique identifier for the container within the
+          project, and can be used to reference it in other API calls, or for SSH connections.
+  - target: $.components.schemas['de.mittwald.v1.container.ServiceResponse'].properties.projectId
+    remove: true
+  - target: $.components.schemas['de.mittwald.v1.container.ServiceResponse'].properties.stackId
+    remove: true
+
   - target: $.components.schemas['de.mittwald.v1.container.ServiceState'].properties.command
     update:
       <<: *command
