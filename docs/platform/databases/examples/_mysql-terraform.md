@@ -15,9 +15,10 @@ resource "mittwald_mysql_database" "example_database" {
   }
 
   user = {
-    access_level    = "full"
-    password        = var.database_password
-    external_access = false
+    access_level        = "full"
+    password_wo         = var.database_password
+    password_wo_version = 1
+    external_access     = false
   }
 }
 ```

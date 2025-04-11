@@ -9,6 +9,7 @@ import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import OperationHint from "@site/src/components/OperationHint";
 import TerraformExample from "@site/docs/platform/databases/examples/_mysql-terraform.md";
+import TerraformExampleGeneratedPassword from "@site/docs/platform/databases/examples/_mysql-terraform-pwdgen.md";
 import TerraformResourceHint from "@site/src/components/TerraformResourceHint";
 
 ## Creating a MySQL database
@@ -54,6 +55,10 @@ import TerraformResourceHint from "@site/src/components/TerraformResourceHint";
     To create a MySQL database using Terraform, you can use the following example:
 
     <TerraformExample />
+
+    You can also use the `mittwald_mysql_password` [ephemeral resource][terraform-ephemeral] to dynamically generate a password. Note that in this case, you should also securely store this password in some kind of secrets manager, because it will be unrecoverable afterwards.
+
+    <TerraformExampleGeneratedPassword />
 
     After creating the resource, you can extract the following additional properties from the resource state:
 
@@ -129,3 +134,4 @@ $ mw database mysql import <database-id> --input dump.sql.gz --gzip
 ```
 
 [cli]: /cli
+[terraform-ephemeral]: https://developer.hashicorp.com/terraform/language/resources/ephemeral
