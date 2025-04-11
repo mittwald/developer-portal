@@ -1,0 +1,434 @@
+---
+title: Breaking (!) API changes for v2 API, April 4 to April 11
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Domain
+  - Container
+  - App
+  - Customer
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+In the week of April 4th to April 11th, 2025, the mittwald API introduced several enhancements, including the addition of multiple new endpoints for managing container registries, stacks, and services, as well as new optional request parameters and updates to response properties.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The success response with the status '200' has been removed from the DELETE operation for deleting a DNSZone (`/v2/dns-zones/{dnsZoneId}`). This is a breaking change.
+- A new endpoint has been added for validating a container registry URI with a POST operation at `/v2/actions/validate-container-registry-uri`.
+- Two new optional query request parameters, 'appIds' and 'searchTerm', have been added to the GET operation for listing AppInstallations that a user has access to (`/v2/app-installations`).
+- Two new optional query request parameters, 'appIds' and 'searchTerm', have also been added to the GET operation for listing AppInstallations belonging to a Project (`/v2/projects/{projectId}/app-installations`).
+- A new endpoint has been added for getting a ContainerImageConfig with a GET operation at `/v2/container-image-config`.
+- An optional property '/items/isAllowedToPlaceOrders' has been added to the response with the '200' status for the GET operation that lists customers (`/v2/customers`).
+- An optional property 'isAllowedToPlaceOrders' has been added to the response with the '200' status for the GET operation that retrieves a customer profile (`/v2/customers/{customerId}`).
+- A success response with the status '204' has been added to the DELETE operation for deleting a DNSZone (`/v2/dns-zones/{dnsZoneId}`).
+- Multiple new endpoints have been added for managing container registries, including:
+  - GET operation to list registries belonging to a Project (`/v2/projects/{projectId}/registries`).
+  - POST operation to create a registry (`/v2/projects/{projectId}/registries`).
+  - GET operation to get a registry (`/v2/registries/{registryId}`).
+  - PATCH operation to update a registry (`/v2/registries/{registryId}`).
+  - DELETE operation to delete a registry (`/v2/registries/{registryId}`).
+- Multiple new endpoints have been added for managing stacks, including:
+  - GET operation to list stacks belonging to a Project (`/v2/projects/{projectId}/stacks`).
+  - GET operation to get a stack (`/v2/stacks/{stackId}`).
+  - PATCH operation to update a stack (`/v2/stacks/{stackId}`).
+  - PUT operation to declaratively create, update, or delete services or volumes belonging to a stack (`/v2/stacks/{stackId}`).
+- Multiple new endpoints have been added for managing services within stacks, including:
+  - GET operation to get a service belonging to a stack (`/v2/stacks/{stackId}/services/{serviceId}`).
+  - POST operations for various actions on services, including pulling an image, recreating, restarting, starting, and stopping a service.
+  - GET operation to get logs belonging to a service (`/v2/stacks/{stackId}/services/{serviceId}/logs`).
+- A new endpoint has been added for deleting a volume belonging to a stack with a DELETE operation at `/v2/stacks/{stackId}/volumes/{volumeId}`.
+- A new endpoint has been added for getting a volume belonging to a stack with a GET operation at `/v2/stacks/{stackId}/volumes/{volumeId}`.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Delete a DNS Zone"
+
+
+- ⚠️ **Breaking:** removed the success response with the status '200'
+
+- added the success response with the status '204'
+
+
+For details, refer to the <OperationLink operation="dns-delete-dns-zone" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Validate a Registries' URI"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-validate-container-registry-uri" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app installations that a user has access to"
+
+
+- added the new optional 'query' request parameter 'appIds'
+
+- added the new optional 'query' request parameter 'searchTerm'
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations-for-user" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a ContainerImageConfig"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-get-container-image-config" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all customer profiles the authenticated user has access to"
+
+
+- added the optional property '/items/isAllowedToPlaceOrders' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="customer-list-customers" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a customer profile"
+
+
+- added the optional property 'isAllowedToPlaceOrders' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="customer-get-customer" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app installations belonging to a Project"
+
+
+- added the new optional 'query' request parameter 'appIds'
+
+- added the new optional 'query' request parameter 'searchTerm'
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Registries belonging to a Project"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-list-registries" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a Registry"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-create-registry" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Services belonging to a Project"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-list-services" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Stacks belonging to a Project"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-list-stacks" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Volumes belonging to a Project"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-list-volumes" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Delete a Registry"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-delete-registry" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Registry"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-get-registry" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a Registry"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-update-registry" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Validate a Registries' credentials"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-validate-registry-credentials" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Stack"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-get-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create, update or delete Services or Volumes belonging to a Stack"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-update-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Declaratively create, update or delete Services or Volumes belonging to a Stack"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-declare-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Service belonging to a Stack"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-get-service" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Pulls the latest version of the Service's image and recreates the Service"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-pull-image-for-service" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Recreate a Service"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-recreate-service" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Restart a started Service"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-restart-service" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Start a stopped Service"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-start-service" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Stop a started Service"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-stop-service" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get logs belonging to a Service"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-get-service-logs" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Delete a Volume belonging to a Stack"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-delete-volume" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Volume belonging to a Stack"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-get-volume" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### Release Summary: mittwald PHP SDK v2.1.129
+
+The mittwald PHP SDK has been updated to version v2.1.129, introducing significant enhancements to the Container API. This release includes a new `ContainerClient` for managing containers, stacks, and volumes, allowing users to perform operations such as creating and deleting container registries, declaring stacks, and retrieving configuration details for container images.
+
+#### Key Features:
+- **Container Management**: 
+  - Create and delete container registries.
+  - Declare stacks with services and volumes.
+  - Delete volumes associated with container stacks.
+  - Retrieve configuration details for specified container images.
+
+#### New Additions:
+- **Client Interfaces**: 
+  - `ContainerClient`
+  - `ContainerClientImpl`
+
+- **Request and Response Objects**:
+  - `CreateRegistryRequest`, `CreateRegistryCreatedResponse`
+  - `DeclareStackRequest`, `DeclareStackOKResponse`
+  - `DeleteRegistryRequest`
+  - `DeleteVolumeRequest`
+
+- **Error Handling**: 
+  - New response classes for handling various error conditions, including bad requests, conflicts, and internal server errors.
+
+These updates enhance the SDK's capabilities, providing a more robust interface for container management. For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.129).
+
+### Release Summary: mittwald PHP SDK v2.1.128
+
+The latest release of the mittwald PHP SDK, version [v2.1.128](https://github.com/mittwald/api-client-php/releases/tag/v2.1.128), introduces important updates and a new feature:
+
+#### Changes:
+- **API Response Update**: The `dnsDeleteDnsZone` method now correctly returns a 204 No Content status instead of a 200 OK status, improving the accuracy of HTTP status responses.
+  
+- **New Feature: Customer Order Placement Status**: 
+  - A new boolean property `isAllowedToPlaceOrders` has been added to the `Customer` schema. This property indicates whether a customer is permitted to place orders.
+  - Attributes include:
+    - Type: boolean
+    - Getter: `getIsAllowedToPlaceOrders()`
+    - Setter: `withIsAllowedToPlaceOrders(bool $isAllowedToPlaceOrders)`
+    - Method to unset: `withoutIsAllowedToPlaceOrders()`
+
+These updates enhance the clarity of API responses and provide better management of customer order placement permissions.
+
+### Release Summary: mittwald PHP SDK v2.1.127
+
+The mittwald PHP SDK has been updated to version 2.1.127. This release introduces enhanced request handling capabilities for listing app installations, allowing for filtering by multiple app IDs and searching using a search term. Key changes include:
+
+- **ListAppinstallationsRequest**: 
+  - Added `appIds` parameter for filtering by specific application IDs.
+  - Introduced `searchTerm` parameter for keyword-based searches.
+  - Updated data validation and handling methods to support new parameters.
+
+- **ListAppinstallationsForUserRequest**:
+  - Added `appIds` parameter for user-specific installation filtering.
+  - Introduced `searchTerm` for improved search functionality in user context.
+
+- **MarketplaceClient Interface**:
+  - Updated documentation for `extensionAuthenticateInstance` to clarify authentication using a session token and an extension secret.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.127).
+
+### mittwald JavaScript SDK Release 4.128.0
+
+The mittwald JavaScript SDK has been updated to version 4.128.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.128.0](https://github.com/mittwald/api-client-js/releases/tag/4.128.0).
+
+### mittwald JavaScript SDK Release 4.127.0
+
+The mittwald JavaScript SDK has been updated to version 4.127.0. This release includes a bug fix and a new feature:
+
+- **Bug Fixes**: The `IngressTarget` has been updated to remove directory target types ([commit 3f1e823](https://github.com/mittwald/api-client-js/commit/3f1e8236b85c8e39cef0b48f425744644f78970f)).
+- **Features**: The generated client has been updated ([commit 02cb611](https://github.com/mittwald/api-client-js/commit/02cb611564d0205dce6274c4bc7ae9946d85e129)).
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.127.0).
+
