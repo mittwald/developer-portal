@@ -2,6 +2,8 @@
 title: Extensions
 ---
 
+import OperationLink from "@site/src/components/OperationLink";
+
 ## What is an extension?
 
 From a domain perspective, an extension is an expansion of the mStudio providing additional functionality.
@@ -80,6 +82,57 @@ For more information, see [lifecycle webhook concept](../concepts/lifecycle-webh
 Optionally, an extension may define an external frontend that functions as an entry point to the extension.
 You configure the external frontend as a URL, for which you may use templating.
 For more information, see [templating of configuration values](../concepts/templating) and [lifecycle webhook concept](../concepts/lifecycle-webhooks).
+
+## Lifecycle of an Extension
+
+### Registration and Verification
+
+<OperationLink operation="extension-register-extension" />
+
+After registering an Extension, verification can be requested.
+To initiate this process, the following information must be provided:
+
+- A unique name for the Extension.
+- Defined scopes and context.
+- Support contact details.
+- If the Extension is not free, webhookUrls must also be specified.
+
+Contributors have the option to abort the verification process at any time.\
+Once submitted, the Extension will be reviewed and verified by mittwald.
+If no feedback is provided and the Extension meets all requirements, it can be published.
+Only the Contributor has the authority to publish an Extension.
+
+### After Publication
+
+Once published, an Extension can be withdrawn by the Contributor.
+This action prevents new Extension Instances from being created and disables existing Extenion Instances, which is useful for maintenance.
+The extension can be republished later without requiring a new verification.
+
+### Modifying an Extension
+
+<OperationLink operation="extension-patch-extension" />
+
+Changes to scopes or webhookUrls require verification by mittwald.
+Once accepted, these changes take effect immediately.
+
+- The Context of an Extension can only be modified before the initial verification request.
+- During development, the Context can be changed freely, but this will remove all existing Extension Instances.
+
+### Adding Extension Instances to a Context
+
+To add an Extension Instance to a Context, the context must first be set.
+
+- Before publication, only the contributor can create Extension Instances within their own organization or projects.
+- After publication, anyone can create Extension Instances.
+
+### Deleting an Extension
+
+To gracefully remove an extension, a deprecation process should be defined. This process includes:
+
+- Specifying a shutdown date.
+- Defining a successor, if applicable.
+
+Extensions are deleted asynchronously, as all associated instances must be removed beforehand.
 
 ## Versioning of Extensions
 
