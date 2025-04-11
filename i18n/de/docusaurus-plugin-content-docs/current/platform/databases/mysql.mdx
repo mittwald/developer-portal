@@ -9,6 +9,7 @@ import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import OperationHint from "@site/src/components/OperationHint";
 import TerraformExample from "@site/docs/platform/databases/examples/_mysql-terraform.md";
+import TerraformExampleGeneratedPassword from "@site/docs/platform/databases/examples/_mysql-terraform-pwdgen.md";
 import TerraformResourceHint from "@site/src/components/TerraformResourceHint";
 
 ## Eine MySQL-Datenbank erstellen
@@ -53,6 +54,10 @@ import TerraformResourceHint from "@site/src/components/TerraformResourceHint";
     Um eine MySQL-Datenbank mit Terraform zu erstellen, kannst du das folgende Beispiel verwenden:
 
     <TerraformExample />
+
+    Du kannst auch die `mittwald_mysql_password` [Ephemeral Resource][terraform-ephemeral] verwenden um ein Passwort dynamisch zu generieren. Beachte, dass du in diesem Fall dieses Passwort auch sicher in einem Secret Manager speichern solltest, da es danach nicht mehr abrufbar ist.
+
+    <TerraformExampleGeneratedPassword />
 
     Nachdem du die Ressource erstellt hast, kannst du die folgenden zusätzlichen Eigenschaften aus dem Ressourcenstatus extrahieren:
 
