@@ -2,6 +2,8 @@
 title: Extensions
 ---
 
+import OperationLink from "@site/src/components/OperationLink";
+
 ## What is an extension?
 
 From a domain perspective, an extension is an expansion of the mStudio providing additional functionality.
@@ -36,8 +38,42 @@ Here, you can explain features, provide instructions, share links for further re
 
 ### State
 
-The **state** of an extension defines whether the extension should be visible or usable in the mStudio.
-This includes, for example, whether it is generally active, displayed in the marketplace, and can be added to an extension context.
+Due to api stability guarantees the `state` field is deprecated.
+The fields `disabled`, `published`, `verifcatonRequested`, `deprecated`, `functional` and `verified` of the `OwnExtension`,
+as found at <OperationLink operation="extension-get-own-extension" />; display the state of the Extension.
+
+- `disbled`: The extension is disabled. No new **ExtensionInstances** can be created.
+- `published`: Everyone can now add the extension to their own **Context**.
+- `verifcatonRequested`: mittwald is verifying the **Extension**.
+- `deprecated`: The **Extension** is deprecated by the **Contributor**.
+- `functional`: The **Extension** operates as expected.
+- `verified`: The Extension has been verified by mittwald and can now be published.
+
+#### Overview
+
+```mermaid
+---
+title: Extension State
+---
+stateDiagram-v2
+  direction TB
+  InDevelopment: In Development
+  InReview: In Review
+  Verified: Verified
+  Published: Published
+  Deprecated: Deprecated
+  Removed: Removed
+  [*] --> InDevelopment:Registered by the Contributor
+  InDevelopment --> InReview:Verification requested by the Contributor
+  InReview --> InDevelopment:Feedback provided by mittwald
+  InReview --> Verified:Verified by mittwald
+  Verified --> Published:Published by the Contributor
+  Published --> Verified:Withdrawn by the Contributor
+  Published --> Deprecated:Deprecated by the Contributor
+  Deprecated --> Removed:Automatically removed after the <br> deprecation period by mittwald
+  Published --> Removed:Removed by the Contributor
+  Removed --> [*]
+```
 
 ### Tags
 
@@ -93,3 +129,21 @@ You are responsible for versioning your extensions and may introduce individual 
 
 If the extension provides an API used by external applications, you should ensure its stability.
 To this end, you may use commonplace conventions and best practices for API versioning.
+
+## Adding an extension to a Context
+
+```mermaid
+---
+title: Adding an Extension to a Context
+---
+stateDiagram
+A: ExtensionInstanceAddedToContext
+B: ExtensionInstanceActivated
+C: ExtensionInstanceDeactivated
+D: ExtensionInstanceRemoved
+A --> B
+C --> D
+B --> D: Removed by end user
+C --> B: Extension chechout perfomed
+B --> C: Extension became costly
+```

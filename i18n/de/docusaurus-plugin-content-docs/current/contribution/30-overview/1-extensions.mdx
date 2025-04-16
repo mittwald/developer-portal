@@ -2,6 +2,8 @@
 title: Extensions
 ---
 
+import OperationLink from "@site/src/components/OperationLink";
+
 ## Was ist eine Extension?
 
 Aus fachlicher Sicht ist eine Extension eine Erweiterung des mStudio, die es ermöglicht,
@@ -40,8 +42,42 @@ Hier können Funktionen erläutert, Anleitungen bereitgestellt, weiterführende 
 
 ### State
 
-Der **State** der Extension definiert, ob sie im mStudio sicht- und nutzbar sein soll.
-Das umfasst beispielsweise (jeweils unabhängig voneinander), ob sie generell aktiv ist, im Marktplatz angezeigt wird und ob sie zu einem Extension Context hinzugefügt werden kann.
+Aufgrund von api-Stabilitätsgarantien ist das Feld `state` deprecated.
+Die Felder `disabled`, `published`, `verifcatonRequested`, `deprecated`, `functional` und `verified` der `OwnExtension`,
+wie sie unter <OperationLink operation="extension-get-own-extension" />; zu finden sind, zeigen den Zustand der Extension an.
+
+- `disbled`: Die Erweiterung ist deaktiviert. Es können keine neuen **ExtensionInstances** erstellt werden.
+- `published`: Jeder kann nun die Erweiterung zu seinem eigenen **Kontext** hinzufügen.
+- `verifcatonRequested`: mittwald verifiziert die **Erweiterung**.
+- `deprecated`: Die **Erweiterung** ist durch den **Beitragenden** veraltet.
+- `funcional`: Die **Erweiterung** funktioniert wie erwartet.
+- `verified`: Die Erweiterung wurde von mittwald verifiziert und kann nun veröffentlicht werden.
+
+#### Overview
+
+```mermaid
+---
+title: Extension State
+---
+stateDiagram-v2
+  direction TB
+  InDevelopment: In Entwicklung
+  InReview: In Überprüfung
+  Verified: Verifiziert
+  Published: Veröffentlicht
+  Deprecated: Ausgemustert
+  Removed: Entfernt
+  [*] --> InDevelopment:Registriert durch den Contriubotr
+  InDevelopment --> InReview:Verifizierung angefragt durch den Contributor
+  InReview --> InDevelopment:Feedback zurück gegeben durch mittwald
+  InReview --> Verified:Verifiziert durch mittwald
+  Verified --> Published:Veröffentlicht durch den Contributor
+  Published --> Verified:Zurückgezogen durch den Contributor
+  Published --> Deprecated:Ausmusterung durch den Contributor
+  Deprecated --> Removed:Automatisch nach der Ausmusterungsphase <br> gelöscht von mittwald
+  Published --> Removed:Löschung durch den Contributor
+  Removed --> [*]
+```
 
 ### Tags
 
@@ -98,3 +134,21 @@ Der Contributor ist für die Versionierung der Extension verantwortlich und kann
 Falls die Extension selbst eine API bereitstellt, die von externen Applikationen genutzt wird,
 wird empfohlen auf Versionierung und Stabilität dieser API zu achten.
 Hierbei können gängige Konventionen und Best Practices für API-Versionierung angewendet werden.
+
+## Eine Extension zu einem Context hinzufügen
+
+```mermaid
+---
+title: Eine Extension zu einem Context hinzufügen
+---
+stateDiagram
+A: ExtensionInstanceAddedToContext
+B: ExtensionInstanceActivated
+C: ExtensionInstanceDeactivated
+D: ExtensionInstanceRemoved
+A --> B
+C --> D
+C --> B: Extension Kaufprozess abgeschlossen
+B --> D: Durch einen Nutzer entfernt
+B --> C: Extension wurde kostenpflichtig
+```
