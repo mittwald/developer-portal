@@ -1,0 +1,221 @@
+---
+title: Breaking (!) API changes for v2 API, April 11 to April 18
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Marketplace
+  - Backup
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week's changelog for the mittwald API includes significant updates such as changes to the response body format and the removal of several required and optional properties for the "Get a Contributor" endpoint, alongside the addition of new endpoints and properties related to pricing in various responses.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The response body type for the `GET /v2/contributors/{contributorId}` operation has changed from 'object' to an unspecified format for status '200'. This is a breaking change.
+- The required properties `customerId`, `id`, `name`, `state`, and `supportInformation` have been removed from the response for the `GET /v2/contributors/{contributorId}` operation with status '200'. This is a breaking change.
+- The optional properties `description`, `email`, `logoRefId`, `phone`, and `url` have been removed from the response for the `GET /v2/contributors/{contributorId}` operation with status '200'.
+- A default value of '1000.00' has been added for the 'query' request parameter `limit` in the `GET /v2/projects/{projectId}/backups` operation.
+- The optional property `/items/pricing` has been added to the response for the `GET /v2/contributors/{contributorId}/extensions` operation with status '200'.
+- The optional property `pricing` has been added to the responses for the `GET /v2/contributors/{contributorId}/extensions/{extensionId}` and `PATCH /v2/contributors/{contributorId}/extensions/{extensionId}` operations with status '200'.
+- Two new endpoints have been added: `GET /v2/customers/{customerId}/lead-fyndr-profile` and `GET /v2/customers/{customerId}/lead-fyndr-profile-request`.
+- A non-success response with status '412' has been added for the `DELETE /v2/extension-instances/{extensionInstanceId}` operation.
+- The optional property `/items/pricing` has been added to the response for the `GET /v2/extensions` operation with status '200'.
+- The optional property `pricing` has been added to the response for the `GET /v2/extensions/{extensionId}` operation with status '200'.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Get a contributor"
+
+
+- ⚠️ **Breaking:** the response's body type/format changed from 'object'/'' to ''/'' for status '200'
+
+- ⚠️ **Breaking:** removed the required property 'customerId' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'id' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'name' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'state' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'supportInformation' from the response with the '200' status
+
+- removed the optional property 'description' from the response with the '200' status
+
+- removed the optional property 'email' from the response with the '200' status
+
+- removed the optional property 'logoRefId' from the response with the '200' status
+
+- removed the optional property 'phone' from the response with the '200' status
+
+- removed the optional property 'url' from the response with the '200' status
+
+- added '#/components/schemas/de.mittwald.v1.marketplace.Contributor, #/components/schemas/de.mittwald.v1.marketplace.OwnContributor' to the response body 'anyOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="extension-get-contributor" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Backups belonging to a Project"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', default value '1000.00' was added
+
+
+For details, refer to the <OperationLink operation="backup-list-project-backups" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Extensions of own contributor"
+
+
+- added the optional property '/items/pricing' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-list-own-extensions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get Extension of own contributor"
+
+
+- added the optional property 'pricing' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-own-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Patch Extension"
+
+
+- added the optional property 'pricing' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-patch-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get your LeadFyndr profile"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="lead-finder-get-lead-fyndr-profile" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get your LeadFyndr request"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="lead-finder-get-lead-fyndr-profile-request" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Delete a free extension instance. If the Extension is chargable the contract must be terminated instead"
+
+
+- added the non-success response with the status '412'
+
+
+For details, refer to the <OperationLink operation="extension-delete-extension-instance" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Extensions"
+
+
+- added the optional property '/items/pricing' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-list-extensions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an Extension"
+
+
+- added the optional property 'pricing' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-extension" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK Release v2.1.131
+
+The mittwald PHP SDK has been updated to version v2.1.131. This release includes several significant changes:
+
+- **Breaking Changes**: The `ExtensionGetContributorOKResponse` class has been removed. As a result, the return type for the `extensionGetContributor` methods in both the `MarketplaceClient` and `MarketplaceClientImpl` classes has been updated to `UntypedResponse`.
+
+- **New Features**: A new class, `OwnContributor`, has been introduced. This class represents contributors in the marketplace and includes properties such as contact person, contract owner, customer details, description, id, name, state, support information, and logo reference. It also provides methods for instance creation from input and conversion back to JSON, along with validation logic based on defined schemas.
+
+- **Removed Files**: The file `ExtensionGetContributorOKResponse.php` has been removed, simplifying the handling of contributor details.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.131).
+
+### mittwald PHP SDK Release v2.1.130
+
+The mittwald PHP SDK has been updated to version v2.1.130. This release introduces several new features and improvements:
+
+#### Added Features
+- **Pricing Strategy for Extensions**: A new `MonthlyPricingStrategy` schema has been introduced to define monthly pricing for extensions, including net price in Euro cents. The `Extension` and `OwnExtension` classes have been updated to include optional pricing attributes.
+- **Profile and Profile Request Management**: A `Profile` class has been added for managing user profiles with attributes such as `approvedOn`, `customerId`, and `domain`. Additionally, a `ProfileRequest` class has been introduced to handle user-requested profiles, status tracking, and metadata like `createdOn` and `requestedBy`. The `ProfileRequestStatus` enumeration defines possible states of a profile request.
+- **New Response Handling**: A new response class, `ExtensionDeleteExtensionInstancePreconditionFailedResponse`, has been created to manage precondition failures when deleting extension instances.
+
+#### Changes
+- The `ListProjectBackupsRequest` class now defaults to a limit of 1000 for the number of backups returned.
+- Updates to various methods in `ListProjectBackupsRequest` and marketplace client classes have been made to improve data handling, reflecting the new pricing strategies and error management responses.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.130).
+
+### mittwald JavaScript SDK Release 4.131.0
+
+The mittwald JavaScript SDK has been updated to version 4.131.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.131.0).
+
+### mittwald JavaScript SDK Release 4.130.0
+
+The mittwald JavaScript SDK has been updated to version 4.130.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.130.0).
+
+### mittwald JavaScript SDK Release 4.129.2
+
+The mittwald JavaScript SDK has been updated to version 4.129.2. This release primarily includes a version bump for the package root, with no additional changes or features introduced. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.129.2).
+
+### mittwald JavaScript SDK Release 4.129.0
+
+The mittwald JavaScript SDK has been updated to version 4.129.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.129.0).
+
