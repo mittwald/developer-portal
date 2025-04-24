@@ -10,6 +10,22 @@ Every mStudio project comes with a default stack named `default`. You can obtain
 
 Creating new stacks is not supported at this time. You can only manage the `default` stack.
 
+### Deleting containers/services from an existing stack
+
+Since this is a differential `PATCH` operation, omitting a service from the request body will simply leave any existing services unchanged.
+
+Instead, to remove an existing container from a stack, set it to an empty object `{}` in the request body. This will remove the container from the stack.
+
+<OperationExample
+  withoutLink
+  operation="container-update-stack"
+  example={{
+    services: {
+      mysql: {},
+    },
+  }}
+/>
+
 ## Managing volumes
 
 You have two options for managing storage for your container stacks:

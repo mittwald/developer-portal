@@ -146,15 +146,26 @@ actions:
         Pulls the image for this container and recreates it. This is equivalent to running
         `docker-compose pull` and `docker-compose up -d` on the command line.
   - target: $.paths['/v2/stacks/{stackId}'].put.requestBody.content['application/json'].schema.properties.services
-    update: &serviceList
+    update:
       description: >
         A set of containers that should be started in this stack. The key is relevant for
         network connectivity between containers, because you can use it as DNS name to
         resolve this containers from other containers running in the same project (or from
         managed apps running in the same project).
+        
+        To **delete** an existing container from a stack using a `PUT` request, simply omit
+        it from the request body.
       x-example-key: mysql
   - target: $.paths['/v2/stacks/{stackId}'].patch.requestBody.content['application/json'].schema.properties.services
-    update: *serviceList
+    update:
+      description: >
+        A set of containers that should be started in this stack. The key is relevant for
+        network connectivity between containers, because you can use it as DNS name to
+        resolve this containers from other containers running in the same project (or from
+        managed apps running in the same project).
+        
+        To **delete** an existing container from a stack using a `PATCH` request, set it to
+        an empty object `{}`.
 
   - target: $.paths['/v2/stacks/{stackId}'].put.requestBody.content['application/json'].schema.properties.volumes
     update: &volumeList
