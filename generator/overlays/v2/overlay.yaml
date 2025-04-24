@@ -152,6 +152,9 @@ actions:
         network connectivity between containers, because you can use it as DNS name to
         resolve this containers from other containers running in the same project (or from
         managed apps running in the same project).
+        
+        To **delete** an existing container from a stack using a `PUT` request, simply omit
+        it from the request body. Using a `PATCH` request, set it to an empty object `{}`.
       x-example-key: mysql
   - target: $.paths['/v2/stacks/{stackId}'].patch.requestBody.content['application/json'].schema.properties.services
     update: *serviceList
