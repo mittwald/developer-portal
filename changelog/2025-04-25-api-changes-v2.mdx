@@ -1,0 +1,151 @@
+---
+title: Breaking (!) API changes for v2 API, April 18 to April 25
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Marketplace
+  - File
+  - Container
+  - Customer
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API introduces several changes including the removal of default values for request parameters, updates to media types, the addition of new API tags, and modifications to response properties and operation IDs.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The default value '1.00' for the 'query' request parameter 'page' was removed in the `GET /v2/extensions` operation. This is a breaking change.
+- The media type 'application/octet-stream' was removed from the request body in the `POST /v2/files` operation. This is a breaking change.
+- The minimum value for the 'query' request parameter 'limit' was set to '1.00' in the `GET /v2/extensions` operation.
+- The minimum value for the 'query' request parameter 'page' was set to '1.00' in the `GET /v2/extensions` operation.
+- A non-success response with the status '412' was added to the `GET /v2/container-image-config` operation.
+- The API operation ID 'lead-finder-get-lead-fyndr-profile' was removed and replaced with 'customer-get-lead-fyndr-profile' in the `GET /v2/customers/{customerId}/lead-fyndr-profile` operation. Additionally, the API tag 'Customer' was added to this operation.
+- The API operation ID 'lead-finder-get-lead-fyndr-profile-request' was removed and replaced with 'customer-get-lead-fyndr-profile-request' in the `GET /v2/customers/{customerId}/lead-fyndr-profile-request` operation. The API tag 'Customer' was also added to this operation.
+- The 'NEW' enum value was removed from the 'status' response property for the response status '200' in the `GET /v2/customers/{customerId}/lead-fyndr-profile-request` operation.
+- The media type 'multipart/form-data' was added to the request body in the `POST /v2/files` operation.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "List Extensions"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'page', default value '1.00' was removed
+
+- for the 'query' request parameter 'limit', the min was set to '1.00'
+
+- for the 'query' request parameter 'page', the min was set to '1.00'
+
+
+For details, refer to the <OperationLink operation="extension-list-extensions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a File"
+
+
+- ⚠️ **Breaking:** removed the media type 'application/octet-stream' from the request body
+
+- added the media type 'multipart/form-data' to the request body
+
+
+For details, refer to the <OperationLink operation="file-create-file" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a ContainerImageConfig"
+
+
+- added the non-success response with the status '412'
+
+
+For details, refer to the <OperationLink operation="container-get-container-image-config" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "lead-finder-get-lead-fyndr-profile"
+
+
+- api operation id 'lead-finder-get-lead-fyndr-profile' removed and replaced with 'customer-get-lead-fyndr-profile'
+
+- api tag 'Customer' added
+
+
+For details, refer to the <OperationLink operation="lead-finder-get-lead-fyndr-profile" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "lead-finder-get-lead-fyndr-profile-request"
+
+
+- api operation id 'lead-finder-get-lead-fyndr-profile-request' removed and replaced with 'customer-get-lead-fyndr-profile-request'
+
+- api tag 'Customer' added
+
+
+For details, refer to the <OperationLink operation="lead-finder-get-lead-fyndr-profile-request" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get your LeadFyndr request"
+
+
+- removed the 'NEW' enum value from the 'status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="customer-get-lead-fyndr-profile-request" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald JavaScript SDK Release 4.136.0
+
+The mittwald JavaScript SDK has been updated to version 4.136.0. This release includes an update to the generated client, enhancing the SDK's functionality. For a detailed comparison with the previous version, please refer to the [release notes](https://github.com/mittwald/api-client-js/releases/tag/4.136.0).
+
+### mittwald JavaScript SDK Release 4.135.0
+
+The mittwald JavaScript SDK has been updated to version 4.135.0. This release includes a feature update where the generated client has been updated. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.135.0).
+
+### mittwald JavaScript SDK Release 4.134.0
+
+The mittwald JavaScript SDK has been updated to version 4.134.0. This release includes the following feature:
+
+- Updated the generated client to enhance functionality and performance ([commit 0dbb147](https://github.com/mittwald/api-client-js/commit/0dbb14792068bb262b2db75bbea01a3ebd42e5c5)).
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.134.0).
+
+### mittwald JavaScript SDK Release 4.133.0
+
+The mittwald JavaScript SDK has been updated to version 4.133.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.133.0).
+
+### mittwald JavaScript SDK Release 4.132.0
+
+The mittwald JavaScript SDK has been updated to version 4.132.0. This release includes an updated generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.132.0).
+
