@@ -1,0 +1,229 @@
+---
+title: Breaking (!) API changes for v2 API, April 25 to May 2
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Marketplace
+  - Backup
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+During the week of April 25 to May 2, 2025, the mittwald API introduced several changes, including updates to the webhook URLs in the extension registration process, modifications to response properties for extension retrieval, and the addition of new required properties in backup-related endpoints.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The `webhookURLs` request property for the `POST /v2/contributors/{contributorId}/extensions` operation has undergone significant changes: a new subschema was added, its type/format changed, and several properties were removed, including `webhookURLs/extensionAddedToContext`, `webhookURLs/extensionInstanceRemovedFromContext`, `webhookURLs/extensionInstanceSecretRotated`, and `webhookURLs/extensionInstanceUpdated`. Note that these changes are breaking.
+  
+- The response body type/format for the `GET /v2/extensions/{extensionId}` operation has changed, and multiple required properties have been removed, including `assets`, `blocked`, `context`, `contributorId`, `description`, `disabled`, `id`, `logoRefId`, `name`, `published`, `scopes`, `state`, `statistics`, `subTitle`, and `support`. This is a breaking change.
+
+- The `GET /v2/extensions` operation now includes a new enum value `true` for the `/items/published` response property.
+
+- Several optional properties have been removed from the `GET /v2/extensions/{extensionId}` response, including `deprecation`, `detailedDescriptions`, `externalFrontends`, `frontendComponents`, `frontendFragments`, and `pricing`.
+
+- The security scheme type for `de.mittwald.v1.commons.LegacyBearerAuthentication` has changed from `apiKey` to `http`.
+
+- New optional properties have been added to the `GET /v2/contributors` response, including `/items/descriptions` and `/items/imprint`.
+
+- The `GET /v2/contributors/{contributorId}` operation now includes new optional properties: `/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Contributor]/descriptions`, `/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Contributor]/imprint`, and `/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/imprint`, as well as a required property `/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/contributorNumber`.
+
+- A new optional request property `webhookUrls` has been added to the `POST /v2/contributors/{contributorId}/extensions` operation.
+
+- The `POST /v2/extension-instances` operation now includes a non-success response with the status `403`.
+
+- The response body for the `GET /v2/extensions/{extensionId}` operation has been updated to include `#/components/schemas/de.mittwald.v1.marketplace.Extension` and `#/components/schemas/de.mittwald.v1.marketplace.UnpublishedExtension` in the `anyOf` list.
+
+- Several required properties have been added to the responses of various backup-related operations, including `requestedAt` for `GET /v2/project-backups/{projectBackupId}`, `GET /v2/projects/{projectId}/backups`, and `POST /v2/projects/{projectId}/backups`.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Register an Extension"
+
+
+- ⚠️ **Breaking:** added '#/components/schemas/de.mittwald.v1.marketplace.WebhookUrls, subschema #2' to the 'webhookURLs' request property 'allOf' list
+
+- ⚠️ **Breaking:** the 'webhookURLs' request property type/format changed from 'object'/'' to ''/''
+
+- removed the request property 'webhookURLs/extensionAddedToContext'
+
+- removed the request property 'webhookURLs/extensionInstanceRemovedFromContext'
+
+- removed the request property 'webhookURLs/extensionInstanceSecretRotated'
+
+- removed the request property 'webhookURLs/extensionInstanceUpdated'
+
+- added the new optional request property 'webhookUrls'
+
+
+For details, refer to the <OperationLink operation="extension-register-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an Extension"
+
+
+- ⚠️ **Breaking:** the response's body type/format changed from 'object'/'' to ''/'' for status '200'
+
+- ⚠️ **Breaking:** removed the required property 'assets' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'blocked' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'context' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'contributorId' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'description' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'disabled' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'id' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'logoRefId' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'name' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'published' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'scopes' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'state' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'statistics' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'subTitle' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'support' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'tags' from the response with the '200' status
+
+- removed the optional property 'deprecation' from the response with the '200' status
+
+- removed the optional property 'detailedDescriptions' from the response with the '200' status
+
+- removed the optional property 'externalFrontends' from the response with the '200' status
+
+- removed the optional property 'frontendComponents' from the response with the '200' status
+
+- removed the optional property 'frontendFragments' from the response with the '200' status
+
+- removed the optional property 'pricing' from the response with the '200' status
+
+- added '#/components/schemas/de.mittwald.v1.marketplace.Extension, #/components/schemas/de.mittwald.v1.marketplace.UnpublishedExtension' to the response body 'anyOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="extension-get-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Extensions"
+
+
+- added the new 'true' enum value to the '/items/published' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="extension-list-extensions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in ""
+
+
+- the component security scheme 'de.mittwald.v1.commons.LegacyBearerAuthentication' type changed from 'apiKey' to 'http'
+
+
+For details, refer to the <OperationLink operation="" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List contributors"
+
+
+- added the optional property '/items/descriptions' to the response with the '200' status
+
+- added the optional property '/items/imprint' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-list-contributors" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a contributor"
+
+
+- added the optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Contributor]/descriptions' to the response with the '200' status
+
+- added the optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Contributor]/imprint' to the response with the '200' status
+
+- added the optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/imprint' to the response with the '200' status
+
+- added the required property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/contributorNumber' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-contributor" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create an extension instance"
+
+
+- added the non-success response with the status '403'
+
+
+For details, refer to the <OperationLink operation="extension-create-extension-instance" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a project backup"
+
+
+- added the required property 'requestedAt' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="backup-get-project-backup" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Backups belonging to a Project"
+
+
+- added the required property '/items/requestedAt' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="backup-list-project-backups" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a Backup of a Project"
+
+
+- added the required property 'requestedAt' to the response with the '201' status
+
+
+For details, refer to the <OperationLink operation="backup-create-project-backup" apiVersion="v2" /> endpoint.
+
+
+
