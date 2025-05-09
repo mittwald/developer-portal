@@ -1,0 +1,273 @@
+---
+title: API changes for v2 API, May 2 to May 9
+authors:
+  - machine
+tags:
+  - apiv2
+  - Project
+  - Container
+  - Customer
+  - Marketplace
+  - Mail
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API introduces several enhancements, including the addition of new optional request parameters, required properties for certain responses, and the new 'suspended' enum value for item statuses.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- The new enum value 'suspended' has been added to the '/items/status' response property for the response status '200' in both the `GET /v2/servers` and `GET /v2/servers/{serverId}` operations.
+- A non-success response with the status '404' has been added to the `GET /v2/container-image-config` operation.
+- The response property 'message' has become required for the status '429' in the `GET /v2/container-image-config` operation.
+- The response property 'type' has become required for the status '429' in the `GET /v2/container-image-config` operation.
+- The new optional 'query' request parameters 'hasExpiry' and 'role' have been added to the `GET /v2/customer-memberships` operation.
+- The new optional 'query' request parameters 'hasExpiry' and 'role' have also been added to the `GET /v2/customers/{customerId}/memberships` operation.
+- The optional property 'chargeability' has been added to the response with the '200' status in the `GET /v2/customers/{customerId}/extensions/{extensionId}` operation.
+- The new optional 'query' request parameters 'hasExpiry', 'isInherited', and 'role' have been added to the `GET /v2/project-memberships` operation.
+- The optional property '/items/avatarRef' has been added to the response with the '200' status in the `GET /v2/project-memberships` operation.
+- The required properties '/items/firstName' and '/items/lastName' have been added to the response with the '200' status in the `GET /v2/project-memberships` operation.
+- The optional property 'avatarRef' has been added to the response with the '200' status in the `GET /v2/project-memberships/{projectMembershipId}` operation.
+- The required properties 'firstName' and 'lastName' have been added to the response with the '200' status in the `GET /v2/project-memberships/{projectMembershipId}` operation.
+- The optional property 'chargeability' has been added to the response with the '200' status in the `GET /v2/projects/{projectId}/extensions/{extensionId}` operation.
+- The new optional 'query' request parameters 'autoResponder', 'catchAll', 'forwardAddress', 'order', and 'sort' have been added to the `GET /v2/projects/{projectId}/mail-addresses` operation.
+- The new optional 'query' request parameters 'hasExpiry', 'isInherited', and 'role' have been added to the `GET /v2/projects/{projectId}/memberships` operation.
+- The optional property '/items/avatarRef' has been added to the response with the '200' status in the `GET /v2/projects/{projectId}/memberships` operation.
+- The required properties '/items/firstName' and '/items/lastName' have been added to the response with the '200' status in the `GET /v2/projects/{projectId}/memberships` operation.
+- The optional property 'avatarRef' has been added to the response with the '200' status in the `GET /v2/projects/{projectId}/memberships/self` operation.
+- The required properties 'firstName' and 'lastName' have been added to the response with the '200' status in the `GET /v2/projects/{projectId}/memberships/self` operation.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "List Servers belonging to the executing user"
+
+
+- added the new 'suspended' enum value to the '/items/status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="project-list-servers" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Server"
+
+
+- added the new 'suspended' enum value to the 'status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="project-get-server" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a ContainerImageConfig"
+
+
+- added the non-success response with the status '404'
+
+- the response property 'message' became required for the status '429'
+
+- the response property 'type' became required for the status '429'
+
+
+For details, refer to the <OperationLink operation="container-get-container-image-config" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List customer memberships belonging to the executing user"
+
+
+- added the new optional 'query' request parameter 'hasExpiry'
+
+- added the new optional 'query' request parameter 'role'
+
+
+For details, refer to the <OperationLink operation="customer-list-customer-memberships" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the extension instance of a specific customer and extension, if existing"
+
+
+- added the optional property 'chargeability' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-extension-instance-for-customer" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Memberships belonging to a Customer"
+
+
+- added the new optional 'query' request parameter 'hasExpiry'
+
+- added the new optional 'query' request parameter 'role'
+
+
+For details, refer to the <OperationLink operation="customer-list-memberships-for-customer" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List extension instances"
+
+
+- added the optional property '/items/chargeability' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-list-extension-instances" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an extension instance"
+
+
+- added the optional property 'chargeability' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-extension-instance" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List ProjectMemberships belonging to the executing user"
+
+
+- added the new optional 'query' request parameter 'hasExpiry'
+
+- added the new optional 'query' request parameter 'isInherited'
+
+- added the new optional 'query' request parameter 'role'
+
+- added the optional property '/items/avatarRef' to the response with the '200' status
+
+- added the required property '/items/firstName' to the response with the '200' status
+
+- added the required property '/items/lastName' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-list-project-memberships" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a ProjectMembership"
+
+
+- added the optional property 'avatarRef' to the response with the '200' status
+
+- added the required property 'firstName' to the response with the '200' status
+
+- added the required property 'lastName' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-get-project-membership" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the extension instance of a specific project and extension, if existing"
+
+
+- added the optional property 'chargeability' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-extension-instance-for-project" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List mail addresses belonging to a Project"
+
+
+- added the new optional 'query' request parameter 'autoResponder'
+
+- added the new optional 'query' request parameter 'catchAll'
+
+- added the new optional 'query' request parameter 'forwardAddress'
+
+- added the new optional 'query' request parameter 'order'
+
+- added the new optional 'query' request parameter 'sort'
+
+
+For details, refer to the <OperationLink operation="mail-list-mail-addresses" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Memberships belonging to a Project"
+
+
+- added the new optional 'query' request parameter 'hasExpiry'
+
+- added the new optional 'query' request parameter 'isInherited'
+
+- added the new optional 'query' request parameter 'role'
+
+- added the optional property '/items/avatarRef' to the response with the '200' status
+
+- added the required property '/items/firstName' to the response with the '200' status
+
+- added the required property '/items/lastName' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-list-memberships-for-project" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the executing user's membership in a Project"
+
+
+- added the optional property 'avatarRef' to the response with the '200' status
+
+- added the required property 'firstName' to the response with the '200' status
+
+- added the required property 'lastName' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-get-self-membership-for-project" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald JavaScript SDK Release 4.141.0
+
+The mittwald JavaScript SDK has been updated to version 4.141.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.141.0).
+
+### mittwald JavaScript SDK Release 4.140.0
+
+The mittwald JavaScript SDK has been updated to version 4.140.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.140.0).
+
+### mittwald JavaScript SDK Release 4.139.0
+
+The mittwald JavaScript SDK has been updated to version 4.139.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.139.0](https://github.com/mittwald/api-client-js/releases/tag/4.139.0).
+
+### mittwald JavaScript SDK Release 4.138.0
+
+The mittwald JavaScript SDK has been updated to version 4.138.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.138.0).
+
+### mittwald JavaScript SDK Release 4.137.0
+
+The mittwald JavaScript SDK has been updated to version 4.137.0. This release includes the following feature:
+
+- Updated generated client ([commit 42afebd](https://github.com/mittwald/api-client-js/commit/42afebd2c3cc59c8f58702a58a6de0f0d1c2c894)).
+
+For more details, please visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.137.0).
+
+### mittwald JavaScript SDK Release 4.136.2
+
+The mittwald JavaScript SDK version 4.136.2 has been released. This update includes a bug fix related to the generation of types for the security HTTP scheme. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.136.2).
+
+### mittwald JavaScript SDK Release 4.136.1
+
+The mittwald JavaScript SDK version 4.136.1 has been released. This update includes a bug fix related to the generation process, specifically allowing the HTTP type for security schemes. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.136.1](https://github.com/mittwald/api-client-js/releases/tag/4.136.1).
+
