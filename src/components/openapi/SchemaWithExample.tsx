@@ -7,11 +7,13 @@ import SchemaExample, {
 import { OpenAPIV3 } from "openapi-types";
 import { translate } from "@docusaurus/Translate";
 import CodeBlock from "@theme/CodeBlock";
+import React from "react";
 
 interface Props {
   schema: OpenAPIV3.SchemaObject;
   format?: ExampleFormat;
   withRawJSONSchema?: boolean;
+  withHeaders?: boolean;
 }
 
 /**
@@ -20,6 +22,7 @@ interface Props {
  * @param schema The schema to render and to generate an example for
  * @param withRawJSONSchema Whether to show the raw JSON schema in a tab
  * @param format Optional format for the example (json or yaml)
+ * @param withHeaders Whether to include headers in the example
  * @see Schema
  * @see SchemaExample
  */
@@ -27,6 +30,7 @@ export default function SchemaWithExample({
   schema,
   withRawJSONSchema,
   format,
+  withHeaders,
 }: Props) {
   return (
     <Tabs groupId="component" defaultValue="schema">
@@ -40,7 +44,11 @@ export default function SchemaWithExample({
         value="example"
         label={translate({ id: "components.SchemaWithExample.example" })}
       >
-        <SchemaExample schema={schema} format={format} />
+        <SchemaExample
+          schema={schema}
+          format={format}
+          withHeaders={withHeaders}
+        />
       </TabItem>
       {withRawJSONSchema && (
         <TabItem
