@@ -2,6 +2,7 @@ import { OpenAPIV3 } from "openapi-types";
 import CodeBlock from "@theme/CodeBlock";
 import { generateSchemaExample } from "@site/src/openapi/generateSchemaExample";
 import * as yaml from "yaml";
+import React from "react";
 
 interface Props {
   title?: string;
