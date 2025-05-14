@@ -6,6 +6,7 @@ import {
   ArrayValue,
   PropertyValue,
 } from "@site/src/components/openapi/OperationInputValue";
+import React from "react";
 
 type Props<TSchema = OpenAPIV3.SchemaObject> = {
   schema: TSchema;

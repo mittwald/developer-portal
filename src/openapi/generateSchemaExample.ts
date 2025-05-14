@@ -15,7 +15,10 @@ export function generateSchemaExample(schema: OpenAPIV3.SchemaObject): any {
   if (schema.type === "object") {
     const example: any = {};
     if (schema.properties) {
-      Object.entries(schema.properties).forEach(([name, property]) => {
+      const nonDeprecatedProperties = Object.entries(schema.properties).filter(
+        ([, property]) => !(property as OpenAPIV3.SchemaObject).deprecated,
+      );
+      nonDeprecatedProperties.forEach(([name, property]) => {
         example[name] = generateSchemaExample(
           property as OpenAPIV3.SchemaObject,
         );

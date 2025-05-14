@@ -3,11 +3,14 @@ import { ReactNode } from "react";
 import styles from "./OperationInputValue.module.css";
 import Type from "@site/src/components/openapi/Type";
 import {
+  Deprecated,
   Optional,
   Required,
 } from "@site/src/components/openapi/RequiredOptional";
 import Schema from "@site/src/components/openapi/Schema";
 import Markdown from "react-markdown";
+import React from "react";
+import clsx from "clsx";
 
 export function AlternativeValue({
   schema,
@@ -62,7 +65,10 @@ export function PropertyValue({
   schema: any;
   required: boolean;
 }) {
+  const deprecated = schema.deprecated ?? false;
+
   const requiredOrOptional = required ? <Required /> : undefined;
+  const deprecatedOrNot = deprecated ? <Deprecated /> : undefined;
   let body: ReactNode;
 
   if (schema.description) {
@@ -76,11 +82,12 @@ export function PropertyValue({
     schema.oneOf;
 
   return (
-    <li key={name}>
+    <li key={name} className={clsx(deprecated && styles.deprecated)}>
       <div className={styles.parameterListHeader}>
         <span className={styles.parameterName}>{name}</span>
         <Type className={styles.parameterType} schema={schema} />
         <div className={styles.parameterListHeaderSpacer} />
+        {deprecatedOrNot}
         {requiredOrOptional}
       </div>
       <div className={styles.parameterListBody}>{body}</div>
