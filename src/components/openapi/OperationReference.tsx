@@ -23,6 +23,7 @@ import ReferenceObject = OpenAPIV3.ReferenceObject;
 import ResponseObject = OpenAPIV3.ResponseObject;
 import SchemaWithExample from "@site/src/components/openapi/SchemaWithExample";
 import SchemaObject = OpenAPIV3.SchemaObject;
+import React from "react";
 
 function OutlinedAccordion({
   children,

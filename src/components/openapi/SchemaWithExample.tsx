@@ -7,6 +7,7 @@ import SchemaExample, {
 import { OpenAPIV3 } from "openapi-types";
 import { translate } from "@docusaurus/Translate";
 import CodeBlock from "@theme/CodeBlock";
+import React from "react";
 
 interface Props {
   schema: OpenAPIV3.SchemaObject;
