@@ -13,14 +13,17 @@ function generateCurlCodeExample(
   const headers = parameters.filter((p) => p.in === "headers") ?? [];
 
   const headerArgs = headers.map(
-    (header) => `-H "${header.name}: ${generateSchemaExample((header.schema ?? { type: "string" }) as OpenAPIV3.NonArraySchemaObject)}"`,
+    (header) =>
+      `-H "${header.name}: ${generateSchemaExample((header.schema ?? { type: "string" }) as OpenAPIV3.NonArraySchemaObject)}"`,
   );
 
   headerArgs.push(`-H "Authorization: Bearer $MITTWALD_API_TOKEN"`);
 
   const queryParamsSet = new URLSearchParams();
   for (const queryParam of queryParams) {
-    let example = generateSchemaExample(queryParam.schema as OpenAPIV3.SchemaObject);
+    let example = generateSchemaExample(
+      queryParam.schema as OpenAPIV3.SchemaObject,
+    );
 
     if (queryParam.name === "skip") {
       continue;
@@ -49,13 +52,30 @@ function generateCurlCodeExample(
     params.push("-X " + method.toUpperCase());
   }
 
-  const bodySchema = (spec.requestBody as OpenAPIV3.RequestBodyObject)
-    ?.content?.["application/json"]?.schema;
-  if (bodySchema) {
-    const body = generateSchemaExample(bodySchema as OpenAPIV3.SchemaObject);
+  const body = spec.requestBody as OpenAPIV3.RequestBodyObject;
+  const bodyJsonSchema = body?.content?.["application/json"]?.schema;
+  if (bodyJsonSchema) {
+    const body = generateSchemaExample(
+      bodyJsonSchema as OpenAPIV3.SchemaObject,
+    );
     if (body) {
       headerArgs.push("-H 'Content-Type: application/json'");
       params.push(`-d '${JSON.stringify(body)}'`);
+    }
+  }
+
+  const bodyMultipartSchema = body?.content?.["multipart/form-data"]?.schema;
+  if (bodyMultipartSchema) {
+    const body = generateSchemaExample(
+      bodyMultipartSchema as OpenAPIV3.SchemaObject,
+    );
+    if (body) {
+      for (let [key, value] of Object.entries(body)) {
+        if (value instanceof Uint8Array) {
+          value = "@some-filename.jpg";
+        }
+        headerArgs.push(`-F "${key}=${value}"`);
+      }
     }
   }
 

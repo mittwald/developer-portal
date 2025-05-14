@@ -6,6 +6,7 @@ import generateCurlCodeExample from "@site/src/openapi/generateCurlCodeExample";
 import generateJavascriptCodeExample from "@site/src/openapi/generateJavascriptCodeExample";
 import generatePHPCodeExample from "@site/src/openapi/generatePHPCodeExample";
 import { ReactElement } from "react";
+import React from "react";
 
 interface OperationUsageProps {
   method: string;
