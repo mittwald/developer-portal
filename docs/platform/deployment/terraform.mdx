@@ -1,0 +1,148 @@
+---
+title: Infrastructure as code with Terraform
+sidebar_label: Terraform
+tags:
+  - Terraform
+  - Deployment
+description: >
+  Terraform is an open-source tool that allows you to define and provision your infrastructure using a declarative configuration language.
+---
+
+[Terraform][terraform] is an open-source tool that allows you to define and provision your infrastructure using a declarative configuration language.
+
+## The mittwald terraform provider
+
+We offer a Terraform provider which allows you to manage your mStudio resources as declarative code. The provider is available on the [Terraform Registry][provider].
+
+### Prerequisites
+
+To get started using the mittwald terraform provider, you need to have the following prerequisites:
+
+- An mStudio API token with the required permissions to manage your resources. Have a look at the ["Getting started" section][apitoken] to learn how to obtain an API token.
+- The [Terraform CLI][terraform] installed on your local machine. The mittwald provider requires Terraform in version 1.10 or higher.
+
+Suggested reading:
+
+- [Terraform fundamentals][terraform-fundamentals]
+- [Documentation for the mittwald terraform provider][provider]
+
+### Your first Terraform configuration
+
+To get started with the mittwald terraform provider, create a new directory for your Terraform configuration and create a file named `main.tf` inside it. This file will contain your Terraform configuration.
+
+```hcl title="main.tf"
+terraform {
+  required_providers {
+    mittwald = {
+      source  = "mittwald/mittwald"
+      version = ">= 1.0.0, <2.0.0"
+    }
+  }
+}
+
+provider "mittwald" {}
+```
+
+This is a minimal configuration that initializes the mittwald provider. You can add more resources to this configuration as needed. The `required_providers` block specifies the mittwald provider and its version constraints. In a real-world project, this section might also include other providers you want to use. The `provider` block initializes the mittwald provider with default settings. You can customize this block to specify your API token and other settings.
+
+When no API token is specified, the provider will look for the `MITTWALD_API_TOKEN` environment variable. You can set this variable in your terminal or in your shell configuration file.
+
+After creating the `main.tf` file, you can initialize your Terraform configuration by running the following command in your terminal:
+
+```shellsession title="Local shell session"
+$ terraform init
+```
+
+:::important
+
+These commands are meant to be run either in your local shell, or in a CI environment; **not** in your hosting environment.
+
+:::
+
+### Creating a new resource
+
+To create a new project on an existing server, you can use the following Terraform configuration:
+
+```hcl title="main.tf"
+resource "mittwald_project" "foobar" {
+  server_id   = "<server-id>"
+  description = "Test project"
+}
+```
+
+After having defined a `mittwald_project` resource, you can create the project by running the following command in your terminal:
+
+```shellsession
+$ terraform apply
+```
+
+This command will create the project on the server specified in the `server_id` attribute.
+
+The IDs of created resources are automatically assigned by the mittwald API. Terraform will save the IDs of created resources in the state file, so that these are not recreated on subsequent runs. You can view the IDs of created resources by running the `terraform show` command.
+
+:::important
+
+The `terraform.tfstate` file should be saved for subsequent runs. Before committing this file to a version control system, make sure that it does not contain any sensitive information. Also consider a [remote backend][terraform-remote] for storing the state file.
+
+:::
+
+### Using variables
+
+There are some values that you might not want to hardcode in your Terraform configuration, such as the server ID. The same goes for secret values, like for example a MySQL user password.
+
+You can use [Terraform variables][terraform-variables] to make your configuration more flexible and reusable. To define a variable, you can define variables in your configuration, and then create a separate variable file (or pass variables via the command line).
+
+```hcl
+variable "server_id" {
+  description = "The ID of the server to create the project on"
+  type        = string
+}
+
+resource "mittwald_project" "example" {
+  server_id   = var.server_id
+  description = "Test project"
+}
+```
+
+## Advanced use cases
+
+### Using predefined modules
+
+For convenience, we provide a set of [predefined modules][terraform-modules] that you can use to deploy common workloads. These modules are available in the `mittwald` module namespace. Have a look at the [Terraform Registry][terraform-modules] for a list of available modules.
+
+### Interconnecting multiple providers
+
+Since Terraform is a multi-cloud tool, you can use it to manage resources across multiple providers. Just as an example, you can create a project on mittwald and then configure your DNS records on Cloudflare:
+
+```hcl
+resource "mittwald_project" "example" {
+  server_id   = var.server_id
+  description = "Test project"
+}
+
+resource "cloudflare_dns_record" "example_dns_record" {
+  for_each = toset(mittwald_project.example.default_ips)
+  zone_id  = var.dns_zone_id
+  content  = each.value
+  name     = "your-site.example"
+  proxied  = false
+  ttl      = 3600
+  type     = "A"
+}
+```
+
+## Managing your terraform state
+
+:::info
+
+This section is still work-in-progress. Stay tuned for updates!
+
+:::
+
+[terraform]: https://developer.hashicorp.com/terraform
+[terraform-fundamentals]: https://developer.hashicorp.com/terraform/tutorials/cli
+[terraform-remote]: https://developer.hashicorp.com/terraform/language/state/remote
+[terraform-variables]: https://developer.hashicorp.com/terraform/language/values/variables
+[terraform-modules]: https://registry.terraform.io/namespaces/mittwald
+[provider]: https://registry.terraform.io/providers/mittwald/mittwald/latest
+[apitoken]: /docs/v2/api/intro
