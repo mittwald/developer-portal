@@ -23,6 +23,7 @@ import ReferenceObject = OpenAPIV3.ReferenceObject;
 import ResponseObject = OpenAPIV3.ResponseObject;
 import SchemaWithExample from "@site/src/components/openapi/SchemaWithExample";
 import SchemaObject = OpenAPIV3.SchemaObject;
+import React from "react";
 
 function OutlinedAccordion({
   children,
@@ -164,6 +165,27 @@ function OperationRequestBody({
 
   const required = spec.required ? <Required /> : <Optional />;
 
+  if ("multipart/form-data" in spec.content) {
+    return (
+      <OutlinedAccordion>
+        <Heading>
+          <div style={{ flexGrow: 1 }}>{title}</div>
+          {required}
+        </Heading>
+        <Content>
+          <p>
+            Format: <code>multipart/form-data</code>
+          </p>
+          <SchemaWithExample
+            schema={spec.content["multipart/form-data"].schema as SchemaObject}
+            format="multipart-form"
+            withHeaders
+          />
+        </Content>
+      </OutlinedAccordion>
+    );
+  }
+
   if ("application/json" in spec.content) {
     return (
       <OutlinedAccordion>
@@ -178,6 +200,7 @@ function OperationRequestBody({
           <SchemaWithExample
             schema={spec.content["application/json"].schema as SchemaObject}
             withRawJSONSchema
+            withHeaders
           />
         </Content>
       </OutlinedAccordion>
@@ -225,6 +248,7 @@ function OperationResponseBody({ spec }: { spec?: OpenAPIV3.ResponseObject }) {
         <SchemaWithExample
           schema={spec.content["application/json"].schema as SchemaObject}
           withRawJSONSchema
+          withHeaders
         />
       </>
     );

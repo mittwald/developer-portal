@@ -2,6 +2,9 @@ import { OpenAPIV3 } from "openapi-types";
 
 export function generateSchemaExample(schema: OpenAPIV3.SchemaObject): any {
   if (schema.example) {
+    if (schema.format === "binary") {
+      return new TextEncoder().encode(schema.example.toString());
+    }
     return schema.example;
   }
 
@@ -45,6 +48,8 @@ export function generateSchemaExample(schema: OpenAPIV3.SchemaObject): any {
       return "f0f86186-0a5a-45b2-aa33-502777496347";
     } else if (schema.format === "idn-hostname") {
       return "some-hostname.example";
+    } else if (schema.format === "binary") {
+      return new Uint8Array([1, 2, 3, 4, 5]);
     }
 
     if (schema.enum !== undefined) {

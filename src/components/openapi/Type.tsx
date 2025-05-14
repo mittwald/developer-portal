@@ -1,4 +1,5 @@
 import { OpenAPIV3 } from "openapi-types";
+import React from "react";
 
 function Type({
   schema,
