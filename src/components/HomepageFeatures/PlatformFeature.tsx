@@ -120,9 +120,7 @@ function PlatformTools() {
             }
             links={[
               <Link to="/cli">CLI</Link>,
-              <Link to="/docs/v2/platform/development/ddev">
-                DDEV <NewBadge />
-              </Link>,
+              <Link to="/docs/v2/platform/development/ddev">DDEV</Link>,
             ]}
           />
         </li>
@@ -138,8 +136,8 @@ function PlatformTools() {
               <Link to="/docs/v2/platform/deployment/typo3surf">
                 TYPO3 Surf
               </Link>,
-              <Link href="https://github.com/mittwald/terraform-provider-mittwald">
-                Terraform
+              <Link to="/docs/v2/platform/deployment/terraform">
+                Terraform <NewBadge />
               </Link>,
             ]}
           />
