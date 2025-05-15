@@ -1,0 +1,148 @@
+---
+title: Infrastructure as Code mit Terraform
+sidebar_label: Terraform
+tags:
+  - Terraform
+  - Deployment
+description: >
+  Terraform ist ein Open-Source-Tool, mit dem du deine Infrastruktur mithilfe einer deklarativen Konfigurationssprache definieren und bereitstellen kannst.
+---
+
+[Terraform][terraform] ist ein Open-Source-Tool, mit dem du deine Infrastruktur mithilfe einer deklarativen Konfigurationssprache definieren und bereitstellen kannst.
+
+## Der mittwald Terraform-Provider
+
+Wir bieten einen Terraform-Provider an, mit dem du deine mStudio-Ressourcen als deklarativen Code verwalten kannst. Der Provider ist in der [Terraform Registry][provider] verfügbar.
+
+### Voraussetzungen
+
+Um mit dem mittwald Terraform-Provider loszulegen, brauchst du folgendes:
+
+- Ein mStudio API-Token mit den erforderlichen Berechtigungen zur Verwaltung deiner Ressourcen. Schau dir den Abschnitt ["Erste Schritte"][apitoken] an, um zu erfahren, wie du ein API-Token erhältst.
+- Die [Terraform CLI][terraform] auf deinem lokalen Rechner. Der mittwald-Provider benötigt Terraform in Version 1.10 oder höher.
+
+Empfohlene Lektüre:
+
+- [Terraform-Grundlagen][terraform-fundamentals]
+- [Dokumentation für den mittwald Terraform-Provider][provider]
+
+### Deine erste Terraform-Konfiguration
+
+Um mit dem mittwald Terraform-Provider loszulegen, erstelle ein neues Verzeichnis für deine Terraform-Konfiguration und erstelle darin eine Datei mit dem Namen `main.tf`. Diese Datei wird deine Terraform-Konfiguration enthalten.
+
+```hcl title="main.tf"
+terraform {
+  required_providers {
+    mittwald = {
+      source  = "mittwald/mittwald"
+      version = ">= 1.0.0, <2.0.0"
+    }
+  }
+}
+
+provider "mittwald" {}
+```
+
+Das ist eine minimale Konfiguration, die den mittwald-Provider initialisiert. Du kannst nach Bedarf weitere Ressourcen zu dieser Konfiguration hinzufügen. Der Block `required_providers` gibt den mittwald-Provider und seine Versionsbeschränkungen an. In einem echten Projekt könnte dieser Abschnitt auch andere Provider enthalten, die du verwenden möchtest. Der Block `provider` initialisiert den mittwald-Provider mit den Standardeinstellungen. Du kannst diesen Block anpassen, um dein API-Token und andere Einstellungen anzugeben.
+
+Wenn kein API-Token angegeben ist, sucht der Provider nach der Umgebungsvariable `MITTWALD_API_TOKEN`. Du kannst diese Variable in deinem Terminal oder in deiner Shell-Konfigurationsdatei setzen.
+
+Nachdem du die Datei `main.tf` erstellt hast, kannst du deine Terraform-Konfiguration initialisieren, indem du den folgenden Befehl in deinem Terminal ausführst:
+
+```shellsession title="Lokale Shell-Sitzung"
+$ terraform init
+```
+
+:::important
+
+Diese Befehle sollten entweder in deiner lokalen Shell oder in einer CI-Umgebung ausgeführt werden; **nicht** in deiner Hosting-Umgebung.
+
+:::
+
+### Erstellen einer neuen Ressource
+
+Um ein neues Projekt auf einem bestehenden Server zu erstellen, kannst du die folgende Terraform-Konfiguration verwenden:
+
+```hcl title="main.tf"
+resource "mittwald_project" "foobar" {
+  server_id   = "<server-id>"
+  description = "Testprojekt"
+}
+```
+
+Nachdem du eine `mittwald_project`-Ressource definiert hast, kannst du das Projekt erstellen, indem du den folgenden Befehl in deinem Terminal ausführst:
+
+```shellsession
+$ terraform apply
+```
+
+Dieser Befehl erstellt das Projekt auf dem im Attribut `server_id` angegebenen Server.
+
+Die IDs der erstellten Ressourcen werden automatisch von der mittwald API zugewiesen. Terraform speichert die IDs der erstellten Ressourcen in der State-Datei, sodass diese bei nachfolgenden Ausführungen nicht erneut erstellt werden. Du kannst die IDs der erstellten Ressourcen anzeigen, indem du den Befehl `terraform show` ausführst.
+
+:::important
+
+Die Datei `terraform.tfstate` sollte für nachfolgende Ausführungen gespeichert werden. Bevor du diese Datei in ein Versionskontrollsystem überträgst, stelle sicher, dass sie keine sensiblen Informationen enthält. Ziehe auch ein [Remote-Backend][terraform-remote] in Betracht, um den Terraform-State zu speichern.
+
+:::
+
+### Verwendung von Variablen
+
+Es gibt einige Werte, die du möglicherweise nicht in deiner Terraform-Konfiguration hartcoden möchtest, wie z.B. die Server-ID. Das gilt auch für geheime Werte, wie zum Beispiel ein MySQL-Benutzerpasswort.
+
+Du kannst [Terraform-Variablen][terraform-variables] verwenden, um deine Konfiguration flexibler und wiederverwendbarer zu gestalten. Um eine Variable zu definieren, kannst du Variablen in deiner Konfiguration definieren und dann eine separate Variablendatei erstellen (oder Variablen über die Befehlszeile übergeben).
+
+```hcl
+variable "server_id" {
+  description = "Die ID des Servers, auf dem das Projekt erstellt werden soll"
+  type        = string
+}
+
+resource "mittwald_project" "example" {
+  server_id   = var.server_id
+  description = "Testprojekt"
+}
+```
+
+## Fortgeschrittene Anwendungsfälle
+
+### Verwendung vordefinierter Module
+
+Zur Vereinfachung stellen wir eine Reihe von [vordefinierten Modulen][terraform-modules] zur Verfügung, die du verwenden kannst, um gängige Workloads bereitzustellen. Diese Module sind im Modul-Namespace `mittwald` verfügbar. Schau dir das [Terraform Registry][terraform-modules] für eine Liste der verfügbaren Module an.
+
+### Verknüpfung mehrerer Provider
+
+Da Terraform ein Multi-Cloud-Tool ist, kannst du es verwenden, um Ressourcen über mehrere Provider hinweg zu verwalten. Zum Beispiel kannst du ein Projekt auf mittwald erstellen und dann deine DNS-Einträge bei Cloudflare konfigurieren:
+
+```hcl
+resource "mittwald_project" "example" {
+  server_id   = var.server_id
+  description = "Testprojekt"
+}
+
+resource "cloudflare_dns_record" "example_dns_record" {
+  for_each = toset(mittwald_project.example.default_ips)
+  zone_id  = var.dns_zone_id
+  content  = each.value
+  name     = "deine-seite.beispiel"
+  proxied  = false
+  ttl      = 3600
+  type     = "A"
+}
+```
+
+## Verwaltung deines Terraform-Zustands
+
+:::info
+
+Dieser Abschnitt ist noch in Arbeit. Bleib dran für Updates!
+
+:::
+
+[terraform]: https://developer.hashicorp.com/terraform
+[terraform-fundamentals]: https://developer.hashicorp.com/terraform/tutorials/cli
+[terraform-remote]: https://developer.hashicorp.com/terraform/language/state/remote
+[terraform-variables]: https://developer.hashicorp.com/terraform/language/values/variables
+[terraform-modules]: https://registry.terraform.io/namespaces/mittwald
+[provider]: https://registry.terraform.io/providers/mittwald/mittwald/latest
+[apitoken]: /docs/v2/api/intro
