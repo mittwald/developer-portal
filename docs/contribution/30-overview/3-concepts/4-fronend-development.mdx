@@ -2,6 +2,8 @@
 title: Fronend Development
 ---
 
+import OperationLink from "@site/src/components/OperationLink";
+
 In general, extensions don't necessarily have to provide a frontend as they are optional.
 Most times though, Extensions should provide a frontend for configuration or interaction with the business logic.
 
@@ -15,11 +17,11 @@ An Extension can use both at the same time.
 
 Here is a brief comparison of them, showing the main differences:
 
-|                       | External Frontend                                             | Frontend Fragment                                                                       |
-| --------------------- | ------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| How it works          | Opens in a new tab or window                                  | Directly embedded inside mStudio using an iframe                                        |
-| Technology and design | freedom to choose any technology stack and design you like    | Built using the same UI components as mStudio, creating a seamless user experience      |
-| When to use           | You need full control of your extension's design and behavior | You aim for tight integration into mStudio while maintaining a consistent look and feel |
+|                           | External Frontend                                             | Frontend Fragment                                                                       |
+| ------------------------- | ------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| **How it works**          | Opens in a new tab or window                                  | Directly embedded inside mStudio using an iframe                                        |
+| **Technology and design** | freedom to choose any technology stack and design you like    | Built using the same UI components as mStudio, creating a seamless user experience      |
+| **When to use**           | You need full control of your extension's design and behavior | You aim for tight integration into mStudio while maintaining a consistent look and feel |
 
 ## External Frontends
 
@@ -28,7 +30,7 @@ Using an external frontend, you have complete freedom to choose any technology s
 
 You should use an external frontend, if your extension's frontend can't be built using flow components, or the user should be able to open the extension without opening the mStudio.
 
-Defining an external frontend enables the use of single sign-on via [Access Token Retrieval Key (ATReK)](./authentication#access-token-retrieval-key).
+Defining an external frontend enables the use of single sign-on via [Access Token Retrieval Key (ATReK)](../authentication#access-token-retrieval-key).
 
 ### Configuration
 
@@ -82,49 +84,63 @@ Custom components and CSS cannot be used.
 To develop a frontend fragment, [Flow Remote Components](#flow-remote-components) must be used.
 
 Since frontend fragments are embedded via an iframe and Safari in particular is restrictive with third-party cookies, frontend fragments must not rely on cookies.
-Authentication and session handling are done using [Session-Tokens](#authentifizierung-und-session-handling-mittels-session-token) and Access Tokens obtained via the Session Token.
+Authentication and session handling are done using [Session Tokens](#authentication-and-session-handling-using-session-tokens) and Access Tokens obtained via the Session Token.
+
+While this page provides a general overview of frontend fragments, the [documentation on how to develop frontend fragments](../../../how-to/develop-frontend-fragment) provides more detailed explanations and examples.
 
 ### Anchors
 
-The mStudio provides clearly defined locations where frontend fragments can be integrated.
-These locations, called anchors, have a unique identifier and are configured in the extension.
-Currently, an extension can only integrate one frontend fragment per anchor.
+mStudio provides well-defined integration points — called **anchors** — where frontend fragments can be embedded.
+Each anchor has a unique identifier and must be explicitly configured in your extension.
 
-An extension that can be added to projects can only use anchors defined at the project detail page level or below.
-Extensions added to organizations can use anchors on or below the organization detail page level.
+> ⚠️ Currently, each extension can only attach **one frontend fragment per anchor**.
 
-Currently, anchors are being developed for the following locations:
+### Anchor Scope and Limitations
 
-- Additional menu items on each navigation level with associated custom (sub)pages
-- Additional tabs on all tabbed pages
-- Additional sections on all pages divided into sections
+- Extensions installed on **projects** can only use anchors defined at the **project detail level or below**.
+- Extensions installed on **organizations** can use anchors at the **organization level**, as well as all levels below (including project-level anchors).
 
-Additionally, a feature is being developed to locate anchors directly in the mStudio and to view which additional properties are provided or required for an anchor.
-For further information on which anchors are available, visit the [Documentation of imolemented anchors](../reference/frontend-fragment-anchors).
+**Example:**
+If an extension is installed on an organization, it may also use project-level anchors.
+However, if it is installed on a project, it **cannot** access organization-level anchors.
+
+### Supported Anchor Types (in development or available):
+
+- Custom menu items (with associated pages) at any navigation level
+- Additional tabs on tabbed views
+- Additional sections on sectioned pages
+
+### Anchor Discovery (Upcoming Feature)
+
+A feature is currently being developed to visually locate available anchors within mStudio.
+This will also expose metadata for each anchor — such as required parameters or available context.
+
+For a complete list of available anchors, refer to the
+[Documentation of Implemented Anchors](../reference/frontend-fragment-anchors).
 
 ## Flow Remote Components
 
 The mStudio only renders components that it knows about.
 To develop frontend fragments, it is recommended to use [Flow Remote Elements](https://github.com/mittwald/flow/tree/main/packages/remote-elements).
 
-While using React/Next.js is not mandatory, it is recommended for developing frontend fragments, as this enables the use of [Remote React Components](https://github.com/mittwald/flow/tree/main/packages/remote-react-components).
+While using React is not mandatory, it is recommended for developing frontend fragments, as this enables the use of [Remote React Components](https://github.com/mittwald/flow/tree/main/packages/remote-react-components).
 These provide the exact same API as the regular [Flow Components](https://github.com/mittwald/flow/tree/main/packages/components), but are designed specifically for use in remote DOMs (frontend fragments).
 
-## Authentifizierung und Session Handling mittels Session-Token
+## Authentication and session handling using session tokens
 
-A so-called Session-Token is used for authentication and session handling within a frontend fragments.
-This Session-Token can be requested from the mStudio via window messages at any time.
+A so-called Session Token is used for authentication and session handling within a frontend fragments.
+This Session Token can be requested from the mStudio via window messages at any time.
 It is a JWT containing information about the current user and the extension instance.
 The token is an online token valid for only 60 seconds and should therefore not be persisted.
 
-The mStudio ensures that a frontend fragment does not create a new Session-Token with every request, but reuses tokens within the first 40 seconds of their validity.
+The mStudio ensures that a frontend fragment does not create a new Session Token with every request, but reuses tokens within the first 40 seconds of their validity.
 
-Session-Tokens always include a session ID that is stable for the current session.
+Session Tokens always include a session ID that is stable for the current session.
 This ID can be used to identify a user’s session and, for example, to map backend sessions.
 Session cookies cannot be used, as this does not work in WebKit-based browsers like Safari.
 
-A frontend fragment must always include the Session-Token when making requests to its backend.
-The JWT claims in the Session-Token include a key called `publicKeySerial`, which refers to the serial number of the mStudio public key used to sign the token.
+A frontend fragment must always include the Session Token when making requests to its backend.
+The JWT claims in the Session Token include a key called `publicKeySerial`, which refers to the serial number of the mStudio public key used to sign the token.
 The Ed25519 public key can be retrieved from the mStudio API using the operation <OperationLink tag="Marketplace" operation="extension-get-public-key" />.
 To do this, use the publicKeySerial from the session token as the serial and the purpose `session_token`.
 
@@ -148,24 +164,22 @@ sequenceDiagram
   participant ExtensionB as Extension Backend
 
   mStudio ->> ExtensionF: render Frontend Fragment
-  ExtensionF ->> mStudio: get Session-Token
-  mStudio -->> ExtensionF: Session-Token
-  ExtensionF ->> ExtensionB: Request with Session-Token Header
-  ExtensionB ->> ExtensionB: Decode Session-Token
+  ExtensionF ->> mStudio: get Session Token
+  mStudio -->> ExtensionF: Session Token
+  ExtensionF ->> ExtensionB: Request with Session Token Header
+  ExtensionB ->> ExtensionB: Decode Session Token
   opt Retrieve Public Key if unknown
     ExtensionB ->> mStudio: Get Public Key By Serial
     mStudio -->> ExtensionB: Public Key
   end
-  ExtensionB ->> ExtensionB: Validate Session-Token
-  ExtensionB ->> mStudio: Authenticate with Session-Token and Extension Secret
+  ExtensionB ->> ExtensionB: Validate Session Token
+  ExtensionB ->> mStudio: Authenticate with Session Token and Extension Secret
   mStudio -->> ExtensionB: Access Token
   ExtensionB ->> mStudio: Domain Action
 ```
-
-## Kontext Parameter
 
 ## Extension Bridge
 
 The Extension Bridge is a JavaScript library that can be used in frontend fragments to communicate with mStudio. It provides functions to retrieve context parameters and to obtain, decode, and validate session tokens.
 
-For more information, see the [Extension Bridge documentation](https://github.com/mittwald/flow/tree/main/packages/ext-bridge)
+For more information, see the [Documentation on how to develop frontend fragments](../../../how-to/develop-frontend-fragment).
