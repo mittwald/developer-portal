@@ -1,0 +1,445 @@
+---
+title: Breaking (!) API changes for v2 API, May 9 to May 16
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Container
+  - Marketplace
+  - Cronjob
+  - File
+  - Database
+  - Project
+  - Page Insights
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API introduces several significant changes, including the requirement of request bodies for multiple operations, the removal of required properties from responses, and the addition of new endpoints for managing extension secrets.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The request body has become required for the following operations: 
+  - `POST /v2/actions/validate-container-registry-uri`
+  - `PATCH /v2/cronjobs/{cronjobId}/app-id`
+  - `POST /v2/files`
+  - `PATCH /v2/mysql-databases/{mysqlDatabaseId}/default-charset`
+  - `PATCH /v2/mysql-databases/{mysqlDatabaseId}/description`
+  - `POST /v2/mysql-databases/{mysqlDatabaseId}/users`
+  - `PUT /v2/mysql-users/{mysqlUserId}`
+  - `PATCH /v2/mysql-users/{mysqlUserId}/password`
+  - `POST /v2/projects/{projectId}/cronjobs`
+  - `PATCH /v2/projects/{projectId}/description`
+  - `POST /v2/projects/{projectId}/mysql-databases`
+  - `POST /v2/projects/{projectId}/redis-databases`
+  - `POST /v2/projects/{projectId}/registries`
+  - `POST /v2/projects/{projectId}/straces`
+  - `PATCH /v2/redis-databases/{redisDatabaseId}/description`
+  - `PATCH /v2/servers/{serverId}/description`
+  - `POST /v2/servers/{serverId}/projects`
+  - Note: Breaking changes have occurred due to the request body becoming required.
+
+- The response property 'message' has become optional for the status '429' in the operation `GET /v2/container-image-config`.
+
+- The response property 'type' has become optional for the status '429' in the operation `GET /v2/container-image-config`.
+
+- The response property type/format for '/items/requestedChanges/webhookUrls' has changed from 'object' to '' for the status '200' in the following operations:
+  - `GET /v2/contributors/{contributorId}/extensions`
+  - `GET /v2/contributors/{contributorId}/extensions/{extensionId}`
+  - `PATCH /v2/contributors/{contributorId}/extensions/{extensionId}`
+
+- The required property '/items/requestedChanges/webhookUrls/extensionAddedToContext' has been removed from the response with the '200' status in the following operations:
+  - `GET /v2/contributors/{contributorId}/extensions`
+  - `GET /v2/contributors/{contributorId}/extensions/{extensionId}`
+  - `PATCH /v2/contributors/{contributorId}/extensions/{extensionId}`
+
+- The required property '/items/requestedChanges/webhookUrls/extensionInstanceRemovedFromContext' has been removed from the response with the '200' status in the following operations:
+  - `GET /v2/contributors/{contributorId}/extensions`
+  - `GET /v2/contributors/{contributorId}/extensions/{extensionId}`
+  - `PATCH /v2/contributors/{contributorId}/extensions/{extensionId}`
+
+- The required property '/items/requestedChanges/webhookUrls/extensionInstanceSecretRotated' has been removed from the response with the '200' status in the following operations:
+  - `GET /v2/contributors/{contributorId}/extensions`
+  - `GET /v2/contributors/{contributorId}/extensions/{extensionId}`
+  - `PATCH /v2/contributors/{contributorId}/extensions/{extensionId}`
+
+- The required property '/items/requestedChanges/webhookUrls/extensionInstanceUpdated' has been removed from the response with the '200' status in the following operations:
+  - `GET /v2/contributors/{contributorId}/extensions`
+  - `GET /v2/contributors/{contributorId}/extensions/{extensionId}`
+  - `PATCH /v2/contributors/{contributorId}/extensions/{extensionId}`
+
+- The following API paths have been removed without deprecation:
+  - `GET /v2/customers/{customerId}/lead-fyndr-profile`
+  - `GET /v2/customers/{customerId}/lead-fyndr-profile-request`
+
+- The following schemas have been removed:
+  - `de.mittwald.v1.lead-finder.Profile`
+  - `de.mittwald.v1.lead-finder.ProfileRequest`
+  - `de.mittwald.v1.lead-finder.User`
+
+- The following response properties have had '#/components/schemas/de.mittwald.v1.marketplace.WebhookUrls, subschema #2' added to their 'oneOf' list for the response status '200':
+  - `GET /v2/contributors/{contributorId}/extensions`
+  - `GET /v2/contributors/{contributorId}/extensions/{extensionId}`
+  - `PATCH /v2/contributors/{contributorId}/extensions/{extensionId}`
+
+- The following endpoints have been added:
+  - `POST /v2/contributors/{contributorId}/extensions/{extensionId}/secret` for generating an Extension secret.
+  - `DELETE /v2/contributors/{contributorId}/extensions/{extensionId}/secret/{extensionSecretId}` for invalidating an Extension secret.
+
+- A new optional request parameter 'hasMfa' has been added to the operation `GET /v2/projects/{projectId}/memberships`.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Validate a Registries' URI"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="container-validate-container-registry-uri" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a ContainerImageConfig"
+
+
+- ⚠️ **Breaking:** the response property 'message' became optional for the status '429'
+
+- ⚠️ **Breaking:** the response property 'type' became optional for the status '429'
+
+
+For details, refer to the <OperationLink operation="container-get-container-image-config" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Extensions of own contributor"
+
+
+- ⚠️ **Breaking:** the '/items/requestedChanges/webhookUrls' response's property type/format changed from 'object'/'' to ''/'' for status '200'
+
+- ⚠️ **Breaking:** removed the required property '/items/requestedChanges/webhookUrls/extensionAddedToContext' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property '/items/requestedChanges/webhookUrls/extensionInstanceRemovedFromContext' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property '/items/requestedChanges/webhookUrls/extensionInstanceSecretRotated' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property '/items/requestedChanges/webhookUrls/extensionInstanceUpdated' from the response with the '200' status
+
+- added '#/components/schemas/de.mittwald.v1.marketplace.WebhookUrls, subschema #2' to the '/items/requestedChanges/webhookUrls' response property 'oneOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="extension-list-own-extensions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get Extension of own contributor"
+
+
+- ⚠️ **Breaking:** the 'requestedChanges/webhookUrls' response's property type/format changed from 'object'/'' to ''/'' for status '200'
+
+- ⚠️ **Breaking:** removed the required property 'requestedChanges/webhookUrls/extensionAddedToContext' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'requestedChanges/webhookUrls/extensionInstanceRemovedFromContext' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'requestedChanges/webhookUrls/extensionInstanceSecretRotated' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'requestedChanges/webhookUrls/extensionInstanceUpdated' from the response with the '200' status
+
+- added '#/components/schemas/de.mittwald.v1.marketplace.WebhookUrls, subschema #2' to the 'requestedChanges/webhookUrls' response property 'oneOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="extension-get-own-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Patch Extension"
+
+
+- ⚠️ **Breaking:** the 'requestedChanges/webhookUrls' response's property type/format changed from 'object'/'' to ''/'' for status '200'
+
+- ⚠️ **Breaking:** removed the required property 'requestedChanges/webhookUrls/extensionAddedToContext' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'requestedChanges/webhookUrls/extensionInstanceRemovedFromContext' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'requestedChanges/webhookUrls/extensionInstanceSecretRotated' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property 'requestedChanges/webhookUrls/extensionInstanceUpdated' from the response with the '200' status
+
+- added '#/components/schemas/de.mittwald.v1.marketplace.WebhookUrls, subschema #2' to the 'requestedChanges/webhookUrls' response property 'oneOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="extension-patch-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a cronjob's app id"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="cronjob-update-cronjob-app-id" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "customer-get-lead-fyndr-profile"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+
+For details, refer to the <OperationLink operation="customer-get-lead-fyndr-profile" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "customer-get-lead-fyndr-profile-request"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+
+For details, refer to the <OperationLink operation="customer-get-lead-fyndr-profile-request" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a File"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="file-create-file" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a MySQL database's default character settings"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="database-update-mysql-database-default-charset" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a MySQL database's description"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="database-update-mysql-database-description" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a MySQL user"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="database-create-mysql-user" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a MySQL user"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="database-update-mysql-user" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a MySQL user's password"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="database-update-mysql-user-password" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a cronjob"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="cronjob-create-cronjob" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a Project's description"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="project-update-project-description" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a MySQL database with a MySQL user"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="database-create-mysql-database" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a Redis database"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="database-create-redis-database" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a Registry"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="container-create-registry" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Schedule a strace measurement for a single http request"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="pageinsights-schedule-strace" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a Redis database's description"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="database-update-redis-database-description" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a Servers's description"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="project-update-server-description" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a Project belonging to a Server"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="project-create-project" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in ""
+
+
+- removed the schema 'de.mittwald.v1.lead-finder.Profile'
+
+- removed the schema 'de.mittwald.v1.lead-finder.ProfileRequest'
+
+- removed the schema 'de.mittwald.v1.lead-finder.User'
+
+
+For details, refer to the <OperationLink operation="" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Generate an Extension secret for the given Extension"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="extension-generate-extension-secret" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Invalidate the given Extension secret immediately"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="extension-invalidate-extension-secret" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Memberships belonging to a Project"
+
+
+- added the new optional 'query' request parameter 'hasMfa'
+
+
+For details, refer to the <OperationLink operation="project-list-memberships-for-project" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald JavaScript SDK Release 4.145.0
+
+The mittwald JavaScript SDK has been updated to version 4.145.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.145.0).
+
+### mittwald JavaScript SDK Release 4.144.0
+
+The mittwald JavaScript SDK has been updated to version 4.144.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.144.0).
+
+### mittwald JavaScript SDK Release 4.143.0
+
+The mittwald JavaScript SDK has been updated to version 4.143.0. This release includes the following feature:
+
+- Updated generated client ([commit 39842c0](https://github.com/mittwald/api-client-js/commit/39842c0d6f2ca3e1a19aa1e725b1b97dea69bc8a)).
+
+For more details, please visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.143.0).
+
+### mittwald JavaScript SDK Release 4.142.0
+
+The mittwald JavaScript SDK has been updated to version 4.142.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.142.0).
+
