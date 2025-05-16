@@ -81,7 +81,7 @@ Therefore, development cannot happen entirely locally, yet - you must use an mSt
 This approach ensures a consistent user experience and enables features such as overlays.
 
 Custom components and CSS cannot be used.
-To develop a frontend fragment, [Flow Remote Components](#flow-remote-components) must be used.
+To develop a frontend fragment, [Flow Remote Elements](#flow-remote-elements) must be used.
 
 Since frontend fragments are embedded via an iframe and Safari in particular is restrictive with third-party cookies, frontend fragments must not rely on cookies.
 Authentication and session handling are done using [Session Tokens](#authentication-and-session-handling-using-session-tokens) and Access Tokens obtained via the Session Token.
@@ -116,12 +116,13 @@ A feature is currently being developed to visually locate available anchors with
 This will also expose metadata for each anchor — such as required parameters or available context.
 
 For a complete list of available anchors, refer to the
-[Documentation of Implemented Anchors](../reference/frontend-fragment-anchors).
+[Documentation of Implemented Anchors](../../../reference/frontend-fragment-anchors).
 
-## Flow Remote Components
+## Flow Remote Elements
 
 The mStudio only renders components that it knows about.
-To develop frontend fragments, it is recommended to use [Flow Remote Elements](https://github.com/mittwald/flow/tree/main/packages/remote-elements).
+To develop frontend fragments, it is necessary to use [Flow Remote Elements](https://github.com/mittwald/flow/tree/main/packages/remote-elements).
+Own components and CSS are not allowed, as the mStudio can only render the components it knows about. Also, frontend fragments should feel like a native feature.
 
 While using React is not mandatory, it is recommended for developing frontend fragments, as this enables the use of [Remote React Components](https://github.com/mittwald/flow/tree/main/packages/remote-react-components).
 These provide the exact same API as the regular [Flow Components](https://github.com/mittwald/flow/tree/main/packages/components), but are designed specifically for use in remote DOMs (frontend fragments).
