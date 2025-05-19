@@ -4,12 +4,38 @@ title: Wie reiche ich eine Extension ein oder verändere diese?
 
 import OperationLink from "@site/src/components/OperationLink";
 
-# Wie reiche ich eine Extension ein?
+Extensions können derzeit nur über die REST API des mStudios eingereicht werden, nachdem du dich [als Contributor registriert](../become-contributor) hast.
+mittwald arbeitet jedoch derzeit an einer umfassenden Verwaltung von Extensions im mStudio.
+Beachte bitte, dass der Marktplatz ein noch sehr junges Feature ist und wir derzeit, im Gegensatz zur restlichen REST API,
+keine Stabilitätsgarantie für die API Routen rund um den Marktplatz und die Extension Verwaltung aussprechen können.
+Die Routen, sowie Request- und Response-Formate können sich derzeit noch ändern.
 
-Nachdem du dich [als Contributor registriert](../become-contributor)
-hast kannst du eine neue Extension über unsere REST API registrieren.
+Im Folgenden werden die wichtigsten Routen beschrieben, die benötigt werden, um über die API eine Extension zu verwalten.
+
+## Extension registrieren
+
+Eine Extension kann über folgende REST API-Operation registriert werden:
 
 <OperationLink operation="extension-register-extension" />
+
+Verpflichtend ist dabei lediglich ein Name.
+Wenn während der Entwicklung eine Extension Instance benötigt wird, muss zusätzlich noch ein Extension Context gesetzt werden.
+Dieser kann im Nachhinein nach geändert werden, solange die Extension nicht verifiziert ist.
+
+## Extension bearbeiten
+
+Über die folgende Route kann nach der Registrierung die Extension bearbeitet werden.
+
+<OperationLink operation="extension-patch-extension" />
+
+Dabei gibt es jedoch ein paar Ausnahmen.
+
+Über die REST-Operation <OperationLink operation="extension-request-asset-upload" /> wird der Upload von Assets, also Bildern für die Galerie im Marktplatz, angefragt.
+Als Response erhältst du eine Asset Reference ID, die du verwenden kannst, um das Asset über die Operation <OperationLink operation="file-create-file" /> hochzuladen.
+Assets können über die Operation <OperationLink operation="extension-remove-asset" /> gelöscht werden.
+
+Analog funktioniert das Hochladen eines Logos. Die Operation <OperationLink operation="extension-request-logo-upload" /> wird verwendet, um den Upload des Logos anzufragen.
+Das Logo wird dann über die Operation <OperationLink operation="file-create-file" /> hochgeladen.
 
 Sobald deine Extension fertig entwickelt und einsatzbereit ist,
 kannst du über unsere REST API eine Überprüfung beantragen.
