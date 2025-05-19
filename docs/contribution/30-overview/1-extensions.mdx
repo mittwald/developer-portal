@@ -17,6 +17,86 @@ If extension instances are created or deleted, for example, the mStudio notifies
 The extensions also provide various [authentication and authorization strategies](../concepts/authentication) to perform authenticated [domain actions](../../glossary#domain-action) in the mStudio.
 These domain actions can occur in the name of the mStudio user using the extension or in the name of the extension itself.
 
+## Lifecycle of an Extension
+
+An extension must first be registered with mStudio before it can be used.
+It goes through several stages, which are explained below.
+
+```mermaid
+stateDiagram-v2
+    state "Extension in development" as inDevelopment
+    state "Extension in verification process" as verifying
+    state "Extension verified" as verified
+    state "Extension published" as published
+    state "Extension deprecated" as deprecated
+    state if_deprecation_expired <<choice>>
+    state "Extension withdrawn" as withdrawn
+
+    [*] --> inDevelopment: Register Extension
+    inDevelopment --> verifying: Request verification
+    verifying --> verified: Verify extension
+    verifying --> inDevelopment: Reject with feedback
+    verified --> published: Publish Extension
+    published --> deprecated: Deprecate Extension
+    deprecated --> if_deprecation_expired
+    if_deprecation_expired --> [*]: Deprecation expired
+    if_deprecation_expired --> published: Cancel deprecation
+    published --> withdrawn: Withdraw Extension
+    withdrawn --> published: Republish Extension
+    withdrawn --> [*]: Delete Extension
+```
+
+### Extension in Development
+
+After registration, the extension is not publicly visible.
+It can only be added to an Extension Context by the contributor, and only if an Extension Context has been defined.
+During development, details such as required scopes, descriptions, and other metadata can be added to the extension.
+
+If the extension is added to an Extension Context and the Extension Context is modified,
+all extension instances will be removed.
+This is only possible while the extension is still in development.
+
+### Extension in Verification Process
+
+Once the extension is fully developed, deployed, and configured, the verification process can begin.
+To request verification, all required fields must be completed.
+mittwald will review the extension for quality and compliance with the guidelines.
+You may receive feedback to improve your extension.
+
+### Extension Verified
+
+If all requirements are met, the extension will be verified by mittwald.
+However, this does not mean it is published yet.
+You retain control over when the extension is published.
+
+### Extension Published
+
+The extension is now publicly visible and can be installed by other mStudio users.
+
+At this stage, changes to the extension are still possible.
+However, the Extension Context can no longer be modified.
+Other potentially security-relevant changes, such as required scopes or webhook URLs, require approval from mittwald.
+
+### Extension Deprecated
+
+When deprecating an extension, you set a date after which it will no longer be supported.
+Until that date, the extension can still be installed and used.
+Users will be notified that the extension will no longer be supported after the specified date.
+
+Once the date has passed, all extension instances are automatically deleted, and the extension is removed from the marketplace.
+The deprecation phase can be canceled at any time as long as the deprecation date has not yet passed.
+
+### Extension Withdrawn
+
+Extensions may be withdrawn by mittwald at any time
+if they violate the guidelines or stop functioning, and the contributor is not reachable.
+
+In this state, all extension instances are deactivated and can no longer be used.
+The extension is no longer visible in the marketplace.
+
+If the issues are resolved, the extension may be re-published by mittwald.
+If the contributor does not respond or refuses to fix the issues, the extension will be deleted by mittwald.
+
 ## Which information does an extension consist of?
 
 An extension consists of various pieces of information described in detail in the [extension reference](../../reference/extensions).

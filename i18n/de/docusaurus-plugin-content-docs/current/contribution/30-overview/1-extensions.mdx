@@ -21,6 +21,86 @@ Außerdem bieten Extensions verschiedene [Authentifizierungs- und Authorisierung
 um authentifizierte [Domain Actions](../../glossary#domain-action) im mStudio durchführen zu können.
 Dies kann entweder im Namen des mStudio Users, der die Extension bedient oder im Namen der Extension selbst geschehen.
 
+## Lifecycle of an extension
+
+Eine Extension muss dem mStudio zunächst bekannt gemacht werden, bevor sie verwendet werden kann.
+Dabei durchläuft sie mehrere Schritte, die im Folgenden erläutert werden.
+
+```mermaid
+
+stateDiagram-v2
+    state "Extension in Entwicklung" as inDevelopment
+    state "Extension in Verifizierungsprozess" as verifying
+    state "Extension verifiziert" as verified
+    state "Extension veröffentlicht" as published
+    state "Extension deprecated" as deprecated
+    state if_deprecation_expired <<choice>>
+    state "Extension zurückgezogen" as withdrawn
+
+    [*] --> inDevelopment: Extension registrieren
+    inDevelopment --> verifying: Verifizierung anfordern
+    verifying --> verified: Extension verifizieren
+    verifying --> inDevelopment: Extension mit Feedback ablehnen
+    verified --> published: Extension veröffentlichen
+    published --> deprecated: Extension deprecaten
+    deprecated --> if_deprecation_expired
+    if_deprecation_expired --> [*]: Deprecation abgelaufen
+    if_deprecation_expired --> published: Deprecation abbrechen
+    published --> withdrawn: Extension zurückziehen
+    withdrawn --> published: Extension veröffentlichen
+    withdrawn --> [*]: Extension löschen
+```
+
+### Extension in Entwicklung
+
+Nach der Registrierung der Extension ist sie nicht öffentlich sichtbar.
+Sie kann auch nur durch den Contributor der Extension installiert werden (, wenn ein Extension Context festgelegt wurde).
+Während der Entwicklung ergeben sich Informationen zu den verschiedenen Feldern der Extension,
+wie die benötigten Scopes, die Beschreibungen, etc. und können in der Extension hinterlegt werden.
+
+Wenn die Extension durch den Contributor zu einem Extension Context hinzugefügt wurde und der Extension Context geändert wird,
+werden alle Extension Instances der Extension vorher entfernt.
+Dies funktioniert nur, während die Extension in Entwicklung ist.
+
+### Extension im Verifizierungsprozess
+
+Sobald die Extension fertig entwickelt, in Betrieb genommen und konfiguriert ist, kann der Verifizierungsprozess gestartet werden.
+Um die Verifizierung der Extension zu beantragen, müssen alle erforderlichen Felder ausgefüllt sein.
+mittwald überprüft die Extension hinsichtlich der Qualität und der Einhaltung der Richtlinien.
+Gegebenenfalls erhältst du Feedback, um die Extension zu verbessern.
+
+### Extension verifiziert
+
+Wenn alle Anforderungen erfüllt sind, wird die Extension durch mittwald verifiziert.
+Das heißt jedoch noch nicht, dass die Extension veröffentlicht ist.
+Du behältst die Kontrolle darüber, wann die Extension veröffentlicht wird.
+
+### Extension veröffentlicht
+
+Die Extension ist nun öffentlich sichtbar und kann von anderen mStudio-Nutzern installiert werden.
+
+In diesem Zustand können immer noch Änderungen an der Extension vorgenommen werden.
+Es ist zu diesem Zeitpunkt jedoch nicht mehr möglich, den Extension Context zu ändern.
+Andere potenziell sicherheitsrelevante Änderungen, wie erforderliche Scopes und Webhook URLs, erfordern eine Bestätigung durch mittwald.
+
+### Extension deprecated
+
+Beim deprecaten einer Extension wird ein Zeitpunkt angegeben, ab dem die Extension nicht mehr unterstützt wird.
+Die Extension kann bis zu diesem Zeitpunkt weiterhin installiert und genutzt werden.
+Dem Nutzer der Extension wird nur angezeigt, dass die Extension ab einem bestimmten Zeitpunkt nicht mehr unterstützt wird.
+Nach Ablaufen des Zeitraums werden automatisch alle Extension Instances gelöscht und die Extension wird aus dem Marktplatz entfernt.
+Die Deprecation kann jederzeit abgebrochen werden, solange der Zeitraum noch nicht abgelaufen ist.
+
+### Extension zurückgezogen
+
+Extensions können durch mittwald jederzeit zurückgezogen werden,
+wenn sie gegen die Richtlinien verstoßen oder nicht mehr funktionieren und der Contributor nicht erreichbar ist.
+In diesem Zustand werden alle Extension Instances deaktiviert und sind nicht mehr nutzbar.
+Die Extension wird in diesem Zustand nicht mehr im Marktplatz angezeigt.
+
+Wenn die Probleme der Extension behoben wurden, kann sie erneut durch mittwald veröffentlicht werden.
+Wenn der Contributor nicht reagiert oder sich nicht bereit erklärt, die Probleme zu beheben, wird die Extension durch mittwald gelöscht.
+
 ## Aus welchen Informationen besteht eine Extension?
 
 Eine Extension besteht aus verschiedenen Informationen, die in der [Extension Referenz](../../reference/extensions) im Detail beschrieben sind.
