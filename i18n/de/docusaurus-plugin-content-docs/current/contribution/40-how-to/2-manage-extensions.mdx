@@ -1,10 +1,6 @@
----
-title: Wie reiche ich eine Extension ein oder verändere diese?
----
-
 import OperationLink from "@site/src/components/OperationLink";
 
-Extensions können derzeit nur über die REST API des mStudios eingereicht werden, nachdem du dich [als Contributor registriert](../become-contributor) hast.
+Extensions können derzeit nur über die REST API des mStudios verwaltet werden, nachdem du dich [als Contributor registriert](../become-contributor) hast.
 mittwald arbeitet jedoch derzeit an einer umfassenden Verwaltung von Extensions im mStudio.
 Beachte bitte, dass der Marktplatz ein noch sehr junges Feature ist und wir derzeit, im Gegensatz zur restlichen REST API,
 keine Stabilitätsgarantie für die API Routen rund um den Marktplatz und die Extension Verwaltung aussprechen können.
@@ -20,11 +16,11 @@ Eine Extension kann über folgende REST API-Operation registriert werden:
 
 Verpflichtend ist dabei lediglich ein Name.
 Wenn während der Entwicklung eine Extension Instance benötigt wird, muss zusätzlich noch ein Extension Context gesetzt werden.
-Dieser kann im Nachhinein nach geändert werden, solange die Extension nicht verifiziert ist.
+Dieser kann im Nachhinein noch geändert werden, solange die Extension nicht verifiziert ist.
 
 ## Extension bearbeiten
 
-Über die folgende Route kann nach der Registrierung die Extension bearbeitet werden.
+Über die folgende Operation kann nach der Registrierung die Extension bearbeitet werden.
 
 <OperationLink operation="extension-patch-extension" />
 
@@ -37,25 +33,30 @@ Assets können über die Operation <OperationLink operation="extension-remove-as
 Analog funktioniert das Hochladen eines Logos. Die Operation <OperationLink operation="extension-request-logo-upload" /> wird verwendet, um den Upload des Logos anzufragen.
 Das Logo wird dann über die Operation <OperationLink operation="file-create-file" /> hochgeladen.
 
+Mit der Operation <OperationLink operation="extension-change-context" /> kann der Extension Context einer Extension geändert werden.
+Diese Route kann nur vor der Verifizierung der Extension verwendet werden.
+Abhängig davon, ob bereits Extension Instances existieren, wird die Änderung entweder sofort wirksam oder es werden erst alle Extension Instances entfernt und danach die Änderung durchgeführt.
+
+Für die Entwicklung von Frontend Fragmenten wird ein globales Extension Secret benötigt.
+Um dieses zu generieren, wird die Operation <OperationLink operation="extension-generate-extension-secret" /> verwendet.
+Das Secret wird als Response zurückgegeben und kann dann in der Extension, bspw. über Umgebungsvariablen, verwendet werden.
+Wenn die Operation erneut aufgerufen wird, wird ein neues Secret generiert.
+Das alte Secret wird damit deprecated und wird in etwa 24h ungültig.
+Diese Zeitspanne sollte genutzt werden, um das Secret in der Extension auszutauschen.
+
+## Extension verifizieren
+
 Sobald deine Extension fertig entwickelt und einsatzbereit ist,
 kannst du über unsere REST API eine Überprüfung beantragen.
 
-<OperationLink operation="extension-request-extension-verification" />
+Dies geschieht über die Operation <OperationLink operation="extension-request-extension-verification" />.
 
 Wir werden den Inhalt deiner Extension prüfen und sie verifizieren.  
 Nach erfolgreicher Verifizierung kannst du sie veröffentlichen.
 
-<OperationLink operation="extension-set-extension-published-state" />
+## Extension veröffentlichen
 
-# Wie erstelle ich einen OAuth2-Client?
+Nachdem deine Extension verifiziert wurde, kann sie veröffentlicht werden.
+Das ist ein separater Schritt, damit du die Kontrolle darüber behältst, ab wann die Extension für alle mStudio-Nutzer verfügbar ist.
 
-Wenn du für deine Extension einen OAuth2-Client nutzen möchtest, benötigen wir von dir nur ein ausgefülltes YAML-Dokument.
-Dieses stellst du uns am Besten über ein Issue [in diesem privaten GitHub-Repository](https://github.com/mittwald/contributor-support) zur Verfügung.
-Für den Aufbau und Inhalt der Datei, siehe [OAuth2 Referenz](../../reference/oauth2).
-
-# Wie überarbeite ich meine Extension?
-
-Der Code deiner Extension liegt in deiner Hand.
-Wenn du Änderungen an der Konfiguration der Extension vornehmen möchtest ist dies über unsere REST API möglich.
-
-<OperationLink operation="extension-patch-extension" />
+Rufe zum veröffentlichen die Operation <OperationLink operation="extension-set-extension-published-state" /> auf.
