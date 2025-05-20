@@ -82,7 +82,7 @@ Detailliertere Informationen findest du in der [Extensionsreferenz](../../../ref
 
 Frontend Fragmente werden über ein iframe im mStudio eingebettet.
 Dieses iframe wird nicht direkt im sichtbaren Bereich der Seite gerendert.
-Stattdessen wird eine **remote Architektur** verwendet, die Webkomponenten, die innerhalb eines iFrames gerendert werden, als React-Komponenten im mStudio spiegelt.
+Stattdessen wird eine **remote Architektur** verwendet, die Webkomponenten, die innerhalb eines iframes gerendert werden, als React-Komponenten im mStudio spiegelt.
 Daher kann die Entwicklung nicht vollständig lokal erfolgen - du musst eine mStudio-Instanz mit einer installierten Extension als Einstiegspunkt verwenden.
 Dieser Ansatz gewährleistet ein konsistentes Benutzererlebnis und ermöglicht Funktionen wie Overlays.
 
@@ -90,7 +90,7 @@ Benutzerdefinierte Komponenten und CSS können nicht verwendet werden.
 Um ein Frontend Fragment zu entwickeln, müssen [Flow Remote Elements](#flow-remote-elements) verwendet werden.
 
 Da Frontend Fragmente über ein iframe eingebettet sind und Safari insbesondere bei Drittanbieter-Cookies restriktiv ist, dürfen Frontend Fragmente nicht auf Cookies angewiesen sein.
-Die Authentifizierung und Sitzungsverwaltung erfolgen über [Session Tokens](#authentication-and-session-handling-using-session-tokens) und Access Token, die über das Session Token erhalten werden.
+Die Authentifizierung und Sitzungsverwaltung erfolgen über [Session-Tokens](#authentication-and-session-handling-using-session-tokens) und Access Token, die über das Session-Token erhalten werden.
 
 Während diese Seite einen allgemeinen Überblick über Frontend Fragmente bietet, bietet die [Dokumentation zur Entwicklung von Frontend Fragmenten](../../../how-to/develop-frontend-fragment) detailliertere Erklärungen und Beispiele.
 
@@ -132,33 +132,33 @@ Obwohl die Verwendung von React nicht zwingend nötig ist, ist es empfehlenswert
 Diese bieten die genau gleiche API wie die regulären [Flow Components](https://github.com/mittwald/flow/tree/main/packages/components),
 sind jedoch speziell für die Verwendung in Remote DOMs (Frontend Fragmenten) konzipiert.
 
-## Authentifizierung und Sitzungsverwaltung mit Session Tokens
+## Authentifizierung und Sitzungsverwaltung mit Session-Tokens
 
-Ein sogenanntes Session Token wird für die Authentifizierung und Sitzungsverwaltung innerhalb von Frontend Fragmenten verwendet.
-Dieses Session Token kann jederzeit vom mStudio angefordert werden.
+Ein sogenanntes Session-Token wird für die Authentifizierung und Sitzungsverwaltung innerhalb von Frontend Fragmenten verwendet.
+Dieses Session-Token kann jederzeit vom mStudio angefordert werden.
 Es ist ein JWT, das Informationen über den aktuellen Benutzer und die Extension Instance enthält.
 Das Token ist ein Online-Token, das nur 60 Sekunden gültig ist und daher nicht gespeichert werden sollte.
 
-Das mStudio stellt sicher, dass ein Frontend Fragment nicht bei jeder Anfrage ein neues Session Token erstellt, sondern Tokens innerhalb der ersten 40 Sekunden ihrer Gültigkeit wiederverwendet.
+Das mStudio stellt sicher, dass ein Frontend Fragment nicht bei jeder Anfrage ein neues Session-Token erstellt, sondern Tokens innerhalb der ersten 40 Sekunden ihrer Gültigkeit wiederverwendet.
 
-Session Tokens enthalten immer eine Session-ID, die für die aktuelle Sitzung stabil ist.
+Session-Tokens enthalten immer eine Session-ID, die für die aktuelle Sitzung stabil ist.
 Diese ID kann verwendet werden, um die Sitzung eines Benutzers zu identifizieren und beispielsweise Backend-Sitzungen zuzuordnen.
 Session-Cookies können nicht verwendet werden, da dies in WebKit-basierten Browsern wie Safari nicht funktioniert.
 
-Ein Frontend Fragment muss immer das Session Token mitsenden, wenn es Anfragen an sein Backend sendet.
-Die JWT-Claims im Session Token enthalten eine Property namens `publicKeySerial`,
+Ein Frontend Fragment muss immer das Session-Token mitsenden, wenn es Anfragen an sein Backend sendet.
+Die JWT-Claims im Session-Token enthalten eine Property namens `publicKeySerial`,
 die sich auf die Seriennummer des mStudio-Öffentlichen Schlüssels bezieht, der zum Signieren des Tokens verwendet wurde.
 Der Ed25519 Public Key kann über die mStudio-API mit der Operation <OperationLink tag="Marketplace" operation="extension-get-public-key" /> abgerufen werden.
-Verwende dazu den publicKeySerial aus dem Session Token als Seriennummer und den Purpose `session_token`.
+Verwende dazu den publicKeySerial aus dem Session-Token als Seriennummer und den Purpose `session_token`.
 
 Um die Signaturüberprüfung zu vereinfachen, kann der öffentliche Schlüssel im SPKI-Format, ASN.1-serialisiert und PEM-codiert über den `format`-Query Parameter abgerufen werden.
 
-Das Backend muss das Session Token bei jeder Anfrage gegen den im Token angegebenen mStudio-öffentlichen Schlüssel validieren,
+Das Backend muss das Session-Token bei jeder Anfrage gegen den im Token angegebenen mStudio-öffentlichen Schlüssel validieren,
 da das Token als Authentifizierungsnachweis des Benutzers dient.
 Dies umfasst das Dekodieren des JWT, das Abrufen des öffentlichen Schlüssels über die API und die Validierung des JWT gegen den Schlüssel.
 Ein öffentlicher Schlüssel mit einer bestimmten Seriennummer ist stabil und kann gecacht oder gespeichert werden.
 
-Das Session Token kann auch in Kombination mit einem Extension Secret verwendet werden, um ein Access Token zu erhalten.
+Das Session-Token kann auch in Kombination mit einem Extension Secret verwendet werden, um ein Access Token zu erhalten.
 Dazu kann die Operation <OperationLink tag="Marketplace" operation="extension-authenticate-with-session-token" /> verwendet werden.
 Das resultierende Access Token ist ebenfalls nur 60 Sekunden gültig und sollte nicht gespeichert werden.
 
@@ -171,16 +171,16 @@ sequenceDiagram
   participant ExtensionB as Extension Backend
 
   mStudio ->> ExtensionF: Frontend Fragment rendern
-  ExtensionF ->> mStudio: Hole Session Token
-  mStudio -->> ExtensionF: Session Token
-  ExtensionF ->> ExtensionB: Request mit Session Token Header
-  ExtensionB ->> ExtensionB: Session Token dekodieren
+  ExtensionF ->> mStudio: Hole Session-Token
+  mStudio -->> ExtensionF: Session-Token
+  ExtensionF ->> ExtensionB: Request mit Session-Token Header
+  ExtensionB ->> ExtensionB: Session-Token dekodieren
   opt Public Key beziehen wenn unbekannt
     ExtensionB ->> mStudio: Hole Public Key mithilfe des Serial
     mStudio -->> ExtensionB: Public Key
   end
-  ExtensionB ->> ExtensionB: Vallidiere Session Token
-  ExtensionB ->> mStudio: Authentifiziere mit Session Token und Extension Secret
+  ExtensionB ->> ExtensionB: Vallidiere Session-Token
+  ExtensionB ->> mStudio: Authentifiziere mit Session-Token und Extension Secret
   mStudio -->> ExtensionB: Access Token
   ExtensionB ->> mStudio: Domain Action
 ```
@@ -188,6 +188,6 @@ sequenceDiagram
 ## Extension Bridge
 
 Die Extension Bridge ist eine JavaScript-Bibliothek, die in Frontend Fragmenten verwendet werden kann, um mit dem mStudio zu kommunizieren.
-Sie bietet Funktionen zum Abrufen von Kontextparametern und zum Erhalten, Dekodieren und Validieren von Session Tokens und Access Tokens
+Sie bietet Funktionen zum Abrufen von Kontextparametern und zum Erhalten, Dekodieren und Validieren von Session-Tokens und Access Tokens
 
 Für weitere Informationen siehe die [Dokumentation zur Entwicklung von Frontend Fragmenten](../../../how-to/develop-frontend-fragment).

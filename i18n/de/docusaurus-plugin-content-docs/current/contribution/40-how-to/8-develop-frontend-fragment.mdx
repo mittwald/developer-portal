@@ -139,13 +139,13 @@ Für Details zur Implementierung einer sicheren Kommunikation zwischen dem Front
 
 Da Frontend-Fragmente innerhalb eines `<iframe>` ausgeführt werden, ist die Handhabung von Cookies und das Sitzungsmanagement aufgrund von Browsereinschränkungen nicht trivial.
 
-Um dies zu adressieren, verwende das Paket `@mittwald/ext-bridge`, um ein Session Token sicher zwischen mStudio,
+Um dies zu adressieren, verwende das Paket `@mittwald/ext-bridge`, um ein Session-Token sicher zwischen mStudio,
 deinem Frontend und deinem Backend auszutauschen – um die Sitzungs-Kontinuität zu gewährleisten.
-Ein Session Token ist ein JWT (JSON Web Token), das vom mStudio generiert und von der Ext Bridge angefordert wird.
+Ein Session-Token ist ein JWT (JSON Web Token), das vom mStudio generiert und von der Ext Bridge angefordert wird.
 Es hat eine sehr kurze Lebensdauer und kann nur innerhalb eines Frontend-Fragment-iframe von mStudio erhalten werden.
-Dein Backend kann dann das Session Token validieren, um eingehende Anfragen deines Frontends zu authentifizieren.
+Dein Backend kann dann das Session-Token validieren, um eingehende Anfragen deines Frontends zu authentifizieren.
 
-Darüber hinaus enthält das Session Token eine stabile `sessionId` in seinen Claims.
+Darüber hinaus enthält das Session-Token eine stabile `sessionId` in seinen Claims.
 Diese `sessionId` wird verwendet, um die aktuelle Session zu identifizieren.
 Sie wird zurückgesetzt, wenn der Benutzer den mStudio-Tab schließt oder sich abmeldet.
 Alle Informationen wie `sessionId`, `userId` oder `projectId` können über die Ext Bridge abgerufen werden.
@@ -159,24 +159,24 @@ npm add @mittwald/ext-bridge
 
 ### Wie das Sessionmanagement funktioniert
 
-1. Dein Frontend fordert vor jeder Backend-Anfrage ein Session Token an.  
-   **Hinweis**: Session Token sind kurzlebig – fordere immer ein frisches Token für _jede_ Anfrage an.
+1. Dein Frontend fordert vor jeder Backend-Anfrage ein Session-Token an.
+   **Hinweis**: Session-Token sind kurzlebig – fordere immer ein frisches Token für _jede_ Anfrage an.
    Die Ext Bridge wird das aktuelle Token automatisch wiederverwenden, solange es gültig bleibt.
 
-2. Dein Backend validiert das Session Token.
+2. Dein Backend validiert das Session-Token.
 
 3. _(Optional)_ Dein Backend kann Metadaten wie `userId`, `sessionId` oder `extensionInstanceId` für zusätzliche Authentifizierung oder Protokollierungszwecke verwenden.
 
 4. _(Optional)_ Dein Backend kann ein Access Token anfordern, um mit der [mittwald API](https://developer.mittwald.de/de/docs/v2/reference/) zu interagieren.
 
-### Unterschied zwischen Session Token und Access Token
+### Unterschied zwischen Session-Token und Access Token
 
-- Ein **Session Token** wird **client-seitig** von deinem Frontend über `@mittwald/ext-bridge` angefordert.
+- Ein **Session-Token** wird **client-seitig** von deinem Frontend über `@mittwald/ext-bridge` angefordert.
   Es ist kurzlebig und wird verwendet, um die Kommunikation zwischen dem Frontend und deinem Backend zu authentifizieren.
-  Ein gültiges Session Token beweist, dass eine Anfrage von einem angemeldeten Benutzer innerhalb von mStudio stammt.
+  Ein gültiges Session-Token beweist, dass eine Anfrage von einem angemeldeten Benutzer innerhalb von mStudio stammt.
   Es gewährt **nicht** (direkt) Zugriff auf die mittwald API.
 
-- Ein **Access Token** hingegen wird **server-seitig** von deinem Backend angefordert – unter Verwendung des Session Tokens und des globalen Secrets deiner Extension.
+- Ein **Access Token** hingegen wird **server-seitig** von deinem Backend angefordert – unter Verwendung des Session-Tokens und des globalen Secrets deiner Extension.
   Dieses globale Secret ist **nicht** dasselbe wie das Secret der Extensionsinstance, das verwendet wird, um einzelne Extensionsinstances zu authentifizieren.
   Ein Access Token ist erforderlich, um dein Backend gegen [mittwald API](https://developer.mittwald.de/de/docs/v2/reference/) zu authentifizieren.
 
@@ -186,7 +186,7 @@ npm add @mittwald/ext-bridge
 
 #### `getSessionToken()`
 
-Verwende `getSessionToken()`, um ein Session Token zu generieren.
+Verwende `getSessionToken()`, um ein Session-Token zu generieren.
 
 > **Wichtig:**
 >
@@ -196,7 +196,7 @@ Verwende `getSessionToken()`, um ein Session Token zu generieren.
 
 #### Beispiel: Axios-Interceptor
 
-Da Session Token kurzlebig sind, wird empfohlen, eine HTTP-Client-Middleware oder einen Interceptor zu verwenden, der automatisch ein frisches Token an jede ausgehende Anfrage anhängt.
+Da Session-Token kurzlebig sind, wird empfohlen, eine HTTP-Client-Middleware oder einen Interceptor zu verwenden, der automatisch ein frisches Token an jede ausgehende Anfrage anhängt.
 
 Beispiel mit Axios:
 
@@ -235,10 +235,10 @@ Wenn dein Frontend-Fragment beispielsweise einen Anchor verwendet, der im Hauptn
 
 #### `verify()`
 
-Verwende die Methode `verify()`, um ein Session Token zu validieren.
+Verwende die Methode `verify()`, um ein Session-Token zu validieren.
 Wenn dies erfolgreich ist, bestätigt es, dass die Anfrage von einem angemeldeten Benutzer aus mStudio stammt; andernfalls wird ein Fehler ausgelöst.
 
-#### Session Token-Payload
+#### Session-Token-Payload
 
 Die Methode `verify()` gibt die verifizierten und decodierten Informationen des Smession Token in der folgenden Struktur zurück:
 
@@ -256,7 +256,7 @@ type SessionTokenPayload = {
 
 #### Beispiel: Express-Middleware
 
-Beispiel für eine Express-Middleware, die das Session Token überprüft und den Payload an den Request anhängt:
+Beispiel für eine Express-Middleware, die das Session-Token überprüft und den Payload an den Request anhängt:
 
 ```javascript
 import { verify } from "@mittwald/ext-bridge";
@@ -276,7 +276,7 @@ app.use((req, res, next) => {
 
 #### Access Token anfordern, um auf die mittwald API zuzugreifen
 
-Du kannst das Session Token auch verwenden, um ein Access Token für die Authentifizierung bei der mittwald API anzufordern.
+Du kannst das Session-Token auch verwenden, um ein Access Token für die Authentifizierung bei der mittwald API anzufordern.
 
 Dieser Vorgang ist durch dein globales _Extensions Secret_ gesichert.
 Du kannst dieses Secret über die API-Route <OperationLink operation="extension-generate-extension-secret" /> generieren oder rotieren.
