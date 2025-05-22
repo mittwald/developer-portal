@@ -6,8 +6,10 @@ title: OAuth2 Clients
 
 import SchemaWithExample from "../../../src/components/openapi/SchemaWithExample";
 
-Currently, we define OAuth2 clients with static YAML documents.
-The following schema describes the allowed and the required values.
+As a contributor, you can manage OAuth2 clients via the mStudio API.
+The required routes are described in the [Guide to Managing OAuth2 Clients](../../how-to/manage-oauth-clients).
+
+Below, the required parameters are explained in more detail.
 
 <SchemaWithExample
   withRawJSONSchema
@@ -17,9 +19,9 @@ The following schema describes the allowed and the required values.
     required: [
       "id",
       "humanReadableName",
-      "allowedGrantTypes",
-      "allowedScopes",
-      "allowedRedirectURIs",
+      "grantTypes",
+      "scopes",
+      "redirectURIs",
     ],
     properties: {
       id: {
@@ -33,7 +35,7 @@ The following schema describes the allowed and the required values.
         description:
           "Name of the OAuth2 client. It should be identical to the extension name",
       },
-      allowedGrantTypes: {
+      grantTypes: {
         type: "array",
         items: {
           type: "string",
@@ -42,7 +44,7 @@ The following schema describes the allowed and the required values.
         description:
           "Allowed OAuth2 grant types. Currently, only authorization_code (with PKCE flow) is allowed",
       },
-      allowedScopes: {
+      scopes: {
         type: "array",
         items: {
           type: "string",
@@ -50,7 +52,7 @@ The following schema describes the allowed and the required values.
         description: "Allowed scopes, the client can request.",
         example: ["mail:read", "mail:write", "project:read"],
       },
-      allowedRedirectURIs: {
+      redirectURIs: {
         type: "array",
         items: {
           type: "string",
@@ -62,10 +64,6 @@ The following schema describes the allowed and the required values.
           "http://localhost:3000/oauth2/callback",
         ],
       },
-      hashedSecret: {
-        type: "string",
-        description: "Argon2id hashed secret of the OAuth2 client.",
-      },
     },
   }}
 />
@@ -74,7 +72,7 @@ The following schema describes the allowed and the required values.
 
 The scopes that the client _may_ request.
 The client does not have to request all scopes.
-Additionally, the scopes of the OAuth2 client don't have to be identical to the scopes of the extension.
+If the OAuth2 Client is used for an extension, the scopes of the OAuth2 client do not have to be identical to the scopes of the extension.
 In many cases, it makes sense that the scopes differ.
 
 For example, one such case is that an extension might only do reading and not writing operations without user interaction.
@@ -93,20 +91,3 @@ The URI string contains the protocol, the complete domain, the port, and the pat
 
 It makes sense to allow `http://localhost` as redirect URI to make local testing possible.
 You have to ensure that the correct port is configured, as mentioned above.
-
-### hashedSecret
-
-In some rare cases, it might be impossible to use the [PKCE flow](https://datatracker.ietf.org/doc/html/rfc7636).
-However, it is possible to create a so-called private client.
-For this, you need a client secret.
-
-Keep in mind that client secrets raise security-relevant issues you can avoid by using PKCE.
-For example, you should not use the private client to implement the OAuth2 authorization code flow in the browser, a native app, or some other easily accessible environment.
-The client's secret is not stored securely in such environments and can be extracted easily by bad actors.
-
-**Therefore, we explicitly recommend using the PKCE flow if possible.**
-
-If you want to use a client secret, you have to hash it with Argon2id beforehand.
-For more information, see [Argon2id on wikipedia](https://en.wikipedia.org/wiki/Argon2) and [the Argon2id reference](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-argon2-13).
-
-If you do not define a client secret, the PKCE flow is used automatically,
