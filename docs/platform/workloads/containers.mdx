@@ -12,6 +12,7 @@ import PlanCompatibility from "@site/src/components/PlanCompatibility";
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import TerraformExample from "@site/docs/platform/workloads/examples/_container-terraform.md";
+import RegistryTerraformExample from "@site/docs/platform/workloads/examples/_containerregistry-terraform.md";
 import TerraformResourceHint from "@site/src/components/TerraformResourceHint";
 import OperationLink from "@site/src/components/OperationLink";
 import OperationExample from "@site/src/components/OperationExample";
@@ -44,6 +45,42 @@ import OperationExample from "@site/src/components/OperationExample";
   </TabItem>
   <TabItem value="api" label="API">
     To learn how to deploy a container via the API, read the article ["Starting a container"](../../../api/howtos/create-container).
+  </TabItem>
+</Tabs>
+
+## Using private registries
+
+If your container image should be loaded from a private registry, you first need to define this registry for the respective project. You can create a registry as follows:
+
+<Tabs groupId="access-mode">
+  <TabItem value="gui" label="mStudio UI">
+    To create a new container registry via the mStudio, follow these steps:
+
+    1. Navigate to the project that you want to create the container in.
+    2. Select the "Containers" menu item in the sidebar.
+    3. Switch to the "Registries" tab.
+    4. Click the "Add registry" button.
+    5. Configure registry URL and credentials for the registry.
+
+  </TabItem>
+  <TabItem value="cli" label="CLI">
+    Managing container registries via the CLI is currently not supported. Please upvote the respective [feature request](https://github.com/mittwald/cli/issues/1150).
+  </TabItem>
+  <TabItem value="terraform" label="Terraform">
+    To define a container registry using Terraform, you can use the following example:
+
+    <RegistryTerraformExample />
+    <TerraformResourceHint resource="container_registry" />
+
+    When applying your configuration, you can either define the registry credentials in a `.tfvars` file or use the `-var` flag to pass them in. The password is a write-only attribute, which will not be persisted in the state file. You will need to increase the `password_wo_version` whenever the password changes.
+
+    ```shellsession
+    $ terraform apply -var registry_credentials='{"username": "username", "password": "password", "password_version": 1}'
+    ```
+
+  </TabItem>
+  <TabItem value="api" label="API">
+    To learn how to create or modify a container registry via the API, read the article ["Starting a container"](../../../api/howtos/create-container).
   </TabItem>
 </Tabs>
 
