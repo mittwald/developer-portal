@@ -19,7 +19,16 @@ To start a custom Docker container, you will need to have the following:
 
 ## Defining a private registry (optional)
 
-If your container image should be loaded from a private registry, you first need to use the <OperationLink operation="container-create-registry" /> operation to define this new registry:
+If your container image should be loaded from a private registry, you first need to define this registry for the respective project.
+
+You can use the following API operations to manage container registries:
+
+<!-- prettier-ignore -->
+- <OperationLink operation="container-create-registry" apiVersion="v2" /> to create a new container registry
+- <OperationLink operation="container-update-registry" apiVersion="v2" /> to update a container registry
+- <OperationLink operation="container-delete-registry" apiVersion="v2" /> to delete a registry
+
+For example, use the <OperationLink operation="container-create-registry" /> operation to define this new registry:
 
 <OperationExample
   operation="container-create-registry"
@@ -33,7 +42,15 @@ If your container image should be loaded from a private registry, you first need
   }}
 />
 
+After a container registry is configured for a project, you can simply use it **within that project** by prefixing the image name, just as you would with a `docker run` command.
+
 ## Starting a container in the default stack
+
+Containers are run as part of a container stack. A container stack is a collection of containers and volumes that are run together. You can use the following API operations to manage container stacks:
+
+<!-- prettier-ignore -->
+- <OperationLink operation="container-list-stacks" apiVersion="v2" /> to list available stacks (use the `default` stack)
+- <OperationLink operation="container-declare-stack" apiVersion="v2" /> to declare the desired state of a container stack; this operation is idempotent and can be used to add/update or remove containers and volumes from a stack
 
 ### Identify the default stack
 
@@ -74,3 +91,19 @@ See the documentation on [container workloads](/docs/v2/platform/workloads/conta
 ## Starting a new container stack (planned)
 
 Starting new container stacks next to the default stack is not supported at the moment.
+
+## Connecting domains to containers
+
+To connect a domain to a running container, you can specify the container as target of an ingress resource. Use the following API operation to create an ingress connected to a container:
+
+<!-- prettier-ignore -->
+- <OperationLink operation="ingress-create-ingress" apiVersion="v2" /> to connect a domain to a container
+
+## Operational tasks
+
+To manage a container stack's lifecycle, you can use the following API operations:
+
+<!-- prettier-ignore -->
+- <OperationLink operation="container-stop-service" apiVersion="v2" /> to stop a service in a container stack
+- <OperationLink operation="container-start-service" apiVersion="v2" /> to start a service in a container stack
+- <OperationLink operation="container-get-service-logs" apiVersion="v2" /> to access the STDOUT stream of a service in a container stack
