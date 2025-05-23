@@ -13,6 +13,7 @@ import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import TerraformExample from "@site/docs/platform/workloads/examples/_container-terraform.md";
 import RegistryTerraformExample from "@site/docs/platform/workloads/examples/_containerregistry-terraform.md";
+import IngressTerraformExample from "@site/docs/platform/workloads/examples/_containeringress-terraform.md";
 import TerraformResourceHint from "@site/src/components/TerraformResourceHint";
 import OperationLink from "@site/src/components/OperationLink";
 import OperationExample from "@site/src/components/OperationExample";
@@ -229,15 +230,28 @@ To make a container port accessible from within your project, you can use the `p
   }}
 />
 
-## Making containers accessible from the internet
+## Making containers accessible from the internet via HTTP
 
-In order to make a container port accessible from the internet, you need to define an Ingress resource which maps to the given container.
+In order to make a container HTTP port accessible from the internet, you need to define an Ingress resource which maps to the given container.
+
+:::important Important: HTTP only
+
+This section is only applicable for HTTP(S) traffic. For this, it is not important what port the container is listening on (as long as it is defined as a `port` in the respective container configuration).
+
+External access for other application protocols than HTTP(S) is not supported at the moment. Please upvote the respective [feature request](https://github.com/mittwald/feature-requests/issues/246).
+
+:::
 
 <Tabs groupId="access-mode">
   <TabItem value="cli" label="CLI">
     Managing containers via the CLI is currently not supported. Please upvote the respective [feature request](https://github.com/mittwald/cli/issues/1150).
   </TabItem>
   <TabItem value="terraform" label="Terraform">
+
+    Use a `mittwald_virtualhost` resource to create an Ingress resource for your container. The following example shows how to create an Ingress resource for a container:
+
+    <IngressTerraformExample />
+    <TerraformResourceHint resource="virtualhost" />
 
   </TabItem>
   <TabItem value="api" label="API">
