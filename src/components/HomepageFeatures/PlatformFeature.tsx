@@ -60,7 +60,7 @@ function PlatformCoreFeatures() {
               <Link to="/docs/v2/platform/workloads/nodejs">Node.js</Link>,
               <Link to="/docs/v2/platform/workloads/python">Python</Link>,
               <Link to="/docs/v2/platform/workloads/containers">
-                Docker <NewBadge />
+                Container <NewBadge />
               </Link>,
             ]}
           />
