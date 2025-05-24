@@ -3,6 +3,7 @@ import CodeBlock from "@theme/CodeBlock";
 import OperationLink from "@site/src/components/OperationLink";
 import styles from "./OperationExample.module.css";
 import clsx from "clsx";
+import React from "react";
 
 interface Props {
   apiVersion?: APIVersion;

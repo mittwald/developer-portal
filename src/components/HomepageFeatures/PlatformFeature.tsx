@@ -59,8 +59,8 @@ function PlatformCoreFeatures() {
               <Link to="/docs/v2/platform/workloads/php">PHP</Link>,
               <Link to="/docs/v2/platform/workloads/nodejs">Node.js</Link>,
               <Link to="/docs/v2/platform/workloads/python">Python</Link>,
-              <Link href="https://github.com/mittwald/feature-requests/issues/1">
-                Docker (planned)
+              <Link to="/docs/v2/platform/workloads/containers">
+                Container <NewBadge />
               </Link>,
             ]}
           />
