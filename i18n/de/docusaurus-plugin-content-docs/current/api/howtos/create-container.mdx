@@ -1,0 +1,121 @@
+---
+sidebar_label: Starten eines Docker-Containers
+title: Starten eines Docker-Containers über die API
+description: Erfahre, wie du einen benutzerdefinierten Docker-Container über die mStudio API startest
+tags:
+  - Docker
+  - Container
+---
+
+import OperationExample from "@site/src/components/OperationExample";
+import OperationLink from "@site/src/components/OperationLink";
+
+## Voraussetzungen
+
+Um einen benutzerdefinierten Docker-Container zu starten, benötigst du Folgendes:
+
+- Die Projekt-ID eines bestehenden Projekts ([wie man ein Projekt erstellt](../create-project)), in dem die Container-Hosting-Funktion verfügbar ist
+- Ein Container-Image, das du starten möchtest. Dieses Image kann in jeder öffentlichen oder privaten Registry verfügbar sein; jedoch muss die Registry aus dem Internet erreichbar sein und darf nicht hinter einer Firewall verborgen sein.
+
+## Definieren einer privaten Registry (optional)
+
+Wenn dein Container-Image aus einer privaten Registry geladen werden soll, musst du diese Registry zuerst für das jeweilige Projekt definieren.
+
+Du kannst die folgenden API-Operationen verwenden, um Container-Registries zu verwalten:
+
+<!-- prettier-ignore -->
+- <OperationLink operation="container-create-registry" apiVersion="v2" /> um eine neue Container-Registry zu erstellen
+- <OperationLink operation="container-update-registry" apiVersion="v2" /> um eine Container-Registry zu aktualisieren
+- <OperationLink operation="container-delete-registry" apiVersion="v2" /> um eine Registry zu löschen
+
+:::important Wichtig: Vorgegebene Registries
+
+Bitte beachte, dass die folgenden Registries bereits in mStudio vordefiniert sind und nicht manuell erstellt werden müssen:
+
+- `index.docker.io` (Docker Hub)
+- `registry.gitlab.com` (GitLab Container Registry)
+- `ghcr.io` (GitHub Container Registry)
+
+Wenn du eine dieser Registries mit einem privaten Image verwenden möchtest, musst du den bestehenden Registry-Eintrag in deinem Projekt finden und ihn mit den Anmeldeinformationen für dein privates Image aktualisieren. Du kannst dies tun, indem du die <OperationLink operation="container-update-registry" />-Operation verwendest.
+
+:::
+
+Zum Beispiel kannst du die <OperationLink operation="container-create-registry" />-Operation verwenden, um diese neue Registry zu definieren:
+
+<OperationExample
+  operation="container-create-registry"
+  example={{
+    credentials: {
+      password: "password",
+      username: "username",
+    },
+    description: "Meine Registry",
+    uri: "my-registry.example",
+  }}
+/>
+
+Nachdem eine Container-Registry für ein Projekt konfiguriert wurde, kannst du sie einfach **innerhalb dieses Projekts** verwenden, indem du den Namen des Images mit jeweiligen Präfix der Registry versiehst, genau wie bei einem `docker run`-Befehl.
+
+## Starten eines Containers im Standard-Stack
+
+Container werden als Teil eines Container-Stacks ausgeführt. Ein Container-Stack ist eine Sammlung von Containern und Volumes, die zusammen ausgeführt werden. Du kannst die folgenden API-Operationen verwenden, um Container-Stacks zu verwalten:
+
+<!-- prettier-ignore -->
+- <OperationLink operation="container-list-stacks" apiVersion="v2" /> um verfügbare Stacks aufzulisten (verwende den `default` Stack)
+- <OperationLink operation="container-declare-stack" apiVersion="v2" /> um den gewünschten Zustand eines Container-Stacks zu deklarieren; diese Operation ist idempotent und kann verwendet werden, um Container und Volumes zu einem Stack hinzuzufügen/aktualisieren oder zu entfernen
+
+### Identifizieren des Standard-Stacks
+
+Bevor du einen Container im Standard-Stack startest, musst du die ID des Standard-Stacks ermitteln. Dazu listest du die verfügbaren Stacks in deinem Projekt auf, indem du den <OperationLink operation="container-list-stacks" />-Endpunkt aufrufst. Der Standard-Stack wird `default` genannt.
+
+### Definieren des Container-Stacks
+
+Nachdem du den Standard-Stack ermittelt hast, kannst du definieren, welche Container und Volumes du in diesem Stack erstellen möchtest. Das folgende Beispiel zeigt eine Beispielanfrage, die einen Container mit einem Volume startet:
+
+<OperationExample
+  operation="container-declare-stack"
+  example={{
+    services: {
+      mycontainer: {
+        image: "my-registry/my-container:v1.0.1",
+        volumes: ["myvolume:/var/www"],
+        command: ["command"],
+        entrypoint: ["/entrypoint.sh"],
+        environment: {
+          FOO: "bar",
+        },
+      },
+    },
+    volumes: {
+      myvolume: {},
+    },
+  }}
+/>
+
+:::important
+
+Die <OperationLink operation="container-declare-stack" />-Operation ist **idempotent** und ersetzt die bestehende Stack-Definition durch die neue. Das bedeutet, dass alle Dienste oder Volumes, die nicht in der neuen Stack-Definition enthalten sind, aus dem Stack entfernt werden. Wenn du einen neuen Dienst oder ein neues Volume zu einem bestehenden Stack hinzufügen möchtest, musst du alle bestehenden Dienste und Volumes in der neuen Stack-Definition einbeziehen. Alternativ kannst du die <OperationLink operation="container-update-stack" />-Operation verwenden, um einzelne Dienste oder Volumes selektiv zu aktualisieren.
+
+:::
+
+Siehe die Dokumentation zu [Container-Workloads](/docs/v2/platform/workloads/containers/) für weitere Informationen darüber, wie Container, Volumes und Netzwerke definiert werden.
+
+## Starten eines neuen Container-Stacks (geplant)
+
+Das Starten neuer Container-Stacks neben dem Standard-Stack wird momentan nicht unterstützt.
+
+## Verbinden von Domains mit Containern
+
+Um eine Domain mit einem laufenden Container zu verbinden, kannst du den Container als Ziel einer Ingress-Ressource angeben. Verwende die folgende API-Operation, um ein Ingress zu erstellen, das mit einem Container verbunden ist:
+
+<!-- prettier-ignore -->
+- <OperationLink operation="ingress-create-ingress" apiVersion="v2" /> um eine Domain mit einem Container zu verbinden
+
+## Betrieb von Containern
+
+Um den Lebenszyklus eines Container-Stacks zu verwalten, kannst du die folgenden API-Operationen verwenden:
+
+<!-- prettier-ignore -->
+- <OperationLink operation="container-stop-service" apiVersion="v2" /> um einen Dienst in einem Container-Stack zu stoppen
+- <OperationLink operation="container-start-service" apiVersion="v2" /> um einen Dienst in einem Container-Stack zu starten
+- <OperationLink operation="container-get-service-logs" apiVersion="v2" /> um auf den STDOUT-Stream eines Dienstes in einem Container-Stack zuzugreifen

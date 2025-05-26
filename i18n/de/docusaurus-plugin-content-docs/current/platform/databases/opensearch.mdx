@@ -13,13 +13,29 @@ import PlanCompatibility from "@site/src/components/PlanCompatibility";
 
 OpenSearch ist eine von der Community getriebene, quelloffene Suchmaschine, die von Elasticsearch abgezweigt wurde. Es handelt sich um eine verteilte, RESTful Such- und Analyse-Engine, die in der Lage ist, eine wachsende Anzahl von Anwendungsfällen zu lösen. Als Fork von Elasticsearch ist OpenSearch vollständig kompatibel mit Elasticsearch-APIs und -Plugins.
 
-## Eine OpenSearch-Datenbank erstellen
+### Eine OpenSearch-Datenbank erstellen
 
-:::important
+Du kannst eine OpenSearch-Datenbank in deiner mittwald Hosting-Umgebung mit [Containern](../workloads/containers) bereitstellen. Der bequemste Weg, dies zu tun, ist die Verwendung von [Terraform](../deployment/terraform) mit unserem [OpenSearch-Modul](https://registry.terraform.io/modules/mittwald/opensearch/mittwald/latest). Das folgende Beispiel zeigt, wie du dieses Modul in deinem eigenen Terraform-Deployment verwenden kannst:
 
-Wir bieten derzeit keine Self-Service-Option zum Bereitstellen einer OpenSearch-Datenbank an. Um eine OpenSearch-Datenbank zu erstellen, öffne bitte ein Support-Ticket über den Menüpunkt "Search Engines" in der mStudio-Benutzeroberfläche.
+```hcl
+resource "random_password" "opensearch_admin" {
+  length  = 16
+  special = true
+}
 
-:::
+module "opensearch" {
+  source = "mittwald/opensearch/mittwald"
+
+  project_id = "<project-id>"
+  initial_admin_password = random_password.opensearch_admin.result
+}
+
+output "opensearch_url" {
+  value = module.opensearch.url
+}
+```
+
+Danach kannst du auf dein OpenSearch-Backend über die vom Modul zurückgegebene URL zugreifen. In der Regel sollte die URL `https://opensearch:9200` sein. Der Standardbenutzername ist `admin`, und das Passwort ist das, das von der Ressource `random_password` generiert wurde.
 
 ## Übliche Anwendungen konfigurieren
 
