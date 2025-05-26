@@ -1,0 +1,121 @@
+---
+sidebar_label: Starting a Docker container
+title: Starting a Docker container using the API
+description: Learn how to start a custom Docker container via the mStudio API
+tags:
+  - Docker
+  - Containers
+---
+
+import OperationExample from "@site/src/components/OperationExample";
+import OperationLink from "@site/src/components/OperationLink";
+
+## Prerequisites
+
+To start a custom Docker container, you will need to have the following:
+
+- The project ID of an existing project ([how to create a project](../create-project)), in which the container hosting feature is available
+- A container image that you want to start. This image may be available in any public or private registry; however, the registry must be reachable from the internet and not hidden behind a firewall.
+
+## Defining a private registry (optional)
+
+If your container image should be loaded from a private registry, you first need to define this registry for the respective project.
+
+You can use the following API operations to manage container registries:
+
+<!-- prettier-ignore -->
+- <OperationLink operation="container-create-registry" apiVersion="v2" /> to create a new container registry
+- <OperationLink operation="container-update-registry" apiVersion="v2" /> to update a container registry
+- <OperationLink operation="container-delete-registry" apiVersion="v2" /> to delete a registry
+
+:::important Important: Pre-defined registries
+
+Please note that the following registries are already pre-defined in the mStudio and do not need to be created manually:
+
+- `index.docker.io` (Docker Hub)
+- `registry.gitlab.com` (GitLab Container Registry)
+- `ghcr.io` (GitHub Container Registry)
+
+If you want to use any of these registries with a private image, you will need to find the existing registry record in your project and update it with the credentials for your private image. You can do this by calling the <OperationLink operation="container-update-registry" /> operation.
+
+:::
+
+For example, use the <OperationLink operation="container-create-registry" /> operation to define this new registry:
+
+<OperationExample
+  operation="container-create-registry"
+  example={{
+    credentials: {
+      password: "password",
+      username: "username",
+    },
+    description: "My registry",
+    uri: "my-registry.example",
+  }}
+/>
+
+After a container registry is configured for a project, you can simply use it **within that project** by prefixing the image name, just as you would with a `docker run` command.
+
+## Starting a container in the default stack
+
+Containers are run as part of a container stack. A container stack is a collection of containers and volumes that are run together. You can use the following API operations to manage container stacks:
+
+<!-- prettier-ignore -->
+- <OperationLink operation="container-list-stacks" apiVersion="v2" /> to list available stacks (use the `default` stack)
+- <OperationLink operation="container-declare-stack" apiVersion="v2" /> to declare the desired state of a container stack; this operation is idempotent and can be used to add/update or remove containers and volumes from a stack
+
+### Identify the default stack
+
+Before starting a container in the default stack, you need to determine the ID of the default stack. For this, list the available stacks in your project by calling the <OperationLink operation="container-list-stacks" /> endpoint. The default stack will we named `default`.
+
+### Defining the container stack
+
+When you have identified the default stack, you can define the container stack that you want to start. The following example shows an example request that starts a container with a volume:
+
+<OperationExample
+  operation="container-declare-stack"
+  example={{
+    services: {
+      mycontainer: {
+        image: "my-registry/my-container:v1.0.1",
+        volumes: ["myvolume:/var/www"],
+        command: ["command"],
+        entrypoint: ["/entrypoint.sh"],
+        environment: {
+          FOO: "bar",
+        },
+      },
+    },
+    volumes: {
+      myvolume: {},
+    },
+  }}
+/>
+
+:::important
+
+The <OperationLink operation="container-declare-stack" /> operation is **idempotent** and will replace the existing stack definition with the new one. This means that any services or volumes that are not included in the new stack definition will be removed from the stack. If you want to add a new service or volume to an existing stack, you need to include all existing services and volumes in the new stack definition. Alternatively, you can use the <OperationLink operation="container-update-stack" /> operation to selectively update individual services or volumes.
+
+:::
+
+See the documentation on [container workloads](/docs/v2/platform/workloads/containers/) for more information on how containers, volumes and networks are defined.
+
+## Starting a new container stack (planned)
+
+Starting new container stacks next to the default stack is not supported at the moment.
+
+## Connecting domains to containers
+
+To connect a domain to a running container, you can specify the container as target of an ingress resource. Use the following API operation to create an ingress connected to a container:
+
+<!-- prettier-ignore -->
+- <OperationLink operation="ingress-create-ingress" apiVersion="v2" /> to connect a domain to a container
+
+## Operational tasks
+
+To manage a container stack's lifecycle, you can use the following API operations:
+
+<!-- prettier-ignore -->
+- <OperationLink operation="container-stop-service" apiVersion="v2" /> to stop a service in a container stack
+- <OperationLink operation="container-start-service" apiVersion="v2" /> to start a service in a container stack
+- <OperationLink operation="container-get-service-logs" apiVersion="v2" /> to access the STDOUT stream of a service in a container stack

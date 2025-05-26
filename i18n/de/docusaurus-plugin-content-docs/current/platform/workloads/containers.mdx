@@ -1,0 +1,289 @@
+---
+title: Verwaltung und Bereitstellung von containerisierten Anwendungen
+sidebar_label: Container
+sidebar_position: 40
+description: Verwaltung und Bereitstellung von containerisierten Anwendungen
+tags:
+  - Container
+  - Docker
+---
+
+import PlanCompatibility from "@site/src/components/PlanCompatibility";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import TerraformExample from "@site/docs/platform/workloads/examples/_container-terraform.md";
+import RegistryTerraformExample from "@site/docs/platform/workloads/examples/_containerregistry-terraform.md";
+import IngressTerraformExample from "@site/docs/platform/workloads/examples/_containeringress-terraform.md";
+import TerraformResourceHint from "@site/src/components/TerraformResourceHint";
+import OperationLink from "@site/src/components/OperationLink";
+import OperationExample from "@site/src/components/OperationExample";
+
+<PlanCompatibility plans={["ps", "ss"]} />
+
+## Starten einer containerisierten Anwendung
+
+<Tabs groupId="access-mode">
+  <TabItem value="gui" label="mStudio UI">
+    Um einen Container über das mStudio zu starten, folge diesen Schritten:
+
+    1. Navigiere zu dem Projekt, in dem du den Container erstellen möchtest.
+    2. Wähle den Menüpunkt "Container" in der Seitenleiste aus.
+    3. Klicke auf die Schaltfläche "Container erstellen".
+    4. Wähle im Installationsassistenten das Container-Image aus, das verwendet werden soll, um deine Anwendung zu starten, und schließe den Assistenten ab, indem du die gewünschte Konfiguration bezüglich Umgebungsvariablen, Volumes und Netzwerkports angibst.
+
+    Der interne DNS-Name deines Containers wird aus dem Namen des Containers abgeleitet. Wenn du beispielsweise einen Container mit dem Namen "Mein Container"`" erstellst, ist der daraus abgeleitete interne DNS-Name `mein-container`. Du kannst den internen DNS-Namen in der UI einsehen, nachdem der Container erstellt wurde.
+
+  </TabItem>
+  <TabItem value="cli" label="CLI">
+    Die Verwaltung von Containern über die CLI wird derzeit nicht unterstützt. Bitte stimme für die entsprechende [Feature-Anfrage](https://github.com/mittwald/cli/issues/1150) ab.
+  </TabItem>
+  <TabItem value="terraform" label="Terraform">
+    Um einen Container mit Terraform bereitzustellen, kannst du das folgende Beispiel verwenden:
+
+    <TerraformExample />
+    <TerraformResourceHint resource="container_stack" />
+
+  </TabItem>
+  <TabItem value="api" label="API">
+    Um zu erfahren, wie man einen Container über die API bereitstellt, lies den Artikel ["Einen Container starten"](../../../api/howtos/create-container).
+  </TabItem>
+</Tabs>
+
+## Verwendung privater Registries
+
+Wenn dein Container-Image aus einer privaten Registry geladen werden soll, musst du diese Registry zuerst für das jeweilige Projekt definieren. Du kannst eine Registry wie folgt erstellen:
+
+<Tabs groupId="access-mode">
+  <TabItem value="gui" label="mStudio UI">
+    Um eine neue Container-Registry über das mStudio zu erstellen, folge diesen Schritten:
+
+    1. Navigiere zu dem Projekt, in dem du den Container erstellen möchtest.
+    2. Wähle den Menüpunkt "Container" in der Seitenleiste aus.
+    3. Wechsle zum Tab "Registries".
+    4. Klicke auf die Schaltfläche "Registry hinzufügen".
+    5. Konfiguriere die Registry-URL und die Anmeldeinformationen für die Registry.
+
+  </TabItem>
+  <TabItem value="cli" label="CLI">
+    Die Verwaltung von Container-Registries über die CLI wird derzeit nicht unterstützt. Bitte stimme für die entsprechende [Feature-Anfrage](https://github.com/mittwald/cli/issues/1150) ab.
+  </TabItem>
+  <TabItem value="terraform" label="Terraform">
+    Um eine Container-Registry mit Terraform zu definieren, kannst du das folgende Beispiel verwenden:
+
+    <RegistryTerraformExample />
+    <TerraformResourceHint resource="container_registry" />
+
+    Beim Anwenden deiner Konfiguration kannst du entweder die Registry-Anmeldeinformationen in einer `.tfvars`-Datei definieren oder das `-var`-Flag verwenden, um sie zu übergeben. Das Passwort ist ein schreibgeschütztes Attribut, das nicht in der State-Datei gespeichert wird. Du musst `password_wo_version` erhöhen, wann immer sich das Passwort ändert.
+
+    ```shellsession
+    $ terraform apply -var registry_credentials='{"username": "username", "password": "password", "password_version": 1}'
+    ```
+
+  </TabItem>
+  <TabItem value="api" label="API">
+    Um zu erfahren, wie man eine Container-Registry über die API erstellt oder ändert, lies den Artikel ["Einen Container starten"](../../../api/howtos/create-container).
+  </TabItem>
+</Tabs>
+
+## Deployment-Strategien
+
+Wenn du deine Anwendung mithilfe von Containern deployst, wirst du typischerweise neue Versionen deiner Anwendung bereitstellen, indem du ein neues Container-Image erstellst und es im selben Container-Stack bereitstellst. Dies ist eine gängige Praxis in containerisierten Umgebungen, da sie eine einfache Versionierung und Rückgängigmachung ermöglicht.
+
+Es gibt zwei Varianten dieses Ansatzes:
+
+1. **Immutable Deployment**: Jede neue Version der Anwendung wird in einem neuen Container-Image bereitgestellt, und das alte Image wird für Rollback-Zwecke aufbewahrt. Dies ist der häufigste Ansatz in containerisierten Umgebungen.
+2. **Mutable Deployment**: Dasselbe Container-Image (im einfachsten Fall das `latest`-Tag) wird für alle Versionen der Anwendung verwendet, und jede neue Version ersetzt die alte.
+
+Beide Strategien können mit mStudio-Containern implementiert werden. Die folgenden Abschnitte beschreiben, wie man sie umsetzt.
+
+### Ein neues Tag für jedes Release pushen
+
+Mit dieser Strategie erstellst du ein neues Container-Image für jedes Release deiner Anwendung. Mit `docker`-Befehlen könnte das so aussehen (das `v1.0.1`-Tag ist nur ein Beispiel für ein Tag, das mit jedem Release erhöht werden könnte):
+
+```bash
+docker build -t my-registry/my-container:v1.0.1 .
+docker push my-registry/my-container:v1.0.1
+```
+
+:::note
+
+Dieser Artikel ist nicht als Tutorial zum Erstellen von Docker-Images gedacht. Sieh dir den Abschnitt [Best Practices für das Erstellen](https://docs.docker.com/build/building/best-practices/) aus der Docker-Dokumentation an, um mehr darüber zu erfahren, wie man Docker-Images erstellt.
+
+:::
+
+Nachdem das Image erstellt wurde, kannst du es in deinem Container-Stack bereitstellen.
+
+<Tabs groupId="access-mode">
+  <TabItem value="cli" label="CLI">
+    Die Verwaltung von Containern über die CLI wird derzeit nicht unterstützt. Bitte stimme für die entsprechende [Feature-Anfrage](https://github.com/mittwald/cli/issues/1150) ab.
+  </TabItem>
+  <TabItem value="terraform" label="Terraform">
+    Wenn du Terraform verwendest, um deine containerisierte Anwendung zu deployen, kannst du eine Terraform-Variable verwenden, um das Image-Tag festzulegen. Dies ermöglicht es dir, das Image-Tag für jedes Release einfach zu ändern:
+
+```hcl
+variable "image_tag" {
+  type = string
+}
+
+resource "mittwald_container_stack" "my_application" {
+  project_id    = mittwald_project.example.id
+  default_stack = true
+
+  containers = {
+    mycontainer = {
+      image = "my-registry/my-container:${var.image_tag}"
+      // ...
+    }
+  }
+}
+```
+
+    Wenn du `terraform apply` ausführst, kannst du die Variable `image_tag` auf die gewünschte Version setzen:
+
+```bash
+terraform apply -var="image_tag=v1.0.1"
+```
+
+  </TabItem>
+  <TabItem value="api" label="API">
+    Mit der API kannst du die <OperationLink operation="container-update-stack" apiVersion="v2" />-Operation verwenden, um das Image des Container-Stacks mit dem neuen Image zu ersetzen.
+
+    <OperationExample operation="container-update-stack" example={{
+      "services": {
+        "mycontainer": {
+          "image": "my-registry/my-container:v1.0.1"
+        }
+      }
+    }} />
+
+    Nach dem Aktualisieren des Images muss der Container explizit neu erstellt werden, um die Änderungen anzuwenden. Dies kann mit der <OperationLink operation="container-recreate-service" apiVersion="v2" />-Operation erfolgen.
+
+  </TabItem>
+</Tabs>
+
+### Aktualisieren eines veränderlichen Tags
+
+Mit dieser Strategie wirst du typischerweise immer wieder dasselbe Container-Image-Tag aktualisieren. Mit `docker`-Befehlen könnte das so aussehen:
+
+```bash
+docker build -t my-registry/my-container:latest .
+docker push my-registry/my-container:latest
+```
+
+Standardmäßig werden Container-Images nicht automatisch aktualisiert, wenn das Image-Tag nicht geändert wird. Du kannst die <OperationLink operation="container-pull-image-for-service" apiVersion="v2" />-Operation verwenden, um das neueste Image für den Container-Stack zu ziehen. Dies wird das Image-Tag auf die neueste Version aktualisieren.
+
+## Verwendung von Volumes
+
+Um persistente Daten in deiner containerisierten Anwendung zu verwalten, kannst du Volumes verwenden. Volumes sind eine Möglichkeit, Daten außerhalb des Containers zu speichern, sodass sie nicht verloren gehen, wenn der Container gestoppt oder entfernt wird.
+
+Du kannst zwei verschiedene Arten von Volumes verwenden:
+
+1. Das **Projekt-Volume** ist ein Volume, das für jedes Projekt erstellt wird und von allen Containern und allen Managed Apps in diesem Projekt zugänglich ist. Dies ist nützlich, um Daten zwischen Containern und Apps zu teilen.
+2. Du kannst auch **Volumes als Teil eines Stacks deklarieren**. Diese sind an den Container-Stack gebunden und von anderen Stacks nicht zugänglich. Dies ist nützlich, um Daten zu speichern, die nur von einem bestimmten Container-Stack benötigt werden.
+
+### Verwendung des Projekt-Volumes
+
+Um das Projekt-Volume zu verwenden, verwende eine Volume-Deklaration wie diese:
+
+<OperationExample
+  operation="container-declare-stack"
+  example={{
+    services: {
+      mycontainer: {
+        image: "my-registry/my-container:v1.0.1",
+        volumes: ["/home/p-XXXXX/html:/var/www"],
+      },
+    },
+  }}
+/>
+
+### Deklarieren von Volumes in Stacks
+
+Um ein Volume innerhalb des Stacks zu deklarieren, definiere deinen Container wie folgt:
+
+<OperationExample
+  operation="container-declare-stack"
+  example={{
+    services: {
+      mycontainer: {
+        image: "my-registry/my-container:v1.0.1",
+        volumes: ["myvolume:/var/www"],
+      },
+    },
+    volumes: {
+      myvolume: {},
+    },
+  }}
+/>
+
+### Backup & Wiederherstellung {#backup}
+
+Alle Volumes (sowohl Projekt-Volumes als auch Stack-Volumes) werden automatisch als Teil des Projekt-Backups gesichert. Das bedeutet, dass du deine Daten im Falle eines Ausfalls oder Datenverlusts wiederherstellen kannst.
+
+_Aber_, ein einfaches Dateisystem-Backup ist möglicherweise nicht für alle Anwendungs-Workloads ausreichend. Wenn deine Anwendung beispielsweise eine Datenbank verwendet, solltest du sicherstellen, dass die Datenbank sich in einem konsistenten Zustand befindet, bevor du ein Backup machst. Dies kann durch die Verwendung der integrierten Backup-Funktionalität der Datenbank oder durch die Verwendung einer Drittanbieter-Backup-Lösung erfolgen.
+
+## Netzwerkverbindung zwischen Containern und Apps
+
+Managed Apps und Container sind mit demselben Netzwerk verbunden. Das bedeutet, dass du auf Apps von deinen Containern und umgekehrt zugreifen kannst. Der Hostname des Containers ist der Schlüssel des Containers in der Stack-Definition; wenn du den Container über die UI erstellt hast, wird der Hostname aus dem Namen des Containers abgeleitet. Wenn du beispielsweise einen Container mit dem Namen `Mein Container` erstellst, wird der interne DNS-Name `mein-container` sein. Du kannst den internen DNS-Namen in der UI einsehen, nachdem der Container erstellt wurde.
+
+Um einen Containerport von innerhalb deines Projekts zugänglich zu machen, kannst du die `ports`-Eigenschaft in der Container-Deklaration verwenden. Das erstellt eine Portzuordnung zwischen dem Containerport und dem per DNS ansprechbaren Service, auf den du aus dem Rest deiner Hosting-Umgebung zugreifen kannst. Um beispielsweise den Port 80 des Containers für andere Workloads, die im selben Projekt laufen (sei es andere Container oder verwaltete Apps), zugänglich zu machen, kannst du die folgende Deklaration verwenden:
+
+<OperationExample
+  operation="container-declare-stack"
+  example={{
+    services: {
+      mycontainer: {
+        image: "my-registry/my-container:latest",
+        ports: ["80:80/tcp"],
+      },
+    },
+  }}
+/>
+
+## Container über HTTP aus dem Internet zugänglich machen
+
+Um einen Container-HTTP-Port aus dem Internet zugänglich zu machen, musst du eine Ingress-Ressource definieren, die auf den gegebenen Container verweist.
+
+:::important Wichtig: Nur HTTP
+
+Dieser Abschnitt gilt nur für HTTP(S)-Traffic. Dabei ist es nicht wichtig, auf welchem Port der Container lauscht (solange er in der jeweiligen Container-Konfiguration als `port` definiert ist).
+
+Externer Zugriff für andere Anwendungsprotokolle als HTTP(S) wird derzeit nicht unterstützt. Bitte stimme für die entsprechende [Feature-Anfrage](https://github.com/mittwald/feature-requests/issues/246) ab.
+
+:::
+
+<Tabs groupId="access-mode">
+  <TabItem value="cli" label="CLI">
+    Die Verwaltung von Containern über die CLI wird derzeit nicht unterstützt. Bitte stimme für die entsprechende [Feature-Anfrage](https://github.com/mittwald/cli/issues/1150) ab.
+  </TabItem>
+  <TabItem value="terraform" label="Terraform">
+
+    Verwende eine `mittwald_virtualhost`-Ressource, um eine Ingress-Ressource für deinen Container zu erstellen. Das folgende Beispiel zeigt, wie man eine Ingress-Ressource für einen Container erstellt:
+
+    <IngressTerraformExample />
+    <TerraformResourceHint resource="virtualhost" />
+
+  </TabItem>
+  <TabItem value="api" label="API">
+
+    <OperationExample
+      operation="ingress-create-ingress"
+      example={{
+        hostname: "some-hostname.example",
+        projectId: "<project-id>",
+        paths: [
+          {
+            path: "/",
+            target: {
+              container: {
+                id: "<container-id>",
+                portProtocol: "80/tcp",
+              },
+            },
+          },
+        ],
+      }}
+    />
+
+  </TabItem>
+</Tabs>

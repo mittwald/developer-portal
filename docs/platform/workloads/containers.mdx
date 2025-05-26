@@ -1,0 +1,289 @@
+---
+title: Managing and deploying containerized applications
+sidebar_label: Containers
+sidebar_position: 40
+description: Managing and deploying containerized applications
+tags:
+  - Containers
+  - Docker
+---
+
+import PlanCompatibility from "@site/src/components/PlanCompatibility";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import TerraformExample from "@site/docs/platform/workloads/examples/_container-terraform.md";
+import RegistryTerraformExample from "@site/docs/platform/workloads/examples/_containerregistry-terraform.md";
+import IngressTerraformExample from "@site/docs/platform/workloads/examples/_containeringress-terraform.md";
+import TerraformResourceHint from "@site/src/components/TerraformResourceHint";
+import OperationLink from "@site/src/components/OperationLink";
+import OperationExample from "@site/src/components/OperationExample";
+
+<PlanCompatibility plans={["ps", "ss"]} />
+
+## Starting a containerized application
+
+<Tabs groupId="access-mode">
+  <TabItem value="gui" label="mStudio UI">
+    To start a container via the mStudio, follow these steps:
+
+    1. Navigate to the project that you want to create the container in.
+    2. Select the "Containers" menu item in the sidebar.
+    3. Click the "Create Container" button.
+    4. In the installation wizard, select the container image that should be used to start your application and complete the wizard, by providing the desired configuration regarding environment variables, volumes and network ports.
+
+    The internal DNS name of your container will be derived from the name of the container. For example, if you create a container named `My container`, the internal DNS name will be `my-container`. You can observe the internal DNS name in the UI after the container has been created.
+
+  </TabItem>
+  <TabItem value="cli" label="CLI">
+    Managing containers via the CLI is currently not supported. Please upvote the respective [feature request](https://github.com/mittwald/cli/issues/1150).
+  </TabItem>
+  <TabItem value="terraform" label="Terraform">
+    To deploy a container using Terraform, you can use the following example:
+
+    <TerraformExample />
+    <TerraformResourceHint resource="container_stack" />
+
+  </TabItem>
+  <TabItem value="api" label="API">
+    To learn how to deploy a container via the API, read the article ["Starting a container"](../../../api/howtos/create-container).
+  </TabItem>
+</Tabs>
+
+## Using private registries
+
+If your container image should be loaded from a private registry, you first need to define this registry for the respective project. You can create a registry as follows:
+
+<Tabs groupId="access-mode">
+  <TabItem value="gui" label="mStudio UI">
+    To create a new container registry via the mStudio, follow these steps:
+
+    1. Navigate to the project that you want to create the container in.
+    2. Select the "Containers" menu item in the sidebar.
+    3. Switch to the "Registries" tab.
+    4. Click the "Add registry" button.
+    5. Configure registry URL and credentials for the registry.
+
+  </TabItem>
+  <TabItem value="cli" label="CLI">
+    Managing container registries via the CLI is currently not supported. Please upvote the respective [feature request](https://github.com/mittwald/cli/issues/1150).
+  </TabItem>
+  <TabItem value="terraform" label="Terraform">
+    To define a container registry using Terraform, you can use the following example:
+
+    <RegistryTerraformExample />
+    <TerraformResourceHint resource="container_registry" />
+
+    When applying your configuration, you can either define the registry credentials in a `.tfvars` file or use the `-var` flag to pass them in. The password is a write-only attribute, which will not be persisted in the state file. You will need to increase the `password_wo_version` whenever the password changes.
+
+    ```shellsession
+    $ terraform apply -var registry_credentials='{"username": "username", "password": "password", "password_version": 1}'
+    ```
+
+  </TabItem>
+  <TabItem value="api" label="API">
+    To learn how to create or modify a container registry via the API, read the article ["Starting a container"](../../../api/howtos/create-container).
+  </TabItem>
+</Tabs>
+
+## Deployment strategies
+
+When using containers for deployment, you will typically roll out new versions of your application by creating a new container image and deploying it to the same container stack. This is a common practice in containerized environments, as it allows for easy versioning and rollback.
+
+There are two variants of this approach:
+
+1. **Immutable deployment**: Each new version of the application is deployed to a new container image, and the old image is kept for rollback purposes. This is the most common approach in containerized environments.
+2. **Mutable deployment**: The same container image (in the easiest case, the `latest` tag) is used for all versions of the application, and each new version replaces the old one.
+
+Both of these strategies can be implemented using mStudio containers. The following sections describe how to implement them.
+
+### Pushing a new tag for each release
+
+Using this strategy, you will create a new container image for each release of your application. Using `docker` commands, this might look like this (the `v1.0.1` tag is just an example for a tag that might increase its version number with each release):
+
+```bash
+docker build -t my-registry/my-container:v1.0.1 .
+docker push my-registry/my-container:v1.0.1
+```
+
+:::note
+
+This article is not intended to be a tutorial on how to build Docker images. Have a look at the [Building best practices](https://docs.docker.com/build/building/best-practices/) section from the Docker documentation for more information on how to build Docker images.
+
+:::
+
+After the image is built, you can deploy it to your container stack.
+
+<Tabs groupId="access-mode">
+  <TabItem value="cli" label="CLI">
+    Managing containers via the CLI is currently not supported. Please upvote the respective [feature request](https://github.com/mittwald/cli/issues/1150).
+  </TabItem>
+  <TabItem value="terraform" label="Terraform">
+    When you are using Terraform to deploy your containerized application, you can use a Terraform variable to set the image tag. This allows you to easily change the image tag for each release:
+
+```hcl
+variable "image_tag" {
+  type = string
+}
+
+resource "mittwald_container_stack" "my_application" {
+  project_id    = mittwald_project.example.id
+  default_stack = true
+
+  containers = {
+    mycontainer = {
+      image = "my-registry/my-container:${var.image_tag}"
+      // ...
+    }
+  }
+}
+```
+
+    When running `terraform apply`, you can set the `image_tag` variable to the desired version:
+
+```bash
+terraform apply -var="image_tag=v1.0.1"
+```
+
+  </TabItem>
+  <TabItem value="api" label="API">
+    Using the API, you can use the <OperationLink operation="container-update-stack" apiVersion="v2" /> operation to replace the image of the container stack with the new image.
+
+    <OperationExample operation="container-update-stack" example={{
+      "services": {
+        "mycontainer": {
+          "image": "my-registry/my-container:v1.0.1"
+        }
+      }
+    }} />
+
+    After updating the image, the container will need to be explicitly recreated to apply the changes. This can be done using the <OperationLink operation="container-recreate-service" apiVersion="v2" /> operation.
+
+  </TabItem>
+</Tabs>
+
+### Updating a mutable tag
+
+Using this strategy, you will typically update the same container image tag over and over again. Using `docker` commands, this might look like this:
+
+```bash
+docker build -t my-registry/my-container:latest .
+docker push my-registry/my-container:latest
+```
+
+By default, container images are not automatically updated when the image tag is not changed. You can use the <OperationLink operation="container-pull-image-for-service" apiVersion="v2" /> operation to pull the latest image for the container stack. This will update the image tag to the latest version.
+
+## Using volumes
+
+To manage persistent data in your containerized application, you can use volumes. Volumes are a way to store data outside of the container, so that it is not lost when the container is stopped or removed.
+
+You can use two different types of volumes:
+
+1. The **project volume** is a volume that is created for each project and can be accessed by all containers and all managed apps in that project. This is useful for sharing data between containers and apps.
+2. You can also declare **volumes as part of a stack**. These are bound to the container stack and are not accessible from other stacks. This is useful for storing data that is only needed by a specific container stack.
+
+### Using the project volume
+
+To use the project volume, use a volume declaration like this:
+
+<OperationExample
+  operation="container-declare-stack"
+  example={{
+    services: {
+      mycontainer: {
+        image: "my-registry/my-container:v1.0.1",
+        volumes: ["/home/p-XXXXX/html:/var/www"],
+      },
+    },
+  }}
+/>
+
+### Declaring volumes in stacks
+
+To declare a volume within the stack, use a volume declaration like this:
+
+<OperationExample
+  operation="container-declare-stack"
+  example={{
+    services: {
+      mycontainer: {
+        image: "my-registry/my-container:v1.0.1",
+        volumes: ["myvolume:/var/www"],
+      },
+    },
+    volumes: {
+      myvolume: {},
+    },
+  }}
+/>
+
+### Backup & recovery {#backup}
+
+All volumes (both project volumes and stack volumes) are backed up automatically as part of the project backup. This means that you can restore your data in case of a failure or data loss.
+
+_However_, a simple filesystem backup might not be sufficient for all application workloads. For example, if your application is using a database, you should ensure that the database is in a consistent state before taking a backup. This can be done by using the database's built-in backup functionality or by using a third-party backup solution.
+
+## Network connectivity between containers and apps
+
+Managed applications and containers are connected to the same network. This means that you can access managed applications from your containers and vice versa. The hostname of the container is the map key of the container in the stack; if you created the container via the GUI, the hostname is derived from the name of the container. For example, if you create a container named `My container`, the internal DNS name will be `my-container`. You can observe the internal DNS name in the UI after the container has been created.
+
+To make a container port accessible from within your project, you can use the `ports` property in the container declaration. This will create a port mapping between the container port and service that is exposed within your hosting environment. For example, to make port 80 of the container accessible for other workloads running in the same project (be it other containers, or managed apps), you can use the following declaration:
+
+<OperationExample
+  operation="container-declare-stack"
+  example={{
+    services: {
+      mycontainer: {
+        image: "my-registry/my-container:latest",
+        ports: ["80:80/tcp"],
+      },
+    },
+  }}
+/>
+
+## Making containers accessible from the internet via HTTP
+
+In order to make a container HTTP port accessible from the internet, you need to define an Ingress resource which maps to the given container.
+
+:::important Important: HTTP only
+
+This section is only applicable for HTTP(S) traffic. For this, it is not important what port the container is listening on (as long as it is defined as a `port` in the respective container configuration).
+
+External access for other application protocols than HTTP(S) is not supported at the moment. Please upvote the respective [feature request](https://github.com/mittwald/feature-requests/issues/246).
+
+:::
+
+<Tabs groupId="access-mode">
+  <TabItem value="cli" label="CLI">
+    Managing containers via the CLI is currently not supported. Please upvote the respective [feature request](https://github.com/mittwald/cli/issues/1150).
+  </TabItem>
+  <TabItem value="terraform" label="Terraform">
+
+    Use a `mittwald_virtualhost` resource to create an Ingress resource for your container. The following example shows how to create an Ingress resource for a container:
+
+    <IngressTerraformExample />
+    <TerraformResourceHint resource="virtualhost" />
+
+  </TabItem>
+  <TabItem value="api" label="API">
+
+    <OperationExample
+      operation="ingress-create-ingress"
+      example={{
+        hostname: "some-hostname.example",
+        projectId: "<project-id>",
+        paths: [
+          {
+            path: "/",
+            target: {
+              container: {
+                id: "<container-id>",
+                portProtocol: "80/tcp",
+              },
+            },
+          },
+        ],
+      }}
+    />
+
+  </TabItem>
+</Tabs>
