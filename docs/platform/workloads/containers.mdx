@@ -181,6 +181,8 @@ You can use two different types of volumes:
 1. The **project volume** is a volume that is created for each project and can be accessed by all containers and all managed apps in that project. This is useful for sharing data between containers and apps.
 2. You can also declare **volumes as part of a stack**. These are bound to the container stack and are not accessible from other stacks. This is useful for storing data that is only needed by a specific container stack.
 
+### Using the project volume
+
 To use the project volume, use a volume declaration like this:
 
 <OperationExample
@@ -194,6 +196,8 @@ To use the project volume, use a volume declaration like this:
     },
   }}
 />
+
+### Declaring volumes in stacks
 
 To declare a volume within the stack, use a volume declaration like this:
 
@@ -211,6 +215,12 @@ To declare a volume within the stack, use a volume declaration like this:
     },
   }}
 />
+
+### Backup & recovery {#backup}
+
+All volumes (both project volumes and stack volumes) are backed up automatically as part of the project backup. This means that you can restore your data in case of a failure or data loss.
+
+_However_, a simple filesystem backup might not be sufficient for all application workloads. For example, if your application is using a database, you should ensure that the database is in a consistent state before taking a backup. This can be done by using the database's built-in backup functionality or by using a third-party backup solution.
 
 ## Network connectivity between containers and apps
 
