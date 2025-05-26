@@ -1,0 +1,316 @@
+---
+title: How to develop a frontend fragment
+---
+
+import OperationLink from "@site/src/components/OperationLink";
+
+## Select an anchor
+
+We are working on showing the available anchors directly in mStudio.
+In the meantime, available anchors are documented in the [Frontend Fragment Anchors Documentation](../../reference/frontend-fragment-anchors).
+
+## Build the frontend
+
+To develop a frontend fragment, you have to use flow remote components. Currently, it is recommended to build your frontend with **React**,
+because [ready-to-use remote components](https://mittwald.github.io/flow/03-components/actions/action-group) for Flow are available.
+You are free to choose any framework you like, such as **Vite**, **Next.js**, or others.
+However, you have to ensure that library functions introduced further down the page are executed on client side.
+Especially with frameworks like **Next.js**, this can be challenging.
+
+For implementing the frontend fragment, you develop a page using these components
+and then configure your extension to use the corresponding URL as fragment for your desired anchor.
+
+To test your frontend fragment, you have to start your frontend application on your local machine and let your (development) extension point on your localhost,
+like described in the [Local Development Documentation](../local-development#testing-frontend-fragments).
+
+### Hello World Example
+
+First, install Flow Remote Components:
+
+```sh
+npm install @mittwald/flow-remote-react-components
+```
+
+Example frontend fragment:
+
+```javascript
+import {
+  Alert,
+  Content,
+  Heading,
+} from "@mittwald/flow-remote-react-components";
+import RemoteRoot from "@mittwald/flow-remote-react-components/RemoteRoot";
+import { useConfig } from "@mittwald/ext-bridge/react";
+
+function SessionInfo() {
+  const config = useConfig();
+  return <InlineCode>{config.sessionId}</InlineCode>;
+}
+
+export default function Demo() {
+  return (
+    <RemoteRoot>
+      <Alert>
+        <Heading>Hello World!</Heading>
+        <Content>
+          This is my first frontend fragment: <SessionInfo />
+        </Content>
+      </Alert>
+    </RemoteRoot>
+  );
+}
+```
+
+### Ingredients used in the Example
+
+#### `<RemoteRoot>`
+
+This component is the root of your extension.
+React components placed under `<RemoteRoot>` are synchronized into the Fragment in mStudio.
+It should only appear once in your frontend fragment and the components you may use are limited.
+See the caveats about [Limited Components](#limited-components).
+When the `<RemoteComponent>` is mounted, you have access to the Ext Bridge.
+
+#### Flow Remote Components
+
+It is important to use the remote version of Flow components.
+Instead of `@mittwald/flow-react-components`, you must import from `@mittwald/flow-remote-react-components`.
+
+You can find a full documentation of available components in the [Flow Repository](https://mittwald.github.io/flow).
+
+#### `useConfig()`
+
+Components below the `<RemoteRoot>` do have access to the Ext Bridge configuration by using the `useConfig()` hook.
+The config holds some relevant information, like the `userId`, `projectId` or `sessionId`.
+
+### Caveats using Flow Remote Components
+
+There are some limitations, you should know when developing with remote
+components.
+
+#### Limited Components
+
+Under the `<RemoteRoot>` component it is only allowed to render the following
+components:
+
+- [Flow Components](https://mittwald.github.io/flow)
+- `<ul>`
+- `<ol>`
+- `<li>`
+- `<strong>`
+
+You can also build up your own components, but finally they must use the
+components listed above.
+If you use other components you will see an error in the console, telling what
+component is not supported.
+
+#### Limited Custom Styling
+
+The following props will not be applied in the mStudio view.
+Therefore it is not possible, to ship your own CSS or styles.
+This limitation is not only technical, but also by design and necessary to ensure a consistent look and feel of the mStudio.
+
+- `className`
+- `style`
+
+#### Event Data
+
+Most event data will be available to your event handlers, consistent with typical local React development practices.
+However, in certain edge cases, event data may be partially missing.
+This occurs because events are serialized and transmitted back to your extension, which can limit access to certain native browser APIs.
+
+If you require support for such cases, please open an issue for further assistance.
+
+### Customize the mStudio page header for your extension
+
+If you need to customize the mStudio page header — such as the title, breadcrumb, or action elements — you can use the [`@mittwald/mstudio-ext-react-components`](https://www.npmjs.com/package/@mittwald/mstudio-ext-react-components) package.
+
+## Connecting Your Own Backend
+
+### When Do You Need a Backend?
+
+Adding your own backend is recommended if you:
+
+- Need to persist data (e.g., user preferences, logs, or other stored information),
+- Want to interact with the **mittwald API** (e.g., to retrieve project or customer data),
+- Require server-side logic or integrations (e.g., data processing or exposing custom APIs).
+
+Implementing a backend provides full flexibility to implement server-side workflows,
+manage sessions, and define complex business logic.
+
+For details on how to implement secure communication between the extension's frontend and backend,
+refer to the section on [Session Handling and Configuration Values via Ext Bridge](#session-handling-and-configuration-values-via-ext-bridge).
+
+## Session Handling and Configuration Values via Ext Bridge
+
+Since frontend fragments run within an `<iframe>`, browser restrictions can complicate cookie handling and session management.
+
+To address this, use the `@mittwald/ext-bridge` package to securely exchange a session token between mStudio, your frontend,
+and your backend — ensuring session continuity.
+A session token is a JWT (JSON Web Token) that is generated by the mStudio and requested by the Ext Bridge.
+It has a very short lifetime and can only be obtained inside a frontend fragment iframe of the mStudio.
+Your backend can then validate the session token to authenticate incoming requests of your frontend.
+
+Furthermore, the session token contains a stable sessionId inside its claims.
+This sessionId is used to identify the current session.
+It gets reset when the user closes the mStudio tab or logs out.
+All the informationen such as the `sessionId`, `userId` or `projectId` can be accessed via the Ext Bridge.
+For more details refer to [`getConfig()`](#getconfig--useconfig-react).
+
+### Installation
+
+```sh
+npm add @mittwald/ext-bridge
+```
+
+### How Session Handling Works
+
+1. Your frontend requests a session token before each backend request.
+   **Note**: Session tokens are short-lived — always request a fresh token for _every_ request.
+   The Ext Bridge will automatically reuse the current token as long as it remains valid.
+
+2. Your backend verifies the session token.
+
+3. _(Optional)_ Your backend may use metadata such as `userId`, `sessionId`, or `extensionInstanceId` for additional authentication or logging purposes.
+
+4. _(Optional)_ Your backend can request an access token to interact with the
+   [mittwald API](https://developer.mittwald.de/de/docs/v2/reference/).
+
+### Difference Between Session Token and Access Token
+
+- A **Session Token** is requested **client-side** by your frontend via `@mittwald/ext-bridge`.
+  It is short-lived and used to authenticate communication between the frontend and your backend.
+  A valid session token proves that a request originates from a logged-in user within mStudio.
+  It does **not** (directly) grant access to the mittwald API.
+
+- An **Access Token**, in contrast, is requested **server-side** by your backend — using the session token and your extension's global secret.
+  This global secret is **not** the same as the extension instance secret, which is used to authenticate individual extension instances.
+  An access token is required to authenticate your backend when interacting with the [mittwald API](https://developer.mittwald.de/de/docs/v2/reference/).
+
+> **Important:** Always generate a new access token on demand. Never cache or reuse access tokens.
+
+### Frontend Implementation
+
+#### `getSessionToken()`
+
+Use `getSessionToken()` to generate a session token.
+
+> **Important:**
+>
+> - Server-Side Rendering (SSR) is **not supported** — this function must be called **client-side**.
+> - The method is available **only after** the `<RemoteRoot>` component has been rendered.
+> - Do **not** call `getSessionToken()` during initial rendering (e.g., inside `useEffect`).
+>   Instead, invoke it **right before** making a backend request.
+
+#### Example: Axios Interceptors
+
+Because session tokens are short-lived, it's recommended to use an HTTP client middleware
+or interceptor that automatically attaches a fresh token to each outgoing request.
+
+Example using Axios:
+
+```javascript
+import axios from "axios";
+import { getSessionToken } from "@mittwald/ext-bridge/browser";
+
+axios.interceptors.request.use(async (request) => {
+  const token = await getSessionToken();
+  request.headers.set("x-session-token", token);
+  return request;
+});
+```
+
+#### `getConfig()` / `useConfig()` (React)
+
+By using `getConfig()` or `useConfig()` (for react), you can access parameters useful for your frontend implementation.
+The return type is:
+
+```typescript
+type ExtBridgeConfig = {
+  sessionId: string;
+  userId: string;
+  extensionId: string;
+  extensionInstanceId: string;
+  appInstallationId?: string;
+  projectId?: string;
+  customerId?: string;
+};
+```
+
+Depending on the anchor, the contextual parameters like `projectId` or `appInstallationId` may or may not be present.
+For example, if your frontend fragment uses an anchor defined in the main customer navigation menu, neither `projectId` nor `appInstallationId` will be set.
+
+### Backend Implementation
+
+#### `verify()`
+
+Use the `verify()` method to validate a session token.
+If successful, it confirms that the request was made by a logged-in user from mStudio;
+otherwise, an error is thrown.
+
+#### Session Token Payload
+
+The `verify()` method returns a verified and decoded session token with the
+following structure:
+
+```typescript
+type SessionTokenPayload = {
+  sessionId: string;
+  userId: string;
+  extensionId: string;
+  extensionInstanceId: string;
+  contextId: string;
+  context: "project" | "organization";
+  scopes: string[];
+};
+```
+
+#### Example: Express Middleware
+
+Example of an Express middleware that verifies the session token and attaches
+the payload to the request object:
+
+```javascript
+import { verify } from "@mittwald/ext-bridge";
+
+app.use((req, res, next) => {
+  const token = req.headers["x-session-token"];
+  if (!token) return next("router");
+
+  verify(token)
+    .then((session) => {
+      req.sessionToken = session;
+      next();
+    })
+    .catch(() => res.sendStatus(401));
+});
+```
+
+#### Getting an Access Token to Access the mittwald API
+
+You can also use the session token to request an access token for authenticating with the mittwald API.
+
+This operation is secured using your global _extension secret_.
+You can generate or rotate this secret via the API route <OperationLink operation="extension-generate-extension-secret" />.
+
+Once retrieved, make sure the extension secret is securely stored and accessible only to your backend.
+One way to do this is by using environment variables.
+
+You can now use the `getAccessToken` method like this:
+
+```ts
+import { getAccessToken } from "@mittwald/ext-bridge/node";
+
+const accessToken = await getAccessToken(
+  sessionTokenFromRequest,
+  process.env.MY_EXT_SECRET,
+);
+
+const projectsResponse = await fetch("https://api.mittwald.de/v2/projects", {
+  headers: {
+    Authorization: `Bearer ${accessToken}`,
+  },
+});
+```
+
+> **Important:** Always create a fresh access token on demand. Never cache or reuse access tokens.
