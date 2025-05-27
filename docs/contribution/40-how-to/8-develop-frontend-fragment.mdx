@@ -18,9 +18,9 @@ However, you have to ensure that library functions introduced further down the p
 Especially with frameworks like **Next.js**, this can be challenging.
 
 For implementing the frontend fragment, you develop a page using these components
-and then configure your extension to use the corresponding URL as fragment for your desired anchor.
+and then configure your Extension to use the corresponding URL as fragment for your desired anchor.
 
-To test your frontend fragment, you have to start your frontend application on your local machine and let your (development) extension point on your localhost,
+To test your frontend fragment, you have to start your frontend application on your local machine and let your (development) Extension point on your localhost,
 like described in the [Local Development Documentation](../local-development#testing-frontend-fragments).
 
 ### Hello World Example
@@ -65,7 +65,7 @@ export default function Demo() {
 
 #### `<RemoteRoot>`
 
-This component is the root of your extension.
+This component is the root of your Extension.
 React components placed under `<RemoteRoot>` are synchronized into the Fragment in mStudio.
 It should only appear once in your frontend fragment and the components you may use are limited.
 See the caveats about [Limited Components](#limited-components).
@@ -117,11 +117,11 @@ This limitation is not only technical, but also by design and necessary to ensur
 
 Most event data will be available to your event handlers, consistent with typical local React development practices.
 However, in certain edge cases, event data may be partially missing.
-This occurs because events are serialized and transmitted back to your extension, which can limit access to certain native browser APIs.
+This occurs because events are serialized and transmitted back to your Extension, which can limit access to certain native browser APIs.
 
 If you require support for such cases, please open an issue for further assistance.
 
-### Customize the mStudio page header for your extension
+### Customize the mStudio page header for your Extension
 
 If you need to customize the mStudio page header — such as the title, breadcrumb, or action elements — you can use the [`@mittwald/mstudio-ext-react-components`](https://www.npmjs.com/package/@mittwald/mstudio-ext-react-components) package.
 
@@ -138,7 +138,7 @@ Adding your own backend is recommended if you:
 Implementing a backend provides full flexibility to implement server-side workflows,
 manage sessions, and define complex business logic.
 
-For details on how to implement secure communication between the extension's frontend and backend,
+For details on how to implement secure communication between the Extension's frontend and backend,
 refer to the section on [Session Handling and Configuration Values via Ext Bridge](#session-handling-and-configuration-values-via-ext-bridge).
 
 ## Session Handling and Configuration Values via Ext Bridge
@@ -183,8 +183,8 @@ npm add @mittwald/ext-bridge
   A valid session token proves that a request originates from a logged-in user within mStudio.
   It does **not** (directly) grant access to the mittwald API.
 
-- An **Access Token**, in contrast, is requested **server-side** by your backend — using the session token and your extension's global secret.
-  This global secret is **not** the same as the extension instance secret, which is used to authenticate individual extension instances.
+- An **Access Token**, in contrast, is requested **server-side** by your backend — using the session token and your Extension's global secret.
+  This global secret is **not** the same as the Extension Instance secret, which is used to authenticate individual Extension Instances.
   An access token is required to authenticate your backend when interacting with the [mittwald API](https://developer.mittwald.de/de/docs/v2/reference/).
 
 > **Important:** Always generate a new access token on demand. Never cache or reuse access tokens.
@@ -290,10 +290,10 @@ app.use((req, res, next) => {
 
 You can also use the session token to request an access token for authenticating with the mittwald API.
 
-This operation is secured using your global _extension secret_.
+This operation is secured using your global _Extension secret_.
 You can generate or rotate this secret via the API route <OperationLink operation="extension-generate-extension-secret" />.
 
-Once retrieved, make sure the extension secret is securely stored and accessible only to your backend.
+Once retrieved, make sure the Extension secret is securely stored and accessible only to your backend.
 One way to do this is by using environment variables.
 
 You can now use the `getAccessToken` method like this:
