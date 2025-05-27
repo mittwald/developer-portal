@@ -18,10 +18,10 @@ You may use the following placeholders:
 
 - `apiVersion`: The API version used for the webhook. Currently always `v1`. See [API versioning](../../overview/concepts/api-versioning).
 - `contributorId`: ID of the contributor
-- `extensionId`: ID of the extension
-- `extensionInstanceId`: ID of the extension instance
-- `contextId`: ID of the extension context, eg. the ProjectID
-- `context`: The extension context kind the extension instance was added to. Currently one of `customer` and `project`.
+- `extensionId`: ID of the Extension
+- `extensionInstanceId`: ID of the Extension Instance
+- `contextId`: ID of the Extension context, eg. the ProjectID
+- `context`: The Extension context kind the Extension Instance was added to. Currently one of `customer` and `project`.
 
 ## Webhook Payloads
 
@@ -496,52 +496,52 @@ For more information about the semantics of the individual lifecycle webhooks, s
 
 ### id
 
-The globally unique identifier of the extension instance.
-Don't confuse this with the extension ID that identifies the extension as a whole.
+The globally unique identifier of the Extension Instance.
+Don't confuse this with the Extension ID that identifies the Extension as a whole.
 Also, you must not confuse this ID with the `request.id` that identifies the request and can be used to mitigate replay attacks.
 For more information, see [request meta information](#request).
 
 ### context
 
-Information about the extension context, the extension instance belongs to.
-Currently, the two possible extension contexts are:
+Information about the Extension context, the Extension Instance belongs to.
+Currently, the two possible Extension contexts are:
 
 - `customer`
 - `project`
 
 Additionally to the `context.kind`, the mStudio transmits the `context.id`.
-This is the ID of the extension context, so the ID of a project, for example.
+This is the ID of the Extension context, so the ID of a project, for example.
 
 ### consentedScopes
 
-The scopes the user consented to when they added the extension to an extension context.
-If the contributor of an extension adds additional scopes to it later, the user has to consent to those scopes before the extension can use those scopes for that extension instance.
+The scopes the user consented to when they added the Extension to an Extension context.
+If the contributor of an Extension adds additional scopes to it later, the user has to consent to those scopes before the Extension can use those scopes for that Extension Instance.
 
-The extension can check whether the required scopes are available using the `consentedScopes`.
+The Extension can check whether the required scopes are available using the `consentedScopes`.
 For this reason, we recommend persisting the `consentedScopes`.
 
 ### state
 
-The current state of the extension instance.
+The current state of the Extension Instance.
 The mStudio currently only informs the external application of the state of `enabled` via the lifecycle webhooks.
-This tells the extension whether an extension instance is active and, therefore, whether it should function.
-The authentication and authorization mechanisms don't work for deactivated extension instances.
-In that case, domain actions of that extension instance are not accepted.
+This tells the Extension whether an Extension Instance is active and, therefore, whether it should function.
+The authentication and authorization mechanisms don't work for deactivated Extension Instances.
+In that case, domain actions of that Extension Instance are not accepted.
 
 ### meta
 
-Meta information about the extension (instance).
+Meta information about the Extension (Instance).
 This includes the extensionID and the contributorID.
 
-These information should be used to ensure that the webhook not only originates from mittwald, but is also intended for the own extension.
+These information should be used to ensure that the webhook not only originates from mittwald, but is also intended for the own Extension.
 This prevents forward replay attacks.
 This should not be confused with the request meta information which describes the webhook call itself.
 
 ### secret
 
-The secret that is used for the authentication of the extension instance.
+The secret that is used for the authentication of the Extension Instance.
 You may use this to implement user-independent authentication.
-For more information, see [authentication of extension instances](../../overview/concepts/authentication#extension-instance-secret).
+For more information, see [authentication of Extension Instances](../../overview/concepts/authentication#extension-instance-secret).
 
 ### request
 
@@ -553,7 +553,7 @@ You can persist the `request.id` and compare it with the IDs of future lifecycle
 The mStudio never sends requests with the same `request.id` multiple times.
 
 You can validate the field `request.target.url` to check whether the request reached the correct receiver.
-This way, you can avoid processing signed requests that an attacker forwarded to another extension.
+This way, you can avoid processing signed requests that an attacker forwarded to another Extension.
 
 You can validate the field `request.createdAt` to identify old requests.
 Keep in mind that the mStudio potentially sends webhooks asynchronously and the time difference between the webhook creation and receiving the webhook may vary.
@@ -631,13 +631,13 @@ TODO
 
 ## Dry Running Webhooks
 
-An extension developer can trigger a webhook in dry run mode to make the extension development easier.
-The developer defines the [webhook kind](#kind) for the dry run webhook execution, and the mStudio then calls the corresponding extension webhook.
+An Extension developer can trigger a webhook in dry run mode to make the Extension development easier.
+The developer defines the [webhook kind](#kind) for the dry run webhook execution, and the mStudio then calls the corresponding Extension webhook.
 The mStudio calls the webhook endpoint with [demo values](#demo-values).\
 After the dry run webhook call is completed, the mStudio returns the result of the webhook call in the [API response](../../../reference/marketplace/extension-dry-run-webhook).
 This includes the response body, the response headers, and general errors.\
-The mStudio includes the query parameter `dry-run=true` in dry-run webhook calls so that extensions can identify them.
-If the `dry-run` query parameter is set to `true` in a webhook call, the extension backend should handle the webhook call as such and interpret the webhook as a test.
+The mStudio includes the query parameter `dry-run=true` in dry-run webhook calls so that Extensions can identify them.
+If the `dry-run` query parameter is set to `true` in a webhook call, the Extension backend should handle the webhook call as such and interpret the webhook as a test.
 The mStudio additionally sets the query parameter `executing-user-id` for dry run webhook calls.
 
 For dry run webhook calls, the `extensionInstanceId` does not have any relevant meaning for real entities in the mStudio.
@@ -646,8 +646,8 @@ Only users that belong to a contributor are allowed to trigger dry run webhooks.
 
 ### Demo Values
 
-You can use the demo values as test data to test the internal logic of your extension by sending the following JSON object in the body.
-If the values are not set, the mStudio derives them from the extension or generates random values.
+You can use the demo values as test data to test the internal logic of your Extension by sending the following JSON object in the body.
+If the values are not set, the mStudio derives them from the Extension or generates random values.
 
 <SchemaWithExample
   withRawJSONSchema

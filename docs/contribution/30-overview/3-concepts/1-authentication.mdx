@@ -11,40 +11,40 @@ OAuth2 supports the following flows:
 - Authorization Code Grant
 - Authorization Code Grant with PKCE
 
-To use OAuth2, you have to [create an OAuth2 client](../../../how-to/manage-oauth-clients) that requests the required scopes.
+To use OAuth2, you have to [create an OAuth2 Client](../../../how-to/manage-oauth-clients) that requests the required scopes.
 You can use this client to execute OAuth 2.0 authentication procedures.
 For more information on the necessary API endpoints for the OAuth2 flow, see [OAuth2 endpoints](../../../reference/api#oauth2).
 
 ## Access Token Retrieval Key
 
-The mStudio provides a single sign-on (SSO) mechanism to allow its users convenient access to extensions.
+The mStudio provides a single sign-on (SSO) mechanism to allow its users convenient access to Extensions.
 The user is redirected to the external application and authenticated at the click of a button in the mStudio.
 
-To do this, the mStudio generates an access token retrieval key (ATReK) and sends it to the frontend of the extension when the button is clicked.
-This only happens, if the extension provides a URL template that contains the ATReK and the UserID as placeholders.
-For more information, see [extension external frontend](../../extensions#external-frontend).
+To do this, the mStudio generates an access token retrieval key (ATReK) and sends it to the frontend of the Extension when the button is clicked.
+This only happens, if the Extension provides a URL template that contains the ATReK and the UserID as placeholders.
+For more information, see [Extension external frontend](../../extensions#external-frontend).
 
 The validity of the ATReK is short and expires after a single use.
 For this reason, the external application must use the ATReK immediately to obtain an access token.
 For more information on how an ATReK is exchanged for an access token, see [access token retrieval key reference](../../../reference/api#using-an-access-token-retrieval-key)
 
 The access token created from an ATReK represents the executing mStudio user.
-Its permissions are limited by the scopes of the extension and the permissions of the mStudio user.
-This ensures that the extension user can only perform those domain actions that they are allowed to perform in the mStudio.
-It also ensures that a user using the extension does not have more permissions than requested by the extension.
+Its permissions are limited by the scopes of the Extension and the permissions of the mStudio user.
+This ensures that the Extension user can only perform those domain actions that they are allowed to perform in the mStudio.
+It also ensures that a user using the Extension does not have more permissions than requested by the Extension.
 
 ## Extension Instance Secret
 
-The extension receives a secret per extension instance to act without further user interaction.
+The Extension receives a secret per Extension Instance to act without further user interaction.
 It is sent to the external application via lifecycle webhooks.
-You can request an access token for the extension with the secret and the extension instance ID.
-The permissions of this access token are limited by the scopes of the extension.
+You can request an access token for the Extension with the secret and the Extension Instance ID.
+The permissions of this access token are limited by the scopes of the Extension.
 
 For more information about the information transmitted via lifecycle webhooks, see [lifecycle webhooks](../../../reference/webhooks).
-For more information about exchanging an extension secret against an access token, see [extension secret reference](../../../reference/api#authenticating-with-the-extension-instance-secret).
+For more information about exchanging an Extension secret against an access token, see [Extension secret reference](../../../reference/api#authenticating-with-the-extension-instance-secret).
 
-An extension can implement its user management with this method.
-Users registered with the external application all interact with the public mStudio API on behalf of the extension and share one secret.
+An Extension can implement its user management with this method.
+Users registered with the external application all interact with the public mStudio API on behalf of the Extension and share one secret.
 
 ## Prompting Login Information of the mStudio User
 

@@ -6,8 +6,8 @@ import OperationLink from "@site/src/components/OperationLink";
 import SchemaWithExample from "../../../src/components/openapi/SchemaWithExample";
 
 There is no way to start the mStudio public API locally.
-This makes the local development of extensions challenging if the extension heavily integrates with the mStudio.
-However, there are ways to assist the local extension development besides mocking the mStudio API, which might be difficult without deep knowledge of the API.
+This makes the local development of Extensions challenging if the Extension heavily integrates with the mStudio.
+However, there are ways to assist the local Extension development besides mocking the mStudio API, which might be difficult without deep knowledge of the API.
 We will explore these in the rest of this page.
 
 ## Authenticated Domain Actions
@@ -17,7 +17,7 @@ It is usually necessary to authenticate against the API.
 
 ### ...via a Personal API Token
 
-It is a good idea to use your personal API token during the early development of your extension, while you evaluate your business idea and work on a proof of concept.
+It is a good idea to use your personal API token during the early development of your Extension, while you evaluate your business idea and work on a proof of concept.
 You can use this token for local development.
 However, it is important that you **do not check in API tokens into version control systems** like Git.
 
@@ -25,23 +25,23 @@ For more information about obtaining an API token, see [obtaining an API token](
 
 ### ...via Extension Instance Secret Rotation
 
-Rotating the extension instance secret is another possibility for using the mStudio public API authenticated without implementing the authentication methods intended for extensions.
+Rotating the Extension Instance secret is another possibility for using the mStudio public API authenticated without implementing the authentication methods intended for Extensions.
 For this, you can use the <OperationLink operation="contributor-rotate-secret-for-extension-instance" /> operation.
-The mStudio returns the new extension secret in the response and transfers it to the extension per webhook.
+The mStudio returns the new Extension secret in the response and transfers it to the Extension per webhook.
 We recommend you store the obtained secret securely, similar to personal API tokens.
-In the future, you can use this secret to obtain access tokens, as described in [authenticating with the extension instance secret](../../reference/api#authenticating-with-the-extension-instance-secret).
+In the future, you can use this secret to obtain access tokens, as described in [authenticating with the Extension Instance secret](../../reference/api#authenticating-with-the-Extension-instance-secret).
 When using this route, the mStudio executes the webhook call synchronously.
 If the webhook call fails, it is not sent again.
 Also, the new secret is not valid if the webhook call failes.
 To test without a working webhook handler, you can add `"allowWebhookFailure": true` to the request body.
 This way, the mStudio ignores failures of the webhook calls and the mStudio responds to the request with the new secret.
 
-If you plan to implement the authentication using the extension instance secret later, this method is especially useful.
-Additionally, you can test initialization processes executed after webhook calls with a working secret without creating a new extension instance in the mStudio for every attempt.
+If you plan to implement the authentication using the Extension Instance secret later, this method is especially useful.
+Additionally, you can test initialization processes executed after webhook calls with a working secret without creating a new Extension Instance in the mStudio for every attempt.
 
 ### ...via OAuth2
 
-If you want to test the authentication and execution of domain actions per OAuth2, we recommend setting up a local redirect URI in the OAuth2 client.
+If you want to test the authentication and execution of domain actions per OAuth2, we recommend setting up a local redirect URI in the OAuth2 Client.
 This can either be the localhost or a domain with an entry to your local host configuration.
 You should ensure that no public domain is used as an entry to your local host configuration that is not in your control to mitigate security risk.
 
@@ -64,13 +64,13 @@ For this, it provides an API you can use to request lifecycle webhooks.
 You can freely choose the values transmitted by the webhooks.
 If you don't set some values, the server randomly generates those values.
 
-If, for example, you set the extension instance IDs of the requested lifecycle webhooks and use a consistent ID, you can simulate complete lifecycles of extension instances.
+If, for example, you set the Extension Instance IDs of the requested lifecycle webhooks and use a consistent ID, you can simulate complete lifecycles of Extension Instances.
 
 ### ...via Dry Run Webhooks
 
 You can use the mStudio backend to simulate lifecycle webhooks by using the <OperationLink operation="extension-dry-run-webhook" /> operation.
-The mStudio will send the requested lifecycle webhook to the URL configured for the extension.
-You can only execute dry-run webhooks for extension instances belonging to you, the contributor.
+The mStudio will send the requested lifecycle webhook to the URL configured for the Extension.
+You can only execute dry-run webhooks for Extension Instances belonging to you, the contributor.
 Similarly to the local development server, you can specify values for the content of the lifecycle webhooks or let the mStudio backend generate random values.
 For an overview of the values you can statically specify, see the linked operation.
 
@@ -89,8 +89,8 @@ It contains the user ID of the user who requested the dry-run webhook.
 ## Testing Frontend Fragments
 
 In order to test if the integration of your frontend fragment is working correctly, you should start your dev server.
-Also, you should configure your (development) extension to use the URL of your local dev server, e.g. `http://localhost:3000/my-fragment`, as the fragment URL.
-To do so, you can create a hidden copy of your extension for local development (see [Staging](../staging))
+Also, you should configure your (development) Extension to use the URL of your local dev server, e.g. `http://localhost:3000/my-fragment`, as the fragment URL.
+To do so, you can create a hidden copy of your Extension for local development (see [Staging](../staging))
 
 This lets you build and test your frontend fragment locally before deploying it live.
 
