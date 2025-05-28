@@ -66,6 +66,16 @@ Lies unseren Leitfaden zu [Webservern](../webservers#making-your-app-accessible-
 
 Lies unseren Leitfaden zu [Webservern](../webservers/#managing-your-process-lifecycle), um zu erfahren, wie du den Prozesslebenszyklus deines PHP-Workers verwalten kannst.
 
+## Automatische PHP-Updates aktivieren
+
+Das automatische Update von PHP-Versionen ist ein [offener Feature-Request](https://github.com/mittwald/feature-requests/issues/70).
+
+Du kannst jedoch eine eigene Lösung zum automatischen Update von PHP bauen, indem du den `mw app dependency update` [CLI](/cli) Befehl verwendest. Dieser Befehl ermöglicht es dir, eine Versionsbeschränkung für die PHP-Abhängigkeit deiner App festzulegen, und aktualisiert die Abhängigkeiten der App entsprechend. Zum Beispiel kannst du den folgenden Befehl ausführen, um deine App auf die neueste 8.4-Version von PHP zu aktualisieren (entweder auf Abruf oder regelmäßig über einen Cron-Job):
+
+```shell-session
+$ mw app dependency update <app-id> --set php=~8.4
+```
+
 ## Beispielanwendungen
 
 ### ReactPHP
