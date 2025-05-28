@@ -73,6 +73,16 @@ Wirf einen Blick auf unseren Leitfaden zum [Betrieb von Webservern](../webserver
 
 Wirf einen Blick auf unseren Leitfaden zum [Betrieb von Webservern](../webservers#das-verwalten-deines-prozesslebenszyklus), um zu erfahren, wie du den Prozesslebenszyklus deiner Node.js-Anwendung verwalten kannst.
 
+## Automatische Node.js-Updates aktivieren
+
+Das automatische Update von Node.js-Versionen ist ein [offener Feature-Request](https://github.com/mittwald/feature-requests/issues/70).
+
+Du kannst jedoch eine eigene Lösung zum automatischen Update von Node.js bauen, indem du den `mw app dependency update` [CLI](/cli) Befehl verwendest. Dieser Befehl ermöglicht es dir, eine Versionsbeschränkung für die Node.js-Abhängigkeit deiner App festzulegen, und aktualisiert die Abhängigkeiten der App entsprechend. Zum Beispiel kannst du den folgenden Befehl ausführen, um deine App auf die neueste 22er-Version von Node.js zu aktualisieren (entweder auf Abruf oder regelmäßig über einen Cron-Job):
+
+```shell-session
+$ mw app dependency update <app-id> --set php=^22.0
+```
+
 ## Beispielanwendungen
 
 ### Express.js
