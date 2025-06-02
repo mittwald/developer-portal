@@ -106,6 +106,12 @@ In this case, we revoke all permissions of the Extension Instance and invalidate
 Nonetheless, the mStudio tries to execute the webhook to achieve a consistent state of the mStudio and Extension data.
 :::
 
+:::note
+In particular, when implementing this webhook, it is important to ensure that the webhook handler is idempotent.
+This means that the webhook handler should not return an error if the extension is not aware of the extension instance.
+If the extension does not recognize an extension instance with the provided ID, the webhook handler should still respond with a successful HTTP status code.
+:::
+
 ## Verifying the Identity of the Sender of Webhooks
 
 We provide the possibility to verify the identity of the sender and the integrity of the request body content.
