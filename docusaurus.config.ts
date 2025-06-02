@@ -9,6 +9,30 @@ import { Options as ClientRedirectOptions } from "@docusaurus/plugin-client-redi
 const lightCodeTheme = themes.oneLight;
 const darkCodeTheme = themes.dracula;
 
+function webpackCryptoFallbackPlugin() {
+  return {
+    name: "webpack-crypto-fallback",
+    configureWebpack() {
+      return {
+        resolve: {
+          fallback: {
+            crypto: require.resolve("crypto-browserify"),
+            stream: require.resolve("stream-browserify"),
+            buffer: require.resolve("buffer/"),
+            process: require.resolve("process/browser.js"),
+          },
+        },
+        plugins: [
+          new (require("webpack").ProvidePlugin)({
+            process: "process/browser.js",
+            Buffer: ["buffer", "Buffer"],
+          }),
+        ],
+      };
+    },
+  };
+}
+
 const config: Config = {
   title: "mittwald Developer Portal",
   //tagline: 'Dinosaurs are cool',
@@ -49,7 +73,6 @@ const config: Config = {
       },
     },
   },
-
   plugins: [
     [
       "@docusaurus/plugin-client-redirects",
@@ -84,6 +107,7 @@ const config: Config = {
         onInlineTags: "ignore",
       },
     ],
+    webpackCryptoFallbackPlugin,
   ],
 
   presets: [
