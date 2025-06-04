@@ -1,0 +1,252 @@
+---
+title: Breaking (!) API changes for v2 API, May 23 to May 30
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Marketplace
+  - App
+  - Contract
+  - Container
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+In the week of 5/23/2025 to 5/30/2025, the mittwald API introduced several significant changes, including the addition of new endpoints, the requirement of request bodies for certain operations, and the removal of deprecated paths, enhancing the overall functionality and structure of the API.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The request body has become required for the `PUT` operation `extension-set-extension-published-state` at the path `/v2/contributors/{contributorId}/extensions/{extensionId}/published`. **This is a breaking change.**
+- The API paths `/v2/system-software/{systemSoftwareId}/versions` and `/v2/system-software/{systemSoftwareId}/versions/{systemSoftwareVersionId}` have been removed without deprecation for the `GET` operations `app-list-systemsoftwareversions` and `app-get-systemsoftwareversion`, respectively.
+- A new endpoint has been added for the `GET` operation `contract-get-detail-of-contract-by-lead-fyndr` at the path `/v2/customers/{customerId}/lead-fyndr-profile/contract`, which returns the Contract for the given LeadFyndrProfile.
+- The `POST` operation `order-preview-order` at the path `/v2/order-previews` has several updates: 
+  - The new 'leadFyndr' enum value has been added to the request property 'orderType'.
+  - The `oneOf` list for the request property 'orderData' now includes `#/components/schemas/de.mittwald.v1.order.LeadFyndrOrderPreview`.
+  - The response body for status '200' now includes `#/components/schemas/de.mittwald.v1.order.HostingOrderPreviewResponse`, `#/components/schemas/de.mittwald.v1.order.DomainOrderPreviewResponse`, `#/components/schemas/de.mittwald.v1.order.ExternalCertificateOrderPreviewResponse`, and `#/components/schemas/de.mittwald.v1.order.LeadFyndrOrderPreviewResponse`.
+  - The `oneOf` list for the response body for status '200' has removed `#/components/schemas/de.mittwald.v1.order.HostingOrderPreviewResponse`, `#/components/schemas/de.mittwald.v1.order.DomainOrderPreviewResponse`, and `#/components/schemas/de.mittwald.v1.order.ExternalCertificateOrderPreviewResponse`.
+- The `POST` operation `order-create-order` at the path `/v2/orders` has been updated with:
+  - The new 'leadFyndr' enum value added to the request property 'orderType'.
+  - The `oneOf` list for the request property 'orderData' now includes `#/components/schemas/de.mittwald.v1.order.LeadFyndrOrder`.
+- The `GET` operation `container-list-services` at the path `/v2/projects/{projectId}/services` has a new required property `/items/statusSetAt` added to the response with status '200'.
+- The `GET` operation `container-list-stacks` at the path `/v2/projects/{projectId}/stacks` has a new required property `/items/services/items/statusSetAt` added to the response with status '200'.
+- The `GET` operation `container-get-stack` at the path `/v2/stacks/{stackId}` has a new required property `services/items/statusSetAt` added to the response with status '200'.
+- The `PATCH` operation `container-update-stack` at the path `/v2/stacks/{stackId}` has a new required property `services/items/statusSetAt` added to the response with status '200'.
+- The `PUT` operation `container-declare-stack` at the path `/v2/stacks/{stackId}` has a new required property `services/items/statusSetAt` added to the response with status '200'.
+- The `GET` operation `container-get-service` at the path `/v2/stacks/{stackId}/services/{serviceId}` has a new required property `statusSetAt` added to the response with status '200'.
+- New endpoints have been added for the `GET` operations `app-list-systemsoftwareversions` and `app-get-systemsoftwareversion` at the paths `/v2/system-softwares/{systemSoftwareId}/versions` and `/v2/system-softwares/{systemSoftwareId}/versions/{systemSoftwareVersionId}`, respectively.
+- The `POST` operation `order-preview-tariff-change` at the path `/v2/tariff-change-previews` has been updated with:
+  - The new 'leadFyndr' enum value added to the request property 'tariffChangeType'.
+  - The `oneOf` list for the request property 'tariffChangeData' now includes `#/components/schemas/de.mittwald.v1.order.LeadFyndrTariffChange`.
+- The `POST` operation `order-create-tariff-change` at the path `/v2/tariff-changes` has been updated with:
+  - The new 'leadFyndr' enum value added to the request property 'tariffChangeType'.
+  - The `oneOf` list for the request property 'tariffChangeData' now includes `#/components/schemas/de.mittwald.v1.order.LeadFyndrTariffChange`.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Publish or withdraw an Extension"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="extension-set-extension-published-state" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List system software versions belonging to a system software"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="app-list-systemsoftwareversions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a system software version"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="app-get-systemsoftwareversion" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the Contract for the given LeadFyndrProfile"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-lead-fyndr" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Preview Order"
+
+
+- added the new 'leadFyndr' enum value to the request property 'orderType'
+
+- added '#/components/schemas/de.mittwald.v1.order.LeadFyndrOrderPreview' to the 'orderData' request property 'oneOf' list
+
+- added '#/components/schemas/de.mittwald.v1.order.HostingOrderPreviewResponse, #/components/schemas/de.mittwald.v1.order.DomainOrderPreviewResponse, #/components/schemas/de.mittwald.v1.order.ExternalCertificateOrderPreviewResponse, #/components/schemas/de.mittwald.v1.order.LeadFyndrOrderPreviewResponse' to the response body 'anyOf' list for the response status '200'
+
+- removed '#/components/schemas/de.mittwald.v1.order.HostingOrderPreviewResponse, #/components/schemas/de.mittwald.v1.order.DomainOrderPreviewResponse, #/components/schemas/de.mittwald.v1.order.ExternalCertificateOrderPreviewResponse' from the response body 'oneOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="order-preview-order" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create an Order"
+
+
+- added the new 'leadFyndr' enum value to the request property 'orderType'
+
+- added '#/components/schemas/de.mittwald.v1.order.LeadFyndrOrder' to the 'orderData' request property 'oneOf' list
+
+
+For details, refer to the <OperationLink operation="order-create-order" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Services belonging to a Project"
+
+
+- added the required property '/items/statusSetAt' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-list-services" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Stacks belonging to a Project"
+
+
+- added the required property '/items/services/items/statusSetAt' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-list-stacks" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Stack"
+
+
+- added the required property 'services/items/statusSetAt' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-get-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create, update or delete Services or Volumes belonging to a Stack"
+
+
+- added the required property 'services/items/statusSetAt' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-update-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Declaratively create, update or delete Services or Volumes belonging to a Stack"
+
+
+- added the required property 'services/items/statusSetAt' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-declare-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Service belonging to a Stack"
+
+
+- added the required property 'statusSetAt' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-get-service" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Preview TariffChange"
+
+
+- added the new 'leadFyndr' enum value to the request property 'tariffChangeType'
+
+- added '#/components/schemas/de.mittwald.v1.order.LeadFyndrTariffChange' to the 'tariffChangeData' request property 'oneOf' list
+
+
+For details, refer to the <OperationLink operation="order-preview-tariff-change" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create TariffChange Order"
+
+
+- added the new 'leadFyndr' enum value to the request property 'tariffChangeType'
+
+- added '#/components/schemas/de.mittwald.v1.order.LeadFyndrTariffChange' to the 'tariffChangeData' request property 'oneOf' list
+
+
+For details, refer to the <OperationLink operation="order-create-tariff-change" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald JavaScript SDK Release 4.156.0
+
+The mittwald JavaScript SDK has been updated to version 4.156.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.156.0](https://github.com/mittwald/api-client-js/releases/tag/4.156.0).
+
+### mittwald JavaScript SDK Release 4.155.0
+
+The mittwald JavaScript SDK has been updated to version 4.155.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald/api-client-js 4.155.0](https://github.com/mittwald/api-client-js/releases/tag/4.155.0).
+
+### mittwald JavaScript SDK Release 4.154.0
+
+The mittwald JavaScript SDK has been updated to version 4.154.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.154.0).
+
+### mittwald JavaScript SDK Release 4.153.0
+
+The mittwald JavaScript SDK has been updated to version 4.153.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.153.0).
+
+### mittwald JavaScript SDK Release 4.152.0
+
+The mittwald JavaScript SDK has been updated to version 4.152.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.152.0).
+
+### mittwald JavaScript SDK Release 4.151.0
+
+The mittwald JavaScript SDK has been updated to version 4.151.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.151.0).
+
