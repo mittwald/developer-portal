@@ -1,0 +1,275 @@
+---
+title: API changes for v2 API, May 30 to June 6
+authors:
+  - machine
+tags:
+  - apiv2
+  - Marketplace
+  - Backup
+  - Container
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API introduces several enhancements, including the addition of required and optional properties to various responses, such as 'contributorName', 'extensionName', and 'homepage', as well as a new optional request parameter 'searchTerm' for listing extensions.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- The optional property `/items/homepage` has been added to the response with the '200' status for the `GET /v2/contributors` operation (List Contributors).
+- The optional property `/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Contributor]/homepage` has been added to the response with the '200' status for the `GET /v2/contributors/{contributorId}` operation (Get a Contributor).
+- The following properties have been added to the response with the '200' status for the `GET /v2/customers/{customerId}/extensions/{extensionId}` operation (Get the ExtensionInstance of a specific customer and extension):
+  - Optional property `contributorId`
+  - Optional property `extensionSubTitle`
+  - Required property `contributorName`
+  - Required property `extensionName`
+- The following properties have been added to the response with the '200' status for the `GET /v2/extension-instances` operation (List ExtensionInstances):
+  - Optional property `/items/contributorId`
+  - Optional property `/items/extensionSubTitle`
+  - Required property `/items/contributorName`
+  - Required property `/items/extensionName`
+- The following properties have been added to the response with the '200' status for the `GET /v2/extension-instances/{extensionInstanceId}` operation (Get an ExtensionInstance):
+  - Optional property `contributorId`
+  - Optional property `extensionSubTitle`
+  - Required property `contributorName`
+  - Required property `extensionName`
+- A new optional request parameter `searchTerm` has been added for the `GET /v2/extensions` operation (List Extensions).
+- The optional property `export/sha256Checksum` has been added to the response with the '200' status for the `GET /v2/project-backups/{projectBackupId}` operation (Get a ProjectBackup).
+- The optional property `/items/export/sha256Checksum` has been added to the response with the '200' status for the `GET /v2/projects/{projectId}/backups` operation (List Backups belonging to a Project).
+- The optional property `export/sha256Checksum` has been added to the response with the '201' status for the `POST /v2/projects/{projectId}/backups` operation (Create a Backup of a Project).
+- The following properties have been added to the response with the '200' status for the `GET /v2/projects/{projectId}/extensions/{extensionId}` operation (Get the ExtensionInstance of a specific project and extension):
+  - Optional property `contributorId`
+  - Optional property `extensionSubTitle`
+  - Required property `contributorName`
+  - Required property `extensionName`
+- The following properties have been added to the response with the '200' status for the `GET /v2/projects/{projectId}/services` operation (List Services belonging to a Project):
+  - Required property `/items/requiresRecreate`
+- The following properties have been added to the response with the '200' status for the `GET /v2/projects/{projectId}/stacks` operation (List Stacks belonging to a Project):
+  - Required property `/items/services/items/requiresRecreate`
+- The required property `services/items/requiresRecreate` has been added to the response with the '200' status for the following operations:
+  - `GET /v2/stacks/{stackId}` (Get a Stack)
+  - `PATCH /v2/stacks/{stackId}` (Create, update or delete Services or Volumes belonging to a Stack)
+  - `PUT /v2/stacks/{stackId}` (Declaratively create, update or delete Services or Volumes belonging to a Stack)
+- The required property `requiresRecreate` has been added to the response with the '200' status for the `GET /v2/stacks/{stackId}/services/{serviceId}` operation (Get a Service belonging to a Stack).
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "List contributors"
+
+
+- added the optional property '/items/homepage' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-list-contributors" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a contributor"
+
+
+- added the optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Contributor]/homepage' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-contributor" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the extension instance of a specific customer and extension, if existing"
+
+
+- added the optional property 'contributorId' to the response with the '200' status
+
+- added the optional property 'extensionSubTitle' to the response with the '200' status
+
+- added the required property 'contributorName' to the response with the '200' status
+
+- added the required property 'extensionName' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-extension-instance-for-customer" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List extension instances"
+
+
+- added the optional property '/items/contributorId' to the response with the '200' status
+
+- added the optional property '/items/extensionSubTitle' to the response with the '200' status
+
+- added the required property '/items/contributorName' to the response with the '200' status
+
+- added the required property '/items/extensionName' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-list-extension-instances" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an extension instance"
+
+
+- added the optional property 'contributorId' to the response with the '200' status
+
+- added the optional property 'extensionSubTitle' to the response with the '200' status
+
+- added the required property 'contributorName' to the response with the '200' status
+
+- added the required property 'extensionName' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-extension-instance" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Extensions"
+
+
+- added the new optional 'query' request parameter 'searchTerm'
+
+
+For details, refer to the <OperationLink operation="extension-list-extensions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a project backup"
+
+
+- added the optional property 'export/sha256Checksum' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="backup-get-project-backup" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Backups belonging to a Project"
+
+
+- added the optional property '/items/export/sha256Checksum' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="backup-list-project-backups" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a Backup of a Project"
+
+
+- added the optional property 'export/sha256Checksum' to the response with the '201' status
+
+
+For details, refer to the <OperationLink operation="backup-create-project-backup" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the extension instance of a specific project and extension, if existing"
+
+
+- added the optional property 'contributorId' to the response with the '200' status
+
+- added the optional property 'extensionSubTitle' to the response with the '200' status
+
+- added the required property 'contributorName' to the response with the '200' status
+
+- added the required property 'extensionName' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-extension-instance-for-project" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Services belonging to a Project"
+
+
+- added the required property '/items/requiresRecreate' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-list-services" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Stacks belonging to a Project"
+
+
+- added the required property '/items/services/items/requiresRecreate' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-list-stacks" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Stack"
+
+
+- added the required property 'services/items/requiresRecreate' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-get-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create, update or delete Services or Volumes belonging to a Stack"
+
+
+- added the required property 'services/items/requiresRecreate' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-update-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Declaratively create, update or delete Services or Volumes belonging to a Stack"
+
+
+- added the required property 'services/items/requiresRecreate' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-declare-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Service belonging to a Stack"
+
+
+- added the required property 'requiresRecreate' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-get-service" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald JavaScript SDK Release 4.161.0
+
+The mittwald JavaScript SDK has been updated to version 4.161.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.161.0).
+
+### mittwald JavaScript SDK Release 4.160.0
+
+The mittwald JavaScript SDK has been updated to version 4.160.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.160.0](https://github.com/mittwald/api-client-js/releases/tag/4.160.0).
+
+### mittwald JavaScript SDK Release 4.159.0
+
+The mittwald JavaScript SDK has been updated to version 4.159.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.159.0).
+
+### mittwald JavaScript SDK Release 4.158.0
+
+The mittwald JavaScript SDK version 4.158.0 has been released. This update includes a feature enhancement with an updated generated client. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.158.0).
+
+### mittwald JavaScript SDK Release 4.157.0
+
+The mittwald JavaScript SDK has been updated to version 4.157.0. This release includes an update to the generated client, enhancing its functionality. For more details, you can view the release on GitHub: [mittwald/api-client-js 4.157.0](https://github.com/mittwald/api-client-js/releases/tag/4.157.0).
+
