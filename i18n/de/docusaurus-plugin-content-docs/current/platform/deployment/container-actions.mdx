@@ -1,0 +1,134 @@
+---
+title: Deployment von containerisierten Anwendungen mit GitHub Actions
+sidebar_label: Container & GitHub Actions
+tags:
+  - Container
+  - Deployment
+description: Erfahre, wie du eine containerisierte Anwendung mit GitHub Actions deployst
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import OperationLink from "@site/src/components/OperationLink";
+
+Mit GitHub Actions kannst du dein Container-Image direkt aus deinem Quellcode-Repository erstellen und veröffentlichen und dann sofort deine Anwendung auf der mittwald Cloud-Plattform deployen. Die offizielle **`mittwald/deploy-container-action`** kümmert sich um die API-Aufrufe, wendet deine Stack-Definition an und erstellt (falls erforderlich) die betroffenen Dienste neu.
+
+## Voraussetzungen
+
+- **mStudio API-Token**; siehe die Dokumentation zu [API-Token erhalten](/docs/v2/api/intro#obtaining-an-api-token)
+- **Stack-ID**; siehe die Dokumentation zu [Standard-Stack identifizieren](/docs/v2/api/howtos/create-container/#identify-default-stack)
+- **(Optional) Private Registry**; siehe [_Verwendung privater Registries_](/docs/v2/platform/workloads/containers/#private-registries)
+- **GitHub Actions Runner**; jeder Runner mit Docker-Unterstützung, z.B. `ubuntu-latest`
+
+## Identifiziere deinen Stack
+
+Folge der Dokumentation zu [Standard-Stack identifizieren](/docs/v2/api/howtos/create-container/#identify-default-stack) deines Projekts. Zur Vereinfachung empfehlen wir, die Stack-ID in einer [GitHub-Variablen](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables) zu speichern, z.B. **`STACK_ID`**.
+
+## Schreibe deine `stack.yaml`
+
+Erstelle als nächstes eine Datei, die deine Stack-Definition irgendwo in deinem Repository enthält (für dieses Beispiel nehmen wir an, `deploy/stack.yaml`). Diese Datei sollte das gleiche Format wie die <OperationLink operation="container-declare-stack" apiVersion="v2" />-Operation haben.
+
+```yaml title="deploy/stack.yaml"
+services:
+  app:
+    image: ghcr.io/<OWNER>/<REPO>:{{ .Env.IMAGE_TAG }}
+    description: "Meine Webanwendung"
+    ports:
+      - "8080/tcp"
+    envs:
+      APP_ENV: production
+volumes: {}
+```
+
+Die Platzhalter innerhalb von `{{ … }}` werden aus Umgebungsvariablen aufgelöst, die du im Workflow übergibst, sodass deine Secrets in GitHub bleiben und niemals im Repository eingecheckt werden müssen.
+
+## Füge Geheimnisse und Variablen zum Repository hinzu
+
+- **`MITTWALD_API_TOKEN`**; API-Token für die mStudio-API
+- **`STACK_ID`**; die in Schritt 1 kopierte ID. Du könntest dies als einfache Konfigurationsvariable festlegen, könntest diese Variable aber auch [deiner Ziel-Environment](https://docs.github.com/actions/learn-github-actions/contexts#vars-context) zuordnen, wenn du environment-abhängig in verschiedene Stacks deployen möchtest.
+
+## Erstelle den GitHub Action Workflow
+
+Erstelle `.github/workflows/deploy.yml`:
+
+```yaml
+name: Build & Deploy to mittwald
+
+on:
+  push:
+    branches: [main]
+  # alternativ:
+  # push:
+  #   tags: [v*]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+
+    environment:
+      name: production
+      url: https://your-app.example
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Anmelden bei GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Metadaten (Tags, Labels) für Docker extrahieren
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+
+      - name: Build & Push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Bereitstellung an mStudio
+        uses: mittwald/deploy-container-action@v1
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        with:
+          api_token: ${{ secrets.MITTWALD_API_TOKEN }}
+          stack_id: ${{ vars.STACK_ID }}
+          stack_file: "${{ github.workspace }}/configs/stack.yaml"
+```
+
+Mit diesem Workflow wird bei jedem Push zu `main` (oder je nach Konfiguration, bei jedem neuen Git-Tag) GitHub ein neues Image erstellen, es in die GitHub Container Registry hochladen und die neuen Images ins mStudio deployen.
+
+## Fortgeschrittene Muster
+
+### Selektive Neustarts
+
+Wenn du Ausfallzeiten für zustandsbehaftete Dienste (z.B. Datenbanken) vermeiden möchtest, kannst du der Action sagen, dass sie die **Neuerstellung** nach dem Update **überspringen** soll:
+
+```yaml
+with:
+  skip_recreation: "mysql,redis"
+```
+
+Nicht aufgelistete Dienste werden nur neu gestartet, wenn die API meldet, dass ein Neustart tatsächlich erforderlich ist.
+
+### Nächste Schritte
+
+- Füge ein [Ingress](/docs/v2/platform/workloads/containers/#ingress-http) hinzu, um HTTP-Ports für das öffentliche Internet freizugeben.
+- Verwende [Terraform](/docs/v2/platform/deployment/terraform/) für vollständig deklarative Infrastruktur und lasse GitHub Actions `terraform apply` aufrufen.
+- Definiere Umgebungen dynamisch pro Pull-Request, um kurzlebige Überprüfungsumgebungen für jeden PR zu erstellen.
