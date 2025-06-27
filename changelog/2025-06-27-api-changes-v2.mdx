@@ -1,0 +1,743 @@
+---
+title: Breaking (!) API changes for v2 API, June 20 to June 27
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - App
+  - Cronjob
+  - Domain
+  - File
+  - Database
+  - Project
+  - Project File System
+  - Container
+  - Marketplace
+  - Conversation
+  - Mail
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+During the week of June 20 to June 27, 2025, the mittwald API introduced several changes, including the addition of new endpoints for managing contributor billing information and extension orders, updates to response property types for various endpoints, and the removal of an API path without deprecation.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The property type of the `uptimeSeconds` response changed from `number` to `double` for the `GET /v2/app-installations/{appInstallationId}/status` operation. This is a breaking change.
+- The `timeout` request property type changed from `number` to `integer` for the `PATCH /v2/cronjobs/{cronjobId}` and `POST /v2/projects/{projectId}/cronjobs` operations.
+- The `GET /v2/domains/{domainId}/latest-screenshot` operation has been removed without deprecation.
+- The property type of `maxSizeInBytes`, `maxSizeInKB`, and `maxSizeInKb` responses changed from `integer` to `int64` for the `GET /v2/file-token-rules/{token}`, `GET /v2/file-type-rules/{name}`, and `GET /v2/file-upload-tokens/{fileUploadToken}/rules` operations.
+- The property type of `properties/imageDimensions/max/height`, `properties/imageDimensions/max/width`, `properties/imageDimensions/min/height`, and `properties/imageDimensions/min/width` responses changed from `integer` to `int64` for the `GET /v2/file-token-rules/{token}`, `GET /v2/file-type-rules/{name}`, and `GET /v2/file-upload-tokens/{fileUploadToken}/rules` operations.
+- The property type of `sizeInBytes` changed from `integer` to `int64` for the `POST /v2/files` and `GET /v2/files/{fileId}/meta` operations.
+- The property type of `storageUsageInBytes` changed from `integer` to `int64` for the `GET /v2/mysql-databases/{mysqlDatabaseId}`, `GET /v2/projects`, and `GET /v2/redis-databases/{redisDatabaseId}` operations.
+- The property type of `size` changed from `integer` to `int64` for the `GET /v2/projects/{projectId}/filesystem-directories`, `GET /v2/projects/{projectId}/filesystem-files`, and `GET /v2/projects/{projectId}/filesystem-disk-usage` operations.
+- The property type of `notificationThresholdInBytes` changed from `integer` to `int64` for the `PUT /v2/projects/{projectId}/storage-space-notification-threshold` and `PUT /v2/servers/{serverId}/storage-space-notification-threshold` operations.
+- The property type of various `meta` fields in the `GET /v2/projects/{projectId}/storage-space-statistics` and `GET /v2/servers/{serverId}/storage-space-statistics` operations changed from `integer` to `int64`.
+- The property type of `volumes/items/storageUsageInBytes` changed from `integer` to `int64` for the `GET /v2/projects/{projectId}/stacks`, `PATCH /v2/stacks/{stackId}`, and `PUT /v2/stacks/{stackId}` operations.
+- Multiple new endpoints have been added, including:
+  - `GET /v2/contributors/{contributorId}/billing-information`
+  - `PUT /v2/contributors/{contributorId}/billing-information`
+  - `GET /v2/contributors/{contributorId}/dashboard`
+  - `PUT /v2/contributors/{contributorId}/extensions/{extensionId}/pricing`
+  - `GET /v2/contributors/{contributorId}/invoices/outgoing`
+  - `POST /v2/contributors/{contributorId}/onboarding-process`
+  - `GET /v2/customers/{customerId}/billing-portal`
+  - `GET /v2/customers/{customerId}/extension-orders`
+  - `GET /v2/customers/{customerId}/payment-method`
+  - `PUT /v2/customers/{customerId}/payment-method`
+  - `GET /v2/domains/latest-screenshot`
+  - `GET /v2/extension-instances`
+  - `GET /v2/extension-instances/{extensionInstanceId}/contract`
+  - `PUT /v2/extension-instances/{extensionInstanceId}/contract`
+  - `DELETE /v2/extension-instances/{extensionInstanceId}/termination`
+  - `POST /v2/extension-instances/{extensionInstanceId}/termination`
+  - `POST /v2/extensions/{extensionId}/checkout`
+  - `POST /v2/extensions/{extensionId}/order`
+  - `GET /v2/projects/{projectId}/extension-orders`
+- Non-success response status `502` has been added for several operations, including:
+  - `GET /v2/projects/{projectId}/filesystem-directories`
+  - `GET /v2/projects/{projectId}/filesystem-disk-usage`
+  - `GET /v2/projects/{projectId}/filesystem-file-content`
+  - `GET /v2/projects/{projectId}/filesystem-files`
+  - `GET /v2/projects/{projectId}/jwt`
+- New optional request parameters and properties have been added for various operations, enhancing their functionality.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Get runtime status belonging to an app installation"
+
+
+- ⚠️ **Breaking:** the 'uptimeSeconds' response's property type/format changed from 'number'/'' to 'number'/'double' for status '200'
+
+
+For details, refer to the <OperationLink operation="app-retrieve-status" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a cronjob"
+
+
+- ⚠️ **Breaking:** the 'timeout' request property type/format changed from 'number'/'' to 'integer'/''
+
+
+For details, refer to the <OperationLink operation="cronjob-update-cronjob" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the latest screenshot's FileReference belonging to a Domain"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="domain-get-latest-screenshot" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Token's upload rules"
+
+
+- ⚠️ **Breaking:** the 'maxSizeInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'maxSizeInKB' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'maxSizeInKb' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'properties/imageDimensions/max/height' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'properties/imageDimensions/max/width' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'properties/imageDimensions/min/height' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'properties/imageDimensions/min/width' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+
+For details, refer to the <OperationLink operation="deprecated-file-get-file-token-rules" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Type's upload rules"
+
+
+- ⚠️ **Breaking:** the 'maxSizeInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'maxSizeInKB' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'maxSizeInKb' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'properties/imageDimensions/max/height' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'properties/imageDimensions/max/width' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'properties/imageDimensions/min/height' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'properties/imageDimensions/min/width' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+
+For details, refer to the <OperationLink operation="deprecated-file-get-file-type-rules" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a FileUploadToken's rules"
+
+
+- ⚠️ **Breaking:** the 'maxSizeInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'maxSizeInKB' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'maxSizeInKb' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'properties/imageDimensions/max/height' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'properties/imageDimensions/max/width' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'properties/imageDimensions/min/height' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'properties/imageDimensions/min/width' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+
+For details, refer to the <OperationLink operation="file-get-file-upload-token-rules" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a FileUploadType's rules"
+
+
+- ⚠️ **Breaking:** the 'maxSizeInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'maxSizeInKB' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'maxSizeInKb' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'properties/imageDimensions/max/height' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'properties/imageDimensions/max/width' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'properties/imageDimensions/min/height' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'properties/imageDimensions/min/width' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+
+For details, refer to the <OperationLink operation="file-get-file-upload-type-rules" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a File"
+
+
+- ⚠️ **Breaking:** the 'sizeInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '201'
+
+
+For details, refer to the <OperationLink operation="file-create-file" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a File's meta"
+
+
+- ⚠️ **Breaking:** the 'sizeInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+
+For details, refer to the <OperationLink operation="file-get-file-meta" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a MySQL database"
+
+
+- ⚠️ **Breaking:** the 'storageUsageInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+
+For details, refer to the <OperationLink operation="database-get-mysql-database" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Projects belonging to the executing user"
+
+
+- ⚠️ **Breaking:** the '/items/backupStorageUsageInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the '/items/webStorageUsageInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+
+For details, refer to the <OperationLink operation="project-list-projects" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Request a Project avatar upload"
+
+
+- ⚠️ **Breaking:** the 'rules/maxSizeInKB' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'rules/properties/imageDimensions/max/height' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'rules/properties/imageDimensions/max/width' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'rules/properties/imageDimensions/min/height' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'rules/properties/imageDimensions/min/width' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+
+For details, refer to the <OperationLink operation="project-request-project-avatar-upload" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a cronjob"
+
+
+- ⚠️ **Breaking:** the 'timeout' request property type/format changed from 'number'/'' to 'integer'/''
+
+
+For details, refer to the <OperationLink operation="cronjob-create-cronjob" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List directories belonging to a Project"
+
+
+- ⚠️ **Breaking:** the 'size' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- added the non-success response with the status '502'
+
+
+For details, refer to the <OperationLink operation="project-file-system-get-directories" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Project directory filesystem usage"
+
+
+- ⚠️ **Breaking:** the 'totalBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'usedBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- added the non-success response with the status '502'
+
+
+For details, refer to the <OperationLink operation="project-file-system-get-disk-usage" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Project file's information"
+
+
+- ⚠️ **Breaking:** the 'size' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- added the non-success response with the status '502'
+
+
+For details, refer to the <OperationLink operation="project-file-system-list-files" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List MySQL databases belonging to a Project"
+
+
+- ⚠️ **Breaking:** the '/items/storageUsageInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+
+For details, refer to the <OperationLink operation="database-list-mysql-databases" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Redis databases belonging to a Project"
+
+
+- ⚠️ **Breaking:** the '/items/storageUsageInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+
+For details, refer to the <OperationLink operation="database-list-redis-databases" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Stacks belonging to a Project"
+
+
+- ⚠️ **Breaking:** the '/items/volumes/items/storageUsageInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- added the optional property '/items/volumes/items/linkedServices' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-list-stacks" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a Project's storage space notification threshold"
+
+
+- ⚠️ **Breaking:** the 'notificationThresholdInBytes' request property type/format changed from 'integer'/'' to 'integer'/'int64'
+
+
+For details, refer to the <OperationLink operation="storagespace-replace-project-notification-threshold" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get storage space Statistics belonging to a Project"
+
+
+- ⚠️ **Breaking:** the 'meta/limitInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'meta/totalExceedanceInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'meta/totalFreeInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'meta/totalUsageInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'notificationThresholdInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'statisticCategories/items/resources/items/usageInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'statisticCategories/items/totalUsageInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+
+For details, refer to the <OperationLink operation="storagespace-get-project-statistics" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Volumes belonging to a Project"
+
+
+- ⚠️ **Breaking:** the '/items/storageUsageInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- added the optional property '/items/linkedServices' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-list-volumes" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Redis database"
+
+
+- ⚠️ **Breaking:** the 'storageUsageInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+
+For details, refer to the <OperationLink operation="database-get-redis-database" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Request a Server avatar upload"
+
+
+- ⚠️ **Breaking:** the 'rules/maxSizeInKB' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'rules/properties/imageDimensions/max/height' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'rules/properties/imageDimensions/max/width' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'rules/properties/imageDimensions/min/height' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'rules/properties/imageDimensions/min/width' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+
+For details, refer to the <OperationLink operation="project-request-server-avatar-upload" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a Server's storage space notification threshold"
+
+
+- ⚠️ **Breaking:** the 'notificationThresholdInBytes' request property type/format changed from 'integer'/'' to 'integer'/'int64'
+
+
+For details, refer to the <OperationLink operation="storagespace-replace-server-notification-threshold" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get storage space Statistics belonging to a Server"
+
+
+- ⚠️ **Breaking:** the 'meta/limitInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'meta/totalExceedanceInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'meta/totalFreeInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'meta/totalUsageInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'notificationThresholdInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'statisticCategories/items/resources/items/usageInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'statisticCategories/items/totalUsageInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+
+For details, refer to the <OperationLink operation="storagespace-get-server-statistics" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Stack"
+
+
+- ⚠️ **Breaking:** the 'volumes/items/storageUsageInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- added the optional property 'volumes/items/linkedServices' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-get-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create, update or delete Services or Volumes belonging to a Stack"
+
+
+- ⚠️ **Breaking:** the 'volumes/items/storageUsageInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- added the optional property 'volumes/items/linkedServices' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-update-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Declaratively create, update or delete Services or Volumes belonging to a Stack"
+
+
+- ⚠️ **Breaking:** the 'volumes/items/storageUsageInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- added the optional property 'volumes/items/linkedServices' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-declare-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Volume belonging to a Stack"
+
+
+- ⚠️ **Breaking:** the 'storageUsageInBytes' response's property type/format changed from 'integer'/'' to 'integer'/'int64' for status '200'
+
+- added the optional property 'linkedServices' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-get-volume" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get contributor Billing Information"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="contributor-get-billing-information" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update contributor Billing Information"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="contributor-update-billing-information" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the Stripe Dashboard Link for a contributor"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="contributor-get-login-link" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Creates or Updates Pricing for an Extension"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="extension-update-extension-pricing" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List all invoices on behalf of a contributor"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="contributor-list-onbehalf-invoices" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create the OnboardingProcess of a contributor"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="extension-create-contributor-onboarding-process" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all message of the conversation"
+
+
+- added '#/components/schemas/de.mittwald.v1.conversation.DeletedFile' to the '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.Message]/files/items/' response property 'oneOf' list for the response status '200'
+
+- added '#/components/schemas/de.mittwald.v1.conversation.DeletedFile' to the '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.ServiceRequest]/files/items/' response property 'oneOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="conversation-list-messages-by-conversation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the Stripe Billing Portal Link for a Customer"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="contributor-get-customer-billing-portal-link" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all open extension orders for given customer"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="extension-get-customer-extension-instance-orders" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get payment method details"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="marketplace-customer-get-payment-method" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the link to update the marketplace payment method"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="marketplace-customer-update-payment-method" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List extension instances"
+
+
+- added the new optional 'query' request parameter 'searchTerm'
+
+
+For details, refer to the <OperationLink operation="extension-list-extension-instances" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the Contract Strategy of an Extension Instance"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="extension-get-extension-instance-contract" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update or Create Contract for existing Extension Instances"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="extension-update-extension-instance-contract" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Cancel an Extension Instance Termination"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="extension-cancel-extension-termination" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Schedule an Extension Instance Termination for the next possible date"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="extension-schedule-extension-termination" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Start a checkout process for an extension"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="extension-start-extension-checkout" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Order Extension with saved payment method"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="extension-order-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all open extension orders for given project"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="extension-get-project-extension-instance-orders" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Project file's content"
+
+
+- added the non-success response with the status '502'
+
+
+For details, refer to the <OperationLink operation="project-file-system-get-file-content" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Project's file/filesystem authorization token"
+
+
+- added the non-success response with the status '502'
+
+
+For details, refer to the <OperationLink operation="project-file-system-get-jwt" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a mail address"
+
+
+- added the new optional request property '/oneOf[#/components/schemas/de.mittwald.v1.mail.CreateMailAddress]/forwardAddresses'
+
+
+For details, refer to the <OperationLink operation="mail-create-mail-address" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald JavaScript SDK Release 4.170.0
+
+The mittwald JavaScript SDK has been updated to version 4.170.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.170.0).
+
+### mittwald JavaScript SDK Release 4.169.0
+
+The mittwald JavaScript SDK has been updated to version 4.169.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald/api-client-js 4.169.0](https://github.com/mittwald/api-client-js/releases/tag/4.169.0).
+
+### mittwald JavaScript SDK Release 4.168.0
+
+The mittwald JavaScript SDK version 4.168.0 has been released. This update introduces a new feature that allows requests to be modified, such as in the `onBeforeRequest` event. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.168.0).
+
+### mittwald JavaScript SDK Release 4.167.0
+
+The mittwald JavaScript SDK has been updated to version 4.167.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.167.0](https://github.com/mittwald/api-client-js/releases/tag/4.167.0).
+
