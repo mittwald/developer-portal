@@ -292,7 +292,19 @@ External access for other application protocols than HTTP(S) is not supported at
 
 <Tabs groupId="access-mode">
   <TabItem value="cli" label="CLI">
-    Managing containers via the CLI is currently not supported. Please upvote the respective [feature request](https://github.com/mittwald/cli/issues/1150).
+
+    To connect an ingress resource to a container, use the `mw domain virtualhost create` command with the `--path-to-container` flag:
+
+    ```shellsession
+    mw domain virtualhost create --hostname domain.example --path-to-container /:[container-uid]:80/tcp
+    ```
+
+    The `--path-to-container` flag should contain three values, separated by colons:
+
+    1. The URL path that should be mapped to the container.
+    2. The container UID.
+    3. The port (in the format `portnumber/protocol`, so for example `80/tcp`) that the container is listening on.
+
   </TabItem>
   <TabItem value="terraform" label="Terraform">
 

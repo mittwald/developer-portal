@@ -35,7 +35,26 @@ import OperationExample from "@site/src/components/OperationExample";
 
   </TabItem>
   <TabItem value="cli" label="CLI">
-    Die Verwaltung von Containern über die CLI wird derzeit nicht unterstützt. Bitte stimme für die entsprechende [Feature-Anfrage](https://github.com/mittwald/cli/issues/1150) ab.
+    Um einen Container über die CLI zu starten, kannst du den Befehl `mw container run` verwenden:
+
+    ```shellsession
+    $ mw container run \
+      --name my-container \
+      --env FOO=BAR \
+      -p 8000:8000/tcp \
+      my-registry/my-container:latest
+    ```
+
+    Weitere Informationen findest du in der Dokumentation zum [`mw container run` Befehl](/docs/v2/cli/reference/container#mw-container-run-image-command-args).
+
+    Wenn du eine Docker Compose-kompatible Datei hast, kannst du auch den Befehl `mw stack deploy` verwenden, um die gesamte `docker-compose.yml` Datei zu deployen:
+
+    ```shellsession
+    $ mw stack deploy
+    ```
+
+    Weitere Informationen findest du in der Dokumentation zum [`mw stack deploy` Befehl](/docs/v2/cli/reference/stack#mw-stack-deploy).
+
   </TabItem>
   <TabItem value="terraform" label="Terraform">
     Um einen Container mit Terraform bereitzustellen, kannst du das folgende Beispiel verwenden:
@@ -65,7 +84,19 @@ Wenn dein Container-Image aus einer privaten Registry geladen werden soll, musst
 
   </TabItem>
   <TabItem value="cli" label="CLI">
-    Die Verwaltung von Container-Registries über die CLI wird derzeit nicht unterstützt. Bitte stimme für die entsprechende [Feature-Anfrage](https://github.com/mittwald/cli/issues/1150) ab.
+    Um eine neue Container-Registry über die CLI zu erstellen, verwende den Befehl `mw registry create`:
+
+    ```shellsession
+    $ mw registry create \
+      --description "Meine Registry"
+      --uri registry.my-company.example
+      --username my-user
+    ```
+
+    Wenn du einen `--username`-Parameter für eine private Registry angibst, fragt der Befehl interaktiv nach dem Passwort. Du kannst auch den `--password`-Parameter verwenden; beachte aber, dass das Passwort in diesem Fall in deiner Shell-History erscheinen könnte.
+
+    Weitere Informationen findest du in der Dokumentation zum [`mw registry create` Befehl](/docs/v2/cli/reference/registry#mw-registry-create).
+
   </TabItem>
   <TabItem value="terraform" label="Terraform">
     Um eine Container-Registry mit Terraform zu definieren, kannst du das folgende Beispiel verwenden:
@@ -115,7 +146,12 @@ Nachdem das Image erstellt wurde, kannst du es in deinem Container-Stack bereits
 
 <Tabs groupId="access-mode">
   <TabItem value="cli" label="CLI">
-    Die Verwaltung von Containern über die CLI wird derzeit nicht unterstützt. Bitte stimme für die entsprechende [Feature-Anfrage](https://github.com/mittwald/cli/issues/1150) ab.
+    Wenn du die CLI verwendest, um deine containerisierte Anwendung zu deployen, kannst du den Befehl `mw container update` verwenden, um das Image-Tag zu aktualisieren:
+
+```shellsession
+$ mw container update my-container --image my-registry/my-container:v1.0.1
+```
+
   </TabItem>
   <TabItem value="terraform" label="Terraform">
     Wenn du Terraform verwendest, um deine containerisierte Anwendung zu deployen, kannst du eine Terraform-Variable verwenden, um das Image-Tag festzulegen. Dies ermöglicht es dir, das Image-Tag für jedes Release einfach zu ändern:
@@ -170,7 +206,7 @@ docker build -t my-registry/my-container:latest .
 docker push my-registry/my-container:latest
 ```
 
-Standardmäßig werden Container-Images nicht automatisch aktualisiert, wenn das Image-Tag nicht geändert wird. Du kannst die <OperationLink operation="container-pull-image-for-service" apiVersion="v2" />-Operation verwenden, um das neueste Image für den Container-Stack zu ziehen. Dies wird das Image-Tag auf die neueste Version aktualisieren.
+Standardmäßig werden Container-Images nicht automatisch aktualisiert, wenn das Image-Tag nicht geändert wird. Du kannst die <OperationLink operation="container-pull-image-for-service" apiVersion="v2" />-Operation oder den CLI-Befehl `mw container recreate --pull` verwenden, um das neueste Image für den Container-Stack zu ziehen. Dies wird das Image-Tag auf die neueste Version aktualisieren.
 
 ## Verwendung von Volumes
 
@@ -254,7 +290,19 @@ Externer Zugriff für andere Anwendungsprotokolle als HTTP(S) wird derzeit nicht
 
 <Tabs groupId="access-mode">
   <TabItem value="cli" label="CLI">
-    Die Verwaltung von Containern über die CLI wird derzeit nicht unterstützt. Bitte stimme für die entsprechende [Feature-Anfrage](https://github.com/mittwald/cli/issues/1150) ab.
+
+    Um eine Ingress-Ressource mit einem Container zu verknüpfen, benutze den `mw domain virtualhost create`-Befehl mit dem `--path-to-container`-Flag:
+
+    ```shellsession
+    mw domain virtualhost create --hostname domain.example --path-to-container /:[container-uid]:80/tcp
+    ```
+
+    Das `--path-to-container`-Flag sollte drei Werte enthalten, getrennt durch Doppelpunkte:
+
+    1. Der URL-Pfad, der auf den Container verweist.
+    2. Die Container-ID.
+    3. Der Port (im Format `portnummer/protokoll`, also beispielsweise `80/tcp`), auf dem der Container lauscht.
+
   </TabItem>
   <TabItem value="terraform" label="Terraform">
 
