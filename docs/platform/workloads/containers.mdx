@@ -35,7 +35,26 @@ import OperationExample from "@site/src/components/OperationExample";
 
   </TabItem>
   <TabItem value="cli" label="CLI">
-    Managing containers via the CLI is currently not supported. Please upvote the respective [feature request](https://github.com/mittwald/cli/issues/1150).
+    To start a container via the CLI, you can use the `mw container run` command:
+
+    ```shellsession
+    $ mw container run \
+      --name my-container \
+      --env FOO=BAR \
+      -p 8000:8000/tcp \
+      my-registry/my-container:latest
+    ```
+
+    See the documentation on the [`mw container run` command](/docs/v2/cli/reference/container#mw-container-run-image-command-args) for more information.
+
+    If you have a Docker Compose compatible file, you can also use the `mw stack deploy` command to deploy the entire `docker-compose.yml` file:
+
+    ```shellsession
+    $ mw stack deploy
+    ```
+
+    See the documentation on the [`mw stack deploy` command](/docs/v2/cli/reference/stack#mw-stack-deploy) for more information.
+
   </TabItem>
   <TabItem value="terraform" label="Terraform">
     To deploy a container using Terraform, you can use the following example:
@@ -65,7 +84,19 @@ If your container image should be loaded from a private registry, you first need
 
   </TabItem>
   <TabItem value="cli" label="CLI">
-    Managing container registries via the CLI is currently not supported. Please upvote the respective [feature request](https://github.com/mittwald/cli/issues/1150).
+    To create a new container registry via the CLI, use the `mw registry create` command:
+
+    ```shellsession
+    $ mw registry create \
+      --description "My registry"
+      --uri registry.my-company.example
+      --username my-user
+    ```
+
+    When you specify a `--username` flag for a private registry, the command will interactively prompt for the password. You can also use the `--password` flag, but keep in mind that the password may show up in your shell history in that case.
+
+    See the documentation on the [`mw registry create` command](/docs/v2/cli/reference/registry#mw-registry-create) for more information.
+
   </TabItem>
   <TabItem value="terraform" label="Terraform">
     To define a container registry using Terraform, you can use the following example:
@@ -115,7 +146,14 @@ After the image is built, you can deploy it to your container stack.
 
 <Tabs groupId="access-mode">
   <TabItem value="cli" label="CLI">
-    Managing containers via the CLI is currently not supported. Please upvote the respective [feature request](https://github.com/mittwald/cli/issues/1150).
+    To update the container image of an existing container, use the `mw container update` command:
+
+    ```shellsession
+    $ mw container update \
+      --image my-registry/my-container:v1.0.1 \
+      my-container
+    ```
+
   </TabItem>
   <TabItem value="terraform" label="Terraform">
     When you are using Terraform to deploy your containerized application, you can use a Terraform variable to set the image tag. This allows you to easily change the image tag for each release:
@@ -170,7 +208,7 @@ docker build -t my-registry/my-container:latest .
 docker push my-registry/my-container:latest
 ```
 
-By default, container images are not automatically updated when the image tag is not changed. You can use the <OperationLink operation="container-pull-image-for-service" apiVersion="v2" /> operation to pull the latest image for the container stack. This will update the image tag to the latest version.
+By default, container images are not automatically updated when the image tag is not changed. You can use the <OperationLink operation="container-pull-image-for-service" apiVersion="v2" /> operation or the `mw container recreate --pull` CLI command to pull the latest image for the container stack. This will update the image tag to the latest version.
 
 ## Using volumes
 
