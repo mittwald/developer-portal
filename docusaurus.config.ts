@@ -186,12 +186,6 @@ const config: Config = {
           label: "Contribution",
         },
         {
-          type: "doc",
-          docId: "reference/index",
-          position: "left",
-          label: "Reference",
-        },
-        {
           to: "/changelog",
           label: "Changelog",
           position: "left",
