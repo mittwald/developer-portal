@@ -175,6 +175,12 @@ const config: Config = {
         },
         {
           type: "doc",
+          docId: "/category/guides/deployment",
+          position: "left",
+          label: "Guides",
+        },
+        {
+          type: "doc",
           docId: "contribution/index",
           position: "left",
           label: "Contribution",
