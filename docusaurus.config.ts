@@ -175,15 +175,15 @@ const config: Config = {
         },
         {
           type: "doc",
-          docId: "contribution/index",
+          docId: "/category/guides/deployment",
           position: "left",
-          label: "Contribution",
+          label: "Guides",
         },
         {
           type: "doc",
-          docId: "reference/index",
+          docId: "contribution/index",
           position: "left",
-          label: "Reference",
+          label: "Contribution",
         },
         {
           to: "/changelog",

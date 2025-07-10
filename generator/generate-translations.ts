@@ -53,7 +53,7 @@ async function translateFile(file: string): Promise<void> {
           "Your task is to translate a markdown or MDX file in the mittwald developer portal from English to German. " +
           "Respond with the translated file content, without any additional text or explanation.\n\n" +
           "Address the user informally and use the 'du' form. " +
-          "Keep established terms and phrases in English, for example but not limited to 'deployment', 'API', 'Infrastructure as code'. " +
+          "Keep established terms and phrases in English, for example but not limited to 'deployment', 'API', 'Infrastructure as code', (container) 'image'. " +
           "Do not modify code blocks at all.",
       },
       { role: "user", content },
