@@ -12,58 +12,74 @@ Die benötigten und erlaubten Attribute sind in folgendem Schema beschrieben.
   format="yaml"
   schema={{
     type: "object",
-    required: ["id", "name", "customerId", "state", "email"],
+    required: ["id", "name", "customerId", "state", "supportInformation", "contributorNumber", "imprint"],
     properties: {
       id: {
         type: "string",
         format: "uuid",
-        description: "ID des Contributoren. Muss global eindeutig sein.",
+        description: "ID of the contributor. It has to be globally unique.",
       },
       name: {
         type: "string",
-        description: "Name des Contributoren.",
+        description: "Name of the contributor.",
         example: "mittwald",
-      },
-      description: {
-        type: "string",
-        description: "Kurzbeschreibung des Contributoren.",
-        example: "Deutscher Web-Hoster und Contributor von Extensions für das mStudio.",
       },
       customerId: {
         type: "string",
         format: "uuid",
         description:
-          "ID der Organisation im mStudio, zu der der Contributor gehört. Ein Contributor hat ein 1:1 Verhältnis zu einer Organisation",
+          "ID of the organization in the mStudio, the contributor belongs to. The mapping of contributors to organizations is 1:1.",
       },
-      state: {
+      supportInformation: {
         type: "object",
-        description: "Status des Contributoren.",
-	      example: {
-	        disabled: false,
-	      },
-	      properties: {
-	        disabled: {
-	          type: "boolean",
-	        },
-	      },
+        properties: {
+          email: {
+            type: "string",
+            example: "support@mittwald.de"
+          },
+          phone: {
+            type: "string",
+            example: "+49 (0) 5772/293-600"
+          }
+        }
       },
       homepage : {
         type: "string",
         description: "Homepage of the Contributor",
         example: "https://mittwald.de/"
       },
-      email: {
+      logoRefId: {
         type: "string",
-        format: "email",
-        description:
-          "E-Mail-Adresse des Contributoren, die für Support Zwecke genutzt werden kann.",
+        example: "79d92944-fe9b-48bd-90c4-24048f3269a3"
       },
-      phone: {
+      state: {
+        type: "object",
+        description: "State of the Contributor.",
+        example: {
+          verified: true
+        },
+        properties: {
+          disabled: {
+            type: "boolean",
+          },
+        },
+      },
+      descriptions: {
+        type: "object",
+        properties: {
+          de: {
+            type: "string",
+            example: "Wir leben Web. Wir atmen Code. Und: Wir lieben Agenturen & Freelancer. Mit maximal performantem und flexiblem Managed Cloud Hosting bieten wir Web Professionals die Plattform, auf der sie mit ihren Webprojekten durchstarten. Clevere Workflows und smarte Features, wie die Analyse der Time to First Byte, machen deine Arbeit effizienter. So macht Hosting Spaß!"
+          },
+          en: {
+            type: "string",
+            example: "We live the web. We breathe code. And: We love agencies & freelancers. With maximum performance and flexible managed cloud hosting, we offer web professionals the platform on which they can take off with their web projects. Clever workflows and smart features, such as time-to-first byte analysis, make your work more efficient. This makes hosting fun!"
+          }
+        }
+      },
+      contributorNumber: {
         type: "string",
-        format: "phone",
-        example: "+491701234567",
-        description:
-          "Telefonnummer des Contributoren, die für Support Zwecke genutzt werden kann.",
+        example: "00000001"
       },
       imprint: {
         oneOf: [
