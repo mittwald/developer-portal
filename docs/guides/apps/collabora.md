@@ -14,7 +14,7 @@ This guide demonstrates the installation using a Nextcloud example – from init
 ### Requirements
 
 1. Installed and configured Nextcloud version 29 or higher, with [Nextcloud Office](https://apps.nextcloud.com/apps/richdocuments) installed
-2. mStudio with a hosting plan that supports [containerized workloads](/docs/platform/workloads/containers)
+2. mStudio with a hosting plan that supports [containerized workloads](/docs/v2/platform/workloads/containers)
 3. Sufficient free RAM (see dashboard)
 4. An already existing subdomain for CODE (e.g. `code.my-domain.tld`)
 

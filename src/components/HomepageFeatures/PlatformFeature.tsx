@@ -132,11 +132,11 @@ function PlatformTools() {
               </Translate>
             }
             links={[
-              <Link to="/docs/v2/platform/deployment/deployer">Deployer</Link>,
-              <Link to="/docs/v2/platform/deployment/typo3surf">
+              <Link to="/docs/v2/guides/deployment/deployer">Deployer</Link>,
+              <Link to="/docs/v2/guides/deployment/typo3surf">
                 TYPO3 Surf
               </Link>,
-              <Link to="/docs/v2/platform/deployment/terraform">
+              <Link to="/docs/v2/guides/deployment/terraform">
                 Terraform <NewBadge />
               </Link>,
             ]}
