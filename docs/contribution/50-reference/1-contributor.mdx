@@ -48,6 +48,11 @@ The following schema describes the allowed and the required values.
           },
         },
       },
+      homepage : {
+        type: "string",
+        description: "Homepage of the Contributor",
+        example: "https://mittwald.de/"
+      },
       email: {
         type: "string",
         format: "email",
@@ -59,6 +64,29 @@ The following schema describes the allowed and the required values.
         example: "+491701234567",
         description: "Phone number of the contributor for support.",
       },
+      imprint: {
+        oneOf: [
+          {
+            type: "object",
+            properties: {
+              text: {
+                type: "string",
+                example: "Mittwald CM Service GmbH & Co. KG\nKönigsberger Straße 4-6\n32339 Espelkamp\nTelefon: +49-5772-293-10\nTelefax: +49-5772-293-33\nHRA: 6640, AG Bad Oeynhause\nUSt. ID-Nr: DE81477321\nKomplementärin: Robert Meyer Verwaltungs GmbH, AG Bad Oeynhausen HRB 13260\nvertreten durch die Geschäftsführer: Robert Meyer, Florian Jürgens"
+              }
+            },
+            required: [ "text" ]
+          },
+          {
+            type: "object",
+            properties: {
+              url: {
+                type: "string"
+              }
+            },
+            required: [ "url" ]
+          }
+        ]
+      }
     },
   }}
 />
