@@ -49,12 +49,45 @@ Automatically generated changelog entries will **NOT** be changed after they are
 
 ### Updating translation files
 
+#### Translating code labels
+
 Translation of components is done using [Docusaurus' built-in translation file handling][docu-i18n]. To update the translation files, you can use the following steps:
 
 ```
 $ npm run docusaurus write-translations
 $ npm run docusaurus write-translations -- -l de
 ```
+
+#### Translating content
+
+This project contains documentation in English and German.
+
+- English is the "default" language; the files are stored in `docs/`
+- German is an additional translations; files are stored in `i18n/de/docusaurus-plugin-content-docs/current/`. Missing content falls back to English
+
+IMPORTANT: Remember to update both locations when making changes.
+
+#### Automated translation with the translation generator script
+
+For translating documentation content (Markdown/MDX files), you can use the translation generator script. This script finds documentation files that don't have translations in the specified target language and uses OpenAI to translate them. The script supports bidirectional translation between languages.
+
+To use the translation generator script:
+
+```
+$ ts-node generator/generate-translations.ts [--lang|-l <target-language-code>] [--source|-s <source-language-code>]
+```
+
+Options:
+
+- `--lang, -l`: Target language code (default: "de")
+- `--source, -s`: Source language code (default: "en")
+
+Examples:
+
+- `ts-node generator/generate-translations.ts`: Translates from English to German
+- `ts-node generator/generate-translations.ts -l en -s de`: Translates from German to English
+
+Note: The script requires an OpenAI API key to be set in your environment.
 
 ### Overriding OpenAPI definitions
 
