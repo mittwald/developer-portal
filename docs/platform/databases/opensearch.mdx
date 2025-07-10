@@ -11,7 +11,7 @@ import PlanCompatibility from "@site/src/components/PlanCompatibility";
 
 ## What is OpenSearch?
 
-OpenSearch is a distributed, community-driven, Apache 2.0-licensed, 100% open-source search and analytics suite used for a wide range of use cases such as real-time application monitoring, log analytics, and website search. OpenSearch provides a highly scalable system for fast access and response to large volumes of data, with an integrated visualization tool, OpenSearch Dashboards, which makes it easy for users to explore their data. OpenSearch is supported by the Apache Lucene search library and supports a variety of search and analytics features.
+OpenSearch is a distributed, community-driven, Apache 2.0-licensed, 100% open-source search and analytics suite used for a wide range of use cases such as real-time application monitoring, log analytics, and website search. OpenSearch provides a highly scalable system for fast access and response to large volumes of data, with an integrated visualization tool, OpenSearch Dashboards, which makes it easy for users to explore their data. OpenSearch is built on the Apache Lucene search library and supports a variety of search and analytics features.
 
 OpenSearch originated as an open-source fork of ElasticSearch after the latter stopped offering a fully open-source version. Using OpenSearch has the advantage that, among other things, full-text search and many other features are available that can extend the search and analytics capabilities of a CMS. For Magento >=2.4, OpenSearch is a prerequisite for installation.
 
@@ -132,7 +132,7 @@ This approach is particularly useful when you need to deploy multiple containers
 
 ### Accessing your container within your hosting environment
 
-Once the container is running, you can verify the instance by accessing it via curl:
+Once the container is running, you can verify the instance is accessible by requesting it via `curl`:
 
 ```bash
 curl -X GET "https://opensearch:9200" -ku admin:SuperSecurePassword123
@@ -162,13 +162,13 @@ You should receive a response similar to:
 
 ## Operation
 
-OpenSearch runs as long as the container is running. It is important that the application populates the indices. For this, use the CLI of the respective CMS.
+OpenSearch runs as long as the container is running. When using OpenSearch as a search engine for your CMS, the search indices need to be populated by your application. For this, most CMS platforms offer integrations.
 
 The volume is automatically included in the regular backup of your project.
 
 ## Setting up common applications
 
-To integrate OpenSearch into applications, an entry is usually required in the configuration file of the CMS. Below are examples for various CMS platforms:
+To integrate OpenSearch into applications, an entry is usually required in the configuration file of the CMS. In this section, you will find examples for various CMS platforms.
 
 ### Magento 2
 

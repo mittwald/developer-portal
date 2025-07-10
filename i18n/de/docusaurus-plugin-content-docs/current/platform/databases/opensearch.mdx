@@ -11,11 +11,19 @@ import PlanCompatibility from "@site/src/components/PlanCompatibility";
 
 ## Was ist OpenSearch?
 
-OpenSearch ist eine von der Community getriebene, quelloffene Suchmaschine, die von Elasticsearch abgezweigt wurde. Es handelt sich um eine verteilte, RESTful Such- und Analyse-Engine, die in der Lage ist, eine wachsende Anzahl von Anwendungsfällen zu lösen. Als Fork von Elasticsearch ist OpenSearch vollständig kompatibel mit Elasticsearch-APIs und -Plugins.
+OpenSearch ist eine verteilte, von der Community getriebene, Apache 2.0-lizenzierte, 100% quelloffene Such- und Analytics-Suite, die für eine Vielzahl von Anwendungsfällen wie Echtzeit-Anwendungsüberwachung, Log-Analyse und Website-Suche verwendet wird. OpenSearch bietet ein hochskalierbares System für schnellen Zugriff und schnelle Antworten auf große Datenmengen, mit einem integrierten Visualisierungstool, OpenSearch Dashboards, das es Benutzern erleichtert, ihre Daten zu erkunden. OpenSearch basiert auf der Apache Lucene-Suchbibliothek und unterstützt eine Vielzahl von Such- und Analysefunktionen.
 
-### Eine OpenSearch-Datenbank erstellen
+OpenSearch entstand als quelloffene Abspaltung von ElasticSearch, nachdem letzteres keine vollständig quelloffene Version mehr anbot. Die Verwendung von OpenSearch hat den Vorteil, dass unter anderem Volltextsuche und viele andere Funktionen verfügbar sind, die die Such- und Analysefähigkeiten eines CMS erweitern können. Für Magento >=2.4 ist OpenSearch eine Voraussetzung für die Installation.
 
-Du kannst eine OpenSearch-Datenbank in deiner mittwald Hosting-Umgebung mit [Containern](../../workloads/containers) bereitstellen. Der bequemste Weg, dies zu tun, ist die Verwendung von [Terraform](../../deployment/terraform) mit unserem [OpenSearch-Modul](https://registry.terraform.io/modules/mittwald/opensearch/mittwald/latest). Das folgende Beispiel zeigt, wie du dieses Modul in deinem eigenen Terraform-Deployment verwenden kannst:
+Als Fork von Elasticsearch ist OpenSearch vollständig kompatibel mit Elasticsearch-APIs und -Plugins.
+
+## Eine OpenSearch-Datenbank erstellen
+
+Du kannst eine OpenSearch-Datenbank in deiner mittwald Hosting-Umgebung mit [Containern](../../workloads/containers) bereitstellen. Es gibt zwei Hauptansätze:
+
+### Verwendung von Terraform (Empfohlen)
+
+Der bequemste Weg, eine OpenSearch-Datenbank bereitzustellen, ist die Verwendung von [Terraform](../../deployment/terraform) mit unserem [OpenSearch-Modul](https://registry.terraform.io/modules/mittwald/opensearch/mittwald/latest). Das folgende Beispiel zeigt, wie du dieses Modul in deinem eigenen Terraform-Deployment verwenden kannst:
 
 ```hcl
 resource "random_password" "opensearch_admin" {
@@ -37,10 +45,166 @@ output "opensearch_url" {
 
 Danach kannst du auf dein OpenSearch-Backend über die vom Modul zurückgegebene URL zugreifen. In der Regel sollte die URL `https://opensearch:9200` sein. Der Standardbenutzername ist `admin`, und das Passwort ist das, das von der Ressource `random_password` generiert wurde.
 
-## Übliche Anwendungen konfigurieren
+### Verwendung der mStudio-Benutzeroberfläche
 
-:::important[Aufruf zur Mithilfe!]
+Alternativ kannst du einen OpenSearch-Container manuell einrichten:
 
-Dieser Abschnitt ist derzeit leer. Bitte verwende den [Issue-Tracker](https://github.com/mittwald/developer-portal/issues) dieses Projekts, um Dokumentationen für spezifische Integrationen anzufordern. Wenn du selbst Erfahrung mit der Einrichtung von OpenSearch mit gängigen Open-Source-Anwendungen hast, nehmen wir auch gerne [Pull Requests](https://github.com/mittwald/developer-portal) entgegen, um entsprechende Tutorials hinzuzufügen.
+1. Gehe in deinem Projekt in mStudio auf den **Container**-Menüpunkt und erstelle einen neuen Container. Du kannst einen beliebigen Namen wählen.
 
-:::
+2. Gib das Image `opensearchproject/opensearch` ein. Du kannst den Entrypoint und das Command wie vorgeschlagen beibehalten.
+
+3. Um deine OpenSearch-Daten persistent zu machen, erstelle ein Volume unter **Volumes** wie folgt:
+
+   - Volume: Neues Volume erstellen
+   - Pfad im Container (Mount Point): `/usr/share/opensearch/data`
+
+4. Setze die folgenden Umgebungsvariablen für den Container:
+
+   ```dotenv
+   OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m  # begrenzt den RAM-Verbrauch von OpenSearch - extrem wichtig, sonst werden 32 GB RAM verbraucht
+   bootstrap.memory_lock=true  # stellt zusammen mit der vorherigen Zeile sicher, dass kein Swapping stattfindet
+   cluster.name=opensearch-cluster  # Name für den OS-Cluster
+   discovery.seed_hosts=opensearch-test  # gibt an, welcher Knoten im Cluster verwendet werden soll
+   node.name=opensearch-test  # Name für den OS-Knoten
+   plugins.security.ssl.http.enabled=false  # ermöglicht die Verbindung über HTTP, da Container kein HTTPS verarbeiten können
+   discovery.site=single-node
+   OPENSEARCH_INITIAL_ADMIN_PASSWORD=SuperSecurePassword123  # setzt das Admin-Passwort. Seit Version 2.12 ist dies obligatorisch
+   ```
+
+Der Standardbenutzer für OpenSearch ist `admin`.
+
+Die vorgeschlagenen Port-Werte sind im OpenSearch-Kontext Standard und können unverändert übernommen werden.
+
+### Verwendung der CLI mit `mw container run`
+
+Du kannst auch einen OpenSearch-Container mit der mittwald CLI und dem Befehl `mw container run` bereitstellen:
+
+```bash
+mw container run \
+  --name opensearch \
+  --env OPENSEARCH_JAVA_OPTS=-Xms512m\ -Xmx512m \
+  --env bootstrap.memory_lock=true \
+  --env cluster.name=opensearch-cluster \
+  --env discovery.seed_hosts=opensearch \
+  --env node.name=opensearch \
+  --env plugins.security.ssl.http.enabled=false \
+  --env discovery.site=single-node \
+  --env OPENSEARCH_INITIAL_ADMIN_PASSWORD=SuperSecurePassword123 \
+  --volume opensearch-data:/usr/share/opensearch/data \
+  opensearchproject/opensearch
+```
+
+Dieser Befehl erstellt einen neuen Container namens "opensearch" mit dem OpenSearch-Image, setzt alle notwendigen Umgebungsvariablen und mountet ein Volume für die persistente Datenspeicherung.
+
+### Verwendung der CLI mit `mw stack deploy`
+
+Wenn du Docker Compose bevorzugst, kannst du eine `docker-compose.yml`-Datei erstellen und sie mit dem Befehl `mw stack deploy` bereitstellen:
+
+1. Erstelle eine `docker-compose.yml`-Datei mit folgendem Inhalt:
+
+   ```yaml
+   version: "3"
+   services:
+     opensearch:
+       image: opensearchproject/opensearch
+       environment:
+         - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+         - bootstrap.memory_lock=true
+         - cluster.name=opensearch-cluster
+         - discovery.seed_hosts=opensearch
+         - node.name=opensearch
+         - plugins.security.ssl.http.enabled=false
+         - discovery.site=single-node
+         - OPENSEARCH_INITIAL_ADMIN_PASSWORD=SuperSecurePassword123
+       volumes:
+         - opensearch-data:/usr/share/opensearch/data
+   volumes:
+     opensearch-data:
+   ```
+
+2. Stelle den Stack mit der CLI bereit:
+
+   ```bash
+   mw stack deploy
+   ```
+
+Dieser Ansatz ist besonders nützlich, wenn du mehrere Container deployen möchtest, die zusammenarbeiten, wie OpenSearch mit OpenSearch Dashboards.
+
+### Zugriff auf deinen Container innerhalb deiner Hosting-Umgebung
+
+Sobald der Container läuft, kannst du überprüfen, ob die Instanz verfügbar ist, indem du über `curl` darauf zugreifst:
+
+```bash
+curl -X GET "https://opensearch:9200" -ku admin:SuperSecurePassword123
+```
+
+Du solltest eine Antwort ähnlich der folgenden erhalten:
+
+```json
+{
+  "name": "c-fdbzvx-0",
+  "cluster_name": "docker-cluster",
+  "cluster_uuid": "hABJsptAR9uw7cBXtqaneA",
+  "version": {
+    "distribution": "opensearch",
+    "number": "2.19.1",
+    "build_type": "tar",
+    "build_hash": "2e4741fb45d1b150aaeeadf66d41445b23ff5982",
+    "build_date": "2025-02-27T01:16:47.726162386Z",
+    "build_snapshot": false,
+    "lucene_version": "9.12.1",
+    "minimum_wire_compatibility_version": "7.10.0",
+    "minimum_index_compatibility_version": "7.0.0"
+  },
+  "tagline": "The OpenSearch Project: https://opensearch.org/"
+}
+```
+
+## Betrieb
+
+OpenSearch läuft, solange der Container läuft. Wenn du OpenSearch als Suchmaschine für dein CMS verwendest, müssen die Suchindices von deiner Anwendung befüllt werden. Die meisten CMS-Plattformen bieten fertige Integrationen hierzu an.
+
+Das Volume wird automatisch in das reguläre Backup deines Projekts einbezogen.
+
+## Einrichtung gängiger Anwendungen
+
+Um OpenSearch in Anwendungen zu integrieren, ist in der Regel ein Eintrag in der Konfigurationsdatei des CMS erforderlich. In diesem Abschnitt findest du Beispiele für verschiedene CMS-Plattformen.
+
+### Magento 2
+
+Für Magento 2 wird der Hostname einfach im Installationsmenü der App eingegeben. Das Setup übernimmt automatisch die Konfiguration.
+
+### Shopware 6
+
+In Shopware enthalten die Dateien `.env` oder `.env.local` bereits Zeilen, in denen Verbindungsdaten gespeichert werden müssen:
+
+```
+SHOPWARE_ES_ENABLED=1
+SHOPWARE_ES_HOSTS="http://USERNAME:PASSWORD@hostname:9200"
+SHOPWARE_ES_INDEXING_ENABLED=1
+SHOPWARE_ES_INDEX_PREFIX=sw
+SHOPWARE_ES_THROW_EXCEPTION=0
+```
+
+USERNAME ist in unserem Fall immer `admin`. Das PASSWORD ist das von uns gesetzte `OPENSEARCH_INITIAL_ADMIN_PASSWORD`.
+
+Anschließend muss der Index über die Shopware-Konsole mit diesem Befehl befüllt werden:
+
+```bash
+php bin/console es:admin:index
+```
+
+Um es im Frontend sichtbar zu machen, muss der Consumer laufen und der Cache geleert werden.
+
+### TYPO3
+
+TYPO3 unterstützt OpenSearch nicht nativ, daher ist eine Erweiterung erforderlich. Eine mögliche Integration wäre [`pluswerk/elasticsearch`](https://github.com/pluswerk/elasticsearch).
+
+### WordPress
+
+WordPress kann sich nicht nativ mit OpenSearch verbinden, aber du kannst das [ElasticPress](https://wordpress.org/plugins/elasticpress/)-Plugin dafür verwenden. Die Verbindungseinstellungen müssen im Plugin-Backend angepasst werden, da die CLI-Erweiterung von ElasticPress das initiale Setup nicht verarbeiten kann.
+Anschließend kann die Indexierung mit dem Befehl aktiviert werden:
+
+```bash
+wp elasticpress index --setup
+```
