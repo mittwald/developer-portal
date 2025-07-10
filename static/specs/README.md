@@ -1,2 +1,2 @@
 - The stable specs (`v1`, `v2` and eventual newer versions) in this directory are regularly pulled from the mittwald API itself, using the scripts in the `generator` directory. This script is run via a scheduled GitHub action.
-- The dev specs (`v2-dev` and eventual newer ones) are _pushed_ by a scheduled pipeline from a repository in the mittwald internal GitLab instance.
+- The dev specs (`v2-dev` and eventual newer ones) are _pushed_ by a scheduled pipeline from a repository in the mittwald internal GitLab instance (search for the `spec-dev-publisher` repo)
