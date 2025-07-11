@@ -81,6 +81,21 @@ function PlatformCoreFeatures() {
             ]}
           />
         </li>
+        <li>
+          <LinkGroup
+            title={
+              <>
+                <Translate id="index.deploy.platform.aimodels">
+                  AI Models
+                </Translate>{" "}
+                <NewBadge />
+              </>
+            }
+            links={[
+              <Link to="/docs/v2/platform/aimodels/intro">Introduction</Link>,
+            ]}
+          />
+        </li>
       </ul>
       <p>
         <Translate id="index.deploy.platform.features">
@@ -133,9 +148,7 @@ function PlatformTools() {
             }
             links={[
               <Link to="/docs/v2/guides/deployment/deployer">Deployer</Link>,
-              <Link to="/docs/v2/guides/deployment/typo3surf">
-                TYPO3 Surf
-              </Link>,
+              <Link to="/docs/v2/guides/deployment/typo3surf">TYPO3 Surf</Link>,
               <Link to="/docs/v2/guides/deployment/terraform">
                 Terraform <NewBadge />
               </Link>,
