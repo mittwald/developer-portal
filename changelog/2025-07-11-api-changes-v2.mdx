@@ -1,0 +1,111 @@
+---
+title: API changes for v2 API, July 4 to July 11
+authors:
+  - machine
+tags:
+  - apiv2
+  - App
+  - Marketplace
+  - Contract
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+During the week of July 4th to July 11th, 2025, the mittwald API underwent several changes, including the removal of certain optional properties from responses, the addition of new optional properties and request parameters, the introduction of new endpoints, and the removal of an API operation ID.
+
+{/* truncate */}
+
+## Summary
+
+- The optional property `/items/processes` has been removed from the `200` status response for the following operations:
+  - `GET /v2/app-installations` (List AppInstallations that a user has access to)
+  - `GET /v2/projects/{projectId}/app-installations` (List AppInstallations belonging to a Project).
+- The optional property `processes` has been removed from the `200` status response for the operation `GET /v2/app-installations/{appInstallationId}` (Get an AppInstallation).
+- The optional property `/items/lockedBy` has been added to the `200` status response for the following operations:
+  - `GET /v2/app-installations` (List AppInstallations that a user has access to)
+  - `GET /v2/projects/{projectId}/app-installations` (List AppInstallations belonging to a Project).
+- The optional property `lockedBy` has been added to the `200` status response for the operation `GET /v2/app-installations/{appInstallationId}` (Get an AppInstallation).
+- A non-success response with the status `412` has been added for the operation `DELETE /v2/app-installations/{appInstallationId}` (Trigger an uninstallation process for an AppInstallation).
+- A non-success response with the status `412` has also been added for the operation `PUT /v2/contributors/{contributorId}/extensions/{extensionId}/pricing` (Creates or Updates Pricing for an Extension).
+- The API operation ID `contract-get-next-termination-date-for-item` has been removed and replaced with `deprecated-contract-get-next-termination-date-for-item` for the operation `GET /v2/contracts/{contractId}/items/{contractItemId}/next-termination-dates`.
+- An endpoint has been added for the operation `GET /v2/contributors/{contributorId}/contract-partners` (List ContractPartners of the contributor).
+- Two new optional query request parameters, `order` and `sort`, have been added for the operation `GET /v2/customers/{customerId}/invoices` (List Invoices of a Customer).
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+## Detailed changes
+
+### Changes in "List app installations that a user has access to"
+
+- removed the optional property '/items/processes' from the response with the '200' status
+
+- added the optional property '/items/lockedBy' to the response with the '200' status
+
+For details, refer to the <OperationLink operation="app-list-appinstallations-for-user" apiVersion="v2" /> endpoint.
+
+### Changes in "Get an app installation"
+
+- removed the optional property 'processes' from the response with the '200' status
+
+- added the optional property 'lockedBy' to the response with the '200' status
+
+For details, refer to the <OperationLink operation="app-get-appinstallation" apiVersion="v2" /> endpoint.
+
+### Changes in "List app installations belonging to a Project"
+
+- removed the optional property '/items/processes' from the response with the '200' status
+
+- added the optional property '/items/lockedBy' to the response with the '200' status
+
+For details, refer to the <OperationLink operation="app-list-appinstallations" apiVersion="v2" /> endpoint.
+
+### Changes in "Trigger an uninstallation process for an app installation"
+
+- added the non-success response with the status '412'
+
+For details, refer to the <OperationLink operation="app-uninstall-appinstallation" apiVersion="v2" /> endpoint.
+
+### Changes in "contract-get-next-termination-date-for-item"
+
+- api operation id 'contract-get-next-termination-date-for-item' removed and replaced with 'deprecated-contract-get-next-termination-date-for-item'
+
+For details, refer to the <OperationLink operation="contract-get-next-termination-date-for-item" apiVersion="v2" /> endpoint.
+
+### Changes in "List ContractPartners of the contributor"
+
+- endpoint added
+
+For details, refer to the <OperationLink operation="contributor-list-contract-partners-of-contributor" apiVersion="v2" /> endpoint.
+
+### Changes in "Creates or Updates Pricing for an Extension"
+
+- added the non-success response with the status '412'
+
+For details, refer to the <OperationLink operation="extension-update-extension-pricing" apiVersion="v2" /> endpoint.
+
+### Changes in "List Invoices of a Customer"
+
+- added the new optional 'query' request parameter 'order'
+
+- added the new optional 'query' request parameter 'sort'
+
+For details, refer to the <OperationLink operation="invoice-list-customer-invoices" apiVersion="v2" /> endpoint.
+
+## Client package releases
+
+### mittwald JavaScript SDK Release 4.181.0
+
+The mittwald JavaScript SDK has been updated to version 4.181.0. This release includes an updated generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.181.0](https://github.com/mittwald/api-client-js/releases/tag/4.181.0).
+
+### mittwald JavaScript SDK Release 4.180.0
+
+The mittwald JavaScript SDK has been updated to version 4.180.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.180.0).
+
+### mittwald JavaScript SDK Release 4.179.0
+
+The mittwald JavaScript SDK has been updated to version 4.179.0. This release includes an update to the generated client, enhancing the functionality and performance of the SDK. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.179.0).
+
+### mittwald JavaScript SDK Release 4.178.0
+
+The mittwald JavaScript SDK has been updated to version 4.178.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.178.0).
