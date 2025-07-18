@@ -1,0 +1,13 @@
+---
+sidebar_label: Fehler
+description: Informationen zu erwartbaren Fehlern und deren Fehlerbehandlung
+title: Fehlercodes und Fehlermeldungen
+---
+
+Liefert die API einen Statuscode außerhalb des Intervalls von 200 bis 399 zurück, liegt ein Fehler in der Anfrage vor. Folgende Fehler sind erwartbar:
+
+- `401 Unauthorized`: Es wurde kein API-Key im `Authorization`-Header übermittelt oder der API-Key ist ungültig.
+- `429 Too Many Requests`: Das RateLimit wurde erreicht. Weitere Anfragen sind innerhalb der Minute nicht möglich. Nach Ablauf der Minute wird das RateLimit zurückgesetzt.
+- `400 Bad Request`: Die Anfrage kann nicht verarbeitet werden. Es sollte eine Fehlernachricht mitgeliefert werden, die die Gründe dafür erläutert:
+    - `At most n image(s) may be provided in one request.`: Die Anzahl der maximal erlaubten Bilder im gesamten übermittelten Context überschreitet die Kapazitäten des Models. Entweder müssen Bilder aus dem übermittelten Context entfernt oder ein neuer Context muss eröffnet werden.
+    - `max_tokens must be at least…`: Die maximale Context-Länge des Modells wurde überschritten für die Generierung von Text. Die Fehlermeldung gibt zudem die Anzahl der Überschreitung als Differenz (negativer Wert, Anzahl Token) aus. Der Context muss gekürzt werden.

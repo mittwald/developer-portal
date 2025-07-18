@@ -1,0 +1,21 @@
+---
+sidebar_label: Abweichungen und Limitierungen
+description: Hinweise zu Abweichungen von der OpenAI API und Informationen zum RateLimit
+title: Abweichungen und Limitierungen
+---
+
+## Abweichungen zur OpenAI-API
+
+Obwohl unsere API kompatibel zur OpenAI-API ist, gibt es einige Einschränkungen:
+
+- Nur ausgewählte Endpunkte sind implementiert (siehe [Liste](../supported-endpoints/))
+- Einige Parameter wie `n`, `logprobs`, `functions` (je nach Modell) sind nicht verfügbar
+- Vision-Input erfolgt derzeit nur über Base64, nicht über URLs
+
+## Limitierungen
+
+Alle Anfragen unterliegen einem RateLimit, um eine faire und gleichmäßige Nutzung und Verfügbarkeit der Modelle für alle Nutzer zu gewährleisten. Im Rahmen der Beta-Phase sind dies für einen API-Key 300 Anfragen pro Minute unabhängig vom genutzten Modell. Wird das Limit erreicht, erhält der Nutzer einen HTTP-Status-Code `429 Too Many Requests`. Nach Ablauf einer Minute wird das Limit für den verwendeten API-Key zurückgesetzt.
+
+Alle Modelle unterliegen zudem modellspezifischen Limitierungen. Diese umfassen immer die erlaubte Context-Länge gemessen an der Anzahl an übermitteln Tokens. Bei Vision-fähigen-Modellen zur Verarbeitung von Bildern können je Anfrage und somit im _gesamten übermittelten Context_ nur eine limitierte Anzahl an Bildern übertragen werden. Dies betrifft somit alle in der gesamten Chat-Historie einer Anfrage übermittelten Bilder.
+
+Gegenwärtig besteht **keine Möglichkeit, Bilder zu generieren**. Eine entsprechende API-Route existiert dementsprechend nicht. 

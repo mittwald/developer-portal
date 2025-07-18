@@ -1,0 +1,21 @@
+---
+sidebar_label: Open WebUI
+description: Information on configuring Open WebUI
+title: Open WebUI
+---
+
+Open WebUI can be used as a ChatGPT-like interface within container hosting. It can be automatically installed and configured when an API key is created if your hosting product supports containers. Otherwise set up Open WebUI either in a local environment or in mittwald's container hosting following our [guide](../../../../category/guides/apps).
+
+If not connected automatically, you may set up the connection in the admin panel. Go to “Settings” and choose “Connections”. In the area for “OpenAI API” add another connection and insert the base URL
+
+```
+https://llm.aihosting.mittwald.de/v1
+```
+
+as well as your API key. Open WebUI will automatically detect all available models.
+
+For optimal results, it may be necessary to adjust the default parameters of Open WebUI for the model. You can modify these parameters in the “Models” section, after selecting the model, under “Advanced Params.” Apply the recommended parameters documented in the models section, such as `top_p`, `top_k`, and `temperature`. We also recommend hiding the embedding models in this section, which are automatically detected by Open WebUI, since they cannot be used in a chat.
+
+Open WebUI offers the ability to store knowledge in the form of documents, which can be accessed as needed. This is known as retrieval-augmented generation (RAG). In the left menu bar, under “Workspace” and then in the “Knowledge” tab, you can upload documents that can be accessed in a chat using a hashtag.
+
+To enable more efficient processing, you can use an embedding model. In the Admin Panel under the “Settings” tab, go to the “Documents” menu item. In the “Embedding” section, first select “OpenAI” in the dropdown menu as the embedding model engine. Then, insert the above-mentioned endpoint and your generated API key. Select one of our offered embedding models under “Embedding Model” and adjust the parameters “Top K” and “RAG Template” in the “Retrieval” section for optimal results.

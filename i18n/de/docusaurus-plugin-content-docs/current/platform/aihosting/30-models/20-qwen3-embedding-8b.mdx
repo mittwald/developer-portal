@@ -1,0 +1,34 @@
+---
+sidebar_label: Qwen3-Embedding-8B
+description: Detaillierte Informationen zu Qwen3-Embedding-8B
+title: Qwen3-Embedding-8B
+---
+
+## Beschreibung
+
+Das Qwen3-Embedding-Modell von Alibaba ist für das Erstellen von Embeddings konzipiert, die für ein RAG-System (Retrieval augmented generation) unverzichtbar sind. Mit diesem Modell ist keine Chat-Interaktion möglich. Es wird benötigt, um Dokumente und Texte in einzelne Vektoren umzuwandeln, die von der anwendenden Applikation in einer Vektordatenbank gespeichert werden und damit eine semantische Suche ermöglichen. Die Stärke dieses Modells liegt in seiner Unterstützung von über 100 Sprachen bei gleichzeitig hoher Performance.
+
+Folgende Limitierungen gelten:
+
+- Maximale Context-Länge: 32.768 Token
+- Embedding Dimension: 4.096
+- `dimensions`-Parameter zur dynamischen Projizierung auf eine geringere Dimension wird nicht unterstützt
+
+Es wird empfohlen, Embeddings für Suchanfragen mit folgendem Template zu formatieren:
+
+```
+Instruct: {task_description}
+Query: {query}
+```
+
+Hierbei sollte `{query}` die individuelle Suchanfrage in *einem* Satz abbilden und `{task_description}` die Aufgabe beschreiben, beispielsweise:
+
+```
+task = 'Given a web search query, retrieve relevant passages that answer the query'
+query = 'Explain gravity'
+```
+
+## Nutzungsbedingungen und Lizenzhinweise
+
+Es gelten die [allgemeinen Nutzungsbedinungen](../../access-and-usage/terms-of-use/). Das Modell wird von Alibaba unter der [Apache 2.0-Lizenz](https://www.apache.org/licenses/LICENSE-2.0.html) angeboten, eine Weiternutzung der generierten Inhalte unterliegt keiner zusätzlichen Restriktion.
+
