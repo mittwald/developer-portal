@@ -85,14 +85,14 @@ function PlatformCoreFeatures() {
           <LinkGroup
             title={
               <>
-                <Translate id="index.deploy.platform.aimodels">
-                  AI Models
+                <Translate id="index.deploy.platform.aihosting">
+                  AI-Hosting
                 </Translate>{" "}
                 <NewBadge />
               </>
             }
             links={[
-              <Link to="/docs/v2/platform/aimodels/intro">Introduction</Link>,
+              <Link to="/docs/v2/platform/aihosting/introduction">Introduction</Link>,
             ]}
           />
         </li>
