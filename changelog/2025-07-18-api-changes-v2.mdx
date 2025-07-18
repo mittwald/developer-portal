@@ -1,0 +1,224 @@
+---
+title: API changes for v2 API, July 11 to July 18
+authors:
+  - machine
+tags:
+  - apiv2
+  - Conversation
+  - Misc
+  - Container
+  - Marketplace
+  - Contract
+  - Domain
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API introduces several enhancements, including the addition of the 'productManagement' enum value across multiple response properties, new endpoints for detecting phishing emails and listing incoming invoices, and updates to request and response properties to improve functionality and flexibility.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- The new 'productManagement' enum value has been added to multiple response properties for the status '200' in the following operations:
+  - `/items/createdBy/department` and `/items/lastMessage/createdBy/department` in the `GET /v2/conversations` operation.
+  - `/items/lastMessageBy/department` and `/items/mainUser/department` in the `GET /v2/conversations` operation.
+  - `createdBy/department`, `lastMessage/createdBy/department`, `lastMessageBy/department`, and `mainUser/department` in the `GET /v2/conversations/{conversationId}` operation.
+  - `/items/allOf[#/components/schemas/de.mittwald.v1.conversation.User]/department` in the `GET /v2/conversations/{conversationId}/members` operation.
+  - `/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.Message]/createdBy/department` and `/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.StatusUpdate]/meta/user/department` in the `GET /v2/conversations/{conversationId}/messages` operation.
+
+- The optional property 'reason' has been added to the response with the '200' status in the `POST /v2/actions/validate-container-registry-uri` operation.
+
+- New endpoints have been added:
+  - `POST /v2/actions/detect-phishing-email` to check if an email is from Mittwald.
+  - `GET /v2/contributors/{contributorId}/invoices/incoming` to list incoming invoices of a contributor.
+  - `GET /v2/contributors/{contributorId}/invoices/incoming/{contributorReceiptId}/file-access-token` to request an access token for the incoming invoice file.
+
+- The 'subschema #7' has been added to the 'oneOf' list for the following properties:
+  - `/items/relatedTo` in the `GET /v2/conversations` operation.
+  - `relatedTo` in the `GET /v2/conversations/{conversationId}` operation.
+  - `relatedTo` in the `POST /v2/conversations` operation.
+  - `relatedTo` in the `PUT /v2/conversations/{conversationId}` operation.
+
+- A new optional request parameter 'search' has been added to the `GET /v2/customers/{customerId}/invoices` operation.
+
+- A non-success response with the status '403' has been added to the `GET /v2/domains/{domainId}` operation.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Get all conversation the authenticated user has created or has access to"
+
+
+- added the new 'productManagement' enum value to the '/items/createdBy/department' response property for the response status '200'
+
+- added the new 'productManagement' enum value to the '/items/lastMessage/createdBy/department' response property for the response status '200'
+
+- added the new 'productManagement' enum value to the '/items/lastMessageBy/department' response property for the response status '200'
+
+- added the new 'productManagement' enum value to the '/items/mainUser/department' response property for the response status '200'
+
+- added 'subschema #7' to the '/items/relatedTo' response property 'oneOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="conversation-list-conversations" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a support conversation"
+
+
+- added the new 'productManagement' enum value to the 'createdBy/department' response property for the response status '200'
+
+- added the new 'productManagement' enum value to the 'lastMessage/createdBy/department' response property for the response status '200'
+
+- added the new 'productManagement' enum value to the 'lastMessageBy/department' response property for the response status '200'
+
+- added the new 'productManagement' enum value to the 'mainUser/department' response property for the response status '200'
+
+- added 'subschema #7' to the 'relatedTo' response property 'oneOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="conversation-get-conversation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get members of a support conversation"
+
+
+- added the new 'productManagement' enum value to the '/items/allOf[#/components/schemas/de.mittwald.v1.conversation.User]/department' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="conversation-get-conversation-members" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all message of the conversation"
+
+
+- added the new 'productManagement' enum value to the '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.Message]/createdBy/department' response property for the response status '200'
+
+- added the new 'productManagement' enum value to the '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.StatusUpdate]/meta/user/department' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="conversation-list-messages-by-conversation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Check if an email is from mittwald"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="verification-detect-phishing-email" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Validate a Registries' URI"
+
+
+- added the optional property 'reason' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-validate-container-registry-uri" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List incoming Invoices of a contributor"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="contributor-list-incoming-invoices" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Request an Access Token for the Incoming Invoice file"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="contributor-receipt-get-file-access-token" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a conversation"
+
+
+- added 'subschema #7' to the 'relatedTo' request property 'oneOf' list
+
+
+For details, refer to the <OperationLink operation="conversation-create-conversation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update the basic properties of the conversation"
+
+
+- added 'subschema #7' to the 'relatedTo' request property 'oneOf' list
+
+
+For details, refer to the <OperationLink operation="conversation-update-conversation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Invoices of a Customer"
+
+
+- added the new optional 'query' request parameter 'search'
+
+
+For details, refer to the <OperationLink operation="invoice-list-customer-invoices" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Domain"
+
+
+- added the non-success response with the status '403'
+
+
+For details, refer to the <OperationLink operation="domain-get-domain" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald JavaScript SDK Release 4.186.0
+
+The mittwald JavaScript SDK has been updated to version 4.186.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.186.0](https://github.com/mittwald/api-client-js/releases/tag/4.186.0).
+
+### mittwald JavaScript SDK Release 4.185.0
+
+The mittwald JavaScript SDK has been updated to version 4.185.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.185.0).
+
+### mittwald JavaScript SDK Release 4.184.0
+
+The mittwald JavaScript SDK has been updated to version 4.184.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.184.0).
+
+### mittwald JavaScript SDK Release 4.183.0
+
+The mittwald JavaScript SDK version 4.183.0 has been released. This update includes the following feature:
+
+- Updated the generated client to enhance functionality and performance ([commit c11f485](https://github.com/mittwald/api-client-js/commit/c11f48547af5dbd6dceaedcb587a5fcb059e8b06)).
+
+For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.183.0).
+
+### mittwald JavaScript SDK Release 4.182.0
+
+The mittwald JavaScript SDK has been updated to version 4.182.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.182.0).
+
