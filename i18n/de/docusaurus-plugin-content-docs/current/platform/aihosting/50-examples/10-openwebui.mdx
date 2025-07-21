@@ -1,0 +1,21 @@
+---
+sidebar_label: Open WebUI
+description: Informationen zur Konfiguration von Open WebUI
+title: Open WebUI
+---
+
+Open WebUI lässt sich als ChatGPT-ähnliches Interface im Container-Hosting betreiben. Sofern dein Projekt in einem Container-fähigem Produkt angesiedelt ist, kann es beim Anlegen des API-Keys automatisch mit installiert und konfiguriert werden. Andernfalls kannst du Open WebUI in einer lokalen Umgebung oder nach unserer [Anleitung](../../../../category/guides/apps) im Container-Hosting aufsetzen.
+
+Um Open WebUI mit mittwalds AI-Hosting zu verbinden, muss das Admin Panel aufgerufen werden. Dort findet sich unter dem Reiter „Settings“ der Menüpunkt „Connections“. Lege hier im Bereich „OpenAI API“ eine weitere Connection an und hinterlege den Endpunkt
+
+```
+https://llm.aihosting.mittwald.de/v1
+```
+
+sowie deinen generierten API-Key. Open WebUI wird automatisch erkennen, welche Modelle zur Verfügung stehen und sie stehen dann in einem Chat zur Verfügung.
+
+Für optimale Ergebnisse kann es erforderlich sein, die Standard-Parameter von Open WebUI für das Modell anzupassen. Du kannst diese Parameter im Bereich „Models“ nach Auswahl des Modells im Abschnitt „Advanced Params“ anpassen. Setze hier die von uns im Abschnitt der Modelle dokumentierten, empfohlenen Parameter wie beispielsweise `top_p`, `top_k` und `Temperature`. Wir empfehlen ebenfalls in diesem Abschnitt die Embedding-Modelle, welche automatisch von Open WebUI erkannt werden, auszublenden, da diese nicht in einem Chat verwendet werden können.
+
+Open WebUI bietet die Funktion an, Wissen in Form von Dokumenten zu hinterlegen, auf die zugegriffen werden kann. Hierbei handelt es sich um sog. Retrieval-augmented generation (RAG). In der linken Menüleiste lassen sich unter „Workspace“ und dann im Reiter „Knowledge“ Dokumente hinterlegen, auf die in einem Chat mit einem Hashtag zugegriffen werden kann.
+
+Hierfür kann für performantere Verarbeitung ein Embedding-Modell genutzt werden. Erneut im Admin Panel unter dem Reiter „Settings“ findet sich der Menüpunkt „Documents“. Wähle dort im Abschnitt „Embedding“ zunächst im Dropdown-Menü „OpenAI“ für die Embedding Model Engine aus. Setze dann den oben genannten Endpunkt und deinen generierten API-Key ein. Setze dann unter „Embedding Model“ ein von uns angebotenes Embedding-Modell ein und passe für optimale Ergebnisse im Bereich „Retrieval“ die Parameter „Top K“ und „RAG Template“ an.

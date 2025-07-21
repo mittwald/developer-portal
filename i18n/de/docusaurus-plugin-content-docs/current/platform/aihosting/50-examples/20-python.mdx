@@ -1,0 +1,66 @@
+---
+sidebar_label: Python
+description: Programmatische Beispiele in Python, wie das AI-Hosting genutzt werden kann
+title: Python-Beispiele
+---
+
+
+Die Nutzung der Modelle innerhalb von Programmiersprachen kann komfortabel über bestehende Libraries stattfinden, welche die OpenAI-API unterstützen. Somit kann mittwalds AI-Hosting in vielen Fällen als Drop-In-Replacement genutzt werden.
+
+Für die folgenden Beispiele müssen zunächst über einen Python-Paketmanager die Libraries installiert werden und der im mStudio generierte API-Key in einer `.env`-Datei hinterlegt werden:
+
+```sh
+pip install python-dotenv openai langchain-openai
+echo 'OPENAI_API_KEY="sk-…"' > .env
+```
+
+Anschließend kann über das `OpenAI`-Paket ein Modell angesprochen werden:
+
+```python
+from openai import OpenAI
+from dotenv import load_dotenv
+
+# Load .env file
+load_dotenv()
+
+# Initialize client with custom host and key from environment
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1"
+)
+
+# Make a simple call
+response = client.chat.completions.create(
+    model="Mistral-Small-3.2-24B-Instruct",
+    temperature = 0.15,
+    messages=[
+        {"role": "user", "content": "Moin und hallo!"}
+    ]
+)
+
+print(response.choices[0].message.content)
+```
+
+Alternativ kann auch `langchain` verwendet werden:
+
+```python
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
+from langchain_core.messages import HumanMessage
+
+# Load .env file
+load_dotenv()
+
+# Initialize client with custom host and key from environment
+chat = ChatOpenAI(
+    model="Mistral-Small-3.2-24B-Instruct",
+    base_url="https://llm.aihosting.mittwald.de/v1",
+    temperature = 0.15
+)
+
+# Get response
+response = chat.invoke([
+    HumanMessage(content="Moin and hello!")
+])
+
+print(response.content)
+```
