@@ -1,0 +1,50 @@
+---
+title: Wie wähle ich den richtigen Extension Context?
+---
+
+Die Wahl des geeigneten `Extension Context` ist eine der zentralen Entscheidungen bei der Konzeption und Entwicklung einer `Extension`.
+
+> **Hinweis:** Der `Extension Context` legt fest, ob deine Extension auf **Projekt-** oder **Organisationsebene** installiert werden kann.
+
+## Wie wähle ich den richtigen Extension Context?
+
+Die Wahl des geeigneten `Extension Context` ist eine der zentralen Entscheidungen bei der Konzeption und Entwicklung einer `Extension`.
+
+> **Hinweis:** Der `Extension Context` legt fest, ob deine Extension auf **Projekt-** oder **Organisationsebene** installiert werden kann.
+
+### Warum ist die Wahl so wichtig?
+
+Die Entscheidung hat weitreichende Auswirkungen auf:
+
+- 🧩 **Funktionale Möglichkeiten**
+- 🔐 **Technische Einschränkungen**
+- 💸 **Preismodell und Monetarisierung**
+
+### Entscheidungsfaktoren
+
+#### 1. Produktspezifische Aspekte
+
+Überlege dir, auf welcher Ebene dein Produkt den größten Mehrwert bietet:
+
+- **Organisationsebene**: Sinnvoll, wenn das Produkt auf organisationsweite Prozesse zugreift (z.B. zentrale Nutzerverwaltung, Vertragsmanagement).
+- **Projektebene**: Geeignet für projektbezogene Tools (z.B. Deployment-Erweiterungen, projektbezogene Visualisierungen).
+
+#### 2. Technische Aspekte
+
+Nicht alle technischen Features stehen auf Projektebene zur Verfügung:
+
+**Einschränkungen von Project Extensions:**
+
+- Der Zugriff ist nur auf Ressourcen **unterhalb** der Projekt-Ebene möglich. Das bedeutet, der Zugriff auf Organisationen, Verträge, Vertragspartner, etc. ist nicht möglich.
+- Kein Einhängen von Frontend-Fragmenten oberhalb der Projekt-Ebene. Es kann also bspw. kein Menüpunkt in der Organisation hinzugefügt werden. Andersherum können bei einer Extension auf Organisationsebene Frontend-Fragmente auf Projektebene und tiefer hinzugefügt werden.
+- Keine projektübergreifende Datenverarbeitung oder -speicherung, es sei denn, der Contributor implementiert dies ausdrücklich selbst innerhalb der Extension.
+- Keine projektübergreifende Abrechnung, es sei denn, der Contributor erstellt eine kostenlose Extension und übernimmt die Abrechnung vollständig selbst.
+
+#### 3. Strategische Aspekte
+
+Die Entscheidung wirkt sich auf dein Preismodell aus:
+
+- Auf Projektebene installierte Extensions müssen **mehrfach bezahlt** werden für die Nutzung in verschiedenen Projekten.
+- Auf Organisationsebene reicht **eine Installation pro Organisation**.
+
+> Beispiel: Ein kleines Tool für 1,50€ je Projekt kann schnell teuer werden, wenn ein Kunde 100 Projekte nutzt, sodass dieser Kunde sich gegen die Nutzung der Extension entscheiden könnte.
