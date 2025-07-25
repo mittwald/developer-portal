@@ -1,0 +1,208 @@
+---
+title: API changes for v2 API, July 18 to July 25
+authors:
+  - machine
+tags:
+  - apiv2
+  - Misc
+  - Mail
+  - Project
+  - Container
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+During the week of July 18 to July 25, 2025, the mittwald API introduced several enhancements, including new endpoints for managing LLM licenses, added required and optional properties to various responses, and introduced new optional request parameters for improved service and volume listings.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- A new endpoint has been added to the API: `GET /v2/llm-models`, which retrieves a list of currently active llm models.
+- The `GET /v2/mail-addresses/{mailAddressId}` operation now includes a required property, `isBackupInProgress`, in the response with a `200` status.
+- The `GET /v2/projects` operation has been updated to include an optional property, `/items/features`, in the response with a `200` status.
+- The `GET /v2/projects/{projectId}` operation now includes an optional property, `features`, in the response with a `200` status.
+- A new endpoint has been added: `GET /v2/projects/{projectId}/llm-licences`, which retrieves a list of already created llm licences.
+- A new endpoint has been added: `POST /v2/projects/{projectId}/llm-licences`, which creates a new llm beta licence for a project and will be purged at the end of beta.
+- A new endpoint has been added: `GET /v2/projects/{projectId}/llm-licences/{licenceId}`, which retrieves a licence of a project.
+- A new endpoint has been added: `PUT /v2/projects/{projectId}/llm-licences/{licenceId}`, which updates a llm licence for a project.
+- The `GET /v2/projects/{projectId}/mail-addresses` operation now includes a required property, `/items/isBackupInProgress`, in the response with a `200` status.
+- The `GET /v2/projects/{projectId}/services` operation has been updated to include several new optional query parameters: `requiresRecreate`, `searchTerm`, `sortOrder`, and `status`.
+- The `GET /v2/projects/{projectId}/storage-space-statistics` operation now includes two optional properties in the response with a `200` status: `meta/lastTotalExceedanceInBytes` and `meta/lastTotalExceedanceInBytesSetAt`.
+- The `GET /v2/projects/{projectId}/volumes` operation has been updated to include two new optional query parameters: `searchTerm` and `sortOrder`.
+- The `GET /v2/servers/{serverId}/storage-space-statistics` operation now includes two optional properties in the response with a `200` status: `meta/lastTotalExceedanceInBytes` and `meta/lastTotalExceedanceInBytesSetAt`.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Get a list of currently active llm models"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="misc-get-llm-models-experimental" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a mail address"
+
+
+- added the required property 'isBackupInProgress' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="mail-get-mail-address" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Projects belonging to the executing user"
+
+
+- added the optional property '/items/features' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-list-projects" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Project"
+
+
+- added the optional property 'features' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-get-project" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a list of already created llm licences"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="project-get-llm-licences-experimental" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Creates a new llm beta Licence for a project. Will be purged on end of beta"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="project-create-llm-beta-licence-experimental" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a licence of a project"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="project-get-llm-licence-experimental" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a llm Licence for a project"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="project-update-llm-licence-experimental" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List mail addresses belonging to a Project"
+
+
+- added the required property '/items/isBackupInProgress' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="mail-list-mail-addresses" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Services belonging to a Project"
+
+
+- added the new optional 'query' request parameter 'requiresRecreate'
+
+- added the new optional 'query' request parameter 'searchTerm'
+
+- added the new optional 'query' request parameter 'sortOrder'
+
+- added the new optional 'query' request parameter 'status'
+
+
+For details, refer to the <OperationLink operation="container-list-services" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get storage space Statistics belonging to a Project"
+
+
+- added the optional property 'meta/lastTotalExceedanceInBytes' to the response with the '200' status
+
+- added the optional property 'meta/lastTotalExceedanceInBytesSetAt' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="storagespace-get-project-statistics" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Volumes belonging to a Project"
+
+
+- added the new optional 'query' request parameter 'searchTerm'
+
+- added the new optional 'query' request parameter 'sortOrder'
+
+
+For details, refer to the <OperationLink operation="container-list-volumes" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get storage space Statistics belonging to a Server"
+
+
+- added the optional property 'meta/lastTotalExceedanceInBytes' to the response with the '200' status
+
+- added the optional property 'meta/lastTotalExceedanceInBytesSetAt' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="storagespace-get-server-statistics" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald JavaScript SDK Release 4.190.0
+
+The mittwald JavaScript SDK has been updated to version 4.190.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.190.0).
+
+### mittwald JavaScript SDK Release 4.189.0
+
+The mittwald JavaScript SDK has been updated to version 4.189.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.189.0).
+
+### mittwald JavaScript SDK Release 4.188.0
+
+The mittwald JavaScript SDK has been updated to version 4.188.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.188.0](https://github.com/mittwald/api-client-js/releases/tag/4.188.0).
+
+### mittwald JavaScript SDK Release 4.187.0
+
+The mittwald JavaScript SDK version 4.187.0 has been released on July 21, 2025. This update includes a feature enhancement with an updated generated client. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.187.0).
+
