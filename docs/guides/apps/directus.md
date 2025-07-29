@@ -1,6 +1,7 @@
 ---
 sidebar_label: Directus
 description: Learn how to run the open-source platform Directus in a containerized environment and connect it to a database.
+
 ---
 
 # Running Directus
@@ -11,6 +12,14 @@ Directus is an open-source data platform that provides an intuitive no-code and 
 
 > Directus is a backend for building projects. Connect it to your database, asset storage, and external services, and you instantly get extensive developer tools (Data Engine) and a comprehensive web application (Data Studio) for working with your data. Granular and powerful access control means that users can only see, interact with, and create the data that corresponds to their role, as used by the Engine and the Studio.  
 > – [Directus Documentation](https://directus.io/docs/getting-started/overview)
+
+## Prerequisites
+
+For optimal production performance, it is strongly recommended to use a managed MySQL database instead of SQLite. A managed database offers several advantages like improved performance and scalability and automatic backups and maintenance.
+
+You can create a managed MySQL database directly in the mittwald mStudio UI before setting up Directus. Alternatively, you can use CLI commands like `mw database mysql create`.
+
+The connection details provided after creation will be needed for configuring Directus.
 
 ## How do I start the container?
 
@@ -30,10 +39,6 @@ For persistent data, you store various paths as volumes. These can be set option
 
 :::note  
 You can add new volumes via the mStudio UI. Each path above should be set as a mount point.  
-:::
-
-:::info  
-The `/directus/database` volume is not needed when using a mittwald managed MySQL database.  
 :::
 
 ### Environment Variables
@@ -56,10 +61,6 @@ DB_DATABASE=mysql_XXXXXX
 DB_USER=dbu_XXXXXX
 DB_PASSWORD=your_database_password
 ```
-
-> :::tip  
-> You can create a MySQL database in the mittwald mStudio UI. After creating the database, you'll receive the connection details that should be used in the environment variables above.  
-> :::
 
 ### Operation
 
@@ -88,7 +89,3 @@ The connection parameters required for a mittwald MySQL database are:
 - `DB_DATABASE` (the name of your database, typically follows the pattern `mysql_XXXXXX`)
 - `DB_USER` (your database username, typically follows the pattern `dbu_XXXXXX`)
 - `DB_PASSWORD` (your database password)
-
-> :::note  
-> Using a managed MySQL database provides better performance, scalability, and reliability compared to SQLite, especially for production environments.  
-> :::
