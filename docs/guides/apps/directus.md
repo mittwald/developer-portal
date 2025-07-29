@@ -123,7 +123,7 @@ services:
 
       # MySQL database configuration
       DB_CLIENT: "mysql"
-      DB_HOST: "mysql-XXXXXX.pg-s-bymcdc.db.project.host"
+      DB_HOST: "mysql-XXXXXX.pg-YYYYYY.db.project.host"
       DB_PORT: "3306"
       DB_DATABASE: "mysql_XXXXXX"
       DB_USER: "dbu_XXXXXX"
@@ -142,30 +142,8 @@ mw stack deploy
 
 This command will read the `docker-compose.yml` file from the current directory and deploy it to your default stack.
 
-### Operation
+## Operation
 
 To make your directus backend reachable from the public internet, it needs to be connected to a domain. After that, you can reach the Directus backend via `https://<domain>/admin`.
 
 As part of the project backup, the data from your volumes is secured and can be restored if needed.
-
-### Integration
-
-Directus can work with a variety of database clients, but we recommend using a mittwald managed MySQL database for optimal performance and reliability.
-
-#### Connecting to a mittwald MySQL Database
-
-To connect Directus to your mittwald managed MySQL database:
-
-1. Create a MySQL database in the mittwald mStudio UI
-2. Note the connection details provided (host, port, database name, username, and password)
-3. Configure the environment variables as shown in the section above
-4. Start your Directus container
-
-The connection parameters required for a mittwald MySQL database are:
-
-- `DB_CLIENT=mysql` (specifies that you're using MySQL)
-- `DB_HOST` (the hostname of your mittwald MySQL server, follows the pattern `mysql-XXXXXX.pg-s-bymcdc.db.project.host`)
-- `DB_PORT` (typically 3306 for MySQL)
-- `DB_DATABASE` (the name of your database, typically follows the pattern `mysql_XXXXXX`)
-- `DB_USER` (your database username, typically follows the pattern `dbu_XXXXXX`)
-- `DB_PASSWORD` (your database password)
