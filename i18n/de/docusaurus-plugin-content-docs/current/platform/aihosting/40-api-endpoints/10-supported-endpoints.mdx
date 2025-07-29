@@ -1,0 +1,87 @@
+---
+sidebar_label: Unterstützte Endpunkte
+description: Informationen zu unterstützten API-Endpunkten und Beispiele
+title: Unterstützte API-Endpunkte
+---
+
+Die API kann über HTTPS angesprochen werden und ist OpenAI-API-kompatibel. Die Base-URL lautet `https://llm.aihosting.mittwald.de`. Häufig wird in Applikationen gefordert, dass zusätzlich die Versionierung mit angegeben wird. In diesem Fall sollte die gesamte Base-URL mit Versionierung angegeben werden: `https://llm.aihosting.mittwald.de/v1`.
+
+Jede Interaktion mit der API erfordert, dass ein `Authorization`-Header mit einem gültigen API-Key übermittelt wird. Dieser Key kann im mStudio erstellt werden.
+
+Wir verwenden in unseren Beispielen `curl`, da dies die einfachste und schnellste Variante zum Testen ist. Für einen produktiven Einsatz empfehlen wir den Einsatz von Frameworks und Libraries, die OpenAI unterstützen. Um die nachfolgenden Beispiele erfolgreich auszuführen, muss der API-Key zunächst als Umgebungsvariable gesetzt werden, beispielsweise so:
+
+```sh
+export APIKEY=sk-…
+```
+
+## /v1/models
+
+Dieser Endpunkt gibt eine Liste der zur Verfügung stehenden Modelle zurück.
+
+```sh
+curl -i -X GET https://llm.aihosting.mittwald.de/v1/models \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $APIKEY"
+```
+
+Es wird ein Dictionary mit einer Liste von verfügbaren Modellen zurückgeliefert. Die darin befindliche `id` kann für die nachfolgenden API-Routen im `model`-Feld verwendet werden.
+
+## /v1/chat/completions und /v1/completions
+
+Über diese Route können Inhalte an das LLM im Chat-Format übersendet werden. Der Endpunkt unterstützt Streaming für die vom LLM generierten Inhalte.
+
+```sh
+curl -i -X POST https://llm.aihosting.mittwald.de/v1/chat/completions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $APIKEY" \
+    -d '{ 
+        "model": "Mistral-Small-3.2-24B-Instruct",
+        "messages": [
+            {
+                "role": "user",
+                "content": "Moin und hallo!"
+            }
+        ]
+    }'
+
+```
+
+Der Parameter `model` erfordert eine gültige Modellbezeichnung, welcher über die `/v1/models`-Route ermittelt werden kann. Es können weitere Modellparameter wie `temperature`, `top_p` oder `top_k` übermittelt werden. Empfohlene Einstellungen hierfür finden sich in der Beschreibung der Modelle, sofern diese vom Standard abweichen. Welche erweiterten Parameter Einfluss auf die Antwort nehmen ist modellabhängig.
+
+Für eine Stream-Response muss die Option `stream: true` gesetzt werden.
+
+```sh
+curl -i -N -X POST https://llm.aihosting.mittwald.de/v1/chat/completions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $APIKEY" \
+    -d '{ 
+        "model": "Mistral-Small-3.2-24B-Instruct",
+        "messages": [
+            {
+                "role": "user",
+                "content": "Moin und hallo!"
+            }
+        ],
+        "stream": true,
+        "temperature": 0.15,
+        "top_k": 10,
+        "top_p": 0.5
+    }'
+```
+
+## /v1/embeddings
+
+Mit dieser Route können Embeddings für Texte erstellt werden.
+
+```sh
+curl -i -X POST https://llm.aihosting.mittwald.de/v1/embeddings \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $APIKEY" \
+    -d '{ 
+        "model": "Qwen3-Embedding-8B",
+        "input": "Ein wichtiges Dokument"
+    }'
+```
+
+Basierend auf dem verwendeten Embedding-Modell können weitere vom Modell unterstützte Parameter wie `dimensions` übermittelt werden. Dies ist bei [Qwen3-Embedding-8B](../../models/qwen3-embedding-8b/) jedoch nicht der Fall.
+
