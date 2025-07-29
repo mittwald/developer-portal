@@ -144,7 +144,7 @@ This command will read the `docker-compose.yml` file from the current directory 
 
 ### Operation
 
-The container is accessible when defined as the target of a domain. It can then be accessed via domain.tld/admin, as Directus represents the backend.
+To make your directus backend reachable from the public internet, it needs to be connected to a domain. After that, you can reach the Directus backend via `https://<domain>/admin`.
 
 As part of the project backup, the data from your volumes is secured and can be restored if needed.
 

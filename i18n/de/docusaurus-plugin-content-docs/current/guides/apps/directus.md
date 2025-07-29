@@ -144,7 +144,7 @@ Dieser Befehl liest die `docker-compose.yml` Datei aus dem aktuellen Verzeichnis
 
 ### Betrieb
 
-Der Container ist zugänglich, wenn er als Ziel einer Domain definiert ist. Er kann dann über domain.tld/admin aufgerufen werden, da Directus das Backend darstellt.
+Um deine Directus-Instanz aus dem öffentlichen Internet erreichbar zu machen, muss sie mit einer Domain verknüopft werden. Im Anschluss kannst du dein Directus-Backend über `https://<domain>/admin` erreichen.
 
 Im Rahmen des Projekt-Backups sind die Daten aus deinen Volumes gesichert und können bei Bedarf wiederhergestellt werden.
 
