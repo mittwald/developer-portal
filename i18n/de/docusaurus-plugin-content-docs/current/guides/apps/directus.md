@@ -24,6 +24,43 @@ Die nach der Erstellung bereitgestellten Verbindungsdetails werden für die Konf
 
 Wir verwenden das `directus/directus` Image von [Docker Hub](https://hub.docker.com/r/directus/directus) für den Container.
 
+### Verwendung von Terraform (Empfohlen)
+
+Der bequemste Weg, eine produktionsreife Directus-Instanz bereitzustellen, ist die Verwendung von [Terraform](/docs/v2/guides/deployment/terraform) mit unserem [Directus-Modul](https://registry.terraform.io/modules/mittwald/directus/mittwald/latest). Das folgende Beispiel zeigt, wie du dieses Modul in deinem eigenen Terraform-Deployment verwenden kannst:
+
+```hcl
+resource "random_password" "admin_password" {
+  length           = 16
+  special          = true
+}
+
+module "directus" {
+  source  = "mittwald/directus/mittwald"
+  version = "1.0.0"
+
+  project_id          = "example_project_id"
+
+  admin_email         = "admin@example.com"
+  admin_password      = random_password.admin_password.result
+}
+
+resource "mittwald_virtualhost" "directus" {
+  hostname   = "example.com"
+  project_id = "example_project_id"
+
+  paths = {
+    "/" = {
+      container = {
+        container_id = module.directus.container_id
+        port         = "8055/tcp"
+      }
+    }
+  }
+}
+```
+
+In diesem Beispiel wird der Container auch mit einer Domain verbunden, indem die Ressource `mittwald_virtualhost` verwendet wird. Nach dem Anwenden der Terraform-Konfiguration solltest du in der Lage sein, auf deine Directus-Instanz über die konfigurierte Domain zuzugreifen.
+
 ### Verwendung der mStudio UI
 
 Gehe im mStudio zu deinem Projekt und wähle **"Container erstellen"**. Ein geführter Dialog öffnet sich, um dir bei der Container-Einrichtung zu helfen.

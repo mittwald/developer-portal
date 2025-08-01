@@ -24,6 +24,43 @@ The connection details provided after creation will be needed for configuring Di
 
 We use the `directus/directus` image from [Docker Hub](https://hub.docker.com/r/directus/directus) for the container.
 
+### Using Terraform (Recommended)
+
+The most convenient way to provision a production-ready Directus instance is using [Terraform](/docs/v2/guides/deployment/terraform) with our [Directus module](https://registry.terraform.io/modules/mittwald/directus/mittwald/latest). The following example shows how you can use this module in your own Terraform deployment:
+
+```hcl
+resource "random_password" "admin_password" {
+  length           = 16
+  special          = true
+}
+
+module "directus" {
+  source  = "mittwald/directus/mittwald"
+  version = "1.0.0"
+
+  project_id          = "example_project_id"
+
+  admin_email         = "admin@example.com"
+  admin_password      = random_password.admin_password.result
+}
+
+resource "mittwald_virtualhost" "directus" {
+  hostname   = "example.com"
+  project_id = "example_project_id"
+
+  paths = {
+    "/" = {
+      container = {
+        container_id = module.directus.container_id
+        port         = "8055/tcp"
+      }
+    }
+  }
+}
+```
+
+In this example, the container is also connected to a domain, using the `mittwald_virtualhost` resource. After applying the Terraform configuration, you should be able to access your Directus instance via the configured domain.
+
 ### Using the mStudio UI
 
 In mStudio, go to your project and select **"Create container"**. A guided dialog will open to assist you with the container setup.
