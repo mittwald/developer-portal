@@ -48,6 +48,11 @@ The following schema describes the allowed and the required values.
           },
         },
       },
+      homepage : {
+        type: "string",
+        description: "Homepage of the Contributor",
+        example: "https://mittwald.de/"
+      },
       email: {
         type: "string",
         format: "email",
@@ -56,9 +61,32 @@ The following schema describes the allowed and the required values.
       phone: {
         type: "string",
         format: "phone",
-        example: "+491701234567",
+        example: "+49123456789",
         description: "Phone number of the contributor for support.",
       },
+      imprint: {
+        oneOf: [
+          {
+            type: "object",
+            properties: {
+              text: {
+                type: "string",
+                example: "Innovate Solutions GmbH & Co. KG\nTech Park 8\n10115 Berlin\nPhone: +49-30-1234-567\nFax: +49-30-1234-568\nCommercial Register No: HRA 7789, Local Court Berlin (Charlottenburg)\nVAT ID No: DE987654321\nGeneral Partner: Alpha Management GmbH, Local Court Berlin (Charlottenburg), HRB 24680\nRepresented by the Managing Directors: Dr. Lena Müller, David Schmidt\n"
+              }
+            },
+            required: [ "text" ]
+          },
+          {
+            type: "object",
+            properties: {
+              url: {
+                type: "string"
+              }
+            },
+            required: [ "url" ]
+          }
+        ]
+      }
     },
   }}
 />
