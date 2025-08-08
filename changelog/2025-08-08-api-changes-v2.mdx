@@ -1,0 +1,1035 @@
+---
+title: Breaking (!) API changes for v2 API, August 1 to August 8
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Misc
+  - Domain
+  - Mail
+  - App
+  - Marketplace
+  - Notification
+  - Project
+  - Container
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+During the week of August 1 to August 8, 2025, the mittwald API introduced several changes, including the requirement of request bodies for multiple endpoints, modifications to request parameter types, and the addition of new required and optional response properties across various operations.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The request body has become required for the following operations, indicating a breaking change:
+  - `POST /v2/actions/detect-phishing-email`: Check if an email is from mittwald.
+  - `POST /v2/actions/list-ingresses-compatible-with-certificate`: List Ingresses compatible with a certificate.
+  - `POST /v2/actions/verify-address`: Check if an address exists.
+  - `POST /v2/actions/verify-company`: Check if a company exists.
+  - `POST /v2/certificate-requests`: Create a CertificateRequest.
+  - `PUT /v2/certificates/{certificateId}`: Update a Certificate.
+  - `POST /v2/certificates/{certificateId}/actions/check-replace-certificate`: Check the replacement of a Certificate.
+  - `PATCH /v2/delivery-boxes/{deliveryBoxId}/description`: Update the description of a DeliveryBox.
+  - `PATCH /v2/delivery-boxes/{deliveryBoxId}/password`: Update the password of a DeliveryBox.
+  - `PUT /v2/deliveryboxes/{id}/description`: Update the description of a deliverybox.
+  - `PUT /v2/deliveryboxes/{id}/password`: Update the password for a specific deliverybox.
+  - `POST /v2/dns-zones`: Create a DNSZone.
+  - `PUT /v2/dns-zones/{dnsZoneId}/record-sets/{recordSet}`: Update a record set on a DNSZone.
+  - `POST /v2/dns-zones/{dnsZoneId}/record-sets/{recordSet}/actions/set-managed`: Set a record set on a DNSZone to managed.
+  - `POST /v2/domain-registrable`: Check if a Domain is available to register.
+  - `POST /v2/domain-transferable`: Check if a Domain is available to transfer.
+  - `POST /v2/domains`: Check if a Domain is available to register (deprecated).
+  - `PATCH /v2/domains/{domainId}/auth-code`: Update the auth code of a Domain.
+  - `PATCH /v2/domains/{domainId}/contacts/{contact}`: Update a contact of a Domain.
+  - `PATCH /v2/domains/{domainId}/nameservers`: Update the nameservers of a Domain.
+  - `PATCH /v2/domains/{domainId}/project-id`: Update a Domain's project id.
+  - `PATCH /v2/mail-addresses/{mailAddressId}/address`: Update a MailAddress.
+  - `PATCH /v2/mail-addresses/{mailAddressId}/autoresponder`: Update the autoresponder of a MailAddress.
+  - `PATCH /v2/mail-addresses/{mailAddressId}/catch-all`: Update the catch-all of a MailAddress.
+  - `PATCH /v2/mail-addresses/{mailAddressId}/forward-addresses`: Update the forward addresses of a MailAddresses.
+  - `PATCH /v2/mail-addresses/{mailAddressId}/password`: Update the password for a MailAddress.
+  - `PATCH /v2/mail-addresses/{mailAddressId}/quota`: Update the quota of a MailAddress.
+  - `PATCH /v2/mail-addresses/{mailAddressId}/spam-protection`: Update the spam protection of a MailAddress.
+  - `POST /v2/projects/{projectId}/delivery-boxes`: Create a DeliveryBox.
+  - `PATCH /v2/projects/{projectId}/mail-settings/{mailSetting}`: Update a mail setting of a Project.
+  - `PUT /v2/projects/{projectId}/mail-settings/{setting}`: Update a mail setting of a Project (deprecated).
+  - `PUT /v2/projects/{projectId}/mailsettings/blacklist`: Update blacklist for a given project ID (deprecated).
+  - `PUT /v2/projects/{projectId}/mailsettings/whitelist`: Update whitelist for a given project ID (deprecated).
+
+- The type/format of the 'projectId' request parameter has changed from 'string'/'uuid' to 'string'/'' for the following operations:
+  - `GET /v2/certificate-requests`: List CertificateRequests belonging to a Project or an Ingress.
+  - `GET /v2/certificates`: List Certificates belonging to a Project or an Ingress.
+  - `GET /v2/domains`: List Domains.
+  - `GET /v2/ingresses`: List Ingresses.
+  - `GET /v2/projects/{projectId}/dns-zones`: List DNSZones belonging to a Project.
+  - `GET /v2/projects/{projectId}/domains`: List Domains belonging to a Project (deprecated).
+  - `GET /v2/projects/{projectId}/ingresses`: List Ingresses belonging to a project (deprecated).
+  - `GET /v2/projects/{projectId}/mail-addresses`: List MailAddresses belonging to a Project.
+  - `GET /v2/projects/{projectId}/app-installations`: List AppInstallations belonging to a Project.
+
+- The type/format of the 'domainId' request parameter has changed from 'string'/'uuid' to 'string'/'' for the following operations:
+  - `DELETE /v2/domains/{domainId}`: Delete a Domain.
+  - `GET /v2/domains/{domainId}`: Get a Domain.
+  - `POST /v2/domains/{domainId}/actions/auth-code`: Create an auth code for a Domains transfer-out process.
+  - `POST /v2/domains/{domainId}/actions/resend-email`: Resend a Domain email.
+  - `PATCH /v2/domains/{domainId}/auth-code`: Update the auth code of a Domain.
+  - `PATCH /v2/domains/{domainId}/contacts/{contact}`: Update a contact of a Domain.
+  - `DELETE /v2/domains/{domainId}/declaration`: Abort a Domain declaration.
+  - `PUT /v2/domains/{domainId}/declarations/authcode`: Update an AuthCode (deprecated).
+  - `PUT /v2/domains/{domainId}/declarations/handles`: Update a Domain's OwnerC handle (deprecated).
+  - `PUT /v2/domains/{domainId}/handles/ownerc`: Change the owner contact of a domain (deprecated).
+
+- The following response properties have become required for the status '200':
+  - `/items/linkedDatabases` and `/items/projectId` for `GET /v2/app-installations`.
+  - `/items/systemSoftware`, `/items/updatePolicy`, and `/items/userInputs` for `GET /v2/app-installations`.
+  - `/items/supportedFeatures` for `GET /v2/projects` and `GET /v2/projects/{projectId}`.
+
+- The following optional properties have been added to the response with the '200' status:
+  - `/items/backendPathTemplate` for `GET /v2/apps/{appId}/versions`, `GET /v2/apps/{appId}/versions/{baseAppVersionId}/update-candidates`.
+  - `backendPathTemplate` for `GET /v2/apps/{appId}/versions/{appVersionId}`.
+
+- New optional request parameters have been added:
+  - `type` and `type-not` for `GET /v2/notifications`.
+  - `recreate` for `PATCH /v2/stacks/{stackId}`.
+  - `skipRecreate` for `POST /v2/stacks/{stackId}/services/{serviceId}/actions/pull`.
+
+- A non-success response with the status '412' has been added for `POST /v2/extensions/{extensionId}/order`.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Check if an email is from mittwald"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="verification-detect-phishing-email" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Ingresses compatible with a certificate"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="ingress-list-ingresses-compatible-with-certificate" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Check if an address exists"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="verification-verify-address" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Check if a company exists"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="verification-verify-company" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List CertificateRequests belonging to a Project or an Ingress"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="ssl-list-certificate-requests" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a CertificateRequest"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="ssl-create-certificate-request" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Certificates belonging to a Project or an Ingress"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="ssl-list-certificates" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a Certificate"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="ssl-replace-certificate" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Check the replacement of a Certificate"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="ssl-check-replace-certificate" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update the description of a delivery box"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="mail-update-delivery-box-description" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update the password of a delivery box"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="mail-update-delivery-box-password" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update the description of an deliverybox"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="deprecated-mail-deliverybox-update-description" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update the password for a specific deliverybox"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="deprecated-mail-deliverybox-update-password" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a DNS Zone"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="dns-create-dns-zone" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a record set on a DNS Zone"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="dns-update-record-set" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Set a record set on a DNS Zone to managed"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="dns-set-record-set-managed" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "updates a-records for a specific zone"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="deprecated-dns-record-a-set-custom" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "set a-records managed by ingress for a specific zone"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="deprecated-dns-record-a-set-managed-by-ingress" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "updates cname-record for a specific zone"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="deprecated-dns-record-cname-set" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "updates mx-records for a specific zone"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="deprecated-dns-record-mx-set-custom" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "sets mx-records to managed for a specific zone"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="deprecated-dns-record-mx-set-managed" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "updates srv-records for a specific zone"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="deprecated-dns-record-srv-set" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "updates txt-records for a specific zone"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="deprecated-dns-record-txt-set" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Check if a Domain is available to register"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="domain-check-domain-registrability" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Check if a Domain is available to transfer"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="domain-check-domain-transferability" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Domains"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="domain-list-domains" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Check if a Domain is available to register"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="deprecated-domain-check-domain-registrability" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Delete a Domain"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'domainId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="domain-delete-domain" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Domain"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'domainId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="domain-get-domain" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create an auth code for a Domains transfer-out process"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'domainId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="domain-create-domain-auth-code" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Resend a Domain email"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'domainId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="domain-resend-domain-email" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update the auth code of a Domain"
+
+
+- ⚠️ **Breaking:** request body became required
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'domainId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="domain-update-domain-auth-code" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a contact of a Domain"
+
+
+- ⚠️ **Breaking:** request body became required
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'domainId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="domain-update-domain-contact" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Abort a Domain declaration"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'domainId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="domain-abort-domain-declaration" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update an AuthCode"
+
+
+- ⚠️ **Breaking:** request body became required
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'domainId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="deprecated-domain-declare-process-change-authcode" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a Domain's OwnerC handle"
+
+
+- ⚠️ **Breaking:** request body became required
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'domainId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="deprecated-domain-declare-process-change-handles" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Change the owner contact of a domain"
+
+
+- ⚠️ **Breaking:** request body became required
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'domainId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="deprecated-domain-change-ownerc-of-domain" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update the nameservers of a Domain"
+
+
+- ⚠️ **Breaking:** request body became required
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'domainId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="domain-update-domain-nameservers" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Change all nameservers of a Domain"
+
+
+- ⚠️ **Breaking:** request body became required
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'domainId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="deprecated-domain-declare-nameservers" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a Domain's project id"
+
+
+- ⚠️ **Breaking:** request body became required
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'domainId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="domain-update-domain-project-id" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Change the Project relation of a Domain"
+
+
+- ⚠️ **Breaking:** request body became required
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'domainId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="deprecated-domain-change-project-of-domain" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Ingresses"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="ingress-list-ingresses" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create an Ingress"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="ingress-create-ingress" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update the paths of an Ingress"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="ingress-update-ingress-paths" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update an Ingresses paths"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="deprecated-ingress-paths" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update the tls settings of an Ingress"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="ingress-update-ingress-tls" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update an Ingresses tls settings"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="deprecated-ingress-tls" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a mail address"
+
+
+- ⚠️ **Breaking:** the 'mailbox/storageInBytes/current/value' response's property type/format changed from 'number'/'' to 'number'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the 'mailbox/storageInBytes/limit' response's property type/format changed from 'number'/'' to 'number'/'int64' for status '200'
+
+
+For details, refer to the <OperationLink operation="mail-get-mail-address" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a mail address"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="mail-update-mail-address-address" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update the autoresponder of a mail address"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="mail-update-mail-address-autoresponder" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update the autoresponder of a mail address"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="deprecated-mail-update-mail-address-autoresponder" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update the catch-all of a mail address"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="mail-update-mail-address-catch-all" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update the catchall of a mail address"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="deprecated-mail-update-mail-address-catchall" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update the forward addresses of a mail addresses"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="mail-update-mail-address-forward-addresses" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update the forward addresses of a mail addresses"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="deprecated-mail-update-mail-address-forward-addresses" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update the password for a mail address"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="mail-update-mail-address-password" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update the password for a mail address"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="deprecated-mail-update-mail-address-password" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update the quota of a mail address"
+
+
+- ⚠️ **Breaking:** request body became required
+
+- ⚠️ **Breaking:** the 'quotaInBytes' request property type/format changed from 'number'/'' to 'number'/'int64'
+
+
+For details, refer to the <OperationLink operation="mail-update-mail-address-quota" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update the quota of a mail address"
+
+
+- ⚠️ **Breaking:** request body became required
+
+- ⚠️ **Breaking:** the 'quotaInBytes' request property type/format changed from 'number'/'' to 'number'/'int64'
+
+
+For details, refer to the <OperationLink operation="deprecated-mail-update-mail-address-quota" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update the spam protection of a mail address"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="mail-update-mail-address-spam-protection" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update the spam protection of a mail address"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="deprecated-mail-update-mail-address-spam-protection" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update mail-address"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="deprecated-mail-mailaddress-update-address" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a delivery box"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="mail-create-deliverybox" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List DNS Zones belonging to a Project"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="dns-list-dns-zones" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Domains belonging to a Project"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="deprecated-domain-list-domains" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Ingresses belonging to a project"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="deprecated-ingress-list-ingresses" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List mail addresses belonging to a Project"
+
+
+- ⚠️ **Breaking:** the '/items/mailbox/storageInBytes/current/value' response's property type/format changed from 'number'/'' to 'number'/'int64' for status '200'
+
+- ⚠️ **Breaking:** the '/items/mailbox/storageInBytes/limit' response's property type/format changed from 'number'/'' to 'number'/'int64' for status '200'
+
+
+For details, refer to the <OperationLink operation="mail-list-mail-addresses" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a mail address"
+
+
+- ⚠️ **Breaking:** request body became required
+
+- ⚠️ **Breaking:** the '/oneOf[#/components/schemas/de.mittwald.v1.mail.CreateMailAddress]/mailbox/quotaInBytes' request property type/format changed from 'number'/'' to 'number'/'int64'
+
+
+For details, refer to the <OperationLink operation="mail-create-mail-address" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a mail setting of a Project"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="mail-update-project-mail-setting" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a mail setting of a Project"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="deprecated-mail-update-project-mail-setting" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update blacklist for a given project ID"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="deprecated-mail-projectsetting-update-blacklist" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update whitelist for a given project ID"
+
+
+- ⚠️ **Breaking:** request body became required
+
+
+For details, refer to the <OperationLink operation="deprecated-mail-projectsetting-update-whitelist" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app installations that a user has access to"
+
+
+- the response property '/items/linkedDatabases' became required for the status '200'
+
+- the response property '/items/projectId' became required for the status '200'
+
+- the response property '/items/systemSoftware' became required for the status '200'
+
+- the response property '/items/updatePolicy' became required for the status '200'
+
+- the response property '/items/userInputs' became required for the status '200'
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations-for-user" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an app installation"
+
+
+- the response property 'linkedDatabases' became required for the status '200'
+
+- the response property 'projectId' became required for the status '200'
+
+- the response property 'systemSoftware' became required for the status '200'
+
+- the response property 'updatePolicy' became required for the status '200'
+
+- the response property 'userInputs' became required for the status '200'
+
+
+For details, refer to the <OperationLink operation="app-get-appinstallation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app versions belonging to an app"
+
+
+- added the optional property '/items/backendPathTemplate' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-list-appversions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an app version"
+
+
+- added the optional property 'backendPathTemplate' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-get-appversion" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List update candidates belonging to an app version"
+
+
+- added the optional property '/items/backendPathTemplate' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-list-update-candidates-for-appversion" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Order Extension with saved payment method"
+
+
+- added the non-success response with the status '412'
+
+
+For details, refer to the <OperationLink operation="extension-order-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List all unread notifications"
+
+
+- added the new optional 'query' request parameter 'type'
+
+- added the new optional 'query' request parameter 'type-not'
+
+
+For details, refer to the <OperationLink operation="notifications-list-notifications" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Projects belonging to the executing user"
+
+
+- added the required property '/items/supportedFeatures' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-list-projects" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Project"
+
+
+- added the required property 'supportedFeatures' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-get-project" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app installations belonging to a Project"
+
+
+- the response property '/items/linkedDatabases' became required for the status '200'
+
+- the response property '/items/projectId' became required for the status '200'
+
+- the response property '/items/systemSoftware' became required for the status '200'
+
+- the response property '/items/updatePolicy' became required for the status '200'
+
+- the response property '/items/userInputs' became required for the status '200'
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create, update or delete Services or Volumes belonging to a Stack"
+
+
+- added the new optional 'query' request parameter 'recreate'
+
+
+For details, refer to the <OperationLink operation="container-update-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Pulls the latest version of the Service's image and optionally recreates the Service"
+
+
+- added the new optional 'query' request parameter 'skipRecreate'
+
+
+For details, refer to the <OperationLink operation="container-pull-image-for-service" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald JavaScript SDK Release 4.197.0
+
+The mittwald JavaScript SDK has been updated to version 4.197.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.197.0).
+
+### mittwald JavaScript SDK Release 4.196.0
+
+The mittwald JavaScript SDK has been updated to version 4.196.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.196.0).
+
+### mittwald JavaScript SDK Release 4.195.0
+
+The mittwald JavaScript SDK has been updated to version 4.195.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.195.0).
+
+### mittwald JavaScript SDK Release 4.194.0
+
+The mittwald JavaScript SDK has been updated to version 4.194.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.194.0).
+
