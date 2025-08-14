@@ -30,8 +30,9 @@ module "solr" {
   source = "mittwald/solr/mittwald"
 
   project_id = var.project_id
+
   solr_version = "9"
-  solr_core_name = "products"
+  solr_core_name = "typo3"
   solr_heap = "2g"
 }
 
@@ -40,7 +41,7 @@ output "solr_url" {
 }
 ```
 
-After this, you can access your Solr backend using the URL returned by the Terraform output. Usually, the URL should be `http://solr:8983`.
+After this, you can access your Solr backend using the URL returned by the Terraform output. Usually, the URL should be `http://solr:8983`. Note that this URL is only accessible from within the hosting environment (e.g., from your application containers or via SSH).
 
 ### Using the mStudio UI
 
@@ -48,9 +49,9 @@ Alternatively, you can set up a Solr container manually:
 
 1. Go to **Containers** in your project in mStudio and create a new one. You can choose any name you like.
 
-2. As image, enter either `solr:9` or `solr:9.9`, depending on how specific the version should be constrained. You can keep the entrypoint and command as suggested.
+2. As image, enter either `solr:9` or a more specific version number like `solr:9.9`, depending on how specific the version should be constrained. You can keep the entrypoint and command as suggested.
 
-3. (optional) To automatically create a Solr core on container startup, change the command to `solr-precreate <corename>`, replacing `<corename>` with a name of your choice.
+3. (optional, but recommended) To automatically create a Solr core on container startup, change the command to `solr-precreate <corename>`, replacing `<corename>` with a name of your choice.
 
 4. To make your Solr data persistent, create a volume under **Volumes** as follows:
 
@@ -60,7 +61,8 @@ Alternatively, you can set up a Solr container manually:
 5. Set the following environment variables for the container:
 
    ```dotenv
-   SOLR_HEAP=512m  # limits Solr RAM usage - important to prevent excessive memory consumption
+   # adjust as needed
+   SOLR_HEAP=512m
    ```
 
 The suggested port values are standard in the Solr context and can be accepted as is. The default port for Solr is 8983.
@@ -120,38 +122,70 @@ curl -X GET "http://solr:8983/solr/admin/info/system"
 
 You should receive a response with information about your Solr instance, including version, memory usage, and system properties.
 
+### Accessing Solr from outside the hosting environment {#public-access}
+
+The Solr URL (`http://solr:8983`) is only accessible from within the hosting environment. To access Solr from your local machine or from the internet, you have two options:
+
+#### Option 1: Using port forwarding
+
+You can use the mittwald CLI to forward the Solr port to your local machine:
+
+```bash
+mw container port-forward solr 8983:8983
+```
+
+This command creates a secure tunnel between your local machine and the Solr container. After running this command, you can access the Solr admin interface at `http://localhost:8983/` in your local web browser.
+
+#### Option 2: Connecting a domain
+
+For more permanent access, you can connect a domain to your Solr container:
+
+1. In mStudio, go to **Domains** and add a new domain or subdomain (e.g., `solr.yourdomain.com`)
+2. Configure the domain to point to your Solr container on port 8983
+3. Once the DNS has propagated, you can access Solr at `http://solr.yourdomain.com/`
+
+Note that if you choose this option, you should consider implementing proper authentication to protect your Solr instance from unauthorized access.
+
 ## Creating a Solr Core
 
-After setting up your Solr container, you'll need to create a core to store your search indices. You can do this using the Solr Admin UI or via the command line:
-
-### Using the Solr Admin UI
-
-1. Access the Solr Admin UI at `http://solr:8983/solr/`
-2. Click on the "Core Admin" menu item
-3. Click on "Add Core" and fill in the required fields:
-   - name: The name of your core (e.g., "typo3")
-   - instanceDir: Leave as default or specify a custom directory
-   - dataDir: Leave as default or specify a custom directory
-   - config: Leave as default (`solrconfig.xml`)
-   - schema: Leave as default (`schema.xml`)
+If you did not create a core on container startup (using the `solr-precreate` command mentioned above), you'll need to create a core to store your search indices, after setting up your Solr container. You can do this using the Solr Admin UI or via the command line:
 
 ### Using the Command Line
 
-You can also create a core using the Solr API via curl:
+The easies way to create a new Solr core is using the `solr create_core` command and the `mw container exec` command:
 
-```bash
-curl "http://solr:8983/solr/admin/cores?action=CREATE&name=typo3&configSet=_default"
 ```
+mw container exec <CONTAINER-ID> 'solr create_core -c typo3'
+```
+
+### Using the Solr Admin UI
+
+Alternatively, you can use the Solr admin UI to create a new core. In this case, start by preparing the respective directories and configuration files (using the `solr create_core` command will do this for you):
+
+1. Make sure that the `instanceDir` at `/var/solr/data/<corename>` exists (with `<corename>` being a name of your choice)
+2. Within that instance directory, the `conf/solrconfig.xml` file must exist. Refer to the [Solr manual](https://solr.apache.org/guide/solr/latest/configuration-guide/configuring-solrconfig-xml.html) to learn more about this configuration file.
+
+After these prerequisites are met, you can create the new Core via the Solr admin UI:
+
+1. Access the Solr Admin UI using one of the methods described in [Accessing Solr from outside the hosting environment](#public-access)
+2. Click on the "Core Admin" menu item
+3. Click on "Add Core" and fill in the required fields:
+
+- name: The name of your core (e.g., "typo3")
+- instanceDir: Leave as default or specify a custom directory
+- dataDir: Leave as default or specify a custom directory
+- config: Leave as default (`solrconfig.xml`)
+- schema: Leave as default (`schema.xml`)
 
 ## Operation
 
-Solr runs as long as the container is running. When using Solr as a search engine for your CMS, the search indices need to be populated by your application. For this, most CMS platforms offer integrations.
+Solr runs as long as the container is running. When using Solr as a search engine for your CMS, the search indices need to be populated by your application. For this, many CMS platforms offer integrations.
 
 The volume is automatically included in the regular backup of your project.
 
 ## Setting up Solr with TYPO3 CMS
 
-TYPO3 CMS can be integrated with Solr using the extension `solr` (also known as EXT:solr). This section provides a step-by-step guide to configure TYPO3 with your Solr instance.
+TYPO3 CMS can be integrated with Solr using the [extension `solr`](https://extensions.typo3.org/extension/solr). This section provides a step-by-step guide to configure TYPO3 with your Solr instance.
 
 ### Installing the Solr Extension
 
@@ -180,104 +214,8 @@ TYPO3 CMS can be integrated with Solr using the extension `solr` (also known as 
 
 ### Configuring TypoScript
 
-Add the following TypoScript setup to your root template:
-
-```typoscript
-plugin.tx_solr {
-    solr {
-        host = solr
-        port = 8983
-        path = /solr/
-        scheme = http
-        core = typo3
-    }
-
-    index {
-        queue {
-            pages {
-                initialization = ApacheSolrForTypo3\Solr\IndexQueue\Initializer\Page
-                indexer = ApacheSolrForTypo3\Solr\IndexQueue\PageIndexer
-                indexer {
-                    // add options here if needed
-                }
-
-                // Define which pages should be indexed
-                additionalWhereClause = nav_hide = 0
-            }
-
-            // Add configuration for other content types as needed
-        }
-    }
-
-    search {
-        // Configure search settings
-        targetPage = 123  // Replace with your search results page UID
-    }
-}
-```
+To get started quickly, include the static TypoScript templates that are provided by the extension. Refer to the [extension's manual](https://docs.typo3.org/p/apache-solr-for-typo3/solr/13.0/en-us/GettingStarted/ConfigureExtension.html#static-typoscript) for more information.
 
 ### Initializing the Index
 
-After configuring the extension, you need to initialize the index:
-
-1. Go to the TYPO3 backend and navigate to "Site Management > Solr".
-2. Select the "Index Queue" tab.
-3. Select the content types you want to index (e.g., pages).
-4. Click on "Initialize selected content types".
-
-Alternatively, you can use the TYPO3 console to initialize and index content:
-
-```bash
-# Initialize the index queue for pages
-./vendor/bin/typo3 solr:updateconnections
-./vendor/bin/typo3 solr:initializeindex pages
-
-# Index all queued items
-./vendor/bin/typo3 solr:indexqueue:indexall
-```
-
-### Adding a Search Form to Your Website
-
-To add a search form to your website, you can use the provided Fluid templates or create your own:
-
-1. Add a plugin content element to a page.
-2. Select "Search: Form" as the plugin type.
-3. Configure the plugin settings as needed.
-
-For the search results, create a new page and add a "Search: Results" plugin to it. Make sure to set this page's UID as the `targetPage` in your TypoScript configuration.
-
-### Advanced Configuration
-
-For more advanced configuration options, refer to the [official EXT:solr documentation](https://docs.typo3.org/p/apache-solr-for-typo3/solr/main/en-us/).
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Connection Issues**: If TYPO3 cannot connect to Solr, verify that:
-
-   - The Solr container is running
-   - The hostname, port, and path are correctly configured
-   - There are no network restrictions between your application and the Solr container
-
-2. **Indexing Issues**: If content is not being indexed properly:
-
-   - Check the TYPO3 system log for errors
-   - Verify that the Solr core exists and is properly configured
-   - Make sure the content you're trying to index meets the criteria defined in your TypoScript configuration
-
-3. **Search Not Working**: If search functionality is not working as expected:
-   - Verify that content has been indexed (check the Solr admin interface)
-   - Ensure the search plugin is properly configured
-   - Check that the search results page is correctly set up
-
-### Solr Admin Interface
-
-The Solr Admin Interface provides valuable tools for troubleshooting:
-
-- **Core Admin**: Manage your Solr cores
-- **Query**: Test search queries directly against your Solr index
-- **Schema Browser**: Explore your schema configuration
-- **Logging**: View Solr logs for error messages
-
-Access the admin interface at `http://solr:8983/solr/`.
+For initializing the search index for the first time, refer to the [extension manual](https://docs.typo3.org/permalink/apache-solr-for-typo3-solr:started-index).
