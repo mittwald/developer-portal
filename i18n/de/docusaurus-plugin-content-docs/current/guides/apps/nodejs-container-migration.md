@@ -94,14 +94,11 @@ rsync -avz ./my-app/ user@server:/html/nodejs-container/
    **Umgebungsvariablen:**
    ```env
    NODE_ENV=production
-   PORT=3000  # Verwende den Port deiner bisherigen Node.js-App
+   PORT=3000  # Port deiner Wahl
    ```
 
    **Port-Konfiguration:**
-   - Füge den gleichen Port hinzu, den deine Node.js-App verwendet hat
-   - Aktiviere die Port-Freigabe
-
-3. **Container starten** über den "Starten"-Button
+   - Füge den gleichen Port wie bei den Umgebungsvariablen hinzu
 
 ### Schritt 4: Domain umstellen
 
