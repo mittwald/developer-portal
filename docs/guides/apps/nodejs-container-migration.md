@@ -141,4 +141,4 @@ If system dependencies are missing, consider:
 
 - [Container Workloads Documentation](/docs/v2/platform/workloads/containers)
 - [Node.js Apps Documentation](/docs/v2/platform/workloads/nodejs)
-- [mittwald CLI Reference](/docs/v2/cli/reference)
+- [mittwald CLI Reference](/docs/v2/cli/reference/container)
