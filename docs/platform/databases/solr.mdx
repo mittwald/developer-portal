@@ -1,0 +1,221 @@
+---
+title: Solr
+sidebar_position: 110
+description: |
+  Apache Solr is a powerful, open-source search platform built on Apache Lucene.
+---
+
+import PlanCompatibility from "@site/src/components/PlanCompatibility";
+
+<PlanCompatibility plans={["ps", "ss"]} />
+
+## What is Solr?
+
+Apache Solr is a highly reliable, scalable and fault-tolerant search platform providing distributed indexing, replication, load-balanced querying, automated failover and recovery, centralized configuration, and more. Solr powers the search and navigation features of many of the world's largest internet sites, enabling powerful full-text search along with hit highlighting, faceted search, real-time indexing, dynamic clustering, database integration, and rich document handling.
+
+Solr is built on Apache Lucene, a high-performance, full-featured text search engine library written in Java. Solr extends Lucene with HTTP APIs, making it easy to use from virtually any programming language. Solr's external configuration allows it to be tailored to many types of applications without Java coding, and it has a plugin architecture to support more advanced customization.
+
+For content management systems like TYPO3, Solr provides powerful search capabilities that can significantly enhance the user experience by enabling fast and relevant search results across your website content.
+
+## Creating a Solr database
+
+You can provision a Solr search engine in your mittwald hosting environment using [containers](../../workloads/containers). There are several approaches to set up Solr:
+
+### Using Terraform (Recommended)
+
+The most convenient way to provision a Solr database is using [Terraform](/docs/v2/guides/deployment/terraform) with our [Solr module](https://registry.terraform.io/modules/mittwald/solr/mittwald/latest). The following example shows how you can use this module in your own Terraform deployment:
+
+```hcl
+module "solr" {
+  source = "mittwald/solr/mittwald"
+
+  project_id = var.project_id
+
+  solr_version = "9"
+  solr_core_name = "typo3"
+  solr_heap = "2g"
+}
+
+output "solr_url" {
+  value = module.solr.url
+}
+```
+
+After this, you can access your Solr backend using the URL returned by the Terraform output. Usually, the URL should be `http://solr:8983`. Note that this URL is only accessible from within the hosting environment (e.g., from your application containers or via SSH).
+
+### Using the mStudio UI
+
+Alternatively, you can set up a Solr container manually:
+
+1. Go to **Containers** in your project in mStudio and create a new one. You can choose any name you like.
+
+2. As image, enter either `solr:9` or a more specific version number like `solr:9.9`, depending on how specific the version should be constrained. You can keep the entrypoint and command as suggested.
+
+3. (optional, but recommended) To automatically create a Solr core on container startup, change the command to `solr-precreate <corename>`, replacing `<corename>` with a name of your choice.
+
+4. To make your Solr data persistent, create a volume under **Volumes** as follows:
+
+   - Volume: Create new volume
+   - Path in container (Mount Point): `/var/solr`
+
+5. Set the following environment variables for the container:
+
+   ```dotenv
+   # adjust as needed
+   SOLR_HEAP=512m
+   ```
+
+The suggested port values are standard in the Solr context and can be accepted as is. The default port for Solr is 8983.
+
+### Using the CLI with `mw container run`
+
+You can also deploy a Solr container using the mittwald CLI with the `mw container run` command:
+
+```bash
+mw container run \
+  --name solr \
+  --env SOLR_HEAP=512m \
+  --volume solr-data:/var/solr \
+  --publish 8983:8983 \
+  solr:9.9 solr-precreate typo3
+```
+
+This command creates a new container named "solr" using the Solr image, sets the necessary environment variables, and mounts a volume for persistent data storage.
+
+### Using the CLI with `mw stack deploy`
+
+If you prefer using Docker Compose, you can create a `docker-compose.yml` file and deploy it using the `mw stack deploy` command:
+
+1. Create a `docker-compose.yml` file with the following content:
+
+   ```yaml
+   version: "3"
+   services:
+     solr:
+       image: solr:9.9
+       command: solr-precreate typo3
+       environment:
+         - SOLR_HEAP=512m
+       ports:
+         - "8983:8983"
+       volumes:
+         - solr-data:/var/solr
+   volumes:
+     solr-data:
+   ```
+
+2. Deploy the stack using the CLI:
+
+   ```bash
+   mw stack deploy
+   ```
+
+This approach is particularly useful when you need to deploy multiple containers that work together.
+
+### Accessing your container within your hosting environment
+
+Once the container is running, you can verify the instance is accessible by requesting it via `curl`:
+
+```bash
+curl -X GET "http://solr:8983/solr/admin/info/system"
+```
+
+You should receive a response with information about your Solr instance, including version, memory usage, and system properties.
+
+### Accessing Solr from outside the hosting environment {#public-access}
+
+The Solr URL (`http://solr:8983`) is only accessible from within the hosting environment. To access Solr from your local machine or from the internet, you have two options:
+
+#### Option 1: Using port forwarding
+
+You can use the mittwald CLI to forward the Solr port to your local machine:
+
+```bash
+mw container port-forward solr 8983:8983
+```
+
+This command creates a secure tunnel between your local machine and the Solr container. After running this command, you can access the Solr admin interface at `http://localhost:8983/` in your local web browser.
+
+#### Option 2: Connecting a domain
+
+For more permanent access, you can connect a domain to your Solr container:
+
+1. In mStudio, go to **Domains** and add a new domain or subdomain (e.g., `solr.yourdomain.com`)
+2. Configure the domain to point to your Solr container on port 8983
+3. Once the DNS has propagated, you can access Solr at `http://solr.yourdomain.com/`
+
+Note that if you choose this option, you should consider implementing proper authentication to protect your Solr instance from unauthorized access.
+
+## Creating a Solr Core
+
+If you did not create a core on container startup (using the `solr-precreate` command mentioned above), you'll need to create a core to store your search indices, after setting up your Solr container. You can do this using the Solr Admin UI or via the command line:
+
+### Using the Command Line
+
+The easies way to create a new Solr core is using the `solr create_core` command and the `mw container exec` command:
+
+```
+mw container exec <CONTAINER-ID> 'solr create_core -c typo3'
+```
+
+### Using the Solr Admin UI
+
+Alternatively, you can use the Solr admin UI to create a new core. In this case, start by preparing the respective directories and configuration files (using the `solr create_core` command will do this for you):
+
+1. Make sure that the `instanceDir` at `/var/solr/data/<corename>` exists (with `<corename>` being a name of your choice)
+2. Within that instance directory, the `conf/solrconfig.xml` file must exist. Refer to the [Solr manual](https://solr.apache.org/guide/solr/latest/configuration-guide/configuring-solrconfig-xml.html) to learn more about this configuration file.
+
+After these prerequisites are met, you can create the new Core via the Solr admin UI:
+
+1. Access the Solr Admin UI using one of the methods described in [Accessing Solr from outside the hosting environment](#public-access)
+2. Click on the "Core Admin" menu item
+3. Click on "Add Core" and fill in the required fields:
+
+- name: The name of your core (e.g., "typo3")
+- instanceDir: Leave as default or specify a custom directory
+- dataDir: Leave as default or specify a custom directory
+- config: Leave as default (`solrconfig.xml`)
+- schema: Leave as default (`schema.xml`)
+
+## Operation
+
+Solr runs as long as the container is running. When using Solr as a search engine for your CMS, the search indices need to be populated by your application. For this, many CMS platforms offer integrations.
+
+The volume is automatically included in the regular backup of your project.
+
+## Setting up Solr with TYPO3 CMS
+
+TYPO3 CMS can be integrated with Solr using the [extension `solr`](https://extensions.typo3.org/extension/solr). This section provides a step-by-step guide to configure TYPO3 with your Solr instance.
+
+### Installing the Solr Extension
+
+1. Install the Solr extension using Composer:
+
+   ```bash
+   composer require apache-solr-for-typo3/solr
+   ```
+
+   Or download it from the [TYPO3 Extension Repository](https://extensions.typo3.org/extension/solr) and install it through the Extension Manager.
+
+2. After installation, go to the Extension Manager in the TYPO3 backend and activate the extension.
+
+### Configuring the Solr Connection
+
+1. Create or edit your site configuration in TYPO3 (Site Management > Sites).
+
+2. In the site configuration, go to the "Solr" tab and configure the connection:
+
+   - Host: `solr` (the hostname of your Solr container)
+   - Port: `8983` (the default Solr port)
+   - Path: `/solr/` (the default Solr path)
+   - Core: `typo3` (or the name of the core you created)
+
+3. Save the configuration.
+
+### Configuring TypoScript
+
+To get started quickly, include the static TypoScript templates that are provided by the extension. Refer to the [extension's manual](https://docs.typo3.org/p/apache-solr-for-typo3/solr/13.0/en-us/GettingStarted/ConfigureExtension.html#static-typoscript) for more information.
+
+### Initializing the Index
+
+For initializing the search index for the first time, refer to the [extension manual](https://docs.typo3.org/permalink/apache-solr-for-typo3-solr:started-index).
