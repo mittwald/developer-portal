@@ -71,7 +71,7 @@ rsync -avz ./my-app/ user@server:/html/nodejs-container/
 
 1. **Open mStudio** and navigate to the project
 
-2. **Go to the container interface** within your mStudio project and select "Create container". Then configure:
+2. **Go to the container interface** within your mStudio project and select "Create". Then configure:
 
    **Container Image:**
    - `node:24` for a specific version
@@ -94,14 +94,11 @@ rsync -avz ./my-app/ user@server:/html/nodejs-container/
    **Environment Variables:**
    ```env
    NODE_ENV=production
-   PORT=3000  # Use the port from the previous Node.js app
+   PORT=3000  # Port of your choice
    ```
 
    **Port Configuration:**
-   - Add the same port the Node.js app was using
-   - Enable port exposure
-
-3. **Start container** using the "Start" button
+   - Add the same port as for the environment variables
 
 ### Step 4: Switch Domain
 
