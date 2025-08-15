@@ -71,7 +71,7 @@ rsync -avz ./my-app/ user@server:/html/nodejs-container/
 
 1. **Open mStudio** and navigate to the project
 
-2. **Go to the container interface** within your mStudio project and select "Create container". Then configure:
+2. **Go to the container interface** within your mStudio project and select "Create". Then configure:
 
    **Container Image:**
    - `node:24` for a specific version
