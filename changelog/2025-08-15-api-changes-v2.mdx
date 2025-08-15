@@ -1,0 +1,364 @@
+---
+title: Breaking (!) API changes for v2 API, August 8 to August 15
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Marketplace
+  - Domain
+  - Mail
+  - Project
+  - File
+  - Contract
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week's update to the mittwald API includes changes to response property types, the addition of required request properties, and the introduction of new optional parameters across various endpoints, enhancing the overall functionality and data handling of the API.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The response property type for '/items/supportInformation/email' in the GET operation for listing contributors has changed from 'string' to 'string' with format 'email'. This is a breaking change.
+- The response property type for '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Contributor]/supportInformation/email' in the GET operation for getting a contributor has changed from 'string' to 'string' with format 'email'. This is a breaking change.
+- The response property type for '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/supportInformation/email' in the GET operation for getting a contributor has changed from 'string' to 'string' with format 'email'. This is a breaking change.
+- The response property type for '/items/support' in the GET operation for listing own extensions has changed from 'object' to an empty format. This is a breaking change.
+- The request property 'support/email' has become required in the POST operation for registering an extension. This is a breaking change.
+- The request property type for 'support/email' in the POST operation for registering an extension has changed from 'string' to 'string' with format 'email'. This is a breaking change.
+- The response property type for 'support' in the GET operation for getting own extension has changed from 'object' to an empty format. This is a breaking change.
+- The request property 'support/email' has become required in the PATCH operation for patching an extension. This is a breaking change.
+- The request property type for 'support/email' in the PATCH operation for patching an extension has changed from 'string' to 'string' with format 'email'. This is a breaking change.
+- The response property type for 'support' in the PATCH operation for patching an extension has changed from 'object' to an empty format. This is a breaking change.
+- The success response with status '204' has been removed from the POST operation for setting a record set on a DNSZone to managed. This is a breaking change.
+- The response property type for '/items/support' in the GET operation for listing extensions has changed from 'object' to an empty format. This is a breaking change.
+- The response property type for '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Extension]/support' in the GET operation for getting an extension has changed from 'object' to an empty format. This is a breaking change.
+- The response property type for '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.UnpublishedExtension]/support' in the GET operation for getting an extension has changed from 'object' to an empty format. This is a breaking change.
+- The request property type for 'quotaInBytes' has changed from 'number' to 'integer' in the PATCH operation for updating the quota of a MailAddress. This is a breaking change.
+- The request property type for 'quotaInBytes' has changed from 'number' to 'integer' in the PUT operation for updating the quota of a MailAddress. This is a breaking change.
+- The request property type for 'mailbox/quotaInBytes' has changed from 'number' to 'integer' in the POST operation for creating a MailAddress. This is a breaking change.
+- The default value '1.00' has been removed for the 'query' request parameter 'page' in the GET operation for listing servers. This is a breaking change.
+- The minimum value for the 'query' request parameter 'limit' has been increased from '0.00' to '1.00' in the GET operation for listing servers. This is a breaking change.
+- The minimum value for the 'query' request parameter 'page' has been increased from '0.00' to '1.00' in the GET operation for listing servers. This is a breaking change.
+- The optional property '/items/support/email' has been removed from the response with status '200' in the GET operation for listing own extensions.
+- The optional property '/items/support/phone' has been removed from the response with status '200' in the GET operation for listing own extensions.
+- The optional property 'support/email' has been removed from the response with status '200' in the GET operation for getting own extension.
+- The optional property 'support/phone' has been removed from the response with status '200' in the GET operation for getting own extension.
+- The optional property 'support/email' has been removed from the response with status '200' in the PATCH operation for patching an extension.
+- The optional property 'support/phone' has been removed from the response with status '200' in the PATCH operation for patching an extension.
+- The optional property '/items/support/email' has been removed from the response with status '200' in the GET operation for listing extensions.
+- The optional property '/items/support/phone' has been removed from the response with status '200' in the GET operation for listing extensions.
+- The optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Extension]/support/email' has been removed from the response with status '200' in the GET operation for getting an extension.
+- The optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Extension]/support/phone' has been removed from the response with status '200' in the GET operation for getting an extension.
+- The optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.UnpublishedExtension]/support/email' has been removed from the response with status '200' in the GET operation for getting an extension.
+- The optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.UnpublishedExtension]/support/phone' has been removed from the response with status '200' in the GET operation for getting an extension.
+- The response property '/items/supportInformation/email' has become required for the status '200' in the GET operation for listing contributors.
+- The response property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Contributor]/supportInformation/email' has become required for the status '200' in the GET operation for getting a contributor.
+- The response property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/supportInformation/email' has become required for the status '200' in the GET operation for getting a contributor.
+- The response property 'allOf' list for '/items/support' has been updated in the GET operation for listing own extensions to include '#/components/schemas/de.mittwald.v1.marketplace.SupportMeta, subschema #2'.
+- The response property 'allOf' list for 'support' has been updated in the GET operation for getting own extension to include '#/components/schemas/de.mittwald.v1.marketplace.SupportMeta, subschema #2'.
+- The response property 'allOf' list for 'support' has been updated in the PATCH operation for patching an extension to include '#/components/schemas/de.mittwald.v1.marketplace.SupportMeta, subschema #2'.
+- A success response with status '200' has been added to the POST operation for setting a record set on a DNSZone to managed.
+- The optional property '/oneOf[#/components/schemas/de.mittwald.v1.extension.SubscriptionBasedContract]/currentPrice' has been added to the response with status '200' in the POST operation for previewing an order.
+- The response property 'allOf' list for '/items/support' has been updated in the GET operation for listing extensions to include '#/components/schemas/de.mittwald.v1.marketplace.SupportMeta, subschema #2'.
+- The response property 'allOf' list for '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Extension]/support' has been updated in the GET operation for getting an extension to include '#/components/schemas/de.mittwald.v1.marketplace.SupportMeta, subschema #2'.
+- The response property 'allOf' list for '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.UnpublishedExtension]/support' has been updated in the GET operation for getting an extension to include '#/components/schemas/de.mittwald.v1.marketplace.SupportMeta, subschema #2'.
+- The new enum value 'anchorIcon' has been added to the 'path' request parameter 'fileUploadType' in the GET operation for getting a FileUploadType's rules.
+- The new optional request property 'orderData/oneOf[#/components/schemas/de.mittwald.v1.order.ProjectHostingOrderPreview]/promotionCode' has been added in the POST operation for previewing an order.
+- The new optional request property 'orderData/oneOf[#/components/schemas/de.mittwald.v1.order.ServerOrderPreview]/promotionCode' has been added in the POST operation for previewing an order.
+- The optional property '/anyOf[#/components/schemas/de.mittwald.v1.order.HostingOrderPreviewResponse]/possibleFreeTrialDays' has been added to the response with status '200' in the POST operation for previewing an order.
+- The new optional 'query' request parameter 'order' has been added in the GET operation for listing projects.
+- The new optional 'query' request parameter 'sort' has been added in the GET operation for listing projects.
+- The new optional 'query' request parameter 'order' has been added in the GET operation for listing servers.
+- The new optional 'query' request parameter 'sort' has been added in the GET operation for listing servers.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "List contributors"
+
+
+- ⚠️ **Breaking:** the '/items/supportInformation/email' response's property type/format changed from 'string'/'' to 'string'/'email' for status '200'
+
+- the response property '/items/supportInformation/email' became required for the status '200'
+
+
+For details, refer to the <OperationLink operation="extension-list-contributors" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a contributor"
+
+
+- ⚠️ **Breaking:** the '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Contributor]/supportInformation/email' response's property type/format changed from 'string'/'' to 'string'/'email' for status '200'
+
+- ⚠️ **Breaking:** the '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/supportInformation/email' response's property type/format changed from 'string'/'' to 'string'/'email' for status '200'
+
+- the response property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Contributor]/supportInformation/email' became required for the status '200'
+
+- the response property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/supportInformation/email' became required for the status '200'
+
+
+For details, refer to the <OperationLink operation="extension-get-contributor" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Extensions of own contributor"
+
+
+- ⚠️ **Breaking:** the '/items/support' response's property type/format changed from 'object'/'' to ''/'' for status '200'
+
+- removed the optional property '/items/support/email' from the response with the '200' status
+
+- removed the optional property '/items/support/phone' from the response with the '200' status
+
+- added '#/components/schemas/de.mittwald.v1.marketplace.SupportMeta, subschema #2' to the '/items/support' response property 'allOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="extension-list-own-extensions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Register an Extension"
+
+
+- ⚠️ **Breaking:** the request property 'support/email' became required
+
+- ⚠️ **Breaking:** the 'support/email' request property type/format changed from 'string'/'' to 'string'/'email'
+
+
+For details, refer to the <OperationLink operation="extension-register-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get Extension of own contributor"
+
+
+- ⚠️ **Breaking:** the 'support' response's property type/format changed from 'object'/'' to ''/'' for status '200'
+
+- removed the optional property 'support/email' from the response with the '200' status
+
+- removed the optional property 'support/phone' from the response with the '200' status
+
+- added '#/components/schemas/de.mittwald.v1.marketplace.SupportMeta, subschema #2' to the 'support' response property 'allOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="extension-get-own-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Patch Extension"
+
+
+- ⚠️ **Breaking:** the request property 'support/email' became required
+
+- ⚠️ **Breaking:** the 'support/email' request property type/format changed from 'string'/'' to 'string'/'email'
+
+- ⚠️ **Breaking:** the 'support' response's property type/format changed from 'object'/'' to ''/'' for status '200'
+
+- removed the optional property 'support/email' from the response with the '200' status
+
+- removed the optional property 'support/phone' from the response with the '200' status
+
+- added '#/components/schemas/de.mittwald.v1.marketplace.SupportMeta, subschema #2' to the 'support' response property 'allOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="extension-patch-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Set a record set on a DNS Zone to managed"
+
+
+- ⚠️ **Breaking:** removed the success response with the status '204'
+
+- added the success response with the status '200'
+
+
+For details, refer to the <OperationLink operation="dns-set-record-set-managed" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Extensions"
+
+
+- ⚠️ **Breaking:** the '/items/support' response's property type/format changed from 'object'/'' to ''/'' for status '200'
+
+- removed the optional property '/items/support/email' from the response with the '200' status
+
+- removed the optional property '/items/support/phone' from the response with the '200' status
+
+- added '#/components/schemas/de.mittwald.v1.marketplace.SupportMeta, subschema #2' to the '/items/support' response property 'allOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="extension-list-extensions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an Extension"
+
+
+- ⚠️ **Breaking:** the '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Extension]/support' response's property type/format changed from 'object'/'' to ''/'' for status '200'
+
+- ⚠️ **Breaking:** the '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.UnpublishedExtension]/support' response's property type/format changed from 'object'/'' to ''/'' for status '200'
+
+- removed the optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Extension]/support/email' from the response with the '200' status
+
+- removed the optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Extension]/support/phone' from the response with the '200' status
+
+- removed the optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.UnpublishedExtension]/support/email' from the response with the '200' status
+
+- removed the optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.UnpublishedExtension]/support/phone' from the response with the '200' status
+
+- added '#/components/schemas/de.mittwald.v1.marketplace.SupportMeta, subschema #2' to the '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Extension]/support' response property 'allOf' list for the response status '200'
+
+- added '#/components/schemas/de.mittwald.v1.marketplace.SupportMeta, subschema #2' to the '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.UnpublishedExtension]/support' response property 'allOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="extension-get-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update the quota of a mail address"
+
+
+- ⚠️ **Breaking:** the 'quotaInBytes' request property type/format changed from 'number'/'int64' to 'integer'/'int64'
+
+
+For details, refer to the <OperationLink operation="mail-update-mail-address-quota" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update the quota of a mail address"
+
+
+- ⚠️ **Breaking:** the 'quotaInBytes' request property type/format changed from 'number'/'int64' to 'integer'/'int64'
+
+
+For details, refer to the <OperationLink operation="deprecated-mail-update-mail-address-quota" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a mail address"
+
+
+- ⚠️ **Breaking:** the '/oneOf[#/components/schemas/de.mittwald.v1.mail.CreateMailAddress]/mailbox/quotaInBytes' request property type/format changed from 'number'/'int64' to 'integer'/'int64'
+
+
+For details, refer to the <OperationLink operation="mail-create-mail-address" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Servers belonging to the executing user"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'page', default value '1.00' was removed
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', the min was increased from '0.00' to '1.00'
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'page', the min was increased from '0.00' to '1.00'
+
+- added the new optional 'query' request parameter 'order'
+
+- added the new optional 'query' request parameter 'sort'
+
+
+For details, refer to the <OperationLink operation="project-list-servers" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the Contract Strategy of an Extension Instance"
+
+
+- added the optional property '/oneOf[#/components/schemas/de.mittwald.v1.extension.SubscriptionBasedContract]/currentPrice' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-extension-instance-contract" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a FileUploadType's rules"
+
+
+- added the new enum value 'anchorIcon' to the 'path' request parameter 'fileUploadType'
+
+
+For details, refer to the <OperationLink operation="file-get-file-upload-type-rules" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Preview Order"
+
+
+- added the new optional request property 'orderData/oneOf[#/components/schemas/de.mittwald.v1.order.ProjectHostingOrderPreview]/promotionCode'
+
+- added the new optional request property 'orderData/oneOf[#/components/schemas/de.mittwald.v1.order.ServerOrderPreview]/promotionCode'
+
+- added the optional property '/anyOf[#/components/schemas/de.mittwald.v1.order.HostingOrderPreviewResponse]/possibleFreeTrialDays' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="order-preview-order" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Projects belonging to the executing user"
+
+
+- added the new optional 'query' request parameter 'order'
+
+- added the new optional 'query' request parameter 'sort'
+
+
+For details, refer to the <OperationLink operation="project-list-projects" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald JavaScript SDK Release 4.201.0
+
+The mittwald JavaScript SDK has been updated to version 4.201.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.201.0).
+
+### mittwald JavaScript SDK Release 4.200.0
+
+The mittwald JavaScript SDK has been updated to version 4.200.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.200.0).
+
+### mittwald JavaScript SDK Release 4.199.1
+
+The mittwald JavaScript SDK version 4.199.1 has been released on August 14, 2025. This update includes several bug fixes:
+
+- The SDK now correctly respects nullable properties in schemas, improving data handling and validation.
+- Minor typographical errors have been corrected to enhance code clarity and maintainability.
+
+For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.199.1](https://github.com/mittwald/api-client-js/releases/tag/4.199.1).
+
+### mittwald JavaScript SDK Release 4.199.0
+
+The mittwald JavaScript SDK has been updated to version 4.199.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.199.0).
+
+### mittwald JavaScript SDK Release 4.198.0
+
+The mittwald JavaScript SDK has been updated to version 4.198.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.198.0).
+
