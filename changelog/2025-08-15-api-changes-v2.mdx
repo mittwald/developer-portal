@@ -46,13 +46,13 @@ While we generally strive to avoid breaking changes in accordance with our [API 
 - The request property 'support/email' has become required in the PATCH operation for patching an extension. This is a breaking change.
 - The request property type for 'support/email' in the PATCH operation for patching an extension has changed from 'string' to 'string' with format 'email'. This is a breaking change.
 - The response property type for 'support' in the PATCH operation for patching an extension has changed from 'object' to an empty format. This is a breaking change.
-- The success response with status '204' has been removed from the POST operation for setting a record set on a DNSZone to managed. This is a breaking change.
+- The success response status code has been changed from '204' to '200' for the POST operation for setting a record set on a DNSZone to managed.
 - The response property type for '/items/support' in the GET operation for listing extensions has changed from 'object' to an empty format. This is a breaking change.
 - The response property type for '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Extension]/support' in the GET operation for getting an extension has changed from 'object' to an empty format. This is a breaking change.
 - The response property type for '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.UnpublishedExtension]/support' in the GET operation for getting an extension has changed from 'object' to an empty format. This is a breaking change.
-- The request property type for 'quotaInBytes' has changed from 'number' to 'integer' in the PATCH operation for updating the quota of a MailAddress. This is a breaking change.
-- The request property type for 'quotaInBytes' has changed from 'number' to 'integer' in the PUT operation for updating the quota of a MailAddress. This is a breaking change.
-- The request property type for 'mailbox/quotaInBytes' has changed from 'number' to 'integer' in the POST operation for creating a MailAddress. This is a breaking change.
+- The request property type for 'quotaInBytes' has changed from 'number' to 'integer' in the PATCH operation for updating the quota of a MailAddress.
+- The request property type for 'quotaInBytes' has changed from 'number' to 'integer' in the PUT operation for updating the quota of a MailAddress.
+- The request property type for 'mailbox/quotaInBytes' has changed from 'number' to 'integer' in the POST operation for creating a MailAddress.
 - The default value '1.00' has been removed for the 'query' request parameter 'page' in the GET operation for listing servers. This is a breaking change.
 - The minimum value for the 'query' request parameter 'limit' has been increased from '0.00' to '1.00' in the GET operation for listing servers. This is a breaking change.
 - The minimum value for the 'query' request parameter 'page' has been increased from '0.00' to '1.00' in the GET operation for listing servers. This is a breaking change.
@@ -74,7 +74,6 @@ While we generally strive to avoid breaking changes in accordance with our [API 
 - The response property 'allOf' list for '/items/support' has been updated in the GET operation for listing own extensions to include '#/components/schemas/de.mittwald.v1.marketplace.SupportMeta, subschema #2'.
 - The response property 'allOf' list for 'support' has been updated in the GET operation for getting own extension to include '#/components/schemas/de.mittwald.v1.marketplace.SupportMeta, subschema #2'.
 - The response property 'allOf' list for 'support' has been updated in the PATCH operation for patching an extension to include '#/components/schemas/de.mittwald.v1.marketplace.SupportMeta, subschema #2'.
-- A success response with status '200' has been added to the POST operation for setting a record set on a DNSZone to managed.
 - The optional property '/oneOf[#/components/schemas/de.mittwald.v1.extension.SubscriptionBasedContract]/currentPrice' has been added to the response with status '200' in the POST operation for previewing an order.
 - The response property 'allOf' list for '/items/support' has been updated in the GET operation for listing extensions to include '#/components/schemas/de.mittwald.v1.marketplace.SupportMeta, subschema #2'.
 - The response property 'allOf' list for '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Extension]/support' has been updated in the GET operation for getting an extension to include '#/components/schemas/de.mittwald.v1.marketplace.SupportMeta, subschema #2'.
@@ -190,9 +189,7 @@ For details, refer to the <OperationLink operation="extension-patch-extension" a
 ### Changes in "Set a record set on a DNS Zone to managed"
 
 
-- ⚠️ **Breaking:** removed the success response with the status '204'
-
-- added the success response with the status '200'
+- changed the success response from '204' to '200', since 'content' is and has always been returned
 
 
 For details, refer to the <OperationLink operation="dns-set-record-set-managed" apiVersion="v2" /> endpoint.
@@ -242,7 +239,7 @@ For details, refer to the <OperationLink operation="extension-get-extension" api
 ### Changes in "Update the quota of a mail address"
 
 
-- ⚠️ **Breaking:** the 'quotaInBytes' request property type/format changed from 'number'/'int64' to 'integer'/'int64'
+- the 'quotaInBytes' request property type/format changed from 'number'/'int64' to 'integer'/'int64'
 
 
 For details, refer to the <OperationLink operation="mail-update-mail-address-quota" apiVersion="v2" /> endpoint.
@@ -252,7 +249,7 @@ For details, refer to the <OperationLink operation="mail-update-mail-address-quo
 ### Changes in "Update the quota of a mail address"
 
 
-- ⚠️ **Breaking:** the 'quotaInBytes' request property type/format changed from 'number'/'int64' to 'integer'/'int64'
+- the 'quotaInBytes' request property type/format changed from 'number'/'int64' to 'integer'/'int64'
 
 
 For details, refer to the <OperationLink operation="deprecated-mail-update-mail-address-quota" apiVersion="v2" /> endpoint.
@@ -262,7 +259,7 @@ For details, refer to the <OperationLink operation="deprecated-mail-update-mail-
 ### Changes in "Create a mail address"
 
 
-- ⚠️ **Breaking:** the '/oneOf[#/components/schemas/de.mittwald.v1.mail.CreateMailAddress]/mailbox/quotaInBytes' request property type/format changed from 'number'/'int64' to 'integer'/'int64'
+- the '/oneOf[#/components/schemas/de.mittwald.v1.mail.CreateMailAddress]/mailbox/quotaInBytes' request property type/format changed from 'number'/'int64' to 'integer'/'int64'
 
 
 For details, refer to the <OperationLink operation="mail-create-mail-address" apiVersion="v2" /> endpoint.
