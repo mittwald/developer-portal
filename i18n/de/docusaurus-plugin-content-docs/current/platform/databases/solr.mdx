@@ -1,0 +1,231 @@
+---
+title: Solr
+sidebar_position: 110
+description: |
+  Apache Solr ist eine leistungsstarke, quelloffene Suchplattform, die auf Apache Lucene basiert.
+---
+
+import PlanCompatibility from "@site/src/components/PlanCompatibility";
+
+<PlanCompatibility plans={["ps", "ss"]} />
+
+## Was ist Solr?
+
+Apache Solr ist eine hochzuverlässige, skalierbare und fehlertolerante Suchplattform, die verteilte Indizierung, Replikation, lastverteilte Abfragen, automatisches Failover und Recovery, zentralisierte Konfiguration und mehr bietet. Solr treibt die Such- und Navigationsfunktionen vieler der größten Internetseiten der Welt an und ermöglicht leistungsstarke Volltextsuche zusammen mit Trefferhervorhebung, facettierter Suche, Echtzeit-Indizierung, dynamischem Clustering, Datenbankintegration und umfangreicher Dokumentenverarbeitung.
+
+Solr basiert auf Apache Lucene, einer leistungsstarken, funktionsreichen Suchmaschinen-Bibliothek, die in Java geschrieben ist. Solr erweitert Lucene mit HTTP-APIs, was die Nutzung aus praktisch jeder Programmiersprache erleichtert. Die externe Konfiguration von Solr ermöglicht es, die Software an viele Arten von Anwendungen anzupassen, ohne Java-Programmierung zu benötigen, und es verfügt über eine Plugin-Architektur für fortgeschrittenere Anpassungen.
+
+Für Content-Management-Systeme wie TYPO3 bietet Solr leistungsstarke Suchfunktionen, die die Benutzererfahrung erheblich verbessern können, indem sie schnelle und relevante Suchergebnisse über die gesamten Website-Inhalte ermöglichen.
+
+## Eine Solr-Datenbank erstellen
+
+Du kannst eine Solr-Suchmaschine in deiner mittwald Hosting-Umgebung mit [Containern](../../workloads/containers) bereitstellen. Es gibt verschiedene Ansätze, um Solr einzurichten:
+
+### Verwendung von Terraform (Empfohlen)
+
+Der bequemste Weg, eine Solr-Datenbank bereitzustellen, ist die Verwendung von [Terraform](/docs/v2/guides/deployment/terraform) mit unserem [Solr-Modul](https://registry.terraform.io/modules/mittwald/solr/mittwald/latest). Das folgende Beispiel zeigt, wie du dieses Modul in deinem eigenen Terraform-Deployment verwenden kannst:
+
+```hcl
+module "solr" {
+  source = "mittwald/solr/mittwald"
+
+  project_id = var.project_id
+
+  solr_version = "9"
+  solr_core_name = "typo3"
+  solr_heap = "2g"
+}
+
+output "solr_url" {
+  value = module.solr.url
+}
+```
+
+Der `solr_version`-Input kann jeder gültige Docker-Tag aus dem [offiziellen `solr`-Repository](https://hub.docker.com/_/solr) sein. Verwende `9`, um einfach die neueste verfügbare Version von Solr 9 zu nutzen, oder einen spezifischeren Tag wie `9.9`.
+
+Danach kannst du auf dein Solr-Backend über die vom Terraform-Output zurückgegebene URL zugreifen. In der Regel sollte die URL `http://solr:8983` sein. Beachte, dass diese URL nur innerhalb der Hosting-Umgebung zugänglich ist (z.B. von deinen Anwendungs-Containern oder über SSH).
+
+Um von deinem lokalen Rechner auf deinen Solr-Container zuzugreifen (ohne ihn mit einer Domain zu verbinden), kannst du den Befehl `mw container port-forward` verwenden:
+
+```shellsession
+$ mw container port-forward solr
+```
+
+Während dieser Befehl läuft, solltest du dich über die URL `http://localhost:8983` mit deiner Solr-Instanz verbinden können.
+
+### Verwendung der mStudio-Benutzeroberfläche
+
+Alternativ kannst du einen Solr-Container manuell einrichten:
+
+1. Gehe in deinem Projekt in mStudio auf den **Container**-Menüpunkt und erstelle einen neuen Container. Du kannst einen beliebigen Namen wählen.
+
+2. Gib als Image entweder `solr:9` oder eine spezifischere Versionsnummer wie `solr:9.9` ein, je nachdem, wie spezifisch die Version eingeschränkt werden soll. Du kannst den Entrypoint und das Command wie vorgeschlagen beibehalten.
+
+3. (optional, aber empfohlen) Um automatisch einen Solr-Core beim Container-Start zu erstellen, ändere das Command zu `solr-precreate <corename>`. Ersetze dabei `<corename>` durch einen Namen deiner Wahl.
+
+4. Um deine Solr-Daten persistent zu speichern, erstelle ein Volume unter **Volumes** wie folgt:
+
+   - Volume: Neues Volume erstellen
+   - Pfad im Container (Mount Point): `/var/solr`
+
+5. Setze die folgenden Umgebungsvariablen für den Container:
+
+   ```dotenv
+   # nach Bedarf anpassen
+   SOLR_HEAP=512m
+   ```
+
+Die vorgeschlagenen Port-Werte sind im Solr-Kontext Standard und können unverändert übernommen werden. Der Standardport für Solr ist 8983.
+
+### Verwendung der CLI mit `mw container run`
+
+Du kannst auch einen Solr-Container mit der mittwald CLI und dem Befehl `mw container run` bereitstellen:
+
+```bash
+mw container run \
+  --name solr \
+  --env SOLR_HEAP=512m \
+  --volume solr-data:/var/solr \
+  --publish 8983:8983 \
+  solr:9.9 solr-precreate typo3
+```
+
+Dieser Befehl erstellt einen neuen Container namens "solr" mit dem Solr-Image, setzt die notwendigen Umgebungsvariablen und mountet ein Volume für die persistente Datenspeicherung.
+
+### Verwendung der CLI mit `mw stack deploy`
+
+Wenn du Docker Compose bevorzugst, kannst du eine `docker-compose.yml`-Datei erstellen und sie mit dem Befehl `mw stack deploy` bereitstellen:
+
+1. Erstelle eine `docker-compose.yml`-Datei mit folgendem Inhalt:
+
+   ```yaml
+   version: "3"
+   services:
+     solr:
+       image: solr:9.9
+       command: solr-precreate typo3
+       environment:
+         - SOLR_HEAP=512m
+       ports:
+         - "8983:8983"
+       volumes:
+         - solr-data:/var/solr
+   volumes:
+     solr-data:
+   ```
+
+2. Stelle den Stack mit der CLI bereit:
+
+   ```bash
+   mw stack deploy
+   ```
+
+Dieser Ansatz ist besonders nützlich, wenn du mehrere Container deployen möchtest, die zusammenarbeiten.
+
+### Zugriff auf deinen Container innerhalb deiner Hosting-Umgebung
+
+Sobald der Container läuft, kannst du überprüfen, ob die Instanz verfügbar ist, indem du über `curl` darauf zugreifst:
+
+```bash
+curl -X GET "http://solr:8983/solr/admin/info/system"
+```
+
+Du solltest eine Antwort mit Informationen über deine Solr-Instanz erhalten, einschließlich Version, Speichernutzung und Systemeigenschaften.
+
+### Zugriff auf Solr von außerhalb der Hosting-Umgebung {#public-access}
+
+Die Solr-URL (`http://solr:8983`) ist nur innerhalb der Hosting-Umgebung zugänglich. Um von deinem lokalen Rechner oder aus dem Internet auf Solr zuzugreifen, hast du zwei Möglichkeiten:
+
+#### Option 1: Verwendung von Port-Forwarding
+
+Du kannst die mittwald CLI verwenden, um den Solr-Port auf deinen lokalen Rechner weiterzuleiten:
+
+```bash
+mw container port-forward solr 8983:8983
+```
+
+Dieser Befehl erstellt einen sicheren Tunnel zwischen deinem lokalen Rechner und dem Solr-Container. Nach Ausführung dieses Befehls kannst du auf die Solr-Admin-Oberfläche unter `http://localhost:8983/` in deinem lokalen Webbrowser zugreifen.
+
+#### Option 2: Verbinden einer Domain
+
+Für einen dauerhafteren Zugriff kannst du eine Domain mit deinem Solr-Container verbinden:
+
+1. Gehe in mStudio zu **Domains** und füge eine neue Domain oder Subdomain hinzu (z.B. `solr.deinedomain.de`)
+2. Konfiguriere die Domain so, dass sie auf deinen Solr-Container auf Port 8983 zeigt
+3. Sobald die DNS-Änderungen propagiert sind, kannst du auf Solr unter `http://solr.deinedomain.de/` zugreifen
+
+Beachte, dass du bei dieser Option eine ordnungsgemäße Authentifizierung implementieren solltest, um deine Solr-Instanz vor unbefugtem Zugriff zu schützen.
+
+## Einen Solr-Core erstellen
+
+Wenn du keinen Core beim Container-Start erstellt hast (mit dem oben erwähnten `solr-precreate`-Befehl), musst du nach dem Einrichten deines Solr-Containers einen Core erstellen, um deine Suchindizes zu speichern. Das kannst du über die Solr-Admin-UI oder über die Kommandozeile tun:
+
+### Verwendung der Kommandozeile
+
+Der einfachste Weg, einen neuen Solr-Core zu erstellen, ist die Verwendung des `solr create_core`-Befehls und des `mw container exec`-Befehls:
+
+```
+mw container exec <CONTAINER-ID> 'solr create_core -c typo3'
+```
+
+### Verwendung der Solr-Admin-UI
+
+Alternativ kannst du die Solr-Admin-UI verwenden, um einen neuen Core zu erstellen. In diesem Fall musst zu zunächst die entsprechenden Verzeichnisse und Konfigurationsdateien vorbereiten (falls du den `solr create_core`-Befehl verwendest, übernimmt der diese Vorbereitung für dich):
+
+1. Stelle sicher, dass das `instanceDir` unter `/var/solr/data/<corename>` existiert (wobei `<corename>` ein Name deiner Wahl ist)
+2. Innerhalb dieses Instance-Verzeichnisses muss die Datei `conf/solrconfig.xml` existieren. Siehe das [Solr-Handbuch](https://solr.apache.org/guide/solr/latest/configuration-guide/configuring-solrconfig-xml.html), um mehr über diese Konfigurationsdatei zu erfahren.
+
+Nachdem diese Voraussetzungen erfüllt sind, kannst du den neuen Core über die Solr-Admin-UI erstellen:
+
+1. Greife auf die Solr-Admin-UI zu, indem du eine der in [Zugriff auf Solr von außerhalb der Hosting-Umgebung](#public-access) beschriebenen Methoden verwendest
+2. Klicke auf den Menüpunkt "Core Admin"
+3. Klicke auf "Add Core" und fülle die erforderlichen Felder aus:
+
+- name: Der Name deines Cores (z.B. "typo3")
+- instanceDir: Belasse es bei der Standardeinstellung oder gib ein benutzerdefiniertes Verzeichnis an
+- dataDir: Belasse es bei der Standardeinstellung oder gib ein benutzerdefiniertes Verzeichnis an
+- config: Belasse es bei der Standardeinstellung (`solrconfig.xml`)
+- schema: Belasse es bei der Standardeinstellung (`schema.xml`)
+
+## Betrieb
+
+Solr läuft, solange der Container läuft. Wenn du Solr als Suchmaschine für dein CMS verwendest, müssen die Suchindizes von deiner Anwendung befüllt werden. Dafür bieten viele CMS-Plattformen Integrationen an.
+
+Das Volume wird automatisch in das reguläre Backup deines Projekts einbezogen.
+
+## Einrichtung von Solr mit TYPO3 CMS
+
+TYPO3 CMS kann mit Solr über die [Erweiterung `solr`](https://extensions.typo3.org/extension/solr) integriert werden. Dieser Abschnitt bietet eine Schritt-für-Schritt-Anleitung zur Konfiguration von TYPO3 mit deiner Solr-Instanz.
+
+### Installation der Solr-Erweiterung
+
+1. Installiere die Solr-Erweiterung mit Composer:
+
+   ```bash
+   composer require apache-solr-for-typo3/solr
+   ```
+
+   Oder lade sie aus dem [TYPO3 Extension Repository](https://extensions.typo3.org/extension/solr) herunter und installiere sie über den Extension Manager.
+
+2. Nach der Installation gehe zum Extension Manager im TYPO3-Backend und aktiviere die Erweiterung.
+
+### Konfiguration der Solr-Verbindung
+
+1. Erstelle oder bearbeite deine Site-Konfiguration in TYPO3 (Site Management > Sites).
+
+2. In der Site-Konfiguration gehe zum Tab "Solr" und konfiguriere die Verbindung:
+
+   - Host: `solr` (der Hostname deines Solr-Containers)
+   - Port: `8983` (der Standard-Solr-Port)
+   - Path: `/solr/` (der Standard-Solr-Pfad)
+   - Core: `typo3` (oder der Name des Cores, den du erstellt hast)
+
+3. Speichere die Konfiguration.
+
+### Konfiguration von TypoScript
+
+Um schnell zu starten, füge die statischen TypoScript-Templates ein, die von der Erweiterung bereitgestellt werden. Weitere Informationen findest du im [Handbuch der Erweiterung](https://docs.typo3.org/p/apache-solr-for-typo3/solr/13.0/en-us/GettingStarted/ConfigureExtension.html#static-typoscript).
+
+### Initialisierung des Index
+
+Für die erstmalige Initialisierung des Suchindex, siehe das [Erweiterungshandbuch](https://docs.typo3.org/permalink/apache-solr-for-typo3-solr:started-index).
