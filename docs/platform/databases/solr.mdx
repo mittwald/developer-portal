@@ -41,7 +41,17 @@ output "solr_url" {
 }
 ```
 
+The `solr_version` input can be any valid Docker tag from the [official `solr` repository](https://hub.docker.com/_/solr). Use `9` to simply use the latest available version of Solr 9, or a more specific tag like `9.9`.
+
 After this, you can access your Solr backend using the URL returned by the Terraform output. Usually, the URL should be `http://solr:8983`. Note that this URL is only accessible from within the hosting environment (e.g., from your application containers or via SSH).
+
+To access your Solr container from your local machine (without connecting it to a domain), you can use the `mw container port-forward` command:
+
+```shellsession
+$ mw container port-forward solr
+```
+
+While this command is running, you should be able to connect to your Solr instance via the URL `http://localhost:8983`.
 
 ### Using the mStudio UI
 
