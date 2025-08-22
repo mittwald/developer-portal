@@ -304,22 +304,21 @@ For other languages, replace `english` in the file paths with the appropriate la
 
 ### Using the Solr Admin UI
 
-Alternatively, you can use the Solr admin UI to create a new core. In this case, start by preparing the respective directories and configuration files (using the `solr create_core` command will do this for you):
+Alternatively, you can use the Solr admin UI to create a new core. For a TYPO3 Solr core, first follow steps 1-3 from the [manual initialization section](#initializing-a-typo3-solr-core-manually) above to prepare all the necessary TYPO3 configuration files and the plugin JAR file.
 
-1. Make sure that the `instanceDir` at `/var/solr/data/<corename>` exists (with `<corename>` being a name of your choice)
-2. Within that instance directory, the `conf/solrconfig.xml` file must exist. Refer to the [Solr manual](https://solr.apache.org/guide/solr/latest/configuration-guide/configuring-solrconfig-xml.html) to learn more about this configuration file.
-
-After these prerequisites are met, you can create the new Core via the Solr admin UI:
+After the prerequisites are met, you can create the new core via the Solr Admin UI:
 
 1. Access the Solr Admin UI using one of the methods described in [Accessing Solr from outside the hosting environment](#public-access)
 2. Click on the "Core Admin" menu item
 3. Click on "Add Core" and fill in the required fields:
 
-- name: The name of your core (e.g., "typo3")
-- instanceDir: Leave as default or specify a custom directory
-- dataDir: Leave as default or specify a custom directory
-- config: Leave as default (`solrconfig.xml`)
-- schema: Leave as default (`schema.xml`)
+- **name**: The name of your core (e.g., "typo3")
+- **instanceDir**: `/var/solr/data/typo3` (or your chosen core directory)
+- **dataDir**: Leave as default or specify a custom directory
+- **config**: `solrconfig.xml`
+- **schema**: `schema.xml`
+
+4. Click "Add Core" to create the TYPO3 Solr core
 
 ## Operation
 
