@@ -1,0 +1,246 @@
+---
+title: Breaking (!) API changes for v2 API, August 15 to August 22
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Marketplace
+  - Project
+  - Contract
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week's changelog for the mittwald API includes significant updates such as changes to response property types, the addition and removal of required and optional properties, new enum values, and the introduction of new endpoints and request parameters.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The response property type for '/items/supportInformation' in the GET operation for listing contributors has changed from 'object' to an unspecified type for status '200'. Additionally, the required property '/items/supportInformation/email' has been removed from the same response. **This is a breaking change.**
+  
+- The response property type for '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Contributor]/supportInformation' and '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/supportInformation' in the GET operation for retrieving a contributor has changed from 'object' to an unspecified type for status '200'. The required property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Contributor]/supportInformation/email' and '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/supportInformation/email' have also been removed from the response. **This is a breaking change.**
+
+- The optional property '/items/supportInformation/phone' has been removed from the response in the GET operation for listing contributors. Similarly, the optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Contributor]/supportInformation/phone' and '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/supportInformation/phone' have been removed from the response in the GET operation for retrieving a contributor.
+
+- The new enum value 'failed' has been added to the '/items/containerMeta/status' response property for status '200' in the GET operation for retrieving LLM licenses. This change has also been applied to the 'containerMeta/status' response property for status '201' in the POST operation for creating LLM beta licenses, as well as for status '200' in the GET and PUT operations for retrieving and updating LLM licenses, respectively.
+
+- The response property 'allOf' list has been updated to include '#/components/schemas/de.mittwald.v1.marketplace.SupportMeta, subschema #2' for the '/items/supportInformation' in the GET operation for listing contributors, and for the '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Contributor]/supportInformation' and '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/supportInformation' in the GET operation for retrieving a contributor.
+
+- The response property 'oneOf' list has been updated to include '#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricePlanStrategy' for the '/items/pricing' in the GET operation for listing own extensions, and for the 'pricing' response property in the GET and PATCH operations for retrieving and patching an extension, respectively.
+
+- New optional request parameters 'order' and 'sort' have been added to the GET operation for listing extensions.
+
+- A new endpoint has been added to retrieve the contract for a given mail address with the GET operation at '/v2/mail-addresses/{mailAddressId}/contract'.
+
+- The optional property '/items/containerMeta/errorMessage' has been added to the response for status '200' in the GET operation for retrieving LLM licenses, and for status '201' in the POST operation for creating LLM beta licenses. The required property '/items/isBlocked' has also been added to the response for both operations.
+
+- The optional property 'containerMeta/errorMessage' has been added to the response for status '200' in the GET operation for retrieving a specific LLM license, and the required property 'isBlocked' has been added to the same response. This change has also been applied to the PUT operation for updating a specific LLM license.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "List contributors"
+
+
+- ⚠️ **Breaking:** the '/items/supportInformation' response's property type/format changed from 'object'/'' to ''/'' for status '200'
+
+- ⚠️ **Breaking:** removed the required property '/items/supportInformation/email' from the response with the '200' status
+
+- removed the optional property '/items/supportInformation/phone' from the response with the '200' status
+
+- added '#/components/schemas/de.mittwald.v1.marketplace.SupportMeta, subschema #2' to the '/items/supportInformation' response property 'allOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="extension-list-contributors" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a contributor"
+
+
+- ⚠️ **Breaking:** the '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Contributor]/supportInformation' response's property type/format changed from 'object'/'' to ''/'' for status '200'
+
+- ⚠️ **Breaking:** the '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/supportInformation' response's property type/format changed from 'object'/'' to ''/'' for status '200'
+
+- ⚠️ **Breaking:** removed the required property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Contributor]/supportInformation/email' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/supportInformation/email' from the response with the '200' status
+
+- removed the optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Contributor]/supportInformation/phone' from the response with the '200' status
+
+- removed the optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/supportInformation/phone' from the response with the '200' status
+
+- added '#/components/schemas/de.mittwald.v1.marketplace.SupportMeta, subschema #2' to the '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Contributor]/supportInformation' response property 'allOf' list for the response status '200'
+
+- added '#/components/schemas/de.mittwald.v1.marketplace.SupportMeta, subschema #2' to the '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/supportInformation' response property 'allOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="extension-get-contributor" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a list of already created llm licences"
+
+
+- added the new 'failed' enum value to the '/items/containerMeta/status' response property for the response status '200'
+
+- added the optional property '/items/containerMeta/errorMessage' to the response with the '200' status
+
+- added the required property '/items/isBlocked' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-get-llm-licences-experimental" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Creates a new llm beta Licence for a project. Will be purged on end of beta"
+
+
+- added the new 'failed' enum value to the 'containerMeta/status' response property for the response status '201'
+
+- added the optional property 'containerMeta/errorMessage' to the response with the '201' status
+
+- added the required property 'isBlocked' to the response with the '201' status
+
+
+For details, refer to the <OperationLink operation="project-create-llm-beta-licence-experimental" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a licence of a project"
+
+
+- added the new 'failed' enum value to the 'containerMeta/status' response property for the response status '200'
+
+- added the optional property 'containerMeta/errorMessage' to the response with the '200' status
+
+- added the required property 'isBlocked' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-get-llm-licence-experimental" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a llm Licence for a project"
+
+
+- added the new 'failed' enum value to the 'containerMeta/status' response property for the response status '200'
+
+- added the optional property 'containerMeta/errorMessage' to the response with the '200' status
+
+- added the required property 'isBlocked' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-update-llm-licence-experimental" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Extensions of own contributor"
+
+
+- added '#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricePlanStrategy' to the '/items/pricing' response property 'oneOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="extension-list-own-extensions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get Extension of own contributor"
+
+
+- added '#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricePlanStrategy' to the 'pricing' response property 'oneOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="extension-get-own-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Patch Extension"
+
+
+- added '#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricePlanStrategy' to the 'pricing' response property 'oneOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="extension-patch-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Extensions"
+
+
+- added the new optional 'query' request parameter 'order'
+
+- added the new optional 'query' request parameter 'sort'
+
+- added '#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricePlanStrategy' to the '/items/pricing' response property 'oneOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="extension-list-extensions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an Extension"
+
+
+- added '#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricePlanStrategy' to the '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Extension]/pricing' response property 'oneOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="extension-get-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the Contract for the given Mail Address"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-mail-address" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald JavaScript SDK Release 4.206.0
+
+The mittwald JavaScript SDK has been updated to version 4.206.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.206.0).
+
+### mittwald JavaScript SDK Release 4.205.0
+
+The mittwald JavaScript SDK has been updated to version 4.205.0. This release includes an update to the generated client, enhancing the functionality of the SDK. For more details, you can view the full release notes on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.205.0).
+
+### mittwald JavaScript SDK Release 4.204.0
+
+The mittwald JavaScript SDK has been updated to version 4.204.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.204.0).
+
+### mittwald JavaScript SDK Release 4.203.0
+
+The mittwald JavaScript SDK has been updated to version 4.203.0. This release includes updates to the generated client, enhancing the SDK's functionality and performance. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.203.0](https://github.com/mittwald/api-client-js/releases/tag/4.203.0).
+
+### mittwald JavaScript SDK Release 4.202.0
+
+The mittwald JavaScript SDK has been updated to version 4.202.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.202.0).
+
