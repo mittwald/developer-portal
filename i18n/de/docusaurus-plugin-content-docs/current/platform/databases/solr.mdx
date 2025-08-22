@@ -53,6 +53,71 @@ $ mw container port-forward solr
 
 Während dieser Befehl läuft, solltest du dich über die URL `http://localhost:8983` mit deiner Solr-Instanz verbinden können.
 
+#### TYPO3-spezifische Terraform-Einrichtung
+
+Für TYPO3-Projekte bieten wir ein [spezielles Terraform-Modul](https://registry.terraform.io/modules/mittwald/solr/mittwald/latest), das Solr automatisch mit den notwendigen Schema- und Konfigurationsdateien konfiguriert, die für TYPO3 optimiert sind:
+
+```hcl
+module "solr" {
+  source = "mittwald/solr/mittwald"
+
+  project_id = var.project_id
+
+  solr_version = "9"
+  solr_core_name = "typo3"
+  solr_heap = "2g"
+}
+
+module "solr_typo3" {
+  source = "mittwald/solr/mittwald//modules/typo3"
+
+  solr_stack_id = module.solr.stack_id
+  solr_core_name = "typo3"
+  solr_core_language = "english"
+  typo3_solr_version = "13.0.3"
+}
+
+output "solr_url" {
+  value = module.solr.url
+}
+```
+
+Für mehrsprachige TYPO3-Installationen kannst du separate Cores für jede Sprache erstellen:
+
+```hcl
+module "solr" {
+  source = "mittwald/solr/mittwald"
+
+  project_id = var.project_id
+  solr_version = "9"
+  solr_heap = "2g"
+}
+
+module "solr_typo3" {
+  source = "mittwald/solr/mittwald//modules/typo3"
+  for_each = toset(["german", "english"])
+
+  solr_stack_id = module.solr.stack_id
+  solr_core_name = "typo3_${each.key}"
+  solr_core_language = each.key
+  typo3_solr_version = "13.0.3"
+}
+
+output "solr_url" {
+  value = module.solr.url
+}
+```
+
+Das TYPO3-Modul führt automatisch folgende Aktionen aus:
+
+- Lädt und installiert die entsprechende `schema.xml` für die angegebene Sprache
+- Konfiguriert sprachspezifische Analyzer und Filter
+- Richtet die erforderliche TYPO3 Solr Plugin JAR-Datei ein
+- Erstellt core.properties mit der korrekten Konfiguration
+- Installiert zusätzliche Konfigurationsdateien wie protwords, synonyms und stopwords
+
+Die `typo3_solr_version` sollte mit der Version der TYPO3 Solr-Erweiterung übereinstimmen, die du in deinem Projekt verwendest.
+
 ### Verwendung der mStudio-Benutzeroberfläche
 
 Alternativ kannst du einen Solr-Container manuell einrichten:
@@ -73,6 +138,8 @@ Alternativ kannst du einen Solr-Container manuell einrichten:
    ```dotenv
    # nach Bedarf anpassen
    SOLR_HEAP=512m
+   SOLR_CONFIG_LIB_ENABLED=true
+   SOLR_MODULES=scripting,analytics,analysis-extras,langid,clustering,extraction
    ```
 
 Die vorgeschlagenen Port-Werte sind im Solr-Kontext Standard und können unverändert übernommen werden. Der Standardport für Solr ist 8983.
@@ -85,12 +152,14 @@ Du kannst auch einen Solr-Container mit der mittwald CLI und dem Befehl `mw cont
 mw container run \
   --name solr \
   --env SOLR_HEAP=512m \
+  --env SOLR_CONFIG_LIB_ENABLED=true \
+  --env SOLR_MODULES=scripting,analytics,analysis-extras,langid,clustering,extraction \
   --volume solr-data:/var/solr \
   --publish 8983:8983 \
   solr:9.9 solr-precreate typo3
 ```
 
-Dieser Befehl erstellt einen neuen Container namens "solr" mit dem Solr-Image, setzt die notwendigen Umgebungsvariablen und mountet ein Volume für die persistente Datenspeicherung.
+Dieser Befehl erstellt einen neuen Container namens "solr" mit dem Solr-Image, setzt die notwendigen Umgebungsvariablen einschließlich der Aktivierung der lib-Verzeichnis-Konfiguration und zusätzlicher Solr-Module, und mountet ein Volume für die persistente Datenspeicherung.
 
 ### Verwendung der CLI mit `mw stack deploy`
 
@@ -106,6 +175,8 @@ Wenn du Docker Compose bevorzugst, kannst du eine `docker-compose.yml`-Datei ers
        command: solr-precreate typo3
        environment:
          - SOLR_HEAP=512m
+         - SOLR_CONFIG_LIB_ENABLED=true
+         - SOLR_MODULES=scripting,analytics,analysis-extras,langid,clustering,extraction
        ports:
          - "8983:8983"
        volumes:
@@ -166,28 +237,83 @@ Wenn du keinen Core beim Container-Start erstellt hast (mit dem oben erwähnten 
 
 Der einfachste Weg, einen neuen Solr-Core zu erstellen, ist die Verwendung des `solr create_core`-Befehls und des `mw container exec`-Befehls:
 
+```shellsession
+$ mw container exec <CONTAINER-ID> 'solr create_core -c typo3'
 ```
-mw container exec <CONTAINER-ID> 'solr create_core -c typo3'
-```
+
+### Manuelle Initialisierung eines TYPO3 Solr-Cores
+
+Wenn du nicht das Terraform TYPO3-Modul verwendest, kannst du einen Solr-Core manuell mit TYPO3-spezifischen Konfigurationsdateien initialisieren, indem du den Befehl `mw container cp` verwendest. Dieser Befehl funktioniert ähnlich wie `docker cp`:
+
+1. Klone zunächst das Git-Repository der TYPO3 Solr-Erweiterungs, um alle Konfigurationsdateien zu erhalten:
+
+   ```bash
+   # Klone das Git-Repository der TYPO3 Solr-Erweiterung
+   git clone https://github.com/TYPO3-Solr/ext-solr.git /tmp/ext-solr
+
+   # Navigiere zum Konfigurationsverzeichnis
+   cd /tmp/ext-solr/Resources/Private/Solr/configsets/ext_solr_13_0_0/conf
+   ```
+
+2. Erstelle die Core-Verzeichnisstruktur im Solr-Container:
+
+   ```bash
+   mw container exec <CONTAINER-ID> 'mkdir -p /var/solr/data/typo3/conf'
+   mw container exec <CONTAINER-ID> 'mkdir -p /var/solr/data/typo3/lib'
+   ```
+
+3. Kopiere die Konfigurationsdateien in den Solr-Container:
+
+   ```bash
+   # Kopiere Hauptkonfigurationsdateien
+   mw container cp -r /tmp/ext-solr/Resources/Private/Solr/configsets/ext_solr_13_0_0/conf <CONTAINER-ID>:/var/solr/data/typo3/conf
+
+   # Kopiere sprachspezifische Dateien (Beispiel für Deutsch)
+   mw container cp -r /tmp/ext-solr/Resources/Private/Solr/configsets/ext_solr_13_0_0/conf/german <CONTAINER-ID>:/var/solr/data/typo3/conf/german
+
+   # Kopiere die TYPO3 Solr Plugin JAR-Datei
+   mw container cp /tmp/ext-solr/Resources/Private/Solr/typo3lib/solr-typo3-plugin-6.0.0.jar <CONTAINER-ID>:/var/solr/data/typo3/lib/
+   ```
+
+4. Erstelle die `core.properties`-Datei:
+
+   ```bash
+   mw container exec <CONTAINER-ID> 'echo "name=typo3" > /var/solr/data/typo3/core.properties'
+   mw container exec <CONTAINER-ID> 'echo "config=solrconfig.xml" >> /var/solr/data/typo3/core.properties'
+   mw container exec <CONTAINER-ID> 'echo "schema=german/schema.xml" >> /var/solr/data/typo3/core.properties'
+   ```
+
+5. Lade den Solr-Core neu, um die neue Konfiguration anzuwenden:
+
+   ```bash
+   mw container exec <CONTAINER-ID> 'curl "http://localhost:8983/solr/admin/cores?action=RELOAD&core=typo3"'
+   ```
+
+6. Bereinige die temporären Dateien:
+
+   ```bash
+   rm -rf /tmp/ext-solr
+   ```
+
+Für andere Sprachen ersetze `german` in den Dateipfaden durch das entsprechende Sprachverzeichnis (z.B. `english`, `french`, etc.). Ersetze `<CONTAINER-ID>` durch deine tatsächliche Solr-Container-ID, die du mit `mw container list` finden kannst.
 
 ### Verwendung der Solr-Admin-UI
 
-Alternativ kannst du die Solr-Admin-UI verwenden, um einen neuen Core zu erstellen. In diesem Fall musst zu zunächst die entsprechenden Verzeichnisse und Konfigurationsdateien vorbereiten (falls du den `solr create_core`-Befehl verwendest, übernimmt der diese Vorbereitung für dich):
+Alternativ kannst du die Solr-Admin-UI verwenden, um einen neuen Core zu erstellen. Für einen TYPO3 Solr-Core folge zunächst den Schritten 1-3 aus dem [Abschnitt zur manuellen Initialisierung](#manuelle-initialisierung-eines-typo3-solr-cores) oben, um alle notwendigen TYPO3-Konfigurationsdateien und die Plugin JAR-Datei vorzubereiten.
 
-1. Stelle sicher, dass das `instanceDir` unter `/var/solr/data/<corename>` existiert (wobei `<corename>` ein Name deiner Wahl ist)
-2. Innerhalb dieses Instance-Verzeichnisses muss die Datei `conf/solrconfig.xml` existieren. Siehe das [Solr-Handbuch](https://solr.apache.org/guide/solr/latest/configuration-guide/configuring-solrconfig-xml.html), um mehr über diese Konfigurationsdatei zu erfahren.
-
-Nachdem diese Voraussetzungen erfüllt sind, kannst du den neuen Core über die Solr-Admin-UI erstellen:
+Nachdem die Voraussetzungen erfüllt sind, kannst du den neuen Core über die Solr-Admin-UI erstellen:
 
 1. Greife auf die Solr-Admin-UI zu, indem du eine der in [Zugriff auf Solr von außerhalb der Hosting-Umgebung](#public-access) beschriebenen Methoden verwendest
 2. Klicke auf den Menüpunkt "Core Admin"
 3. Klicke auf "Add Core" und fülle die erforderlichen Felder aus:
 
-- name: Der Name deines Cores (z.B. "typo3")
-- instanceDir: Belasse es bei der Standardeinstellung oder gib ein benutzerdefiniertes Verzeichnis an
-- dataDir: Belasse es bei der Standardeinstellung oder gib ein benutzerdefiniertes Verzeichnis an
-- config: Belasse es bei der Standardeinstellung (`solrconfig.xml`)
-- schema: Belasse es bei der Standardeinstellung (`schema.xml`)
+- **name**: Der Name deines Cores (z.B. "typo3")
+- **instanceDir**: `/var/solr/data/typo3` (oder dein gewähltes Core-Verzeichnis)
+- **dataDir**: Belasse es bei der Standardeinstellung oder gib ein benutzerdefiniertes Verzeichnis an
+- **config**: `solrconfig.xml`
+- **schema**: `schema.xml`
+
+4. Klicke auf "Add Core", um den TYPO3 Solr-Core zu erstellen
 
 ## Betrieb
 

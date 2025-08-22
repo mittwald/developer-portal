@@ -55,7 +55,7 @@ While this command is running, you should be able to connect to your Solr instan
 
 #### TYPO3-Specific Terraform Setup
 
-For TYPO3 projects, we provide a specialized TYPO3 module that automatically configures Solr with the necessary schema and configuration files optimized for TYPO3:
+For TYPO3 projects, we provide a [specialized Terraform module](https://registry.terraform.io/modules/mittwald/solr/mittwald/latest) that automatically configures Solr with the necessary schema and configuration files optimized for TYPO3:
 
 ```hcl
 module "solr" {
@@ -266,21 +266,16 @@ If you're not using the Terraform TYPO3 module, you can manually initialize a So
 
    ```bash
    # Copy main configuration files
-   mw container cp /tmp/ext-solr/Resources/Private/Solr/configsets/ext_solr_13_0_0/conf/solrconfig.xml <CONTAINER-ID>:/var/solr/data/typo3/conf/
-   mw container cp /tmp/ext-solr/Resources/Private/Solr/configsets/ext_solr_13_0_0/conf/general_schema_fields.xml <CONTAINER-ID>:/var/solr/data/typo3/conf/
-   mw container cp /tmp/ext-solr/Resources/Private/Solr/configsets/ext_solr_13_0_0/conf/general_schema_types.xml <CONTAINER-ID>:/var/solr/data/typo3/conf/
-   mw container cp /tmp/ext-solr/Resources/Private/Solr/configsets/ext_solr_13_0_0/conf/elevate.xml <CONTAINER-ID>:/var/solr/data/typo3/conf/
-   mw container cp /tmp/ext-solr/Resources/Private/Solr/configsets/ext_solr_13_0_0/conf/currency.xml <CONTAINER-ID>:/var/solr/data/typo3/conf/
+   mw container cp -r /tmp/ext-solr/Resources/Private/Solr/configsets/ext_solr_13_0_0/conf <CONTAINER-ID>:/var/solr/data/typo3/conf
 
    # Copy language-specific files (example for English)
-   mw container cp /tmp/ext-solr/Resources/Private/Solr/configsets/ext_solr_13_0_0/conf/english/schema.xml <CONTAINER-ID>:/var/solr/data/typo3/conf/
-   mw container cp /tmp/ext-solr/Resources/Private/Solr/configsets/ext_solr_13_0_0/conf/english/protwords.txt <CONTAINER-ID>:/var/solr/data/typo3/conf/
+   mw container cp -r /tmp/ext-solr/Resources/Private/Solr/configsets/ext_solr_13_0_0/conf/english <CONTAINER-ID>:/var/solr/data/typo3/conf/english
 
    # Copy the TYPO3 Solr plugin JAR file
    mw container cp /tmp/ext-solr/Resources/Private/Solr/typo3lib/solr-typo3-plugin-6.0.0.jar <CONTAINER-ID>:/var/solr/data/typo3/lib/
    ```
 
-4. Create the core.properties file:
+4. Create the `core.properties` file:
 
    ```bash
    mw container exec <CONTAINER-ID> 'echo "name=typo3" > /var/solr/data/typo3/core.properties'
