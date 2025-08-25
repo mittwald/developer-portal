@@ -78,6 +78,7 @@ function PlatformCoreFeatures() {
               <Link to="/docs/v2/platform/databases/opensearch">
                 OpenSearch
               </Link>,
+              <Link to="/docs/v2/platform/databases/solr">Solr</Link>,
             ]}
           />
         </li>
@@ -92,7 +93,9 @@ function PlatformCoreFeatures() {
               </>
             }
             links={[
-              <Link to="/docs/v2/platform/aihosting/introduction">Introduction</Link>,
+              <Link to="/docs/v2/platform/aihosting/introduction">
+                Introduction
+              </Link>,
             ]}
           />
         </li>
