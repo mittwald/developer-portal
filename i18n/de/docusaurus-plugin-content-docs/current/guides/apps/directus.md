@@ -131,6 +131,7 @@ mw container run \
   --volume "uploads:/directus/uploads" \
   --volume "extensions:/directus/extensions" \
   --volume "templates:/directus/templates" \
+  --create-volumes \
   directus/directus
 ```
 
