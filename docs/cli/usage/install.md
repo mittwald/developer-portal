@@ -21,9 +21,13 @@ You can also use Homebrew to upgrade the CLI:
 $ brew upgrade mw
 ```
 
+Read how to [install or update autocompletions](#autocompletion).
+
 ## On Windows
 
 Retrieve the latest release package (`*.exe` file) from our [releases page](https://github.com/mittwald/cli/releases), and run the installer. After running the installer, you should be able to use the `mw` command on either the CMD prompt or PowerShell.
+
+Read how to [install or update autocompletions](#autocompletion).
 
 ## On Linux
 
@@ -60,3 +64,13 @@ $ docker run \
     -e MITTWALD_API_TOKEN \
     mittwald/cli --help
 ```
+
+## Autocompletion
+
+We provide autocompletion for the `mw` CLI. To enable it, run the following command and follow the printed instructions:
+
+```
+$ mw autocomplete
+```
+
+After updating the CLI run `mw autocomplete --refresh-cache` and open a new shell context to load the new autocompletion.
