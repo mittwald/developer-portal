@@ -21,9 +21,13 @@ Du kannst Homebrew auch verwenden, um die CLI zu aktualisieren:
 $ brew upgrade mw
 ```
 
+Lies wie du [Autovervollständigung](#autovervollständigung) installierst und aktualisierst.
+
 ## Unter Windows
 
 Lade das neueste Installationspaket (`*.exe`-Datei) von unserer [Releases-Seite](https://github.com/mittwald/cli/releases) herunter und führe den Installer aus. Nach dem Ausführen des Installers solltest du den Befehl `mw` sowohl in der CMD-Eingabeaufforderung als auch in PowerShell verwenden können.
+
+Lies wie du [Autovervollständigung](#autovervollständigung) installierst und aktualisierst.
 
 ## Unter Linux
 
@@ -60,3 +64,13 @@ $ docker run \
     -e MITTWALD_API_TOKEN \
     mittwald/cli --help
 ```
+
+## Autovervollständigung
+
+Wir bieten eine Autovervollständigung für die `mw`-CLI an. Um diese zu aktivieren, führe den folgenden Befehl aus und befolge die angezeigten Anweisungen:
+
+```
+$ mw autocomplete
+```
+
+Nach einer Aktualisierung der CLI, führe den Befehl `mw autocomplete --refresh-cache` aus und öffne einen neuen Shell-Kontext, um die neue Autovervollständigung zu laden.
