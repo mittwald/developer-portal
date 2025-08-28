@@ -1,0 +1,153 @@
+---
+sidebar_label: PostgreSQL
+description: Starte und betreibe eine PostgreSQL-Datenbank containerisiert im Projekt.
+---
+
+import TerraformExample from "@site/docs/platform/databases/examples/_postgresql-terraform.md";
+import TerraformExampleGeneratedPassword from "@site/docs/platform/databases/examples/_postgresql-terraform-pwdgen.md";
+import TerraformResourceHint from "@site/src/components/TerraformResourceHint";
+
+# PostgreSQL ausführen
+
+## Einführung
+
+PostgreSQL ist ein leistungsstarkes, objektrelationales Datenbankmanagementsystem (ORDBMS), das für seine Stabilität, Skalierbarkeit und Erweiterbarkeit bekannt ist. Es ist Open Source und unterstützt eine Vielzahl von SQL-Funktionen, einschließlich komplexer Abfragen, Transaktionen, Indizierung und JSON-Daten.
+
+PostgreSQL eignet sich sowohl für kleine Anwendungen als auch für große, datenintensive Systeme und wird weltweit von Unternehmen und Entwicklern genutzt.
+
+## Eine PostgreSQL-Datenbank erstellen
+
+Du kannst eine PostgreSQL-Datenbank in deiner mittwald Hosting-Umgebung mit [Containern](../../workloads/containers) bereitstellen. Es gibt verschiedene Hauptansätze:
+
+### Verwendung von Terraform (Empfohlen)
+
+Der bequemste Weg, eine PostgreSQL-Datenbank bereitzustellen, ist die Verwendung von [Terraform](/docs/v2/guides/deployment/terraform). Das folgende Beispiel zeigt, wie du einen PostgreSQL-Container in deinem eigenen Terraform-Deployment verwenden kannst:
+
+<TerraformExample />
+
+Du kannst auch die `random_password`-Ressource verwenden, um ein Passwort dynamisch zu generieren. Beachte, dass du in diesem Fall dieses Passwort auch sicher in einem Secret Manager speichern solltest, da es danach nicht mehr abrufbar ist.
+
+<TerraformExampleGeneratedPassword />
+
+Nachdem du die Ressource erstellt hast, kannst du von innerhalb deiner Hostingumgebung über die URL `postgresql://postgresql:5432` auf die PostgreSQL-Datenbank zugreifen.
+
+<TerraformResourceHint resource="container_stack" />
+
+### Verwendung der mStudio-Benutzeroberfläche
+
+Alternativ kannst du einen PostgreSQL-Container manuell einrichten:
+
+1. Gehe in deinem Projekt in mStudio auf den **Container**-Menüpunkt und erstelle einen neuen Container. Du kannst einen beliebigen Namen wählen.
+
+2. Gib das Image `postgres:17` ein. Du kannst den Entrypoint und das Command wie vorgeschlagen beibehalten.
+
+#### Volumes
+
+Um die Daten deiner PostgreSQL-Datenbank persistent zu speichern, definiere Volumes unter **Volumes** wie folgt:
+
+- Neues Volume erstellen, auf **Pfad im Container** (Mount Point): `/var/lib/postgresql/data` (Speichert die Nutzdaten der Datenbank)
+- Pfad im Projekt `/files/postgresql-backups`, auf **Pfad im Container** (Mount Point):\*\* `/mnt` (Dieser Pfad dient dazu, Datenbank-Dumps oder Backups zu speichern)
+
+#### Umgebungsvariablen
+
+Setze die folgenden Umgebungsvariablen für den Container:
+
+```dotenv
+POSTGRES_PASSWORD=mypassword
+POSTGRES_USER=myuser # optional; Standardwert ist "postgres"
+POSTGRES_DB=mydatabase # optional; Standardwert ist "postgres"
+```
+
+#### Ports
+
+Übernehme den vorgeschlagenen Standardport `5432`.
+
+### Verwendung der CLI mit `mw container run`
+
+Du kannst auch einen PostgreSQL-Container mit der mittwald CLI und dem Befehl `mw container run` bereitstellen:
+
+```bash
+mw container run \
+  --name postgresql \
+  --env POSTGRES_DB=mydatabase \
+  --env POSTGRES_USER=myuser \
+  --env POSTGRES_PASSWORD=mypassword \
+  --volume postgresql-data:/var/lib/postgresql/data \
+  --volume /files/postgresql-backups:/mnt \
+  --publish 5432:5432/tcp \
+  --create-volumes \
+  postgres:17
+```
+
+Dieser Befehl erstellt einen neuen Container namens "postgresql" mit dem PostgreSQL-Image, setzt alle notwendigen Umgebungsvariablen und mountet Volumes für die persistente Datenspeicherung.
+
+### Verwendung der CLI mit `mw stack deploy`
+
+Wenn du Docker Compose bevorzugst, kannst du eine `docker-compose.yml`-Datei erstellen und sie mit dem Befehl `mw stack deploy` bereitstellen:
+
+1. Erstelle eine `docker-compose.yml`-Datei mit folgendem Inhalt:
+
+   ```yaml
+   version: "3"
+   services:
+     postgresql:
+       image: postgres:17
+       environment:
+         - POSTGRES_DB=mydatabase
+         - POSTGRES_USER=myuser
+         - POSTGRES_PASSWORD=mypassword
+       ports:
+         - "5432:5432"
+       volumes:
+         - postgresql_data:/var/lib/postgresql/data
+         - /files/postgresql-backups:/mnt
+   volumes:
+     postgresql_data:
+   ```
+
+2. Stelle den Stack mit der CLI bereit:
+
+   ```bash
+   mw stack deploy
+   ```
+
+Dieser Ansatz ist besonders nützlich, wenn du mehrere Container deployen möchtest, die zusammenarbeiten.
+
+### Zugriff auf deinen Container innerhalb deiner Hosting-Umgebung
+
+Sobald der Container läuft, kannst du überprüfen, ob die PostgreSQL-Instanz verfügbar ist. Es gibt zwei Hauptmöglichkeiten:
+
+#### Option 1: Direkter Zugriff über Container-Shell
+
+```bash
+mw container ssh postgresql
+psql -U myuser -d mydatabase
+```
+
+#### Option 2: Port-Weiterleitung für lokalen Zugriff
+
+```bash
+mw container port-forward postgresql 5432:5432
+```
+
+In einem separaten Terminal kannst du dann lokal eine Verbindung herstellen:
+
+```bash
+psql -h localhost -p 5432 -U myuser -d mydatabase
+```
+
+Bei beiden Optionen solltest du zur PostgreSQL-Eingabeaufforderung weitergeleitet werden, wo du SQL-Befehle ausführen kannst.
+
+## Betrieb
+
+Deine PostgreSQL-Daten werden im Rahmen des regelmäßigen Projektbackups gesichert. Für Datenbanken wird jedoch **dringend empfohlen**, zusätzlich eigene Dumps zu erstellen, um Konsistenz und Wiederherstellbarkeit sicherzustellen.
+
+Ein Dump kann direkt im Container erstellt werden. Beispielbefehl für ein manuelles Backup:
+
+```bash
+mw container exec postgresql "pg_dump -U myuser mydatabase -f /mnt/mydatabase.sql"
+```
+
+Die Backup-Datei wird dann im Projekt unter `/files/postgresql-backups/` verfügbar sein.
+
+Automatisierungen sind über Cronjobs problemlos möglich.
