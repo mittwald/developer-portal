@@ -86,7 +86,6 @@ mw container run \
   --description "Collabora Online Development Edition" \
   --publish 9980/tcp \
   --env "extra_params=--o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.host[0]=.+ --o:storage.wopi.host[0]=.+ --o:server_name=code.my-domain.tld" \
-  --create-volumes \
   collabora/code
 ```
 
@@ -98,7 +97,6 @@ mw container run \
   --description "Collabora Online Development Edition" \
   --publish 9980/tcp \
   --env "extra_params=--o:aliasgroup1=https://.*:443 --o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.host[0]=.+ --o:storage.wopi.host[0]=.+ --o:server_name=code.my-domain.tld" \
-  --create-volumes \
   collabora/code
 ```
 
