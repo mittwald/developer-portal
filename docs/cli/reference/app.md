@@ -32,6 +32,7 @@ Manage apps, and app installations in your projects
 
 
 
+
 ## `mw app copy [INSTALLATION-ID]`
 
 Copy an app within a project
@@ -1615,6 +1616,29 @@ FLAG DESCRIPTIONS
     will be used for this.
 
     You can also set this value by setting the MITTWALD_SSH_USER environment variable.
+```
+
+## `mw app version-info APP VERSION`
+
+This command shows information about a specific app version. It is useful to get information about the user inputs that are required for the version to be deployed successfully.
+
+```
+USAGE
+  $ mw app version-info APP VERSION [--token <value>]
+
+ARGUMENTS
+  APP      name of the app
+  VERSION  version of the app
+
+AUTHENTICATION FLAGS
+  --token=<value>  API token to use for authentication (overrides environment and config file). NOTE: watch out that
+                   tokens passed via this flag might be logged in your shell history.
+
+DESCRIPTION
+  This command shows information about a specific app version. It is useful to get information about the user inputs
+  that are required for the version to be deployed successfully.
+
+  show information about specific app versions
 ```
 
 ## `mw app versions [APP]`
