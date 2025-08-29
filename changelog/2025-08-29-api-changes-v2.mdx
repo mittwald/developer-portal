@@ -1,0 +1,334 @@
+---
+title: Breaking (!) API changes for v2 API, August 22 to August 29
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Marketplace
+  - File
+  - Project File System
+  - App
+  - Container
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week's changelog for the mittwald API includes several updates, such as changes to response property types, the addition and removal of required and optional properties, new optional request parameters, and the introduction of new endpoints.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The response property type for the '/items/homepage' in the 'GET /v2/contributors' operation has changed from 'string' to 'uri' for status '200'. This is a breaking change.
+- The response property type for the '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Contributor]/homepage' in the 'GET /v2/contributors/{contributorId}' operation has changed from 'string' to 'uri' for status '200'. This is a breaking change.
+- The required properties '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/contractOwner/address' and '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/contractOwner/salutation' have been removed from the response of the 'GET /v2/contributors/{contributorId}' operation for status '200'. This is a breaking change.
+- The response body type for the 'GET /v2/files/{fileId}' operation has changed from 'string' to 'binary' for status '200'. This is a breaking change.
+- The media type 'text/plain' has been removed from the response of the 'GET /v2/projects/{projectId}/filesystem-file-content' operation for status '200'. This is a breaking change.
+- Multiple optional properties have been removed from the response of the 'GET /v2/contributors/{contributorId}' operation for status '200': '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/contractOwner/company', '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/contractOwner/emailAddress', '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/contractOwner/firstName', '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/contractOwner/lastName', '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/contractOwner/phoneNumbers', '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/contractOwner/title', and '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/contractOwner/useFormalTerm'.
+- Several optional properties have been added to various operations: 'missingUserInputs/items/additionalValidationSchema' to 'GET /v2/app-installations/{appInstallationId}/missing-dependencies', '/items/userInputs/items/additionalValidationSchema' to 'GET /v2/apps/{appId}/versions', 'userInputs/items/additionalValidationSchema' to 'GET /v2/apps/{appId}/versions/{appVersionId}', and '/items/userInputs/items/additionalValidationSchema' to 'GET /v2/apps/{appId}/versions/{baseAppVersionId}/update-candidates'.
+- The response property '/items/email' has become required for the 'GET /v2/contributors' operation for status '200'.
+- The response property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Contributor]/email' has become required for the 'GET /v2/contributors/{contributorId}' operation for status '200'.
+- The response property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/email' has become required for the 'GET /v2/contributors/{contributorId}' operation for status '200'.
+- The required properties '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/contractOwner/contact', '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/contractOwner/inherited', and '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/nameInherited' have been added to the response of the 'GET /v2/contributors/{contributorId}' operation for status '200'.
+- A new endpoint has been added for the 'PATCH /v2/contributors/{contributorId}' operation.
+- The response property 'oneOf' list for the pricing in the 'GET /v2/contributors/{contributorId}/extensions' and 'GET /v2/contributors/{contributorId}/extensions/{extensionId}' operations has had '#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricingStrategy' removed.
+- The response property 'oneOf' list for the pricing in the 'PATCH /v2/contributors/{contributorId}/extensions/{extensionId}' operation has had '#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricingStrategy' removed.
+- New optional request parameters 'limit', 'order', 'page', 'skip', and 'sort' have been added to the 'GET /v2/contributors/{contributorId}/invoices/incoming' operation.
+- A new endpoint has been added for the 'POST /v2/customers/{customerId}/contributor' operation.
+- The response property 'oneOf' list for the pricing in the 'GET /v2/extensions' operation has had '#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricingStrategy' removed.
+- The required property '/items/createdAt' has been added to the response of the 'GET /v2/extensions' operation for status '200'.
+- The response property 'oneOf' list for the pricing in the 'GET /v2/extensions/{extensionId}' operation has had '#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricingStrategy' removed.
+- The required property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Extension]/createdAt' has been added to the response of the 'GET /v2/extensions/{extensionId}' operation for status '200'.
+- The media type 'application/octet-stream' has been added to the response of the 'GET /v2/projects/{projectId}/filesystem-file-content' operation for status '200'.
+- New optional request parameter 'tail' has been added to the 'GET /v2/stacks/{stackId}/services/{serviceId}/logs' operation.
+- Additional optional properties have been added to the responses of the 'GET /v2/system-softwares/{systemSoftwareId}/versions' and 'GET /v2/system-softwares/{systemSoftwareId}/versions/{systemSoftwareVersionId}' operations.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "List contributors"
+
+
+- ⚠️ **Breaking:** the '/items/homepage' response's property type/format changed from 'string'/'' to 'string'/'uri' for status '200'
+
+- the response property '/items/email' became required for the status '200'
+
+
+For details, refer to the <OperationLink operation="extension-list-contributors" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a contributor"
+
+
+- ⚠️ **Breaking:** the '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Contributor]/homepage' response's property type/format changed from 'string'/'' to 'string'/'uri' for status '200'
+
+- ⚠️ **Breaking:** removed the required property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/contractOwner/address' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/contractOwner/salutation' from the response with the '200' status
+
+- removed the optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/contractOwner/company' from the response with the '200' status
+
+- removed the optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/contractOwner/emailAddress' from the response with the '200' status
+
+- removed the optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/contractOwner/firstName' from the response with the '200' status
+
+- removed the optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/contractOwner/lastName' from the response with the '200' status
+
+- removed the optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/contractOwner/phoneNumbers' from the response with the '200' status
+
+- removed the optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/contractOwner/title' from the response with the '200' status
+
+- removed the optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/contractOwner/useFormalTerm' from the response with the '200' status
+
+- added the optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/descriptions' to the response with the '200' status
+
+- added the optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/homepage' to the response with the '200' status
+
+- the response property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Contributor]/email' became required for the status '200'
+
+- the response property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/email' became required for the status '200'
+
+- added the required property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/contractOwner/contact' to the response with the '200' status
+
+- added the required property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/contractOwner/inherited' to the response with the '200' status
+
+- added the required property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/nameInherited' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-contributor" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a File"
+
+
+- ⚠️ **Breaking:** the response's body type/format changed from 'string'/'' to 'string'/'binary' for status '200'
+
+
+For details, refer to the <OperationLink operation="file-get-file" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Project file's content"
+
+
+- ⚠️ **Breaking:** removed the media type 'text/plain' for the response with the status '200'
+
+- added the media type 'application/octet-stream' for the response with the status '200'
+
+
+For details, refer to the <OperationLink operation="project-file-system-get-file-content" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the missing requirements of an appInstallation for a specific target app version"
+
+
+- added the optional property 'missingUserInputs/items/additionalValidationSchema' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-get-missing-dependencies-for-appinstallation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app versions belonging to an app"
+
+
+- added the optional property '/items/userInputs/items/additionalValidationSchema' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-list-appversions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an app version"
+
+
+- added the optional property 'userInputs/items/additionalValidationSchema' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-get-appversion" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List update candidates belonging to an app version"
+
+
+- added the optional property '/items/userInputs/items/additionalValidationSchema' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-list-update-candidates-for-appversion" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Patch contributor"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="contributor-patch-contributor" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Extensions of own contributor"
+
+
+- removed '#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricingStrategy' from the '/items/pricing' response property 'oneOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="extension-list-own-extensions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get Extension of own contributor"
+
+
+- removed '#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricingStrategy' from the 'pricing' response property 'oneOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="extension-get-own-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Patch Extension"
+
+
+- removed '#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricingStrategy' from the 'pricing' response property 'oneOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="extension-patch-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List incoming Invoices of a contributor"
+
+
+- added the new optional 'query' request parameter 'limit'
+
+- added the new optional 'query' request parameter 'order'
+
+- added the new optional 'query' request parameter 'page'
+
+- added the new optional 'query' request parameter 'skip'
+
+- added the new optional 'query' request parameter 'sort'
+
+
+For details, refer to the <OperationLink operation="contributor-list-incoming-invoices" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Express interest to be a contributor"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="contributor-express-interest-to-contribute" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Extensions"
+
+
+- removed '#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricingStrategy' from the '/items/pricing' response property 'oneOf' list for the response status '200'
+
+- added the required property '/items/createdAt' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-list-extensions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an Extension"
+
+
+- added '#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricePlanStrategy' to the '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.UnpublishedExtension]/pricing' response property 'oneOf' list for the response status '200'
+
+- removed '#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricingStrategy' from the '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Extension]/pricing' response property 'oneOf' list for the response status '200'
+
+- removed '#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricingStrategy' from the '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.UnpublishedExtension]/pricing' response property 'oneOf' list for the response status '200'
+
+- added the required property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Extension]/createdAt' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get logs belonging to a Service"
+
+
+- added the new optional 'query' request parameter 'tail'
+
+
+For details, refer to the <OperationLink operation="container-get-service-logs" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List system software versions belonging to a system software"
+
+
+- added the optional property '/items/userInputs/items/additionalValidationSchema' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-list-systemsoftwareversions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a system software version"
+
+
+- added the optional property 'userInputs/items/additionalValidationSchema' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-get-systemsoftwareversion" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald JavaScript SDK Release 4.211.0
+
+The mittwald JavaScript SDK has been updated to version 4.211.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.211.0](https://github.com/mittwald/api-client-js/releases/tag/4.211.0).
+
+### mittwald JavaScript SDK Release 4.210.0
+
+The mittwald JavaScript SDK has been updated to version 4.210.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.210.0).
+
+### mittwald JavaScript SDK Release 4.209.0
+
+The mittwald JavaScript SDK has been updated to version 4.209.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.209.0).
+
+### mittwald JavaScript SDK Release 4.208.0
+
+The mittwald JavaScript SDK has been updated to version 4.208.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.208.0).
+
+### mittwald JavaScript SDK Release 4.207.0
+
+The mittwald JavaScript SDK has been updated to version 4.207.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.207.0).
+
