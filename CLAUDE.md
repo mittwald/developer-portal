@@ -67,20 +67,25 @@ The project extends Docusaurus with specialized components in `src/components/`:
 
 ## Authoring guidelines
 
+1. Do not number headings
+2. Do not use horizontal rules
+3. Do not use blockquotes as callouts
+4. Use formatting like emphasis and italics VERY sparsely
+
 ### Writing deployment guides
 
 When writing deployment guides for applications, databases, or other services that should run in containers, follow the following structure:
 
 1. Deploying the workload
    1. Deployment via Terraform (recommended)
-      - relevant documentation:
+      - BEFORE writing examples, read the following documentation:
         - https://registry.terraform.io/providers/mittwald/mittwald/latest/docs/resources/container_stack
         - https://registry.terraform.io/providers/mittwald/mittwald/latest/docs/data-sources/container_image
    2. Deployment via mStudio UI
    3. Imperative deployment on the CLI via `mw container run` command
       - relevant documentation:
         - https://docs.mittwald.de/cli/container/run/
-        - search the Docher Hub for documentation on the relevant images
+        - search the Docker Hub for documentation on the relevant images
    4. Declarative deployment on the CLI via `mw stack deploy` command
 2. Operations; in this section, include any operational tasks that are required to run the workload, such as backups, monitoring, or logging.
-3. Integrations; in this section, describe integrations in common CMS platforms such as WordPress, Drupal, TYPO3 or Joomla.
+3. Integrations; in this section, describe integrations in common CMS platforms such as WordPress, Drupal, TYPO3 or Joomla. Do not suggest integrations that would require writing a custom plugin or anything of the sort.
