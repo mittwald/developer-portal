@@ -5,7 +5,7 @@ sidebar_label: KI-unterstützte Entwicklung
 
 # KI-unterstützte Entwicklung
 
-Du kannst mittwalds [KI-Modelle](/platform/aihosting) verwenden, um dich in deinem Entwicklungsprozess zu unterstützen. Die Modelle sind DSGVO-konform und werden in Deutschland gehostet, ohne Nutzerdaten zu speichern oder für das Training zu verwenden.
+Du kannst mittwalds [KI-Modelle](/docs/v2/platform/aihosting) verwenden, um dich in deinem Entwicklungsprozess zu unterstützen. Die Modelle sind DSGVO-konform und werden in Deutschland gehostet, ohne Nutzerdaten zu speichern oder für das Training zu verwenden.
 
 Um die Modelle zu nutzen, musst du einen Proxy-Dienst auf deinem lokalen Rechner einrichten, der die Authentifizierung übernimmt und Anfragen an die mittwald-API weiterleitet.
 
@@ -35,7 +35,7 @@ Der Proxy läuft unter `http://localhost:4000/v1` und bietet eine OpenAI-kompati
 
 ## Verfügbare Modelle
 
-Der Service bietet verschiedene KI-Modelle, die für unterschiedliche Entwicklungsaufgaben optimiert sind. Eine vollständige Liste der verfügbaren Modelle und ihrer Spezifikationen findest du in der [KI-Modelle-Dokumentation](/platform/aihosting/models).
+Der Service bietet verschiedene KI-Modelle, die für unterschiedliche Entwicklungsaufgaben optimiert sind. Eine vollständige Liste der verfügbaren Modelle und ihrer Spezifikationen findest du in der [KI-Modelle-Dokumentation](/docs/v2/platform/aihosting/models).
 
 ## IDE-Integration
 

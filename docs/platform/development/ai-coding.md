@@ -5,7 +5,7 @@ sidebar_label: AI-assisted development
 
 # AI-assisted development
 
-You can use mittwald's [AI models](/platform/aihosting) to assist you in your development process. The models are GDPR-compliant and are hosted in Germany without storing user data or using it for training.
+You can use mittwald's [AI models](/docs/v2/platform/aihosting) to assist you in your development process. The models are GDPR-compliant and are hosted in Germany without storing user data or using it for training.
 
 To use the models, you need to set up a proxy service on your local machine to handle authentication and forward requests to the mittwald API.
 
@@ -35,7 +35,7 @@ The proxy will run at `http://localhost:4000/v1` and provides an OpenAI-compatib
 
 ## Available models
 
-The service offers several AI models optimized for different development tasks. For a complete list of available models and their specifications, see the [AI models documentation](/platform/aihosting/models).
+The service offers several AI models optimized for different development tasks. For a complete list of available models and their specifications, see the [AI models documentation](/docs/v2/platform/aihosting/models).
 
 ## IDE integration
 
