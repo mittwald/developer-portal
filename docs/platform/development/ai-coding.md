@@ -18,7 +18,9 @@ The service offers several AI models optimized for different development tasks. 
 | IDE                                      | Integrations                                         |
 | ---------------------------------------- | ---------------------------------------------------- |
 | Jetbrains IDEs (IntelliJ, PHPStorm, ...) | [Continue](#continue), [Jetbrains AI](#jetbrains-ai) |
-| Visual Studio Code                       | [Continue](#continue)                                |
+| Visual Studio Code                       | [Continue](#continue), [Cline](#cline)               |
+| Cursor                                   | [Cline](#cline)                                      |
+| Windsurf                                 | [Cline](#cline)                                      |
 
 ### Jetbrains AI (for Jetbrains IDEs, like IntelliJ, PHPStorm, WebStorm, ...) {#jetbrains-ai}
 
@@ -62,6 +64,17 @@ context:
   - provider: folder
   - provider: codebase
 ```
+
+### Cline (for Visual Studio Code, Cursor or Windsurf) {#cline}
+
+[Cline](https://cline.bot) works with Visual Studio Code, Cursor and Windsurf. Start by installing the [appropriate IDE plugin](https://marketplace.visualstudio.com/items?itemName=saoudrizwan.claude-dev).
+
+When configuring Cline via its UI, select the following options:
+
+- **API Provider**: Select "OpenAI Compatible"
+- **Base URL**: Enter `https://llm.aihosting.mittwald.de/v1`
+- **OpenAI Compatible API Key**: Enter your LLM API key from the mStudio
+- **Model ID**: Enter `Qwen3-Coder-30B-Instruct`
 
 ## Usage limits
 
