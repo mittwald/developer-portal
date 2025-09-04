@@ -4,29 +4,34 @@ import Translate, { translate } from "@docusaurus/Translate";
 import Link from "@docusaurus/Link";
 import Admonition from "@theme/Admonition";
 
-type PlanDefinition = {
-  name: string;
-  url: string;
+type FeatureDefinition = {
+  url?: string;
 };
 
-const planNames: Record<string, PlanDefinition> = {
-  psl: { name: "proSpace lite", url: "https://www.mittwald.de/prospace" },
-  ps: { name: "proSpace", url: "https://www.mittwald.de/prospace" },
-  ss: { name: "Space Server", url: "https://www.mittwald.de/space-server" }
+const featureDefinitions: Record<string, FeatureDefinition> = {
+  nodejs: { url: "https://www.mittwald.de/produkte/nodejs" },
+  container: { url: "https://www.mittwald.de/mstudio/container-hosting" },
+  ai: { url: "https://www.mittwald.de/mstudio/ai-hosting" },
+  redis: {},
 };
 
 export interface PlanCompatibilityProps {
-  plans: string[];
+  features: (keyof typeof featureDefinitions)[];
 }
 
-export default function PlanCompatibility({ plans }: PlanCompatibilityProps) {
-  const names: ReactNode = plans
+export default function PlanCompatibility({
+  features,
+}: PlanCompatibilityProps) {
+  const names: ReactNode = features
     .map(
-      (plan): ReactNode => (
-        <Link to={planNames[plan].url} target="_blank">
-          {planNames[plan].name}
-        </Link>
-      )
+      (feature): ReactNode =>
+        featureDefinitions[feature].url ? (
+          <Link to={featureDefinitions[feature].url} target="_blank">
+            <Translate id={`compat.${feature}`} />
+          </Link>
+        ) : (
+          <Translate id={`compat.${feature}`} />
+        ),
     )
     .map((n): ReactNode => <span className={styles.compatName}>{n}</span>)
     .reduce((prev, curr) => [prev, ", ", curr]);
@@ -35,7 +40,8 @@ export default function PlanCompatibility({ plans }: PlanCompatibilityProps) {
     <Admonition type={"note"} title={translate({ id: "compat.title" })}>
       <p>
         <Translate id="compat.body">
-          This documentation applies only to the following plans
+          This documentation requires the following mStudio features which might
+          not be available in all hosting plans
         </Translate>
         : {names}.
       </p>
