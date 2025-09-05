@@ -1,0 +1,353 @@
+---
+title: Breaking (!) API changes for v2 API, August 29 to September 5
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Marketplace
+  - App
+  - Contract
+  - LeadFyndr
+  - Domain
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+In the week of 8/29/2025 to 9/5/2025, the mittwald API introduced several enhancements, including changes to response property types, the addition of required and optional properties, new endpoints for managing contributors and DNS zones, and updates to request parameters for improved functionality.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The property type for the response '/items/logoRefId' has changed from 'string' to 'uuid' for the status '200' in both the `GET /v2/contributors` and `GET /v2/contributors/{contributorId}` operations. This is a breaking change.
+- The required property '/items/phase' has been added to the response with the '200' status in both the `GET /v2/app-installations` and `GET /v2/app-installations` operations.
+- The following endpoints have been added: 
+  - `DELETE /v2/contributors/{contributorId}` for deleting a Contributor.
+  - `DELETE /v2/contributors/{contributorId}/avatar` for deleting a deviating contributor avatar and returning to the inherited customer avatar.
+  - `POST /v2/contributors/{contributorId}/avatar` for adding a deviating avatar to a Contributor.
+  - `GET /v2/dns-zones/{dnsZoneId}/zone-file` for getting a zone file for a DNSZone.
+- The optional property 'logoInherited' has been added to the response with the '200' status in both the `GET /v2/contributors/{contributorId}` and `PATCH /v2/contributors/{contributorId}` operations.
+- The new optional request property 'dryRun' has been added to the `PUT /v2/contributors/{contributorId}/extensions/{extensionId}/pricing` operation.
+- The optional property 'priceChangeConsequence' has been added to the response with the '200' status in the `PUT /v2/contributors/{contributorId}/extensions/{extensionId}/pricing` operation.
+- The new optional 'query' request parameter 'search' has been added to the `GET /v2/contributors/{contributorId}/invoices/incoming` operation.
+- The optional properties '/items/context' and '/items/referencedId' have been added to the response with the '200' status in the `GET /v2/customers/{customerId}/extension-orders` operation.
+- The new optional 'query' request parameter 'status' has been added to the `GET /v2/customers/{customerId}/invoices` operation.
+- The new enum value 'company' has been added to the 'query' request parameter 'sort' in the `GET /v2/customers/{customerId}/unlocked-leads` operation.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "List contributors"
+
+
+- ⚠️ **Breaking:** the '/items/logoRefId' response's property type/format changed from 'string'/'' to 'string'/'uuid' for status '200'
+
+
+For details, refer to the <OperationLink operation="extension-list-contributors" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a contributor"
+
+
+- ⚠️ **Breaking:** the '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Contributor]/logoRefId' response's property type/format changed from 'string'/'' to 'string'/'uuid' for status '200'
+
+- added the optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/logoInherited' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-contributor" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in ""
+
+
+- removed the schema 'de.mittwald.v1.marketplace.MonthlyPricingStrategy'
+
+
+For details, refer to the <OperationLink operation="" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app installations that a user has access to"
+
+
+- added the required property '/items/phase' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations-for-user" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an app installation"
+
+
+- added the required property 'phase' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-get-appinstallation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Delete a contributor"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="contributor-delete-contributor" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Patch contributor"
+
+
+- added the optional property 'logoInherited' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="contributor-patch-contributor" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Delete deviating contributor avatar und return to the inherited customer avatar"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="contributor-reset-contributor-avatar" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Add a deviating avatar to a contributor"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="contributor-request-deviating-contributor-avatar-upload" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Creates or Updates Pricing for an Extension"
+
+
+- added the new optional request property 'dryRun'
+
+- added the optional property 'priceChangeConsequence' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-update-extension-pricing" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List incoming Invoices of a contributor"
+
+
+- added the new optional 'query' request parameter 'search'
+
+
+For details, refer to the <OperationLink operation="contributor-list-incoming-invoices" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all open extension orders for given customer"
+
+
+- added the optional property '/items/context' to the response with the '200' status
+
+- added the optional property '/items/referencedId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-customer-extension-instance-orders" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Invoices of a Customer"
+
+
+- added the new optional 'query' request parameter 'status'
+
+
+For details, refer to the <OperationLink operation="invoice-list-customer-invoices" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all unlocked leads. Organisation can unlock leads"
+
+
+- added the new enum value 'company' to the 'query' request parameter 'sort'
+
+
+For details, refer to the <OperationLink operation="leadfyndr-list-unlocked-leads" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a zone file for a DNS Zone"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="dns-get-zone-file" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app installations belonging to a Project"
+
+
+- added the required property '/items/phase' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all open extension orders for given project"
+
+
+- added the optional property '/items/context' to the response with the '200' status
+
+- added the optional property '/items/referencedId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-project-extension-instance-orders" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK Release v2.1.136
+
+The mittwald PHP SDK has been updated to version v2.1.136. This release introduces a new feature and several changes aimed at enhancing the functionality of the SDK.
+
+#### Added Features
+- A new `search` parameter has been implemented for the `ContributorListIncomingInvoicesRequest` class. This feature allows users to filter incoming invoices based on specific criteria, improving the flexibility of invoice querying.
+
+#### Changes
+- The `search` parameter has been added to the request properties.
+- A `getSearch` method has been introduced to retrieve the value of the `search` parameter.
+- A `withSearch` method has been implemented to set the search parameter with validation, ensuring input conformity.
+- A `withoutSearch` method has been added to allow the removal of the search parameter.
+- Input handling has been updated to accommodate the new `search` parameter when creating an instance of `ContributorListIncomingInvoicesRequest`.
+- The `toArray` method has been modified to include the `search` parameter in the output if it is set.
+- The `toQuery` method has been adjusted to include the `search` parameter in the query representation.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.136).
+
+### mittwald PHP SDK v2.1.135 Release
+
+The mittwald PHP SDK has been updated to version 2.1.135. This release introduces new features and enhancements aimed at improving functionality and user experience.
+
+#### Features
+
+- **Status Filtering for Customer Invoices**: The `InvoiceListCustomerInvoicesRequest` class now supports filtering invoices by an array of statuses, including `CONFIRMED`, `PAID`, `PARTIALLY_PAID`, and `OVERPAID`.
+
+- **Domain DNS Get Zone File Functionality**: New classes and methods have been added to facilitate obtaining DNS zone files. This includes:
+  - A request class for fetching zone files using a DNS zone ID.
+  - Various response classes to handle different outcomes of the zone file retrieval process, including error scenarios.
+
+#### Enhancements
+
+- **Invoice Filtering Enhancements**: 
+  - The `withStatus` method allows setting desired statuses for invoice queries.
+  - New methods such as `getStatus` and `withoutStatus` enhance the handling of status attributes in invoice requests.
+
+- **Improvement in DomainClient Interface**: 
+  - The `DomainClient` now includes a `dnsGetZoneFile` method to retrieve BIND-compliant DNS zone files using a specified DNS zone ID.
+
+- **Response Handling for DNS Zone File Requests**: 
+  - Enhanced error response handling for DNS zone file requests, including distinct classes for bad requests and rate limiting, improving resilience and error visibility.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.135).
+
+### mittwald PHP SDK v2.1.134 Release Summary
+
+The mittwald PHP SDK has been updated to version v2.1.134. This release introduces several new features and improvements:
+
+- **Contributor Management**: A new method `contributorDeleteContributor` allows for the deletion of contributors, with comprehensive handling of HTTP responses.
+- **Avatar Management**: 
+  - The `contributorRequestDeviatingContributorAvatarUpload` method enables the upload of a deviating avatar for contributors.
+  - The `contributorResetContributorAvatar` method allows resetting a contributor's avatar to the default customer avatar.
+- **Schema Enhancements**: New validation schemas have been added for avatar operations, improving response handling.
+- **Enum Additions**: Existing enums have been extended to enhance filtering and sorting capabilities.
+- **Bug Fixes and Improvements**: Enhanced type handling in response classes and adjusted validation schemas for better error handling and user feedback.
+- **General Code Refactoring**: Improvements in code structure for better maintainability and readability.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.134).
+
+### mittwald PHP SDK Release v2.1.132
+
+The mittwald PHP SDK has released version v2.1.132, introducing several new features and improvements. 
+
+#### Added Features
+- **New `LeadFyndrClient`:** A new client has been added to enhance lead management and retrieval capabilities.
+- **LeadFyndr Method Implementation:** An interface method for `leadFyndr()` has been added and implemented, allowing access to the new `LeadFyndrClient`.
+- **Uninstall App Installation Enhancement:** A new response class, `UninstallAppinstallationPreconditionFailedResponse`, improves error handling for app uninstallation requests.
+
+#### Changes and Fixes
+- **Error Management:** Updated response classes now use `internalValidationSchema` for input validation, standardizing the process.
+- **Consistency Improvements:** Methods for validation and error handling have been standardized across multiple classes.
+- **API Client Interface Updates:** Adjustments have been made to improve clarity and consistency in client interfaces.
+- **Logical Adjustments:** Changes in request and response classes ensure reliable API functionality.
+
+These updates enhance the functionality, maintainability, and reliability of the API client, particularly in lead management and error handling. For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.132).
+
+### mittwald JavaScript SDK Release 4.218.0
+
+The mittwald JavaScript SDK has been updated to version 4.218.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.218.0](https://github.com/mittwald/api-client-js/releases/tag/4.218.0).
+
+### mittwald JavaScript SDK Release 4.217.0
+
+The mittwald JavaScript SDK has been updated to version 4.217.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.217.0).
+
+### mittwald JavaScript SDK Release 4.216.0
+
+The mittwald JavaScript SDK has been updated to version 4.216.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.216.0).
+
+### mittwald JavaScript SDK Release 4.215.0
+
+The mittwald JavaScript SDK has been updated to version 4.215.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.215.0).
+
+### mittwald JavaScript SDK Release 4.214.1
+
+The mittwald JavaScript SDK has been updated to version 4.214.1. This release is a version bump only for the package root, with no additional changes or features introduced. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.214.1](https://github.com/mittwald/api-client-js/releases/tag/4.214.1).
+
+### mittwald JavaScript SDK Release 4.214.0
+
+The mittwald JavaScript SDK has been updated to version 4.214.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.214.0).
+
+### mittwald JavaScript SDK Release 4.213.0
+
+The mittwald JavaScript SDK has been updated to version 4.213.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.213.0).
+
+### mittwald JavaScript SDK Release 4.212.0
+
+The mittwald JavaScript SDK has been updated to version 4.212.0. This release includes the following feature:
+
+- Updated generated client ([commit 2902ca7](https://github.com/mittwald/api-client-js/commit/2902ca7ae917cbabd92ecd7fc714c5b934ee852b))
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.212.0).
+
