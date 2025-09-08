@@ -1,0 +1,48 @@
+---
+title: How to choose the right Extension Context
+---
+
+Choosing the appropriate `Extension Context` is one of the most important decisions when designing and developing an `Extension`.
+
+> **Note:** The `Extension Context` determines whether your extension can be installed at the **project** or **organization** level.
+
+### Why is this decision important?
+
+Your choice has significant impact on:
+
+- 🧩 **Functional capabilities**
+- 🔐 **Technical limitations**
+- 💸 **Pricing strategy and monetization**
+
+### Decision factors
+
+#### 1. Product-specific considerations
+
+Think about the level at which your product delivers the most value:
+
+- **Organization level**: Makes sense if your product deals with organization-wide processes (e.g., centralized user management, contract handling).
+- **Project level**: Suitable for project-specific tools (e.g., deployment features, visualizations tied to a specific project).
+
+#### 2. Technical considerations
+
+Not all technical features are available at the project level:
+
+**Limitations of Project Extensions:**
+
+- Access is limited to resources **at** or **below** the project level.
+  This means that access to organizations, contracts, contract partners, etc., is not possible.
+- No ability to embed frontend fragments above the project level.
+  For example, you cannot add a menu item to organizations.
+  Conversely, extensions installed at the organization level _can_ include frontend fragments on the project level and below.
+- No cross-project data processing or storage — unless the Contributor explicitly implements this functionality inside the extension.
+- No cross-project billing — unless the Contributor makes the extension free in perspective of the marketplace and handles billing entirely on their own.
+
+#### 3. Strategic considerations
+
+This decision will directly affect your pricing strategy:
+
+- Extensions installed on the project level must be **paid for multiple times** — once per project where they’re used.
+- On the organization level, **one installation per organization** is sufficient.
+
+> Example: A small tool priced at €1.50 per project can become quite expensive if a customer manages 100 projects.
+> This might lead to that customer deciding against using the extension.
