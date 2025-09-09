@@ -384,7 +384,122 @@ The following is a Schema of all properties of an extension:
             description: "The amout of instances for this extension. Accurate for the Contributor. Publicly rounded to the next lower hundred."
           }
         }
-      }
+      },
+      pricing: {
+        type: "array",
+        items: {
+          type: "object",
+          required: [ "priceInCents", "variantKey" ],
+          properties: {
+            priceInCents: {
+              type: "integer",
+              example: "5000",
+              description: "Price of the extension in Cents"
+            },
+            variantKey: {
+              type: "string",
+              description: "indentifiyer of the pricing variant"
+            },
+            name: {
+              type: "string",
+              description: "name of the pricing variant"
+            }
+          }
+        }
+      },
+      requestedChanges: {
+        type: "object",
+        properties: {
+          context:{
+            type: "string",
+            enum: ["project", "customer"]
+          },
+          scopes: {
+            type: "array",
+            items: {
+              type: "string"
+            }
+          },
+          webhookUrls: {
+            type: "object",
+            required: ["backend"],
+            properties: {
+              backend: {
+                type: "object",
+                required: [
+                  "extensionAddedToContext",
+                  "extensionInstanceRemovedFromContext",
+                  "extensionInstanceSecretRotated",
+                  "extensionInstanceUpdated",
+                ],
+                properties: {
+                  extensionAddedToContext: {
+                    type: "object",
+                    required: ["url"],
+                    properties: {
+                      url: {
+                        type: "string",
+                        format: "uri",
+                        minLength: 1,
+                        description:
+                          "The URL that the mStudio calls when the Extension is added to an Extension context. May contain placeholders",
+                        example:
+                          "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/added",
+                      },
+                    },
+                  },
+                  extensionInstanceUpdated: {
+                    type: "object",
+                    required: ["url"],
+                    properties: {
+                      url: {
+                        type: "string",
+                        format: "uri",
+                        minLength: 1,
+                        description:
+                          "The URL that the mStudio calls when the Extension Instance is updated. May contain placeholders",
+                        example:
+                          "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/updated",
+                      },
+                    },
+                  },
+                  extensionInstanceSecretRotated: {
+                    type: "object",
+                    required: ["url"],
+                    properties: {
+                      url: {
+                        type: "string",
+                        format: "uri",
+                        minLength: 1,
+                        description:
+                          "The URL that the mStudio calls when the Extension Instance secret is rotated. May contain placeholders",
+                        example:
+                          "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/secret-rotated",
+                      },
+                    },
+                  },
+                  extensionInstanceRemovedFromContext: {
+                    type: "object",
+                    required: ["url"],
+                    properties: {
+                      url: {
+                        type: "string",
+                        format: "uri",
+                        minLength: 1,
+                        description:
+                          "The URL that the mStudio calls when the Extension Instance is removed from a context. May contain placeholders",
+                        example:
+                          "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/removed",
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          }, 
+        },
+        description: "Requested Changes which have to be revied by a Mittwald Employee"
+      },
     },
   }}
 />
