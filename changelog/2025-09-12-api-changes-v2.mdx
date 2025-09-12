@@ -1,0 +1,647 @@
+---
+title: Breaking (!) API changes for v2 API, September 5 to September 12
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Contract
+  - Marketplace
+  - Conversation
+  - App
+  - Container
+  - LeadFyndr
+  - Mail
+  - Project
+  - Relocation
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week's update to the mittwald API includes significant changes such as the alteration of request parameter types for various endpoints, the addition of required and optional properties in responses, and the introduction of new optional request parameters, enhancing the overall functionality and flexibility of the API.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The type/format of the 'contractId' path request parameter has been changed from 'string'/'uuid' to 'string' for the following operations: 
+  - GET /v2/contracts/{contractId} (contract-get-detail-of-contract)
+  - GET /v2/contracts/{contractId}/base-items (contract-get-base-item-of-contract)
+  - GET /v2/contracts/{contractId}/items/{contractItemId} (contract-get-detail-of-contract-item)
+  - DELETE /v2/contracts/{contractId}/items/{contractItemId}/tariff-change (contract-cancel-contract-tariff-change)
+  - DELETE /v2/contracts/{contractId}/items/{contractItemId}/termination (contract-cancel-contract-item-termination)
+  - POST /v2/contracts/{contractId}/items/{contractItemId}/termination (contract-terminate-contract-item)
+  - DELETE /v2/contracts/{contractId}/termination (contract-cancel-contract-termination)
+  - POST /v2/contracts/{contractId}/termination (contract-terminate-contract). **This is a breaking change.**
+
+- The type/format of the 'contributorId' path request parameter has been changed from 'string'/'uuid' to 'string' for the following operations:
+  - GET /v2/contributors/{contributorId}/billing-information (contributor-get-billing-information)
+  - PUT /v2/contributors/{contributorId}/billing-information (contributor-update-billing-information)
+  - GET /v2/contributors/{contributorId}/dashboard (contributor-get-login-link)
+  - PUT /v2/contributors/{contributorId}/extensions/{extensionId}/pricing (extension-update-extension-pricing)
+  - GET /v2/contributors/{contributorId}/invoices/outgoing (contributor-list-onbehalf-invoices)
+  - POST /v2/contributors/{contributorId}/onboarding-process (extension-create-contributor-onboarding-process). **This is a breaking change.**
+
+- The type/format of the 'customerId' path request parameter has been changed from 'string'/'uuid' to 'string' for the following operations:
+  - GET /v2/customers/{customerId}/billing-portal (contributor-get-customer-billing-portal-link)
+  - GET /v2/customers/{customerId}/contracts (contract-list-contracts)
+  - GET /v2/customers/{customerId}/payment-method (marketplace-customer-get-payment-method)
+  - PUT /v2/customers/{customerId}/payment-method (marketplace-customer-update-payment-method). **This is a breaking change.**
+
+- The type/format of the 'domainId' path request parameter has been changed from 'string'/'uuid' to 'string' for the operation GET /v2/domains/{domainId}/contract (contract-get-detail-of-contract-by-domain). **This is a breaking change.**
+
+- The type/format of the 'projectId' path request parameter has been changed from 'string'/'uuid' to 'string' for the operation GET /v2/projects/{projectId}/contract (contract-get-detail-of-contract-by-project). **This is a breaking change.**
+
+- The type/format of the 'serverId' path request parameter has been changed from 'string'/'uuid' to 'string' for the operation GET /v2/servers/{serverId}/contract (contract-get-detail-of-contract-by-server). **This is a breaking change.**
+
+- The required property '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.ServiceRequest]/internal' has been removed from the response with the '200' status for the operation GET /v2/conversations/{conversationId}/messages (conversation-list-messages-by-conversation). **This is a breaking change.**
+
+- The required property 'digest' has been added to the response with the '200' status for the operation GET /v2/container-image-config (container-get-container-image-config).
+
+- The required property 'archive' has been added to the response with the '200' status for the operation GET /v2/mail-addresses/{mailAddressId} (mail-get-mail-address).
+
+- The required property '/items/archive' has been added to the response with the '200' status for the operation GET /v2/projects/{projectId}/mail-addresses (mail-list-mail-addresses).
+
+- The required property 'limit' has been added to the response with the '200' status for the operation GET /v2/projects/{projectId}/llm-licences/{licenceId} (project-get-llm-licence-experimental).
+
+- The required property 'limit' has been added to the response with the '201' status for the operation POST /v2/projects/{projectId}/llm-licences (project-create-llm-beta-licence-experimental).
+
+- The required property 'limit' has been added to the response with the '200' status for the operation PUT /v2/projects/{projectId}/llm-licences/{licenceId} (project-update-llm-licence-experimental).
+
+- The new optional request parameter 'anchor' has been added for the operation GET /v2/extension-instances (extension-list-extension-instances).
+
+- The new optional request parameter 'mailArchive' has been added for the operation GET /v2/projects/{projectId}/mail-addresses (mail-list-mail-addresses).
+
+- The new optional request property 'emailInboxes' has been added for the operation POST /v2/relocation (relocation-create-relocation).
+
+- The new optional property 'frontendFragments' has been added to the response with the '200' status for the operations:
+  - GET /v2/customers/{customerId}/extensions/{extensionId} (extension-get-extension-instance-for-customer)
+  - GET /v2/projects/{projectId}/extensions/{extensionId} (extension-get-extension-instance-for-project)
+  - GET /v2/extension-instances (extension-list-extension-instances).
+
+- The request body 'oneOf' list has been modified by removing 'subschema #1, subschema #2' for the operation POST /v2/extensions/{extensionId}/order (extension-order-extension). **This is a breaking change.**
+
+- The request body 'oneOf' list has been modified by adding 'subschema #1, subschema #2' for the operation POST /v2/extensions/{extensionId}/order (extension-order-extension). **This is a breaking change.**
+
+- The endpoint DELETE /v2/mail-addresses/{mailAddressId}/mail-archive (mail-disable-mail-archive) has been added.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Returns the Contract with the given ID"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'contractId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the BaseItem of the Contract with the given ID"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'contractId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="contract-get-base-item-of-contract" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the ContractItem with the given ID"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'contractId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-item" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Cancel the TariffChange for the referred ContractItem"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'contractId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="contract-cancel-contract-tariff-change" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Cancel the Termination for the referred ContractItem"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'contractId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="contract-cancel-contract-item-termination" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Schedule the Termination of a ContractItem"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'contractId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="contract-terminate-contract-item" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Cancel the Termination for the referred Contract"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'contractId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="contract-cancel-contract-termination" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Schedule the Termination of a Contract"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'contractId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="contract-terminate-contract" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get contributor Billing Information"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'contributorId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="contributor-get-billing-information" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update contributor Billing Information"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'contributorId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="contributor-update-billing-information" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the Stripe Dashboard Link for a contributor"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'contributorId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="contributor-get-login-link" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Creates or Updates Pricing for an Extension"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'contributorId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="extension-update-extension-pricing" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List all invoices on behalf of a contributor"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'contributorId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="contributor-list-onbehalf-invoices" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create the OnboardingProcess of a contributor"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'contributorId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="extension-create-contributor-onboarding-process" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all message of the conversation"
+
+
+- ⚠️ **Breaking:** removed the required property '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.ServiceRequest]/internal' from the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="conversation-list-messages-by-conversation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the Stripe Billing Portal Link for a Customer"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'customerId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="contributor-get-customer-billing-portal-link" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return a list of Contracts for the given Customer"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'customerId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="contract-list-contracts" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get payment method details"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'customerId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="marketplace-customer-get-payment-method" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the link to update the marketplace payment method"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'customerId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="marketplace-customer-update-payment-method" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the Contract for the given Domain"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'domainId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-domain" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Order Extension with saved payment method"
+
+
+- ⚠️ **Breaking:** removed 'subschema #1, subschema #2' from the request body 'oneOf' list
+
+- added 'subschema #1, subschema #2' to the request body 'oneOf' list
+
+
+For details, refer to the <OperationLink operation="extension-order-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the Contract for the given Project"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-project" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the Contract for the given Server"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'serverId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-server" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app installations that a user has access to"
+
+
+- added the new 'reconfiguring' enum value to the '/items/phase' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations-for-user" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an app installation"
+
+
+- added the new 'reconfiguring' enum value to the 'phase' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="app-get-appinstallation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app installations belonging to a Project"
+
+
+- added the new 'reconfiguring' enum value to the '/items/phase' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in ""
+
+
+- removed the schema 'de.mittwald.v1.llmlocksmith.ContainerMeta'
+
+- removed the schema 'de.mittwald.v1.llmlocksmith.Licence'
+
+- removed the schema 'de.mittwald.v1.llmlocksmith.Model'
+
+
+For details, refer to the <OperationLink operation="" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a ContainerImageConfig"
+
+
+- added the required property 'digest' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-get-container-image-config" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the extension instance of a specific customer and extension, if existing"
+
+
+- added the optional property 'frontendFragments' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-extension-instance-for-customer" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all unlocked leads. Organisation can unlock leads"
+
+
+- added the required property 'leads/items/company/allOf[subschema #2]/phoneNumbers' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="leadfyndr-list-unlocked-leads" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a detail of a unlocked lead. Organisation can unlock leads"
+
+
+- added the required property 'company/allOf[subschema #2]/phoneNumbers' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="leadfyndr-get-unlocked-lead" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List extension instances"
+
+
+- added the new optional 'query' request parameter 'anchor'
+
+- added the optional property '/items/frontendFragments' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-list-extension-instances" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an extension instance"
+
+
+- added the optional property 'frontendFragments' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-extension-instance" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a mail address"
+
+
+- added the required property 'archive' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="mail-get-mail-address" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Disable the mail-archive of a mail address"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="mail-disable-mail-archive" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the extension instance of a specific project and extension, if existing"
+
+
+- added the optional property 'frontendFragments' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-extension-instance-for-project" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a list of already created llm licences"
+
+
+- added the required property '/items/limit' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-get-llm-licences-experimental" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Creates a new llm beta Licence for a project. Will be purged on end of beta"
+
+
+- added the required property 'limit' to the response with the '201' status
+
+
+For details, refer to the <OperationLink operation="project-create-llm-beta-licence-experimental" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a licence of a project"
+
+
+- added the required property 'limit' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-get-llm-licence-experimental" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a llm Licence for a project"
+
+
+- added the required property 'limit' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-update-llm-licence-experimental" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List mail addresses belonging to a Project"
+
+
+- added the new optional 'query' request parameter 'mailArchive'
+
+- added the required property '/items/archive' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="mail-list-mail-addresses" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Relocate an external Project to mittwald"
+
+
+- added the new optional request property 'emailInboxes'
+
+
+For details, refer to the <OperationLink operation="relocation-create-relocation" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK Release v2.1.140
+
+The latest release of the mittwald PHP SDK, version v2.1.140, introduces several enhancements and modifications to improve functionality and flexibility. 
+
+#### Key Changes:
+
+- **Mail Archive Management**: A new request, `DisableMailArchiveRequest`, has been added to manage mail archives, along with corresponding response classes to handle different outcomes.
+- **Mail Address Archive**: A `MailAddressArchive` schema has been introduced to manage archive settings, including properties such as active status, quota, and usage.
+- **Enhanced Mail Address Schema**: The `MailAddress` schema now includes an `archive` property for mail archiving settings.
+- **Contract Requests**: The UUID format restriction for `contractId` has been removed in various contract management requests to increase flexibility.
+- **List Mail Addresses**: The request now includes an option for `mailArchive`, allowing users to toggle the retrieval of archive information.
+- **Refactoring**: Model references and namespaces have been updated to `Aihosting` from `Llmlocksmith`, and helper classes like `LicenceLimit` and `LicenceLimitUnit` have been introduced for better structure.
+- **Schema Updates**: The `ContainerImageConfig` schema now includes a `digest` property, and a new phase, `reconfiguring`, has been added to project workflows.
+
+These updates enhance the API's mail archiving capabilities, improve schema definitions, and support LLM functionalities, ensuring consistency across client requests and responses.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.140).
+
+### mittwald PHP SDK v2.1.139 Release
+
+The mittwald PHP SDK has released version v2.1.139. This update introduces significant changes to the `ServiceRequest` class by removing the `internal` property, which simplifies the class structure and reduces complexity.
+
+#### Breaking Changes
+- The `internal` property has been removed from the `ServiceRequest` class. This includes:
+  - Removal of the property declaration.
+  - Removal of the `getInternal()` method.
+  - Elimination of the `internal` parameter from the constructor.
+  - Removal of the `withInternal()` method.
+
+#### Changes
+- The `ServiceRequest` constructor now requires fewer parameters due to the elimination of the `internal` boolean.
+- Methods such as `from()` and `toJson()` no longer handle the `internal` property, streamlining object construction and serialization.
+
+This release focuses on enhancing the clarity and structure of the `ServiceRequest` model by removing unnecessary complexity.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.139).
+
+### Release Summary: mittwald PHP SDK v2.1.138
+
+The mittwald PHP SDK has released version [v2.1.138](https://github.com/mittwald/api-client-php/releases/tag/v2.1.138), introducing several enhancements and updates:
+
+#### Added Features
+
+- **Extension List Extension Instances Request Enhancements**: 
+  - An `anchor` parameter has been added to the `ExtensionListExtensionInstancesRequest` class for improved pagination control.
+  - New methods `withAnchor` and `withoutAnchor` are available for managing the `anchor` property.
+
+- **Company Details Schema Update**:
+  - The `DetailCompany` schema now includes a `phoneNumbers` property, allowing for multiple phone numbers to be stored.
+
+- **Extension Instance Schema Expansion**:
+  - A `frontendFragments` property has been introduced in the `ExtensionInstance` schema to support additional frontend-specific data.
+
+#### Changes Made
+
+- **ExtensionListExtensionInstancesRequest.php**:
+  - Added `anchor` property and methods `getAnchor`, `withAnchor`, and `withoutAnchor`.
+
+- **DetailCompany.php**:
+  - Added `phoneNumbers` property with methods `getPhoneNumbers` and `withPhoneNumbers`.
+
+- **ExtensionInstance.php**:
+  - Added `frontendFragments` property with methods `getFrontendFragments`, `withFrontendFragments`, and `withoutFrontendFragments`.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.138).
+
+### Release Summary: mittwald PHP SDK v2.1.137
+
+The mittwald PHP SDK has been updated to version v2.1.137. This release introduces a significant enhancement to the relocation functionality by allowing the transfer of email inboxes during the relocation process. Users can now specify a list of email inboxes to be included in relocation requests.
+
+#### Key Features and Changes:
+
+- **Email Inboxes in Relocation Requests**: 
+  - New capability to transfer email inboxes as part of relocation requests.
+  - `CreateRelocationRequest.php` now includes an `emailInboxes` property.
+  - `CreateRelocationRequestBody.php` has been updated to handle `emailInboxes` with appropriate getter, setter, and JSON serialization methods.
+  - A new `EmailInbox.php` schema has been introduced to manage email inbox properties, including validation rules for email and password inputs.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.137).
+
+### mittwald JavaScript SDK Release 4.224.0
+
+The mittwald JavaScript SDK has been updated to version 4.224.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.224.0).
+
+### mittwald JavaScript SDK Release 4.223.0
+
+The mittwald JavaScript SDK has been updated to version 4.223.0. This release includes an update to the generated client, enhancing the functionality and performance of the SDK. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.223.0).
+
+### mittwald JavaScript SDK Release 4.222.0
+
+The mittwald JavaScript SDK has been updated to version 4.222.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.222.0).
+
+### mittwald JavaScript SDK Release 4.221.0
+
+The mittwald JavaScript SDK has been updated to version 4.221.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald/api-client-js 4.221.0](https://github.com/mittwald/api-client-js/releases/tag/4.221.0).
+
+### mittwald JavaScript SDK Release 4.220.0
+
+The mittwald JavaScript SDK version 4.220.0 has been released. This update includes a feature enhancement with an updated generated client. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.220.0).
+
+### mittwald JavaScript SDK Release 4.219.0
+
+The mittwald JavaScript SDK has been updated to version 4.219.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.219.0](https://github.com/mittwald/api-client-js/releases/tag/4.219.0).
+
