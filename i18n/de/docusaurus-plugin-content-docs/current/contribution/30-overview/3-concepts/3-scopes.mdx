@@ -3,6 +3,7 @@ title: Scopes
 ---
 
 import OperationLink from "@site/src/components/OperationLink";
+import OperationExample from "@site/src/components/OperationExample";
 
 Scopes sind ein Konzept, um die Zugriffsrechte auf die mStudio Public API zu gruppieren und einzuschränken.
 Ein Scope ist ein Satz an Berechtigungen, der es einem Benutzer oder einer Anwendung erlaubt, auf bestimmte Operationen von Ressourcen zuzugreifen.
@@ -35,73 +36,33 @@ In diesen Fällen die benötigten Scopes explizit in der Beschreibung der Operat
 
 ### Verfügbarkeit von Scopes
 
-Derzeit sind noch nicht alle Scopes für die mStudio API implementiert.
-Die derzeit verfügbaren Scopes sind:
+> Hinweis: Nicht alle Scopes der mStudio API sind derzeit implementiert.
 
-- Customer
+Wenn Ihre Organisation zum [Contributor hochgestuft wurde](../../40-how-to/1-become-contributor.mdx), können Sie die verfügbaren Scopes in mStudio einsehen.
 
-  - `customer:read`
-  - `customer:write`
-  - `customer:delete`
+1. Navigieren Sie zum Tab **Entwicklung** innerhalb Ihrer Organisation.  
+2. Dort finden Sie eine Liste aller Extensions oder können eine neue erstellen.  
+3. Öffnen Sie eine Extension und wechseln Sie zum Tab **Berechtigungen**.  
+4. Im Bereich **Berechtigungen** können Sie über die Schaltfläche **Bearbeiten** die `requiredScopes` Ihrer Extension anpassen.  
+  Hier können Sie aus allen Verfügbaren Scopes auswählen.
 
-- Contract
+Alternativ können Sie alle verfügbaren Scopes über den API-Endpunkt abrufen:
 
-  - `contract:read`
-  - `contract:write`
-  - `contract:delete`
 
-- Project
-
-  - `project:read`
-  - `project:write`
-  - `project:delete`
-
-- Domain
-
-  - `domain:read`
-  - `domain:write`
-  - `domain:delete`
-
-- Mail
-
-  - `mail:read`
-  - `mail:write`
-  - `mail:delete`
-
-- User
-
-  - `user:read`
-  - `user:write`
-  - `user:delete`
-
-- SSH/SFTP User
-
-  - `sshuser:read`
-  - `sshuser:write`
-  - `sshuser:delete`
-
-- Database
-
-  - `database:read`
-  - `database:write`
-  - `database:delete`
-
-- App
-
-  - `app:read`
-  - `app:write`
-  - `app:delete`
-
-- Extension
-
-  - `extension:read`
-  - `extension:write`
-  - `extension:delete`
-
-- Backup
-  - `backup:read`
-  - `backup:write`
-  - `backup:delete`
+<OperationExample
+  operation="extension-list-scopes"
+  example={[
+		{
+			"name": "project:read",
+		},
+		{
+			"name": "project:write",
+		},
+		{
+			"name": "project:delete",
+		}
+  ]}
+/>
 
 mittwald arbeitet daran, weitere Scopes zu implementieren und die Verfügbarkeit der Scopes zu erweitern.
 Wenn ein Scope benötigt wird, der nicht in dieser Liste aufgeführt ist, kann dieser [bei mittwald angefragt werden](../../../how-to/support/).
