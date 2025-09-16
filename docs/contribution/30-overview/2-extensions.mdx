@@ -107,12 +107,12 @@ The following is an overview.
 
 An Extension has four different description fields.
 
-The first elements visible to the user are the **Name** and the **SubTitle**.
-The **Name** can be creative and engaging – it does not have to be descriptive.
-The **SubTitle** provides a brief and concise way to highlight the main selling point of the Extension.
+The first elements visible to the user are the Name and the SubTitle.
+The Name can be creative and engaging – it does not have to be descriptive.
+The SubTitle provides a brief and concise way to highlight the main selling point of the Extension.
 
-For a slightly more detailed explanation, the **Description** can be used.
-Additionally, there is a **Detailed Description**, which contains even more information and allows formatting.
+For a slightly more detailed explanation, the Description can be used.
+Additionally, there is a Detailed Description, which contains even more information and allows formatting.
 Here, you can explain features, provide instructions, share links for further reading, include a changelog, and much more.
 
 ### State
@@ -137,10 +137,10 @@ You have to provide at least an E-Mail address where users can contact you.
 
 ### Scopes
 
-An Extension needs permissions to access the REST API of the mStudio and execute **domain actions**.
+An Extension needs permissions to access the REST API of the mStudio and execute domain actions.
 These have to be accepted by the user when installing the Extension.
 
-These permissions are defined by [**scopes**](../concepts/scopes).
+These permissions are defined by [scopes](../concepts/scopes).
 The Extension definition contains a list of scopes describing the Extensions permissions.
 
 ### Extension Context
@@ -148,6 +148,7 @@ The Extension definition contains a list of scopes describing the Extensions per
 Users can add an Extension either to a project or an organization.
 As a contributor, you must decide which Extension context makes sense for your Extension.
 This decision depends on multiple factors, such as the target audience, use case, or business model.
+The Context can be changed during development, before verification but doing so leads to deletion of all instances, after verification the context cannot be changed.
 
 ### Lifecycle Webhook Endpoints
 
@@ -161,6 +162,24 @@ For more information, see [lifecycle webhook concept](../concepts/lifecycle-webh
 Optionally, an Extension may define external frontends that function as an entry point to the Extension or frontend fragments to embed frontend directly into mStudio.
 Either way, your frontend is a separate application.
 For more information, see [frontend development](../concepts/frontend-development).
+
+### Requested Changes
+
+Once an Extension has been verified, a contributor can submit a request to modify the Extension’s scopes or webhook URLs. 
+The request will be revied by a Mittwald employee within 2–3 business days.  
+ 
+If the request is approved, the Extension continues to function for all existing users, but the newly added scopes remain unavailable until each user explicitly accepts the updated permission set. 
+Users who have already installed the Extension will receive a prompt to grant the new scopes. Only after a user accepts the changes can the Extension access the newly added capabilities.
+
+### Assets
+
+Assets are media files (photos or videos) that are displayed in the marketplace listing to showcase the Extension’s features, UI, or demo footage.  
+They are optional but strongly recommended because a rich visual presentation increases discoverability and user trust.
+They can be uploaded using the File Service and ordered using the index property.
+
+### Statistics
+
+The exact number of Extension Instances is available to the contributor in the Entwickeln tab. For the public, the number is rounded down to the next lower hundred.
 
 ## Versioning of Extensions
 
