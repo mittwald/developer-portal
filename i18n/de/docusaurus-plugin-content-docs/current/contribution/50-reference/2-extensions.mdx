@@ -4,7 +4,6 @@ title: Extensions
 
 import SchemaWithExample from "../../../../../../src/components/openapi/SchemaWithExample";
 
-Extensions werden derzeit über statische YAML-Dokumente definiert.
 Die benötigten und erlaubten Attribute sind in folgendem Schema beschrieben.
 Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Informationen besteht eine Extension?](../../overview/extensions#aus-welchen-informationen-besteht-eine-extension)
 
@@ -14,37 +13,51 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
   schema={{
     type: "object",
     required: [
-      "id",
-      "contributorId",
-      "name",
-      "subTitle",
-      "description",
-      "support",
-      "state",
-      "extensionContext",
-      "requiredScopes",
-      "externalComponents",
+        "id",
+        "name",
+        "contributorId",
+        "context",
+        "createdAt",
+        "description",
+        "scopes",
+        "assets",
+        "disabled",
+        "logoRefId",
+        "published",
+        "statistics",
+        "subTitle",
+        "support",
+        "tags",
+        "verificationRequested",
+        "verified",
+        "functional",
+        "webhookUrls",
+        "externalFrontends",
+        "frontendFragments",
+        "extensionStatistics",
+        "pricing",
+        "requestedChanges"
     ],
     properties: {
       id: {
         type: "string",
         format: "uuid",
-        description: "Global einheitlicher Identifier der Extension",
+        description: "Globally eindeutig identifizierender Bezeichner der Extension",
       },
       contributorId: {
         type: "string",
         format: "uuid",
         description:
-          "Identifier des Contributors. Entspricht dem identifier des Customers/der Organisation im mStudio",
+          "Bezeichner des Contributors. Entspricht dem Identifier des Kunden/der Organisation im mStudio",
       },
       name: {
         type: "string",
         description: "Name der Extension",
-        example: "Example Extension",
+        example: "Beispiel Extension",
       },
       subTitle: {
         type: "object",
-        description: "Ein paar Worte um die Extension zu bewerben.",
+        description: "Ein paar Worte, um die Extension zu bewerben.",
         required: ["de"],
         properties: {
           de: {
@@ -62,69 +75,67 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
       description: {
         type: "string",
         description:
-          "Kurzbeschreibung der Extension. Sollte möglichst kurz, prägnant und in weniger als 300 Zeichen die Extension erklären",
+          "Kurze Beschreibung der Extension. Sie soll die Extension knapp, prägnant erklären",
         example:
-          "Eine Beispiel Extension, die zeigen soll, welche Informationen benötigt werden, um eine Extension einzureichen",
+          "Eine Beispiel‑Extension, die zeigt, welche Informationen benötigt werden, um eine Extension einzureichen",
       },
       detailedDescriptions: {
         type: "object",
         description:
-          "Ausführliche Beschreibungen der Extension in unterschiedlichen Sprachen",
+          "Ausführliche Beschreibungen der Extension in verschiedenen Sprachen",
         required: ["de"],
         properties: {
           de: {
             type: "object",
-            description: "Ausführliche Beschreibung der Extension in Deutsch",
+            description: "Ausführliche Beschreibung der Extension auf Deutsch",
             required: ["markdown"],
             properties: {
               markdown: {
                 type: "string",
-                description:
-                  "Ein Beschreibungstext mit Markdown-Formatierungen",
+                description: "Ein Beschreibungstext mit Markdown‑Formatierungen",
                 minLength: 1,
                 example:
-                  "# Ein Beispiel\nDies ist eine Beispiel Extension-Beschreibung.\n## Weitere Informationen\nHier könnten **weitere** Informationen stehen.",
+                  "# Ein Beispiel\nDies ist eine Beispiel Extension‑Beschreibung.\n## Weitere Informationen\nHier könnten **weitere** Informationen stehen.",
               },
               plain: {
                 type: "string",
                 description: "Ein Beschreibungstext ohne Formatierungen",
                 minLength: 1,
                 example:
-                  "Eine ausführliche Besipiel Extension-Beschreibung. Diese enthält keine Formatierungen.",
+                  "Eine ausführliche Beispiel‑Extension‑Beschreibung. Diese enthält keine Formatierungen.",
               },
             },
           },
           en: {
             type: "object",
-            description: "Ausführliche Beschreibung der Extension in Englisch",
+            description: "Ausführliche Beschreibung der Extension auf Englisch",
             required: ["markdown"],
             properties: {
               markdown: {
                 type: "string",
-                description:
-                  "Ein Beschreibungstext mit Markdown-Formatierungen",
+                description: "Ein Beschreibungstext mit Markdown‑Formatierungen",
                 minLength: 1,
                 example:
-                  "# An example\nThis is an example Extension description.\n## Further informations\nHere could be **further** informations.",
+                  "# An example\nThis is an example Extension description.\n## Further information\nHere could be **further** information.",
               },
               plain: {
                 type: "string",
                 description: "Ein Beschreibungstext ohne Formatierungen",
                 minLength: 1,
-                exmple:
+                example:
                   "A detailed example Extension description. This does not contain any formatting.",
               },
             },
           },
         },
       },
-      extensionContext: {
+      context: {
         type: "string",
         enum: ["project", "customer"],
         description:
-          "Gibt an, ob die Extension zu einem Projekt oder zu einer Organisation hinzugefügt werden kann",
+          "Definiert, ob die Extension zu einem Projekt oder einer Organisation hinzugefügt werden kann",
       },
-      requiredScopes: {
+      scopes: {
         type: "array",
         items: {
           type: "string",
@@ -132,7 +143,7 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
         },
         description: "Berechtigungen, die die Extension benötigt",
       },
-      externalComponents: {
+      webhookUrls: {
         type: "object",
         required: ["backend"],
         properties: {
@@ -140,9 +151,9 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
             type: "object",
             required: [
               "extensionAddedToContext",
-              "extensionInstanceUpdated",
-              "extensionInstanceSecretRotated",
               "extensionInstanceRemovedFromContext",
+              "extensionInstanceSecretRotated",
+              "extensionInstanceUpdated",
             ],
             properties: {
               extensionAddedToContext: {
@@ -152,8 +163,9 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
                   url: {
                     type: "string",
                     format: "uri",
+                    minLength: 1,
                     description:
-                      "URL, die aufgerufen wird, wenn die Extension zu einem Extension Context hinzugefügt wird. Kann Platzhalter enthalten",
+                      "Die URL, die von mStudio aufgerufen wird, wenn die Extension zu einem Kontext hinzugefügt wird. Kann Platzhalter enthalten",
                     example:
                       "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/added",
                   },
@@ -166,8 +178,9 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
                   url: {
                     type: "string",
                     format: "uri",
+                    minLength: 1,
                     description:
-                      "URL, die aufgerufen wird, wenn eine Extension Instance aktualisiert wird. Kann Platzhalter enthalten",
+                      "Die URL, die von mStudio aufgerufen wird, wenn eine Extension‑Instanz aktualisiert wird. Kann Platzhalter enthalten",
                     example:
                       "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/updated",
                   },
@@ -180,8 +193,9 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
                   url: {
                     type: "string",
                     format: "uri",
+                    minLength: 1,
                     description:
-                      "URL, die aufgerufen wird, wenn das Secret einer Extension Instance rotiert wird. Kann Platzhalter enthalten",
+                      "Die URL, die von mStudio aufgerufen wird, wenn das Secret einer Extension‑Instanz rotiert wird. Kann Platzhalter enthalten",
                     example:
                       "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/secret-rotated",
                   },
@@ -194,8 +208,9 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
                   url: {
                     type: "string",
                     format: "uri",
+                    minLength: 1,
                     description:
-                      "URL, die aufgerufen wird, wenn die Extension aus einem Extension Context entfernt wird. Kann Platzhalter enthalten",
+                      "Die URL, die von mStudio aufgerufen wird, wenn eine Extension‑Instanz aus einem Kontext entfernt wird. Kann Platzhalter enthalten",
                     example:
                       "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/removed",
                   },
@@ -203,44 +218,82 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
               },
             },
           },
-          frontends: {
-            type: "object",
-            properties: {
-              index: {
-                type: "object",
-                required: ["url"],
-                properties: {
-                  url: {
-                    type: "string",
-                    format: "uri",
-                    description:
-                      "URL, die aufgerufen wird, wenn die Extension im mStudio aufgerufen wird. Kann Platzhalter enthalten",
-                    example: "https://example.org/:extensionInstanceId",
-                  },
+        },
+      },
+      externalFrontends: {
+        type: "array",
+        items: {
+          type: "object",
+          properties:{
+            index: {
+              type: "object",
+              required: ["url"],
+              properties: {
+                name: {
+                  type: "string",
+                  description: "Der Name, den das Frontend in der Liste der Extension Frontends haben wird",
+                  example: "Beispiel"
+                },
+                url: {
+                  type: "string",
+                  format: "uri",
+                  description:
+                    "Die URL, zu der der Benutzer weitergeleitet wird, wenn er die Extension im mStudio öffnet. Kann Platzhalter enthalten",
+                  example: "https://example.org/:extensionInstanceId",
                 },
               },
             },
-          },
+          }
         },
       },
-      support: {
+      assets: {
+        type: "array",
+        items: {
+          type: "object",
+          required: ["id", "index", "assetType"],
+          properties: {
+            id:{
+              type: "string",
+              format: "uuid",
+              description: "Die Datei‑ID des Assets",
+              example: "709049e1-f283-4ef8-a35b-1b2f672852b0"
+            },
+            index:{
+              type: "integer",
+              description: "Der Index des Assets. Muss nicht fortlaufend sein. Kann zur Reihenfolge der Assets benutzt werden.",
+              example: 1
+            },
+            assetType:{
+              type: "string",
+              enum: ["image", "video"],
+              example: "image"
+            }
+          }
+        }
+      },
+      disabled: {
+        type: "boolean",
+        description: "Gibt an, ob die Extension deaktiviert ist"
+      },
+      logoRefId: {
+        type: "string",
+        format: "uuid",
+        description: "Die Datei‑ID des Logos",
+        example: "9b2af58a-2625-41eb-adc6-bb6f7be9b90a"
+      },
+      published: {
+        type: "boolean",
+        description: "Gibt an, ob diese Extension veröffentlicht wurde"
+      },
+      statistics: {
         type: "object",
-        required: ["email"],
         properties: {
-          email: {
-            type: "string",
-            format: "email",
-            description:
-              "E-Mail-Adresse, die für Supportanfragen genutzt werden kann",
-          },
-          phone: {
-            type: "string",
-            format: "phone",
-            description:
-              "Telefonnummer, die für Supportanfragen genutzt werden kann",
-            example: "+49 170 123456",
-          },
-        },
+          amountOfInstances: {
+            type: "integer",
+            example: "42",
+            description: "Anzahl der Instanzen dieser Extension. Genau für den Contributor. Öffentlich gerundet auf die nächstgrößere hundert."
+          }
+        }
       },
       tags: {
         type: "array",
@@ -250,25 +303,200 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
         },
         description: "Tags, die die Extension beschreiben",
       },
-      state: {
+      support: {
         type: "object",
+        required: ["email"],
         properties: {
-          hidden: {
-            type: "boolean",
-            description: "Gibt an, ob die Extension im mStudio sichtbar ist",
+          email: {
+            type: "string",
+            format: "email",
+            description: "E‑Mail‑Adresse, die für Supportanfragen genutzt werden kann",
           },
-          disabled: {
-            type: "boolean",
-            description:
-              "Gibt an, ob Extension Instances für diese Extension existieren dürfen",
+          phone: {
+            type: "string",
+            format: "phone",
+            description: "Telefonnummer, die für Supportanfragen genutzt werden kann",
+            example: "+49 170 123456",
           },
-          blocked: {
+          inherited: {
             type: "boolean",
-            description:
-              "Gibt an, ob die Extension zu einem Extension Context hinzugefügt werden kann",
-          },
+            description: "Gibt an, ob die angegebene Unterstützung von dem Contributor übernommen wurde",
+            example: false
+          }
         },
       },
+      verificationRequested: {
+        type: "boolean",
+        description: "Gibt an, ob die Verifizierung der Extension angefordert wurde"
+      },
+      verified: {
+        type: "boolean",
+        description: "Gibt an, ob die Extension verifiziert wurde"
+      },
+      functional: {
+        type: "boolean",
+        description: "Gibt an, ob die Extension funktionsfähig ist"
+      },
+      frontendFragments: {
+        type: "object",
+        additionalProperties: {
+          description:"Der Anker, an dem das Frontend‑Fragment eingebettet werden soll",
+          type: "object",
+          properties: {
+            "additionalProperties": {
+              type: "object",
+              additionalProperties: {
+                type: "string"
+              },
+            },
+            url: {
+              type: "string",
+              format: "uri",
+              example: "URL des Frontend‑Fragments"
+            }
+          }
+        }
+      },
+      extensionStatistics: {
+        type: "object",
+        properties: {
+          amountOfInstances: {
+            type: "integer",
+            example: "42",
+            description: "Anzahl der Instanzen dieser Extension. Genau für den Contributor. Öffentlich gerundet auf die nächstgrößere hundert."
+          }
+        }
+      },
+      pricing: {
+        type: "array",
+        items: {
+          type: "object",
+          required: [ "priceInCents", "variantKey" ],
+          properties: {
+            priceInCents: {
+              type: "integer",
+              example: "5000",
+              description: "Preis der Extension in Cent"
+            },
+            variantKey: {
+              type: "string",
+              description: "Identifikator des Preisvarianten‑Schlüssels"
+            },
+            name: {
+              type: "string",
+              description:"Bezeichnung der Variante (nur in der UI sichtbar)",
+              example:"Standard"
+            }
+          }
+        }
+      },
+      requestedChanges: {
+        type: "object",
+        description:"Erlaubte Änderungen, die ein Contributor vorschlagen kann",
+        properties: {
+          context: {
+            type: "object",
+            properties: {
+              hidden: {
+                type: "boolean",
+                description: "Gibt an, ob die Extension im mStudio sichtbar ist"
+              },
+              blocked: {
+                type: "boolean",
+                description:
+                  "Gibt an, ob die Extension zu einem Kontext hinzugefügt werden kann"
+              },
+              disabled: {
+                type: "boolean",
+                description:
+                  "Gibt an, ob Extension‑Instanzen für diese Extension existieren dürfen"
+              }
+            }
+          },
+          scopes: {
+            type: "array",
+            items: {
+              type: "string",
+              example: "project:read"
+            },
+            description: "Berechtigungen, die die Extension benötigt"
+          },
+          webhookUrls: {
+            type: "object",
+            required: ["backend"],
+            properties: {
+              backend: {
+                type: "object",
+                required: [
+                  "extensionAddedToContext",
+                  "extensionInstanceRemovedFromContext",
+                  "extensionInstanceSecretRotated",
+                  "extensionInstanceUpdated",
+                ],
+                properties: {
+                  extensionAddedToContext: {
+                    type: "object",
+                    required: ["url"],
+                    properties: {
+                      url: {
+                        type: "string",
+                        format: "uri",
+                        description:
+                          "URL, die aufgerufen wird, wenn die Extension zu einem Extension Context hinzugefügt wird. Kann Platzhalter enthalten",
+                        example:
+                          "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/added"
+                      }
+                    }
+                  },
+                  extensionInstanceUpdated: {
+                    type: "object",
+                    required: ["url"],
+                    properties: {
+                      url: {
+                        type: "string",
+                        format: "uri",
+                        description:
+                          "URL, die aufgerufen wird, wenn eine Extension Instance aktualisiert wird. Kann Platzhalter enthalten",
+                        example:
+                          "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/updated"
+                      }
+                    }
+                  },
+                  extensionInstanceSecretRotated: {
+                    type: "object",
+                    required: ["url"],
+                    properties: {
+                      url: {
+                        type: "string",
+                        format: "uri",
+                        description:
+                          "URL, die aufgerufen wird, wenn das Secret einer Extension Instance rotiert wird. Kann Platzhalter enthalten",
+                        example:
+                          "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/secret-rotated"
+                      }
+                    }
+                  },
+                  extensionInstanceRemovedFromContext: {
+                    type: "object",
+                    required: ["url"],
+                    properties: {
+                      url: {
+                        type: "string",
+                        format: "uri",
+                        description:
+                          "URL, die aufgerufen wird, wenn die Extension aus einem Extension Context entfernt wird. Kann Platzhalter enthalten",
+                        example:
+                          "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/removed"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        description:"Ein Vorschlag für die Änderungen, die ein Contributor vorschlagen kann"
+      }
     },
   }}
 />
