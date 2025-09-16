@@ -3,6 +3,7 @@ title: Scopes
 ---
 
 import OperationLink from "@site/src/components/OperationLink";
+import OperationExample from "@site/src/components/OperationExample";
 
 Scopes sind ein Konzept, um die Zugriffsrechte auf die mStudio Public API zu gruppieren und einzuschränken.
 Ein Scope ist ein Satz an Berechtigungen, der es einem Benutzer oder einer Anwendung erlaubt, auf bestimmte Operationen von Ressourcen zuzugreifen.
@@ -47,12 +48,21 @@ Wenn Ihre Organisation zum [Contributor hochgestuft wurde](../../40-how-to/1-bec
 
 Alternativ können Sie alle verfügbaren Scopes über den API-Endpunkt abrufen:
 
-```sh
-curl -s -X GET \
-  'https://api.mittwald.de/v2/scopes' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json'
-```
+
+<OperationExample
+  operation="extension-list-scopes"
+  example={[
+		{
+			"name": "project:read",
+		},
+		{
+			"name": "project:write",
+		},
+		{
+			"name": "project:delete",
+		}
+  ]}
+/>
 
 mittwald arbeitet daran, weitere Scopes zu implementieren und die Verfügbarkeit der Scopes zu erweitern.
 Wenn ein Scope benötigt wird, der nicht in dieser Liste aufgeführt ist, kann dieser [bei mittwald angefragt werden](../../../how-to/support/).

@@ -3,6 +3,7 @@ title: Scopes
 ---
 
 import OperationLink from "@site/src/components/OperationLink";
+import OperationExample from "@site/src/components/OperationExample";
 
 Scopes are a concept that groups and limits the access permissions of the mStudio public API.
 A scope is a set of permissions that allow a user or application to access specific operations of resources.
@@ -45,23 +46,21 @@ If your organization has been [promoted to a contributor](../../40-how-to/1-beco
 
 Alternatively, you can retrieve all available scopes via the API endpoint:
 
-```sh
-curl -s -X 'GET' \
-  'https://api.mittwald.de/v2/scopes' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json
-```
-**Example Response:**
-```json
-[
-  {
-    "name": "project:read",
-  },
-  {
-    "name": "project:write",
-  }
-]
-```
+<OperationExample
+  operation="extension-list-scopes"
+  example={[
+		{
+			"name": "project:read",
+		},
+		{
+			"name": "project:write",
+		},
+		{
+			"name": "project:delete",
+		}
+  ]}
+/>
+
 
 mittwald works on implementing more scopes to expand the list of available scopes.
 If you need a scope that is not available yet, you can [ask us](../../../how-to/support/) for it.
