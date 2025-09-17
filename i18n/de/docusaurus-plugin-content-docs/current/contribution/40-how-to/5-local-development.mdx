@@ -11,6 +11,54 @@ Neben der Möglichkeit, die mStudio API zu mocken, was sich ohne Kenntnisse der 
 existieren dennoch Mittel und Wege, um die lokale Entwicklung von Extensions zu erleichtern.
 Diese werden im Folgenden vorgestellt.
 
+## Erstellen einer Extension Instance
+
+Wenn du lokal entwickelst, musst du möglicherweise deine Extension innerhalb vom **mStudio** testen.  
+Dazu musst du eine **Extension Instance** erstellen, wofür du die **Extension ID** deiner Extension kennen musst.
+
+:::Note
+Alle Extension Instances innerhalb deines Contributors sind kostenlos.
+:::
+
+Während der Entwicklung wird deine Extension **nicht** im Marktplatz angezeigt.
+
+### ...über das mStudio (empfohlen)
+
+1. Öffne das **mStudio**.  
+2. Navigiere zum **Marktplatz**.  
+3. Wähle eine beliebige Extension aus.  
+4. Ersetze in der URL-Pfad die Extension ID mit der **Extension ID deiner Extension**.
+
+### ...über die API
+
+Du kannst eine Extension Instance programmatisch mit der  
+<OperationLink operation="extension-add-extension-to-context" /> Operation erstellen.
+
+### Benötigte Eigenschaften
+
+:::note
+Der **context** deiner Extension muss gesetzt sein, bevor du eine Instance erstellst.
+:::
+
+- **Extension ID**:  
+  Die Extension ID kannst du im Tab **Entwicklung** deiner Extension im mStudio kopieren.
+
+- **Scopes**:  
+  Im Bereich **Berechtigungen** im mStudio findest du die ausgewählten Scopes.  
+  Für jeden ausgewählten Scope musst du im `scopes`-Feld deines Request-Bodys einen Eintrag im folgenden Format hinzufügen:\
+  `"area:(read|write|delete)"`.
+
+![Extension permissions section](../../../../../../resources/contributing/extensions/extension-berechtigungen.jpg)
+
+:::tip
+Wenn du eine Extension Instance über das mStudio erstellst, musst du dich nicht darum kümmern, den richtigen context zu setzen oder die richtigen Scopes auszuwählen.
+:::
+
+### Nach der Veröffentlichung deiner Extension
+
+Nach der Veröffentlichung deiner Extension werden die Extension Instances, die du zu Testzwecken erstellt hast, **entfernt**.  
+Du kannst deine Extension jedoch jederzeit kostenlos zu deinen Contextes hinzufügen.
+
 ## Authentifizierte Domain Actions
 
 Um die Geschäftslogik im Zusammenspiel mit dem mStudio effektiv zu testen, ist es am einfachsten,
