@@ -4,11 +4,9 @@ title: How to manage extensions?
 
 import OperationLink from "@site/src/components/OperationLink";
 
-Extensions can now be managed primarily through the **mStudio** interface, available in the Entwickeln tab for [registered contributors](../become-contributor).  
-Here, you can create, edit, request verification, and publish your Extension — without needing to call the API directly.
+Extensions can now be managed primarily through the **mStudio** interface, available in the Entwickeln-Tab for [registered contributors](../become-contributor).  
 
 Alternatively, all actions can still be performed via the mStudio's REST API.  
-This remains useful for automation or integrating Extension management into CI/CD workflows.
 
 The API routes related to Extension management are now relatively stable, but may still be subject to minor adjustments over time.
 
@@ -16,7 +14,7 @@ Below is an overview of the key API operations used to manage Extensions.
 
 ## Register Extension
 
-To register a new Extension, go to the *Entwickeln* tab in the mStudio and click **"Anlegen"**.  
+To register a new Extension, go to the Entwickeln-Tab in the mStudio and click **"Anlegen"**.  
 Only a name is required to get started.
 
 Alternatively, an Extension can be registered using the following REST API operation:
@@ -42,11 +40,11 @@ Assets can be deleted via the <OperationLink operation="extension-remove-asset" 
 Uploading a logo works similarly. The operation <OperationLink operation="extension-request-logo-upload" /> is used to request the upload of the logo.
 The logo is then uploaded using the <OperationLink operation="file-create-file" /> operation.
 
-The <OperationLink operation="extension-change-context" /> operation allows changing the Extension Context of an Extension.
-This route can only be used before the Extension is verified.
-Depending on whether Extension Instances already exist, the change will either take effect immediately or all Extension Instances will be removed first before applying the change.
+The Extension Context can also be modified, as long as the Extension has not yet been submitted for verification.
+This change can now be made either through the Entwickeln tab in mStudio or via the standard edit route.
+Depending on whether Extension Instances already exist, the change will either take effect immediately or all Extension Instances will be removed before applying it.
 
-For developing frontend fragments, a global Extension Secret is required.
+For developing frontend fragments, a global Extension Secret is required. <br/>
 Currently, generating an Extension Secret is only possible via the API. 
 
 To generate one, use the <OperationLink operation="extension-generate-extension-secret" /> operation.
