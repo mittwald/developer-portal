@@ -253,7 +253,7 @@ For more information about the individual attributes, see [which information an 
           },
           inherited: {
             type: "boolean",
-            description: "weather the provided description was inherited from the conrtributor",
+            description: "Weather the provided support information was inherited from the conrtributor",
             example: false
           }
         },
@@ -332,20 +332,22 @@ For more information about the individual attributes, see [which information an 
       },
       frontendFragments: {
         type: "object",
+        description: "This is a map of anchros to urls. The key of the map is the anchor of a frontend fragment.",
         additionalProperties: {
-          description:"The Anchor where the Frontend Fragment is to be embedded",
+          description:"The URL of the frontend fragment and additional properties for display in the mStudio.",
           type: "object",
           properties: {
             "additionalProperties": {
               type: "object",
               additionalProperties: {
                 type: "string"
+                description:"Some Information needed for the mStudio like the icon.",
               },
             },
             url: {
               type: "string",
               format: "uri",
-              example: "The Url of the Frontend Fragment"
+              example: "The URL of the frontend fragment."
             }
           }
         }
@@ -369,15 +371,15 @@ For more information about the individual attributes, see [which information an 
             priceInCents: {
               type: "integer",
               example: "5000",
-              description: "Price of the extension in Cents"
+              description: "Price of the extension in Cents."
             },
             variantKey: {
               type: "string",
-              description: "indentifiyer of the pricing variant"
+              description: "Identifier of the pricing variant."
             },
             name: {
               type: "string",
-              description: "name of the pricing variant"
+              description: "Name of the pricing variant."
             },
             description: {
               type: "string",
@@ -482,7 +484,7 @@ For more information about the individual attributes, see [which information an 
             },
           }, 
         },
-        description: "Requested Changes which have to be revied by a Mittwald Employee"
+        description: "Requested Changes which have to be revied by a Mittwald Employee."
       },
     },
   }}
