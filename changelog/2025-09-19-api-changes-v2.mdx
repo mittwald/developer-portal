@@ -1,0 +1,417 @@
+---
+title: Breaking (!) API changes for v2 API, September 12 to September 19
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Marketplace
+  - Contract
+  - App
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API introduces several changes including the removal of default values for request parameters, updates to parameter types, the addition of new optional properties, and the introduction of required properties in responses, enhancing the overall functionality and flexibility of the API.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The default value for the 'query' request parameter 'limit' was removed for the `GET /v2/contributors` operation. This is a breaking change.
+- The default value for the 'query' request parameter 'page' was removed for the `GET /v2/contributors` operation. This is a breaking change.
+- The type/format of the 'path' request parameter 'invoiceId' was changed from 'string'/'uuid' to 'string'/'', affecting both the `GET /v2/customers/{customerId}/invoices/{invoiceId}/file-access-token` and `GET /v2/invoices/{invoiceId}` operations. This is a breaking change.
+- The type/format of the 'path' request parameter 'orderId' was changed from 'string'/'uuid' to 'string'/'', affecting the `GET /v2/orders/{orderId}` operation. This is a breaking change.
+- The type/format of the 'path' request parameter 'projectId' was changed from 'string'/'uuid' to 'string'/'', affecting the `GET /v2/projects/{projectId}/orders` operation. This is a breaking change.
+- The minimum value was set to '1.00' for the 'query' request parameter 'limit' in the `GET /v2/contributors` operation.
+- The minimum value was set to '1.00' for the 'query' request parameter 'page' in the `GET /v2/contributors` operation.
+- A new optional request property 'installationPath' was added to the `POST /v2/app-installations/{appInstallationId}/actions/copy` operation.
+- An optional property '/items/defaultCronjobs' was added to the response with the '200' status for the `GET /v2/apps/{appId}/versions` operation.
+- An optional property 'defaultCronjobs' was added to the response with the '200' status for the `GET /v2/apps/{appId}/versions/{appVersionId}` operation.
+- An optional property '/items/defaultCronjobs' was added to the response with the '200' status for the `GET /v2/apps/{appId}/versions/{baseAppVersionId}/update-candidates` operation.
+- A new optional 'query' request parameter 'order' was added to the `GET /v2/contributors` operation.
+- A new optional 'query' request parameter 'sort' was added to the `GET /v2/contributors` operation.
+- A required property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/verificationRequested' was added to the response with the '200' status for the `GET /v2/contributors/{contributorId}` operation.
+- A required property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/verified' was added to the response with the '200' status for the `GET /v2/contributors/{contributorId}` operation.
+- A required property 'verificationRequested' was added to the response with the '200' status for the `PATCH /v2/contributors/{contributorId}` operation.
+- A required property 'verified' was added to the response with the '200' status for the `PATCH /v2/contributors/{contributorId}` operation.
+- A new endpoint `POST /v2/contributors/{contributorId}/verification-process` was added to start the verification process of a contributor.
+- An optional property 'variantKey' was added to the response with the '200' status for the `GET /v2/customers/{customerId}/extensions/{extensionId}` operation.
+- An optional property '/items/variantKey' was added to the response with the '200' status for the `GET /v2/extension-instances` operation.
+- A new optional request property 'variantKey' was added to the `POST /v2/extension-instances` operation.
+- An optional property 'variantKey' was added to the response with the '200' status for the `GET /v2/extension-instances/{extensionInstanceId}` operation.
+- A new 'mailArchive' enum value was added to the request property 'orderType' for the `POST /v2/order-previews` operation.
+- A new 'mailArchive' enum value was added to the request property 'orderType' for the `POST /v2/orders` operation.
+- A new optional request property 'installationPath' was added to the `POST /v2/projects/{projectId}/app-installations` operation.
+- An optional property 'variantKey' was added to the response with the '200' status for the `GET /v2/projects/{projectId}/extensions/{extensionId}` operation.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "List contributors"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', default value '1000.00' was removed
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'page', default value '1.00' was removed
+
+- for the 'query' request parameter 'limit', the min was set to '1.00'
+
+- for the 'query' request parameter 'page', the min was set to '1.00'
+
+- added the new optional 'query' request parameter 'order'
+
+- added the new optional 'query' request parameter 'sort'
+
+
+For details, refer to the <OperationLink operation="extension-list-contributors" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Request an Access Token for the Invoice file"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'invoiceId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="invoice-get-file-access-token" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get details of an Invoice"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'invoiceId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="invoice-detail" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get Order for Customer"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'orderId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="order-get-order" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get list of Orders of a Project"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
+
+
+For details, refer to the <OperationLink operation="order-list-project-orders" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Request a copy of an app installation"
+
+
+- added the new optional request property 'installationPath'
+
+
+For details, refer to the <OperationLink operation="app-request-appinstallation-copy" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app versions belonging to an app"
+
+
+- added the optional property '/items/defaultCronjobs' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-list-appversions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an app version"
+
+
+- added the optional property 'defaultCronjobs' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-get-appversion" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List update candidates belonging to an app version"
+
+
+- added the optional property '/items/defaultCronjobs' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-list-update-candidates-for-appversion" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a contributor"
+
+
+- added the required property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/verificationRequested' to the response with the '200' status
+
+- added the required property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.OwnContributor]/verified' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-contributor" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Patch contributor"
+
+
+- added the required property 'verificationRequested' to the response with the '200' status
+
+- added the required property 'verified' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="contributor-patch-contributor" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Start the verification process of a contributor"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="contributor-request-verification" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the extension instance of a specific customer and extension, if existing"
+
+
+- added the optional property 'variantKey' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-extension-instance-for-customer" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List extension instances"
+
+
+- added the optional property '/items/variantKey' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-list-extension-instances" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create an extension instance"
+
+
+- added the new optional request property 'variantKey'
+
+
+For details, refer to the <OperationLink operation="extension-create-extension-instance" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an extension instance"
+
+
+- added the optional property 'variantKey' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-extension-instance" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Preview Order"
+
+
+- added the new 'mailArchive' enum value to the request property 'orderType'
+
+- added '#/components/schemas/de.mittwald.v1.order.MailArchiveOrderPreview' to the 'orderData' request property 'oneOf' list
+
+- added '#/components/schemas/de.mittwald.v1.order.MailArchiveOrderPreviewResponse' to the response body 'anyOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="order-preview-order" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create an Order"
+
+
+- added the new 'mailArchive' enum value to the request property 'orderType'
+
+- added '#/components/schemas/de.mittwald.v1.order.MailArchiveOrder' to the 'orderData' request property 'oneOf' list
+
+
+For details, refer to the <OperationLink operation="order-create-order" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Request an app installation"
+
+
+- added the new optional request property 'installationPath'
+
+
+For details, refer to the <OperationLink operation="app-request-appinstallation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the extension instance of a specific project and extension, if existing"
+
+
+- added the optional property 'variantKey' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-extension-instance-for-project" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK Release v2.1.144
+
+The mittwald PHP SDK has released version v2.1.144, introducing several new features and updates. For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.144).
+
+#### Added Features
+
+- **Contributor Request Verification Feature**: A new functionality to initiate the verification process for contributors using a `ContributorRequestVerificationRequest` that requires a `contributorId`.
+- **Response Classes**: New classes have been added to handle various scenarios related to contributor verification:
+  - `ContributorRequestVerificationBadRequestResponse` for bad requests.
+  - `ContributorRequestVerificationDefaultResponse` for default error responses.
+  - `ContributorRequestVerificationTooManyRequestsResponse` for rate limit issues, with a detailed response body.
+
+- **Marketplace Client Updates**: The `MarketplaceClient` interface now includes a `contributorRequestVerification` method, which is implemented in `MarketplaceClientImpl`.
+
+#### Changes
+
+- **Own Contributor Schema**: The schema now includes `verificationRequested` and `verified` boolean properties to track the verification status of contributors.
+- **Extension Schema Updates**: Certain properties in the `Extension` and `OwnExtension` schemas have been marked as deprecated.
+
+### mittwald PHP SDK Release v2.1.143
+
+The latest release of the mittwald PHP SDK, version 2.1.143, introduces new features and enhancements for improved application installation management. 
+
+#### Added Features
+- **Installation Path Support**: A new `installationPath` property has been added to the `RequestAppinstallationRequest` and `RequestAppinstallationCopyRequest` classes. This feature allows users to specify the installation path for applications, providing greater flexibility and control over application installations.
+
+#### Changes
+- **RequestAppinstallationRequest**: 
+  - Added `installationPath` property to the request schema.
+
+- **RequestAppinstallationRequestBody**: 
+  - Introduced `installationPath` property of type `?string`.
+  - Added getter method for `installationPath`.
+  - Implemented `withInstallationPath` and `withoutInstallationPath` methods.
+  - Updated constructor and JSON serialization methods to incorporate `installationPath`.
+
+- **RequestAppinstallationCopyRequest**: 
+  - Added `installationPath` property to the request schema.
+
+- **RequestAppinstallationCopyRequestBody**: 
+  - Introduced `installationPath` property of type `?string`.
+  - Added getter method for `installationPath`.
+  - Implemented `withInstallationPath` and `withoutInstallationPath` methods.
+  - Updated constructor and JSON serialization methods to incorporate `installationPath`.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.143).
+
+### mittwald PHP SDK Release v2.1.142
+
+The mittwald PHP SDK has been updated to version v2.1.142. This release introduces several new features and improvements:
+
+#### Added Features
+- **Sorting and Ordering of Contributors**: The `ExtensionListContributorsRequest` now supports sorting by name and defining the sort order as ascending or descending.
+- **Default Cronjobs**: A new `DefaultCronjob` class has been added, enabling the definition of cron jobs with scheduled intervals, commands, and timeout configurations.
+
+#### Changes
+- **`ExtensionListContributorsRequest`**: 
+  - Minimum values are now set for `limit` and `page` fields.
+  - New `sort` and `order` fields allow customization of the contributor list response.
+  - Accessor methods for `limit` and `page` now return `null` when not set.
+  - New methods for setting and unsetting `sort` and `order` have been added.
+  
+- **`MarketplaceClient` Interface**:
+  - PHPDoc comments updated to clarify that `extensionListContributors` returns a list of contributors within the mStudio.
+
+- **`AppVersion` Class**:
+  - A new property `defaultCronjobs` and corresponding accessors have been added to manage default cronjob configurations.
+
+- **New Schema Classes**:
+  - `CronjobCommand` class introduced to define executable commands for cron jobs.
+  - `DefaultCronjob` class created to encapsulate properties like `active`, `command`, `description`, `interval`, `timeout`, and `urlTemplate`.
+
+- **General Improvements**:
+  - Validation checks added for fields in methods to ensure data integrity.
+  - Existing methods updated to accommodate new functionalities with improved handling of optional parameters.
+
+For more details, please visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.142).
+
+### mittwald PHP SDK Release v2.1.141
+
+The latest release of the mittwald PHP SDK, version v2.1.141, introduces several new features and changes. 
+
+#### Added Features
+- **Mail Archive Order Support**: New functionality has been implemented to manage mail archive orders, including validation and handling of mail address IDs and synchronization options.
+- **Variant Key for Extension Instances**: A `variantKey` parameter has been introduced for extension instances, providing greater flexibility in extension management.
+
+#### Breaking Changes
+- The UUID format validation for `invoiceId` and `orderId` has been removed in several request classes.
+
+#### Changes to Requests
+- The `InvoiceDetailRequest`, `InvoiceGetFileAccessTokenRequest`, `OrderGetOrderRequest`, and `OrderListProjectOrdersRequest` classes have been updated to remove the UUID format requirement for `invoiceId` and `orderId`.
+- Enhancements have been made to the `OrderCreateOrderRequest`, `OrderCreateOrderRequestBody`, and `OrderPreviewOrderRequest` to support new `MailArchiveOrder` and `MailArchiveOrderPreview` schemas.
+
+#### New Schemas
+- **MailArchiveOrder**: A new schema for creating mail archive orders.
+- **MailArchiveOrderPreview**: A schema for previewing mail archive orders.
+- **MailArchiveOrderPreviewResponse**: A response schema for mail archive order previews.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.141).
+
+### mittwald JavaScript SDK Release 4.229.0
+
+The mittwald JavaScript SDK has been updated to version 4.229.0. This release includes an updated generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.229.0).
+
+### mittwald JavaScript SDK Release 4.228.0
+
+The mittwald JavaScript SDK has been updated to version 4.228.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.228.0](https://github.com/mittwald/api-client-js/releases/tag/4.228.0).
+
+### mittwald JavaScript SDK Release 4.227.0
+
+The mittwald JavaScript SDK has been updated to version 4.227.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.227.0).
+
+### mittwald JavaScript SDK Release 4.226.0
+
+The mittwald JavaScript SDK has been updated to version 4.226.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.226.0).
+
+### mittwald JavaScript SDK Release 4.225.0
+
+The mittwald JavaScript SDK has been updated to version 4.225.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.225.0](https://github.com/mittwald/api-client-js/releases/tag/4.225.0).
+
+### mittwald JavaScript SDK Release 4.224.1
+
+The mittwald JavaScript SDK version 4.224.1 has been released. This update primarily addresses a security issue by bumping the axios dependency to fix CVE-2025-58754. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.224.1).
+
