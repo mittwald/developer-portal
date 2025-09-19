@@ -12,10 +12,15 @@ We will explore these in the rest of this page.
 
 ## Creating an Extension Instance
 
-When developing locally, you may need to test your Extension within the **mStudio**.  
-To do this, you must create an **Extension Instance**, which requires knowing the **Extension ID** of your Extension.
+:::note
+The **context** of your Extension must be set before creating an instance.
+:::
 
-:::Note
+When developing locally, you may need to test your Extension within the **mStudio**.\
+To do this, you must create an **Extension Instance**, which requires knowing the **Extension ID** of your Extension.\
+You can find the Extension ID in the "Entwicklung" tab of your Extension in the mStudio.
+
+:::note
 All Extension Instances within your contributor are free of charge.
 :::
 
@@ -23,37 +28,21 @@ During development, your extension will **not** appear on the Marketplace.
 
 ### ...via the mStudio (recommended) 
 
-1. Open the **mStudio**.  
-2. Navigate to the **Marketplace**.  
-3. Select any Extension.  
+1. Open the **mStudio**.
+2. Navigate to the **Marketplace**.
+3. Select any Extension.
 4. In the URL path, replace the Extension ID with the **Extension ID of your Extension**.
 
 ### ...via the API
 
-You can create an Extension Instance programmatically by using the  
+You can create an Extension Instance programmatically by using the
 <OperationLink operation="extension-add-extension-to-context" /> operation.
 
+For every required scope of your Extension, add an entry to the `scopes` field in your request body using the format:\
+`"area:(read|write|delete)"`.\
+You can find the scopes in the "**Berechtigungen**" section of your Extension in the mStudio.
 
-### Getting the Required Properties
-
-:::Note
-The **context** of your Extension must be set before creating an instance.
-:::
-
-- **Extension ID**:  
-  You can copy the Extension ID in the **Entwicklung** tab of your Extension in mStudio.
-
-- **Scopes**:  
-  In the **Permissions** section of mStudio, you will find the selected scopes.  
-  For every selected scope, add an entry to the `scopes` field in your request body using the format:\
-	`"area:(read|write|delete)"`. 
-
-![Extension permissions section](../../../resources/contributing/extensions/extension-permissions.jpg)
-
-:::Tip
-When creating an Extension Instance via the mStudio you dont have to worry about setting the correct context and
-selecting the correct scopes.
-:::
+![Extension permissions section](../../../resources/contributing/extensions/extension-berechtigungen.jpg)
 
 ### after publishing your Extension
 
