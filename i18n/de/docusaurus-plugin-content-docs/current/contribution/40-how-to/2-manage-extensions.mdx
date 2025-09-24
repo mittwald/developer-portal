@@ -12,7 +12,7 @@ Alternativ können alle Aktionen weiterhin über die REST API des mStudios ausge
 
 Die API-Routen zur Verwaltung von Extensions sind mittlerweile relativ stabil, können aber noch kleinere Anpassungen erfahren.
 
-Im Folgenden findest du eine Übersicht über die wichtigsten Operationen zur Verwaltung von Extensions:
+Es folgt du eine Übersicht über die wichtigsten Operationen zur Verwaltung von Extensions:
 
 ## Extension registrieren
 
@@ -29,20 +29,20 @@ Alternativ kann eine Extension über die folgende REST API-Operation registriert
 ## Extension bearbeiten
 
 Sobald eine Extension registriert ist, kann sie jederzeit im Entwickeln-Tab des mStudios bearbeitet werden.
-Dort kannst du Metadaten anpassen, Scopes ändern, Assets hochladen, Webhooks konfigurieren und mehr.
+Dort ist es möglich Metadaten anzupassen, Scopes zuändern, Assets hochzuladen, Webhooks zukonfigurieren und mehr.
 
 Alternativ können die Metadaten durch folgende REST API-Operation angepasst werden.
 
 <OperationLink operation="extension-patch-extension" />
 
-Wenn du die API verwendest, gibt es ein paar Besonderheiten zu beachten:
+Bei verwendung der API, gibt es ein paar Besonderheiten zu beachten:
 
-Die REST-Operation <OperationLink operation="extension-request-asset-upload" /> dient dazu, den Upload von Assets (z. B. Bildern für die Marktplatz-Galerie) anzufragen.
-Als Antwort erhältst du eine Asset Reference ID, die du anschließend mit der Operation <OperationLink operation="file-create-file" /> hochladen kannst.
-Assets lassen sich über <OperationLink operation="extension-remove-asset" /> auch wieder entfernen.
+Über die REST-Operation <OperationLink operation="extension-request-asset-upload" /> wird der Upload von Assets, also Bildern für die Galerie im Marktplatz, angefragt.
+Als Response erhältst du eine Asset Reference ID, die du verwenden kannst, um das Asset über die Operation <OperationLink operation="file-create-file" /> hochzuladen.
+Assets können über die Operation <OperationLink operation="extension-remove-asset" /> gelöscht werden.
 
-Der Upload eines Logos funktioniert analog:
-Nutze <OperationLink operation="extension-request-logo-upload" />, um den Upload anzufragen, und anschließend <OperationLink operation="file-create-file" />, um die Datei hochzuladen.
+Analog funktioniert das Hochladen eines Logos. Die Operation <OperationLink operation="extension-request-logo-upload" /> wird verwendet, um den Upload des Logos anzufragen.
+Das Logo wird dann über die Operation <OperationLink operation="file-create-file" /> hochgeladen.
 
 Der Extension Context kann ebenfalls bearbeitet werden, solange die Extension noch nicht zur Verifizierung eingereicht wurde.
 Diese Änderung erfolgt nun im entwicklen Tab des mStudio oder über die reguläre Bearbeiten-Route.
@@ -65,11 +65,9 @@ Diese Zeitspanne solltest du nutzen, um das Secret in deiner Extension auszutaus
 Sobald deine Extension fertig entwickelt und einsatzbereit ist, kannst du eine Überprüfung beantragen.
 Dies ist derzeit nur über die REST API möglich.
 
-Nutze dazu die Operation:
-
 <OperationLink operation="extension-request-extension-verification" />
 
-Wir prüfen den Inhalt deiner Extension und geben entweder Feedback oder schalten sie zur Veröffentlichung frei.
+Wir prüfen den Inhalt deiner Extension innerhalb von 3-5 werktagen und geben entweder Feedback oder schalten sie zur Veröffentlichung frei.
 
 ## Extension veröffentlichen
 
