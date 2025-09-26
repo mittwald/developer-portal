@@ -25,7 +25,9 @@ Dies kann entweder im Namen des mStudio Users, der die Extension bedient oder im
 
 Eine Extension muss dem mStudio zunächst bekannt gemacht werden, bevor sie verwendet werden kann.
 Dabei durchläuft sie mehrere Schritte, die im Folgenden erläutert werden.
-Jeder Schritt wird entweder durch den Contributor oder durch mittwald durchgeführt, indem bestimmte API-Operationen aufgerufen werden, die in der [Dokumentation zur Extensionverwaltung](../../how-to/manage-extensions) erklärt sind.
+
+Jeder Schritt wird entweder durch den Contributor oder durch mittwald durchgeführt, der Contributor kann seine Extension in seinem Entwickeln Tab bearbeiten sowie Verifizierung von Mittwald anfragen. Alternativ kann jeder Schritt auch über API-Operationen ausgeführt werden, wie in der [Dokumentation zur Extensionverwaltung](../../how-to/manage-extensions) erläutert.
+
 
 ```mermaid
 
@@ -104,12 +106,12 @@ Wenn der Contributor nicht reagiert oder sich nicht bereit erklärt, die Problem
 
 ## Aus welchen Informationen besteht eine Extension?
 
-Eine Extension besteht aus verschiedenen Informationen, die in der [Extension Referenz](../../reference/extensions) im Detail beschrieben sind.
-Im Folgenden soll ein grober Überblick gegeben werden.
+Eine Extension besteht aus verschiedenen Informationen, die in der [Extension-Referenz](../../reference/extensions) im Detail beschrieben sind.  
+Die folgenden Felder können im Entwickeln-Tab gepflegt werden und bestimmen, wie die Extension im mStudio dargestellt und verwendet wird.
 
 ### Name und Beschreibungen
 
-Eine Erweiterung verfügt über vier verschiedene Beschreibungsfelder.
+Jede Extension enthält vier Felder zur Beschreibung.
 
 Die ersten sichtbaren Elemente für den Nutzer sind der **Name** und der **SubTitle**.
 Der **Name** kann kreativ und ansprechend gestaltet werden – er muss nicht unbedingt beschreibend sein.
@@ -118,11 +120,6 @@ Der Untertitel bietet die Möglichkeit, den Hauptvorteil der Extension kurz und 
 Für eine etwas ausführlichere Erklärung kann die **Description** genutzt werden.
 Zusätzlich gibt es eine **Detailed Description**, die noch mehr Informationen enthält und Formatierungen erlaubt.
 Hier können Funktionen erläutert, Anleitungen bereitgestellt, weiterführende Links geteilt, ein Changelog integriert und vieles mehr beschrieben werden.
-
-### State
-
-Der **State** der Extension definiert, ob sie im mStudio sicht- und nutzbar sein soll.
-Das umfasst beispielsweise (jeweils unabhängig voneinander), ob sie generell aktiv ist, im Marktplatz angezeigt wird und ob sie zu einem Extension Context hinzugefügt werden kann.
 
 ### Tags
 
@@ -141,29 +138,61 @@ Dazu muss mindestens eine E-Mail-Adresse angegeben werden, an die sich Nutzer we
 
 ### Scopes
 
-Um über die REST-API des mStudios zugreifen, und dort **Domain Actions** durchführen zu können, benötigt eine Extension Berechtigungen, die vom Nutzer während der Installation bestätigt werden müssen.
+Um auf die REST-API des mStudios zuzugreifen und **Domain Actions** auszuführen, benötigt eine Extension bestimmte Berechtigungen.  
+Diese werden als [**Scopes**](../concepts/scopes) definiert und müssen bei der Installation durch die Nutzer:innen bestätigt werden.
 
-Diese Berechtigungen sind in Form von [**Scopes**](../concepts/scopes) definiert. Die Extension-Definition enthält eine Liste von Scopes, die die Berechtigungen der Extension beschreiben.
+Die Scopes können im Entwickeln-Tab eingetragen und verwaltet werden.
 
 ### Extension Context
 
-Eine Extension kann entweder zu einem Projekt oder zu einer Organisation hinzugefügt werden.
-Ein Contributor muss sich während der Konzept- oder Entwicklungsphase entscheiden, welcher Extension Context für die Extension sinnvoll ist.
-Die Entscheidung hängt von mehreren Faktoren, wie der Zielgruppe, dem Anwendungsfall aber auch dem Geschäftsmodell, ab.
+Eine Extension kann entweder einem Projekt oder einer Organisation hinzugefügt werden.  
+Der passende Extension Context sollte während der Entwicklung festgelegt werden.  
+Er richtet sich nach dem Anwendungsfall, der Zielgruppe und ggf. dem Geschäftsmodell.
+
+Der Context kann während der Entwicklungsphase geändert werden – dabei werden jedoch alle vorhandenen Extension Instances gelöscht.  
+Nach der Verifizierung ist der Context nicht mehr änderbar.
 
 ### Lifecycle Webhook Endpoints
 
-Eine Extension muss definieren, an welche URLs Lifecycle-Webhooks gesendet werden sollen.
-Über diese Webhooks wird der Extension mitgeteilt, welche Extension Instances existieren und in welchem Zustand sie sich befinden.
-Für jeden Lifecycle kann ein eigener Webhook-Endpoint konfiguriert werden.
-Für weitere Informationen zu Lifecycle-Webhooks siehe [Lifecycle Webhooks Konzept](../concepts/lifecycle-webhooks).
+Lifecycle Webhooks informieren die Extension über Änderungen an ihren Extension Instances, z.B. bei Erstellung oder Löschung.  
+Für jeden Lebenszyklus-Zeitpunkt kann ein eigener Webhook-Endpoint definiert werden.
+
+Die Konfiguration der Endpoints erfolgt im Entwickeln-Tab.  
+Die Angabe von Lifecycle Webhook Endpoints ist optional.
+
+Weitere Informationen finden sich im [Konzept zu Lifecycle Webhooks](../concepts/lifecycle-webhooks).
 
 ### Frontend
 
-Optional kann eine Extension externe Frontends, die als Einstiegspunkt zur Extension dienen und Frontend Fragmente, die direkt im mStudio eingebettet werden, definieren.
+Optional kann eine Extension externe Frontends oder eingebettete Frontend-Fragmente definieren.
 
-In beiden Fällen ist dein Frontend eine separate Anwendung.
-Weitere Informationen findest du unter [Frontend Entwicklung](../concepts/frontend-development).
+- **Externe Frontends** dienen als Einstiegspunkt zur Extension.
+- **Frontend-Fragmente** können direkt im mStudio eingebettet werden.
+
+In beiden Fällen handelt es sich um eigenständige Webanwendungen.  
+Details dazu finden sich unter [Frontend-Entwicklung](../concepts/frontend-development).
+
+### Änderungsanfragen
+
+Nach der Verifizierung sind sicherheitsrelevante Felder wie Scopes oder Webhook-URLs nicht direkt änderbar.  
+Um Änderungen vorzunehmen, kann über den Entwickeln-Tab eine Änderungsanfrage gestellt werden.
+
+Mittwald prüft solche Anfragen in der Regel innerhalb von 2–3 Werktagen.  
+Nach Freigabe bleibt die Extension für bestehende Nutzer:innen weiter nutzbar, neue Scopes müssen jedoch bestätigt werden.
+
+### Assets
+
+Assets sind Medieninhalte wie Screenshots oder Videos, die im Marktplatz angezeigt werden.  
+Sie dienen dazu, Funktionen oder die Benutzeroberfläche der Extension visuell zu präsentieren.
+
+Assets sind optional, können aber über den Entwickeln-Tab als Weitere Medien hochgeladen und sortiert werden.
+
+### Statistiken
+
+Im Marktplatz wird die Anzahl aktiver Extension Instances angezeigt. Dieser Wert wird abgerundet auf die nächstniedrigere Hunderter-Stufe dargestellt.
+
+Contributoren sehen im Entwickeln-Tab zusätzlich die **exakte Anzahl** ihrer aktiven Instances.
+
 
 ## Versionierung von Extensions
 
