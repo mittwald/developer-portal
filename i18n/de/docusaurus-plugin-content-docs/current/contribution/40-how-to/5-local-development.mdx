@@ -11,6 +11,45 @@ Neben der Möglichkeit, die mStudio API zu mocken, was sich ohne Kenntnisse der 
 existieren dennoch Mittel und Wege, um die lokale Entwicklung von Extensions zu erleichtern.
 Diese werden im Folgenden vorgestellt.
 
+## Erstellen einer Extension Instance
+
+:::note
+Es muss bereits ein [Context](../30-overview/1-extensions.mdx#extension-context) zugewiesen sein, bevor du eine Extension Instance erstellen kannst.
+:::
+
+Wenn du deine Extension entwickelst, kannst du sie nur innerhalb des **mStudio** vollständig testen.\
+Dazu musst du eine **Extension Instance** erstellen, wofür du die **Extension ID** deiner Extension kennen musst.\
+Die Extension ID kann unter dem "Entwicklung" Tab der Extension im mStudio eingesehen werden.
+
+:::note
+Alle Extension Instances innerhalb deines Contributors sind kostenlos.
+:::
+
+Während der Entwicklung wird deine Extension **nicht** im Marktplatz angezeigt.
+
+### ...über das mStudio (empfohlen)
+
+1. Öffne das **mStudio**.
+2. Navigiere zum **Marktplatz**.
+3. Wähle eine beliebige Extension aus.
+4. Ersetze in der URL-Pfad die Extension ID mit der **Extension ID deiner Extension**.
+
+### ...über die API
+
+Du kannst eine Extension Instance programmatisch mit der
+<OperationLink operation="extension-add-extension-to-context" /> Operation erstellen.
+
+Für jeden benötigten Scope musst du im `scopes`-Feld deines Request-Bodys einen Eintrag im folgenden Format hinzufügen:\
+`"bereich:(read|write|delete)"`.
+Die benötigten Scopes findest du in dem Bereich	"**Berechtigungen**" deiner Extension im mStudio.
+
+![Extension Berechtigungen Bereich](../../../../../../resources/contributing/extensions/extension-berechtigungen.jpg)
+
+### Nach der Veröffentlichung deiner Extension
+
+Nach der Veröffentlichung deiner Extension werden die Extension Instances, die du zu Testzwecken erstellt hast, **entfernt**.  
+Du kannst deine Extension jedoch jederzeit kostenlos zu deinen Contextes hinzufügen.
+
 ## Authentifizierte Domain Actions
 
 Um die Geschäftslogik im Zusammenspiel mit dem mStudio effektiv zu testen, ist es am einfachsten,
