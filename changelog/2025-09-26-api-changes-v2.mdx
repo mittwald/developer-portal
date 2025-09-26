@@ -1,0 +1,159 @@
+---
+title: API changes for v2 API, September 19 to September 26
+authors:
+  - machine
+tags:
+  - apiv2
+  - App
+  - Domain
+  - Contract
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API introduces several important changes, including the requirement of additional response properties for successful status codes in various endpoints, the addition of a new optional request parameter for listing ingresses, and the introduction of a new non-success response status for order creation.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- The response properties `/items/defaultCronjobs/items/command/interpreterTemplate` and `/items/defaultCronjobs/items/command/pathTemplate` have become required for the status '200' in the following operations:
+  - `GET /v2/apps/{appId}/versions` (List AppVersions belonging to an App)
+  - `GET /v2/apps/{appId}/versions/{appVersionId}` (Get an AppVersion)
+  - `GET /v2/apps/{appId}/versions/{baseAppVersionId}/update-candidates` (List update candidates belonging to an AppVersion)
+
+- A new optional request parameter named `hostnameSubstring` has been added to the `GET /v2/ingresses` operation (List Ingresses).
+
+- A non-success response with the status '422' has been added to the `POST /v2/orders` operation (Create an Order).
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "List app versions belonging to an app"
+
+
+- the response property '/items/defaultCronjobs/items/command/interpreterTemplate' became required for the status '200'
+
+- the response property '/items/defaultCronjobs/items/command/pathTemplate' became required for the status '200'
+
+
+For details, refer to the <OperationLink operation="app-list-appversions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an app version"
+
+
+- the response property 'defaultCronjobs/items/command/interpreterTemplate' became required for the status '200'
+
+- the response property 'defaultCronjobs/items/command/pathTemplate' became required for the status '200'
+
+
+For details, refer to the <OperationLink operation="app-get-appversion" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List update candidates belonging to an app version"
+
+
+- the response property '/items/defaultCronjobs/items/command/interpreterTemplate' became required for the status '200'
+
+- the response property '/items/defaultCronjobs/items/command/pathTemplate' became required for the status '200'
+
+
+For details, refer to the <OperationLink operation="app-list-update-candidates-for-appversion" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Ingresses"
+
+
+- added the new optional 'query' request parameter 'hostnameSubstring'
+
+
+For details, refer to the <OperationLink operation="ingress-list-ingresses" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create an Order"
+
+
+- added the non-success response with the status '422'
+
+
+For details, refer to the <OperationLink operation="order-create-order" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### Release Summary: mittwald PHP SDK v2.1.147
+
+The latest release of the mittwald PHP SDK, version v2.1.147, introduces several enhancements to improve the robustness and reliability of the `CronjobCommand` class. Key updates include:
+
+- **Required Fields in CronjobCommand**: The `interpreterTemplate` and `pathTemplate` fields are now mandatory, ensuring these critical attributes are always set.
+- **Constructor Improvements**: The constructor now requires `interpreterTemplate` and `pathTemplate` as parameters, ensuring they are initialized upon object creation.
+- **Type Consistency**: The types for `interpreterTemplate` and `pathTemplate` have been updated to non-nullable strings, enhancing type safety.
+- **Removal of Unused Methods**: The methods `withoutInterpreterTemplate` and `withoutPathTemplate` have been removed due to the mandatory nature of these fields.
+- **JSON Serialization Simplification**: The `toJson` method has been streamlined by removing unnecessary existence checks for `interpreterTemplate` and `pathTemplate`.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.147).
+
+### mittwald PHP SDK v2.1.146 Release Summary
+
+The mittwald PHP SDK has released version 2.1.146, which introduces enhanced error handling capabilities for order creation processes. This update includes support for managing `422 Unprocessable Entity` responses, providing more detailed feedback when order creation fails due to validation errors.
+
+#### New Features
+- **Enhanced Error Handling for Order Creation**: Improved support for `422 Unprocessable Entity` responses in the `OrderCreateOrder` process.
+
+#### Added
+- **OrderCreateOrderUnprocessableEntityResponse**: A new response class for handling semantically invalid order creation requests.
+- **OrderCreateOrderUnprocessableEntityResponseBody**: Encapsulates the body of the `422 Unprocessable Entity` response for structured error detail access.
+- **OrderCreateOrderUnprocessableEntityResponseBodyError**: Represents error details in the response body for unprocessable entity errors.
+
+#### Changes
+- Updated `ContractClientImpl` logic to appropriately manage `422` status codes by integrating with the new response class.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.146).
+
+### Release Summary: mittwald PHP SDK v2.1.145
+
+The latest release of the mittwald PHP SDK, version [v2.1.145](https://github.com/mittwald/api-client-php/releases/tag/v2.1.145), introduces new features and improvements:
+
+#### Added Features
+- **Hostname Substring Filtering**: A new feature allows filtering ingress requests based on a specified substring in the hostname. Users can now specify a `hostnameSubstring` that must conform to a defined pattern.
+
+#### Changes
+- A new property `hostnameSubstring` has been added to the `IngressListIngressesRequest` class.
+- The `hostnameSubstring` is validated against a regex pattern to ensure it adheres to specific character and length restrictions.
+- Getter and setter methods for `hostnameSubstring` have been implemented, allowing users to specify or remove this filter when creating requests.
+
+#### Additional Improvements
+- Request handling methods have been updated to incorporate the new `hostnameSubstring` property, ensuring its inclusion in various input/output operations.
+- Users can now use `withHostnameSubstring` and `withoutHostnameSubstring` methods to dynamically modify the state of requests, enhancing control over hostname queries. 
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.145).
+
+### mittwald JavaScript SDK Release 4.232.0
+
+The mittwald JavaScript SDK has been updated to version 4.232.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.232.0).
+
+### mittwald JavaScript SDK Release 4.231.0
+
+The mittwald JavaScript SDK has been updated to version 4.231.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.231.0).
+
+### mittwald JavaScript SDK Release 4.230.0
+
+The mittwald JavaScript SDK has been updated to version 4.230.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.230.0).
+
