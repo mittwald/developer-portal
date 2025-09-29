@@ -4,7 +4,6 @@ title: Extensions
 
 import SchemaWithExample from "../../../src/components/openapi/SchemaWithExample";
 
-Currently, we define Extensions with static YAML documents.
 The following schema describes the allowed and the required values.
 For more information about the individual attributes, see [which information an Extension consists of](../../overview/extensions#which-information-does-an-extension-consist-of).
 
@@ -14,16 +13,20 @@ For more information about the individual attributes, see [which information an 
   schema={{
     type: "object",
     required: [
-      "id",
-      "contributorId",
-      "name",
-      "subTitle",
-      "description",
-      "support",
-      "state",
-      "extensionContext",
-      "requiredScopes",
-      "externalComponents",
+        "id",
+        "name",
+        "contributorId",
+        "context",
+        "createdAt",
+        "description",
+        "scopes",
+        "assets",
+        "logoRefId",
+        "published",
+        "statistics",
+        "subTitle",
+        "support",
+        "tags"
     ],
     properties: {
       id: {
@@ -62,7 +65,7 @@ For more information about the individual attributes, see [which information an 
       description: {
         type: "string",
         description:
-          "Short description of the Extension. It should explain the Extension concisely in less than 300 characters",
+          "Short description of the Extension. It should explain the Extension concisely.",
         example:
           "An example Extension to show which information is needed to create an Extension",
       },
@@ -116,13 +119,13 @@ For more information about the individual attributes, see [which information an 
           },
         },
       },
-      extensionContext: {
+      context: {
         type: "string",
         enum: ["project", "customer"],
         description:
           "Defines, whether the Extension may be added to a project or an organization",
       },
-      requiredScopes: {
+      scopes: {
         type: "array",
         items: {
           type: "string",
@@ -130,7 +133,7 @@ For more information about the individual attributes, see [which information an 
         },
         description: "Permissions, the Extension requires",
       },
-      externalComponents: {
+      webhookUrls: {
         type: "object",
         required: ["backend"],
         properties: {
@@ -138,9 +141,9 @@ For more information about the individual attributes, see [which information an 
             type: "object",
             required: [
               "extensionAddedToContext",
-              "extensionInstanceUpdated",
-              "extensionInstanceSecretRotated",
               "extensionInstanceRemovedFromContext",
+              "extensionInstanceSecretRotated",
+              "extensionInstanceUpdated",
             ],
             properties: {
               extensionAddedToContext: {
@@ -150,6 +153,7 @@ For more information about the individual attributes, see [which information an 
                   url: {
                     type: "string",
                     format: "uri",
+                    minLength: 1,
                     description:
                       "The URL that the mStudio calls when the Extension is added to an Extension context. May contain placeholders",
                     example:
@@ -164,6 +168,7 @@ For more information about the individual attributes, see [which information an 
                   url: {
                     type: "string",
                     format: "uri",
+                    minLength: 1,
                     description:
                       "The URL that the mStudio calls when the Extension Instance is updated. May contain placeholders",
                     example:
@@ -178,6 +183,7 @@ For more information about the individual attributes, see [which information an 
                   url: {
                     type: "string",
                     format: "uri",
+                    minLength: 1,
                     description:
                       "The URL that the mStudio calls when the Extension Instance secret is rotated. May contain placeholders",
                     example:
@@ -192,6 +198,7 @@ For more information about the individual attributes, see [which information an 
                   url: {
                     type: "string",
                     format: "uri",
+                    minLength: 1,
                     description:
                       "The URL that the mStudio calls when the Extension Instance is removed from a context. May contain placeholders",
                     example:
@@ -201,24 +208,32 @@ For more information about the individual attributes, see [which information an 
               },
             },
           },
-          frontends: {
-            type: "object",
-            properties: {
-              index: {
-                type: "object",
-                required: ["url"],
-                properties: {
-                  url: {
-                    type: "string",
-                    format: "uri",
-                    description:
-                      "The URL that the user is directed to when they open the Extension in the mStudio. May contain placeholders",
-                    example: "https://example.org/:extensionInstanceId",
-                  },
+        },
+      },
+      externalFrontends: {
+        type: "array",
+        items: {
+          type: "object",
+          properties:{
+            index: {
+              type: "object",
+              required: ["url"],
+              properties: {
+                name: {
+                  type: "string",
+                  description: "The name the frontend will have in the list of Extension Frontends",
+                  example: "Example"
+                },
+                url: {
+                  type: "string",
+                  format: "uri",
+                  description:
+                    "The URL that the user is directed to when they open the Extension in the mStudio. May contain placeholders",
+                  example: "https://example.org/:extensionInstanceId",
                 },
               },
             },
-          },
+          }
         },
       },
       support: {
@@ -236,6 +251,11 @@ For more information about the individual attributes, see [which information an 
             description: "Phone number that may be used for support requests",
             example: "+49 170 123456",
           },
+          inherited: {
+            type: "boolean",
+            description: "Weather the provided support information was inherited from the conrtributor",
+            example: false
+          }
         },
       },
       tags: {
@@ -246,25 +266,225 @@ For more information about the individual attributes, see [which information an 
         },
         description: "Tags that describe the Extension",
       },
-      state: {
+      published: {
+        type: "boolean",
+        description: "Weather this Extension has been published"
+      },
+      verificationRequested: {
+        type: "boolean",
+        description: "Weather verification of the Extension has been requested"
+      },
+      verified: {
+        type: "boolean",
+        description: "Weather the Extension has been verified"
+      },
+      logoRefId: {
+        type: "string",
+        format: "uuid",
+        description: "The fileId of the the Logo",
+        example: "9b2af58a-2625-41eb-adc6-bb6f7be9b90a"
+      },
+      functional: {
+        type: "boolean",
+        description: "weather the extension is functional"
+      },
+      assets: {
+        type: "array",
+        items: {
+          type: "object",
+          required: ["id", "index", "assetType"],
+          properties: {
+            id:{
+              type: "string",
+              format: "uuid",
+              description: "The fileId of the asset",
+              example: "709049e1-f283-4ef8-a35b-1b2f672852b0"
+            },
+            index:{
+              type: "integer",
+              description: "The index of the asset. Does not have to be successive. Can be used to order the assets.",
+              example: 1
+            },
+            assetType:{
+              type: "string",
+              enum: ["image", "video"],
+              example: "image"
+            }
+          }
+        }
+      },
+      secrets: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            secretId: {
+              type: "string",
+              format: "uuid",
+              example: "6b87abc1-f0fd-4518-a21e-7c8bca3c7c25"
+            },
+            usableUntil:{
+              type: "string",
+              format: "date-time"
+            }
+          }
+        }
+      },
+      frontendFragments: {
+        type: "object",
+        description: "This is a map of anchros to urls. The key of the map is the anchor of a frontend fragment.",
+        additionalProperties: {
+          description:"The URL of the frontend fragment and additional properties for display in the mStudio.",
+          type: "object",
+          properties: {
+            "additionalProperties": {
+              type: "object",
+              additionalProperties: {
+                type: "string",
+                description:"Some Information needed for the mStudio like the icon.",
+              },
+            },
+            url: {
+              type: "string",
+              format: "uri",
+              example: "The URL of the frontend fragment."
+            }
+          }
+        }
+      },
+      extensionStatistics: {
         type: "object",
         properties: {
-          hidden: {
-            type: "boolean",
-            description:
-              "Defines, whether this Extension is visible in the mStudio",
+          amountOfInstances: {
+            type: "integer",
+            example: "42",
+            description: "The amount of instances for this extension. Accurate for the Contributor. Publicly rounded to the next lower hundred."
+          }
+        }
+      },
+      pricing: {
+        type: "array",
+        items: {
+          type: "object",
+          required: [ "priceInCents", "variantKey" ],
+          properties: {
+            priceInCents: {
+              type: "integer",
+              example: "5000",
+              description: "Price of the extension in Cents."
+            },
+            variantKey: {
+              type: "string",
+              description: "Identifier of the pricing variant."
+            },
+            name: {
+              type: "string",
+              description: "Name of the pricing variant."
+            },
+            description: {
+              type: "string",
+              description: "description of the provided services"
+            },
+            isBookingStopped: {
+              type: "boolean",
+              description: "Weather the Variant can be installed",
+              example: false
+            }
+          }
+        }
+      },
+      requestedChanges: {
+        type: "object",
+        properties: {
+          context:{
+            type: "string",
+            enum: ["project", "customer"]
           },
-          disabled: {
-            type: "boolean",
-            description:
-              "Defines, whether Instances of this Extension may exist",
+          scopes: {
+            type: "array",
+            items: {
+              type: "string"
+            }
           },
-          blocked: {
-            type: "boolean",
-            description:
-              "Defines, whether this Extension may be added to a context",
-          },
+          webhookUrls: {
+            type: "object",
+            required: ["backend"],
+            properties: {
+              backend: {
+                type: "object",
+                required: [
+                  "extensionAddedToContext",
+                  "extensionInstanceRemovedFromContext",
+                  "extensionInstanceSecretRotated",
+                  "extensionInstanceUpdated",
+                ],
+                properties: {
+                  extensionAddedToContext: {
+                    type: "object",
+                    required: ["url"],
+                    properties: {
+                      url: {
+                        type: "string",
+                        format: "uri",
+                        minLength: 1,
+                        description:
+                          "The URL that the mStudio calls when the Extension is added to an Extension context. May contain placeholders",
+                        example:
+                          "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/added",
+                      },
+                    },
+                  },
+                  extensionInstanceUpdated: {
+                    type: "object",
+                    required: ["url"],
+                    properties: {
+                      url: {
+                        type: "string",
+                        format: "uri",
+                        minLength: 1,
+                        description:
+                          "The URL that the mStudio calls when the Extension Instance is updated. May contain placeholders",
+                        example:
+                          "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/updated",
+                      },
+                    },
+                  },
+                  extensionInstanceSecretRotated: {
+                    type: "object",
+                    required: ["url"],
+                    properties: {
+                      url: {
+                        type: "string",
+                        format: "uri",
+                        minLength: 1,
+                        description:
+                          "The URL that the mStudio calls when the Extension Instance secret is rotated. May contain placeholders",
+                        example:
+                          "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/secret-rotated",
+                      },
+                    },
+                  },
+                  extensionInstanceRemovedFromContext: {
+                    type: "object",
+                    required: ["url"],
+                    properties: {
+                      url: {
+                        type: "string",
+                        format: "uri",
+                        minLength: 1,
+                        description:
+                          "The URL that the mStudio calls when the Extension Instance is removed from a context. May contain placeholders",
+                        example:
+                          "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/removed",
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          }, 
         },
+        description: "Requested Changes which have to be revied by a Mittwald Employee."
       },
     },
   }}

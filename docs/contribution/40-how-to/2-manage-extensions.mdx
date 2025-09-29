@@ -4,31 +4,34 @@ title: How to manage extensions?
 
 import OperationLink from "@site/src/components/OperationLink";
 
-Extensions can currently only be managed via the mStudio's REST API, after you have [registered as a contributor](../become-contributor).
-However, mittwald is currently working on a comprehensive management interface for Extensions inside mStudio.
-Please note that the marketplace is still a very new feature, and unlike the rest of the REST API,
-we currently cannot guarantee the stability of the API routes related to the marketplace and Extension management.
-The paths, as well as request and response formats, are still subject to change.
+Extensions can be managed primarily through the **mStudio** interface, available in the Entwickeln-Tab for [registered contributors](../become-contributor).  
 
-Below are the most important routes needed to manage an Extension via the API.
+Alternatively, all actions can still be performed via the mStudio's REST API.  
+
+The API routes related to Extension management are now relatively stable, but may still be subject to minor adjustments over time.
+
+Below is an overview of the key API operations used to manage Extensions.
 
 ## Register Extension
 
-An Extension can be registered using the following REST API operation:
+To register a new Extension, go to the Entwickeln-Tab in the mStudio and click **"Anlegen"**.  
+Only a name is required to get started.
+
+Alternatively, an Extension can be registered using the following REST API operation:
 
 <OperationLink operation="extension-register-extension" />
 
-Only a name is required.
-If you need an Extension Instance during development, you also have to set an Extension Context.
-This context can be changed later, as long as the Extension has not been verified.
+If you want to test your Extension in a real context during development, you can set an Extension Context during registration.  
+This context can still be changed later, as long as the Extension has not been submitted for verification.
 
 ## Edit Extension
 
-After registration, the Extension can be edited using the following operation:
+Once registered, an Extension can be edited at any time in the *Entwickeln-Tab* of the mStudio.  
+Here you can update metadata, adjust scopes, upload assets, configure webhooks, and more.
 
 <OperationLink operation="extension-patch-extension" />
 
-There are a few exceptions to note.
+When using the API there are a few exceptions to note.
 
 The REST operation <OperationLink operation="extension-request-asset-upload" /> is used to request the upload of assets, such as images for the marketplace gallery.
 As a response, you'll receive an Asset Reference ID, which you can use to upload the asset using the <OperationLink operation="file-create-file" /> operation.
@@ -37,11 +40,13 @@ Assets can be deleted via the <OperationLink operation="extension-remove-asset" 
 Uploading a logo works similarly. The operation <OperationLink operation="extension-request-logo-upload" /> is used to request the upload of the logo.
 The logo is then uploaded using the <OperationLink operation="file-create-file" /> operation.
 
-The <OperationLink operation="extension-change-context" /> operation allows changing the Extension Context of an Extension.
-This route can only be used before the Extension is verified.
-Depending on whether Extension Instances already exist, the change will either take effect immediately or all Extension Instances will be removed first before applying the change.
+The Extension Context can also be modified, as long as the Extension has not yet been submitted for verification.
+This change can now be made either through the Entwickeln-Tab in mStudio or via the standard edit route.
+Depending on whether Extension Instances already exist, the change will either take effect immediately or all Extension Instances will be removed before applying it.
 
-For developing frontend fragments, a global Extension Secret is required.
+For developing frontend fragments, a global Extension Secret is required. <br/>
+Currently, generating an Extension Secret is only possible via the API. 
+
 To generate one, use the <OperationLink operation="extension-generate-extension-secret" /> operation.
 The secret will be returned in the response and can then be used in the Extension, e.g., via environment variables.
 If the operation is called again, a new secret will be generated.
@@ -51,15 +56,19 @@ This time window should be used to replace the secret within the Extension.
 ## Verify Extension
 
 Once your Extension is fully developed and ready for use,
-you can request a verification via our REST API.
+you can request a verification only via our REST API.
 
 This is done using the <OperationLink operation="extension-request-extension-verification" /> operation.
 
-We will review the content of your Extension and either verify it or respond with feedback.
+We will review the content of your Extension within 3-5 business days and either verify it or respond with feedback.
 
 ## Publish Extension
 
 Once your Extension has been verified, it can be published.
+You can publish your extension via <OperationLink operation="extension-set-extension-published-state" />.
+
+This operation also allows for the withdrawal of Extensions. 
+This might be useful if you don't want any more new Extension Instances for a certain time. 
 This is a separate step to ensure you retain control over when the Extension becomes available to all mStudio users.
 
 To publish the Extension, call the <OperationLink operation="extension-set-extension-published-state" /> operation.
