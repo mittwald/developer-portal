@@ -256,23 +256,18 @@ If you're not using the Terraform TYPO3 module, you can manually initialize a So
    cd /tmp/ext-solr/Resources/Private/Solr/configsets/ext_solr_13_0_0/conf
    ```
 
-2. Create the core directory structure in the Solr container:
-
-   ```bash
-   mw container exec <CONTAINER-ID> 'mkdir -p /var/solr/data/typo3/conf'
-   mw container exec <CONTAINER-ID> 'mkdir -p /var/solr/data/typo3/lib'
-   ```
-
-3. Copy the configuration files to the Solr container:
+2. Copy the configuration files to the Solr container:
 
    ```bash
    # Copy main configuration files
-   mw container cp -r /tmp/ext-solr/Resources/Private/Solr/configsets/ext_solr_13_0_0/conf <CONTAINER-ID>:/var/solr/data/typo3/conf
+   mw container cp -r /tmp/ext-solr/Resources/Private/Solr/configsets/ext_solr_13_0_0/conf <CONTAINER-ID>:/var/solr/data/typo3/
+   ```
 
-   # Copy language-specific files (example for English)
-   mw container cp -r /tmp/ext-solr/Resources/Private/Solr/configsets/ext_solr_13_0_0/conf/english <CONTAINER-ID>:/var/solr/data/typo3/conf/english
+3. Copy the TYPO3 Solr plugin JAR file:
 
+   ```bash
    # Copy the TYPO3 Solr plugin JAR file
+   mw container exec <CONTAINER-ID> 'mkdir -p /var/solr/data/typo3/lib'
    mw container cp /tmp/ext-solr/Resources/Private/Solr/typo3lib/solr-typo3-plugin-6.0.0.jar <CONTAINER-ID>:/var/solr/data/typo3/lib/
    ```
 
