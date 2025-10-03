@@ -1,0 +1,130 @@
+---
+title: API changes for v2 API, September 26 to October 3
+authors:
+  - machine
+tags:
+  - apiv2
+  - Domain
+  - Cronjob
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API introduces several enhancements, including the addition of optional properties for cronjob management, a new request parameter for ingress listing, and the enforcement of a maximum length for the 'hostnameSubstring' parameter.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- For the `GET /v2/ingresses` operation, the maximum length for the 'query' request parameter 'hostnameSubstring' has been set to '253'. This change is a warning as it may require client support for this restriction.
+- The optional property 'failedExecutionAlertThreshold' has been added to the response with the '200' status for the `GET /v2/cronjobs/{cronjobId}` operation.
+- A new optional request property 'failedExecutionAlertThreshold' has been added for both the `PATCH /v2/cronjobs/{cronjobId}` and `POST /v2/projects/{projectId}/cronjobs` operations.
+- The optional property '/items/failedExecutionAlertThreshold' has been added to the response with the '200' status for the `GET /v2/projects/{projectId}/cronjobs` operation.
+- A new optional 'query' request parameter 'appInstallationId' has been added for the `GET /v2/ingresses` operation.
+- The pattern '^[a-zA-Z0-9\\-\\.äöüÄÖÜß]{3,253}$' has been removed from the 'query' request parameter 'hostnameSubstring' for the `GET /v2/ingresses` operation.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "List Ingresses"
+
+
+- for the 'query' request parameter 'hostnameSubstring', the maxLength was set to '253'
+
+- added the new optional 'query' request parameter 'appInstallationId'
+
+- removed the pattern '^[a-zA-Z0-9\-\.äöüÄÖÜß]{3,253}$' from the 'query' request parameter 'hostnameSubstring'
+
+
+For details, refer to the <OperationLink operation="ingress-list-ingresses" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a cronjob"
+
+
+- added the optional property 'failedExecutionAlertThreshold' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="cronjob-get-cronjob" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a cronjob"
+
+
+- added the new optional request property 'failedExecutionAlertThreshold'
+
+
+For details, refer to the <OperationLink operation="cronjob-update-cronjob" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List cronjobs belonging to a Project"
+
+
+- added the optional property '/items/failedExecutionAlertThreshold' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="cronjob-list-cronjobs" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a cronjob"
+
+
+- added the new optional request property 'failedExecutionAlertThreshold'
+
+
+For details, refer to the <OperationLink operation="cronjob-create-cronjob" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK Release v2.1.148
+
+The mittwald PHP SDK has been updated to version v2.1.148. This release introduces several new features and changes aimed at improving the functionality and monitoring capabilities of the SDK.
+
+#### Features
+
+- **New `failedExecutionAlertThreshold` Field**: A new integer field has been added to the Cronjob functionality. This field allows users to specify a threshold for failed executions that will trigger an alert, enhancing the monitoring capabilities for scheduled tasks.
+
+#### Changes
+
+- **UpdateCronjobRequest**: 
+  - Added the `failedExecutionAlertThreshold` property, which is an integer with a minimum value of 0.
+
+- **UpdateCronjobRequestBody**:
+  - Introduced the `failedExecutionAlertThreshold` with getter and setter methods.
+  - Added validation for setting the `failedExecutionAlertThreshold`.
+  - Updated constructor and serialization logic to accommodate the new field.
+
+- **IngressListIngressesRequest**:
+  - Added a new property `appInstallationId` of type string to differentiate between requests for different application installations.
+
+- **Cronjob Schema**:
+  - Introduced `failedExecutionAlertThreshold` to maintain consistency across requests.
+
+- **CronjobRequest**:
+  - Added `failedExecutionAlertThreshold` with respective validation and serialization logic.
+
+These updates provide enhanced functionality for managing cronjob alert thresholds and offer better context for managing ingress requests across different applications.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.148).
+
+### mittwald JavaScript SDK Release 4.233.0
+
+The mittwald JavaScript SDK has been updated to version 4.233.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the full release notes on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.233.0).
+
