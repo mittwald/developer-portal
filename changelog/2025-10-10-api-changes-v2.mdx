@@ -1,0 +1,629 @@
+---
+title: Breaking (!) API changes for v2 API, October 3 to October 10
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Contract
+  - Cronjob
+  - App
+  - Marketplace
+  - Customer
+  - LeadFyndr
+  - Backup
+  - Project
+  - Container
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week's update to the mittwald API introduces several enhancements, including the addition of default values for request parameters, increased minimum values for certain parameters, new optional properties in responses, and the introduction of multiple new endpoints.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- For the `GET /v2/orders` operation, the following changes have been made:
+  - A default value of `1000.00` was added for the `query` request parameter `limit`.
+  - A default value of `0.00` was added for the `query` request parameter `skip`.
+  - The minimum value for the `query` request parameter `limit` was increased from `0.00` to `1.00`.
+  - The minimum value for the `query` request parameter `page` was increased from `0.00` to `1.00`. **This is a breaking change.**
+
+- For the `POST /v2/projects/{projectId}/cronjobs` operation, the minimum value for the request property `failedExecutionAlertThreshold` was increased to `1.00`. **This is a breaking change.**
+
+- The following optional properties were added to the response with the `200` status for various operations:
+  - `deletionRequested` for `GET /v2/app-installations`.
+  - `additionalItems/items/termination/explanation`, `baseItem/termination/explanation`, and `termination/explanation` for `GET /v2/certificates/{certificateId}/contract`.
+  - `additionalItems/items/termination/explanation`, `baseItem/termination/explanation`, and `termination/explanation` for `GET /v2/contracts/{contractId}`.
+  - `termination/explanation` for `GET /v2/contracts/{contractId}/base-items`.
+  - `termination/explanation` for `GET /v2/contracts/{contractId}/items/{contractItemId}`.
+  - `explanation` for `POST /v2/contracts/{contractId}/items/{contractItemId}/termination`.
+  - `explanation` for `POST /v2/contracts/{contractId}/termination`.
+  - `additionalItems/items/termination/explanation` for `GET /v2/customers/{customerId}/contracts`.
+  - `reissuedBy` for `GET /v2/customers/{customerId}/invoices`.
+  - `additionalItems/items/termination/explanation`, `baseItem/termination/explanation`, and `termination/explanation` for `GET /v2/projects/{projectId}/contract`.
+  - `additionalItems/items/termination/explanation`, `baseItem/termination/explanation`, and `termination/explanation` for `GET /v2/servers/{serverId}/contract`.
+  - `additionalItems/items/termination/explanation` for `GET /v2/domains/{domainId}/contract`.
+  - `additionalItems/items/termination/explanation` for `GET /v2/mail-addresses/{mailAddressId}/contract`.
+  - `additionalItems/items/termination/explanation` for `GET /v2/customers/{customerId}/lead-fyndr-profile/contract`.
+
+- The following required properties were added to the response with the `200` status for various operations:
+  - `/items/pricing/oneOf[#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricePlanStrategy]/items/isBookingStopped` for `GET /v2/contributors/{contributorId}/extensions`.
+  - `/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Extension]/pricing/oneOf[#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricePlanStrategy]/items/isBookingStopped` for `GET /v2/extensions/{extensionId}`.
+  - `/items/failedExecutionAlertThreshold` for `GET /v2/projects/{projectId}/cronjobs`.
+  - `/items/pricing/oneOf[#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricePlanStrategy]/items/isBookingStopped` for `GET /v2/contributors/{contributorId}/extensions/{extensionId}`.
+
+- New optional request parameters `page` were added for the following operations:
+  - `GET /v2/customer-invites`.
+  - `GET /v2/customer-memberships`.
+  - `GET /v2/project-invites`.
+  - `GET /v2/project-memberships`.
+
+- The following endpoints were added:
+  - `DELETE /v2/contributors/{contributorId}/verification-process` to cancel the verification process of a contributor.
+  - `POST /v2/customers/{customerId}/unlocked-leads-export` to create an export of unlocked leads for the given customerId.
+  - `GET /v2/customers/{customerId}/unlocked-leads-exports` to get unlocked leads export history for the given customerId.
+  - `GET /v2/stacks/{stackId}/volumes` to list volumes belonging to a stack.
+
+- The following enum values were removed from response properties:
+  - The empty enum value from the `export/phase` response property for the `200` status in `GET /v2/project-backups/{projectBackupId}`.
+  - The empty enum value from the `/items/export/phase` response property for the `200` status in `GET /v2/projects/{projectId}/backups`.
+  - The empty enum value from the `export/phase` response property for the `201` status in `POST /v2/projects/{projectId}/backups`.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Get list of Orders"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', default value '1000.00' was added
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'skip', default value '0.00' was added
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', the min was increased from '0.00' to '1.00'
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'page', the min was increased from '0.00' to '1.00'
+
+
+For details, refer to the <OperationLink operation="order-list-orders" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a cronjob"
+
+
+- ⚠️ **Breaking:** the 'failedExecutionAlertThreshold' request property's min was increased to '1.00'
+
+
+For details, refer to the <OperationLink operation="cronjob-create-cronjob" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app installations that a user has access to"
+
+
+- added the optional property '/items/deletionRequested' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations-for-user" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an app installation"
+
+
+- added the optional property 'deletionRequested' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-get-appinstallation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the Contract for the given Certificate"
+
+
+- added the optional property 'additionalItems/items/termination/explanation' to the response with the '200' status
+
+- added the optional property 'baseItem/termination/explanation' to the response with the '200' status
+
+- added the optional property 'termination/explanation' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-certificate" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Returns the Contract with the given ID"
+
+
+- added the optional property 'additionalItems/items/termination/explanation' to the response with the '200' status
+
+- added the optional property 'baseItem/termination/explanation' to the response with the '200' status
+
+- added the optional property 'termination/explanation' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the BaseItem of the Contract with the given ID"
+
+
+- added the optional property 'termination/explanation' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="contract-get-base-item-of-contract" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the ContractItem with the given ID"
+
+
+- added the optional property 'termination/explanation' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-item" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Schedule the Termination of a ContractItem"
+
+
+- added the optional property 'explanation' to the response with the '201' status
+
+
+For details, refer to the <OperationLink operation="contract-terminate-contract-item" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Schedule the Termination of a Contract"
+
+
+- added the new optional request property 'explanation'
+
+- added the optional property 'explanation' to the response with the '201' status
+
+
+For details, refer to the <OperationLink operation="contract-terminate-contract" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Extensions of own contributor"
+
+
+- added the required property '/items/pricing/oneOf[#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricePlanStrategy]/items/isBookingStopped' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-list-own-extensions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get Extension of own contributor"
+
+
+- added the required property 'pricing/oneOf[#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricePlanStrategy]/items/isBookingStopped' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-own-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Patch Extension"
+
+
+- added the required property 'pricing/oneOf[#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricePlanStrategy]/items/isBookingStopped' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-patch-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Cancel the verification-process of a contributor"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="contributor-cancel-verification" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a cronjob"
+
+
+- the response property 'failedExecutionAlertThreshold' became required for the status '200'
+
+
+For details, refer to the <OperationLink operation="cronjob-get-cronjob" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List customer invites belonging to the executing user"
+
+
+- added the new optional 'query' request parameter 'page'
+
+
+For details, refer to the <OperationLink operation="customer-list-customer-invites" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List customer memberships belonging to the executing user"
+
+
+- added the new optional 'query' request parameter 'page'
+
+
+For details, refer to the <OperationLink operation="customer-list-customer-memberships" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return a list of Contracts for the given Customer"
+
+
+- added the optional property '/items/additionalItems/items/termination/explanation' to the response with the '200' status
+
+- added the optional property '/items/baseItem/termination/explanation' to the response with the '200' status
+
+- added the optional property '/items/termination/explanation' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="contract-list-contracts" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Invoices of a Customer"
+
+
+- added the optional property '/items/reissuedBy' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="invoice-list-customer-invoices" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get details of an Invoice"
+
+
+- added the optional property 'reissuedBy' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="deprecated-invoice-detail-of-invoice" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the Contract for the given LeadFyndrProfile"
+
+
+- added the optional property 'additionalItems/items/termination/explanation' to the response with the '200' status
+
+- added the optional property 'baseItem/termination/explanation' to the response with the '200' status
+
+- added the optional property 'termination/explanation' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-lead-fyndr" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create an export of unlocked leads for the given customerId"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="leadfyndr-create-leads-export" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get unlocked leads export history for the given customerId"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="leadfyndr-get-leads-export-history" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the Contract for the given Domain"
+
+
+- added the optional property 'additionalItems/items/termination/explanation' to the response with the '200' status
+
+- added the optional property 'baseItem/termination/explanation' to the response with the '200' status
+
+- added the optional property 'termination/explanation' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-domain" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Extensions"
+
+
+- added the required property '/items/pricing/oneOf[#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricePlanStrategy]/items/isBookingStopped' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-list-extensions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an Extension"
+
+
+- added the required property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Extension]/pricing/oneOf[#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricePlanStrategy]/items/isBookingStopped' to the response with the '200' status
+
+- added the required property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.UnpublishedExtension]/pricing/oneOf[#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricePlanStrategy]/items/isBookingStopped' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get details of an Invoice"
+
+
+- added the optional property 'reissuedBy' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="invoice-detail" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the Contract for the given Mail Address"
+
+
+- added the optional property 'additionalItems/items/termination/explanation' to the response with the '200' status
+
+- added the optional property 'baseItem/termination/explanation' to the response with the '200' status
+
+- added the optional property 'termination/explanation' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-mail-address" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a project backup"
+
+
+- removed the '' enum value from the 'export/phase' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="backup-get-project-backup" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List ProjectInvites belonging to the executing user"
+
+
+- added the new optional 'query' request parameter 'page'
+
+
+For details, refer to the <OperationLink operation="project-list-project-invites" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List ProjectMemberships belonging to the executing user"
+
+
+- added the new optional 'query' request parameter 'page'
+
+
+For details, refer to the <OperationLink operation="project-list-project-memberships" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app installations belonging to a Project"
+
+
+- added the optional property '/items/deletionRequested' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Backups belonging to a Project"
+
+
+- removed the '' enum value from the '/items/export/phase' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="backup-list-project-backups" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a Backup of a Project"
+
+
+- removed the '' enum value from the 'export/phase' response property for the response status '201'
+
+
+For details, refer to the <OperationLink operation="backup-create-project-backup" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the Contract for the given Project"
+
+
+- added the optional property 'additionalItems/items/termination/explanation' to the response with the '200' status
+
+- added the optional property 'baseItem/termination/explanation' to the response with the '200' status
+
+- added the optional property 'termination/explanation' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-project" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List cronjobs belonging to a Project"
+
+
+- the response property '/items/failedExecutionAlertThreshold' became required for the status '200'
+
+
+For details, refer to the <OperationLink operation="cronjob-list-cronjobs" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the Contract for the given Server"
+
+
+- added the optional property 'additionalItems/items/termination/explanation' to the response with the '200' status
+
+- added the optional property 'baseItem/termination/explanation' to the response with the '200' status
+
+- added the optional property 'termination/explanation' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-server" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Volumes belonging to a Stack"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-list-stack-volumes" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK Release v2.1.152
+
+The latest release of the mittwald PHP SDK, [v2.1.152](https://github.com/mittwald/api-client-php/releases/tag/v2.1.152), introduces several enhancements aimed at improving the clarity and communication of contract terminations.
+
+#### Added Features
+- **Explanation Field**: A new `explanation` field has been added to both the contract termination request and response bodies. This allows users to specify and understand the reasons behind contract or contract item terminations.
+
+#### Changes
+- **TerminateContract**:
+  - **TerminateContractCreatedResponse & Body**: Now includes an `explanation` property for additional context.
+  - **TerminateContractRequest & Body**: The request body now supports the `explanation` property for more detailed termination requests.
+
+- **TerminateContractItem**:
+  - **TerminateContractItemCreatedResponse & Body**: The `explanation` property has been incorporated for item termination responses.
+
+- **Termination Schema**: The schema now includes an `explanation` field to enhance the information provided during contract terminations.
+
+These updates aim to enhance the user experience by providing more detailed information during contract and item termination processes.
+
+### mittwald PHP SDK Release v2.1.151
+
+The latest release of the mittwald PHP SDK, version [v2.1.151](https://github.com/mittwald/api-client-php/releases/tag/v2.1.151), introduces new features and updates to enhance the functionality of the Marketplace API.
+
+#### New Features
+- **Contributor Cancellation Verification**: 
+  - Added the ability to cancel the verification process of a contributor within the Marketplace client.
+  - Introduced new classes to handle various response scenarios:
+    - `ContributorCancelVerificationRequest`
+    - `ContributorCancelVerificationBadRequestResponse`
+    - `ContributorCancelVerificationDefaultResponse`
+    - `ContributorCancelVerificationTooManyRequestsResponse`
+    - `ContributorCancelVerificationTooManyRequestsResponseBody`
+  - The `MarketplaceClient` interface now includes a method `contributorCancelVerification` to manage cancellation requests.
+
+#### Updates
+- **AppInstallation Schema**: 
+  - Added a boolean property `deletionRequested` to track the deletion state.
+- **MonthlyPricePlanStrategyItem Schema**: 
+  - Introduced a boolean property `isBookingStopped` to indicate if a variant is bookable.
+
+These enhancements improve the management of contributor verification processes and expand the schema capabilities within the Marketplace API.
+
+### Release Summary: mittwald PHP SDK v2.1.150
+
+The latest release of the mittwald PHP SDK, version 2.1.150, introduces new features and enhancements aimed at improving container management capabilities. 
+
+#### Key Features:
+
+- **New API Endpoint for Listing Stack Volumes**: The `ContainerClient` now supports listing volumes associated with a stack, providing detailed information about these volumes.
+  - **Method**: `listStackVolumes(ListStackVolumesRequest $request): ListStackVolumesOKResponse`
+  - **Purpose**: Fetches a list of volumes for a specific stack.
+
+- **New Request and Response Classes**:
+  - **Request Class**: `ListStackVolumesRequest` for querying stack volumes.
+  - **Response Classes**: 
+    - `ListStackVolumesOKResponse` for successful responses.
+    - `ListStackVolumesBadRequestResponse` for malformed requests.
+    - `ListStackVolumesForbiddenResponse` for access issues.
+    - `ListStackVolumesNotFoundResponse` for non-existent stacks.
+    - `ListStackVolumesTooManyRequestsResponse` for exceeded request limits.
+
+- **Modifications to `ContainerClientImpl`**: Updated to include the `listStackVolumes` method, facilitating interaction with the API for volume data retrieval.
+
+- **API Documentation**: Enhanced with in-line documentation to guide developers on using the new feature effectively.
+
+- **Additional Enhancements**: Includes robust input validation to ensure error-resilient API behavior.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.150).
+
+### Release v2.1.149 of mittwald PHP SDK
+
+The mittwald PHP SDK has been updated to version 2.1.149. This release introduces several enhancements and changes to improve the functionality and reliability of the SDK.
+
+#### Enhancements
+- The `failedExecutionAlertThreshold` attribute in the `Cronjob` class now requires a minimum value of 1, ensuring that a valid positive integer is always provided.
+- The constructor and relevant methods have been updated to make `failedExecutionAlertThreshold` a mandatory parameter.
+
+#### Changes
+- The `failedExecutionAlertThreshold` type has been changed from nullable to non-nullable, enhancing type safety.
+- All related methods, including the getter, have been adjusted to ensure a valid integer is always returned.
+- Unused methods related to `failedExecutionAlertThreshold` have been removed to simplify the codebase.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.149).
+
+### mittwald JavaScript SDK Release 4.238.0
+
+The mittwald JavaScript SDK has been updated to version 4.238.0. This release includes an update to the generated client, enhancing its functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.238.0](https://github.com/mittwald/api-client-js/releases/tag/4.238.0).
+
+### mittwald JavaScript SDK Release 4.237.0
+
+The mittwald JavaScript SDK has been updated to version 4.237.0. This release includes the following feature:
+
+- Updated the generated client to enhance functionality and performance ([commit 9893cf1](https://github.com/mittwald/api-client-js/commit/9893cf1631a54d95caa8aab4c89445e6b4c6a454)).
+
+For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.237.0).
+
+### mittwald JavaScript SDK Release 4.236.0
+
+The mittwald JavaScript SDK has been updated to version 4.236.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.236.0](https://github.com/mittwald/api-client-js/releases/tag/4.236.0).
+
+### mittwald JavaScript SDK Release 4.235.0
+
+The mittwald JavaScript SDK has been updated to version 4.235.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.235.0).
+
+### mittwald JavaScript SDK Release 4.234.0
+
+The mittwald JavaScript SDK has been updated to version 4.234.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.234.0](https://github.com/mittwald/api-client-js/releases/tag/4.234.0).
+
