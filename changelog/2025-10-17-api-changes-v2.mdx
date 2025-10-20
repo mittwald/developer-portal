@@ -1,17 +1,15 @@
 ---
-title: Breaking (!) API changes for v2 API, October 10 to October 17
+title: API changes for v2 API, October 10 to October 17
 authors:
   - machine
 tags:
   - apiv2
-  - breaking
   - Marketplace
   - Database
   - Backup
   - Project
   - Project File System
   - Container
-
 ---
 
 import OperationHint from "@site/src/components/OperationHint";
@@ -19,31 +17,15 @@ import OperationLink from "@site/src/components/OperationLink";
 
 This week's changelog for the mittwald API includes significant updates such as changes to request parameter types, the addition of new optional properties, and the introduction of a new endpoint for copying MySQL databases.
 
-{/* truncate */}
-
-
-
-:::caution Breaking changes
-
-This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
-
-While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
-
-:::
-
-
-
 ## Summary
 
-
-- The request body type for the `PUT` operation to update extension pricing has changed from 'object' to an unspecified type. This is a breaking change.
-- The type of the `mysqlDatabaseId` path parameter has changed from 'string'/'uuid' to 'string' for the following operations: `DELETE` (delete a MySQLDatabase), `GET` (get a MySQLDatabase), `PATCH` (update a MySQLDatabase's default character settings), `PATCH` (update a MySQLDatabase's description), `GET` (list MySQLUsers belonging to a Database), and `POST` (create a MySQLUser). This is a breaking change.
-- The type of the `mysqlUserId` path parameter has changed from 'string'/'uuid' to 'string' for the following operations: `DELETE` (delete a MySQLUser), `GET` (get a MySQLUser), `PUT` (update a MySQLUser), `POST` (disable a MySQLUser), `POST` (enable a MySQLUser), `PATCH` (update a MySQLUser's password), and `GET` (get a MySQLUser's PhpMyAdmin-URL). This is a breaking change.
-- The type of the `projectBackupId` path parameter has changed from 'string'/'uuid' to 'string' for the following operations: `DELETE` (delete a ProjectBackup), `GET` (get a ProjectBackup), `PATCH` (update a ProjectBackup's description), `DELETE` (delete a ProjectBackupExport), and `POST` (create a ProjectBackupExport). This is a breaking change.
-- The type of the `projectId` path parameter has changed from 'string'/'uuid' to 'string' for the following operations: `GET` (get a Project), `DELETE` (delete a Project's avatar), `POST` (request a Project avatar upload), `GET` (list BackupSchedules belonging to a Project), `POST` (create a BackupSchedule for a Project), `GET` (list Backups belonging to a Project), `POST` (create a Backup of a Project), `PATCH` (update a Project's description), `GET` (get a Project directory filesystem usage), `GET` (get a Project file's content), `GET` (get a Project file's information), `GET` (list MySQLDatabases belonging to a Project), `POST` (create a MySQLDatabase with a MySQLUser), `GET` (list RedisDatabases belonging to a Project), `POST` (create a RedisDatabase), `GET` (list Registries belonging to a Project), `POST` (create a Registry), `GET` (list Services belonging to a Project), `GET` (list Stacks belonging to a Project), and `GET` (list Volumes belonging to a Project). This is a breaking change.
-- The type of the `redisDatabaseId` path parameter has changed from 'string'/'uuid' to 'string' for the following operations: `DELETE` (delete a RedisDatabase), `GET` (get a RedisDatabase), `PATCH` (update a RedisDatabase's configuration), and `PATCH` (update a RedisDatabase's description). This is a breaking change.
-- The type of the `serverId` path parameter has changed from 'string'/'uuid' to 'string' for the following operations: `DELETE` (delete a Server's avatar), `POST` (request a Server avatar upload), `PATCH` (update a Server's description), and `POST` (create a Project belonging to a Server). This is a breaking change.
-- The type of the `serviceId` path parameter has changed from 'string'/'uuid' to 'string' for the following operations: `GET` (get a Service belonging to a Stack), `POST` (pull image for a Service), `POST` (recreate a Service), `POST` (restart a Service), `POST` (start a Service), `POST` (stop a Service), and `GET` (get logs belonging to a Service). This is a breaking change.
+- The type of the `mysqlDatabaseId` path parameter has changed from 'string'/'uuid' to 'string' for the following operations: `DELETE` (delete a MySQLDatabase), `GET` (get a MySQLDatabase), `PATCH` (update a MySQLDatabase's default character settings), `PATCH` (update a MySQLDatabase's description), `GET` (list MySQLUsers belonging to a Database), and `POST` (create a MySQLUser).
+- The type of the `mysqlUserId` path parameter has changed from 'string'/'uuid' to 'string' for the following operations: `DELETE` (delete a MySQLUser), `GET` (get a MySQLUser), `PUT` (update a MySQLUser), `POST` (disable a MySQLUser), `POST` (enable a MySQLUser), `PATCH` (update a MySQLUser's password), and `GET` (get a MySQLUser's PhpMyAdmin-URL).
+- The type of the `projectBackupId` path parameter has changed from 'string'/'uuid' to 'string' for the following operations: `DELETE` (delete a ProjectBackup), `GET` (get a ProjectBackup), `PATCH` (update a ProjectBackup's description), `DELETE` (delete a ProjectBackupExport), and `POST` (create a ProjectBackupExport). T
+- The type of the `projectId` path parameter has changed from 'string'/'uuid' to 'string' for the following operations: `GET` (get a Project), `DELETE` (delete a Project's avatar), `POST` (request a Project avatar upload), `GET` (list BackupSchedules belonging to a Project), `POST` (create a BackupSchedule for a Project), `GET` (list Backups belonging to a Project), `POST` (create a Backup of a Project), `PATCH` (update a Project's description), `GET` (get a Project directory filesystem usage), `GET` (get a Project file's content), `GET` (get a Project file's information), `GET` (list MySQLDatabases belonging to a Project), `POST` (create a MySQLDatabase with a MySQLUser), `GET` (list RedisDatabases belonging to a Project), `POST` (create a RedisDatabase), `GET` (list Registries belonging to a Project), `POST` (create a Registry), `GET` (list Services belonging to a Project), `GET` (list Stacks belonging to a Project), and `GET` (list Volumes belonging to a Project).
+- The type of the `redisDatabaseId` path parameter has changed from 'string'/'uuid' to 'string' for the following operations: `DELETE` (delete a RedisDatabase), `GET` (get a RedisDatabase), `PATCH` (update a RedisDatabase's configuration), and `PATCH` (update a RedisDatabase's description).
+- The type of the `serverId` path parameter has changed from 'string'/'uuid' to 'string' for the following operations: `DELETE` (delete a Server's avatar), `POST` (request a Server avatar upload), `PATCH` (update a Server's description), and `POST` (create a Project belonging to a Server).
+- The type of the `serviceId` path parameter has changed from 'string'/'uuid' to 'string' for the following operations: `GET` (get a Service belonging to a Stack), `POST` (pull image for a Service), `POST` (recreate a Service), `POST` (restart a Service), `POST` (start a Service), `POST` (stop a Service), and `GET` (get logs belonging to a Service).
 - The `dryRun` request property has been removed from the `PUT` operation to update extension pricing.
 - The `priceInCents` request property has been removed from the `PUT` operation to update extension pricing.
 - The `PUT` operation to update extension pricing has added 'subschema #1, subschema #2' to the request body 'oneOf' list.
@@ -56,567 +38,333 @@ While we generally strive to avoid breaking changes in accordance with our [API 
 
 _Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
 
+## Developer's note
+
+For a lot of routes, the format of the id parameter has changed from a UUID to a simple string, according to the API Spec. This is only logical, as we enabled resources to be queried using shortId some time ago.
 
 ## Detailed changes
 
-
-
-### Changes in "Creates or Updates Pricing for an Extension"
-
-
-- ⚠️ **Breaking:** the request's body type/format changed from 'object'/'' to ''/''
-
-- removed the request property 'dryRun'
-
-- removed the request property 'priceInCents'
-
-- added 'subschema #1, subschema #2' to the request body 'oneOf' list
-
-- added the optional property 'nextPossiblePriceChange' to the response with the '200' status
-
-- the response property 'extensionId' became required for the status '200'
-
-- the response property 'priceChangeConsequence' became required for the status '200'
-
-
-For details, refer to the <OperationLink operation="extension-update-extension-pricing" apiVersion="v2" /> endpoint.
-
-
-
 ### Changes in "Delete a MySQL database"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'mysqlDatabaseId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'mysqlDatabaseId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="database-delete-mysql-database" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get a MySQL database"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'mysqlDatabaseId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'mysqlDatabaseId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="database-get-mysql-database" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Update a MySQL database's default character settings"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'mysqlDatabaseId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'mysqlDatabaseId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="database-update-mysql-database-default-charset" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Update a MySQL database's description"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'mysqlDatabaseId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'mysqlDatabaseId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="database-update-mysql-database-description" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "List MySQL users belonging to a Database"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'mysqlDatabaseId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'mysqlDatabaseId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="database-list-mysql-users" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Create a MySQL user"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'mysqlDatabaseId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'mysqlDatabaseId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="database-create-mysql-user" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Delete a MySQL user"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'mysqlUserId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'mysqlUserId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="database-delete-mysql-user" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get a MySQL user"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'mysqlUserId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'mysqlUserId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="database-get-mysql-user" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Update a MySQL user"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'mysqlUserId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'mysqlUserId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="database-update-mysql-user" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Disable a MySQL user"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'mysqlUserId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'mysqlUserId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="database-disable-mysql-user" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Enable a MySQL user"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'mysqlUserId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'mysqlUserId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="database-enable-mysql-user" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Update a MySQL user's password"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'mysqlUserId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'mysqlUserId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="database-update-mysql-user-password" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get a MySQL user's PhpMyAdmin-URL"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'mysqlUserId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'mysqlUserId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="database-get-mysql-user-php-my-admin-url" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Delete a project backup"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'projectBackupId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'projectBackupId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="backup-delete-project-backup" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get a project backup"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'projectBackupId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'projectBackupId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="backup-get-project-backup" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Change the description of a project backup"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'projectBackupId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'projectBackupId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="backup-update-project-backup-description" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Delete a project backup export"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'projectBackupId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'projectBackupId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="backup-delete-project-backup-export" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Export a project backup for download"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'projectBackupId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'projectBackupId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="backup-create-project-backup-export" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get a Project"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
+- for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 - added the optional property 'deletionRequested' to the response with the '200' status
 
-
 For details, refer to the <OperationLink operation="project-get-project" apiVersion="v2" /> endpoint.
-
-
 
 ### Changes in "Delete a Project's avatar"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="project-delete-project-avatar" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Request a Project avatar upload"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="project-request-project-avatar-upload" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "List backup schedules belonging to a Project"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="backup-list-project-backup-schedules" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Create a backup schedule for a Project"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="backup-create-project-backup-schedule" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "List Backups belonging to a Project"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="backup-list-project-backups" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Create a Backup of a Project"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="backup-create-project-backup" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Update a Project's description"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="project-update-project-description" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get a Project directory filesystem usage"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="project-file-system-get-disk-usage" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get a Project file's content"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="project-file-system-get-file-content" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get a Project file's information"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="project-file-system-list-files" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "List MySQL databases belonging to a Project"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="database-list-mysql-databases" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Create a MySQL database with a MySQL user"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="database-create-mysql-database" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "List Redis databases belonging to a Project"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="database-list-redis-databases" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Create a Redis database"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="database-create-redis-database" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "List Registries belonging to a Project"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="container-list-registries" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Create a Registry"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="container-create-registry" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "List Services belonging to a Project"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="container-list-services" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "List Stacks belonging to a Project"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="container-list-stacks" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "List Volumes belonging to a Project"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="container-list-volumes" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Delete a Redis database"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'redisDatabaseId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'redisDatabaseId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="database-delete-redis-database" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get a Redis database"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'redisDatabaseId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'redisDatabaseId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="database-get-redis-database" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Update a Redis database's configuration"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'redisDatabaseId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'redisDatabaseId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="database-update-redis-database-configuration" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Update a Redis database's description"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'redisDatabaseId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'redisDatabaseId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="database-update-redis-database-description" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Delete a Server's avatar"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'serverId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'serverId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="project-delete-server-avatar" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Request a Server avatar upload"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'serverId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'serverId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="project-request-server-avatar-upload" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Update a Servers's description"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'serverId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'serverId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="project-update-server-description" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Create a Project belonging to a Server"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'serverId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'serverId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="project-create-project" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get a Service belonging to a Stack"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'serviceId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'serviceId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="container-get-service" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Pulls the latest version of the Service's image and optionally recreates the Service"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'serviceId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'serviceId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="container-pull-image-for-service" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Recreate a Service"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'serviceId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'serviceId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="container-recreate-service" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Restart a started Service"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'serviceId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'serviceId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="container-restart-service" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Start a stopped Service"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'serviceId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'serviceId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="container-start-service" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Stop a started Service"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'serviceId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'serviceId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="container-stop-service" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get logs belonging to a Service"
 
-
-- ⚠️ **Breaking:** for the 'path' request parameter 'serviceId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
+- for the 'path' request parameter 'serviceId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
 For details, refer to the <OperationLink operation="container-get-service-logs" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get the Contract Strategy of an Extension Instance"
-
 
 - added the optional property '/oneOf[#/components/schemas/de.mittwald.v1.extension.SubscriptionBasedContract]/variantDescription' to the response with the '200' status
 
@@ -624,45 +372,34 @@ For details, refer to the <OperationLink operation="container-get-service-logs" 
 
 - added the optional property '/oneOf[#/components/schemas/de.mittwald.v1.extension.SubscriptionBasedContract]/variantName' to the response with the '200' status
 
-
 For details, refer to the <OperationLink operation="extension-get-extension-instance-contract" apiVersion="v2" /> endpoint.
-
-
 
 ### Changes in "Update or Create Contract for existing Extension Instances"
 
-
 - added the new optional request property 'variantKey'
-
 
 For details, refer to the <OperationLink operation="extension-update-extension-instance-contract" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Copy a MySQL database with a MySQL user"
-
 
 - endpoint added
 
-
 For details, refer to the <OperationLink operation="database-copy-mysql-database" apiVersion="v2" /> endpoint.
-
-
-
 
 ## Client package releases
 
-
 ### mittwald PHP SDK Release v2.1.155
 
-The latest release of the mittwald PHP SDK, version 2.1.155, introduces several updates and improvements. 
+The latest release of the mittwald PHP SDK, version 2.1.155, introduces several updates and improvements.
 
 #### Features
+
 - A new property `deletionRequested` has been added to the Project schema. This boolean property indicates whether a deletion request for a project has been made.
 
 #### Changes
 
 ##### API Request Modifications
+
 - The `format: uuid` specification has been removed from several request properties to simplify API interactions. This affects the following requests:
   - `CreateProjectRequest.serverId`
   - `DeleteProjectAvatarRequest.projectId`
@@ -677,9 +414,11 @@ The latest release of the mittwald PHP SDK, version 2.1.155, introduces several 
   - `ProjectFileSystemListFilesRequest.projectId`
 
 ##### Project Schema Update
+
 - The `deletionRequested` property has been added, allowing clients to check if a project deletion has been requested.
 
 ##### Constructor and Method Updates
+
 - The Project class now includes methods to manage the `deletionRequested` property:
   - `getDeletionRequested()`: Retrieves the current value.
   - `withDeletionRequested(bool $deletionRequested)`: Sets the value.
@@ -692,9 +431,11 @@ For more details, visit the [release page](https://github.com/mittwald/api-clien
 The latest release of the mittwald PHP SDK, [v2.1.154](https://github.com/mittwald/api-client-php/releases/tag/v2.1.154), introduces new features and improvements to enhance database management capabilities.
 
 #### Features
+
 - **New Database Copying Functionality:** This release adds a feature to copy MySQL databases along with their associated users via a dedicated API endpoint. It includes comprehensive handling for various scenarios such as successful operations, bad requests, and rate limit exceedances.
 
 #### Bug Fixes and Improvements
+
 - The `format` property for `uuid` has been removed from several request schemas within the `Backup` and `Database` clients, including:
   - `CreateProjectBackupRequest`
   - `CreateProjectBackupExportRequest`
@@ -702,6 +443,7 @@ The latest release of the mittwald PHP SDK, [v2.1.154](https://github.com/mittwa
   - Other related database operations handling client requests.
 
 #### New Endpoints
+
 - **Copy MySQL Database Endpoint:**
   - Introduces the ability to copy a MySQL database with associated user creation.
   - Implements related request and response classes to handle operations, including:
@@ -716,20 +458,25 @@ These updates provide a robust setup for managing MySQL databases and enhance th
 
 ### mittwald PHP SDK Release v2.1.153
 
-The latest release of the mittwald PHP SDK, version 2.1.153, introduces several new features and changes aimed at enhancing the management of extension pricing and variants. 
+The latest release of the mittwald PHP SDK, version 2.1.153, introduces several new features and changes aimed at enhancing the management of extension pricing and variants.
 
 #### Features
+
 - **Variant Handling in Extension Pricing**: This release adds support for managing different price plans and variants of extensions. Users can now specify a `variantKey` when updating an extension instance and choose pricing options based on price plans.
 
 #### Changes
+
 - **Extension Update Requests**:
+
   - `ExtensionUpdateExtensionInstanceContractRequest`: Introduces a new `variantKey` property, essential for extensions with multiple variants.
   - `ExtensionUpdateExtensionPricingRequest`: Updated to support two alternative request bodies for specifying a price in cents or selecting a price plan, with added validations.
 
 - **Responses**:
+
   - `ExtensionUpdateExtensionPricingOKResponse`: Includes a new `nextPossiblePriceChange` property to indicate the next valid time for price changes.
 
 - **Data Models**:
+
   - New classes such as `PricePlan`, `Variant`, and `VariantDescriptionChangeType` have been introduced to handle price plans and variant descriptions.
   - `SubscriptionBasedContract`: Enhanced with new properties for extended variant information.
 
@@ -754,4 +501,3 @@ The mittwald JavaScript SDK has been updated to version 4.240.0. This release in
 ### mittwald JavaScript SDK Release 4.239.0
 
 The mittwald JavaScript SDK has been updated to version 4.239.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.239.0).
-
