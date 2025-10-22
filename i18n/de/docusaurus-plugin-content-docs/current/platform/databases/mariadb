@@ -1,0 +1,132 @@
+# MariaDB ausführen
+
+## Einführung
+
+MariaDB ist ein freies, quelloffenes Datenbankmanagementsystem (DBMS), das ursprünglich als Fork von MySQL entstanden ist. Es wurde von den ursprünglichen Entwicklern von MySQL gegründet, nachdem Oracle MySQL übernommen hatte. Ziel war es, eine vollständig offene Alternative zu MySQL bereitzustellen.
+
+## Eine PostgreSQL-Datenbank erstellen
+
+Du kannst eine MariaDB-Datenbank in deiner mittwald Hosting-Umgebung mit Containern bereitstellen. Es gibt verschiedene Hauptansätze:
+
+
+### Verwendung der mStudio-Benutzeroberfläche
+
+Alternativ kannst du einen MariaDB-Container manuell einrichten:
+
+1. Gehe in deinem Projekt in mStudio auf den **Container**-Menüpunkt und erstelle einen neuen Container. Du kannst einen beliebigen Namen wählen.
+
+2. Gib das Image `mariadb:lts-ubi9` ein. Du kannst den Entrypoint und das Command wie vorgeschlagen beibehalten.
+
+#### Volumes
+
+Um die Daten deiner PostgreSQL-Datenbank persistent zu speichern, definiere Volumes unter **Volumes** wie folgt:
+
+- Neues Volume erstellen, auf **Pfad im Container** (Mount Point): `/var/lib/mysql` (Speichert die Nutzdaten der Datenbank)
+- Pfad im Projekt `/files/mariadb-backup-backup`, auf **Pfad im Container** (Mount Point):\*\* `/mnt` (Dieser Pfad dient dazu, Datenbank-Dumps oder Backups zu speichern)
+
+#### Umgebungsvariablen
+
+Setze die folgenden Umgebungsvariablen für den Container:
+
+```dotenv
+MARIADB_ROOT_PASSWORD=my_root_password
+MARIADB_DATABASE=my_database
+MARIADB_USER=my_user
+MARIADB_PASSWORD=my_user_password
+```
+
+#### Ports
+
+Übernehme den vorgeschlagenen Standardport `3306`.
+
+### Verwendung der CLI mit `mw container run`
+
+Du kannst auch einen PostgreSQL-Container mit der mittwald CLI und dem Befehl `mw container run` bereitstellen:
+
+```bash
+mw container run \
+  --name mariadb \
+  --env MARIADB_ROOT_PASSWORD=my_root_password \
+  --env MARIADB_DATABASE=my_database \
+  --env MARIADB_USER=my_user \
+  --env MARIADB_PASSWORD=my_user_password \
+  --volume mariadb-data:/var/lib/mysql \
+  --volume /files/mariadb-backup:/mnt \
+  --publish 3306:3306/tcp \
+  --create-volumes \
+  mariadb:lts-ubi9
+```
+
+Dieser Befehl erstellt einen neuen Container namens "mariadb" mit dem MariaDB-Image, setzt alle notwendigen Umgebungsvariablen und mountet Volumes für die persistente Datenspeicherung.
+
+### Verwendung der CLI mit `mw stack deploy`
+
+Wenn du Docker Compose bevorzugst, kannst du eine `docker-compose.yml`-Datei erstellen und sie mit dem Befehl `mw stack deploy` bereitstellen:
+
+1. Erstelle eine `docker-compose.yml`-Datei mit folgendem Inhalt:
+
+   ```yaml
+   version: "3"
+   services:
+     mariadb:
+       image: mariadb:lts-ubi9
+       environment:
+            - MARIADB_ROOT_PASSWORD=my_root_password
+            - MARIADB_DATABASE=my_database
+            - MARIADB_USER=my_user
+            - MARIADB_PASSWORD=my_user_password
+       ports:
+         - "3306:3306"
+       volumes:
+         - mariadb_data:/var/lib/mysql
+         - /files/mariadb-backup:/mnt
+   volumes:
+     mariadb_data:
+   ```
+
+2. Stelle den Stack mit der CLI bereit:
+
+   ```bash
+   mw stack deploy
+   ```
+
+Dieser Ansatz ist besonders nützlich, wenn du mehrere Container deployen möchtest, die zusammenarbeiten.
+
+### Zugriff auf deinen Container innerhalb deiner Hosting-Umgebung
+
+Sobald der Container läuft, kannst du überprüfen, ob die MariaDB-Instanz verfügbar ist. Es gibt zwei Hauptmöglichkeiten:
+
+#### Option 1: Direkter Zugriff über Container-Shell
+
+```bash
+mw container ssh mariadb
+mysql -umy_user -p -hlocalhost my_database
+```
+
+#### Option 2: Port-Weiterleitung für lokalen Zugriff
+
+```bash
+mw container port-forward mariadb 3306:3306
+```
+
+In einem separaten Terminal kannst du dann lokal eine Verbindung herstellen:
+
+```bash
+mysql -umy_user -P 3306 -p -hlocalhost my_database
+```
+
+Bei beiden Optionen solltest du zur MariaDB-Eingabeaufforderung weitergeleitet werden, wo du SQL-Befehle ausführen kannst.
+
+## Betrieb
+
+Deine MariaDB-Daten werden im Rahmen des regelmäßigen Projektbackups gesichert. Für Datenbanken wird jedoch **dringend empfohlen**, zusätzlich eigene Dumps zu erstellen, um Konsistenz und Wiederherstellbarkeit sicherzustellen.
+
+Ein Dump kann direkt im Container erstellt werden. Beispielbefehl für ein manuelles Backup:
+
+```bash
+mysqldump --column-statistics=0 --opt --no-tablespaces -u'my_user' -p'my_user_password' -h'mariadb' 'my_database' > /mnt/mydatabase.sql"
+```
+
+Die Backup-Datei wird dann im Projekt unter `/files/mariadb-backup/` verfügbar sein.
+
+Automatisierungen sind über Cronjobs problemlos möglich.
