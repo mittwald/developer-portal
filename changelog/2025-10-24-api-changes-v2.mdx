@@ -1,10 +1,9 @@
 ---
-title: Breaking (!) API changes for v2 API, October 17 to October 24
+title: API changes for v2 API, October 17 to October 24
 authors:
   - machine
 tags:
   - apiv2
-  - breaking
   - App
   - Cronjob
   - Customer
@@ -12,7 +11,6 @@ tags:
   - Project
   - Marketplace
   - Domain
-
 ---
 
 import OperationHint from "@site/src/components/OperationHint";
@@ -22,8 +20,6 @@ This week's update to the mittwald API includes changes to the request parameter
 
 {/* truncate */}
 
-
-
 :::caution Breaking changes
 
 This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
@@ -32,478 +28,284 @@ While we generally strive to avoid breaking changes in accordance with our [API 
 
 :::
 
-
-
 ## Summary
 
-
-- The type/format of the 'appInstallationId' request parameter has changed from 'string'/'uuid' to 'string' for the following operations: 
-  - DELETE /v2/app-installations/{appInstallationId} (app-uninstall-appinstallation)
-  - GET /v2/app-installations/{appInstallationId} (app-get-appinstallation)
-  - PATCH /v2/app-installations/{appInstallationId} (app-patch-appinstallation)
-  - PATCH /v2/app-installations/{appInstallationId}/database (app-link-database)
-  - PATCH /v2/app-installations/{appInstallationId}/database/replace (app-replace-database)
-  - DELETE /v2/app-installations/{appInstallationId}/databases/{databaseId} (app-unlink-database)
-  - PUT /v2/app-installations/{appInstallationId}/databases/{databaseId}/users (app-set-database-users)
-  - GET /v2/app-installations/{appInstallationId}/missing-dependencies (app-get-missing-dependencies-for-appinstallation)
-  - GET /v2/app-installations/{appInstallationId}/systemSoftware (app-get-installed-systemsoftware-for-appinstallation)  
-  **Note: This is a breaking change.**
-
-- The type/format of the 'cronjobId' request parameter has changed from 'string'/'uuid' to 'string' for the following operations:
-  - DELETE /v2/cronjobs/{cronjobId} (cronjob-delete-cronjob)
-  - GET /v2/cronjobs/{cronjobId} (cronjob-get-cronjob)
-  - PATCH /v2/cronjobs/{cronjobId} (cronjob-update-cronjob)
-  - PATCH /v2/cronjobs/{cronjobId}/app-id (cronjob-update-cronjob-app-id)
-  - GET /v2/cronjobs/{cronjobId}/executions (cronjob-list-executions)
-  - POST /v2/cronjobs/{cronjobId}/executions (cronjob-create-execution)
-  - GET /v2/cronjobs/{cronjobId}/executions/{executionId} (cronjob-get-execution)
-  - POST /v2/cronjobs/{cronjobId}/executions/{executionId}/actions/abort (cronjob-abort-execution)  
-  **Note: This is a breaking change.**
-
-- The type/format of the 'customerId' request parameter has changed from 'string'/'uuid' to 'string' for the following operations:
-  - POST /v2/customers/{customerId}/actions/leave (deprecated-customer-leave-customer)
-  - POST /v2/customers/{customerId}/invites (customer-create-customer-invite)  
-  **Note: This is a breaking change.**
-
-- The type/format of the 'fileId' request parameter has changed from 'string'/'uuid' to 'string' for the following operations:
-  - GET /v2/files/{fileId} (file-get-file)
-  - GET /v2/files/{fileId}/meta (file-get-file-meta)
-  - GET /v2/files/{fileId}/{fileName} (file-get-file-with-name)  
-  **Note: This is a breaking change.**
-
-- The type/format of the 'projectId' request parameter has changed from 'string'/'uuid' to 'string' for the following operations:
-  - GET /v2/projects/{projectId}/app-installations (app-list-appinstallations)
-  - POST /v2/projects/{projectId}/app-installations (app-request-appinstallation)
-  - GET /v2/projects/{projectId}/cronjobs (cronjob-list-cronjobs)
-  - POST /v2/projects/{projectId}/cronjobs (cronjob-create-cronjob)
-  - POST /v2/projects/{projectId}/invites (project-create-project-invite)
-  - POST /v2/projects/{projectId}/leave (deprecated-project-leave-project)  
-  **Note: This is a breaking change.**
+- The type/format of the `appInstallationId`, `cronjobId`, `customerId`, `fileId` and `projectId` request parameters have changed from 'string'/'uuid' to 'string' for all operations. On a specification level, this might be considered a breaking change; however, this change only reflects the actual behavior of the API, and does not affect the generated client libraries.
 
 - The response property 'chargeability' has become required for the status '200' in the following operations:
-  - GET /v2/customers/{customerId}/extensions/{extensionId} (extension-get-extension-instance-for-customer)
-  - GET /v2/extension-instances/{extensionInstanceId} (extension-get-extension-instance)
-  - GET /v2/projects/{projectId}/extensions/{extensionId} (extension-get-extension-instance-for-project)  
- 
+  - `GET /v2/customers/{customerId}/extensions/{extensionId}` (extension-get-extension-instance-for-customer)
+  - `GET /v2/extension-instances/{extensionInstanceId}` (extension-get-extension-instance)
+  - `GET /v2/projects/{projectId}/extensions/{extensionId}` (extension-get-extension-instance-for-project)
+
 - The required property 'chargeability/reasons/isNonChargeableCustomer' has been added to the response with the '200' status in the following operations:
-  - GET /v2/customers/{customerId}/extensions/{extensionId} (extension-get-extension-instance-for-customer)
-  - GET /v2/extension-instances/{extensionInstanceId} (extension-get-extension-instance)
-  - GET /v2/projects/{projectId}/extensions/{extensionId} (extension-get-extension-instance-for-project)
-  - GET /v2/extension-instances (extension-list-extension-instances)  
+  - `GET /v2/customers/{customerId}/extensions/{extensionId}` (extension-get-extension-instance-for-customer)
+  - `GET /v2/extension-instances/{extensionInstanceId}` (extension-get-extension-instance)
+  - `GET /v2/projects/{projectId}/extensions/{extensionId}` (extension-get-extension-instance-for-project)
+  - `GET /v2/extension-instances` (extension-list-extension-instances)
 
 - The optional property '/items/scheduledDeletionDate' has been added to the response with the '200' status in the following operations:
-  - GET /v2/domains (domain-list-domains)
-  - GET /v2/domains/{domainId} (domain-get-domain)
-  - GET /v2/projects/{projectId}/domains (deprecated-domain-list-domains)  
+  - `GET /v2/domains` (domain-list-domains)
+  - `GET /v2/domains/{domainId}` (domain-get-domain)
+  - `GET /v2/projects/{projectId}/domains` (deprecated-domain-list-domains)
 
 - The following endpoints have been added:
-  - DELETE /v2/domains/{domainId}/scheduled-deletion (domain-cancel-scheduled-deletion)
-  - POST /v2/domains/{domainId}/scheduled-deletion (domain-create-scheduled-deletion)
+  - `DELETE /v2/domains/{domainId}/scheduled-deletion` (domain-cancel-scheduled-deletion)
+  - `POST /v2/domains/{domainId}/scheduled-deletion` (domain-create-scheduled-deletion)
 
 _Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
 
-
 ## Detailed changes
-
-
 
 ### Changes in "Trigger an uninstallation process for an app installation"
 
-
 - ⚠️ **Breaking:** for the 'path' request parameter 'appInstallationId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
 
 For details, refer to the <OperationLink operation="app-uninstall-appinstallation" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get an app installation"
 
-
 - ⚠️ **Breaking:** for the 'path' request parameter 'appInstallationId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
 
 For details, refer to the <OperationLink operation="app-get-appinstallation" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Update properties belonging to an app installation"
 
-
 - ⚠️ **Breaking:** for the 'path' request parameter 'appInstallationId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
 
 For details, refer to the <OperationLink operation="app-patch-appinstallation" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Create linkage between an app installation and a MySQL database"
 
-
 - ⚠️ **Breaking:** for the 'path' request parameter 'appInstallationId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
 
 For details, refer to the <OperationLink operation="app-link-database" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Replace a MySQL Database with another MySQL Database"
 
-
 - ⚠️ **Breaking:** for the 'path' request parameter 'appInstallationId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
 
 For details, refer to the <OperationLink operation="app-replace-database" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Remove linkage between an app installation and a Database"
 
-
 - ⚠️ **Breaking:** for the 'path' request parameter 'appInstallationId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
 
 For details, refer to the <OperationLink operation="app-unlink-database" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Create linkage between an app installation and database users"
 
-
 - ⚠️ **Breaking:** for the 'path' request parameter 'appInstallationId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
 
 For details, refer to the <OperationLink operation="app-set-database-users" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get the missing requirements of an appInstallation for a specific target app version"
 
-
 - ⚠️ **Breaking:** for the 'path' request parameter 'appInstallationId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
 
 For details, refer to the <OperationLink operation="app-get-missing-dependencies-for-appinstallation" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get the installed system software' for a specific app installation`"
-
 
 - ⚠️ **Breaking:** for the 'path' request parameter 'appInstallationId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
-
 For details, refer to the <OperationLink operation="app-get-installed-systemsoftware-for-appinstallation" apiVersion="v2" /> endpoint.
-
-
 
 ### Changes in "Delete a cronjob"
 
-
 - ⚠️ **Breaking:** for the 'path' request parameter 'cronjobId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
 
 For details, refer to the <OperationLink operation="cronjob-delete-cronjob" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get a cronjob"
 
-
 - ⚠️ **Breaking:** for the 'path' request parameter 'cronjobId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
 
 For details, refer to the <OperationLink operation="cronjob-get-cronjob" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Update a cronjob"
 
-
 - ⚠️ **Breaking:** for the 'path' request parameter 'cronjobId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
 
 For details, refer to the <OperationLink operation="cronjob-update-cronjob" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Update a cronjob's app id"
 
-
 - ⚠️ **Breaking:** for the 'path' request parameter 'cronjobId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
 
 For details, refer to the <OperationLink operation="cronjob-update-cronjob-app-id" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "List cronjob executions belonging to a cronjob"
 
-
 - ⚠️ **Breaking:** for the 'path' request parameter 'cronjobId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
 
 For details, refer to the <OperationLink operation="cronjob-list-executions" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Trigger a cronjob"
 
-
 - ⚠️ **Breaking:** for the 'path' request parameter 'cronjobId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
 
 For details, refer to the <OperationLink operation="cronjob-create-execution" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get a cronjob execution"
 
-
 - ⚠️ **Breaking:** for the 'path' request parameter 'cronjobId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
 
 For details, refer to the <OperationLink operation="cronjob-get-execution" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Abort a cronjob execution"
-
 
 - ⚠️ **Breaking:** for the 'path' request parameter 'cronjobId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
-
 For details, refer to the <OperationLink operation="cronjob-abort-execution" apiVersion="v2" /> endpoint.
-
-
 
 ### Changes in "Leave a Customer"
 
-
 - ⚠️ **Breaking:** for the 'path' request parameter 'customerId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
 
 For details, refer to the <OperationLink operation="deprecated-customer-leave-customer" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Create a customer invite"
-
 
 - ⚠️ **Breaking:** for the 'path' request parameter 'customerId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
-
 For details, refer to the <OperationLink operation="customer-create-customer-invite" apiVersion="v2" /> endpoint.
-
-
 
 ### Changes in "Get a File"
 
-
 - ⚠️ **Breaking:** for the 'path' request parameter 'fileId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
 
 For details, refer to the <OperationLink operation="file-get-file" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get a File's meta"
 
-
 - ⚠️ **Breaking:** for the 'path' request parameter 'fileId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
 
 For details, refer to the <OperationLink operation="file-get-file-meta" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get a File with user-friendly url"
-
 
 - ⚠️ **Breaking:** for the 'path' request parameter 'fileId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
-
 For details, refer to the <OperationLink operation="file-get-file-with-name" apiVersion="v2" /> endpoint.
-
-
 
 ### Changes in "List app installations belonging to a Project"
 
-
 - ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
 
 For details, refer to the <OperationLink operation="app-list-appinstallations" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Request an app installation"
 
-
 - ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
 
 For details, refer to the <OperationLink operation="app-request-appinstallation" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "List cronjobs belonging to a Project"
 
-
 - ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
 
 For details, refer to the <OperationLink operation="cronjob-list-cronjobs" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Create a cronjob"
 
-
 - ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
 
 For details, refer to the <OperationLink operation="cronjob-create-cronjob" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Create a ProjectInvite"
 
-
 - ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
-
 
 For details, refer to the <OperationLink operation="project-create-project-invite" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Leave a Project"
-
 
 - ⚠️ **Breaking:** for the 'path' request parameter 'projectId', the type/format was changed from 'string'/'uuid' to 'string'/''
 
-
 For details, refer to the <OperationLink operation="deprecated-project-leave-project" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get the extension instance of a specific customer and extension, if existing"
-
 
 - the response property 'chargeability' became required for the status '200'
 
 - added the required property 'chargeability/reasons/isNonChargeableCustomer' to the response with the '200' status
 
-
 For details, refer to the <OperationLink operation="extension-get-extension-instance-for-customer" apiVersion="v2" /> endpoint.
-
-
 
 ### Changes in "List Domains"
 
-
 - added the optional property '/items/scheduledDeletionDate' to the response with the '200' status
-
 
 For details, refer to the <OperationLink operation="domain-list-domains" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get a Domain"
-
 
 - added the optional property 'scheduledDeletionDate' to the response with the '200' status
 
-
 For details, refer to the <OperationLink operation="domain-get-domain" apiVersion="v2" /> endpoint.
-
-
 
 ### Changes in "Cancel a scheduled deletion of a Domain"
 
-
 - endpoint added
-
 
 For details, refer to the <OperationLink operation="domain-cancel-scheduled-deletion" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Create a scheduled deletion of a Domain"
-
 
 - endpoint added
 
-
 For details, refer to the <OperationLink operation="domain-create-scheduled-deletion" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "List extension instances"
-
 
 - the response property '/items/chargeability' became required for the status '200'
 
 - added the required property '/items/chargeability/reasons/isNonChargeableCustomer' to the response with the '200' status
 
-
 For details, refer to the <OperationLink operation="extension-list-extension-instances" apiVersion="v2" /> endpoint.
-
-
 
 ### Changes in "Get an extension instance"
 
-
 - the response property 'chargeability' became required for the status '200'
 
 - added the required property 'chargeability/reasons/isNonChargeableCustomer' to the response with the '200' status
-
 
 For details, refer to the <OperationLink operation="extension-get-extension-instance" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "List Domains belonging to a Project"
-
 
 - added the optional property '/items/scheduledDeletionDate' to the response with the '200' status
 
-
 For details, refer to the <OperationLink operation="deprecated-domain-list-domains" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get the extension instance of a specific project and extension, if existing"
-
 
 - the response property 'chargeability' became required for the status '200'
 
 - added the required property 'chargeability/reasons/isNonChargeableCustomer' to the response with the '200' status
 
-
 For details, refer to the <OperationLink operation="extension-get-extension-instance-for-project" apiVersion="v2" /> endpoint.
 
-
-
-
 ## Client package releases
-
 
 ### mittwald PHP SDK Release v2.1.156
 
 The mittwald PHP SDK has released version v2.1.156, introducing several new features and improvements. This release focuses on enhancing domain management capabilities and improving request and response handling.
 
 #### New Features
-- **Domain Scheduled Deletion Management**: 
+
+- **Domain Scheduled Deletion Management**:
   - Introduced the ability to create and cancel scheduled deletions for domains using `CreateScheduledDeletion` and `CancelScheduledDeletion` requests.
   - Enhanced domain schema with `scheduledDeletionDate` for improved lifecycle management.
 
 #### Fixes and Improvements
+
 - **Request and Response Models**:
   - Removed `format: "uuid"` from certain request models for better validation.
   - Improved validation response handling to ensure proper error types are returned for bad or excessive requests.
 
 #### New Response Types
+
 - Implemented new response types for error handling in scheduled deletion operations, including:
   - `CancelScheduledDeletionBadRequestResponse`
   - `CancelScheduledDeletionTooManyRequestsResponse`
@@ -511,6 +313,7 @@ The mittwald PHP SDK has released version v2.1.156, introducing several new feat
 - Enhanced default response handling for these operations.
 
 #### Updates in Domain and Marketplace Schemas
+
 - Enhanced `Domain` schema with `scheduledDeletionDate`.
 - Added `Chargeability` handling in `ExtensionInstance` schema for better data integrity.
 
@@ -535,4 +338,3 @@ The mittwald JavaScript SDK has been updated to version 4.242.2. This release in
 ### mittwald JavaScript SDK Release 4.242.1
 
 The mittwald JavaScript SDK has been updated to version 4.242.1. This release includes a version bump for the package root. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.242.1).
-
