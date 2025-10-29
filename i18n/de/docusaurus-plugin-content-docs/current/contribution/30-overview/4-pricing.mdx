@@ -25,27 +25,6 @@ Jede Variante besteht aus folgenden Eigenschaften:
 Wenn Kunden eine Extension installieren, können sie eine der verfügbaren Varianten auswählen.  
 Die gewählte Variante bestimmt sowohl den Preis als auch den Funktionsumfang.
 
-```mermaid
-C4Context
-    Person(customer, "Kunde")
-    Enterprise_Boundary(mStudio, "mStudio") {
-        System_Ext(frontend, "mStudio Frontend")
-        System_Ext(api, "mStudio API")
-        System_Ext(webhooks, "Lifecycle Webhooks")
-    }
-
-    Enterprise_Boundary(contributor, "Contributor") {
-        System(extension, "Extension Backend")
-        SystemDb(db, "Datenbank")
-    }
-
-    Rel(customer, frontend, "Wählt Variante bei Installation")
-    Rel(frontend, api, "Erstellt ExtensionInstance mit variantKey")
-    Rel(api, webhooks, "Sendet Lifecycle Webhooks")
-    Rel(webhooks, extension, "Enthält variantKey in Payload")
-    Rel(extension, db, "Speichert gewählte Variante")
-```
-
 ---
 
 ## Verwaltung von Preisvarianten im mStudio
@@ -120,26 +99,8 @@ Contributoren werden über diese Vorgänge über **Lifecycle Webhooks** informie
 
 ## Technische Integration
 
-Jede Extension erhält Benachrichtigungen vom mStudio über die **Lifecycle Webhooks**.  
+Jede Extension erhält Benachrichtigungen vom mStudio über die [**Lifecycle Webhooks**](https://developer.mittwald.de/docs/v2/contribution/reference/webhooks/).  
 Diese Webhook-Payloads enthalten den `variantKey`, um zu identifizieren, welche Variante ein Kunde gewählt hat.
-
-### Beispiel: Lifecycle-Webhook-Payload
-
-```json
-{
-  "event": "extensionInstance.created",
-  "data": {
-    "instanceId": "abc123",
-    "extensionId": "my-extension",
-    "variantKey": "pro",
-    "customerId": "cust789",
-    "status": "active"
-  }
-}
-```
-
-Die Extension muss einen Endpoint bereitstellen, der solche Webhook-Aufrufe empfängt.  
-Sie sollte den `variantKey` speichern und verarbeiten, um sicherzustellen, dass für den Kunden der richtige Funktionsumfang aktiviert wird.
 
 > **Wichtig:**  
 > Der `variantKey` ist der technische Referenzwert für die Variantenverwaltung.  
@@ -147,11 +108,7 @@ Sie sollte den `variantKey` speichern und verarbeiten, um sicherzustellen, dass 
 
 ### Zugriff über die Extension Bridge
 
-Während einer aktiven Sitzung im mStudio kann eine Extension über die **Extension Bridge** auf die gewählte Variante zugreifen:
-
-```js
-const variant = window.mittwald.session.variantKey;
-```
+Während einer aktiven Sitzung im mStudio kann eine Extension über die **Extension Bridge und die aktuelle Session** auf die gewählte Variante zugreifen: [Session-Handling](https://developer.mittwald.de/docs/v2/contribution/how-to/develop-frontend-fragment/#session-handling-and-configuration-values-via-ext-bridge)
 
 So kann das Frontend der Extension seine Darstellung oder Funktionalität dynamisch an die gewählte Variante anpassen.
 
