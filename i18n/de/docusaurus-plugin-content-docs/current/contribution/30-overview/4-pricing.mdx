@@ -1,0 +1,225 @@
+---
+title: Preisvarianten einer Extension
+---
+
+## Konzept der Preisvarianten
+
+Extensions im mStudio können mit unterschiedlichen Preismodellen angeboten werden.  
+Ein Contributor kann entscheiden, ob eine Extension:
+
+- **Kostenlos** angeboten wird  
+- Einen **einzelnen festen Preis** hat  
+- Oder **mehrere Preisvarianten** anbietet  
+
+Eine Preisvariante ermöglicht es, verschiedene **Funktionsumfänge** oder **Leistungsstufen** einer Extension zu unterschiedlichen Preisen anzubieten.
+
+Jede Variante besteht aus folgenden Eigenschaften:
+
+| Eigenschaft | Beschreibung |
+|--------------|---------------|
+| **Name** | Anzeigename der Variante (z. B. „Basic“, „Pro“, „Enterprise“) |
+| **Preis** | Monatlicher oder jährlicher Preis, der dem Kunden berechnet wird |
+| **Beschreibung** | Beschreibung des Funktionsumfangs oder der enthaltenen Leistungen |
+| **variantKey** | Technischer Bezeichner der Variante (muss eindeutig sein und kann nach Anlage nicht mehr geändert werden) |
+
+Wenn Kunden eine Extension installieren, können sie eine der verfügbaren Varianten auswählen.  
+Die gewählte Variante bestimmt sowohl den Preis als auch den Funktionsumfang.
+
+```mermaid
+C4Context
+    Person(customer, "Kunde")
+    Enterprise_Boundary(mStudio, "mStudio") {
+        System_Ext(frontend, "mStudio Frontend")
+        System_Ext(api, "mStudio API")
+        System_Ext(webhooks, "Lifecycle Webhooks")
+    }
+
+    Enterprise_Boundary(contributor, "Contributor") {
+        System(extension, "Extension Backend")
+        SystemDb(db, "Datenbank")
+    }
+
+    Rel(customer, frontend, "Wählt Variante bei Installation")
+    Rel(frontend, api, "Erstellt ExtensionInstance mit variantKey")
+    Rel(api, webhooks, "Sendet Lifecycle Webhooks")
+    Rel(webhooks, extension, "Enthält variantKey in Payload")
+    Rel(extension, db, "Speichert gewählte Variante")
+```
+
+---
+
+## Verwaltung von Preisvarianten im mStudio
+
+Preisvarianten werden im Bereich **Extensionverwaltung** des mStudio konfiguriert:
+
+```
+Organisation -> Contribution -> Entwicklung -> Extension auswählen oder anlegen -> Details -> Preisdetails
+```
+
+Im Abschnitt **Preisdetails** können Contributoren:
+
+1. **Neue Varianten anlegen**, indem sie folgende Angaben machen:
+   - Einen **Namen**
+   - Einen **Preis**
+   - Eine **Beschreibung**
+   - Einen eindeutigen **variantKey**
+
+2. **Bestehende Varianten bearbeiten**, sofern sich die Extension **nicht innerhalb der 30-tägigen Sperrfrist nach Veröffentlichung** befindet (siehe unten).
+
+### Regeln für die Variantenverwaltung
+
+- Der **variantKey** wird vom Contributor vergeben und identifiziert die Variante eindeutig **innerhalb einer Extension**.  
+- Nach dem ersten Anlegen kann der **variantKey nicht mehr geändert** werden.  
+- Wenn die Extension zuvor einen Einzelpreis hatte, ersetzt die **erste angelegte Variante** diesen Preisplan.
+
+### Verhalten der Benutzeroberfläche
+
+Die mStudio-Oberfläche stellt separate Eingabefelder für jede Eigenschaft einer Variante bereit.  
+Pflichtfelder sind mit `*` markiert.  
+Das System prüft automatisch eindeutige `variantKey`s und Preisformate.  
+Wenn zutreffend, kann der Contributor bei Änderungen angeben, ob diese eine **Leistungsänderung** darstellen.
+
+---
+
+## Einschränkungen nach Veröffentlichung
+
+Nach der Veröffentlichung einer Extension dürfen **30 Tage lang keine Änderungen an Preisen oder Varianten vorgenommen werden**.
+
+Diese Sperre betrifft:
+
+- Das Hinzufügen oder Entfernen von Varianten  
+- Änderungen an **Name**, **Beschreibung** oder **Preis** bestehender Varianten  
+- Den Wechsel zwischen **kostenlos**, **Einzelpreis** oder **Preisvarianten**
+
+Nach Ablauf der 30 Tage können Änderungen erneut vorgenommen werden.  
+Wenn eine Änderung den **Funktionsumfang** betrifft, muss dies im mStudio ausdrücklich gekennzeichnet werden.
+
+---
+
+## Auswirkungen auf bestehende Installationen
+
+Wenn Preis- oder Variantenänderungen vorgenommen werden, sorgt das System dafür, dass bestehende Kunden informiert werden und den neuen Bedingungen **zustimmen** oder **ablehnen** müssen.
+
+### Eine Kundeninteraktion ist erforderlich, wenn:
+
+- Eine Extension von **kostenlos → Einzelpreis** oder **kostenlos → Varianten** wechselt  
+- Ein **Einzelpreis** geändert wird  
+- Die vom Nutzer gewählte **Variante** geändert wird  
+- Der **Funktionsumfang** einer Variante geändert wird  
+
+### Ablauf
+
+1. Der betroffene Kunde erhält eine **Benachrichtigung im mStudio** sowie eine **E-Mail**.  
+2. Der Kunde muss innerhalb von **30 Tagen** auf diese Änderung reagieren.  
+3. Wenn innerhalb dieser Frist keine Reaktion erfolgt, wird die entsprechende **ExtensionInstance automatisch gelöscht**.
+
+Contributoren werden über diese Vorgänge über **Lifecycle Webhooks** informiert.
+
+---
+
+## Technische Integration
+
+Jede Extension erhält Benachrichtigungen vom mStudio über die **Lifecycle Webhooks**.  
+Diese Webhook-Payloads enthalten den `variantKey`, um zu identifizieren, welche Variante ein Kunde gewählt hat.
+
+### Beispiel: Lifecycle-Webhook-Payload
+
+```json
+{
+  "event": "extensionInstance.created",
+  "data": {
+    "instanceId": "abc123",
+    "extensionId": "my-extension",
+    "variantKey": "pro",
+    "customerId": "cust789",
+    "status": "active"
+  }
+}
+```
+
+Die Extension muss einen Endpoint bereitstellen, der solche Webhook-Aufrufe empfängt.  
+Sie sollte den `variantKey` speichern und verarbeiten, um sicherzustellen, dass für den Kunden der richtige Funktionsumfang aktiviert wird.
+
+> **Wichtig:**  
+> Der `variantKey` ist der technische Referenzwert für die Variantenverwaltung.  
+> Er muss im Backend des Contributors eindeutig auf die entsprechende Variante abgebildet werden.
+
+### Zugriff über die Extension Bridge
+
+Während einer aktiven Sitzung im mStudio kann eine Extension über die **Extension Bridge** auf die gewählte Variante zugreifen:
+
+```js
+const variant = window.mittwald.session.variantKey;
+```
+
+So kann das Frontend der Extension seine Darstellung oder Funktionalität dynamisch an die gewählte Variante anpassen.
+
+---
+
+## Beispielarchitektur mit Variantenverarbeitung
+
+```mermaid
+block-beta
+  columns 2
+  frontend["Extension Frontend"]
+  mstudio["mStudio"]
+  space:2
+  webhooks["Lifecycle Webhook API"] businessapi["Extension Business API"]
+
+  logic["Variantenlogik / Business Layer"]:2
+  repo["Repository"]:2
+  db[("Datenbank")]:2
+
+  frontend-->businessapi
+  mstudio-->webhooks
+  logic-->repo
+  repo-->db
+```
+
+In diesem Aufbau gilt:
+
+- Die **Lifecycle Webhook API** empfängt Benachrichtigungen vom mStudio, einschließlich `variantKey`.  
+- Die **Business API** stellt funktionsabhängige Logik bereit, basierend auf der gespeicherten Variante.  
+- Das **Frontend** passt seine Oberfläche und Funktionen an die aktuelle Variante an.  
+- Die **Datenbank** speichert alle Varianten-Zuordnungen und Preishistorien.
+
+---
+
+## Verantwortlichkeiten der Contributoren
+
+Contributoren sind verantwortlich für:
+
+- Das Anlegen und Pflegen ihrer Varianten im mStudio  
+- Die korrekte Verarbeitung des `variantKey` im eigenen Backend  
+- Das Handling der Lifecycle-Webhooks  
+- Die technische Abbildung der gewählten Variante im eigenen Funktions- oder Abrechnungssystem  
+- Die Einhaltung der **30-Tage-Sperrfrist** nach Veröffentlichung  
+
+---
+
+## Best Practices
+
+- Verwende **aussagekräftige Keys** für Varianten (z. B. `basic`, `pro`, `enterprise`).  
+- Beschreibe den **Funktionsumfang** jeder Variante klar und transparent.  
+- Logge alle Ereignisse im Zusammenhang mit Variantenänderungen intern.  
+- Teste alle Variantenwechsel gründlich vor der Veröffentlichung.  
+- Vermeide das Löschen von Varianten, die aktuell von Kunden genutzt werden.
+
+---
+
+## Fehlerbehebung
+
+| Problem | Mögliche Ursache | Lösung |
+|----------|------------------|--------|
+| Variante wird im Backend nicht erkannt | Fehlender oder falscher `variantKey` | Webhook-Payload korrekt verarbeiten und Zuordnung prüfen |
+| Änderungen nicht möglich | 30-tägige Sperrfrist aktiv | Warten, bis Sperrfrist abgelaufen ist |
+| Kunde verliert Zugriff auf Extension | Keine Reaktion auf Preisänderung innerhalb von 30 Tagen | ExtensionInstance wurde automatisch gelöscht |
+| Falscher Funktionsumfang aktiv | Variante nicht korrekt in der Business-Logik verarbeitet | `variantKey`-Mapping im Backend prüfen |
+
+---
+
+## Zusammenfassung
+
+Preisvarianten ermöglichen eine flexible Monetarisierung von Extensions im mStudio-Ökosystem.  
+Durch die Einhaltung der beschriebenen Prozesse und Lifecycle-Anforderungen können Contributoren ihre Extensions sicher und transparent mit unterschiedlichen Preis- und Funktionsstufen anbieten.  
+Eine saubere Webhook-Verarbeitung und konsistente Variantenverwaltung sind dabei entscheidend für korrekte Abrechnung und Kundenerfahrung.
