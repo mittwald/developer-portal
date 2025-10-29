@@ -112,34 +112,6 @@ Während einer aktiven Sitzung im mStudio kann eine Extension über die **Extens
 
 So kann das Frontend der Extension seine Darstellung oder Funktionalität dynamisch an die gewählte Variante anpassen.
 
----
-
-## Beispielarchitektur mit Variantenverarbeitung
-
-```mermaid
-block-beta
-  columns 2
-  frontend["Extension Frontend"]
-  mstudio["mStudio"]
-  space:2
-  webhooks["Lifecycle Webhook API"] businessapi["Extension Business API"]
-
-  logic["Variantenlogik / Business Layer"]:2
-  repo["Repository"]:2
-  db[("Datenbank")]:2
-
-  frontend-->businessapi
-  mstudio-->webhooks
-  logic-->repo
-  repo-->db
-```
-
-In diesem Aufbau gilt:
-
-- Die **Lifecycle Webhook API** empfängt Benachrichtigungen vom mStudio, einschließlich `variantKey`.  
-- Die **Business API** stellt funktionsabhängige Logik bereit, basierend auf der gespeicherten Variante.  
-- Das **Frontend** passt seine Oberfläche und Funktionen an die aktuelle Variante an.  
-- Die **Datenbank** speichert alle Varianten-Zuordnungen und Preishistorien.
 
 ---
 
