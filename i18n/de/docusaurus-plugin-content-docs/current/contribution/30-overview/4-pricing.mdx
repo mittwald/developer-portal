@@ -34,6 +34,8 @@ Preisvarianten werden im Bereich **Extensionverwaltung** des mStudio konfigurier
 ```
 Organisation -> Contribution -> Entwicklung -> Extension auswählen oder anlegen -> Details -> Preisdetails
 ```
+> :warning: Beachte, dass **jede** Änderung der Preisdetails (inklusive dem Hinzufügen von Varianten) zu einer 30-tägigen Sperre für erneute Bearbeitungen führt
+![Extension Preisdetail Bereich](../../../../../../resources/contributing/extensions/PricingSection-mStudio.png)
 
 Im Abschnitt **Preisdetails** können Contributoren:
 
@@ -49,7 +51,7 @@ Im Abschnitt **Preisdetails** können Contributoren:
 
 - Der **variantKey** wird vom Contributor vergeben und identifiziert die Variante eindeutig **innerhalb einer Extension**.  
 - Nach dem ersten Anlegen kann der **variantKey nicht mehr geändert** werden.  
-- Wenn die Extension zuvor einen Einzelpreis hatte, kann der **erste angelegte Preis** als Variatne mit dem **"default" Key** weiterverwendet werden.
+- Wenn die Extension zuvor einen Einzelpreis hatte, kann der **erste angelegte Preis** als Variante mit dem **"default" Key** weiterverwendet werden. Diese Variante benötigt ab sofort ebenfalls eine Beschreibng ihrer Leistungsmerkmale.
 
 ### Verhalten der Benutzeroberfläche
 
@@ -78,13 +80,13 @@ Wenn eine Änderung den **Funktionsumfang** betrifft, muss dies im mStudio ausdr
 
 ## Auswirkungen auf bestehende Installationen
 
-Wenn Preis- oder Leistungsumfangsänderungen vorgenommen werden, sorgt das System dafür, dass bestehende Kunden informiert werden und den neuen Bedingungen **zustimmen** oder **ablehnen** müssen.
+Wenn Preis- oder Leistungsumfangsänderungen vorgenommen werden, sorgt das System dafür, dass bestehende Kunden informiert werden und den neuen Bedingungen **zustimmen** oder **ablehnen** müssen. Lehnt der Kunde ab oder reagiert 30 Tage nicht, wird seine Instanz entfernt.
 
 ### Eine Kundeninteraktion ist erforderlich, wenn:
 
 - Eine Extension von **kostenlos → Einzelpreis** oder **kostenlos → Varianten** wechselt  
 - Ein **Einzelpreis** geändert wird  
-- Die vom Nutzer gewählte **Variante** (Preis oder Leistungsumfang) geändert wird  
+- Die vom Nutzer gewählte **Variante** geändert wird. Dies betrifft nur Ämnderungen am Preis, oder dem Leistungsumfang. Sollten die Leistungsmerkmale kosmetisch verändert werden (Rechtschreibfehler etc.) hat der Contributor die Wahl, keine Leistungsumfangsänderung anzukündigen.
 
 ### Ablauf
 
@@ -99,12 +101,12 @@ Contributoren werden über diese Vorgänge über **Lifecycle Webhooks** informie
 
 ## Technische Integration
 
-Jede Extension erhält Benachrichtigungen vom mStudio über die [**Lifecycle Webhooks**](https://developer.mittwald.de/docs/v2/contribution/reference/webhooks/).  
+Jede Extension erhält Benachrichtigungen vom mStudio über die [**Lifecycle Webhooks**](https://developer.mittwald.de/docs/v2/contribution/reference/webhooks/), falls diese eingerichtet wurden.  
 Diese Webhook-Payloads enthalten den `variantKey`, um zu identifizieren, welche Variante ein Kunde gewählt hat.
 
 > **Wichtig:**  
 > Der `variantKey` ist der technische Referenzwert für die Variantenverwaltung.  
-> Er muss im Backend des Contributors eindeutig auf die entsprechende Variante abgebildet werden.
+> Er muss im Backend des Contributors eindeutig auf die entsprechende Variante abgebildet werden, insofern eine Unterscheidung der Varianten dort notwendig ist.
 
 ### Zugriff über die Extension Bridge
 
@@ -120,7 +122,7 @@ So kann das Frontend der Extension seine Darstellung oder Funktionalität dynami
 Contributoren sind verantwortlich für:
 
 - Das Anlegen und Pflegen ihrer Varianten im mStudio  
-- Die korrekte Verarbeitung des `variantKey` im eigenen Backend  
+- Die korrekte Verarbeitung des `variantKey` im eigenen Backend, falls notwendig 
 - Das Handling der Lifecycle-Webhooks  
 - Die technische Abbildung der gewählten Variante im eigenen Funktions- oder Abrechnungssystem  
 - Die Einhaltung der **30-Tage-Sperrfrist** nach einer Preisänderung  
@@ -132,7 +134,7 @@ Contributoren sind verantwortlich für:
 - Verwende **aussagekräftige Keys** für Varianten (z. B. `basic`, `pro`, `enterprise`).  
 - Beschreibe den **Leistungsumfang** jeder Variante klar und transparent.  
 - Logge alle Ereignisse im Zusammenhang mit Variantenänderungen intern.  
-- Teste alle Variantenwechsel gründlich vor der Veröffentlichung.  
+- Teste alle Variantenwechsel und Leistungsumfänge gründlich vor der Veröffentlichung.  
 
 ---
 
@@ -140,7 +142,7 @@ Contributoren sind verantwortlich für:
 
 | Problem | Mögliche Ursache | Lösung |
 |----------|------------------|--------|
-| Variante wird im Backend nicht erkannt | Fehlender oder falscher `variantKey` | Webhook-Payload korrekt verarbeiten und Zuordnung prüfen |
+| Variante wird im Backend nicht erkannt | Fehlender oder falscher `variantKey` | Webhook-Payload, falls in Verwendung, korrekt verarbeiten und Zuordnung prüfen |
 | Änderungen nicht möglich | 30-tägige Sperrfrist aktiv | Warten, bis Sperrfrist abgelaufen ist |
 | Kunde verliert Zugriff auf Extension | Keine Reaktion auf Preisänderung innerhalb von 30 Tagen | ExtensionInstance wurde automatisch gelöscht |
 | Falscher Funktionsumfang aktiv | Variante nicht korrekt in der Business-Logik verarbeitet | `variantKey`-Mapping im Backend prüfen |
@@ -151,4 +153,4 @@ Contributoren sind verantwortlich für:
 
 Preisvarianten ermöglichen eine flexible Monetarisierung von Extensions im mStudio.  
 Durch die Einhaltung der beschriebenen Prozesse und Lifecycle-Anforderungen können Contributoren ihre Extensions sicher und transparent mit unterschiedlichen Preis- und Funktionsstufen anbieten.  
-Eine saubere Webhook-Verarbeitung und konsistente Variantenverwaltung sind dabei entscheidend für korrekte Abrechnung und Kundenerfahrung.
+Eine saubere Webhook-Verarbeitung oder die Nutzung des variantKey aus dem Session Token, und konsistente Variantenverwaltung sind dabei entscheidend für korrekte Abrechnung und Kundenerfahrung.
