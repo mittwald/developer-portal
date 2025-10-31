@@ -1,0 +1,342 @@
+---
+title: Breaking (!) API changes for v2 API, October 24 to October 31
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - User
+  - LeadFyndr
+  - Marketplace
+  - Cronjob
+  - Container
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API introduces several changes, including modifications to response formats and properties for the user authentication and lead management endpoints, the addition of a new endpoint for cronjob execution analysis, and updates to the response structure for various service-related operations.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The response body type for the `POST` operation at `/v2/authenticate` has changed from 'object' to an unspecified type for the '400' status. Additionally, the required properties 'message' and 'type' have been removed from the response for the same status. This constitutes a breaking change.
+- For the `GET` operation at `/v2/customers/{customerId}/leads` and `/v2/customers/{customerId}/unlocked-leads`, the type of the 'technologies' query parameter's '/items/' property has changed from 'string' to an unspecified type.
+- The `GET` operation at `/v2/customers/{customerId}/unlocked-leads` has had several optional properties removed from the response with the '200' status, including 'leads/items/contact/address/address_prefix', 'leads/items/contact/address/country_code', and 'leads/items/contact/address/house_number'.
+- The `GET` operation at `/v2/customers/{customerId}/unlocked-leads/{leadId}` has also had optional properties removed from the response with the '200' status, specifically 'contact/address/address_prefix', 'contact/address/country_code', and 'contact/address/house_number'.
+- The `POST` operation at `/v2/authenticate` has added '#/components/schemas/de.mittwald.v1.commons.ValidationErrors' and '#/components/schemas/de.mittwald.v1.commons.Error' to the response body 'anyOf' list for the '400' status.
+- A new non-success response with the status '412' has been added to the `DELETE` operation at `/v2/contributors/{contributorId}/extensions/{extensionId}`.
+- A new endpoint has been added for the `GET` operation at `/v2/cronjobs/{cronjobId}/executions/{executionId}/analysis`.
+- The `GET` operation at `/v2/customers/{customerId}/unlocked-leads` has added optional properties to the response with the '200' status, including 'leads/items/contact/address/addressPrefix', 'leads/items/contact/address/countryCode', and 'leads/items/contact/address/houseNumber'.
+- The `GET` operation at `/v2/customers/{customerId}/unlocked-leads/{leadId}` has added optional properties to the response with the '200' status, including 'contact/address/addressPrefix', 'contact/address/countryCode', and 'contact/address/houseNumber'.
+- The `GET` operation at `/v2/projects/{projectId}/services` has added the optional property '/items/deploy' to the response with the '200' status.
+- The `GET` operation at `/v2/projects/{projectId}/stacks` has added the optional property '/items/services/items/deploy' to the response with the '200' status.
+- The `GET` operation at `/v2/stacks/{stackId}` has added the optional property 'services/items/deploy' to the response with the '200' status.
+- The `PATCH` operation at `/v2/stacks/{stackId}` has added the optional property 'services/items/deploy' to the response with the '200' status.
+- The `PUT` operation at `/v2/stacks/{stackId}` has added the optional property 'services/items/deploy' to the response with the '200' status.
+- The `GET` operation at `/v2/stacks/{stackId}/services/{serviceId}` has added the optional property 'deploy' to the response with the '200' status.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Authenticate yourself to get an access token"
+
+
+- ⚠️ **Breaking:** the response's body type/format changed from 'object'/'' to ''/'' for status '400'
+
+- ⚠️ **Breaking:** removed the required property 'message' from the response with the '400' status
+
+- ⚠️ **Breaking:** removed the required property 'type' from the response with the '400' status
+
+- added '#/components/schemas/de.mittwald.v1.commons.ValidationErrors, #/components/schemas/de.mittwald.v1.commons.Error' to the response body 'anyOf' list for the response status '400'
+
+
+For details, refer to the <OperationLink operation="user-authenticate" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all leads. Use the unlocked routes for more lead details"
+
+
+- for the 'query' request parameter 'technologies', the type/format of property '/items/' was changed from 'string'/'' to ''/''
+
+
+For details, refer to the <OperationLink operation="leadfyndr-list-leads" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all unlocked leads. Organisation can unlock leads"
+
+
+- for the 'query' request parameter 'technologies', the type/format of property '/items/' was changed from 'string'/'' to ''/''
+
+- removed the optional property 'leads/items/contact/address/address_prefix' from the response with the '200' status
+
+- removed the optional property 'leads/items/contact/address/country_code' from the response with the '200' status
+
+- removed the optional property 'leads/items/contact/address/house_number' from the response with the '200' status
+
+- added the optional property 'leads/items/contact/address/addressPrefix' to the response with the '200' status
+
+- added the optional property 'leads/items/contact/address/countryCode' to the response with the '200' status
+
+- added the optional property 'leads/items/contact/address/houseNumber' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="leadfyndr-list-unlocked-leads" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a detail of a unlocked lead. Organisation can unlock leads"
+
+
+- removed the optional property 'contact/address/address_prefix' from the response with the '200' status
+
+- removed the optional property 'contact/address/country_code' from the response with the '200' status
+
+- removed the optional property 'contact/address/house_number' from the response with the '200' status
+
+- added the optional property 'contact/address/addressPrefix' to the response with the '200' status
+
+- added the optional property 'contact/address/countryCode' to the response with the '200' status
+
+- added the optional property 'contact/address/houseNumber' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="leadfyndr-get-unlocked-lead" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Delete an extension"
+
+
+- added the non-success response with the status '412'
+
+
+For details, refer to the <OperationLink operation="extension-delete-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a cronjob execution analysis for failed executions"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="cronjob-get-execution-analysis" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Services belonging to a Project"
+
+
+- added the optional property '/items/deploy' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-list-services" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Stacks belonging to a Project"
+
+
+- added the optional property '/items/services/items/deploy' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-list-stacks" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Stack"
+
+
+- added the optional property 'services/items/deploy' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-get-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create, update or delete Services or Volumes belonging to a Stack"
+
+
+- added the optional property 'services/items/deploy' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-update-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Declaratively create, update or delete Services or Volumes belonging to a Stack"
+
+
+- added the optional property 'services/items/deploy' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-declare-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Service belonging to a Stack"
+
+
+- added the optional property 'deploy' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-get-service" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK Release v2.1.161
+
+The latest release of the mittwald PHP SDK, version v2.1.161, introduces new features and updates to enhance functionality and documentation clarity.
+
+#### New Features
+- A new class, `ExtensionDeleteExtensionPreconditionFailedResponse`, has been introduced to handle specific HTTP responses for delete extension operations when preconditions fail.
+
+#### Changes
+- Documentation updates in `MarketplaceClient.php` and `MarketplaceClientImpl.php` to provide clearer guidance on the extension deletion process.
+- A new case has been added in `MarketplaceClientImpl` to handle 412 status code responses with the `ExtensionDeleteExtensionPreconditionFailedResponse`.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.161).
+
+### mittwald PHP SDK Release v2.1.160
+
+The latest release of the mittwald PHP SDK, version v2.1.160, introduces several changes and removals to streamline and simplify the codebase. 
+
+#### Removed
+- The `AuthenticateBadRequestResponse` class has been removed. This class previously managed responses for bad authentication requests, including its associated methods and validation schema.
+
+#### Changes
+- **UserClientImpl Updates**: The reference to `AuthenticateBadRequestResponse` has been removed. Handling for status code `400` now utilizes an `UntypedResponse`.
+- **CronjobExecutionAnalysis Updates**: The class has been simplified by removing properties and methods related to `issues` and `recommendation`. It now focuses solely on handling a `message`, which reduces its complexity. The `buildFromInput` method and `toJson` output have been updated accordingly.
+
+For more details, please visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.160).
+
+### mittwald PHP SDK Release v2.1.159
+
+The mittwald PHP SDK has been updated to version v2.1.159. This release introduces several new features and API changes, primarily focusing on cronjob execution analysis.
+
+#### Features
+- **Cronjob Execution Analysis**: A new feature has been added to retrieve detailed analyses of cronjob executions, particularly for failed executions. This includes messages about possible causes and recommendations for resolution.
+
+#### API Changes
+- **New Methods**:
+  - `getExecutionAnalysis`: This method allows users to obtain an analysis of failed cronjob executions by accepting a `GetExecutionAnalysisRequest` object and returning a `GetExecutionAnalysisOKResponse`.
+
+- **New Responses**:
+  - Various response classes have been introduced for the `getExecutionAnalysis` method, including:
+    - `GetExecutionAnalysisBadRequestResponse`
+    - `GetExecutionAnalysisDefaultResponse`
+    - `GetExecutionAnalysisForbiddenResponse`
+    - `GetExecutionAnalysisInternalServerErrorResponse`
+    - `GetExecutionAnalysisNotFoundResponse`
+    - `GetExecutionAnalysisTooManyRequestsResponse`
+    - `GetExecutionAnalysisOKResponse`
+
+- **New Request Class**:
+  - `GetExecutionAnalysisRequest`: This new request class is used to fetch execution analysis, requiring an `executionId` and a `cronjobId`.
+
+- **New Schema Classes**:
+  - `CronjobExecutionAnalysis`: A schema class that outlines the structure of the cronjob execution analysis response.
+
+- **Updated Existing Schemas**:
+  - Adjustments have been made to existing schema classes under the `Leadfyndr` namespace, changing field names from snake_case to camelCase, such as:
+    - `address_prefix` to `addressPrefix`
+    - `country_code` to `countryCode`
+    - `house_number` to `houseNumber`
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.159).
+
+### mittwald PHP SDK Release v2.1.158
+
+The latest release of the mittwald PHP SDK, version 2.1.158, introduces several enhancements and new features aimed at improving container management and resource allocation capabilities. 
+
+#### Added Features
+- New classes for container management, including `Deploy`, `ResourceSpec`, and `Resources`, have been introduced. These classes enhance the API's ability to manage container deployment specifications and resource allocation.
+
+#### Updated Requests
+- **ListLeadsRequest** and **ListUnlockedLeadsRequest** have been updated to modify the `technologies` field. It now supports an array structure that can include a string type or the value 'none'. The type hint for `technologies` has been updated from `string[]|null` to `mixed[]|null`.
+
+#### New Classes
+- **Deploy**: Defines the deployment schema for containers, including methods for managing resources, input validation, and JSON serialization.
+- **ResourceSpec**: Represents resource specifications for containers, including CPU and memory constraints, with validation and serialization features.
+- **Resources**: Provides a schema to define limits on resources for container deployments, wrapping around `ResourceSpec` and including methods for validation and input handling.
+
+#### Updated Service Management
+- **ServiceDeclareRequest** and **ServiceRequest**: Both classes now include a `deploy` field referencing the new `Deploy` schema, with updated methods and input handling to support deployment specifications.
+- **ServiceResponse**: Expanded to include a reference to the `Deploy` class for handling deployment information in responses.
+
+These updates collectively enhance the API's flexibility and usability in managing container deployments and associated resources. For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.158).
+
+### mittwald PHP SDK Release v2.1.157
+
+The mittwald PHP SDK has been updated to version v2.1.157. This release introduces new features and improvements:
+
+#### Added
+- **CheckMigrationIsPossibleErrorActiveMailArchiveForAddress Class**: A new class designed to handle errors related to active mail archives during migration. It includes methods for validation, input processing, and JSON serialization.
+- **Array activeMailArchiveForAddress in PossibleCheckErrors**: The `PossibleCheckErrors` schema now supports an array of `CheckMigrationIsPossibleErrorActiveMailArchiveForAddress`, enabling the reporting of multiple active mail archive errors simultaneously.
+
+#### Changed
+- **PossibleCheckErrors Constructor**: Updated to accept and initialize the `activeMailArchiveForAddress` parameter.
+- **buildFromInput Method**: Now creates instances of `CheckMigrationIsPossibleErrorActiveMailArchiveForAddress` from input data for the `activeMailArchiveForAddress` property.
+- **toJson Method**: Enhanced to include serialization of the new `activeMailArchiveForAddress` property alongside existing error types.
+- **withActiveMailArchiveForAddress Method**: Introduced to allow fluent modification of the `activeMailArchiveForAddress` property within `PossibleCheckErrors`.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.157).
+
+### mittwald JavaScript SDK Release 4.251.0
+
+The mittwald JavaScript SDK has been updated to version 4.251.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.251.0).
+
+### mittwald JavaScript SDK Release 4.250.0
+
+The mittwald JavaScript SDK has been updated to version 4.250.0. This release includes an update to the generated client, enhancing the functionality and performance of the SDK. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.250.0).
+
+### mittwald JavaScript SDK Release 4.249.0
+
+The mittwald JavaScript SDK has been updated to version 4.249.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.249.0](https://github.com/mittwald/api-client-js/releases/tag/4.249.0).
+
+### mittwald JavaScript SDK Release 4.248.0
+
+The mittwald JavaScript SDK has been updated to version 4.248.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.248.0).
+
+### mittwald JavaScript SDK Release 4.247.0
+
+The mittwald JavaScript SDK has been updated to version 4.247.0. This release introduces a new feature:
+
+- **Models:** Added a contributor model to enhance the SDK's functionality ([commit ff1d76e](https://github.com/mittwald/api-client-js/commit/ff1d76e0730c9a7b668e75a39b64fcae0378a266)).
+
+For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.247.0](https://github.com/mittwald/api-client-js/releases/tag/4.247.0).
+
+### mittwald JavaScript SDK Release 4.246.0
+
+The mittwald JavaScript SDK has been updated to version 4.246.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.246.0](https://github.com/mittwald/api-client-js/releases/tag/4.246.0).
+
+### mittwald JavaScript SDK Release 4.245.0
+
+The mittwald JavaScript SDK has been updated to version 4.245.0. This release includes a feature update to the generated client. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.245.0](https://github.com/mittwald/api-client-js/releases/tag/4.245.0).
+
