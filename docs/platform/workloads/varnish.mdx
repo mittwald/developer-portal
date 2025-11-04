@@ -1,0 +1,559 @@
+---
+title: Adding a caching proxy
+sidebar_label: Caching proxies
+sidebar_position: 40
+description: Add a caching proxy to your application or your container
+tags:
+  - Containers
+  - Docker
+---
+
+import PlanCompatibility from "@site/src/components/PlanCompatibility";
+import TerraformResourceHint from "@site/src/components/TerraformResourceHint";
+
+<PlanCompatibility features={["container"]} />
+
+## Introduction
+
+A caching reverse proxy like [Varnish Cache](https://varnish-cache.org/) sits between your web application and the internet, storing frequently accessed content in memory. This significantly reduces load on your application server and dramatically improves response times for cached content.
+
+**Benefits of using Varnish:**
+
+- **Performance**: Serve cached content directly from memory, reducing response times from hundreds of milliseconds to just a few
+- **Scalability**: Handle significantly more concurrent users by reducing backend load
+- **Flexibility**: Fine-grained control over what gets cached and for how long using VCL (Varnish Configuration Language)
+- **Cost efficiency**: Reduce resource requirements for your backend application
+
+This guide demonstrates how to deploy Varnish as a caching layer in front of a TYPO3 application on the mittwald platform, but the same principles apply to any managed application.
+
+## Prerequisites
+
+Before you begin, ensure you have:
+
+- A mittwald project with container support enabled
+- Basic familiarity with containerized applications
+- For Terraform deployments: The [mittwald Terraform provider](https://registry.terraform.io/providers/mittwald/mittwald/latest/docs) configured
+
+## Architecture overview
+
+The setup consists of three main components:
+
+1. **Backend application**: A TYPO3 (or other PHP) application connected to a virtual host
+2. **Varnish container**: Runs the Varnish caching server
+3. **VCL configuration**: Defines caching behavior and routes requests to the backend
+
+```
+Internet → Varnish Container (Port 80) → TYPO3 Application
+                ↓
+         VCL Configuration
+         (Host header rewrite)
+```
+
+:::info Important: Host Header Rewriting
+
+On the mittwald platform, the backend application must be connected to a virtual host (even when the actual production traffic will be routed through the Varnish container). The VCL configuration rewrites the HTTP `Host` header to match the backend application's internal hostname (e.g., `app-XXXXX.p-YYYYY.project.space`) so requests are properly routed.
+
+:::
+
+## Deploying Varnish with TYPO3
+
+### Using Terraform
+
+#### Step 1: Define your project and backend application
+
+First, create your mittwald project and TYPO3 application:
+
+```hcl
+terraform {
+  required_providers {
+    mittwald = {
+      source  = "mittwald/mittwald"
+      version = "~> 1.4"
+    }
+  }
+}
+
+provider "mittwald" {
+  # Provider configuration
+}
+
+locals {
+  server_id      = "your-server-id"      # Replace with your server ID
+  public_domain  = "www.example.com"     # Replace with your actual domain
+}
+
+# Variable for TYPO3 admin password
+variable "typo3_admin_password" {
+  type      = string
+  sensitive = true
+}
+
+# Create the project
+resource "mittwald_project" "varnish_demo" {
+  description = "TYPO3 with Varnish Cache"
+  server_id   = local.server_id
+}
+
+# Look up required system software versions
+data "mittwald_systemsoftware" "php" {
+  name     = "php"
+  selector = "^8.4"
+}
+
+data "mittwald_systemsoftware" "composer" {
+  name        = "composer"
+  recommended = true
+}
+
+# Look up the latest TYPO3 version
+data "mittwald_app" "typo3" {
+  name     = "typo3"
+  selector = "^13"
+}
+
+# Create TYPO3 backend application
+resource "mittwald_app" "typo3" {
+  project_id = mittwald_project.varnish_demo.id
+
+  app           = data.mittwald_app.typo3.name
+  version       = data.mittwald_app.typo3.version
+  description   = "TYPO3 Backend"
+  update_policy = "patchLevel"
+
+  user_inputs = {
+    "host"        = "https://${local.public_domain}"
+    "installmode" = "composer"
+    "site_title"  = "TYPO3 with Varnish"
+    "admin_user"  = "admin"
+    "admin_pass"  = var.typo3_admin_password
+  }
+
+  dependencies = {
+    (data.mittwald_systemsoftware.php.name) = {
+      version       = data.mittwald_systemsoftware.php.version
+      update_policy = "patchLevel"
+    }
+    (data.mittwald_systemsoftware.composer.name) = {
+      version       = data.mittwald_systemsoftware.composer.version
+      update_policy = "patchLevel"
+    }
+  }
+}
+
+# Connect the TYPO3 app to an internal virtual host
+# This is required so Varnish can route requests to it
+resource "mittwald_virtualhost" "typo3_backend" {
+  hostname   = "backend.${mittwald_project.varnish_demo.short_id}.project.space"
+  project_id = mittwald_project.varnish_demo.id
+
+  paths = {
+    "/" = {
+      app = {
+        app_id = mittwald_app.typo3.id
+      }
+    }
+  }
+}
+```
+
+:::info TYPO3 Trusted Hosts Pattern
+
+Since TYPO3 will be accessed via the backend virtual host (by Varnish) but configured with the public domain as its base URL, you need to configure TYPO3's `trustedHostsPattern` to accept both hostnames. Add this to your TYPO3 `config/system/settings.php` or `config/system/additional.php`:
+
+```php
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['trustedHostsPattern'] =
+    'backend\..*\.project\.space|' . preg_quote('www.example.com', '/');
+```
+
+Replace `www.example.com` with your actual public domain. This allows TYPO3 to accept requests from both the internal backend hostname (used by Varnish) and the public domain.
+
+:::
+
+#### Step 2: Create the VCL configuration file
+
+Create a file named `default.vcl` in your Terraform working directory. You can use the [example VCL from the mittwald TYPO3 extension](https://github.com/mittwald/typo3-varnishcache/blob/main/Resources/Private/Example/default-4.vcl) as a base, with one critical addition for the mittwald platform:
+
+```vcl
+vcl 4.0;
+
+backend default {
+    .host = "${backend.host}";
+    .port = "${backend.port}";
+}
+
+# For the complete VCL configuration including cache rules, BAN support,
+# ESI processing, and static file handling, see:
+# https://github.com/mittwald/typo3-varnishcache/blob/main/Resources/Private/Example/default-4.vcl
+
+sub vcl_recv {
+    # Preserve the original Host header
+    set req.http.X-Forwarded-Host = req.http.Host;
+
+    # ... other vcl_recv rules from the example VCL ...
+}
+
+sub vcl_backend_fetch {
+    # IMPORTANT: This Host header rewrite is required for the mittwald platform
+    # The backend app must be reachable via its internal virtual host
+    set bereq.http.Host = "${backend.external_host}";
+}
+
+# ... other subroutines from the example VCL (vcl_backend_response, vcl_deliver, etc.) ...
+```
+
+#### Step 3: Upload the VCL configuration and deploy Varnish
+
+Complete your Terraform configuration with the VCL file upload and Varnish container:
+
+```hcl
+# Upload the VCL configuration file
+resource "mittwald_remote_file" "varnish_vcl" {
+  app_id = mittwald_app.typo3.id
+
+  path = "/files/varnish/default.vcl"
+  contents = templatefile("${path.module}/default.vcl", {
+    backend = {
+      host          = mittwald_app.typo3.short_id
+      port          = 8080
+      external_host = mittwald_virtualhost.typo3_backend.hostname
+    }
+  })
+}
+
+# Look up the Varnish container image
+data "mittwald_container_image" "varnish" {
+  image = "varnish:8"
+}
+
+# Deploy the Varnish container
+resource "mittwald_container_stack" "varnish" {
+  project_id    = mittwald_project.varnish_demo.id
+  default_stack = true
+
+  # Ensure VCL file is uploaded before starting container
+  depends_on = [mittwald_remote_file.varnish_vcl]
+
+  containers = {
+    varnish = {
+      description = "Varnish caching server"
+      image       = data.mittwald_container_image.varnish.image
+      entrypoint  = data.mittwald_container_image.varnish.entrypoint
+      command     = data.mittwald_container_image.varnish.command
+
+      ports = [
+        {
+          container_port = 80
+          public_port    = 80
+          protocol       = "tcp"
+        }
+      ]
+
+      volumes = [
+        {
+          mount_path   = "/etc/varnish"
+          project_path = "/files/varnish"
+        }
+      ]
+    }
+  }
+}
+
+# Connect Varnish to your public domain
+resource "mittwald_virtualhost" "public" {
+  hostname   = local.public_domain
+  project_id = mittwald_project.varnish_demo.id
+
+  paths = {
+    "/" = {
+      container = {
+        container_id = mittwald_container_stack.varnish.containers["varnish"].id
+        port         = "80/tcp"
+      }
+    }
+  }
+}
+```
+
+#### Step 4: Apply the configuration
+
+```shellsession
+$ terraform init
+$ terraform plan
+$ terraform apply -var="typo3_admin_password=YOUR_SECURE_PASSWORD"
+```
+
+You can also store the password in a `.tfvars` file or use environment variables:
+
+```shellsession
+$ export TF_VAR_typo3_admin_password="YOUR_SECURE_PASSWORD"
+$ terraform apply
+```
+
+After applying, your TYPO3 application will be accessible through Varnish at your configured domain.
+
+<TerraformResourceHint resource="container_stack" />
+
+### Using the CLI
+
+#### Step 1: Create the project and TYPO3 application
+
+```shellsession
+# Create a new project
+$ mw project create --description "TYPO3 with Varnish" --server <server-id>
+
+# Create TYPO3 application
+$ mw app create typo3 \
+  --version 13.4.3 \
+  --description "TYPO3 Backend"
+```
+
+During the interactive installation, configure TYPO3 with your public domain (e.g., `https://www.example.com`) as the base URL, not the backend hostname. Note the application ID from the output, you'll need it in the following steps.
+
+#### Step 2: Connect TYPO3 to an internal virtual host
+
+```shellsession
+# Get your project's short ID
+$ mw project get <project-id>
+
+# Create internal virtual host for the backend
+$ mw domain virtualhost create \
+  --hostname backend.<project-short-id>.project.space \
+  --path-to-app /:<app-id>
+```
+
+#### Step 3: Create and upload the VCL configuration
+
+Create a file named `default.vcl` locally. Start with the [example VCL from the mittwald TYPO3 extension](https://github.com/mittwald/typo3-varnishcache/blob/main/Resources/Private/Example/default-4.vcl) and add the Host header rewriting required for the mittwald platform:
+
+```vcl
+vcl 4.0;
+
+backend default {
+    .host = "a-XXXXX";  # Replace with your app's short ID
+    .port = "8080";
+}
+
+# For the complete VCL configuration including cache rules, BAN support,
+# ESI processing, and static file handling, copy from:
+# https://github.com/mittwald/typo3-varnishcache/blob/main/Resources/Private/Example/default-4.vcl
+
+sub vcl_recv {
+    set req.http.X-Forwarded-Host = req.http.Host;
+
+    # ... other vcl_recv rules from the example VCL ...
+}
+
+sub vcl_backend_fetch {
+    # IMPORTANT: Replace with your backend's internal virtual host
+    # This Host header rewrite is required for the mittwald platform
+    set bereq.http.Host = "backend.<project-short-id>.project.space";
+}
+
+# ... other subroutines from the example VCL ...
+```
+
+Upload the VCL file to `/files/varnish/default.vcl` in your TYPO3 app.
+
+#### Step 4: Deploy the Varnish container
+
+```shellsession
+$ mw container run \
+  --name varnish \
+  -p 80:80/tcp \
+  --volume /files/varnish:/etc/varnish \
+  varnish:8
+```
+
+#### Step 5: Connect Varnish to your public domain
+
+```shellsession
+# Get the container ID
+$ mw container list
+
+# Create the virtual host
+$ mw domain virtualhost create \
+  --hostname www.example.com \
+  --path-to-container /:<container-id>:80/tcp
+```
+
+:::info TYPO3 Trusted Hosts Pattern
+
+Since TYPO3 will be accessed via the backend virtual host (by Varnish) but configured with the public domain as its base URL, configure TYPO3's `trustedHostsPattern` to accept both hostnames in your `config/system/settings.php` or `config/system/additional.php`:
+
+```php
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['trustedHostsPattern'] =
+    'backend\..*\.project\.space|' . preg_quote('www.example.com', '/');
+```
+
+Replace `www.example.com` with your actual public domain.
+
+:::
+
+### Using the mStudio UI
+
+#### Step 1: Create the TYPO3 application
+
+1. Navigate to your project in mStudio
+2. Click "Apps" in the sidebar
+3. Click "Create App" and select "TYPO3 CMS"
+4. Complete the installation wizard
+   - Configure the base URL with your public domain (e.g., `https://www.example.com`), not the backend hostname
+5. Note the application's short ID (visible in the app details)
+
+#### Step 2: Create an internal virtual host
+
+1. In your project, click "Domains" in the sidebar
+2. Click "Add vHost"
+3. Use hostname: `backend.<project-short-id>.project.space`
+4. Connect the virtual host with the TYPO3 app.
+
+#### Step 3: Prepare the VCL configuration
+
+Download the [example VCL from the mittwald TYPO3 extension](https://github.com/mittwald/typo3-varnishcache/blob/main/Resources/Private/Example/default-4.vcl) and modify it to add Host header rewriting in the `vcl_backend_fetch` subroutine (see the CLI section above for the specific changes needed).
+
+Upload it to `/files/varnish/default.vcl` in your app using the file manager or SFTP.
+
+#### Step 4: Create the Varnish container
+
+1. In your project, click "Containers" in the sidebar
+2. Click "Create Container"
+3. Select "varnish:8" as the image
+4. Configure:
+   - Name: `varnish`
+   - Port mapping: `80:80/tcp`
+   - Volumes: Mount `/files/varnish` to `/etc/varnish`
+5. Click "Create"
+
+#### Step 5: Connect to your domain
+
+1. Click "Domains" in the sidebar
+2. Click "Add Virtual Host"
+3. Enter your public domain (e.g., `www.example.com`)
+4. Point it to the Varnish container on port 80
+
+:::info TYPO3 Trusted Hosts Pattern
+
+Since TYPO3 will be accessed via the backend virtual host (by Varnish) but configured with the public domain as its base URL, configure TYPO3's `trustedHostsPattern` to accept both hostnames in your `config/system/settings.php` or `config/system/additional.php`:
+
+```php
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['trustedHostsPattern'] =
+    'backend\..*\.project\.space|' . preg_quote('www.example.com', '/');
+```
+
+Replace `www.example.com` with your actual public domain.
+
+:::
+
+## Customizing the VCL configuration
+
+The [example VCL configuration](https://github.com/mittwald/typo3-varnishcache/blob/main/Resources/Private/Example/default-4.vcl) from the mittwald TYPO3 extension includes:
+
+- **BAN support** for cache invalidation (used automatically by the TYPO3 extension)
+- **Cookie handling** that bypasses cache for TYPO3 backend users (`be_typo_user` cookie)
+- **Static file caching** with optimized TTLs for images, CSS, JS, etc.
+- **ESI (Edge Side Includes)** processing support
+- **Streaming** for media files
+- **Retry logic** for server errors (5xx responses)
+
+You can customize the VCL based on your needs:
+
+### Handling frontend user sessions
+
+If your TYPO3 site has logged-in frontend users, the example VCL already checks for the `fe_typo_user` cookie. Pages for logged-in users will bypass the cache automatically.
+
+### Cache invalidation
+
+The VCL supports the BAN method for invalidating multiple cached objects at once. For TYPO3 users, the [mittwald TYPO3 Varnish extension](https://github.com/mittwald/typo3-varnishcache) provides seamless integration - install it in your TYPO3 installation and it will automatically send BAN requests to Varnish whenever content is updated in the backend, keeping your cache in sync with your content.
+
+:::info
+
+The VCL examples in this guide are based on the [example VCL configuration](https://github.com/mittwald/typo3-varnishcache/blob/main/Resources/Private/Example/default-4.vcl) from the mittwald TYPO3 extension. The key addition for the mittwald platform is the Host header rewriting logic in `vcl_backend_fetch`.
+
+:::
+
+## Monitoring and debugging
+
+### Check if caching is working
+
+The VCL configuration adds an `x-cache` header to responses:
+
+```shellsession
+$ curl -I https://www.example.com
+HTTP/1.1 200 OK
+x-cache: HIT
+```
+
+- `x-cache: HIT` = Content served from cache
+- `x-cache: MISS` = Content fetched from backend
+
+### View Varnish logs
+
+This command will print the standard output of Varnish itself:
+
+```shellsession
+$ mw container logs <container-id>
+```
+
+To get the actual (per-request) logs, use `varnishlog`:
+
+```shellsession
+$ mw container exec <container-id> -- varnishlog
+```
+
+### Varnish statistics
+
+Connect to the container and use `varnishstat`:
+
+```shellsession
+$ mw container exec <container-id> -- varnishstat
+```
+
+### Common issues
+
+**Problem**: All requests show `x-cache: MISS`
+
+- Check if requests have cookies (cookies trigger `pass` mode for non-static content)
+- Verify your VCL logic isn't forcing `pass` mode for the specific URLs
+- Check backend response headers (e.g., `Cache-Control: no-cache` will prevent caching)
+- For TYPO3: Ensure you're not accessing backend URLs (`/typo3/`) or logged in with a backend user cookie
+
+**Problem**: Backend application returns 404, 403 or doesn't respond
+
+- Verify the internal virtual host is correctly configured
+- Check the `Host` header is being rewritten correctly in VCL
+- Ensure the backend hostname in VCL matches your app's virtual host
+
+**Problem**: Container won't start
+
+- Check VCL syntax: Run `varnishd -C -f /etc/varnish/default.vcl` (if the container does not start, run this command in a separate container with an overwritten entrypoint or in a container on your local machine)
+- Verify the VCL file was uploaded to the correct path
+- Check container logs for error messages
+
+## Performance considerations
+
+### Cache hit ratio
+
+A good cache hit ratio is typically above 80%. Monitor this with:
+
+```shellsession
+$ mw container exec <container-id> 'varnishstat -1' | grep 'cache_\(hit\|miss\)\s'
+```
+
+### Memory sizing
+
+Varnish stores cached content in memory. For production use, you may want to:
+
+1. Monitor memory usage
+2. Adjust container resources based on your traffic patterns
+3. Consider implementing size limits in VCL
+
+### Grace mode
+
+The example VCL enables "grace mode" which serves stale content if the backend is unavailable. This improves reliability but means users might see outdated content during backend outages.
+
+## Further reading
+
+- [Varnish Cache Documentation](https://varnish-cache.org/docs/)
+- [VCL (Varnish Configuration Language) Reference](https://varnish-cache.org/docs/trunk/reference/vcl.html)
+- [Container management on mittwald](./containers.mdx)
+- [Managing domains and virtual hosts](/docs/v2/platform/domains)
