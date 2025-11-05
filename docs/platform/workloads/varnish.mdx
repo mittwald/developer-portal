@@ -24,7 +24,7 @@ A caching reverse proxy like [Varnish Cache](https://varnish-cache.org/) sits be
 - **Flexibility**: Fine-grained control over what gets cached and for how long using VCL (Varnish Configuration Language)
 - **Cost efficiency**: Reduce resource requirements for your backend application
 
-This guide demonstrates how to deploy Varnish as a caching layer in front of a TYPO3 application on the mittwald platform, but the same principles apply to any managed application.
+This guide demonstrates how to deploy Varnish as a caching layer in front of web applications (TYPO3, Shopware 5/6) on the mittwald platform, with specific configuration examples for each platform.
 
 ## Prerequisites
 
@@ -38,12 +38,12 @@ Before you begin, ensure you have:
 
 The setup consists of three main components:
 
-1. **Backend application**: A TYPO3 (or other PHP) application connected to a virtual host
+1. **Backend application**: Your web application (TYPO3, Shopware, etc.) connected to a virtual host
 2. **Varnish container**: Runs the Varnish caching server
 3. **VCL configuration**: Defines caching behavior and routes requests to the backend
 
 ```
-Internet → Varnish Container (Port 80) → TYPO3 Application
+Internet → Varnish Container (Port 80) → Backend Application
                 ↓
          VCL Configuration
          (Host header rewrite)
@@ -55,7 +55,13 @@ On the mittwald platform, the backend application must be connected to a virtual
 
 :::
 
-## Deploying Varnish with TYPO3
+## Deployment
+
+This section covers the general deployment process for Varnish with a backend application. For application-specific VCL configurations, see the sections for [TYPO3](#typo3-configuration), [Shopware 5](#shopware-5-configuration), or [Shopware 6](#shopware-6-configuration) after completing the deployment.
+
+### Example: Deploying with TYPO3
+
+The following examples demonstrate deployment using TYPO3 as the backend application. The same process applies to other applications, with appropriate adjustments to the app type and configuration.
 
 ### Using Terraform
 
@@ -171,7 +177,7 @@ Replace `www.example.com` with your actual public domain. This allows TYPO3 to a
 
 #### Step 2: Create the VCL configuration file
 
-Create a file named `default.vcl` in your Terraform working directory. You can use the [example VCL from the mittwald TYPO3 extension](https://github.com/mittwald/typo3-varnishcache/blob/main/Resources/Private/Example/default-4.vcl) as a base, with one critical addition for the mittwald platform:
+Create a file named `default.vcl` in your Terraform working directory. Use the official VCL configuration for your application (see [Application-Specific VCL Configurations](#application-specific-vcl-configurations) below) with one critical addition for the mittwald platform:
 
 ```vcl
 vcl 4.0;
@@ -181,15 +187,16 @@ backend default {
     .port = "${backend.port}";
 }
 
-# For the complete VCL configuration including cache rules, BAN support,
-# ESI processing, and static file handling, see:
-# https://github.com/mittwald/typo3-varnishcache/blob/main/Resources/Private/Example/default-4.vcl
+# Copy the complete VCL configuration for your application:
+# - TYPO3: https://github.com/mittwald/typo3-varnishcache/blob/main/Resources/Private/Example/default-4.vcl
+# - Shopware 5: https://developers.shopware.com/sysadmins-guide/varnish-setup/
+# - Shopware 6: https://developer.shopware.com/docs/guides/hosting/infrastructure/reverse-http-cache.html
 
 sub vcl_recv {
     # Preserve the original Host header
     set req.http.X-Forwarded-Host = req.http.Host;
 
-    # ... other vcl_recv rules from the example VCL ...
+    # ... other vcl_recv rules from your application's VCL ...
 }
 
 sub vcl_backend_fetch {
@@ -198,7 +205,7 @@ sub vcl_backend_fetch {
     set bereq.http.Host = "${backend.external_host}";
 }
 
-# ... other subroutines from the example VCL (vcl_backend_response, vcl_deliver, etc.) ...
+# ... other subroutines from your application's VCL (vcl_backend_response, vcl_deliver, etc.) ...
 ```
 
 #### Step 3: Upload the VCL configuration and deploy Varnish
@@ -323,7 +330,7 @@ $ mw domain virtualhost create \
 
 #### Step 3: Create and upload the VCL configuration
 
-Create a file named `default.vcl` locally. Start with the [example VCL from the mittwald TYPO3 extension](https://github.com/mittwald/typo3-varnishcache/blob/main/Resources/Private/Example/default-4.vcl) and add the Host header rewriting required for the mittwald platform:
+Create a file named `default.vcl` locally. Start with the official VCL configuration for your application (see [Application-Specific VCL Configurations](#application-specific-vcl-configurations) below) and add the Host header rewriting required for the mittwald platform:
 
 ```vcl
 vcl 4.0;
@@ -333,14 +340,15 @@ backend default {
     .port = "8080";
 }
 
-# For the complete VCL configuration including cache rules, BAN support,
-# ESI processing, and static file handling, copy from:
-# https://github.com/mittwald/typo3-varnishcache/blob/main/Resources/Private/Example/default-4.vcl
+# Copy the complete VCL configuration for your application:
+# - TYPO3: https://github.com/mittwald/typo3-varnishcache/blob/main/Resources/Private/Example/default-4.vcl
+# - Shopware 5: https://developers.shopware.com/sysadmins-guide/varnish-setup/
+# - Shopware 6: https://developer.shopware.com/docs/guides/hosting/infrastructure/reverse-http-cache.html
 
 sub vcl_recv {
     set req.http.X-Forwarded-Host = req.http.Host;
 
-    # ... other vcl_recv rules from the example VCL ...
+    # ... other vcl_recv rules from your application's VCL ...
 }
 
 sub vcl_backend_fetch {
@@ -349,10 +357,10 @@ sub vcl_backend_fetch {
     set bereq.http.Host = "backend.<project-short-id>.project.space";
 }
 
-# ... other subroutines from the example VCL ...
+# ... other subroutines from your application's VCL ...
 ```
 
-Upload the VCL file to `/files/varnish/default.vcl` in your TYPO3 app.
+Upload the VCL file to `/files/varnish/default.vcl` in your app.
 
 #### Step 4: Deploy the Varnish container
 
@@ -409,7 +417,7 @@ Replace `www.example.com` with your actual public domain.
 
 #### Step 3: Prepare the VCL configuration
 
-Download the [example VCL from the mittwald TYPO3 extension](https://github.com/mittwald/typo3-varnishcache/blob/main/Resources/Private/Example/default-4.vcl) and modify it to add Host header rewriting in the `vcl_backend_fetch` subroutine (see the CLI section above for the specific changes needed).
+Download the official VCL configuration for your application (see [Application-Specific VCL Configurations](#application-specific-vcl-configurations) below) and modify it to add Host header rewriting in the `vcl_backend_fetch` subroutine (see the CLI section above for the specific changes needed).
 
 Upload it to `/files/varnish/default.vcl` in your app using the file manager or SFTP.
 
@@ -444,30 +452,119 @@ Replace `www.example.com` with your actual public domain.
 
 :::
 
-## Customizing the VCL configuration
+## Application-Specific VCL Configurations
 
-The [example VCL configuration](https://github.com/mittwald/typo3-varnishcache/blob/main/Resources/Private/Example/default-4.vcl) from the mittwald TYPO3 extension includes:
+The VCL examples in the deployment section above show the basic structure with the critical Host header rewriting required for the mittwald platform. This section provides application-specific guidance for TYPO3, Shopware 5, and Shopware 6.
 
-- **BAN support** for cache invalidation (used automatically by the TYPO3 extension)
+### TYPO3 Configuration
+
+The [mittwald TYPO3 Varnish extension](https://github.com/mittwald/typo3-varnishcache) provides a [complete VCL example](https://github.com/mittwald/typo3-varnishcache/blob/main/Resources/Private/Example/default-4.vcl) that includes:
+
+- **BAN support** for cache invalidation (automatically triggered by the TYPO3 extension)
 - **Cookie handling** that bypasses cache for TYPO3 backend users (`be_typo_user` cookie)
 - **Static file caching** with optimized TTLs for images, CSS, JS, etc.
 - **ESI (Edge Side Includes)** processing support
 - **Streaming** for media files
 - **Retry logic** for server errors (5xx responses)
 
-You can customize the VCL based on your needs:
+**Key integration point**: Install the [mittwald TYPO3 Varnish extension](https://github.com/mittwald/typo3-varnishcache) in your TYPO3 installation. It automatically sends BAN requests to Varnish whenever content is updated in the backend, keeping your cache in sync with your content.
 
-### Handling frontend user sessions
-
-If your TYPO3 site has logged-in frontend users, the example VCL already checks for the `fe_typo_user` cookie. Pages for logged-in users will bypass the cache automatically.
-
-### Cache invalidation
-
-The VCL supports the BAN method for invalidating multiple cached objects at once. For TYPO3 users, the [mittwald TYPO3 Varnish extension](https://github.com/mittwald/typo3-varnishcache) provides seamless integration - install it in your TYPO3 installation and it will automatically send BAN requests to Varnish whenever content is updated in the backend, keeping your cache in sync with your content.
+**Frontend user sessions**: The example VCL checks for the `fe_typo_user` cookie. Pages for logged-in frontend users automatically bypass the cache.
 
 :::info
 
-The VCL examples in this guide are based on the [example VCL configuration](https://github.com/mittwald/typo3-varnishcache/blob/main/Resources/Private/Example/default-4.vcl) from the mittwald TYPO3 extension. The key addition for the mittwald platform is the Host header rewriting logic in `vcl_backend_fetch`.
+When using the mittwald TYPO3 extension's VCL example, remember to add the Host header rewriting in `vcl_backend_fetch` as shown in the deployment examples above.
+
+:::
+
+### Shopware 5 Configuration
+
+Shopware 5 uses a custom cache invalidation mechanism. Use the [official Shopware 5 Varnish configuration](https://developers.shopware.com/sysadmins-guide/varnish-setup/) as your base VCL.
+
+**Key features to include from the Shopware 5 VCL:**
+
+- **Cache invalidation**: PURGE and BAN methods using `X-Shopware-Invalidates` header
+- **Cookie normalization**: Shop, currency, and cache-context-hash cookies for improved cache hit rates
+- **URL normalization**: Strip UTM and tracking parameters from URLs
+- **ESI support**: Enable with `Surrogate-Capability` and `Surrogate-Control` headers
+- **Custom headers**: `X-Shopware-Cache-Id` for identifying cacheable content
+
+**mittwald-specific addition**: In your `vcl_backend_fetch` subroutine, add the Host header rewriting:
+
+```vcl
+sub vcl_backend_fetch {
+    # Standard Shopware 5 backend fetch logic here...
+    # (from the official Shopware 5 VCL)
+
+    # IMPORTANT: Add this for mittwald platform
+    set bereq.http.Host = "backend.<project-short-id>.project.space";
+}
+```
+
+**Cache warming**: Shopware 5 supports cache warming. Configure your shop to send warm-up requests to the internal backend hostname if needed.
+
+**Reference**: [Shopware 5 Varnish Setup Guide](https://developers.shopware.com/sysadmins-guide/varnish-setup/)
+
+### Shopware 6 Configuration
+
+Shopware 6 requires **Varnish 6.0 or later with the XKey module** for surrogate key-based cache invalidation.
+
+**Shopware 6 configuration requirements:**
+
+1. Enable reverse proxy in your Shopware configuration (`config/packages/shopware.yaml`):
+
+```yaml
+shopware:
+    http_cache:
+        reverse_proxy:
+            enabled: true
+            use_varnish_xkey: true
+            hosts: [ "http://varnish" ]
+            max_parallel_invalidations: 3
+```
+
+2. Set environment variable: `SHOPWARE_HTTP_CACHE_ENABLED=1`
+
+**Key VCL requirements from [Shopware 6 documentation](https://developer.shopware.com/docs/guides/hosting/infrastructure/reverse-http-cache.html):**
+
+- **XKey module**: Use `xkey.purge()` for hard purge or `xkey.softpurge()` for soft purge
+- **Surrogate keys**: Shopware sends `Xkey` headers for targeted invalidation
+- **Cache-Control headers**: Respect `s-maxage` from Shopware responses
+
+**mittwald-specific VCL structure:**
+
+```vcl
+vcl 4.1;
+
+import xkey;
+
+backend default {
+    .host = "a-XXXXX";  # Your Shopware app's short ID
+    .port = "8080";
+}
+
+# Copy the complete Shopware 6 VCL from the official documentation
+# https://developer.shopware.com/docs/guides/hosting/infrastructure/reverse-http-cache.html
+
+sub vcl_backend_fetch {
+    # Standard Shopware 6 backend fetch logic...
+
+    # IMPORTANT: Add this for mittwald platform
+    set bereq.http.Host = "backend.<project-short-id>.project.space";
+}
+```
+
+**Cache invalidation**: Use Shopware's built-in cache clearing:
+- `bin/console cache:clear:http` — Clears reverse proxy cache only (recommended)
+- Shopware automatically invalidates cache when content changes in the admin
+
+**Soft purge option**: Modify the VCL to use `xkey.softpurge()` instead of `xkey.purge()` to serve stale content while refreshing in the background.
+
+**Reference**: [Shopware 6 Reverse HTTP Cache Guide](https://developer.shopware.com/docs/guides/hosting/infrastructure/reverse-http-cache.html)
+
+:::tip Varnish Version
+
+Make sure to use Varnish 6.0 or later for Shopware 6. The `varnish:8` image used in the deployment examples includes the XKey module by default.
 
 :::
 
@@ -553,6 +650,18 @@ The example VCL enables "grace mode" which serves stale content if the backend i
 
 ## Further reading
 
+### General Varnish Documentation
+
 - [Varnish Cache Documentation](https://varnish-cache.org/docs/)
 - [VCL (Varnish Configuration Language) Reference](https://varnish-cache.org/docs/trunk/reference/vcl.html)
+
+### Application-Specific Documentation
+
+- **TYPO3**: [mittwald TYPO3 Varnish Extension](https://github.com/mittwald/typo3-varnishcache)
+- **Shopware 5**: [Varnish Setup Guide](https://developers.shopware.com/sysadmins-guide/varnish-setup/)
+- **Shopware 6**: [Reverse HTTP Cache Guide](https://developer.shopware.com/docs/guides/hosting/infrastructure/reverse-http-cache.html)
+
+### mittwald Platform Documentation
+
 - [Container management on mittwald](./containers.mdx)
+- [Managing domains and virtual hosts](/docs/v2/platform/domains)
