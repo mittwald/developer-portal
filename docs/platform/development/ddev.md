@@ -67,7 +67,7 @@ $ ddev config \
     --project-type <type> \
     --php-version <php-version> \
     --database mysql:<mysql-version>
-$ ddev get mittwald/ddev
+$ ddev add-on get mittwald/ddev-mittwald
 ```
 
 Replace `<type>`, `<php-version>`, and `<mysql-version>` with the appropriate values for your project. After running these commands, your DDEV environment will be configured, and the [mittwald DDEV addon][ddev-addon] will be installed.
