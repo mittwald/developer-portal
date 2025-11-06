@@ -67,7 +67,7 @@ $ ddev config \
     --project-type <type> \
     --php-version <php-version> \
     --database mysql:<mysql-version>
-$ ddev get mittwald/ddev
+$ ddev add-on get mittwald/ddev-mittwald
 ```
 
 Ersetze `<type>`, `<php-version>` und `<mysql-version>` durch die entsprechenden Werte für dein Projekt. Nach Ausführung dieser Befehle wird deine DDEV-Umgebung konfiguriert, und das [mittwald DDEV-Addon][ddev-addon] wird installiert.
