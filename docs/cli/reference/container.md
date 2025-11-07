@@ -40,8 +40,10 @@ FLAGS
   -r, --recursive           copy directories recursively
 
 SSH CONNECTION FLAGS
-  --ssh-identity-file=<value>  the SSH identity file (private key) to use for public key authentication.
-  --ssh-user=<value>           override the SSH user to connect with; if omitted, your own user will be used
+  --ssh-identity-file=<value>  [env: MITTWALD_SSH_IDENTITY_FILE] the SSH identity file (private key) to use for public
+                               key authentication.
+  --ssh-user=<value>           [env: MITTWALD_SSH_USER] override the SSH user to connect with; if omitted, your own user
+                               will be used
 
 AUTHENTICATION FLAGS
   --token=<value>  API token to use for authentication (overrides environment and config file). NOTE: watch out that
@@ -164,8 +166,10 @@ FLAGS
       --shell=<value>       [default: /bin/sh] shell to use for the SSH connection
 
 SSH CONNECTION FLAGS
-  --ssh-identity-file=<value>  the SSH identity file (private key) to use for public key authentication.
-  --ssh-user=<value>           override the SSH user to connect with; if omitted, your own user will be used
+  --ssh-identity-file=<value>  [env: MITTWALD_SSH_IDENTITY_FILE] the SSH identity file (private key) to use for public
+                               key authentication.
+  --ssh-user=<value>           [env: MITTWALD_SSH_USER] override the SSH user to connect with; if omitted, your own user
+                               will be used
 
 AUTHENTICATION FLAGS
   --token=<value>  API token to use for authentication (overrides environment and config file). NOTE: watch out that
@@ -329,8 +333,9 @@ USAGE
 
 ARGUMENTS
   CONTAINER-ID  ID or short ID of the container to connect to
-  PORT          Specifies the port mapping between your local machine and the container. Format:
-                'local-port:container-port'. If not specified, available ports will be detected automatically.
+  [PORT]        Specifies the port mapping between your local machine and the container. Format:
+                'local-port:container-port' or just 'port' (in which case the same port is used locally and in the
+                container). If not specified, available ports will be detected automatically.
 
 FLAGS
   -p, --project-id=<value>  ID or short ID of a project; this flag is optional if a default project is set in the
@@ -338,8 +343,10 @@ FLAGS
   -q, --quiet               suppress process output and only display a machine-readable summary
 
 SSH CONNECTION FLAGS
-  --ssh-identity-file=<value>  the SSH identity file (private key) to use for public key authentication.
-  --ssh-user=<value>           override the SSH user to connect with; if omitted, your own user will be used
+  --ssh-identity-file=<value>  [env: MITTWALD_SSH_IDENTITY_FILE] the SSH identity file (private key) to use for public
+                               key authentication.
+  --ssh-user=<value>           [env: MITTWALD_SSH_USER] override the SSH user to connect with; if omitted, your own user
+                               will be used
 
 AUTHENTICATION FLAGS
   --token=<value>  API token to use for authentication (overrides environment and config file). NOTE: watch out that
@@ -500,27 +507,29 @@ USAGE
     <value>] [--entrypoint <value>] [--name <value>] [-p <value>...] [-P] [-v <value>...] IMAGE [COMMAND] [ARGS...]
 
 ARGUMENTS
-  IMAGE...    Can be specified as a repository/tag or repository@digest (e.g., 'ubuntu:20.04' or
-              'alpine@sha256:abc123...'). If no tag is provided, 'latest' is assumed.
-  COMMAND...  This overrides the default command specified in the container image. If omitted, the default command from
-              the image will be used. For example, 'bash' or 'python app.py'.
-  ARGS...     These are the runtime arguments passed to the command specified by the command parameter or the
-              container's default command, not to the container itself. For example, if the command is 'echo', the args
-              might be 'hello world'.
+  IMAGE...      Can be specified as a repository/tag or repository@digest (e.g., 'ubuntu:20.04' or
+                'alpine@sha256:abc123...'). If no tag is provided, 'latest' is assumed.
+  [COMMAND...]  This overrides the default command specified in the container image. If omitted, the default command
+                from the image will be used. For example, 'bash' or 'python app.py'.
+  [ARGS...]     These are the runtime arguments passed to the command specified by the command parameter or the
+                container's default command, not to the container itself. For example, if the command is 'echo', the
+                args might be 'hello world'.
 
 FLAGS
   -P, --publish-all          publish all ports that are defined in the image
   -e, --env=<value>...       set environment variables in the container
+  -m, --memory=<value>       set memory limit for the container
   -p, --project-id=<value>   ID or short ID of a project; this flag is optional if a default project is set in the
                              context
   -q, --quiet                suppress process output and only display a machine-readable summary
   -v, --volume=<value>...    bind mount a volume to the container
+      --cpus=<value>         set CPU limit for the container
       --create-volumes       automatically create named volumes that do not exist
       --description=<value>  add a descriptive label to the container
       --entrypoint=<value>   override the default entrypoint of the container image
       --env-file=<value>...  read environment variables from a file
       --name=<value>         assign a custom name to the container
-      --publish=<value>...   publish a container's port(s) to the host
+      --publish=<value>...   publish a container's port(s)
 
 AUTHENTICATION FLAGS
   --token=<value>  API token to use for authentication (overrides environment and config file). NOTE: watch out that
@@ -534,6 +543,11 @@ FLAG DESCRIPTIONS
   -e, --env=<value>...  set environment variables in the container
 
     Format: KEY=VALUE. Multiple environment variables can be specified with multiple --env flags.
+
+  -m, --memory=<value>  set memory limit for the container
+
+    Specify the maximum amount of memory the container can use (e.g., '512m', '1g', '2g'). This is equivalent to the
+    docker run --memory flag or the deploy.resources.limits.memory field in docker-compose.
 
   -p, --project-id=<value>  ID or short ID of a project; this flag is optional if a default project is set in the context
 
@@ -551,6 +565,11 @@ FLAG DESCRIPTIONS
     volumes.Needs to be in the format <host-path>:<container-path>. If you specify a file path as volume, this will
     mount a path from your hosting environment's file system (NOT your local file system) into the container. You can
     also specify a named volume, which needs to be created beforehand.
+
+  --cpus=<value>  set CPU limit for the container
+
+    Specify the number of CPUs available to the container (e.g., '0.5', '1', '2'). This is equivalent to the docker run
+    --cpus flag or the deploy.resources.limits.cpus field in docker-compose.
 
   --create-volumes  automatically create named volumes that do not exist
 
@@ -576,11 +595,12 @@ FLAG DESCRIPTIONS
     This makes it easier to reference the container in subsequent commands. If omitted, a random name will be generated
     automatically.
 
-  --publish=<value>...  publish a container's port(s) to the host
+  --publish=<value>...  publish a container's port(s)
 
-    Map a container's port to a port on the host system. Format: <host-port>:<container-port> or just <container-port>
-    (in which case the host port will be automatically assigned). For example, --publish 8080:80 maps port 80 in the
-    container to port 8080 on the host. Use multiple --publish flags to publish multiple ports.
+    Expose a container's port within the cluster. Format: <cluster-port>:<container-port> or just <port> (in which case
+    the same port is used for both cluster and container). For example, --publish 8080:80 maps port 80 in the container
+    to port 8080 within the cluster, while --publish 8080 exposes port 8080 as port 8080. Use multiple --publish flags
+    to publish multiple ports.
 
     NOTE: Please note that the usual shorthand -p is not supported for this flag, as it would conflict with the
     --project flag.
@@ -606,8 +626,10 @@ FLAGS
       --test                test connection and exit
 
 SSH CONNECTION FLAGS
-  --ssh-identity-file=<value>  the SSH identity file (private key) to use for public key authentication.
-  --ssh-user=<value>           override the SSH user to connect with; if omitted, your own user will be used
+  --ssh-identity-file=<value>  [env: MITTWALD_SSH_IDENTITY_FILE] the SSH identity file (private key) to use for public
+                               key authentication.
+  --ssh-user=<value>           [env: MITTWALD_SSH_USER] override the SSH user to connect with; if omitted, your own user
+                               will be used
 
 AUTHENTICATION FLAGS
   --token=<value>  API token to use for authentication (overrides environment and config file). NOTE: watch out that
@@ -763,8 +785,8 @@ FLAG DESCRIPTIONS
 
   -p, --publish=<value>...  update the container's port mappings
 
-    Map a container's port to a port on the host system. Format: <host-port>:<container-port> or just <container-port>
-    (in which case the host port will be automatically assigned). Use multiple -p flags to publish multiple ports.
+    Expose a container's port within the cluster. Format: <cluster-port>:<container-port> or just <port> (in which case
+    the same port is used for both cluster and container). Use multiple -p flags to publish multiple ports.
 
   -q, --quiet  suppress process output and only display a machine-readable summary
 

@@ -14,7 +14,7 @@ USAGE
   $ mw autocomplete [SHELL] [-r]
 
 ARGUMENTS
-  SHELL  (zsh|bash|powershell) Shell type
+  [SHELL]  (zsh|bash|powershell) Shell type
 
 FLAGS
   -r, --refresh-cache  Refresh cache (ignores displaying instructions)
@@ -34,4 +34,4 @@ EXAMPLES
   $ mw autocomplete --refresh-cache
 ```
 
-_See code: [@oclif/plugin-autocomplete](https://github.com/oclif/plugin-autocomplete/blob/v3.2.35/src/commands/autocomplete/index.ts)_
+_See code: [@oclif/plugin-autocomplete](https://github.com/oclif/plugin-autocomplete/blob/v3.2.38/src/commands/autocomplete/index.ts)_
