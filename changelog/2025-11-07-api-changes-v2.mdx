@@ -1,0 +1,190 @@
+---
+title: Breaking (!) API changes for v2 API, October 31 to November 7
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - User
+  - Domain
+  - Marketplace
+  - Backup
+  - Mail
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API introduces several enhancements, including an increase in the minimum and maximum length for the 'token' request property, the addition of new optional request parameters and properties, and multiple new endpoints for managing project backups and mail settings.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The minimum length of the 'token' request property for the `POST /v2/users/self/credentials/password/confirm-reset` operation has been increased from 6 to 20 characters. This is a breaking change.
+- The maximum length of the 'token' request property for the `POST /v2/users/self/credentials/password/confirm-reset` operation has also been increased from 6 to 20 characters.
+- New optional query request parameters 'limit', 'page', and 'skip' have been added to the `POST /v2/actions/list-ingresses-compatible-with-certificate` operation.
+- A new optional request property '/oneOf[subschema #2]/pricePlan/variants/items/isBookingStopped' has been added to the `PUT /v2/contributors/{contributorId}/extensions/{extensionId}/pricing` operation.
+- An optional property 'restorePath' has been added to the response with the '200' status for the `GET /v2/project-backups/{projectBackupId}` operation.
+- A new endpoint `GET /v2/project-backups/{projectBackupId}/path` has been added to get the table of contents for a ProjectBackup.
+- A new endpoint `POST /v2/project-backups/{projectBackupId}/restore-path` has been added to restore a ProjectBackup's path.
+- An optional property '/items/restorePath' has been added to the response with the '200' status for the `GET /v2/projects/{projectId}/backups` operation.
+- An optional property 'restorePath' has been added to the response with the '201' status for the `POST /v2/projects/{projectId}/backups` operation.
+- A new endpoint `PUT /v2/projects/{projectId}/mail-settings/{mailSetting}` has been added to update a mail setting of a Project.
+- A new endpoint `PATCH /v2/projects/{projectId}/mail-settings/{setting}` has been added to update a mail setting of a Project.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Confirm password reset"
+
+
+- ⚠️ **Breaking:** the 'token' request property's minLength was increased from '6' to '20'
+
+- the 'token' request property's maxLength was increased from '6' to '20'
+
+
+For details, refer to the <OperationLink operation="user-confirm-password-reset" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Ingresses compatible with a certificate"
+
+
+- added the new optional 'query' request parameter 'limit'
+
+- added the new optional 'query' request parameter 'page'
+
+- added the new optional 'query' request parameter 'skip'
+
+
+For details, refer to the <OperationLink operation="ingress-list-ingresses-compatible-with-certificate" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Creates or Updates Pricing for an Extension"
+
+
+- added the new optional request property '/oneOf[subschema #2]/pricePlan/variants/items/isBookingStopped'
+
+
+For details, refer to the <OperationLink operation="extension-update-extension-pricing" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a project backup"
+
+
+- added the optional property 'restorePath' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="backup-get-project-backup" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get table of contents for a project backup"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="backup-get-project-backup-directories" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Restore a project backup's path"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="backup-request-project-backup-restore-path" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Backups belonging to a Project"
+
+
+- added the optional property '/items/restorePath' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="backup-list-project-backups" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a Backup of a Project"
+
+
+- added the optional property 'restorePath' to the response with the '201' status
+
+
+For details, refer to the <OperationLink operation="backup-create-project-backup" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a mail setting of a Project"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="deprecated-mail-update-project-mail-setting" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a mail setting of a Project"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="mail-update-project-mail-setting" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald JavaScript SDK Release 4.256.0
+
+The mittwald JavaScript SDK has been updated to version 4.256.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.256.0](https://github.com/mittwald/api-client-js/releases/tag/4.256.0).
+
+### mittwald JavaScript SDK Release 4.255.0
+
+The mittwald JavaScript SDK has been updated to version 4.255.0. This release includes an update to the generated client, enhancing its functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.255.0).
+
+### mittwald JavaScript SDK Release 4.254.0
+
+The mittwald JavaScript SDK has been updated to version 4.254.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.254.0).
+
+### mittwald JavaScript SDK Release 4.253.0
+
+The mittwald JavaScript SDK has been updated to version 4.253.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.253.0).
+
+### mittwald JavaScript SDK Release 4.252.0
+
+The mittwald JavaScript SDK has been updated to version 4.252.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.252.0).
+
+### mittwald JavaScript SDK Release 4.251.1
+
+The mittwald JavaScript SDK version 4.251.1 has been released. This update includes a bug fix for the `ConsistencyHandlingInterceptor`. Specifically, the fix ensures that the `if-event-reached` header is only set if it is not already present. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.251.1).
+
