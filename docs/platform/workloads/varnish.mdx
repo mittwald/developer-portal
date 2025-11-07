@@ -6,6 +6,9 @@ description: Add a caching proxy to your application or your container
 tags:
   - Containers
   - Docker
+  - TYPO3
+  - Shopware
+  - Varnish
 ---
 
 import PlanCompatibility from "@site/src/components/PlanCompatibility";
@@ -59,15 +62,17 @@ On the mittwald platform, the backend application must be connected to a virtual
 
 This section covers the general deployment process for Varnish with a backend application. For application-specific VCL configurations, see the sections for [TYPO3](#typo3-configuration), [Shopware 5](#shopware-5-configuration), or [Shopware 6](#shopware-6-configuration) after completing the deployment.
 
-### Example: Deploying with TYPO3
+:::note TYPO3 as example
 
 The following examples demonstrate deployment using TYPO3 as the backend application. The same process applies to other applications, with appropriate adjustments to the app type and configuration.
+
+:::
 
 ### Using Terraform
 
 #### Step 1: Define your project and backend application
 
-First, create your mittwald project and TYPO3 application:
+First, create your mittwald project and deploy your managed application (TYPO3, in this example):
 
 ```hcl
 terraform {
@@ -100,30 +105,19 @@ resource "mittwald_project" "varnish_demo" {
   server_id   = local.server_id
 }
 
-# Look up required system software versions
-data "mittwald_systemsoftware" "php" {
-  name     = "php"
-  selector = "^8.4"
-}
-
-data "mittwald_systemsoftware" "composer" {
-  name        = "composer"
-  recommended = true
-}
-
 # Look up the latest TYPO3 version
 data "mittwald_app" "typo3" {
   name     = "typo3"
   selector = "^13"
 }
 
-# Create TYPO3 backend application
-resource "mittwald_app" "typo3" {
+# Create backend application
+resource "mittwald_app" "example" {
   project_id = mittwald_project.varnish_demo.id
 
   app           = data.mittwald_app.typo3.name
   version       = data.mittwald_app.typo3.version
-  description   = "TYPO3 Backend"
+  description   = "TYPO3"
   update_policy = "patchLevel"
 
   user_inputs = {
@@ -133,29 +127,18 @@ resource "mittwald_app" "typo3" {
     "admin_user"  = "admin"
     "admin_pass"  = var.typo3_admin_password
   }
-
-  dependencies = {
-    (data.mittwald_systemsoftware.php.name) = {
-      version       = data.mittwald_systemsoftware.php.version
-      update_policy = "patchLevel"
-    }
-    (data.mittwald_systemsoftware.composer.name) = {
-      version       = data.mittwald_systemsoftware.composer.version
-      update_policy = "patchLevel"
-    }
-  }
 }
 
 # Connect the TYPO3 app to an internal virtual host
 # This is required so Varnish can route requests to it
-resource "mittwald_virtualhost" "typo3_backend" {
+resource "mittwald_virtualhost" "example_backend" {
   hostname   = "backend.${mittwald_project.varnish_demo.short_id}.project.space"
   project_id = mittwald_project.varnish_demo.id
 
   paths = {
     "/" = {
       app = {
-        app_id = mittwald_app.typo3.id
+        app_id = mittwald_app.example.id
       }
     }
   }
@@ -215,14 +198,14 @@ Complete your Terraform configuration with the VCL file upload and Varnish conta
 ```hcl
 # Upload the VCL configuration file
 resource "mittwald_remote_file" "varnish_vcl" {
-  app_id = mittwald_app.typo3.id
+  app_id = mittwald_app.example.id
 
   path = "/files/varnish/default.vcl"
   contents = templatefile("${path.module}/default.vcl", {
     backend = {
-      host          = mittwald_app.typo3.short_id
+      host          = mittwald_app.example.short_id
       port          = 8080
-      external_host = mittwald_virtualhost.typo3_backend.hostname
+      external_host = mittwald_virtualhost.example_backend.hostname
     }
   })
 }
@@ -306,15 +289,20 @@ After applying, your TYPO3 application will be accessible through Varnish at you
 
 ```shellsession
 # Create a new project
-$ mw project create --description "TYPO3 with Varnish" --server <server-id>
+$ mw project create --description "Managed application with Varnish" --server <server-id>
 
 # Create TYPO3 application
-$ mw app create typo3 \
+$ mw app install typo3 \
   --version 13.4.3 \
-  --description "TYPO3 Backend"
+  --install-mode composer \
+  --admin-user admin \
+  --admin-pass "#supersecr3t!" \
+  --site-title "TYPO3 example"
+  --host "https://www.example.com" \
+  --description "TYPO3 example"
 ```
 
-During the interactive installation, configure TYPO3 with your public domain (e.g., `https://www.example.com`) as the base URL, not the backend hostname. Note the application ID from the output, you'll need it in the following steps.
+In the `mw app install` command, use your public domain (e.g., `https://www.example.com`) as the base URL, not the backend hostname. Note the application ID from the output, you'll need it in the following steps.
 
 #### Step 2: Connect TYPO3 to an internal virtual host
 
@@ -367,7 +355,7 @@ Upload the VCL file to `/files/varnish/default.vcl` in your app.
 ```shellsession
 $ mw container run \
   --name varnish \
-  -p 80:80/tcp \
+  --publish-all \
   --volume /files/varnish:/etc/varnish \
   varnish:8
 ```
@@ -399,25 +387,22 @@ Replace `www.example.com` with your actual public domain.
 
 ### Using the mStudio UI
 
-#### Step 1: Create the TYPO3 application
+#### Step 1: Create the backend application
 
-1. Navigate to your project in mStudio
-2. Click "Apps" in the sidebar
-3. Click "Create App" and select "TYPO3 CMS"
-4. Complete the installation wizard
-   - Configure the base URL with your public domain (e.g., `https://www.example.com`), not the backend hostname
-5. Note the application's short ID (visible in the app details)
+1. Install your required backend application (e.g., TYPO3) in your project using the mStudio UI. Alternatively, create a custom PHP application and deploy it yourself.
+2. When installing an application via the mStudio, use your public domain (e.g., `https://www.example.com`) as the base URL in your application configuration, not the backend hostname.
+3. After installation, note the application's short ID (visible in the app details)
 
 #### Step 2: Create an internal virtual host
 
 1. In your project, click "Domains" in the sidebar
 2. Click "Add vHost"
 3. Use hostname: `backend.<project-short-id>.project.space`
-4. Connect the virtual host with the TYPO3 app.
+4. Connect the virtual host with the backend app.
 
 #### Step 3: Prepare the VCL configuration
 
-Download the official VCL configuration for your application (see [Application-Specific VCL Configurations](#application-specific-vcl-configurations) below) and modify it to add Host header rewriting in the `vcl_backend_fetch` subroutine (see the CLI section above for the specific changes needed).
+Download the exampel VCL configuration for your application (see [Application-Specific VCL Configurations](#application-specific-vcl-configurations) below) and modify it to add Host header rewriting in the `vcl_backend_fetch` subroutine (see the CLI section above for the specific changes needed).
 
 Upload it to `/files/varnish/default.vcl` in your app using the file manager or SFTP.
 
@@ -515,12 +500,12 @@ Shopware 6 requires **Varnish 6.0 or later with the XKey module** for surrogate 
 
 ```yaml
 shopware:
-    http_cache:
-        reverse_proxy:
-            enabled: true
-            use_varnish_xkey: true
-            hosts: [ "http://varnish" ]
-            max_parallel_invalidations: 3
+  http_cache:
+    reverse_proxy:
+      enabled: true
+      use_varnish_xkey: true
+      hosts: ["http://varnish"]
+      max_parallel_invalidations: 3
 ```
 
 2. Set environment variable: `SHOPWARE_HTTP_CACHE_ENABLED=1`
@@ -555,6 +540,7 @@ sub vcl_backend_fetch {
 ```
 
 **Cache invalidation**: Use Shopware's built-in cache clearing:
+
 - `bin/console cache:clear:http` — Clears reverse proxy cache only (recommended)
 - Shopware automatically invalidates cache when content changes in the admin
 
