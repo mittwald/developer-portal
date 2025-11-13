@@ -143,16 +143,14 @@ resource "mittwald_virtualhost" "example_backend" {
 }
 ```
 
-:::info TYPO3 Trusted Hosts Pattern
+:::info TYPO3 Reverse Proxy settings
 
-Since TYPO3 will be accessed via the backend virtual host (by Varnish) but configured with the public domain as its base URL, you need to configure TYPO3's `trustedHostsPattern` to accept both hostnames. Add this to your TYPO3 `config/system/settings.php` or `config/system/additional.php`:
+Since TYPO3 will be accessed via the Varnish proxy, you will need to configure your TYPO3 instance to be aware of the reverse proxy; for this, set the `[SYS][reverseProxyIP]` and `[SYS][reverseProxyHeaderMultiValue]` values in `config/system/settings.php` or `config/system/additional.php`:
 
 ```php
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['trustedHostsPattern'] =
-    'backend\..*\.project\.space|' . preg_quote('www.example.com', '/');
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyIP'] = '*';
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyHeaderMultiValue'] = 'first';
 ```
-
-Replace `www.example.com` with your actual public domain. This allows TYPO3 to accept requests from both the internal backend hostname (used by Varnish) and the public domain.
 
 :::
 
@@ -370,16 +368,14 @@ $ mw domain virtualhost create \
   --path-to-container /:<container-id>:80/tcp
 ```
 
-:::info TYPO3 Trusted Hosts Pattern
+:::info TYPO3 Reverse Proxy settings
 
-Since TYPO3 will be accessed via the backend virtual host (by Varnish) but configured with the public domain as its base URL, configure TYPO3's `trustedHostsPattern` to accept both hostnames in your `config/system/settings.php` or `config/system/additional.php`:
+Since TYPO3 will be accessed via the Varnish proxy, you will need to configure your TYPO3 instance to be aware of the reverse proxy; for this, set the `[SYS][reverseProxyIP]` and `[SYS][reverseProxyHeaderMultiValue]` values in `config/system/settings.php` or `config/system/additional.php`:
 
 ```php
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['trustedHostsPattern'] =
-    'backend\..*\.project\.space|' . preg_quote('www.example.com', '/');
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyIP'] = '*';
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyHeaderMultiValue'] = 'first';
 ```
-
-Replace `www.example.com` with your actual public domain.
 
 :::
 
@@ -422,16 +418,14 @@ Upload it to `/files/varnish/default.vcl` in your app using the file manager or 
 3. Enter your public domain (e.g., `www.example.com`)
 4. Point it to the Varnish container on port 80
 
-:::info TYPO3 Trusted Hosts Pattern
+:::info TYPO3 Reverse Proxy settings
 
-Since TYPO3 will be accessed via the backend virtual host (by Varnish) but configured with the public domain as its base URL, configure TYPO3's `trustedHostsPattern` to accept both hostnames in your `config/system/settings.php` or `config/system/additional.php`:
+Since TYPO3 will be accessed via the Varnish proxy, you will need to configure your TYPO3 instance to be aware of the reverse proxy; for this, set the `[SYS][reverseProxyIP]` and `[SYS][reverseProxyHeaderMultiValue]` values in `config/system/settings.php` or `config/system/additional.php`:
 
 ```php
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['trustedHostsPattern'] =
-    'backend\..*\.project\.space|' . preg_quote('www.example.com', '/');
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyIP'] = '*';
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyHeaderMultiValue'] = 'first';
 ```
-
-Replace `www.example.com` with your actual public domain.
 
 :::
 
