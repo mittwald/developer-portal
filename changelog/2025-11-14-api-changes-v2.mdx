@@ -1,0 +1,174 @@
+---
+title: Breaking (!) API changes for v2 API, November 7 to November 14
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Marketplace
+  - Conversation
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+In the week of 11/7/2025 to 11/14/2025, the mittwald API introduced several updates, including the addition of required and optional properties to various response objects, enhancing the detail and flexibility of the data returned for invoice and conversation-related endpoints.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The response property '/items/webLink' became optional for the status '200' in the operation to list all invoices on behalf of a contributor. This is a breaking change.
+- A required property '/items/invoiceType' was added to the response with the '200' status in the operation to list all invoices on behalf of a contributor.
+- Multiple optional properties were added to the response with the '200' status in the operation to get all conversations the authenticated user has created or has access to:
+  - '/items/createdBy/atlasGroup'
+  - '/items/createdBy/group'
+  - '/items/lastMessage/createdBy/atlasGroup'
+  - '/items/lastMessage/createdBy/group'
+  - '/items/lastMessageBy/atlasGroup'
+  - '/items/lastMessageBy/group'
+  - '/items/mainUser/atlasGroup'
+  - '/items/mainUser/group'
+- Multiple optional properties were added to the response with the '200' status in the operation to get a support conversation:
+  - 'createdBy/atlasGroup'
+  - 'createdBy/group'
+  - 'lastMessage/createdBy/atlasGroup'
+  - 'lastMessage/createdBy/group'
+  - 'lastMessageBy/atlasGroup'
+  - 'lastMessageBy/group'
+  - 'mainUser/atlasGroup'
+  - 'mainUser/group'
+- Multiple optional properties were added to the response with the '200' status in the operation to get members of a support conversation:
+  - '/items/allOf[#/components/schemas/de.mittwald.v1.conversation.User]/atlasGroup'
+  - '/items/allOf[#/components/schemas/de.mittwald.v1.conversation.User]/group'
+- Multiple optional properties were added to the response with the '200' status in the operation to get all messages of the conversation:
+  - '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.Message]/createdBy/atlasGroup'
+  - '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.Message]/createdBy/group'
+  - '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.StatusUpdate]/meta/user/atlasGroup'
+  - '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.StatusUpdate]/meta/user/group'
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "List all invoices on behalf of a contributor"
+
+
+- ⚠️ **Breaking:** the response property '/items/webLink' became optional for the status '200'
+
+- added the required property '/items/invoiceType' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="contributor-list-onbehalf-invoices" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all conversation the authenticated user has created or has access to"
+
+
+- added the optional property '/items/createdBy/atlasGroup' to the response with the '200' status
+
+- added the optional property '/items/createdBy/group' to the response with the '200' status
+
+- added the optional property '/items/lastMessage/createdBy/atlasGroup' to the response with the '200' status
+
+- added the optional property '/items/lastMessage/createdBy/group' to the response with the '200' status
+
+- added the optional property '/items/lastMessageBy/atlasGroup' to the response with the '200' status
+
+- added the optional property '/items/lastMessageBy/group' to the response with the '200' status
+
+- added the optional property '/items/mainUser/atlasGroup' to the response with the '200' status
+
+- added the optional property '/items/mainUser/group' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="conversation-list-conversations" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a support conversation"
+
+
+- added the optional property 'createdBy/atlasGroup' to the response with the '200' status
+
+- added the optional property 'createdBy/group' to the response with the '200' status
+
+- added the optional property 'lastMessage/createdBy/atlasGroup' to the response with the '200' status
+
+- added the optional property 'lastMessage/createdBy/group' to the response with the '200' status
+
+- added the optional property 'lastMessageBy/atlasGroup' to the response with the '200' status
+
+- added the optional property 'lastMessageBy/group' to the response with the '200' status
+
+- added the optional property 'mainUser/atlasGroup' to the response with the '200' status
+
+- added the optional property 'mainUser/group' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="conversation-get-conversation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get members of a support conversation"
+
+
+- added the optional property '/items/allOf[#/components/schemas/de.mittwald.v1.conversation.User]/atlasGroup' to the response with the '200' status
+
+- added the optional property '/items/allOf[#/components/schemas/de.mittwald.v1.conversation.User]/group' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="conversation-get-conversation-members" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all message of the conversation"
+
+
+- added the optional property '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.Message]/createdBy/atlasGroup' to the response with the '200' status
+
+- added the optional property '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.Message]/createdBy/group' to the response with the '200' status
+
+- added the optional property '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.StatusUpdate]/meta/user/atlasGroup' to the response with the '200' status
+
+- added the optional property '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.StatusUpdate]/meta/user/group' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="conversation-list-messages-by-conversation" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald JavaScript SDK Release 4.259.0
+
+The mittwald JavaScript SDK has been updated to version 4.259.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [Release 4.259.0](https://github.com/mittwald/api-client-js/releases/tag/4.259.0).
+
+### mittwald JavaScript SDK Release 4.258.0
+
+The mittwald JavaScript SDK has been updated to version 4.258.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.258.0).
+
+### mittwald JavaScript SDK Release 4.257.0
+
+The mittwald JavaScript SDK has been updated to version 4.257.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.257.0).
+
