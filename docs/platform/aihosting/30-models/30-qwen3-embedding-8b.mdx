@@ -23,6 +23,55 @@ Query: {query}
 
 Here, `{query}` should express the individual search query in *one* sentence, and `{task_description}` should describe the task, for example:
 
+## Truncating and normalizing embeddings
+
+If you require smaller vector dimensions, you can truncate the embedding vector to the desired dimensions and normalize it afterwards.
+This is possible because the model was trained using [Matryoshka Representation Learning](https://arxiv.org/abs/2205.13147).
+To normalize the vector use code like this:
+
+Install the required libraries and set up the token first:
+
+```sh
+pip install python-dotenv openai langchain-openai
+echo 'OPENAI_API_KEY="sk-…"' > .env
+```
+
+Use the model and truncate to 256 dimensions + normalize the embedding:
+
+```python
+from openai import OpenAI
+import numpy as np
+from dotenv import load_dotenv
+
+# Load .env file
+load_dotenv()
+
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1"
+)
+
+def normalize_l2(x):
+    x = np.array(x)
+    if x.ndim == 1:
+        norm = np.linalg.norm(x)
+        if norm == 0:
+            return x
+        return x / norm
+    else:
+        norm = np.linalg.norm(x, 2, axis=1, keepdims=True)
+        return np.where(norm == 0, x, x / norm)
+
+
+response = client.embeddings.create(
+    model="Qwen3-Embedding-8B", input="Testing 123", encoding_format="float"
+)
+
+cut_dim = response.data[0].embedding[:256]
+norm_dim = normalize_l2(cut_dim)
+
+print(norm_dim)
+```
+
 ## Terms of use and licensing
 
 The [general terms of use](../../access-and-usage/terms-of-use/) apply. The model is provided by Alibaba under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0.html), and reuse of the generated content is not subject to any additional restrictions.
