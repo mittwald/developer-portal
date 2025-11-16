@@ -22,7 +22,7 @@ Mit GitHub Actions kannst du dein Container-Image direkt aus deinem Quellcode-Re
 
 ## Identifiziere deinen Stack
 
-Folge der Dokumentation zu [Standard-Stack identifizieren](/docs/v2/api/howtos/create-container/#identify-default-stack) deines Projekts. Zur Vereinfachung empfehlen wir, die Stack-ID in einer [GitHub-Variablen](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables) zu speichern, z.B. **`STACK_ID`**.
+Folge der Dokumentation zu [Standard-Stack identifizieren](/docs/v2/api/howtos/create-container/#identify-default-stack) deines Projekts. Zur Vereinfachung empfehlen wir, die Stack-ID in einer [GitHub-Variablen](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables) zu speichern oder (wenn du in mehrere Umgebungen deployst) ein GitHub [Environment Secret](https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments) zu verwenden, z.B. **`STACK_ID`**.
 
 ## Schreibe deine `stack.yaml`
 
@@ -31,11 +31,11 @@ Erstelle als nächstes eine Datei, die deine Stack-Definition irgendwo in deinem
 ```yaml title="deploy/stack.yaml"
 services:
   app:
-    image: ghcr.io/<OWNER>/<REPO>:{{ .Env.IMAGE_TAG }}
+    image: "{{ .Env.IMAGE_TAG }}"
     description: "Meine Webanwendung"
     ports:
       - "8080/tcp"
-    envs:
+    environment:
       APP_ENV: production
 volumes: {}
 ```
@@ -56,10 +56,10 @@ name: Build & Deploy to mittwald
 
 on:
   push:
-    branches: [main]
+    tags: [v*]
   # alternativ:
   # push:
-  #   tags: [v*]
+  #   branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -93,6 +93,9 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
 
       - name: Build & Push
         uses: docker/build-push-action@v5
@@ -101,18 +104,20 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Bereitstellung an mStudio
         uses: mittwald/deploy-container-action@v1
         env:
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
         with:
           api_token: ${{ secrets.MITTWALD_API_TOKEN }}
           stack_id: ${{ vars.STACK_ID }}
           stack_file: "${{ github.workspace }}/configs/stack.yaml"
 ```
 
-Mit diesem Workflow wird bei jedem Push zu `main` (oder je nach Konfiguration, bei jedem neuen Git-Tag) GitHub ein neues Image erstellen, es in die GitHub Container Registry hochladen und die neuen Images ins mStudio deployen.
+Mit diesem Workflow wird bei jedem Push eines neuen Git-Tags (oder je nach Konfiguration, bei jedem Push zu `main`) GitHub ein neues Image erstellen, es in die GitHub Container Registry hochladen und die neuen Images ins mStudio deployen.
 
 ## Fortgeschrittene Muster
 
