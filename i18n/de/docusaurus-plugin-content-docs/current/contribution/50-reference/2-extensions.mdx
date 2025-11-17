@@ -376,7 +376,8 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
             priceInCents: {
               type: "integer",
               example: "5000",
-              description: "Preis der Extension in Cent"
+              description: "Preis der Extension in Cent",
+              maxLength: 1000000
             },
             variantKey: {
               type: "string",
@@ -384,8 +385,19 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
             },
             name: {
               type: "string",
-              description:"Bezeichnung der Variante (nur in der UI sichtbar)",
-              example:"Standard"
+              description: "Bezeichnung der Variante (nur in der UI sichtbar)",
+              example: "Standard",
+              maxLength: 80
+            },
+             description: {
+              type: "string",
+              description: "Beschreibung des Leistungsumfangs der Variante",
+              maxLength: 300
+            },
+            isBookingStopped: {
+              type: "boolean",
+              description: "Gibt an, ob die Variante nicht mehr gebucht werden kann",
+              example: false
             }
           }
         }
