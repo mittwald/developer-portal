@@ -377,7 +377,7 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
               type: "integer",
               example: "5000",
               description: "Preis der Extension in Cent",
-              maxLength: 1000000
+              maximum: 1000000,
             },
             variantKey: {
               type: "string",
@@ -399,6 +399,21 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
               description: "Gibt an, ob die Variante nicht mehr gebucht werden kann",
               example: false
             }
+          }
+        }
+      },
+      pricingDetails: {
+        type: "object",
+        description: "Die Detailansicht des Preisplans. Gibt an, ob ein Upgrade oder Downgrade zu verschiedenen Varianten möglich ist.",
+        required: ["isUpgradeAllowed", "isDowngradeAllowed"],
+        properties: {
+          isUpgradeAllowed: {
+            type: "boolean",
+            description: "Gibt an, ob ein Upgrade auf eine andere Variante erlaubt ist"
+          },
+          isDowngradeAllowed: {
+            type: "boolean",
+            description: "Gibt an, ob ein Downgrade auf eine andere Variante erlaubt ist"
           }
         }
       },
