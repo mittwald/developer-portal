@@ -444,9 +444,7 @@ The [mittwald TYPO3 Varnish extension](https://github.com/mittwald/typo3-varnish
 - **Streaming** for media files
 - **Retry logic** for server errors (5xx responses)
 
-**Key integration point**: Install the [mittwald TYPO3 Varnish extension](https://github.com/mittwald/typo3-varnishcache) in your TYPO3 installation. It automatically sends BAN requests to Varnish whenever content is updated in the backend, keeping your cache in sync with your content.
-
-**Frontend user sessions**: The example VCL checks for the `fe_typo_user` cookie. Pages for logged-in frontend users automatically bypass the cache.
+Install the [mittwald TYPO3 Varnish extension](https://github.com/mittwald/typo3-varnishcache) in your TYPO3 installation. It automatically sends BAN requests to Varnish whenever a TYPO3 page cache is flushed (either manually, or by editing a page), keeping your cache in sync with your content.
 
 :::info
 
@@ -466,6 +464,18 @@ Shopware 5 uses a custom cache invalidation mechanism. Use the [official Shopwar
 - **ESI support**: Enable with `Surrogate-Capability` and `Surrogate-Control` headers
 - **Custom headers**: `X-Shopware-Cache-Id` for identifying cacheable content
 
+When using Varnish with Shopware 5, make sure to follow the [official configuration guide](https://developers.shopware.com/sysadmins-guide/varnish-setup/#shopware-configuration) closely. Especially, remember to disable the built-in HTTP cache in Shopware 5 to avoid conflicts with Varnish, and set the `trustedProxies` configuration:
+
+```injectablephp
+'trustedProxies' => ['100.64.0.0/10'],
+```
+
+:::note Cloud-internal IP addresses
+
+mittwald's cloud platform assigns container addresses dynamically from the `100.64.0.0/10` range. Therefore, when configuring trusted proxies in Shopware 5, use this CIDR block to ensure proper handling of client IP addresses.
+
+:::
+
 **mittwald-specific addition**: In your `vcl_backend_fetch` subroutine, add the Host header rewriting:
 
 ```vcl
@@ -479,8 +489,6 @@ sub vcl_backend_fetch {
 ```
 
 **Cache warming**: Shopware 5 supports cache warming. Configure your shop to send warm-up requests to the internal backend hostname if needed.
-
-**Reference**: [Shopware 5 Varnish Setup Guide](https://developers.shopware.com/sysadmins-guide/varnish-setup/)
 
 ### Shopware 6 Configuration
 
@@ -502,7 +510,7 @@ shopware:
 
 2. Set environment variable: `SHOPWARE_HTTP_CACHE_ENABLED=1`
 
-**Key VCL requirements from [Shopware 6 documentation](https://developer.shopware.com/docs/guides/hosting/infrastructure/reverse-http-cache.html):**
+Key VCL requirements from [Shopware 6 documentation](https://developer.shopware.com/docs/guides/hosting/infrastructure/reverse-http-cache.html) include:
 
 - **XKey module**: Use `xkey.purge()` for hard purge or `xkey.softpurge()` for soft purge
 - **Surrogate keys**: Shopware sends `Xkey` headers for targeted invalidation
@@ -531,14 +539,10 @@ sub vcl_backend_fetch {
 }
 ```
 
-**Cache invalidation**: Use Shopware's built-in cache clearing:
+To invalidate the cache, use Shopware's built-in cache clearing:
 
 - `bin/console cache:clear:http` — Clears reverse proxy cache only (recommended)
 - Shopware automatically invalidates cache when content changes in the admin
-
-**Soft purge option**: Modify the VCL to use `xkey.softpurge()` instead of `xkey.purge()` to serve stale content while refreshing in the background.
-
-**Reference**: [Shopware 6 Reverse HTTP Cache Guide](https://developer.shopware.com/docs/guides/hosting/infrastructure/reverse-http-cache.html)
 
 :::tip Varnish Version
 
@@ -550,7 +554,19 @@ Make sure to use Varnish 6.0 or later for Shopware 6. The `varnish:8` image used
 
 ### Check if caching is working
 
-The VCL configuration adds an `x-cache` header to responses:
+Most VCL configurations add an `x-cache` header to responses using a `vcl_deliver` rule that should look like this:
+
+```vcl
+sub vcl_deliver {
+    if (obj.hits > 0) {
+        set resp.http.x-cache = "HIT";
+    } else {
+        set resp.http.x-cache = "MISS";
+    }
+}
+```
+
+When this is in place, you can check the response headers to see if content is being served from cache:
 
 ```shellsession
 $ curl -I https://www.example.com

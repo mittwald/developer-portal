@@ -444,9 +444,7 @@ Die [mittwald TYPO3 Varnish Extension](https://github.com/mittwald/typo3-varnish
 - **Streaming** für Mediendateien
 - **Retry-Logik** für Serverfehler (5xx-Antworten)
 
-**Wichtiger Integrationspunkt**: Installiere die [mittwald TYPO3 Varnish Extension](https://github.com/mittwald/typo3-varnishcache) in deiner TYPO3-Installation. Sie sendet automatisch BAN-Anfragen an Varnish, wenn Inhalte im Backend aktualisiert werden, und hält deinen Cache mit deinen Inhalten synchron.
-
-**Frontend-Benutzersitzungen**: Die Beispiel-VCL prüft auf das `fe_typo_user`-Cookie. Seiten für angemeldete Frontend-Benutzer umgehen automatisch den Cache.
+Installiere die [mittwald TYPO3 Varnish Extension](https://github.com/mittwald/typo3-varnishcache) in deiner TYPO3-Installation. Sie sendet automatisch BAN-Anfragen an Varnish, wenn ein TYPO3-Seiten-Cache geleert wird (entweder manuell oder durch Bearbeiten einer Seite), und hält deinen Cache mit deinen Inhalten synchron.
 
 :::info
 
@@ -466,6 +464,18 @@ Shopware 5 verwendet einen benutzerdefinierten Cache-Invalidierungsmechanismus. 
 - **ESI-Unterstützung**: Aktivieren mit `Surrogate-Capability`- und `Surrogate-Control`-Headern
 - **Benutzerdefinierte Header**: `X-Shopware-Cache-Id` zur Identifizierung von cachebaren Inhalten
 
+Wenn du Varnish mit Shopware 5 verwendest, stelle sicher, dass du der [offiziellen Konfigurationsanleitung](https://developers.shopware.com/sysadmins-guide/varnish-setup/#shopware-configuration) genau folgst. Insbesondere solltest du daran denken, den integrierten HTTP-Cache in Shopware 5 zu deaktivieren, um Konflikte mit Varnish zu vermeiden, und die `trustedProxies`-Konfiguration zu setzen:
+
+```injectablephp
+'trustedProxies' => ['100.64.0.0/10'],
+```
+
+:::note Cloud-interne IP-Adressen
+
+Die mittwald Cloud-Plattform weist Container-Adressen dynamisch aus dem Bereich `100.64.0.0/10` zu. Verwende daher beim Konfigurieren vertrauenswürdiger Proxies in Shopware 5 diesen CIDR-Block, um eine korrekte Behandlung der Client-IP-Adressen sicherzustellen.
+
+:::
+
 **mittwald-spezifische Ergänzung**: Füge in deiner `vcl_backend_fetch`-Subroutine die Host-Header-Umschreibung hinzu:
 
 ```vcl
@@ -479,8 +489,6 @@ sub vcl_backend_fetch {
 ```
 
 **Cache-Warming**: Shopware 5 unterstützt Cache-Warming. Konfiguriere deinen Shop so, dass er bei Bedarf Warm-up-Anfragen an den internen Backend-Hostnamen sendet.
-
-**Referenz**: [Shopware 5 Varnish-Setup-Anleitung](https://developers.shopware.com/sysadmins-guide/varnish-setup/)
 
 ### Shopware 6-Konfiguration
 
@@ -502,7 +510,7 @@ shopware:
 
 2. Setze die Umgebungsvariable: `SHOPWARE_HTTP_CACHE_ENABLED=1`
 
-**Wichtige VCL-Anforderungen aus der [Shopware 6-Dokumentation](https://developer.shopware.com/docs/guides/hosting/infrastructure/reverse-http-cache.html):**
+Wichtige VCL-Anforderungen aus der [Shopware 6-Dokumentation](https://developer.shopware.com/docs/guides/hosting/infrastructure/reverse-http-cache.html) umfassen:
 
 - **XKey-Modul**: Verwende `xkey.purge()` für Hard-Purge oder `xkey.softpurge()` für Soft-Purge
 - **Surrogate-Keys**: Shopware sendet `Xkey`-Header für gezielte Invalidierung
@@ -531,14 +539,10 @@ sub vcl_backend_fetch {
 }
 ```
 
-**Cache-Invalidierung**: Verwende die integrierte Cache-Löschung von Shopware:
+Zum Invalidieren des Caches verwende die integrierte Cache-Löschung von Shopware:
 
 - `bin/console cache:clear:http` — Löscht nur den Reverse-Proxy-Cache (empfohlen)
 - Shopware invalidiert den Cache automatisch, wenn Inhalte im Admin geändert werden
-
-**Soft-Purge-Option**: Ändere die VCL so, dass `xkey.softpurge()` anstelle von `xkey.purge()` verwendet wird, um veraltete Inhalte zu liefern, während im Hintergrund aktualisiert wird.
-
-**Referenz**: [Shopware 6 Reverse-HTTP-Cache-Anleitung](https://developer.shopware.com/docs/guides/hosting/infrastructure/reverse-http-cache.html)
 
 :::tip Varnish-Version
 
@@ -550,7 +554,19 @@ Stelle sicher, dass du für Shopware 6 Varnish 6.0 oder höher verwendest. Das i
 
 ### Prüfen, ob Caching funktioniert
 
-Die VCL-Konfiguration fügt den Antworten einen `x-cache`-Header hinzu:
+Die meisten VCL-Konfigurationen fügen den Antworten einen `x-cache`-Header hinzu, indem sie eine `vcl_deliver`-Regel verwenden, die so aussehen sollte:
+
+```vcl
+sub vcl_deliver {
+    if (obj.hits > 0) {
+        set resp.http.x-cache = "HIT";
+    } else {
+        set resp.http.x-cache = "MISS";
+    }
+}
+```
+
+Wenn dies vorhanden ist, kannst du die Antwort-Header überprüfen, um zu sehen, ob Inhalte aus dem Cache geliefert werden:
 
 ```shellsession
 $ curl -I https://www.example.com
@@ -569,7 +585,7 @@ Dieser Befehl gibt die Standardausgabe von Varnish selbst aus:
 $ mw container logs <container-id>
 ```
 
-Um die tatsächlichen (pro-Anfrage) Logs zu erhalten, verwenden Sie `varnishlog`:
+Um die tatsächlichen (pro-Anfrage) Logs zu erhalten, verwende `varnishlog`:
 
 ```shellsession
 $ mw container exec <container-id> -- varnishlog
@@ -577,7 +593,7 @@ $ mw container exec <container-id> -- varnishlog
 
 ### Varnish-Statistiken
 
-Verbinden Sie sich mit dem Container und verwenden Sie `varnishstat`:
+Verbinde dich mit dem Container und verwende `varnishstat`:
 
 ```shellsession
 $ mw container exec <container-id> -- varnishstat
