@@ -28,6 +28,56 @@ task = 'Given a web search query, retrieve relevant passages that answer the que
 query = 'Explain gravity'
 ```
 
+## Embeddings kürzen und normalisieren
+
+Wenn du kleinere Vektordimensionen benötigst, kannst du den Embedding-Vektor einfach auf die gewünschte Länge kürzen und anschließend normalisieren.
+Das ist möglich, weil das Modell mit [Matryoshka Representation Learning](https://arxiv.org/abs/2205.13147) trainiert wurde.
+
+Zum Normalisieren des Vektors kannst du zum Beispiel folgenden Code verwenden:
+
+Installiere zunächst die benötigten Bibliotheken und lege den Token an:
+
+```sh
+pip install python-dotenv openai langchain-openai
+echo 'OPENAI_API_KEY="sk-…"' > .env
+```
+
+Nutze dann das Modell und kürze auf 256 Dimensionen + normalisiere das Embedding:
+
+```python
+from openai import OpenAI
+import numpy as np
+from dotenv import load_dotenv
+
+# Load .env file
+load_dotenv()
+
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1"
+)
+
+def normalize_l2(x):
+    x = np.array(x)
+    if x.ndim == 1:
+        norm = np.linalg.norm(x)
+        if norm == 0:
+            return x
+        return x / norm
+    else:
+        norm = np.linalg.norm(x, 2, axis=1, keepdims=True)
+        return np.where(norm == 0, x, x / norm)
+
+
+response = client.embeddings.create(
+    model="Qwen3-Embedding-8B", input="Testing 123", encoding_format="float"
+)
+
+cut_dim = response.data[0].embedding[:256]
+norm_dim = normalize_l2(cut_dim)
+
+print(norm_dim)
+```
+
 ## Nutzungsbedingungen und Lizenzhinweise
 
 Es gelten die [allgemeinen Nutzungsbedinungen](../../access-and-usage/terms-of-use/). Das Modell wird von Alibaba unter der [Apache 2.0-Lizenz](https://www.apache.org/licenses/LICENSE-2.0.html) angeboten, eine Weiternutzung der generierten Inhalte unterliegt keiner zusätzlichen Restriktion.
