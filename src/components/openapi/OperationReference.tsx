@@ -63,6 +63,7 @@ function OperationParameter({ param }: { param: ParameterObject }) {
       name={param.name}
       schema={param.schema as OpenAPIV3.SchemaObject}
       required={param.required}
+      deprecated={param.deprecated}
       body={body}
     />
   );
@@ -86,6 +87,7 @@ function OperationResponseHeader({
       name={name}
       schema={header.schema as OpenAPIV3.SchemaObject}
       required={header.required}
+      deprecated={header.deprecated}
       body={body}
     />
   );

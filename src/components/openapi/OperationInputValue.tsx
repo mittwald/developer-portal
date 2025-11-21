@@ -100,22 +100,36 @@ export function OperationInputValue({
   name,
   schema,
   required,
+  deprecated,
   body,
 }: {
   name: string;
   schema: OpenAPIV3.SchemaObject;
   required: boolean | undefined;
+  deprecated: boolean | undefined;
   body: ReactNode;
 }) {
+  const tags: ReactNode[] = [];
+
+  if (deprecated) {
+    tags.push(<Deprecated key="deprecated" />);
+  }
+
+  if (required !== undefined) {
+    tags.push(
+      required ? <Required key="required" /> : <Optional key="optional" />,
+    );
+  }
+
   return (
     <li>
       <div className={styles.parameterListHeader}>
         <span className={styles.parameterName}>{name}</span>
         <Type className={styles.parameterType} schema={schema} />
-        {required !== undefined && (
+        {tags.length > 0 && (
           <>
             <div className={styles.parameterListHeaderSpacer} />
-            {required ? <Required /> : <Optional />}
+            {tags}
           </>
         )}
       </div>
