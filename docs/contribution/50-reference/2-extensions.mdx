@@ -371,7 +371,8 @@ For more information about the individual attributes, see [which information an 
             priceInCents: {
               type: "integer",
               example: "5000",
-              description: "Price of the extension in Cents."
+              description: "Price of the extension in Cents.",
+              maximum: 1000000,
             },
             variantKey: {
               type: "string",
@@ -379,17 +380,34 @@ For more information about the individual attributes, see [which information an 
             },
             name: {
               type: "string",
-              description: "Name of the pricing variant."
+              description: "Name of the pricing variant.",
+              maxLength: 80
             },
             description: {
               type: "string",
-              description: "description of the provided services"
+              description: "description of the provided services",
+              maxLength: 300
             },
             isBookingStopped: {
               type: "boolean",
               description: "Weather the Variant can be installed",
               example: false
             }
+          }
+        }
+      },
+      pricingDetails: {
+        type: "object",
+        description: "The details section of the price plan. It informs if choosing different variants as a upgrade or downgrade is possible.",
+        required: ["isUpgradeAllowed", "isDowngradeAllowed"],
+        properties: {
+          isUpgradeAllowed: {
+            type: "boolean",
+            description: "Weather upgrading to a different variant is allowed"
+          },
+          isDowngradeAllowed: {
+            type: "boolean",
+            description: "Weather downgrading to a different variant is allowed"
           }
         }
       },
