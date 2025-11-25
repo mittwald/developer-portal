@@ -1,0 +1,660 @@
+---
+title: Einen Caching-Proxy hinzufügen
+sidebar_label: Caching-Proxies
+sidebar_position: 40
+description: Füge einen Caching-Proxy zu deiner Anwendung oder deinem Container hinzu
+tags:
+  - Containers
+  - Docker
+  - TYPO3
+  - Shopware
+  - Varnish
+---
+
+import PlanCompatibility from "@site/src/components/PlanCompatibility";
+import TerraformResourceHint from "@site/src/components/TerraformResourceHint";
+
+<PlanCompatibility features={["container"]} />
+
+## Einführung
+
+Ein Caching-Reverse-Proxy wie [Varnish Cache](https://varnish-cache.org/) sitzt zwischen deiner Webanwendung und dem Internet und speichert häufig abgerufene Inhalte im Arbeitsspeicher. Dies reduziert die Last auf deinem Anwendungsserver erheblich und verbessert die Antwortzeiten für gecachte Inhalte deutlich.
+
+**Vorteile von Varnish:**
+
+- **Performance**: Liefert gecachte Inhalte direkt aus dem Speicher und reduziert Antwortzeiten auf wenige Millisekunden
+- **Skalierbarkeit**: Bewältigt deutlich mehr gleichzeitige Benutzer durch Reduzierung der Backend-Last
+- **Flexibilität**: Feingranulare Kontrolle darüber, was wie lange gecacht wird, mithilfe von VCL (Varnish Configuration Language)
+- **Kosteneffizienz**: Reduziert die Ressourcenanforderungen für deine Backend-Anwendung
+
+Diese Anleitung zeigt, wie du Varnish als Caching-Ebene vor Webanwendungen (TYPO3, Shopware 5/6) auf der mittwald-Plattform einsetzt, mit spezifischen Konfigurationsbeispielen für jede Plattform.
+
+## Voraussetzungen
+
+Bevor du beginnst, stelle sicher, dass du Folgendes hast:
+
+- Ein mittwald-Projekt, in dem das Container Hosting verfügbar ist
+- Grundkenntnisse im Umgang mit containerisierten Anwendungen
+- Für Terraform-Deployments: Den [mittwald Terraform Provider](https://registry.terraform.io/providers/mittwald/mittwald/latest/docs)
+
+## Architekturübersicht
+
+Das Setup besteht aus drei Hauptkomponenten:
+
+1. **Backend-Anwendung**: Deine Webanwendung (TYPO3, Shopware, etc.), die mit einem Virtual Host verbunden ist
+2. **Varnish-Container**: Führt den Varnish-Caching-Server aus
+3. **VCL-Konfiguration**: Definiert das Caching-Verhalten und leitet Anfragen an das Backend weiter
+
+```
+Internet → Varnish Container (Port 80) → Backend-Anwendung
+                ↓
+         VCL-Konfiguration
+         (Host-Header-Umschreibung)
+```
+
+:::info Wichtig: Host-Header-Umschreibung
+
+Auf der mittwald-Plattform muss die Backend-Anwendung mit einem Virtual Host verbunden sein (auch wenn der eigentliche Produktiv-Traffic über den Varnish-Container geleitet wird). Die VCL-Konfiguration schreibt den HTTP-`Host`-Header um, sodass er mit dem internen Hostnamen der Backend-Anwendung übereinstimmt (z.B. `app-XXXXX.p-YYYYY.project.space`), damit Anfragen korrekt weitergeleitet werden.
+
+:::
+
+## Deployment
+
+Dieser Abschnitt behandelt den allgemeinen Deployment-Prozess für Varnish mit einer Backend-Anwendung. Für anwendungsspezifische VCL-Konfigurationen siehe die Abschnitte für [TYPO3](#typo3-konfiguration), [Shopware 5](#shopware-5-konfiguration) oder [Shopware 6](#shopware-6-konfiguration), nachdem du das Deployment abgeschlossen hast.
+
+:::note TYPO3 als Beispiel
+
+Die folgenden Beispiele demonstrieren das Deployment mit TYPO3 als Backend-Anwendung. Der gleiche Prozess gilt für andere Anwendungen, mit entsprechenden Anpassungen des App-Typs und der Konfiguration.
+
+:::
+
+### Mit Terraform
+
+#### Schritt 1: Definiere dein Projekt und deine Backend-Anwendung
+
+Erstelle zunächst dein mittwald-Projekt und deploye deine Managed Application (in diesem Beispiel TYPO3):
+
+```hcl
+terraform {
+  required_providers {
+    mittwald = {
+      source  = "mittwald/mittwald"
+      version = "~> 1.4"
+    }
+  }
+}
+
+provider "mittwald" {
+  # Provider-Konfiguration
+}
+
+locals {
+  server_id      = "your-server-id"      # Ersetze dies mit deiner Server-ID
+  public_domain  = "www.example.com"     # Ersetze dies mit deiner Domain
+}
+
+# Variable für TYPO3-Admin-Passwort
+variable "typo3_admin_password" {
+  type      = string
+  sensitive = true
+}
+
+# Projekt erstellen
+resource "mittwald_project" "varnish_demo" {
+  description = "TYPO3 mit Varnish Cache"
+  server_id   = local.server_id
+}
+
+# Neueste TYPO3-Version nachschlagen
+data "mittwald_app" "typo3" {
+  name     = "typo3"
+  selector = "^13"
+}
+
+# Backend-Anwendung erstellen
+resource "mittwald_app" "example" {
+  project_id = mittwald_project.varnish_demo.id
+
+  app           = data.mittwald_app.typo3.name
+  version       = data.mittwald_app.typo3.version
+  description   = "TYPO3"
+  update_policy = "patchLevel"
+
+  user_inputs = {
+    "host"        = "https://${local.public_domain}"
+    "installmode" = "composer"
+    "site_title"  = "TYPO3 mit Varnish"
+    "admin_user"  = "admin"
+    "admin_pass"  = var.typo3_admin_password
+  }
+}
+
+# TYPO3-App mit einem internen Virtual Host verbinden
+# Dies ist erforderlich, damit Varnish Anfragen dorthin weiterleiten kann
+resource "mittwald_virtualhost" "example_backend" {
+  hostname   = "backend.${mittwald_project.varnish_demo.short_id}.project.space"
+  project_id = mittwald_project.varnish_demo.id
+
+  paths = {
+    "/" = {
+      app = mittwald_app.example.id
+    }
+  }
+}
+```
+
+:::info TYPO3 Reverse-Proxy-Einstellungen
+
+Da auf TYPO3 über den Varnish-Proxy zugegriffen wird, musst du deine TYPO3-Instanz so konfigurieren, dass sie den Reverse-Proxy erkennt. Setze dazu die Werte `[SYS][reverseProxyIP]` und `[SYS][reverseProxyHeaderMultiValue]` in `config/system/settings.php` oder `config/system/additional.php`:
+
+```php
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyIP'] = '*';
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyHeaderMultiValue'] = 'first';
+```
+
+:::
+
+#### Schritt 2: Erstelle die VCL-Konfigurationsdatei
+
+Erstelle eine Datei mit dem Namen `default.vcl` in deinem Terraform-Arbeitsverzeichnis. Verwende die offizielle VCL-Konfiguration für deine Anwendung (siehe [Anwendungsspezifische VCL-Konfigurationen](#anwendungsspezifische-vcl-konfigurationen) unten) mit einer wichtigen Ergänzung für die mittwald-Plattform:
+
+```vcl
+vcl 4.1;
+
+backend default {
+    .host = "${backend.host}";
+    .port = "${backend.port}";
+}
+
+# Kopiere die vollständige VCL-Konfiguration für deine Anwendung:
+# - TYPO3: https://github.com/mittwald/typo3-varnishcache/blob/main/Resources/Private/Example/default-4.vcl
+# - Shopware 5: https://developers.shopware.com/sysadmins-guide/varnish-setup/
+# - Shopware 6: https://developer.shopware.com/docs/guides/hosting/infrastructure/reverse-http-cache.html
+
+sub vcl_recv {
+    # Originalen Host-Header beibehalten
+    set req.http.X-Forwarded-Host = req.http.Host;
+
+    # ... andere vcl_recv-Regeln aus der VCL deiner Anwendung ...
+}
+
+sub vcl_backend_fetch {
+    # WICHTIG: Diese Host-Header-Umschreibung ist für die mittwald-Plattform erforderlich
+    # Die Backend-App muss über ihren internen Virtual Host erreichbar sein
+    set bereq.http.Host = "${backend.external_host}";
+}
+
+# ... andere Subroutinen aus der VCL deiner Anwendung (vcl_backend_response, vcl_deliver, etc.) ...
+```
+
+#### Schritt 3: VCL-Konfiguration hochladen und Varnish deployen
+
+Vervollständige deine Terraform-Konfiguration mit der VCL-Datei und dem Varnish-Container:
+
+```hcl
+# VCL-Konfigurationsdatei hochladen
+resource "mittwald_remote_file" "varnish_vcl" {
+  app_id = mittwald_app.example.id
+
+  path = "/files/varnish/default.vcl"
+  contents = templatefile("${path.module}/default.vcl", {
+    backend = {
+      host          = mittwald_app.example.short_id
+      port          = 8080
+      external_host = mittwald_virtualhost.example_backend.hostname
+    }
+  })
+}
+
+# Varnish-Container-Image nachschlagen
+data "mittwald_container_image" "varnish" {
+  image = "varnish:8"
+}
+
+# Varnish-Container deployen
+resource "mittwald_container_stack" "varnish" {
+  project_id    = mittwald_project.varnish_demo.id
+  default_stack = true
+
+  # Sicherstellen, dass VCL-Datei hochgeladen ist, bevor Container gestartet wird
+  depends_on = [mittwald_remote_file.varnish_vcl]
+
+  containers = {
+    varnish = {
+      description = "Varnish-Caching-Server"
+      image       = data.mittwald_container_image.varnish.image
+      entrypoint  = data.mittwald_container_image.varnish.entrypoint
+      command     = data.mittwald_container_image.varnish.command
+
+      ports = [
+        {
+          container_port = 80
+          public_port    = 80
+          protocol       = "tcp"
+        }
+      ]
+
+      volumes = [
+        {
+          mount_path   = "/etc/varnish"
+          project_path = "/files/varnish"
+        }
+      ]
+    }
+  }
+}
+
+# Varnish mit Ihrer öffentlichen Domain verbinden
+resource "mittwald_virtualhost" "public" {
+  hostname   = local.public_domain
+  project_id = mittwald_project.varnish_demo.id
+
+  paths = {
+    "/" = {
+      container = {
+        container_id = mittwald_container_stack.varnish.containers["varnish"].id
+        port         = "80/tcp"
+      }
+    }
+  }
+}
+```
+
+#### Schritt 4: Konfiguration anwenden
+
+```shellsession
+$ terraform init
+$ terraform plan
+$ terraform apply -var="typo3_admin_password=DEIN_SICHERES_PASSWORT"
+```
+
+Du kannst das Passwort auch in einer `.tfvars`-Datei speichern oder Umgebungsvariablen verwenden:
+
+```shellsession
+$ export TF_VAR_typo3_admin_password="DEIN_SICHERES_PASSWORT"
+$ terraform apply
+```
+
+Nach der Anwendung ist deine TYPO3-Anwendung über Varnish unter deiner konfigurierten Domain erreichbar.
+
+<TerraformResourceHint resource="container_stack" />
+
+### Mit der CLI
+
+#### Schritt 1: Projekt und TYPO3-Anwendung erstellen
+
+```shellsession
+# Neues Projekt erstellen
+$ mw project create --description "Managed Application mit Varnish" --server <server-id>
+
+# TYPO3-Anwendung erstellen
+$ mw app install typo3 \
+  --version 13.4.3 \
+  --install-mode composer \
+  --admin-user admin \
+  --admin-pass "#supersecr3t!" \
+  --site-title "TYPO3-Beispiel"
+  --host "https://www.example.com" \
+  --description "TYPO3-Beispiel"
+```
+
+Verwende im Befehl `mw app install` deine öffentliche Domain (z.B. `https://www.example.com`) als Basis-URL, nicht den Backend-Hostnamen. Notiere dir die Anwendungs-ID aus der Ausgabe, du benötigst sie in den folgenden Schritten.
+
+#### Schritt 2: TYPO3 mit einem internen Virtual Host verbinden
+
+```shellsession
+# Kurz-ID deines Projekts abrufen
+$ mw project get <project-id>
+
+# Internen Virtual Host für das Backend erstellen
+$ mw domain virtualhost create \
+  --hostname backend.<project-short-id>.project.space \
+  --path-to-app /:<app-id>
+```
+
+#### Schritt 3: VCL-Konfiguration erstellen und hochladen
+
+Erstelle lokal eine Datei mit dem Namen `default.vcl`. Beginne mit der offiziellen VCL-Konfiguration für deine Anwendung (siehe [Anwendungsspezifische VCL-Konfigurationen](#anwendungsspezifische-vcl-konfigurationen) unten) und füge die für die mittwald-Plattform erforderliche Host-Header-Umschreibung hinzu:
+
+```vcl
+vcl 4.1;
+
+backend default {
+    .host = "a-XXXXX";  # Ersetze dies mit der Kurz-ID deiner App
+    .port = "8080";
+}
+
+# Kopiere die vollständige VCL-Konfiguration für deine Anwendung:
+# - TYPO3: https://github.com/mittwald/typo3-varnishcache/blob/main/Resources/Private/Example/default-4.vcl
+# - Shopware 5: https://developers.shopware.com/sysadmins-guide/varnish-setup/
+# - Shopware 6: https://developer.shopware.com/docs/guides/hosting/infrastructure/reverse-http-cache.html
+
+sub vcl_recv {
+    set req.http.X-Forwarded-Host = req.http.Host;
+
+    # ... andere vcl_recv-Regeln aus der VCL deiner Anwendung ...
+}
+
+sub vcl_backend_fetch {
+    # WICHTIG: Ersetze dies mit dem internen Virtual Host deines Backends
+    # Diese Host-Header-Umschreibung ist für die mittwald-Plattform erforderlich
+    set bereq.http.Host = "backend.<project-short-id>.project.space";
+}
+
+# ... andere Subroutinen aus der VCL deiner Anwendung ...
+```
+
+Lade die VCL-Datei nach `/files/varnish/default.vcl` in deiner App hoch.
+
+#### Schritt 4: Varnish-Container deployen
+
+```shellsession
+$ mw container run \
+  --name varnish \
+  --publish-all \
+  --volume /files/varnish:/etc/varnish \
+  varnish:8
+```
+
+#### Schritt 5: Varnish mit deiner öffentlichen Domain verbinden
+
+```shellsession
+# Container-ID abrufen
+$ mw container list
+
+# Virtual Host erstellen
+$ mw domain virtualhost create \
+  --hostname www.example.com \
+  --path-to-container /:<container-id>:80/tcp
+```
+
+:::info TYPO3 Reverse-Proxy-Einstellungen
+
+Da auf TYPO3 über den Varnish-Proxy zugegriffen wird, musst du deine TYPO3-Instanz so konfigurieren, dass sie den Reverse-Proxy erkennt. Setze dazu die Werte `[SYS][reverseProxyIP]` und `[SYS][reverseProxyHeaderMultiValue]` in `config/system/settings.php` oder `config/system/additional.php`:
+
+```php
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyIP'] = '*';
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyHeaderMultiValue'] = 'first';
+```
+
+:::
+
+### Mit der mStudio-Oberfläche
+
+#### Schritt 1: Backend-Anwendung erstellen
+
+1. Installiere deine gewünschte Backend-Anwendung (z.B. TYPO3) in deinem Projekt über die mStudio-Oberfläche. Alternativ kannst du eine eigene PHP-Anwendung erstellen und selbst deployen.
+2. Verwende beim Installieren einer Anwendung über das mStudio deine öffentliche Domain (z.B. `https://www.example.com`) als Basis-URL in deiner Anwendungskonfiguration, nicht den Backend-Hostnamen.
+3. Notiere dir nach der Installation die Kurz-ID der Anwendung (sichtbar in den App-Details)
+
+#### Schritt 2: Internen Virtual Host erstellen
+
+1. Klicke in deinem Projekt auf "Domains" in der Seitenleiste
+2. Klicke auf "vHost hinzufügen"
+3. Verwende als Hostname: `backend.<project-short-id>.project.space`
+4. Verbinde den Virtual Host mit der Backend-App.
+
+#### Schritt 3: VCL-Konfiguration vorbereiten
+
+Lade die Beispiel-VCL-Konfiguration für deine Anwendung herunter (siehe [Anwendungsspezifische VCL-Konfigurationen](#anwendungsspezifische-vcl-konfigurationen) unten) und modifiziere sie, um die Host-Header-Umschreibung in der Subroutine `vcl_backend_fetch` hinzuzufügen (siehe den CLI-Abschnitt oben für die spezifischen erforderlichen Änderungen).
+
+Lade sie nach `/files/varnish/default.vcl` in deiner App über den Dateimanager oder SFTP hoch.
+
+#### Schritt 4: Varnish-Container erstellen
+
+1. Klicke in deinem Projekt auf "Container" in der Seitenleiste
+2. Klicke auf "Container erstellen"
+3. Wähle "varnish:8" als Image
+4. Konfiguriere:
+   - Name: `varnish`
+   - Port-Mapping: `80:80/tcp`
+   - Volumes: Mounte `/files/varnish` nach `/etc/varnish`
+5. Klicke auf "Erstellen"
+
+#### Schritt 5: Mit deiner Domain verbinden
+
+1. Klicke auf "Domains" in der Seitenleiste
+2. Klicke auf "Virtual Host hinzufügen"
+3. Gib deine öffentliche Domain ein (z.B. `www.example.com`)
+4. Verweise auf den Varnish-Container auf Port 80
+
+:::info TYPO3 Reverse-Proxy-Einstellungen
+
+Da auf TYPO3 über den Varnish-Proxy zugegriffen wird, musst du deine TYPO3-Instanz so konfigurieren, dass sie den Reverse-Proxy erkennt. Setze dazu die Werte `[SYS][reverseProxyIP]` und `[SYS][reverseProxyHeaderMultiValue]` in `config/system/settings.php` oder `config/system/additional.php`:
+
+```php
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyIP'] = '*';
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyHeaderMultiValue'] = 'first';
+```
+
+:::
+
+## Anwendungsspezifische VCL-Konfigurationen
+
+Die VCL-Beispiele im Deployment-Abschnitt oben zeigen die Grundstruktur mit der für die mittwald-Plattform erforderlichen Host-Header-Umschreibung. Dieser Abschnitt bietet anwendungsspezifische Anleitungen für TYPO3, Shopware 5 und Shopware 6.
+
+### TYPO3-Konfiguration
+
+Die [mittwald TYPO3 Varnish Extension](https://github.com/mittwald/typo3-varnishcache) bietet ein [vollständiges VCL-Beispiel](https://github.com/mittwald/typo3-varnishcache/blob/main/Resources/Private/Example/default-4.vcl), das Folgendes enthält:
+
+- **BAN-Unterstützung** für Cache-Invalidierung (wird automatisch von der TYPO3-Extension ausgelöst)
+- **Cookie-Handling**, das den Cache für TYPO3-Backend-Benutzer umgeht (`be_typo_user`-Cookie)
+- **Caching statischer Dateien** mit optimierten TTLs für Bilder, CSS, JS, etc.
+- **ESI (Edge Side Includes)** Verarbeitungsunterstützung
+- **Streaming** für Mediendateien
+- **Retry-Logik** für Serverfehler (5xx-Antworten)
+
+Installiere die [mittwald TYPO3 Varnish Extension](https://github.com/mittwald/typo3-varnishcache) in deiner TYPO3-Installation. Sie sendet automatisch BAN-Anfragen an Varnish, wenn ein TYPO3-Seiten-Cache geleert wird (entweder manuell oder durch Bearbeiten einer Seite), und hält deinen Cache mit deinen Inhalten synchron.
+
+:::info
+
+Wenn du das VCL-Beispiel der mittwald TYPO3 Extension verwendest, denke daran, die Host-Header-Umschreibung in `vcl_backend_fetch` hinzuzufügen, wie in den Deployment-Beispielen oben gezeigt.
+
+:::
+
+### Shopware 5-Konfiguration
+
+Shopware 5 verwendet einen benutzerdefinierten Cache-Invalidierungsmechanismus. Verwende die [offizielle Shopware 5 Varnish-Konfiguration](https://developers.shopware.com/sysadmins-guide/varnish-setup/) als Basis-VCL.
+
+**Wichtige Funktionen aus der Shopware 5 VCL:**
+
+- **Cache-Invalidierung**: PURGE- und BAN-Methoden mit dem `X-Shopware-Invalidates`-Header
+- **Cookie-Normalisierung**: Shop-, Währungs- und Cache-Context-Hash-Cookies für verbesserte Cache-Trefferquoten
+- **URL-Normalisierung**: Entfernen von UTM- und Tracking-Parametern aus URLs
+- **ESI-Unterstützung**: Aktivieren mit `Surrogate-Capability`- und `Surrogate-Control`-Headern
+- **Benutzerdefinierte Header**: `X-Shopware-Cache-Id` zur Identifizierung von cachebaren Inhalten
+
+Wenn du Varnish mit Shopware 5 verwendest, stelle sicher, dass du der [offiziellen Konfigurationsanleitung](https://developers.shopware.com/sysadmins-guide/varnish-setup/#shopware-configuration) genau folgst. Insbesondere solltest du daran denken, den integrierten HTTP-Cache in Shopware 5 zu deaktivieren, um Konflikte mit Varnish zu vermeiden, und die `trustedProxies`-Konfiguration zu setzen:
+
+```injectablephp
+'trustedProxies' => ['100.64.0.0/10'],
+```
+
+:::note Cloud-interne IP-Adressen
+
+Die mittwald Cloud-Plattform weist Container-Adressen dynamisch aus dem Bereich `100.64.0.0/10` zu. Verwende daher beim Konfigurieren vertrauenswürdiger Proxies in Shopware 5 diesen CIDR-Block, um eine korrekte Behandlung der Client-IP-Adressen sicherzustellen.
+
+:::
+
+**mittwald-spezifische Ergänzung**: Füge in deiner `vcl_backend_fetch`-Subroutine die Host-Header-Umschreibung hinzu:
+
+```vcl
+sub vcl_backend_fetch {
+    # Standard Shopware 5 Backend-Fetch-Logik hier...
+    # (aus der offiziellen Shopware 5 VCL)
+
+    # WICHTIG: Dies für die mittwald-Plattform hinzufügen
+    set bereq.http.Host = "backend.<project-short-id>.project.space";
+}
+```
+
+**Cache-Warming**: Shopware 5 unterstützt Cache-Warming. Konfiguriere deinen Shop so, dass er bei Bedarf Warm-up-Anfragen an den internen Backend-Hostnamen sendet.
+
+### Shopware 6-Konfiguration
+
+Shopware 6 erfordert **Varnish 6.0 oder höher mit dem XKey-Modul** für Surrogate-Key-basierte Cache-Invalidierung.
+
+**Shopware 6-Konfigurationsanforderungen:**
+
+1. Aktiviere Reverse-Proxy in deiner Shopware-Konfiguration (`config/packages/shopware.yaml`):
+
+```yaml
+shopware:
+  http_cache:
+    reverse_proxy:
+      enabled: true
+      use_varnish_xkey: true
+      hosts: ["http://varnish"]
+      max_parallel_invalidations: 3
+```
+
+2. Setze die Umgebungsvariable: `SHOPWARE_HTTP_CACHE_ENABLED=1`
+
+Wichtige VCL-Anforderungen aus der [Shopware 6-Dokumentation](https://developer.shopware.com/docs/guides/hosting/infrastructure/reverse-http-cache.html) umfassen:
+
+- **XKey-Modul**: Verwende `xkey.purge()` für Hard-Purge oder `xkey.softpurge()` für Soft-Purge
+- **Surrogate-Keys**: Shopware sendet `Xkey`-Header für gezielte Invalidierung
+- **Cache-Control-Header**: Respektiere `s-maxage` aus Shopware-Antworten
+
+**mittwald-spezifische VCL-Struktur:**
+
+```vcl
+vcl 4.1;
+
+import xkey;
+
+backend default {
+    .host = "a-XXXXX";  # Kurz-ID deiner Shopware-App
+    .port = "8080";
+}
+
+# Kopiere die vollständige Shopware 6 VCL aus der offiziellen Dokumentation
+# https://developer.shopware.com/docs/guides/hosting/infrastructure/reverse-http-cache.html
+
+sub vcl_backend_fetch {
+    # Standard Shopware 6 Backend-Fetch-Logik...
+
+    # WICHTIG: Dies für die mittwald-Plattform hinzufügen
+    set bereq.http.Host = "backend.<project-short-id>.project.space";
+}
+```
+
+Zum Invalidieren des Caches verwende die integrierte Cache-Löschung von Shopware:
+
+- `bin/console cache:clear:http` — Löscht nur den Reverse-Proxy-Cache (empfohlen)
+- Shopware invalidiert den Cache automatisch, wenn Inhalte im Admin geändert werden
+
+:::tip Varnish-Version
+
+Stelle sicher, dass du für Shopware 6 Varnish 6.0 oder höher verwendest. Das in den Deployment-Beispielen verwendete `varnish:8`-Image enthält standardmäßig das XKey-Modul.
+
+:::
+
+## Monitoring und Debugging
+
+### Prüfen, ob Caching funktioniert
+
+Die meisten VCL-Konfigurationen fügen den Antworten einen `x-cache`-Header hinzu, indem sie eine `vcl_deliver`-Regel verwenden, die so aussehen sollte:
+
+```vcl
+sub vcl_deliver {
+    if (obj.hits > 0) {
+        set resp.http.x-cache = "HIT";
+    } else {
+        set resp.http.x-cache = "MISS";
+    }
+}
+```
+
+Wenn dies vorhanden ist, kannst du die Antwort-Header überprüfen, um zu sehen, ob Inhalte aus dem Cache geliefert werden:
+
+```shellsession
+$ curl -I https://www.example.com
+HTTP/1.1 200 OK
+x-cache: HIT
+```
+
+- `x-cache: HIT` = Inhalt aus dem Cache geliefert
+- `x-cache: MISS` = Inhalt vom Backend abgerufen
+
+### Varnish-Logs anzeigen
+
+Dieser Befehl gibt die Standardausgabe von Varnish selbst aus:
+
+```shellsession
+$ mw container logs <container-id>
+```
+
+Um die tatsächlichen (pro-Anfrage) Logs zu erhalten, verwende `varnishlog`:
+
+```shellsession
+$ mw container exec <container-id> -- varnishlog
+```
+
+### Varnish-Statistiken
+
+Verbinde dich mit dem Container und verwende `varnishstat`:
+
+```shellsession
+$ mw container exec <container-id> -- varnishstat
+```
+
+### Häufige Probleme
+
+**Problem**: Alle Anfragen zeigen `x-cache: MISS`
+
+- Prüfe, ob Anfragen Cookies haben (Cookies lösen den `pass`-Modus für nicht-statische Inhalte aus)
+- Überprüfe, ob deine VCL-Logik den `pass`-Modus für die spezifischen URLs erzwingt
+- Prüfe Backend-Antwort-Header (z.B. `Cache-Control: no-cache` verhindert Caching)
+- Für TYPO3: Stelle sicher, dass du nicht auf Backend-URLs zugreifst (`/typo3/`) oder mit einem Backend-Benutzer-Cookie angemeldet bist
+
+**Problem**: Backend-Anwendung gibt 404, 403 zurück oder antwortet nicht
+
+- Überprüfe, ob der interne Virtual Host korrekt konfiguriert ist
+- Prüfe, ob der `Host`-Header in der VCL korrekt umgeschrieben wird
+- Stelle sicher, dass der Backend-Hostname in der VCL mit dem Virtual Host deiner App übereinstimmt
+
+**Problem**: Container startet nicht
+
+- VCL-Syntax prüfen: Führe `varnishd -C -f /etc/varnish/default.vcl` aus (wenn der Container nicht startet, führe diesen Befehl in einem separaten Container mit einem überschriebenen Entrypoint, oder in einem Container auf deiner lokalen Maschine aus)
+- Überprüfe, ob die VCL-Datei in den korrekten Pfad hochgeladen wurde
+- Überprüfe die Container-Logs auf Fehlermeldungen
+
+## Performance-Überlegungen
+
+### Cache-Trefferquote
+
+Eine gute Cache-Trefferquote liegt typischerweise über 80%. Cache-Hits und -Misses können mit folgendem Befehl überwacht werden:
+
+```shellsession
+$ mw container exec <container-id> 'varnishstat -1' | grep 'cache_\(hit\|miss\)\s'
+```
+
+### Speichergröße
+
+Varnish speichert gecachte Inhalte im Arbeitsspeicher. Für den Produktiveinsatz möchtest du möglicherweise:
+
+1. Speichernutzung überwachen
+2. Container-Ressourcen basierend auf deinen Traffic-Mustern anpassen
+3. Größenbeschränkungen in der VCL implementieren
+
+### Grace-Modus
+
+Die Beispiel-VCL aktiviert den "Grace-Modus", der veraltete Inhalte liefert, wenn das Backend nicht verfügbar ist. Dies verbessert die Zuverlässigkeit, bedeutet aber, dass Benutzer während Backend-Ausfällen möglicherweise veraltete Inhalte sehen.
+
+## Weiterführende Informationen
+
+### Allgemeine Varnish-Dokumentation
+
+- [Varnish-Cache-Dokumentation](https://varnish-cache.org/docs/)
+- [VCL (Varnish Configuration Language)-Referenz](https://varnish-cache.org/docs/trunk/reference/vcl.html)
+
+### Anwendungsspezifische Dokumentation
+
+- **TYPO3**: [mittwald TYPO3 Varnish Extension](https://github.com/mittwald/typo3-varnishcache)
+- **Shopware 5**: [Varnish-Setup-Anleitung](https://developers.shopware.com/sysadmins-guide/varnish-setup/)
+- **Shopware 6**: [Reverse-HTTP-Cache-Anleitung](https://developer.shopware.com/docs/guides/hosting/infrastructure/reverse-http-cache.html)
+
+### mittwald-Plattform-Dokumentation
+
+- [Container-Verwaltung auf mittwald](../containers)
