@@ -1,0 +1,172 @@
+---
+title: Breaking (!) API changes for v2 API, November 21 to November 28
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - App
+  - Marketplace
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API introduces several enhancements, including the addition of default values for the 'limit' request parameter across multiple endpoints, new optional properties for extension pricing updates, and the introduction of two new endpoints for managing extension variant changes.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- For the `GET` operations `app-list-appinstallations-for-user`, `app-list-appinstallations`, and `app-list-systemsoftwares`, a default value of `1000.00` was added for the `query` request parameter `limit`. This is a breaking change.
+- Two new optional request properties, `isDowngradeAllowed` and `isUpgradeAllowed`, were added to the `PUT` operation `extension-update-extension-pricing` at the path `/v2/contributors/{contributorId}/extensions/{extensionId}/pricing`.
+- The `GET` operation `extension-get-extension-instance-contract` now includes two optional properties in the response with a `200` status: `contractPeriodEndDate` and `pendingVariantChange`.
+- A new endpoint was added for the `DELETE` operation `extension-cancel-extension-variant-change` at the path `/v2/extension-instances/{extensionInstanceId}/contract/variant-change`.
+- A new endpoint was added for the `POST` operation `extension-schedule-extension-variant-change` at the path `/v2/extension-instances/{extensionInstanceId}/contract/variant-change`.
+- The `GET` operation `extension-get-extension` now includes an optional property in the response with a `200` status: `pricingDetails`.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "List app installations that a user has access to"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', default value '1000.00' was added
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations-for-user" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app installations belonging to a Project"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', default value '1000.00' was added
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List system softwares"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', default value '1000.00' was added
+
+
+For details, refer to the <OperationLink operation="app-list-systemsoftwares" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Creates or Updates Pricing for an Extension"
+
+
+- added the new optional request property '/oneOf[subschema #2]/pricePlan/isDowngradeAllowed'
+
+- added the new optional request property '/oneOf[subschema #2]/pricePlan/isUpgradeAllowed'
+
+
+For details, refer to the <OperationLink operation="extension-update-extension-pricing" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the Contract Strategy of an Extension Instance"
+
+
+- added the optional property '/oneOf[#/components/schemas/de.mittwald.v1.extension.SubscriptionBasedContract]/contractPeriodEndDate' to the response with the '200' status
+
+- added the optional property '/oneOf[#/components/schemas/de.mittwald.v1.extension.SubscriptionBasedContract]/pendingVariantChange' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-extension-instance-contract" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Cancel an Extension Instance Variant Change"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="extension-cancel-extension-variant-change" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Schedule an Extension Instance Variant change for the next possible date"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="extension-schedule-extension-variant-change" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an Extension"
+
+
+- added the optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.UnpublishedExtension]/pricingDetails' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-extension" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald JavaScript SDK Release 4.270.0
+
+The mittwald JavaScript SDK has been updated to version 4.270.0. This release includes an update to the generated client, enhancing its functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.270.0).
+
+### mittwald JavaScript SDK Release 4.269.0
+
+The mittwald JavaScript SDK has been updated to version 4.269.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.269.0).
+
+### mittwald JavaScript SDK Release 4.268.0
+
+The mittwald JavaScript SDK has been updated to version 4.268.0. This release includes the following feature:
+
+- Updated generated client ([commit 1217aab](https://github.com/mittwald/api-client-js/commit/1217aabf1c3c83d30d3a5fdf05b904354ed5069f))
+
+For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.268.0](https://github.com/mittwald/api-client-js/releases/tag/4.268.0).
+
+### mittwald JavaScript SDK Release 4.267.0
+
+The mittwald JavaScript SDK has been updated to version 4.267.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.267.0).
+
+### mittwald JavaScript SDK Release 4.266.0
+
+The mittwald JavaScript SDK has been updated to version 4.266.0. This release includes the following feature:
+
+- Updated the generated client to enhance functionality and performance ([commit 317abf4](https://github.com/mittwald/api-client-js/commit/317abf42e3ac968894eb310bba46b0c9ca04259e)).
+
+For more details, you can view the full release notes on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.266.0).
+
+### mittwald JavaScript SDK Release 4.265.0
+
+The mittwald JavaScript SDK has been updated to version 4.265.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.265.0).
+
+### mittwald JavaScript SDK Release 4.264.0
+
+The mittwald JavaScript SDK has been updated to version 4.264.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.264.0).
+
