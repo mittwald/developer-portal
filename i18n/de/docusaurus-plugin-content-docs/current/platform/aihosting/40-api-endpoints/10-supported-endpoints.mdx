@@ -69,6 +69,45 @@ curl -i -N -X POST https://llm.aihosting.mittwald.de/v1/chat/completions \
     }'
 ```
 
+## /v1/responses (experimentell)
+
+Dieser Endpunkt bietet Zugriff auf die **Responses API**, welcher auf der Struktur von der [OpenAI Responses API](https://platform.openai.com/docs/api-reference/responses) basiert.
+Da die Route noch **experimentell** ist, sind nicht alle Funktionen vollständig verfügbar. Einige erweiterte Parameter können sich anders verhalten als in der [OpenAI Responses API](https://platform.openai.com/docs/api-reference/responses).
+
+Strukturierte Ausgaben wie schema-basiertes JSON können über diesen Endpunkt derzeit nicht erzwungen werden.
+Falls ein festes Ausgabeformat benötigt wird, sollte stattdessen der Endpunkt /v1/chat/completions verwendet werden
+
+```sh
+curl -i -X POST https://llm.aihosting.mittwald.de/v1/responses \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $APIKEY" \
+    -d '{
+        "model": "Mistral-Small-3.2-24B-Instruct",
+        "input": "Erkläre den Zweck dieses experimentellen Endpunkts."
+    }'
+````
+
+Die Antwort enthält den generierten Text sowie Metadaten.
+Da der Endpunkt noch in Entwicklung ist, können einzelne Felder fehlen oder abweichend umgesetzt sein.
+
+Um eine gestreamte Antwort zu erhalten, wird `stream: true` gesetzt:
+
+```sh
+curl -i -N -X POST https://llm.aihosting.mittwald.de/v1/responses \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $APIKEY" \
+    -d '{
+        "model": "Mistral-Small-3.2-24B-Instruct",
+        "input": "Sende eine kurze gestreamte Nachricht.",
+        "stream": true,
+        "temperature": 0.2,
+        "top_p": 0.5,
+        "top_k": 20
+    }'
+```
+
+Streaming wird unterstützt, kann jedoch je nach Funktion oder Parameter leicht eingeschränkt sein.
+
 ## /v1/embeddings
 
 Mit dieser Route können Embeddings für Texte erstellt werden.
