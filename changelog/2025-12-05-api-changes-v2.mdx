@@ -1,0 +1,82 @@
+---
+title: API changes for v2 API, November 28 to December 5
+authors:
+  - machine
+tags:
+  - apiv2
+  - Domain
+  - Mail
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API introduces a new optional 'query' request parameter for deleting domains and adds a new endpoint for listing mail addresses.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- A new optional request parameter named 'deleteIngresses' has been added to the DELETE operation for the domain deletion endpoint (`/v2/domains/{domainId}`).
+- A new endpoint has been added for the GET operation to list mail addresses (`/v2/mail-addresses/`).
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Delete a Domain"
+
+
+- added the new optional 'query' request parameter 'deleteIngresses'
+
+
+For details, refer to the <OperationLink operation="domain-delete-domain" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List mail addresses"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="mail-list-mail-addresses-for-user" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK Release v2.1.162
+
+The latest release of the mittwald PHP SDK, version [v2.1.162](https://github.com/mittwald/api-client-php/releases/tag/v2.1.162), introduces several new features and updates aimed at enhancing usability and consistency across the API.
+
+#### Features
+- **Default Limit for Requests**: The `ListAppinstallationsRequest`, `ListAppinstallationsForUserRequest`, and `ListSystemsoftwaresRequest` now include a default limit of 1000, improving usability by automatically applying this limit if none is specified.
+- **Backup Client Enhancements**: New methods `getProjectBackupDirectories` and `requestProjectBackupRestorePath` have been added to the `BackupClient` interface, allowing for better management of project backups.
+- **Improved Error Handling**: New response classes have been introduced to manage various error scenarios, enhancing the robustness of error handling across services like Mail and Marketplace.
+- **Mail API Changes**: The `MailClient` now includes new requests and responses for listing mail addresses, offering improved access to user-specific mail functionalities.
+
+#### Updates
+- **API Changes**: The `ListMailAddressesForUserRequest` now supports comprehensive query parameters, including pagination and filtering options.
+- **Error Response Classes**: New classes have been added to handle specific error responses for mail address requests, such as bad requests and service unavailability.
+- **Code Refactoring**: Several classes have been renamed and restructured for improved clarity, including updates to mail setting enums.
+
+This release focuses on enhancing the developer experience by providing clearer error management, maintaining consistency in default settings, and improving the overall usability of the API. For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.162).
+
+### mittwald JavaScript SDK Release 4.272.0
+
+The mittwald JavaScript SDK has been updated to version 4.272.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.272.0).
+
+### mittwald JavaScript SDK Release 4.271.0
+
+The mittwald JavaScript SDK has been updated to version 4.271.0. This release includes an update to the generated client, enhancing its functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.271.0).
+
