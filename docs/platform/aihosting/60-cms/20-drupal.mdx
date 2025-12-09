@@ -6,26 +6,45 @@ title: Drupal CMS
 
 ## Using the mittwald AI provider
 
-- https://www.drupal.org/project/ai_provider_mittwald
+The mittwald AI provider integration brings powerful AI capabilities directly into your Drupal CMS. This module allows you to leverage mittwald's AI models for various tasks including text translation, chat interfaces, image vision processing, and embeddings generation. You can find the official module on the [Drupal project page](https://www.drupal.org/project/ai_provider_mittwald).
 
 ### Installation
 
-Installation:
+To get started with the mittwald AI provider, you'll need to install the module using Composer and enable it through Drush. This requires an active Drupal installation with Composer support.
 
-```
+Run the following commands in your Drupal project directory:
+
+```bash
 composer require drupal/ai_provider_mittwald
 drush en ai_provider_mittwald
 ```
 
+The first command downloads the mittwald AI provider module and its dependencies, while the second command enables the module in your Drupal installation. If you prefer, you can also enable the module through the Drupal admin interface under **Extend**.
+
 ### Configuration
 
-1. Go to **Configuration** -> **System** -> **Keys**, click on **Add key** and insert your mittwald AI Hosting API key.
-1. Go to **Configuration** -> **AI** -> **Provider Settings**, click on **mittwald Authentication**; in the field **mittwald API key**, select the key you created in the previous step and save the configuration.
-1. Go to **Configuration** -> **AI** -> **AI default settings**, select **mittwald** as default provider for
-   1. Translate text
-   1. Chat (and Chat with Image Visiion, and chat with Tool Calling)
-   1. Embeddings
+Once the module is installed, you'll need to configure it with your mittwald AI Hosting API key. The configuration process involves three main steps: setting up secure key storage, configuring the provider authentication, and selecting mittwald as your default AI provider.
+
+#### Step 1: Store your API key securely
+
+Navigate to **Configuration** -> **System** -> **Keys** in your Drupal admin interface. Click on **Add key** to create a new key entry. Give your key a descriptive name (such as "mittwald AI API Key") and paste your mittwald AI Hosting API key into the key value field. This approach ensures your API credentials are stored securely and can be managed centrally.
+
+If you don't have an API key yet, you can generate one through your mittwald account dashboard in the AI Hosting section.
+
+#### Step 2: Configure provider authentication
+
+Next, you'll connect the stored API key to the mittwald AI provider. Go to **Configuration** -> **AI** -> **Provider Settings** and locate the **mittwald Authentication** section. In the **mittwald API key** dropdown field, select the key you created in the previous step. Save the configuration to establish the connection between your Drupal site and the mittwald AI services.
+
+#### Step 3: Set mittwald as default provider
+
+Finally, configure which AI capabilities should use the mittwald provider by default. Navigate to **Configuration** -> **AI** -> **AI default settings**. Here you can select **mittwald** as the default provider for multiple AI functionalities:
+
+- **Translate text**: Enable AI-powered translation capabilities across your Drupal content
+- **Chat**: Set up conversational AI interfaces, including advanced features like Image Vision and Tool Calling support
+- **Embeddings**: Generate vector embeddings for semantic search and content recommendations
+
+By setting mittwald as the default provider, all AI-powered features in your Drupal installation will automatically use mittwald's AI models unless you specify otherwise for specific use cases.
 
 ## Using vector databases
 
-coming soon
+Support for vector databases is currently in development and will be available at a later time. Vector databases enable advanced semantic search capabilities and content recommendations by storing and querying AI-generated embeddings efficiently.
