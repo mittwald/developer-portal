@@ -1,0 +1,56 @@
+---
+sidebar_label: Whisper-Large-V3-Turbo
+description: Detaillierte Informationen zu Whisper-Large-V3-Turbo
+title: Whisper-Large-V3-Turbo
+---
+
+## Beschreibung
+
+„Whisper-Large-V3-Turbo“ ist ein mehrsprachiges automatisches Spracherkennungsmodell (ASR – *Automatic Speech Recognition*) von OpenAI, optimiert für Geschwindigkeit und Effizienz. Es basiert auf der Architektur des bekannten „Whisper-Large-V3“-Modells, verwendet jedoch eine leichtere Decoder-Struktur für deutlich geringere Latenz bei nur minimalem Genauigkeitsverlust. Das Modell unterstützt über 99 Sprachen und ist ideal für die Transkription von Spracheingaben.
+
+Die folgenden Einschränkungen gelten für dieses Modell bei unserer Plattform:
+- Maximale Dateigröße: 25 MB pro Upload
+- Keine explizite Kontextlängenbegrenzung – abhängig von Audiodauer und Dateigröße
+- Es ist derzeit keine Übersetzung möglich (`to_language`)
+- Unterstützte Ausgabeformate: **`text`**, **`json`**
+    - Andere Formate (`srt`, `vtt`, `verbose_json`) werden aktuell nicht unterstützt
+
+### Unterstützte Eingabeformate
+
+`mp3`, `ogg`, `wav`, `flac`
+
+## Unterstützte Werte für Parameter `language` (ISO-639-1 Sprachcodes)
+
+`af`, `ar`, `az`, `be`, `bg`, `bs`, `ca`, `cs`, `cy`, `da`, `de`, `el`, `en`, `es`, `et`, `fa`, `fi`, `fr`, `gl`, `he`, `hi`, `hr`, `hu`, `hy`, `id`, `is`, `it`, `ja`, `kk`, `kn`, `ko`, `lt`, `lv`, `mk`, `mi`, `mr`, `ms`, `ne`, `nl`, `no`, `pl`, `pt`, `ro`, `ru`, `sk`, `sl`, `sr`, `sv`, `sw`, `ta`, `th`, `tl`, `tr`, `uk`, `ur`, `vi`, `zh`
+
+### Empfohlene Inferenzparameter
+
+- `temperature=1.0`
+- `top_p=1.0`
+- `response_format="json"`
+- **`language` wie `language="de"`sollte immer explizit gesetzt werden**, um die Genauigkeit zu maximieren.
+  Wird kein Wert angegeben, wird **standardmäßig Deutsch (`"de"`)** angenommen, kann aber für anderssprachige Eingaben dann schlechtere Ergebnisse liefern.
+
+### Beispielausgabe (`response_format=json`)
+
+```json
+{
+  "text": "Das ist der transkribierte Text einer Spracheingabe.",
+  "usage": {
+    "type": "duration",
+    "seconds": 8
+  }
+}
+```
+
+### Best Practices
+
+- **Setze den Parameter `language` immer explizit**, z. B. `language="de"` für deutschsprachige Audiodateien.
+- Segmentiere lange Audiodateien in < 25 MB-Chunks.
+- Für Echtzeit- oder near-real-time-Anwendungen `response_format="text"` verwenden.
+- Bei mehrsprachigen Aufnahmen: einzelne Sprachen separat transkribieren für bessere Präzision.
+
+
+## Nutzungsbedingungen und Lizenzierung
+
+Die [allgemeinen Nutzungsbedingungen](../../access-and-usage/terms-of-use/) gelten. Das Modell wird von OpenAI unter der [MIT-Lizenz](https://opensource.org/licenses/MIT) bereitgestellt, und die Wiederverwendung des generierten Inhalts unterliegt keinen zusätzlichen Einschränkungen.

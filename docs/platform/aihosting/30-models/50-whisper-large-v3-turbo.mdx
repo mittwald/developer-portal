@@ -1,0 +1,55 @@
+---
+sidebar_label: Whisper-Large-V3-Turbo
+description: Detailed information about Whisper-Large-V3-Turbo
+title: Whisper-Large-V3-Turbo
+---
+
+## Description
+
+“Whisper-Large-V3-Turbo” is a multilingual automatic speech recognition model (ASR) developed by OpenAI, optimized for speed and efficiency. It is based on the architecture of the well-known “Whisper-Large-V3” model, but uses a lighter decoder structure to significantly reduce latency with only a minimal loss in accuracy. The model supports over 99 languages and is ideal for transcribing speech inputs.
+
+The following limitations apply to this model on our platform:
+- Maximum file size: 25 MB per upload
+- No explicit context length limit – depends on audio duration and file size
+- Translation is currently not supported (`to_language`)
+- Supported output formats: **`text`**, **`json`**
+    - Other formats (`srt`, `vtt`, `verbose_json`) are currently not supported
+
+### Supported Input Formats
+
+`mp3`, `ogg`, `wav`, `flac`
+
+## Supported values for parameter `language` (ISO-639-1 language codes)
+
+`af`, `ar`, `az`, `be`, `bg`, `bs`, `ca`, `cs`, `cy`, `da`, `de`, `el`, `en`, `es`, `et`, `fa`, `fi`, `fr`, `gl`, `he`, `hi`, `hr`, `hu`, `hy`, `id`, `is`, `it`, `ja`, `kk`, `kn`, `ko`, `lt`, `lv`, `mk`, `mi`, `mr`, `ms`, `ne`, `nl`, `no`, `pl`, `pt`, `ro`, `ru`, `sk`, `sl`, `sr`, `sv`, `sw`, `ta`, `th`, `tl`, `tr`, `uk`, `ur`, `vi`, `zh`
+
+### Recommended Inference Parameters
+
+- `temperature=1.0`
+- `top_p=1.0`
+- `response_format="json"`
+- **`language` like `language="de"`should always be set explicitly** to maximize accuracy.
+  If no value is provided, **German (`"de"`)** will be assumed by default, which may result in poorer outcomes for inputs in other languages.
+
+### Example Output (`response_format=json`)
+
+```json
+{
+  "text": "This is the transcribed text of a speech input.",
+  "usage": {
+    "type": "duration",
+    "seconds": 8
+  }
+}
+```
+
+### Best Practices
+
+- **Always set the `language` parameter explicitly**, e.g. `language="de"` for German audio files.
+- Segment long audio files into chunks of < 25 MB.
+- For real-time or near-real-time applications, use `response_format="text"`.
+- For multilingual recordings: transcribe each language separately for better accuracy.
+
+## Terms of Use and Licensing
+
+The [general terms of use](../../access-and-usage/terms-of-use/) apply. The model is provided by OpenAI under the [MIT License](https://opensource.org/licenses/MIT), and reuse of the generated content is subject to no additional restrictions.
