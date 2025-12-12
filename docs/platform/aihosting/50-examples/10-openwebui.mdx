@@ -19,3 +19,26 @@ For optimal results, it may be necessary to adjust the default parameters of Ope
 Open WebUI offers the ability to store knowledge in the form of documents, which can be accessed as needed. This is known as retrieval-augmented generation (RAG). In the left menu bar, under “Workspace” and then in the “Knowledge” tab, you can upload documents that can be accessed in a chat using a hashtag.
 
 To enable more efficient processing, you can use an embedding model. In the Admin Panel under the “Settings” tab, go to the “Documents” menu item. In the “Embedding” section, first select “OpenAI” in the dropdown menu as the embedding model engine. Then, insert the above-mentioned endpoint and your generated API key. Select one of our offered embedding models under “Embedding Model” and adjust the parameters “Top K” and “RAG Template” in the “Retrieval” section for optimal results.
+
+Whisper-Large-V3-Turbo can also be configured in Open WebUI for speech-to-text (STT) functionality. This model supports over 99 languages and is optimized for audio transcription via our hosted API.
+
+In the Admin Panel under “Settings” > “Audio”, configure the following:
+
+- **Engine**: Select “OpenAI”
+- Enter your API endpoint and password again if necessary
+- **STT Model**: Enter model name “whisper-large-v3-turbo”
+
+This are the settings you have to modify in the Admin Panel. Whisper will appear in the model list after connection, but it should be hidden from chat model selection since it's designed for audio transcription, not conversational AI. In “Workspace” > “Models”, select Whisper-Large-V3-Turbo and choose “Hide” to prevent it from appearing as a chat option.
+
+You can furhter specify how Open Web UI interacts with the model. These settings are available to you in the user settings (not Administrator panel) under "Audio":
+
+- **Language**: Explicitly set the language code (e.g., “de” for German, which is the default if not specified)
+- **Directly Send Speech**: Sends directly without you confirming.
+
+In the admin panel, you may also specify the recommended settings for Whisper - as well as in the chat settings:
+
+- **Additional Parameters**: Set `temperature=1.0`, `top_p=1.0`.
+
+For testing, click the microphone icon in a chat interface and speak in the configured language. The transcription will use our `/v1/audio/transcriptions` endpoint with support for MP3, OGG, WAV, and FLAC formats (maximum 25 MB file size). Always set the language parameter explicitly for best accuracy, especially for non-German audio inputs.
+
+You can now use whisper in any chat of your liking! Chat with your favourite LLM by dictating your question and sending it.
