@@ -124,3 +124,38 @@ curl -i -X POST https://llm.aihosting.mittwald.de/v1/embeddings \
 
 Basierend auf dem verwendeten Embedding-Modell können weitere vom Modell unterstützte Parameter wie `dimensions` übermittelt werden. Dies ist bei [Qwen3-Embedding-8B](../../models/qwen3-embedding-8b/) jedoch nicht der Fall.
 
+## /v1/audio/transcriptions
+
+Dieser Endpunkt ermöglicht es, Audiodateien mit Whisper-Modellen in Text zu transkribieren.
+
+```sh
+curl -X POST https://llm.aihosting.mittwald.de/v1/audio/transcriptions \
+    -H "Authorization: Bearer $APIKEY" \
+    -F "file=@/path/to/audio.mp3" \
+    -F "model=Whisper-Large-V3-Turbo"
+```
+
+Der `file`-Parameter sollte die zu transkribierende Audiodatei enthalten. Unterstützte Formate sind MP3, OGG, WAV und FLAC. Die maximale Dateigröße beträgt 25 MB. Der `model`-Parameter gibt an, welches Whisper-Modell für die Transkription verwendet werden soll.
+
+Zusätzlich können folgende optionale Parameter übermittelt werden:
+
+- `language`: Die Sprache der Audioeingabe (ISO-639-1-Format). Falls nicht angegeben, wird standardmäßig Deutsch ("de") angenommen. Es wird dringend empfohlen, diesen Parameter immer explizit zu setzen, um die beste Genauigkeit zu erzielen.
+- `temperature`: Sampling-Temperatur, empfohlener Wert ist 1.0
+- `response_format`: Format der Antwort (json oder text). Andere Formate wie srt, vtt und verbose_json werden derzeit nicht unterstützt.
+
+```sh
+curl -X POST https://llm.aihosting.mittwald.de/v1/audio/transcriptions \
+    -H "Authorization: Bearer $APIKEY" \
+    -F "file=@/path/to/audio.mp3" \
+    -F "model=Whisper-Large-V3-Turbo" \
+    -F "language=de" \
+    -F "temperature=1.0" \
+    -F "response_format=json"
+```
+
+**Wichtige Hinweise:**
+
+- Übersetzungsfunktion (`to_language`-Parameter) wird nicht unterstützt
+- Für beste Ergebnisse sollte der `language`-Parameter immer explizit angegeben werden
+- Segmentiere große Audiodateien bei Bedarf in Teile kleiner als 25 MB
+
