@@ -1,0 +1,100 @@
+---
+title: Breaking (!) API changes for v2 API, December 5 to December 12
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - App
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+During the week of December 5th to December 12th, 2025, the mittwald API has removed the default value of '1000.00' for the 'limit' query parameter across several endpoints, including those for listing app installations for users and projects, as well as system software.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The default value of '1000.00' for the 'query' request parameter 'limit' has been removed for the following operations:
+  - `GET /v2/app-installations` (List AppInstallations that a user has access to.)
+  - `GET /v2/projects/{projectId}/app-installations` (List AppInstallations belonging to a Project.)
+  - `GET /v2/system-softwares` (List SystemSoftwares.)
+  
+  Note: This change is a breaking change.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "List app installations that a user has access to"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', default value '1000.00' was removed
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations-for-user" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app installations belonging to a Project"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', default value '1000.00' was removed
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List system softwares"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', default value '1000.00' was removed
+
+
+For details, refer to the <OperationLink operation="app-list-systemsoftwares" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### Release Summary: mittwald PHP SDK v2.1.163
+
+The latest release of the mittwald PHP SDK, version [v2.1.163](https://github.com/mittwald/api-client-php/releases/tag/v2.1.163), introduces significant updates to request limit handling and serialization processes.
+
+#### Key Changes:
+
+- **Request Limit Handling**: 
+  - The `limit` attribute in request classes such as `ListAppinstallationsRequest`, `ListAppinstallationsForUserRequest`, and `ListSystemsoftwaresRequest` is now optional. It has been changed from an `int` with a default of `1000` to a nullable `int` without a default value.
+  - A new method, `withoutLimit()`, has been added to these request classes, allowing users to configure requests without a limit, thus providing greater flexibility.
+
+- **Serialization Adjustments**:
+  - The serialization logic has been updated to include the limit in the output only if it is set, avoiding the unnecessary inclusion of a default value.
+
+These enhancements improve the adaptability and flexibility of the API, allowing for better management of request parameters and accommodating various use cases without imposing a rigid structure on the limit parameter.
+
+### mittwald JavaScript SDK Release 4.273.0
+
+The mittwald JavaScript SDK has been updated to version 4.273.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.273.0](https://github.com/mittwald/api-client-js/releases/tag/4.273.0).
+
