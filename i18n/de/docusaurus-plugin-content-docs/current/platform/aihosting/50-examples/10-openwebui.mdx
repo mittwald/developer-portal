@@ -18,4 +18,27 @@ Für optimale Ergebnisse kann es erforderlich sein, die Standard-Parameter von O
 
 Open WebUI bietet die Funktion an, Wissen in Form von Dokumenten zu hinterlegen, auf die zugegriffen werden kann. Hierbei handelt es sich um sog. Retrieval-augmented generation (RAG). In der linken Menüleiste lassen sich unter „Workspace“ und dann im Reiter „Knowledge“ Dokumente hinterlegen, auf die in einem Chat mit einem Hashtag zugegriffen werden kann.
 
-Hierfür kann für performantere Verarbeitung ein Embedding-Modell genutzt werden. Erneut im Admin Panel unter dem Reiter „Settings“ findet sich der Menüpunkt „Documents“. Wähle dort im Abschnitt „Embedding“ zunächst im Dropdown-Menü „OpenAI“ für die Embedding Model Engine aus. Setze dann den oben genannten Endpunkt und deinen generierten API-Key ein. Setze dann unter „Embedding Model“ ein von uns angebotenes Embedding-Modell ein und passe für optimale Ergebnisse im Bereich „Retrieval“ die Parameter „Top K“ und „RAG Template“ an.
+Hierfür kann für performantere Verarbeitung ein Embedding-Modell genutzt werden. Erneut im Admin Panel unter dem Reiter „Settings" findet sich der Menüpunkt „Documents". Wähle dort im Abschnitt „Embedding" zunächst im Dropdown-Menü „OpenAI" für die Embedding Model Engine aus. Setze dann den oben genannten Endpunkt und deinen generierten API-Key ein. Setze dann unter „Embedding Model" ein von uns angebotenes Embedding-Modell ein und passe für optimale Ergebnisse im Bereich „Retrieval" die Parameter „Top K" und „RAG Template" an.
+
+Whisper-Large-V3-Turbo kann ebenfalls in Open WebUI für Speech-to-Text (STT) Funktionalität konfiguriert werden. Dieses Modell unterstützt über 99 Sprachen und ist für Audio-Transkription über unsere gehostete API optimiert.
+
+Im Admin Panel unter „Settings" > „Audio" sind folgende Einstellungen vorzunehmen:
+
+- **Engine**: Wähle „OpenAI"
+- Falls erforderlich, gib deinen API-Endpunkt und dein Passwort erneut ein
+- **STT Model**: Gib den Modellnamen „whisper-large-v3-turbo" ein
+
+Dies sind die Einstellungen, die im Admin Panel vorgenommen werden müssen. Whisper wird nach der Verbindung in der Modellliste erscheinen, sollte aber aus der Chat-Modell-Auswahl ausgeblendet werden, da es für Audio-Transkription entwickelt wurde, nicht für konversationelle KI. Wähle unter „Workspace" > „Models" Whisper-Large-V3-Turbo aus und wähle „Hide", um zu verhindern, dass es als Chat-Option erscheint.
+
+Du kannst weiter spezifizieren, wie Open WebUI mit dem Modell interagiert. Diese Einstellungen stehen dir in den Benutzereinstellungen (nicht im Administrator-Panel) unter „Audio" zur Verfügung:
+
+- **Language**: Setze den Sprachcode explizit (z.B. „de" für Deutsch, was die Standardeinstellung ist, falls nicht angegeben)
+- **Directly Send Speech**: Sendet direkt ohne dass du bestätigen musst.
+
+Im Admin Panel kannst du auch die empfohlenen Einstellungen für Whisper festlegen - sowie in den Chat-Einstellungen:
+
+- **Additional Parameters**: Setze `temperature=1.0`, `top_p=1.0`.
+
+Zum Testen klicke auf das Mikrofon-Symbol in einer Chat-Oberfläche und sprich in der konfigurierten Sprache. Die Transkription verwendet unseren `/v1/audio/transcriptions`-Endpunkt mit Unterstützung für MP3-, OGG-, WAV- und FLAC-Formate (maximale Dateigröße 25 MB). Setze den Sprachparameter immer explizit für beste Genauigkeit, insbesondere für nicht-deutsche Audioeingaben.
+
+Du kannst Whisper nun in jedem Chat deiner Wahl verwenden! Chatte mit deinem Lieblings-LLM, indem du deine Frage diktierst und absendest.

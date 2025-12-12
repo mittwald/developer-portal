@@ -34,7 +34,7 @@ This route allows content to be sent to the LLM in chat format. The endpoint sup
 curl -i -X POST https://llm.aihosting.mittwald.de/v1/chat/completions \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $APIKEY" \
-    -d '{ 
+    -d '{
         "model": "Mistral-Small-3.2-24B-Instruct",
         "messages": [
             {
@@ -54,7 +54,7 @@ To receive a streamed response, the option `stream: true` must be set.
 curl -i -N -X POST https://llm.aihosting.mittwald.de/v1/chat/completions \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $APIKEY" \
-    -d '{ 
+    -d '{
         "model": "Mistral-Small-3.2-24B-Instruct",
         "messages": [
             {
@@ -76,7 +76,6 @@ As the route is still **experimental**, not all features are fully supported. So
 
 Structured output such as schema-based JSON **cannot currently be enforced** with this endpoint.
 If structured output is required, the `/v1/chat/completions` endpoint should be used instead.
-
 
 ```sh
 curl -i -X POST https://llm.aihosting.mittwald.de/v1/responses \
@@ -117,7 +116,7 @@ This route allows you to generate embeddings for texts.
 curl -i -X POST https://llm.aihosting.mittwald.de/v1/embeddings \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $APIKEY" \
-    -d '{ 
+    -d '{
         "model": "Qwen3-Embedding-8B",
         "input": "An important document"
     }'
@@ -125,3 +124,37 @@ curl -i -X POST https://llm.aihosting.mittwald.de/v1/embeddings \
 
 Depending on the embedding model used, additional supported parameters such as `dimensions` can be submitted. However, this is not applicable to [Qwen3-Embedding-8B](../../models/qwen3-embedding-8b/).
 
+## /v1/audio/transcriptions
+
+This endpoint allows you to transcribe audio files into text using Whisper models.
+
+```sh
+curl -X POST https://llm.aihosting.mittwald.de/v1/audio/transcriptions \
+    -H "Authorization: Bearer $APIKEY" \
+    -F "file=@/path/to/audio.mp3" \
+    -F "model=Whisper-Large-V3-Turbo"
+```
+
+The `file` parameter should contain the audio file to be transcribed. Supported formats include MP3, OGG, WAV, and FLAC. Maximum file size is 25 MB. The `model` parameter specifies which Whisper model to use for transcription.
+
+Additional optional parameters can be provided:
+
+- `language`: The language of the input audio (ISO-639-1 format). If not specified, German ("de") will be assumed by default. It is strongly recommended to always set this parameter explicitly for best accuracy.
+- `temperature`: Sampling temperature, recommended value is 1.0
+- `response_format`: Format of the response (json or text). Other formats like srt, vtt, and verbose_json are not currently supported.
+
+```sh
+curl -X POST https://llm.aihosting.mittwald.de/v1/audio/transcriptions \
+    -H "Authorization: Bearer $APIKEY" \
+    -F "file=@/path/to/audio.mp3" \
+    -F "model=Whisper-Large-V3-Turbo" \
+    -F "language=de" \
+    -F "temperature=1.0" \
+    -F "response_format=json"
+```
+
+**Important notes:**
+
+- Translation functionality (`to_language` parameter) is not supported
+- For best results, always specify the `language` parameter explicitly
+- Segment large audio files into chunks smaller than 25 MB if needed
