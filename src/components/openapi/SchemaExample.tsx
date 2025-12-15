@@ -11,6 +11,8 @@ interface Props {
   withHeaders?: boolean;
 }
 
+type RendererProps = Omit<Props, "schema"> & { content: any };
+
 export type ExampleFormat = "json" | "yaml" | "form" | "multipart-form";
 
 /**
@@ -42,10 +44,25 @@ export default function SchemaExample({
     ));
   }
 
-  const example = generateSchemaExample(schema);
+  return (
+    <SchemaExampleRenderer
+      content={generateSchemaExample(schema)}
+      withHeaders={withHeaders}
+      title={title}
+      format={format}
+    />
+  );
+}
+
+export function SchemaExampleRenderer({
+  content,
+  title,
+  format = "json",
+  withHeaders = false,
+}: RendererProps) {
   const rendered = withHeaders
-    ? renderExampleWithHeaders(format, example)
-    : renderExample(format, example);
+    ? renderExampleWithHeaders(format, content)
+    : renderExample(format, content);
 
   return (
     <CodeBlock showLineNumbers={true} language="yaml" title={title}>
