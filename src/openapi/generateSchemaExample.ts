@@ -12,7 +12,7 @@ export function generateSchemaExample(schema: OpenAPIV3.SchemaObject): any {
     return generateSchemaExample(schema.oneOf[0] as OpenAPIV3.SchemaObject);
   }
 
-  if (schema.type === "object") {
+  if (schema.type === "object" || "properties" in schema) {
     const example: any = {};
     if (schema.properties) {
       const nonDeprecatedProperties = Object.entries(schema.properties).filter(
