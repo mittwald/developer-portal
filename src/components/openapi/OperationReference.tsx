@@ -9,7 +9,7 @@ import {
 } from "@site/src/components/openapi/RequiredOptional";
 import Translate, { translate } from "@docusaurus/Translate";
 import HTTPResponseStatus from "@site/src/components/openapi/HTTPResponseStatus";
-import { Accordion } from "@mittwald/flow-react-components";
+import { Accordion, AlertBadge } from "@mittwald/flow-react-components";
 import { Heading } from "@mittwald/flow-react-components";
 import { Content } from "@mittwald/flow-react-components";
 import { Text } from "@mittwald/flow-react-components";
@@ -24,6 +24,7 @@ import ResponseObject = OpenAPIV3.ResponseObject;
 import SchemaWithExample from "@site/src/components/openapi/SchemaWithExample";
 import SchemaObject = OpenAPIV3.SchemaObject;
 import React from "react";
+import ExampleObject = OpenAPIV3.ExampleObject;
 
 function OutlinedAccordion({
   children,
@@ -172,12 +173,10 @@ function OperationRequestBody({
       <OutlinedAccordion>
         <Heading>
           <div style={{ flexGrow: 1 }}>{title}</div>
+          <AlertBadge status={"info"}>multipart/form-data</AlertBadge>
           {required}
         </Heading>
         <Content>
-          <p>
-            Format: <code>multipart/form-data</code>
-          </p>
           <SchemaWithExample
             schema={spec.content["multipart/form-data"].schema as SchemaObject}
             format="multipart-form"
@@ -189,18 +188,18 @@ function OperationRequestBody({
   }
 
   if ("application/json" in spec.content) {
+    const body = spec.content["application/json"];
     return (
       <OutlinedAccordion>
         <Heading>
           <div style={{ flexGrow: 1 }}>{title}</div>
+          <AlertBadge status={"info"}>application/json</AlertBadge>
           {required}
         </Heading>
         <Content>
-          <p>
-            Format: <code>application/json</code>
-          </p>
           <SchemaWithExample
-            schema={spec.content["application/json"].schema as SchemaObject}
+            schema={body.schema as SchemaObject}
+            examples={body.examples as Record<string, ExampleObject>}
             withRawJSONSchema
             withHeaders
           />
