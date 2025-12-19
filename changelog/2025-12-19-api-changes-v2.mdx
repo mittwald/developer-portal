@@ -1,0 +1,268 @@
+---
+title: API changes for v2 API, December 12 to December 19
+authors:
+  - machine
+tags:
+  - apiv2
+  - Marketplace
+  - Contract
+  - Domain
+  - Project File System
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week's update to the mittwald API introduces several enhancements, including the addition of required and optional properties in responses for various endpoints, new optional request properties, the introduction of a new endpoint for retrieving AI Hosting contracts, and the removal of a security scheme from the domain suggestions endpoint.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- The `GET /v2/contributors/{contributorId}/extensions` operation now includes a required property `isDeletionScheduled` and an optional property `deletionDeadline` in the response with a `200` status.
+- The `GET /v2/contributors/{contributorId}/extensions/{extensionId}` operation has been updated to include a required property `isDeletionScheduled` and an optional property `deletionDeadline` in the response with a `200` status.
+- The `PATCH /v2/contributors/{contributorId}/extensions/{extensionId}` operation now includes a required property `isDeletionScheduled` and an optional property `deletionDeadline` in the response with a `200` status.
+- The `PUT /v2/contributors/{contributorId}/extensions/{extensionId}/pricing` operation has been updated to include two new optional request properties: `deletionDeadline` and `isDeletionScheduled`, as well as an optional response property `deletionDeadline`.
+- The `GET /v2/contributors/{contributorId}/invoices/incoming` operation now includes an optional property `invoiceType` in the response with a `200` status.
+- A new endpoint `GET /v2/customers/{customerId}/ai-hosting/contract` has been added to return the AI Hosting Contract for the given Customer.
+- The `GET /v2/domain-suggestions` operation has had the endpoint scheme security `de.mittwald.v1.commons.AccessToken` removed.
+- The `POST /v2/domains/{domainId}/scheduled-deletion` operation now includes a new optional request property `deleteIngresses`.
+- The `GET /v2/extensions` operation has been updated to include a required property `isDeletionScheduled` and an optional property `deletionDeadline` in the response with a `200` status.
+- The `GET /v2/extensions/{extensionId}` operation now includes two required properties: `isDeletionScheduled` and an optional property `deletionDeadline` in the response with a `200` status.
+- The `GET /v2/projects/{projectId}/jwt` operation has had a non-success response with the status `401` added.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "List Extensions of own contributor"
+
+
+- added the optional property '/items/pricing/oneOf[#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricePlanStrategy]/items/deletionDeadline' to the response with the '200' status
+
+- added the required property '/items/pricing/oneOf[#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricePlanStrategy]/items/isDeletionScheduled' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-list-own-extensions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get Extension of own contributor"
+
+
+- added the optional property 'pricing/oneOf[#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricePlanStrategy]/items/deletionDeadline' to the response with the '200' status
+
+- added the required property 'pricing/oneOf[#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricePlanStrategy]/items/isDeletionScheduled' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-own-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Patch Extension"
+
+
+- added the optional property 'pricing/oneOf[#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricePlanStrategy]/items/deletionDeadline' to the response with the '200' status
+
+- added the required property 'pricing/oneOf[#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricePlanStrategy]/items/isDeletionScheduled' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-patch-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Creates or Updates Pricing for an Extension"
+
+
+- added the new optional request property '/oneOf[subschema #2]/pricePlan/variants/items/deletionDeadline'
+
+- added the new optional request property '/oneOf[subschema #2]/pricePlan/variants/items/isDeletionScheduled'
+
+- added the optional property 'priceChangeConsequence/variantConsequences/items/deletionDeadline' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-update-extension-pricing" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List incoming Invoices of a contributor"
+
+
+- added the optional property '/items/invoiceType' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="contributor-list-incoming-invoices" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the AI Hosting Contract for the given Customer"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-ai-hosting" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Suggest a list of domains based on a prompt using AI"
+
+
+- the endpoint scheme security 'de.mittwald.v1.commons.AccessToken' was removed from the API
+
+
+For details, refer to the <OperationLink operation="domain-suggest" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a scheduled deletion of a Domain"
+
+
+- added the new optional request property 'deleteIngresses'
+
+
+For details, refer to the <OperationLink operation="domain-create-scheduled-deletion" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Extensions"
+
+
+- added the optional property '/items/pricing/oneOf[#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricePlanStrategy]/items/deletionDeadline' to the response with the '200' status
+
+- added the required property '/items/pricing/oneOf[#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricePlanStrategy]/items/isDeletionScheduled' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-list-extensions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an Extension"
+
+
+- added the optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Extension]/pricing/oneOf[#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricePlanStrategy]/items/deletionDeadline' to the response with the '200' status
+
+- added the optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.UnpublishedExtension]/pricing/oneOf[#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricePlanStrategy]/items/deletionDeadline' to the response with the '200' status
+
+- added the required property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Extension]/pricing/oneOf[#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricePlanStrategy]/items/isDeletionScheduled' to the response with the '200' status
+
+- added the required property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.UnpublishedExtension]/pricing/oneOf[#/components/schemas/de.mittwald.v1.marketplace.MonthlyPricePlanStrategy]/items/isDeletionScheduled' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Project's file/filesystem authorization token"
+
+
+- added the non-success response with the status '401'
+
+
+For details, refer to the <OperationLink operation="project-file-system-get-jwt" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK Release v2.1.167
+
+The latest release of the mittwald PHP SDK, version 2.1.167, introduces several new features and enhancements:
+
+#### Features Added
+- A new `invoiceType` field has been added to the `ContributorListIncomingInvoicesOKResponse` and `ContributorListIncomingInvoicesOKResponseBodyItem` classes.
+- An enumeration, `ContributorListIncomingInvoicesOKResponseBodyItemInvoiceType`, has been introduced to define possible invoice types: `REGULAR`, `CORRECTION`, `REISSUE`, and `CANCELLATION`.
+
+#### Enhancements
+- The `getInvoiceType` method in the `ContributorListIncomingInvoicesOKResponseBodyItem` class now returns the invoice type if it is set.
+- New methods, `withInvoiceType` and `withoutInvoiceType`, have been added to manage the `invoiceType` property more effectively.
+- Constructor logic has been extended to accommodate the `invoiceType` when creating instances of `ContributorListIncomingInvoicesOKResponseBodyItem`.
+- The serialization process in the `toJson` method has been improved to include the `invoiceType` in the output if it is set.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.167).
+
+### Release Summary: mittwald PHP SDK v2.1.166
+
+The mittwald PHP SDK has been updated to version 2.1.166. This release introduces several enhancements and changes, primarily focusing on the addition of a new field, `deletionDeadline`, across various components in the Marketplace and ProjectFileSystem clients. This feature allows users to track the scheduled deletion date for variants and items, improving lifecycle management of extension pricing and project files.
+
+#### Key Features:
+- **New Field**: `deletionDeadline` added to manage and track scheduled deletion dates.
+- **Marketplace Extensions**: Updates to several classes, including `ExtensionUpdateExtensionPricingOKResponse.php` and `Variant.php`, to incorporate the `deletionDeadline` and `isDeletionScheduled` properties.
+- **ProjectFileSystem**: Enhanced handling of unauthorized responses with the introduction of `ProjectFileSystemGetJwtUnauthorizedResponse`.
+- **Marketplace Pricing Plans**: `MonthlyPricePlanStrategyItem.php` now includes `deletionDeadline` and `isDeletionScheduled` for better management of pricing plans.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.166).
+
+### mittwald PHP SDK Release v2.1.165
+
+The latest release of the mittwald PHP SDK, version [v2.1.165](https://github.com/mittwald/api-client-php/releases/tag/v2.1.165), introduces several new features and improvements:
+
+#### Added Features
+- A new method `getDetailOfContractByAiHosting` has been added to the `ContractClient` and its implementation in `ContractClientImpl`. This method allows retrieval of AI Hosting Contract details for a specific customer using their customer ID.
+
+#### New API Requests and Responses
+- **Request Class:**
+  - `GetDetailOfContractByAiHostingRequest`: Encapsulates request parameters for retrieving AI Hosting Contracts, requiring a `customerId`.
+
+- **Response Classes:**
+  - `GetDetailOfContractByAiHostingOKResponse`: For successful contract detail retrieval.
+  - `GetDetailOfContractByAiHostingBadRequestResponse`: Handles 400 Bad Request errors.
+  - `GetDetailOfContractByAiHostingNotFoundResponse`: For 404 Not Found errors.
+  - `GetDetailOfContractByAiHostingTooManyRequestsResponse`: Manages 429 Too Many Requests errors.
+  - `GetDetailOfContractByAiHostingDefaultResponse`: Captures other response errors.
+
+- **Response Body Class:**
+  - `GetDetailOfContractByAiHostingTooManyRequestsResponseBody`: Models the body content for too many requests responses, including `message` and `type` fields.
+
+#### Changes in Interfaces and Implementations
+- The `ContractClient` interface now includes the new method for AI Hosting Contracts.
+- `ContractClientImpl` has been extended to implement the new method, handling requests and HTTP responses.
+- Validation schemas have been added to ensure data integrity and manage errors effectively.
+
+This release enhances the API client's functionality by providing a dedicated method for accessing AI Hosting Contract details, improving service interaction and error handling.
+
+### mittwald PHP SDK Release v2.1.164
+
+The latest release of the mittwald PHP SDK, version 2.1.164, introduces new features and enhancements focused on improving the scheduled deletion process. 
+
+#### New Features
+- Added support for the `deleteIngresses` parameter in scheduled deletion requests, allowing users to decide whether to delete corresponding Ingress and subdomain Ingresses.
+
+#### Enhancements
+- Introduced the `deleteIngresses` property in the `CreateScheduledDeletionRequestBody` class to manage the deletion of Ingress objects.
+- Updated JSON serialization for `CreateScheduledDeletionRequestBody` to include the `deleteIngresses` property when set.
+- Added `withDeleteIngresses()` method for setting the `deleteIngresses` property with validation.
+- Added `withoutDeleteIngresses()` method for unsetting the `deleteIngresses` property.
+- Improved input validation in the `fromJson()` method to support the new `deleteIngresses` parameter.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.164).
+
+### mittwald JavaScript SDK Release 4.278.0
+
+The mittwald JavaScript SDK has been updated to version 4.278.0. This release includes an update to the generated client, enhancing its functionality. For more details, you can view the release on GitHub: [mittwald/api-client-js 4.278.0](https://github.com/mittwald/api-client-js/releases/tag/4.278.0).
+
+### mittwald JavaScript SDK Release 4.277.0
+
+The mittwald JavaScript SDK has been updated to version 4.277.0. This release includes a feature update where the generated client has been updated. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.277.0).
+
+### mittwald JavaScript SDK Release 4.276.0
+
+The mittwald JavaScript SDK has been updated to version 4.276.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.276.0](https://github.com/mittwald/api-client-js/releases/tag/4.276.0).
+
+### mittwald JavaScript SDK Release 4.275.0
+
+The mittwald JavaScript SDK has been updated to version 4.275.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.275.0).
+
+### mittwald JavaScript SDK Release 4.274.0
+
+The mittwald JavaScript SDK has been updated to version 4.274.0. This release includes an update to the generated client, enhancing its functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.274.0).
+
