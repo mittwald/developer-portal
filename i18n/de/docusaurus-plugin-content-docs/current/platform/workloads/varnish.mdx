@@ -143,17 +143,6 @@ resource "mittwald_virtualhost" "example_backend" {
 }
 ```
 
-:::info TYPO3 Reverse-Proxy-Einstellungen
-
-Da auf TYPO3 über den Varnish-Proxy zugegriffen wird, musst du deine TYPO3-Instanz so konfigurieren, dass sie den Reverse-Proxy erkennt. Setze dazu die Werte `[SYS][reverseProxyIP]` und `[SYS][reverseProxyHeaderMultiValue]` in `config/system/settings.php` oder `config/system/additional.php`:
-
-```php
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyIP'] = '*';
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyHeaderMultiValue'] = 'first';
-```
-
-:::
-
 #### Schritt 2: Erstelle die VCL-Konfigurationsdatei
 
 Erstelle eine Datei mit dem Namen `default.vcl` in deinem Terraform-Arbeitsverzeichnis. Verwende die offizielle VCL-Konfiguration für deine Anwendung (siehe [Anwendungsspezifische VCL-Konfigurationen](#anwendungsspezifische-vcl-konfigurationen) unten) mit einer wichtigen Ergänzung für die mittwald-Plattform:
@@ -368,17 +357,6 @@ $ mw domain virtualhost create \
   --path-to-container /:<container-id>:80/tcp
 ```
 
-:::info TYPO3 Reverse-Proxy-Einstellungen
-
-Da auf TYPO3 über den Varnish-Proxy zugegriffen wird, musst du deine TYPO3-Instanz so konfigurieren, dass sie den Reverse-Proxy erkennt. Setze dazu die Werte `[SYS][reverseProxyIP]` und `[SYS][reverseProxyHeaderMultiValue]` in `config/system/settings.php` oder `config/system/additional.php`:
-
-```php
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyIP'] = '*';
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyHeaderMultiValue'] = 'first';
-```
-
-:::
-
 ### Mit der mStudio-Oberfläche
 
 #### Schritt 1: Backend-Anwendung erstellen
@@ -418,17 +396,6 @@ Lade sie nach `/files/varnish/default.vcl` in deiner App über den Dateimanager 
 3. Gib deine öffentliche Domain ein (z.B. `www.example.com`)
 4. Verweise auf den Varnish-Container auf Port 80
 
-:::info TYPO3 Reverse-Proxy-Einstellungen
-
-Da auf TYPO3 über den Varnish-Proxy zugegriffen wird, musst du deine TYPO3-Instanz so konfigurieren, dass sie den Reverse-Proxy erkennt. Setze dazu die Werte `[SYS][reverseProxyIP]` und `[SYS][reverseProxyHeaderMultiValue]` in `config/system/settings.php` oder `config/system/additional.php`:
-
-```php
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyIP'] = '*';
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyHeaderMultiValue'] = 'first';
-```
-
-:::
-
 ## Anwendungsspezifische VCL-Konfigurationen
 
 Die VCL-Beispiele im Deployment-Abschnitt oben zeigen die Grundstruktur mit der für die mittwald-Plattform erforderlichen Host-Header-Umschreibung. Dieser Abschnitt bietet anwendungsspezifische Anleitungen für TYPO3, Shopware 5 und Shopware 6.
@@ -451,6 +418,13 @@ Installiere die [mittwald TYPO3 Varnish Extension](https://github.com/mittwald/t
 Wenn du das VCL-Beispiel der mittwald TYPO3 Extension verwendest, denke daran, die Host-Header-Umschreibung in `vcl_backend_fetch` hinzuzufügen, wie in den Deployment-Beispielen oben gezeigt.
 
 :::
+
+Da auf TYPO3 über den Varnish-Proxy zugegriffen wird, musst du deine TYPO3-Instanz so konfigurieren, dass sie den Reverse-Proxy erkennt. Setze dazu die Werte `[SYS][reverseProxyIP]` und `[SYS][reverseProxyHeaderMultiValue]` in `config/system/settings.php` oder `config/system/additional.php`:
+
+```php
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyIP'] = '*';
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyHeaderMultiValue'] = 'first';
+```
 
 ### Shopware 5-Konfiguration
 
@@ -494,19 +468,19 @@ sub vcl_backend_fetch {
 
 Shopware 6 erfordert **Varnish 6.0 oder höher mit dem XKey-Modul** für Surrogate-Key-basierte Cache-Invalidierung.
 
-**Shopware 6-Konfigurationsanforderungen:**
+Um Shopware 6 für Reverse-Proxy-Caching zu konfigurieren, folge diesen Schritten:
 
 1. Aktiviere Reverse-Proxy in deiner Shopware-Konfiguration (`config/packages/shopware.yaml`):
 
-```yaml
-shopware:
-  http_cache:
-    reverse_proxy:
-      enabled: true
-      use_varnish_xkey: true
-      hosts: ["http://varnish"]
-      max_parallel_invalidations: 3
-```
+   ```yaml
+   shopware:
+     http_cache:
+       reverse_proxy:
+         enabled: true
+         use_varnish_xkey: true
+         hosts: ["http://varnish"]
+         max_parallel_invalidations: 3
+   ```
 
 2. Setze die Umgebungsvariable: `SHOPWARE_HTTP_CACHE_ENABLED=1`
 

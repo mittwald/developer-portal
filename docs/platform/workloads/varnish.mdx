@@ -143,17 +143,6 @@ resource "mittwald_virtualhost" "example_backend" {
 }
 ```
 
-:::info TYPO3 Reverse Proxy settings
-
-Since TYPO3 will be accessed via the Varnish proxy, you will need to configure your TYPO3 instance to be aware of the reverse proxy; for this, set the `[SYS][reverseProxyIP]` and `[SYS][reverseProxyHeaderMultiValue]` values in `config/system/settings.php` or `config/system/additional.php`:
-
-```php
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyIP'] = '*';
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyHeaderMultiValue'] = 'first';
-```
-
-:::
-
 #### Step 2: Create the VCL configuration file
 
 Create a file named `default.vcl` in your Terraform working directory. Use the official VCL configuration for your application (see [Application-Specific VCL Configurations](#application-specific-vcl-configurations) below) with one critical addition for the mittwald platform:
@@ -368,17 +357,6 @@ $ mw domain virtualhost create \
   --path-to-container /:<container-id>:80/tcp
 ```
 
-:::info TYPO3 Reverse Proxy settings
-
-Since TYPO3 will be accessed via the Varnish proxy, you will need to configure your TYPO3 instance to be aware of the reverse proxy; for this, set the `[SYS][reverseProxyIP]` and `[SYS][reverseProxyHeaderMultiValue]` values in `config/system/settings.php` or `config/system/additional.php`:
-
-```php
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyIP'] = '*';
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyHeaderMultiValue'] = 'first';
-```
-
-:::
-
 ### Using the mStudio UI
 
 #### Step 1: Create the backend application
@@ -418,17 +396,6 @@ Upload it to `/files/varnish/default.vcl` in your app using the file manager or 
 3. Enter your public domain (e.g., `www.example.com`)
 4. Point it to the Varnish container on port 80
 
-:::info TYPO3 Reverse Proxy settings
-
-Since TYPO3 will be accessed via the Varnish proxy, you will need to configure your TYPO3 instance to be aware of the reverse proxy; for this, set the `[SYS][reverseProxyIP]` and `[SYS][reverseProxyHeaderMultiValue]` values in `config/system/settings.php` or `config/system/additional.php`:
-
-```php
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyIP'] = '*';
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyHeaderMultiValue'] = 'first';
-```
-
-:::
-
 ## Application-Specific VCL Configurations
 
 The VCL examples in the deployment section above show the basic structure with the critical Host header rewriting required for the mittwald platform. This section provides application-specific guidance for TYPO3, Shopware 5, and Shopware 6.
@@ -451,6 +418,13 @@ Install the [mittwald TYPO3 Varnish extension](https://github.com/mittwald/typo3
 When using the mittwald TYPO3 extension's VCL example, remember to add the Host header rewriting in `vcl_backend_fetch` as shown in the deployment examples above.
 
 :::
+
+Since TYPO3 will be accessed via the Varnish proxy, you will need to configure your TYPO3 instance to be aware of the reverse proxy; for this, set the `[SYS][reverseProxyIP]` and `[SYS][reverseProxyHeaderMultiValue]` values in `config/system/settings.php` or `config/system/additional.php`:
+
+```php
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyIP'] = '*';
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyHeaderMultiValue'] = 'first';
+```
 
 ### Shopware 5 Configuration
 
@@ -494,19 +468,19 @@ sub vcl_backend_fetch {
 
 Shopware 6 requires **Varnish 6.0 or later with the XKey module** for surrogate key-based cache invalidation.
 
-**Shopware 6 configuration requirements:**
+To configure Shopware 6 for reverse proxy caching, follow these steps:
 
 1. Enable reverse proxy in your Shopware configuration (`config/packages/shopware.yaml`):
 
-```yaml
-shopware:
-  http_cache:
-    reverse_proxy:
-      enabled: true
-      use_varnish_xkey: true
-      hosts: ["http://varnish"]
-      max_parallel_invalidations: 3
-```
+   ```yaml
+   shopware:
+     http_cache:
+       reverse_proxy:
+         enabled: true
+         use_varnish_xkey: true
+         hosts: ["http://varnish"]
+         max_parallel_invalidations: 3
+   ```
 
 2. Set environment variable: `SHOPWARE_HTTP_CACHE_ENABLED=1`
 
