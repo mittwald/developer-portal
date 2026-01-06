@@ -63,7 +63,8 @@ extra_params=--o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.ho
 **For multiple Nextcloud instances:**
 
 ```
-extra_params=--o:aliasgroup1=https://.*:443 --o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.host[0]=.+ --o:storage.wopi.host[0]=.+ --o:server_name=code.my-domain.tld
+aliasgroup1=https://.*:443
+extra_params=--o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.host[0]=.+ --o:storage.wopi.host[0]=.+ --o:server_name=code.my-domain.tld
 ```
 
 :::note
@@ -96,7 +97,8 @@ mw container run \
   --name collabora \
   --description "Collabora Online Development Edition" \
   --publish 9980/tcp \
-  --env "extra_params=--o:aliasgroup1=https://.*:443 --o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.host[0]=.+ --o:storage.wopi.host[0]=.+ --o:server_name=code.my-domain.tld" \
+  --env "aliasgroup1=https://.*:443" \
+  --env "extra_params=--o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.host[0]=.+ --o:storage.wopi.host[0]=.+ --o:server_name=code.my-domain.tld" \
   collabora/code
 ```
 
@@ -119,8 +121,9 @@ services:
     environment:
       # For a single Nextcloud instance in the same project:
       extra_params: "--o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.host[0]=.+ --o:storage.wopi.host[0]=.+ --o:server_name=code.my-domain.tld"
-      # For multiple Nextcloud instances (uncomment this line and comment the line above):
-      # extra_params: "--o:aliasgroup1=https://.*:443 --o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.host[0]=.+ --o:storage.wopi.host[0]=.+ --o:server_name=code.my-domain.tld"
+      # For multiple Nextcloud instances (uncomment these lines and comment the line above):
+      # aliasgroup1: "https://.*:443"
+      # extra_params: "--o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.host[0]=.+ --o:storage.wopi.host[0]=.+ --o:server_name=code.my-domain.tld"
 ```
 
 Make sure to replace `code.my-domain.tld` with your actual subdomain. Choose the appropriate `extra_params` configuration based on your use case (single or multiple Nextcloud instances).
