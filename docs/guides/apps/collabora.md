@@ -39,18 +39,18 @@ Collabora/CODE can be operated either as a separate instance in its own project 
 
 In mStudio, go to your project and select **“Create container”**. A guided dialog will open to assist you with the container setup.
 
-First, enter a description – this is a free text field used to identify the container. For example, enter **“collabora/code”** and click **“Next”**.
+First, enter a description – this is a free text field used to identify the container. For example, enter **“collabora/code”**.
 
 Next, you'll be asked for the image name. You can find this on [Docker Hub](https://hub.docker.com/r/collabora/code), in this case it is `collabora/code`. Enter this value and confirm with **“Next”**.
 
 #### Entrypoint and Volume
 
-- The **Entrypoint** can remain unchanged → **“Next”**
-- In the next step, you can create a **Volume** (persistent storage). This is not strictly required for `collabora/code`, so you can skip this step → **“Next”**
+- The **Entrypoint** can remain unchanged
+- In the next step, you can create a **Volume** (persistent storage). This is not strictly required for `collabora/code`, so you can skip this section
 
 #### Environment Variables
 
-In the next step **“Add environment variables”**, we need to make some adjustments. Click **“Add variable”** – two input fields (Key & Value) will appear.
+In the next section **“Add environment variables”**, we need to make some adjustments. Click **“Add variable”** – two input fields (Key & Value) will appear.
 
 Now it depends on whether `collabora/code` will be used for **a single** Nextcloud instance in the same project or for **multiple** Nextcloud instances. Replace `code.my-domain.tld` with your actual subdomain.
 
@@ -64,6 +64,9 @@ extra_params=--o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.ho
 
 ```
 aliasgroup1=https://.*:443
+```
+
+```
 extra_params=--o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.host[0]=.+ --o:storage.wopi.host[0]=.+ --o:server_name=code.my-domain.tld
 ```
 
