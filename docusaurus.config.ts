@@ -76,6 +76,14 @@ const config: Config = {
   },
   plugins: [
     [
+      '@cmfcmf/docusaurus-search-local',
+      {
+        indexDocs: true,
+        indexBlog: false,
+        language: ["en", "de"],
+      },
+    ],
+    [
       "@docusaurus/plugin-client-redirects",
       {
         createRedirects(path) {
