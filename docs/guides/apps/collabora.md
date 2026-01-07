@@ -76,7 +76,7 @@ extra_params=--o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.ho
 
 :::
 
-Once you've entered the desired value, click **“Next”**. In the final dialog, you’ll be asked for the **port** – you can leave this unchanged. Click **“Create container”** to create and start the container.
+Once you've entered the desired value, click **“Save”**. In the final section, you’ll be asked for the **port** – you can leave this unchanged. Click **“Create container”** to create and start the container.
 
 ### Alternative: Using the `mw container run` command
 
