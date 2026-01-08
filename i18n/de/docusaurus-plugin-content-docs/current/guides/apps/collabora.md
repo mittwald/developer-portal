@@ -39,18 +39,18 @@ Collabora/CODE kann entweder als separate Instanz in einem eigenen Projekt oder 
 
 Gehe im mStudio zu deinem Projekt und wähle **„Container erstellen“**. Ein geführter Dialog öffnet sich, um dir bei der Container-Einrichtung zu helfen.
 
-Zuerst gib eine Beschreibung ein – dies ist ein Freitextfeld, das zur Identifizierung des Containers verwendet wird. Gib zum Beispiel **„collabora/code“** ein und klicke auf **„Weiter“**.
+Zuerst gib eine Beschreibung ein – dies ist ein Freitextfeld, das zur Identifizierung des Containers verwendet wird. Gib zum Beispiel **„collabora/code“** ein.
 
 Als Nächstes wirst du nach dem Image-Namen gefragt. Du kannst diesen auf [Docker Hub](https://hub.docker.com/r/collabora/code) finden, in diesem Fall ist es `collabora/code`. Gib diesen Wert ein und bestätige mit **„Weiter“**.
 
 #### Entrypoint und Volume
 
-- Der **Entrypoint** kann unverändert bleiben → **„Weiter“**
-- Im nächsten Schritt kannst du ein **Volume** (persistente Speicherung) erstellen. Dies ist für `collabora/code` nicht zwingend erforderlich, daher kannst du diesen Schritt überspringen → **„Weiter“**
+- Der **Entrypoint** kann unverändert bleiben
+- Im nächsten Abschnitt kannst du ein **Volume** (persistente Speicherung) erstellen. Dies ist für `collabora/code` nicht zwingend erforderlich, daher kannst du diesen Schritt überspringen
 
 #### Umgebungsvariablen
 
-Im nächsten Schritt **„Umgebungsvariablen hinzufügen“** müssen wir einige Anpassungen vornehmen. Klicke auf **„Variable hinzufügen“** – zwei Eingabefelder (Key & Value) erscheinen.
+Im nächsten Abschnitt **„Umgebungsvariablen hinzufügen“** müssen wir einige Anpassungen vornehmen. Klicke auf **„Variable hinzufügen“** – zwei Eingabefelder (Key & Value) erscheinen.
 
 Jetzt hängt es davon ab, ob `collabora/code` für **eine einzelne** Nextcloud-Instanz im selben Projekt oder für **mehrere** Nextcloud-Instanzen verwendet wird. Ersetze `code.meine-domain.tld` durch deine tatsächliche Subdomain.
 
@@ -63,7 +63,11 @@ extra_params=--o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.ho
 **Für mehrere Nextcloud-Instanzen:**
 
 ```
-extra_params=--o:aliasgroup1=https://.*:443 --o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.host[0]=.+ --o:storage.wopi.host[0]=.+ --o:server_name=code.meine-domain.tld
+aliasgroup1=https://.*:443
+```
+
+```
+extra_params=--o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.host[0]=.+ --o:storage.wopi.host[0]=.+ --o:server_name=code.meine-domain.tld
 ```
 
 :::note
@@ -72,7 +76,7 @@ extra_params=--o:aliasgroup1=https://.*:443 --o:ssl.enable=false --o:ssl.termina
 
 :::
 
-Sobald du den gewünschten Wert eingegeben hast, klicke auf **„Weiter“**. Im letzten Dialog wirst du nach dem **Port** gefragt – du kannst dies unverändert lassen. Klicke auf **„Container erstellen“**, um den Container zu erstellen und zu starten.
+Sobald du den gewünschten Wert eingegeben hast, klicke auf **„Speichern“**. Im letzten Abschnitt wirst du nach dem **Port** gefragt – du kannst dies unverändert lassen. Klicke auf **„Container erstellen“**, um den Container zu erstellen und zu starten.
 
 ### Alternative: Mit dem Befehl `mw container run`
 
@@ -97,8 +101,8 @@ mw container run \
   --name collabora \
   --description "Collabora Online Development Edition" \
   --publish 9980/tcp \
-  --env "extra_params=--o:aliasgroup1=https://.*:443 --o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.host[0]=.+ --o:storage.wopi.host[0]=.+ --o:server_name=code.meine-domain.tld" \
-  --create-volumes \
+  --env "aliasgroup1=https://.*:443" \
+  --env "extra_params=--o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.host[0]=.+ --o:storage.wopi.host[0]=.+ --o:server_name=code.my-domain.tld" \
   collabora/code
 ```
 
@@ -121,8 +125,8 @@ services:
     environment:
       # Für eine einzelne Nextcloud-Instanz im selben Projekt:
       extra_params: "--o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.host[0]=.+ --o:storage.wopi.host[0]=.+ --o:server_name=code.meine-domain.tld"
-      # Für mehrere Nextcloud-Instanzen (entferne diesen Kommentar und kommentiere die Zeile oben aus):
-      # extra_params: "--o:aliasgroup1=https://.*:443 --o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.host[0]=.+ --o:storage.wopi.host[0]=.+ --o:server_name=code.meine-domain.tld"
+      # Für mehrere Nextcloud-Instanzen (aktiviere diese Zeile):
+      # aliasgroup1: "https://.*:443"
 ```
 
 Stelle sicher, dass du `code.meine-domain.tld` durch deine tatsächliche Subdomain ersetzt. Wähle die entsprechende `extra_params`-Konfiguration basierend auf deinem Anwendungsfall (einzelne oder mehrere Nextcloud-Instanzen).

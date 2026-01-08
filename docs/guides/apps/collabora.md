@@ -39,18 +39,18 @@ Collabora/CODE can be operated either as a separate instance in its own project 
 
 In mStudio, go to your project and select **“Create container”**. A guided dialog will open to assist you with the container setup.
 
-First, enter a description – this is a free text field used to identify the container. For example, enter **“collabora/code”** and click **“Next”**.
+First, enter a description – this is a free text field used to identify the container. For example, enter **“collabora/code”**.
 
 Next, you'll be asked for the image name. You can find this on [Docker Hub](https://hub.docker.com/r/collabora/code), in this case it is `collabora/code`. Enter this value and confirm with **“Next”**.
 
 #### Entrypoint and Volume
 
-- The **Entrypoint** can remain unchanged → **“Next”**
-- In the next step, you can create a **Volume** (persistent storage). This is not strictly required for `collabora/code`, so you can skip this step → **“Next”**
+- The **Entrypoint** can remain unchanged
+- In the next section, you can create a **Volume** (persistent storage). This is not strictly required for `collabora/code`, so you can skip this section
 
 #### Environment Variables
 
-In the next step **“Add environment variables”**, we need to make some adjustments. Click **“Add variable”** – two input fields (Key & Value) will appear.
+In the next section **“Add environment variables”**, we need to make some adjustments. Click **“Add variable”** – two input fields (Key & Value) will appear.
 
 Now it depends on whether `collabora/code` will be used for **a single** Nextcloud instance in the same project or for **multiple** Nextcloud instances. Replace `code.my-domain.tld` with your actual subdomain.
 
@@ -63,7 +63,11 @@ extra_params=--o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.ho
 **For multiple Nextcloud instances:**
 
 ```
-extra_params=--o:aliasgroup1=https://.*:443 --o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.host[0]=.+ --o:storage.wopi.host[0]=.+ --o:server_name=code.my-domain.tld
+aliasgroup1=https://.*:443
+```
+
+```
+extra_params=--o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.host[0]=.+ --o:storage.wopi.host[0]=.+ --o:server_name=code.my-domain.tld
 ```
 
 :::note
@@ -72,7 +76,7 @@ extra_params=--o:aliasgroup1=https://.*:443 --o:ssl.enable=false --o:ssl.termina
 
 :::
 
-Once you've entered the desired value, click **“Next”**. In the final dialog, you’ll be asked for the **port** – you can leave this unchanged. Click **“Create container”** to create and start the container.
+Once you've entered the desired value, click **“Save”**. In the final section, you’ll be asked for the **port** – you can leave this unchanged. Click **“Create container”** to create and start the container.
 
 ### Alternative: Using the `mw container run` command
 
@@ -96,7 +100,8 @@ mw container run \
   --name collabora \
   --description "Collabora Online Development Edition" \
   --publish 9980/tcp \
-  --env "extra_params=--o:aliasgroup1=https://.*:443 --o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.host[0]=.+ --o:storage.wopi.host[0]=.+ --o:server_name=code.my-domain.tld" \
+  --env "aliasgroup1=https://.*:443" \
+  --env "extra_params=--o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.host[0]=.+ --o:storage.wopi.host[0]=.+ --o:server_name=code.my-domain.tld" \
   collabora/code
 ```
 
@@ -119,8 +124,8 @@ services:
     environment:
       # For a single Nextcloud instance in the same project:
       extra_params: "--o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.host[0]=.+ --o:storage.wopi.host[0]=.+ --o:server_name=code.my-domain.tld"
-      # For multiple Nextcloud instances (uncomment this line and comment the line above):
-      # extra_params: "--o:aliasgroup1=https://.*:443 --o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.host[0]=.+ --o:storage.wopi.host[0]=.+ --o:server_name=code.my-domain.tld"
+      # For multiple Nextcloud instances (uncomment this line):
+      # aliasgroup1: "https://.*:443"
 ```
 
 Make sure to replace `code.my-domain.tld` with your actual subdomain. Choose the appropriate `extra_params` configuration based on your use case (single or multiple Nextcloud instances).
