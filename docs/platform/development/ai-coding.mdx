@@ -126,14 +126,6 @@ mcpServers:
     env:
       POSTGRES_CONNECTION_STRING: "postgresql://user:pass@localhost:5432/dbname"
 
-  # n8n: Workflow automation and integration
-  n8n:
-    command: npx
-    args: ["-y", "@n8n/mcp-server", "--stdio"]
-    env:
-      N8N_API_URL: "http://localhost:5678"
-      N8N_API_KEY: "your-n8n-api-key"
-
   # Directus: Headless CMS data management
   directus:
     command: npx
@@ -165,15 +157,13 @@ mcpServers:
 
 **PostgreSQL MCP** allows safe database introspection and querying, helping with schema design, query optimization, and data analysis.
 
-**n8n MCP** enables AI-driven workflow automation, allowing the model to trigger workflows, query execution history, and integrate with hundreds of services through n8n's automation platform.
-
 **Directus MCP** provides AI assistants with controlled access to your Directus CMS, enabling content creation, updates, querying collections, and asset management through natural language. Ideal for content editors and data analysts.
 
 **OpenSearch MCP** enables AI assistants to interact with OpenSearch clusters, performing operations like searching indices, retrieving mappings, analyzing cluster health, and managing shards through the Model Context Protocol.
 
 **Apache Solr MCP** allows AI to perform powerful hybrid search queries against Solr indexes, combining both keyword and vector search capabilities for enterprise search applications.
 
-Ask the assistant explicitly to use a tool (e.g., "use Brave Search to find recent information about...", "trigger the deployment workflow in n8n", or "search our Solr index for documents about..."). Always scope access narrowly and review any data access or modifications.
+Ask the assistant explicitly to use a tool (e.g., "use Brave Search to find recent information about...", or "search our Solr index for documents about..."). Always scope access narrowly and review any data access or modifications.
 
 ### Kilo Code: MCP servers
 
@@ -181,15 +171,14 @@ Kilo Code can also use MCP servers. Add them via settings (Tools → Add MCP Ser
 
 **Recommended SOTA MCP Servers:**
 
-| Server | Purpose | Installation |
-|--------|---------|-------------|
-| **Context7** | Fresh library documentation | `npx -y @context7/mcp-server --stdio` |
-| **Brave Search** | Privacy-focused web search | `npx -y @modelcontextprotocol/server-brave-search --stdio` |
-| **PostgreSQL** | Database introspection & queries | `npx -y @modelcontextprotocol/server-postgres --stdio` |
-| **n8n** | Workflow automation & integrations | `npx -y @n8n/mcp-server --stdio` |
-| **Directus** | Headless CMS & content management | `npx -y @directus/content-mcp --stdio` |
-| **OpenSearch** | Search & analytics engine | `npx -y @opensearch-project/mcp-server --stdio` |
-| **Apache Solr** | Enterprise search platform | `uvx solr-mcp` (Python) |
+| Server           | Purpose                           | Installation                                               |
+| ---------------- | --------------------------------- | ---------------------------------------------------------- |
+| **Context7**     | Fresh library documentation       | `npx -y @context7/mcp-server --stdio`                      |
+| **Brave Search** | Privacy-focused web search        | `npx -y @modelcontextprotocol/server-brave-search --stdio` |
+| **PostgreSQL**   | Database introspection & queries  | `npx -y @modelcontextprotocol/server-postgres --stdio`     |
+| **Directus**     | Headless CMS & content management | `npx -y @directus/content-mcp --stdio`                     |
+| **OpenSearch**   | Search & analytics engine         | `npx -y @opensearch-project/mcp-server --stdio`            |
+| **Apache Solr**  | Enterprise search platform        | `uvx solr-mcp` (Python)                                    |
 
 **Configuration example:**
 
@@ -210,14 +199,6 @@ Kilo Code can also use MCP servers. Add them via settings (Tools → Add MCP Ser
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-postgres", "--stdio"],
       "env": { "POSTGRES_CONNECTION_STRING": "postgresql://..." }
-    },
-    "n8n": {
-      "command": "npx",
-      "args": ["-y", "@n8n/mcp-server", "--stdio"],
-      "env": {
-        "N8N_API_URL": "http://localhost:5678",
-        "N8N_API_KEY": "your-n8n-api-key"
-      }
     },
     "directus": {
       "command": "npx",
@@ -261,7 +242,6 @@ Kilo Code can also use MCP servers. Add them via settings (Tools → Add MCP Ser
 - Context7 MCP: https://www.npmjs.com/package/@context7/mcp-server
 - Brave Search MCP: https://www.npmjs.com/package/@modelcontextprotocol/server-brave-search
 - PostgreSQL MCP: https://www.npmjs.com/package/@modelcontextprotocol/server-postgres
-- n8n MCP: https://www.npmjs.com/package/@n8n/mcp-server
 - Directus MCP: https://www.npmjs.com/package/@directus/content-mcp
 - OpenSearch MCP: https://github.com/opensearch-project/opensearch-mcp-server-py
 - Apache Solr MCP: https://github.com/allenday/solr-mcp
@@ -375,14 +355,6 @@ Create MCP configuration in `~/.config/claude-code/mcp.json`:
       "args": ["-y", "@modelcontextprotocol/server-postgres", "--stdio"],
       "env": {
         "POSTGRES_CONNECTION_STRING": "postgresql://user:password@localhost:5432/dbname"
-      }
-    },
-    "n8n": {
-      "command": "npx",
-      "args": ["-y", "@n8n/mcp-server", "--stdio"],
-      "env": {
-        "N8N_API_URL": "http://localhost:5678",
-        "N8N_API_KEY": "your-n8n-api-key"
       }
     },
     "directus": {

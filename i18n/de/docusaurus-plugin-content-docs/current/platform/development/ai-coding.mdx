@@ -126,14 +126,6 @@ mcpServers:
     env:
       POSTGRES_CONNECTION_STRING: "postgresql://user:pass@localhost:5432/dbname"
 
-  # n8n: Workflow-Automatisierung und Integration
-  n8n:
-    command: npx
-    args: ["-y", "@n8n/mcp-server", "--stdio"]
-    env:
-      N8N_API_URL: "http://localhost:5678"
-      N8N_API_KEY: "dein-n8n-api-key"
-
   # Directus: Headless CMS Datenverwaltung
   directus:
     command: npx
@@ -165,15 +157,13 @@ mcpServers:
 
 **PostgreSQL MCP** ermöglicht sichere Datenbank-Inspektion und Abfragen und hilft bei Schema-Design, Abfrage-Optimierung und Datenanalyse.
 
-**n8n MCP** ermöglicht KI-gesteuerte Workflow-Automatisierung, erlaubt dem Modell, Workflows auszulösen, Ausführungshistorie abzufragen und mit hunderten von Services über n8ns Automatisierungsplattform zu integrieren.
-
 **Directus MCP** bietet KI-Assistenten kontrollierten Zugriff auf dein Directus CMS und ermöglicht Content-Erstellung, Updates, Abfragen von Collections und Asset-Management durch natürliche Sprache. Ideal für Content-Editoren und Datenanalysten.
 
 **OpenSearch MCP** ermöglicht KI-Assistenten die Interaktion mit OpenSearch-Clustern, um Operationen wie das Durchsuchen von Indizes, Abrufen von Mappings, Analysieren der Cluster-Gesundheit und Verwalten von Shards über das Model Context Protocol durchzuführen.
 
 **Apache Solr MCP** ermöglicht der KI, leistungsstarke hybride Suchabfragen gegen Solr-Indizes durchzuführen, die sowohl Keyword- als auch Vektorsuche für Enterprise-Suchanwendungen kombinieren.
 
-Bitte den Assistenten explizit, ein Tool zu nutzen (z. B. „nutze Brave Search, um aktuelle Informationen über ... zu finden", „löse den Deployment-Workflow in n8n aus" oder „durchsuche unseren Solr-Index nach Dokumenten über ..."). Beschränke den Zugriff stets eng und überprüfe Datenzugriffe oder Änderungen.
+Bitte den Assistenten explizit, ein Tool zu nutzen (z. B. „nutze Brave Search, um aktuelle Informationen über ... zu finden" oder „durchsuche unseren Solr-Index nach Dokumenten über ..."). Beschränke den Zugriff stets eng und überprüfe Datenzugriffe oder Änderungen.
 
 ### Kilo Code: MCP-Server
 
@@ -181,15 +171,14 @@ Kilo Code kann ebenfalls MCP-Server verwenden. Füge sie über die Einstellungen
 
 **Empfohlene SOTA MCP-Server:**
 
-| Server | Zweck | Installation |
-|--------|-------|-------------|
-| **Context7** | Aktuelle Bibliotheksdokumentation | `npx -y @context7/mcp-server --stdio` |
-| **Brave Search** | Datenschutzfreundliche Web-Suche | `npx -y @modelcontextprotocol/server-brave-search --stdio` |
-| **PostgreSQL** | Datenbank-Inspektion & Abfragen | `npx -y @modelcontextprotocol/server-postgres --stdio` |
-| **n8n** | Workflow-Automatisierung & Integrationen | `npx -y @n8n/mcp-server --stdio` |
-| **Directus** | Headless CMS & Content-Management | `npx -y @directus/content-mcp --stdio` |
-| **OpenSearch** | Such- & Analyse-Engine | `npx -y @opensearch-project/mcp-server --stdio` |
-| **Apache Solr** | Enterprise-Suchplattform | `uvx solr-mcp` (Python) |
+| Server           | Zweck                             | Installation                                               |
+| ---------------- | --------------------------------- | ---------------------------------------------------------- |
+| **Context7**     | Aktuelle Bibliotheksdokumentation | `npx -y @context7/mcp-server --stdio`                      |
+| **Brave Search** | Datenschutzfreundliche Web-Suche  | `npx -y @modelcontextprotocol/server-brave-search --stdio` |
+| **PostgreSQL**   | Datenbank-Inspektion & Abfragen   | `npx -y @modelcontextprotocol/server-postgres --stdio`     |
+| **Directus**     | Headless CMS & Content-Management | `npx -y @directus/content-mcp --stdio`                     |
+| **OpenSearch**   | Such- & Analyse-Engine            | `npx -y @opensearch-project/mcp-server --stdio`            |
+| **Apache Solr**  | Enterprise-Suchplattform          | `uvx solr-mcp` (Python)                                    |
 
 **Konfigurationsbeispiel:**
 
@@ -210,14 +199,6 @@ Kilo Code kann ebenfalls MCP-Server verwenden. Füge sie über die Einstellungen
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-postgres", "--stdio"],
       "env": { "POSTGRES_CONNECTION_STRING": "postgresql://..." }
-    },
-    "n8n": {
-      "command": "npx",
-      "args": ["-y", "@n8n/mcp-server", "--stdio"],
-      "env": {
-        "N8N_API_URL": "http://localhost:5678",
-        "N8N_API_KEY": "dein-n8n-api-key"
-      }
     },
     "directus": {
       "command": "npx",
@@ -261,7 +242,6 @@ Kilo Code kann ebenfalls MCP-Server verwenden. Füge sie über die Einstellungen
 - Context7 MCP: https://www.npmjs.com/package/@context7/mcp-server
 - Brave Search MCP: https://www.npmjs.com/package/@modelcontextprotocol/server-brave-search
 - PostgreSQL MCP: https://www.npmjs.com/package/@modelcontextprotocol/server-postgres
-- n8n MCP: https://www.npmjs.com/package/@n8n/mcp-server
 - Directus MCP: https://www.npmjs.com/package/@directus/content-mcp
 - OpenSearch MCP: https://github.com/opensearch-project/opensearch-mcp-server-py
 - Apache Solr MCP: https://github.com/allenday/solr-mcp
@@ -375,14 +355,6 @@ MCP-Konfiguration in `~/.config/claude-code/mcp.json` erstellen:
       "args": ["-y", "@modelcontextprotocol/server-postgres", "--stdio"],
       "env": {
         "POSTGRES_CONNECTION_STRING": "postgresql://user:password@localhost:5432/dbname"
-      }
-    },
-    "n8n": {
-      "command": "npx",
-      "args": ["-y", "@n8n/mcp-server", "--stdio"],
-      "env": {
-        "N8N_API_URL": "http://localhost:5678",
-        "N8N_API_KEY": "dein-n8n-api-key"
       }
     },
     "directus": {
