@@ -8,7 +8,7 @@ The API is accessible via HTTPS and is compatible with the OpenAI API. The base 
 
 Every interaction with the API requires an `Authorization` header with a valid API key. This key can be created in mStudio.
 
-In our examples, we use `curl`, as it is the simplest and quickest way to test. For production use, we recommend using frameworks and libraries that support OpenAI. To run the following examples please setup your API key as an environemt variable first, e.g.
+In our examples, we use `curl`, as it is the simplest and quickest way to test. For production use, we recommend using frameworks and libraries that support OpenAI. To run the following examples please setup your API key as an environment variable first, e.g.
 
 ```sh
 export APIKEY=sk-…
@@ -68,6 +68,54 @@ curl -i -N -X POST https://llm.aihosting.mittwald.de/v1/chat/completions \
         "top_p": 0.5
     }'
 ```
+
+### Vision (image + text)
+
+```sh
+curl -i -X POST https://llm.aihosting.mittwald.de/v1/chat/completions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $APIKEY" \
+    -d '{
+        "model": "Ministral-3-14B-Instruct-2512",
+        "messages": [{
+          "role": "user",
+          "content": [
+            {"type": "text", "text": "What is in this image?"},
+            {"type": "image_url", "image_url": {"url": "https://example.com/photo.jpg"}}
+          ]
+        }],
+        "temperature": 0.1
+    }'
+```
+
+### Function calling (tools)
+
+The model can call functions/tools that you define. The API will return the function name and arguments that should be called - you must implement and execute the actual function yourself.
+
+```sh
+curl -i -X POST https://llm.aihosting.mittwald.de/v1/chat/completions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $APIKEY" \
+    -d '{
+      "model": "Devstral-Small-2-24B-Instruct-2512",
+      "messages": [{"role": "user", "content": "Weather in Berlin?"}],
+      "tools": [{
+        "type": "function",
+        "function": {
+          "name": "get_weather",
+          "description": "Get current weather",
+          "parameters": {
+            "type": "object",
+            "properties": {"city": {"type": "string"}},
+            "required": ["city"]
+          }
+        }
+      }],
+      "tool_choice": "auto"
+    }'
+```
+
+**Important**: The `get_weather` function (or any tool you define) must be implemented in your application. The API only tells you which function to call and with what arguments - you are responsible for executing the function and returning the results back to the model if needed.
 
 ## /v1/responses (experimental)
 

@@ -80,6 +80,419 @@ When configuring Cline via its UI, select the following options:
 - **OpenAI Compatible API Key**: Enter your LLM API key from the mStudio
 - **Model ID**: Enter `Devstral-Small-2-24B-Instruct-2512`
 
+### Kilo Code (agentic coding)
+
+Kilo Code supports OpenAI-compatible providers. Configure Devstral as follows:
+
+- Provider: OpenAI Compatible
+- Base URL: `https://llm.aihosting.mittwald.de/v1`
+- API Key: your mStudio LLM API key
+- Model: `Devstral-Small-2-24B-Instruct-2512`
+
+Example environment:
+
+```sh
+export OPENAI_API_KEY=sk-...
+export OPENAI_BASE_URL=https://llm.aihosting.mittwald.de/v1
+```
+
+Then select Devstral in Kilo Code’s model picker for agent tasks.
+
+### Continue: MCP servers
+
+Continue can connect to Model Context Protocol (MCP) servers to grant the model controlled access to external tools and services.
+
+Add MCP servers in `~/.continue/config.yaml`:
+
+```yaml
+mcpServers:
+  # Context7: Up-to-date library documentation
+  context7:
+    command: npx
+    args: ["-y", "@context7/mcp-server", "--stdio"]
+    env: { CONTEXT7_API_KEY: "your-context7-api-key" }
+
+  # Brave Search: Web search with privacy focus
+  brave-search:
+    command: npx
+    args: ["-y", "@modelcontextprotocol/server-brave-search", "--stdio"]
+    env: { BRAVE_API_KEY: "your-brave-api-key" }
+
+  # PostgreSQL: Database queries and schema inspection
+  postgres:
+    command: npx
+    args: ["-y", "@modelcontextprotocol/server-postgres", "--stdio"]
+    env:
+      POSTGRES_CONNECTION_STRING: "postgresql://user:pass@localhost:5432/dbname"
+
+  # n8n: Workflow automation and integration
+  n8n:
+    command: npx
+    args: ["-y", "@n8n/mcp-server", "--stdio"]
+    env:
+      N8N_API_URL: "http://localhost:5678"
+      N8N_API_KEY: "your-n8n-api-key"
+
+  # Directus: Headless CMS data management
+  directus:
+    command: npx
+    args: ["-y", "@directus/content-mcp", "--stdio"]
+    env:
+      DIRECTUS_URL: "https://your-directus-instance.com"
+      DIRECTUS_TOKEN: "your-directus-token"
+
+  # OpenSearch: Search and analytics engine
+  opensearch:
+    command: npx
+    args: ["-y", "@opensearch-project/mcp-server", "--stdio"]
+    env:
+      OPENSEARCH_URL: "https://localhost:9200"
+      OPENSEARCH_USERNAME: "admin"
+      OPENSEARCH_PASSWORD: "admin"
+
+  # Apache Solr: Enterprise search platform
+  solr:
+    command: uvx
+    args: ["solr-mcp"]
+    env:
+      SOLR_URL: "http://localhost:8983/solr"
+```
+
+**Context7** provides fresh documentation for popular libraries and frameworks, ensuring the model has access to the latest API changes and best practices.
+
+**Brave Search** enables web search capabilities with strong privacy protections, useful for finding recent solutions, documentation, or checking current information.
+
+**PostgreSQL MCP** allows safe database introspection and querying, helping with schema design, query optimization, and data analysis.
+
+**n8n MCP** enables AI-driven workflow automation, allowing the model to trigger workflows, query execution history, and integrate with hundreds of services through n8n's automation platform.
+
+**Directus MCP** provides AI assistants with controlled access to your Directus CMS, enabling content creation, updates, querying collections, and asset management through natural language. Ideal for content editors and data analysts.
+
+**OpenSearch MCP** enables AI assistants to interact with OpenSearch clusters, performing operations like searching indices, retrieving mappings, analyzing cluster health, and managing shards through the Model Context Protocol.
+
+**Apache Solr MCP** allows AI to perform powerful hybrid search queries against Solr indexes, combining both keyword and vector search capabilities for enterprise search applications.
+
+Ask the assistant explicitly to use a tool (e.g., "use Brave Search to find recent information about...", "trigger the deployment workflow in n8n", or "search our Solr index for documents about..."). Always scope access narrowly and review any data access or modifications.
+
+### Kilo Code: MCP servers
+
+Kilo Code can also use MCP servers. Add them via settings (Tools → Add MCP Server) or in the configuration file.
+
+**Recommended SOTA MCP Servers:**
+
+| Server | Purpose | Installation |
+|--------|---------|-------------|
+| **Context7** | Fresh library documentation | `npx -y @context7/mcp-server --stdio` |
+| **Brave Search** | Privacy-focused web search | `npx -y @modelcontextprotocol/server-brave-search --stdio` |
+| **PostgreSQL** | Database introspection & queries | `npx -y @modelcontextprotocol/server-postgres --stdio` |
+| **n8n** | Workflow automation & integrations | `npx -y @n8n/mcp-server --stdio` |
+| **Directus** | Headless CMS & content management | `npx -y @directus/content-mcp --stdio` |
+| **OpenSearch** | Search & analytics engine | `npx -y @opensearch-project/mcp-server --stdio` |
+| **Apache Solr** | Enterprise search platform | `uvx solr-mcp` (Python) |
+
+**Configuration example:**
+
+```json
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@context7/mcp-server", "--stdio"],
+      "env": { "CONTEXT7_API_KEY": "your-key" }
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search", "--stdio"],
+      "env": { "BRAVE_API_KEY": "your-key" }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "--stdio"],
+      "env": { "POSTGRES_CONNECTION_STRING": "postgresql://..." }
+    },
+    "n8n": {
+      "command": "npx",
+      "args": ["-y", "@n8n/mcp-server", "--stdio"],
+      "env": {
+        "N8N_API_URL": "http://localhost:5678",
+        "N8N_API_KEY": "your-n8n-api-key"
+      }
+    },
+    "directus": {
+      "command": "npx",
+      "args": ["-y", "@directus/content-mcp", "--stdio"],
+      "env": {
+        "DIRECTUS_URL": "https://your-directus-instance.com",
+        "DIRECTUS_TOKEN": "your-directus-token"
+      }
+    },
+    "opensearch": {
+      "command": "npx",
+      "args": ["-y", "@opensearch-project/mcp-server", "--stdio"],
+      "env": {
+        "OPENSEARCH_URL": "https://localhost:9200",
+        "OPENSEARCH_USERNAME": "admin",
+        "OPENSEARCH_PASSWORD": "admin"
+      }
+    },
+    "solr": {
+      "command": "uvx",
+      "args": ["solr-mcp"],
+      "env": {
+        "SOLR_URL": "http://localhost:8983/solr"
+      }
+    }
+  }
+}
+```
+
+**Safety best practices:**
+
+- Scope access narrowly (specific databases, domains, paths)
+- Log all tool calls for audit purposes
+- Use low temperature (≤ 0.2) for tool planning to reduce hallucinations
+- Review diffs and queries before executing
+- Start with read-only access when possible
+
+### MCP server links
+
+- Model Context Protocol: https://modelcontextprotocol.io/
+- Context7 MCP: https://www.npmjs.com/package/@context7/mcp-server
+- Brave Search MCP: https://www.npmjs.com/package/@modelcontextprotocol/server-brave-search
+- PostgreSQL MCP: https://www.npmjs.com/package/@modelcontextprotocol/server-postgres
+- n8n MCP: https://www.npmjs.com/package/@n8n/mcp-server
+- Directus MCP: https://www.npmjs.com/package/@directus/content-mcp
+- OpenSearch MCP: https://github.com/opensearch-project/opensearch-mcp-server-py
+- Apache Solr MCP: https://github.com/allenday/solr-mcp
+- MCP Server Registry: https://github.com/modelcontextprotocol/servers
+
+### Kilo Code: Web fetch & browsing
+
+Kilo Code can use a web-fetch/browsing tool (if enabled in your setup) to retrieve and summarize external pages.
+
+- Enable the web/browsing tool in Kilo Code’s settings or tool list.
+- Prefer public URLs (no auth), and provide the exact target links in your prompt.
+- Keep network scope small: request a single page or shallow depth, and ask the agent to quote sources.
+
+Prompt patterns
+
+- “Fetch https://example.com/spec and summarize key endpoints in 10 bullet points. Include canonical links.”
+- “Open https://huggingface.co/mistralai/Ministral-3-14B-Instruct-2512 and extract context length, modalities, and license. Return as JSON.”
+
+Tips
+
+- Ask the agent to include citation URLs next to each claim.
+- Use deterministic sampling for factual extraction: `temperature <= 0.2`.
+- For long pages, request a TOC and then deep-dive into sections by anchor.
+
+### Claude Code (CLI): Complete configuration {#claude-code}
+
+[Claude Code](https://github.com/anthropics/claude-code) is Anthropic's official CLI tool for agentic coding. To use it with mittwald's AI hosting, configure it as an OpenAI-compatible provider.
+
+**Installation:**
+
+```sh
+# Install Claude Code CLI
+npm install -g @anthropic/claude-code
+
+# Or use npx (no installation required)
+npx @anthropic/claude-code
+```
+
+**Configuration:**
+
+Claude Code uses a configuration file at `~/.config/claude-code/settings.json` (or `%APPDATA%\claude-code\settings.json` on Windows).
+
+```json
+{
+  "apiProvider": "openai-compatible",
+  "baseURL": "https://llm.aihosting.mittwald.de/v1",
+  "apiKey": "sk-your-mittwald-api-key",
+  "model": "Devstral-Small-2-24B-Instruct-2512",
+  "temperature": 0.15,
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@context7/mcp-server", "--stdio"],
+      "env": {
+        "CONTEXT7_API_KEY": "your-context7-api-key"
+      }
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search", "--stdio"],
+      "env": {
+        "BRAVE_API_KEY": "your-brave-api-key"
+      }
+    }
+  },
+  "webFetch": {
+    "enabled": true,
+    "maxDepth": 2,
+    "followRedirects": true,
+    "timeout": 10000
+  }
+}
+```
+
+**Environment variables (alternative):**
+
+```sh
+# Set via environment variables
+export CLAUDE_CODE_API_PROVIDER=openai-compatible
+export CLAUDE_CODE_BASE_URL=https://llm.aihosting.mittwald.de/v1
+export CLAUDE_CODE_API_KEY=sk-your-mittwald-api-key
+export CLAUDE_CODE_MODEL=Devstral-Small-2-24B-Instruct-2512
+
+# Run Claude Code
+claude-code "refactor the authentication module"
+```
+
+**MCP server setup for Claude Code:**
+
+Create MCP configuration in `~/.config/claude-code/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@context7/mcp-server", "--stdio"],
+      "env": {
+        "CONTEXT7_API_KEY": "your-context7-api-key"
+      }
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search", "--stdio"],
+      "env": {
+        "BRAVE_API_KEY": "your-brave-api-key"
+      }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "--stdio"],
+      "env": {
+        "POSTGRES_CONNECTION_STRING": "postgresql://user:password@localhost:5432/dbname"
+      }
+    },
+    "n8n": {
+      "command": "npx",
+      "args": ["-y", "@n8n/mcp-server", "--stdio"],
+      "env": {
+        "N8N_API_URL": "http://localhost:5678",
+        "N8N_API_KEY": "your-n8n-api-key"
+      }
+    },
+    "directus": {
+      "command": "npx",
+      "args": ["-y", "@directus/content-mcp", "--stdio"],
+      "env": {
+        "DIRECTUS_URL": "https://your-directus-instance.com",
+        "DIRECTUS_TOKEN": "your-directus-token"
+      }
+    },
+    "opensearch": {
+      "command": "npx",
+      "args": ["-y", "@opensearch-project/mcp-server", "--stdio"],
+      "env": {
+        "OPENSEARCH_URL": "https://localhost:9200",
+        "OPENSEARCH_USERNAME": "admin",
+        "OPENSEARCH_PASSWORD": "admin"
+      }
+    },
+    "solr": {
+      "command": "uvx",
+      "args": ["solr-mcp"],
+      "env": {
+        "SOLR_URL": "http://localhost:8983/solr"
+      }
+    }
+  }
+}
+```
+
+**WebFetch configuration:**
+
+Claude Code supports built-in web fetching capabilities. Configure in `settings.json`:
+
+```json
+{
+  "webFetch": {
+    "enabled": true,
+    "allowedDomains": [
+      "github.com",
+      "stackoverflow.com",
+      "docs.python.org",
+      "developer.mozilla.org"
+    ],
+    "blockedDomains": [],
+    "maxDepth": 2,
+    "followRedirects": true,
+    "timeout": 10000,
+    "userAgent": "ClaudeCode/1.0",
+    "maxContentLength": 1048576
+  }
+}
+```
+
+**WebFetch usage examples:**
+
+```sh
+# Fetch and analyze API documentation
+claude-code "fetch https://api.github.com/docs and summarize the authentication methods"
+
+# Compare implementations
+claude-code "fetch https://github.com/user/repo/blob/main/auth.py and compare with our current auth.py implementation"
+
+# Research best practices
+claude-code "fetch https://docs.python.org/3/library/asyncio.html and help me refactor our code to use async/await properly"
+```
+
+**Fine-tuning WebFetch behavior:**
+
+```json
+{
+  "webFetch": {
+    "enabled": true,
+    "allowedDomains": ["*.github.com", "docs.*", "*.readthedocs.io"],
+    "maxDepth": 1,
+    "extractionRules": {
+      "removeSelectors": [".sidebar", ".footer", "nav"],
+      "focusSelectors": ["article", "main", ".documentation"]
+    },
+    "caching": {
+      "enabled": true,
+      "ttl": 3600
+    }
+  }
+}
+```
+
+**Tips for Claude Code:**
+
+- Use `--verbose` flag to see detailed MCP server communication
+- Use `--dry-run` to preview changes before applying
+- Set `temperature: 0.1-0.2` for deterministic code edits
+- Use streaming mode for large refactors: `--stream`
+- Enable audit logging: `"auditLog": { "enabled": true, "path": "~/.claude-code/audit.log" }`
+
+## Model selection
+
+- Ministral-3-14B-Instruct-2512: chat + vision, general assistants, multimodal UX.
+- Devstral-Small-2-24B-Instruct-2512: agentic coding, tool use, multi-file edits; supports vision.
+
+## Long-context tips (256k)
+
+- Avoid sending entire repositories; retrieve relevant files/function bodies only.
+- Summarize prior steps and include IDs/anchors to rehydrate context on demand.
+- Stream responses; raise `max_tokens` only when necessary.
+- Prefer deterministic sampling for tools and edits: `temperature <= 0.2`.
+
+## Disclaimer
+
+Third‑party tools, MCP servers and external links are provided for convenience without endorsement or warranty. Use them at your own risk, review licenses and privacy policies, and scope access conservatively (least privilege). Avoid sending sensitive data to external services unless required and permitted.
+
 ## Usage limits
 
 During the beta phase, each API key is limited to 300 requests per minute. The service is currently free while in beta, with full release expected in 2025.

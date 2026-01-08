@@ -1,0 +1,305 @@
+---
+sidebar_label: n8n workflow automation
+title: AI-powered workflow automation with n8n
+description: Use mittwald's AI models to build intelligent workflows in n8n
+---
+
+import PlanCompatibility from "@site/src/components/PlanCompatibility";
+
+# AI-powered workflow automation with n8n
+
+<PlanCompatibility features={["ai"]} />
+
+[n8n](https://n8n.io) is a powerful workflow automation platform that can be integrated with mittwald's AI hosting to create intelligent, AI-driven workflows.
+
+## What is n8n?
+
+n8n is a fair-code licensed workflow automation tool that connects apps and services. With mittwald's AI models, you can:
+
+- Build intelligent chatbots and customer support workflows
+- Automate content generation and analysis
+- Create AI-powered data processing pipelines
+- Implement smart routing and decision-making logic
+- Generate summaries, translations, and insights automatically
+
+## Quick start
+
+### 1. Set up n8n
+
+Install n8n locally or use n8n cloud:
+
+```sh
+# Install n8n globally
+npm install -g n8n
+
+# Start n8n
+n8n start
+```
+
+n8n will be available at `http://localhost:5678`
+
+### 2. Configure AI hosting endpoint
+
+In your n8n workflow, use the **HTTP Request** node to call mittwald's AI hosting API:
+
+**Node configuration:**
+- **Method**: POST
+- **URL**: `https://llm.aihosting.mittwald.de/v1/chat/completions`
+- **Authentication**: Header Auth
+  - **Name**: `Authorization`
+  - **Value**: `Bearer YOUR_API_KEY`
+
+**Body (JSON):**
+```json
+{
+  "model": "Devstral-Small-2-24B-Instruct-2512",
+  "messages": [
+    {
+      "role": "user",
+      "content": "{{ $json.prompt }}"
+    }
+  ],
+  "temperature": 0.7
+}
+```
+
+### 3. Extract the response
+
+Add a **Set** node after the HTTP Request to extract the AI response:
+
+```javascript
+// Expression to get the AI response
+{{ $json.choices[0].message.content }}
+```
+
+## Use cases and examples
+
+### Example 1: Smart email responder
+
+**Workflow:** Webhook → AI Analysis → Email Reply
+
+1. **Webhook Trigger**: Receives incoming emails
+2. **HTTP Request (AI)**: Analyzes email sentiment and generates response
+3. **Email Node**: Sends automated reply
+
+**AI Prompt:**
+```
+Analyze this customer email and generate a professional, empathetic response:
+
+Email: {{ $json.email_body }}
+Sender: {{ $json.sender_name }}
+
+Generate a response that:
+- Addresses the customer's concerns
+- Maintains a friendly, professional tone
+- Offers concrete next steps
+```
+
+### Example 2: Content summarizer
+
+**Workflow:** Schedule → Fetch Content → Summarize → Save
+
+1. **Schedule Trigger**: Runs daily
+2. **HTTP Request**: Fetches articles/content
+3. **AI Processing**: Summarizes content
+4. **Database/Notion**: Saves summaries
+
+**AI Prompt:**
+```
+Summarize the following article in 3 bullet points, focusing on key takeaways:
+
+{{ $json.article_text }}
+```
+
+### Example 3: Sentiment analysis pipeline
+
+**Workflow:** Database Poll → AI Analysis → Slack Alert
+
+1. **Database Trigger**: Monitors new customer feedback
+2. **HTTP Request (AI)**: Analyzes sentiment
+3. **Switch Node**: Routes based on sentiment score
+4. **Slack/Email**: Notifies team of negative feedback
+
+**AI Prompt:**
+```
+Analyze the sentiment of this customer feedback on a scale of 1-10:
+
+Feedback: {{ $json.feedback_text }}
+
+Return only a JSON object with this structure:
+{
+  "score": 8,
+  "sentiment": "positive",
+  "summary": "Customer is satisfied with the service",
+  "urgent": false
+}
+```
+
+### Example 4: Document classification
+
+**Workflow:** File Trigger → Extract Text → Classify → Move File
+
+1. **File Trigger**: Watches upload folder
+2. **Extract Text**: Reads document content
+3. **AI Classification**: Categorizes document
+4. **Move File**: Organizes into appropriate folder
+
+**AI Prompt:**
+```
+Classify this document into one of these categories: invoice, contract, report, correspondence, other.
+
+Document content:
+{{ $json.document_text }}
+
+Return only the category name.
+```
+
+### Example 5: Multi-language support bot
+
+**Workflow:** Webhook → Detect Language → Translate → AI Response → Translate Back
+
+1. **Webhook**: Receives customer message
+2. **AI Detection**: Detects language
+3. **AI Translation**: Translates to English (if needed)
+4. **AI Response**: Generates response
+5. **AI Translation**: Translates back to original language
+6. **HTTP Response**: Returns to customer
+
+## Advanced: Using the n8n AI node
+
+n8n has built-in AI nodes that can be configured with OpenAI-compatible endpoints:
+
+### Configure the OpenAI node
+
+1. Add **OpenAI** node to your workflow
+2. Configure credentials:
+   - **API Key**: Your mittwald API key
+   - **Base URL**: `https://llm.aihosting.mittwald.de/v1` (if supported by node)
+
+**Note**: If the OpenAI node doesn't support custom base URLs, use the HTTP Request approach shown above.
+
+### Using the AI Agent node
+
+For complex workflows, use the **AI Agent** node:
+
+1. Configure with mittwald's endpoint
+2. Add tools (web search, database queries, etc.)
+3. Let the AI decide which tools to use based on the input
+
+## Best practices
+
+### Temperature settings
+
+- **Factual tasks** (classification, extraction): `0.1 - 0.2`
+- **Balanced** (customer support, summaries): `0.5 - 0.7`
+- **Creative** (content generation, brainstorming): `0.8 - 1.0`
+
+### Error handling
+
+Always add error handling nodes:
+
+```javascript
+// Check if AI response is valid
+{{ $json.choices && $json.choices[0] && $json.choices[0].message ? true : false }}
+```
+
+### Rate limiting
+
+- Batch requests where possible
+- Add delays between calls for high-volume workflows
+- Cache responses when appropriate
+
+### Security
+
+- Store API keys in n8n credentials (never in workflow JSON)
+- Validate and sanitize user inputs before sending to AI
+- Log AI interactions for audit purposes
+
+## MCP integration
+
+When using n8n with Claude Code or Continue via MCP:
+
+```yaml
+# ~/.continue/config.yaml
+mcpServers:
+  n8n:
+    command: npx
+    args: ["-y", "@n8n/mcp-server", "--stdio"]
+    env:
+      N8N_API_URL: "http://localhost:5678"
+      N8N_API_KEY: "your-n8n-api-key"
+```
+
+This allows AI coding assistants to:
+- Trigger n8n workflows
+- Query workflow execution history
+- Debug workflow failures
+- Generate new workflow templates
+
+## Example workflow templates
+
+### Customer support automation
+
+```
+Webhook (Customer Question)
+  → AI Sentiment Analysis
+  → Switch (Urgent/Non-urgent)
+    → Urgent: Slack Alert + AI Response
+    → Non-urgent: AI Response + Log to Database
+  → Send Response
+```
+
+### Content moderation
+
+```
+Database Trigger (New Content)
+  → AI Content Analysis
+  → Function (Check Policies)
+  → Switch (Approved/Flagged)
+    → Approved: Publish
+    → Flagged: Human Review Queue
+```
+
+### Automated reporting
+
+```
+Schedule (Daily 9am)
+  → Database Query (Get Metrics)
+  → AI Report Generation
+  → AI Chart Suggestions
+  → Email to Team
+```
+
+## Troubleshooting
+
+### Common issues
+
+**Issue**: "Unauthorized" error
+- **Solution**: Check API key is correct and has `Bearer` prefix
+
+**Issue**: Response is empty or malformed
+- **Solution**: Verify JSON structure and model name
+
+**Issue**: Timeout errors
+- **Solution**: Increase timeout in HTTP Request node settings or reduce input size
+
+### Testing
+
+Use n8n's **test workflow** feature to debug:
+1. Click "Execute Workflow" button
+2. Check each node's output
+3. Verify AI responses are as expected
+
+## Resources
+
+- n8n Documentation: https://docs.n8n.io/
+- n8n Community: https://community.n8n.io/
+- n8n Workflow Templates: https://n8n.io/workflows/
+- mittwald AI Models: [/docs/v2/platform/aihosting/models](/docs/v2/platform/aihosting/models)
+
+## Support
+
+For questions about:
+- **n8n setup**: See [n8n documentation](https://docs.n8n.io/)
+- **mittwald AI hosting**: Contact mittwald support
+- **Integration issues**: Check both n8n and mittwald documentation

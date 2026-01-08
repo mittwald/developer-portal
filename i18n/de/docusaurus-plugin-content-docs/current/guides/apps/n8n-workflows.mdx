@@ -1,0 +1,305 @@
+---
+sidebar_label: n8n Workflow-Automatisierung
+title: KI-gestützte Workflow-Automatisierung mit n8n
+description: Nutze mittwalds KI-Modelle für intelligente Workflows in n8n
+---
+
+import PlanCompatibility from "@site/src/components/PlanCompatibility";
+
+# KI-gestützte Workflow-Automatisierung mit n8n
+
+<PlanCompatibility features={["ai"]} />
+
+[n8n](https://n8n.io) ist eine leistungsstarke Workflow-Automatisierungsplattform, die mit mittwalds AI-Hosting integriert werden kann, um intelligente, KI-gesteuerte Workflows zu erstellen.
+
+## Was ist n8n?
+
+n8n ist ein fair-code lizenziertes Workflow-Automatisierungstool, das Apps und Services verbindet. Mit mittwalds KI-Modellen kannst du:
+
+- Intelligente Chatbots und Kundenservice-Workflows erstellen
+- Content-Generierung und -Analyse automatisieren
+- KI-gestützte Datenverarbeitungs-Pipelines erstellen
+- Smartes Routing und Entscheidungslogik implementieren
+- Automatisch Zusammenfassungen, Übersetzungen und Insights generieren
+
+## Schnellstart
+
+### 1. n8n einrichten
+
+Installiere n8n lokal oder nutze n8n Cloud:
+
+```sh
+# n8n global installieren
+npm install -g n8n
+
+# n8n starten
+n8n start
+```
+
+n8n ist dann unter `http://localhost:5678` erreichbar
+
+### 2. AI-Hosting-Endpunkt konfigurieren
+
+Nutze in deinem n8n-Workflow den **HTTP Request**-Node, um mittwalds AI-Hosting-API aufzurufen:
+
+**Node-Konfiguration:**
+- **Methode**: POST
+- **URL**: `https://llm.aihosting.mittwald.de/v1/chat/completions`
+- **Authentifizierung**: Header Auth
+  - **Name**: `Authorization`
+  - **Wert**: `Bearer DEIN_API_KEY`
+
+**Body (JSON):**
+```json
+{
+  "model": "Devstral-Small-2-24B-Instruct-2512",
+  "messages": [
+    {
+      "role": "user",
+      "content": "{{ $json.prompt }}"
+    }
+  ],
+  "temperature": 0.7
+}
+```
+
+### 3. Antwort extrahieren
+
+Füge einen **Set**-Node nach dem HTTP Request hinzu, um die KI-Antwort zu extrahieren:
+
+```javascript
+// Expression, um die KI-Antwort zu erhalten
+{{ $json.choices[0].message.content }}
+```
+
+## Anwendungsfälle und Beispiele
+
+### Beispiel 1: Intelligenter E-Mail-Antwort-Bot
+
+**Workflow:** Webhook → KI-Analyse → E-Mail-Antwort
+
+1. **Webhook Trigger**: Empfängt eingehende E-Mails
+2. **HTTP Request (KI)**: Analysiert E-Mail-Sentiment und generiert Antwort
+3. **Email Node**: Sendet automatische Antwort
+
+**KI-Prompt:**
+```
+Analysiere diese Kunden-E-Mail und erstelle eine professionelle, empathische Antwort:
+
+E-Mail: {{ $json.email_body }}
+Absender: {{ $json.sender_name }}
+
+Generiere eine Antwort, die:
+- Auf die Anliegen des Kunden eingeht
+- Einen freundlichen, professionellen Ton hat
+- Konkrete nächste Schritte anbietet
+```
+
+### Beispiel 2: Content-Zusammenfasser
+
+**Workflow:** Zeitplan → Content abrufen → Zusammenfassen → Speichern
+
+1. **Schedule Trigger**: Läuft täglich
+2. **HTTP Request**: Holt Artikel/Content
+3. **KI-Verarbeitung**: Fasst Content zusammen
+4. **Database/Notion**: Speichert Zusammenfassungen
+
+**KI-Prompt:**
+```
+Fasse den folgenden Artikel in 3 Stichpunkten zusammen, fokussiere dich auf die wichtigsten Erkenntnisse:
+
+{{ $json.article_text }}
+```
+
+### Beispiel 3: Sentiment-Analyse-Pipeline
+
+**Workflow:** Database Poll → KI-Analyse → Slack-Benachrichtigung
+
+1. **Database Trigger**: Überwacht neues Kundenfeedback
+2. **HTTP Request (KI)**: Analysiert Sentiment
+3. **Switch Node**: Routing basierend auf Sentiment-Score
+4. **Slack/Email**: Benachrichtigt Team bei negativem Feedback
+
+**KI-Prompt:**
+```
+Analysiere das Sentiment dieses Kundenfeedbacks auf einer Skala von 1-10:
+
+Feedback: {{ $json.feedback_text }}
+
+Gib nur ein JSON-Objekt mit dieser Struktur zurück:
+{
+  "score": 8,
+  "sentiment": "positive",
+  "summary": "Kunde ist mit dem Service zufrieden",
+  "urgent": false
+}
+```
+
+### Beispiel 4: Dokumenten-Klassifizierung
+
+**Workflow:** File Trigger → Text extrahieren → Klassifizieren → Datei verschieben
+
+1. **File Trigger**: Überwacht Upload-Ordner
+2. **Extract Text**: Liest Dokumenteninhalt
+3. **KI-Klassifizierung**: Kategorisiert Dokument
+4. **Move File**: Organisiert in passenden Ordner
+
+**KI-Prompt:**
+```
+Klassifiziere dieses Dokument in eine dieser Kategorien: rechnung, vertrag, bericht, korrespondenz, sonstiges.
+
+Dokumenteninhalt:
+{{ $json.document_text }}
+
+Gib nur den Kategorienamen zurück.
+```
+
+### Beispiel 5: Mehrsprachiger Support-Bot
+
+**Workflow:** Webhook → Sprache erkennen → Übersetzen → KI-Antwort → Zurückübersetzen
+
+1. **Webhook**: Empfängt Kundennachricht
+2. **KI-Erkennung**: Erkennt Sprache
+3. **KI-Übersetzung**: Übersetzt ins Deutsche (falls nötig)
+4. **KI-Antwort**: Generiert Antwort
+5. **KI-Übersetzung**: Übersetzt zurück in Originalsprache
+6. **HTTP Response**: Gibt Antwort an Kunden zurück
+
+## Erweitert: n8n AI-Node verwenden
+
+n8n hat integrierte AI-Nodes, die mit OpenAI-kompatiblen Endpunkten konfiguriert werden können:
+
+### OpenAI-Node konfigurieren
+
+1. Füge **OpenAI**-Node zum Workflow hinzu
+2. Konfiguriere Credentials:
+   - **API Key**: Dein mittwald API-Key
+   - **Base URL**: `https://llm.aihosting.mittwald.de/v1` (falls vom Node unterstützt)
+
+**Hinweis**: Falls der OpenAI-Node keine benutzerdefinierten Base-URLs unterstützt, nutze den HTTP-Request-Ansatz von oben.
+
+### AI-Agent-Node verwenden
+
+Für komplexe Workflows nutze den **AI Agent**-Node:
+
+1. Konfiguriere mit mittwalds Endpunkt
+2. Füge Tools hinzu (Web-Suche, Datenbankabfragen, etc.)
+3. Lass die KI entscheiden, welche Tools basierend auf der Eingabe genutzt werden
+
+## Best Practices
+
+### Temperatur-Einstellungen
+
+- **Faktische Aufgaben** (Klassifizierung, Extraktion): `0.1 - 0.2`
+- **Ausgewogen** (Kundenservice, Zusammenfassungen): `0.5 - 0.7`
+- **Kreativ** (Content-Generierung, Brainstorming): `0.8 - 1.0`
+
+### Fehlerbehandlung
+
+Füge immer Error-Handling-Nodes hinzu:
+
+```javascript
+// Prüfen, ob KI-Antwort gültig ist
+{{ $json.choices && $json.choices[0] && $json.choices[0].message ? true : false }}
+```
+
+### Rate Limiting
+
+- Batch-Anfragen wo möglich
+- Füge Verzögerungen zwischen Aufrufen bei High-Volume-Workflows hinzu
+- Cache Antworten, wenn angebracht
+
+### Sicherheit
+
+- Speichere API-Keys in n8n-Credentials (nie im Workflow-JSON)
+- Validiere und bereinige Benutzereingaben vor dem Senden an die KI
+- Protokolliere KI-Interaktionen zu Audit-Zwecken
+
+## MCP-Integration
+
+Bei Verwendung von n8n mit Claude Code oder Continue via MCP:
+
+```yaml
+# ~/.continue/config.yaml
+mcpServers:
+  n8n:
+    command: npx
+    args: ["-y", "@n8n/mcp-server", "--stdio"]
+    env:
+      N8N_API_URL: "http://localhost:5678"
+      N8N_API_KEY: "dein-n8n-api-key"
+```
+
+Dies ermöglicht KI-Coding-Assistenten:
+- n8n-Workflows auszulösen
+- Workflow-Ausführungshistorie abzufragen
+- Workflow-Fehler zu debuggen
+- Neue Workflow-Templates zu generieren
+
+## Beispiel-Workflow-Templates
+
+### Kundenservice-Automatisierung
+
+```
+Webhook (Kundenfrage)
+  → KI-Sentiment-Analyse
+  → Switch (Dringend/Nicht-dringend)
+    → Dringend: Slack-Benachrichtigung + KI-Antwort
+    → Nicht-dringend: KI-Antwort + Log in Datenbank
+  → Antwort senden
+```
+
+### Content-Moderation
+
+```
+Database Trigger (Neuer Content)
+  → KI-Content-Analyse
+  → Function (Richtlinien prüfen)
+  → Switch (Freigegeben/Markiert)
+    → Freigegeben: Veröffentlichen
+    → Markiert: Warteschlange für manuelle Prüfung
+```
+
+### Automatisiertes Reporting
+
+```
+Schedule (Täglich 9 Uhr)
+  → Database Query (Metriken abrufen)
+  → KI-Report-Generierung
+  → KI-Chart-Vorschläge
+  → E-Mail an Team
+```
+
+## Fehlerbehebung
+
+### Häufige Probleme
+
+**Problem**: "Unauthorized"-Fehler
+- **Lösung**: Prüfe, ob API-Key korrekt ist und `Bearer`-Präfix hat
+
+**Problem**: Antwort ist leer oder fehlerhaft
+- **Lösung**: Überprüfe JSON-Struktur und Modellnamen
+
+**Problem**: Timeout-Fehler
+- **Lösung**: Erhöhe Timeout in HTTP-Request-Node-Einstellungen oder reduziere Eingabegröße
+
+### Testen
+
+Nutze n8ns **Test Workflow**-Funktion zum Debuggen:
+1. Klicke auf "Execute Workflow"-Button
+2. Prüfe die Ausgabe jedes Nodes
+3. Verifiziere, dass KI-Antworten erwartungsgemäß sind
+
+## Ressourcen
+
+- n8n-Dokumentation: https://docs.n8n.io/
+- n8n-Community: https://community.n8n.io/
+- n8n-Workflow-Templates: https://n8n.io/workflows/
+- mittwald KI-Modelle: [/docs/v2/platform/aihosting/models](/docs/v2/platform/aihosting/models)
+
+## Support
+
+Für Fragen zu:
+- **n8n-Setup**: Siehe [n8n-Dokumentation](https://docs.n8n.io/)
+- **mittwald AI-Hosting**: Kontaktiere mittwald-Support
+- **Integrationsprobleme**: Prüfe sowohl n8n- als auch mittwald-Dokumentation

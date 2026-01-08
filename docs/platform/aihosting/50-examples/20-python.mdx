@@ -63,3 +63,77 @@ response = chat.invoke([
 
 print(response.content)
 ```
+
+## Vision (image + text)
+
+```python
+from openai import OpenAI
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+
+resp = client.chat.completions.create(
+    model="Ministral-3-14B-Instruct-2512",
+    messages=[{
+        "role": "user",
+        "content": [
+            {"type": "text", "text": "Describe this image succinctly."},
+            {"type": "image_url", "image_url": {"url": "https://example.com/sample.jpg"}}
+        ]
+    }],
+    temperature=0.1
+)
+print(resp.choices[0].message.content)
+```
+
+Notes: up to 4 images per request recommended; prefer square-ish aspect ratios.
+
+## Tool-calling (function calling)
+
+```python
+from openai import OpenAI
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+
+tools = [
+  {
+    "type": "function",
+    "function": {
+      "name": "get_weather",
+      "description": "Get current weather",
+      "parameters": {
+        "type": "object",
+        "properties": {"city": {"type": "string"}},
+        "required": ["city"]
+      }
+    }
+  }
+]
+
+resp = client.chat.completions.create(
+    model="Devstral-Small-2-24B-Instruct-2512",
+    messages=[{"role": "user", "content": "What is the weather in Berlin?"}],
+    tools=tools,
+    tool_choice="auto"
+)
+
+# Check if the model called a tool
+if resp.choices[0].message.tool_calls:
+    call = resp.choices[0].message.tool_calls[0]
+    print(f"Function: {call.function.name}")
+    print(f"Arguments: {call.function.arguments}")
+```
+
+## Streaming responses
+
+```python
+from openai import OpenAI
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+
+stream = client.chat.completions.create(
+    model="Devstral-Small-2-24B-Instruct-2512",
+    messages=[{"role": "user", "content": "Write a short poem about coding"}],
+    stream=True
+)
+
+for chunk in stream:
+    if chunk.choices[0].delta.content:
+        print(chunk.choices[0].delta.content, end="", flush=True)
+```
