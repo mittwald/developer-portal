@@ -125,9 +125,8 @@ services:
     environment:
       # Für eine einzelne Nextcloud-Instanz im selben Projekt:
       extra_params: "--o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.host[0]=.+ --o:storage.wopi.host[0]=.+ --o:server_name=code.meine-domain.tld"
-      # Für mehrere Nextcloud-Instanzen (aktiviere diese zwei Zeilen und kommentiere die Zeile oben aus):
+      # Für mehrere Nextcloud-Instanzen (aktiviere diese Zeile):
       # aliasgroup1: "https://.*:443"
-      # extra_params: "--o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.host[0]=.+ --o:storage.wopi.host[0]=.+ --o:server_name=code.meine-domain.tld"
 ```
 
 Stelle sicher, dass du `code.meine-domain.tld` durch deine tatsächliche Subdomain ersetzt. Wähle die entsprechende `extra_params`-Konfiguration basierend auf deinem Anwendungsfall (einzelne oder mehrere Nextcloud-Instanzen).
