@@ -44,7 +44,7 @@ export default function OperationDocCardList(p: Props) {
     }));
 
   return (
-    <OperationList.List batchSize={100}>
+    <OperationList.List batchSize={100} aria-label={p.tag}>
       <OperationList.StaticData data={operations} />
       <OperationList.Search autoSubmit />
       <OperationList.Sorting property="method" name="Method" />
