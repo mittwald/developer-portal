@@ -46,7 +46,7 @@ Next, you'll be asked for the image name. You can find this on [Docker Hub](http
 #### Entrypoint and Volume
 
 - The **Entrypoint** can remain unchanged
-- In the next step, you can create a **Volume** (persistent storage). This is not strictly required for `collabora/code`, so you can skip this section
+- In the next section, you can create a **Volume** (persistent storage). This is not strictly required for `collabora/code`, so you can skip this section
 
 #### Environment Variables
 
