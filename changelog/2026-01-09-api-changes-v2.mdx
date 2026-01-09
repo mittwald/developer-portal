@@ -1,0 +1,194 @@
+---
+title: Breaking (!) API changes for v2 API, January 2 to January 9
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Database
+  - Cronjob
+  - Misc
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+During the week of January 2, 2026, to January 9, 2026, the mittwald API introduced several updates, including the removal of the 'readonly' enum value from the 'user/accessLevel' request property, the addition of optional properties such as 'concurrencyPolicy' and 'timeZone' across various endpoints, and the introduction of a new endpoint for listing valid time zones.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The enum value 'readonly' has been removed from the request property 'user/accessLevel' for both the `POST` operations: `database-copy-mysql-database` and `database-create-mysql-database`. This is a breaking change.
+- The `GET` operation `cronjob-get-cronjob` has had several optional properties added to its response with a '200' status: 'concurrencyPolicy', 'latestExecution/exitCode', and 'timeZone'.
+- The `PATCH` operation `cronjob-update-cronjob` now includes two new optional request properties: 'concurrencyPolicy' and 'timeZone'.
+- The `GET` operation `cronjob-list-executions` has had the optional property '/items/exitCode' added to its response with a '200' status.
+- The `GET` operation `cronjob-get-execution` has had the optional property 'exitCode' added to its response with a '200' status.
+- The `POST` operation `cronjob-abort-execution` has been removed and replaced with the deprecated operation id 'deprecated-cronjob-abort-execution'.
+- The `GET` operation `cronjob-list-cronjobs` has had several optional properties added to its response with a '200' status: '/items/concurrencyPolicy', '/items/latestExecution/exitCode', and '/items/timeZone'.
+- The `POST` operation `cronjob-create-cronjob` now includes two new optional request properties: 'concurrencyPolicy' and 'timeZone'.
+- A new endpoint has been added for the `GET` operation `miscellaneous-list-time-zones` at the path '/v2/time-zones', which lists valid time zones.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Copy a MySQL database with a MySQL user"
+
+
+- ⚠️ **Breaking:** removed the enum value 'readonly' of the request property 'user/accessLevel'
+
+
+For details, refer to the <OperationLink operation="database-copy-mysql-database" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a MySQL database with a MySQL user"
+
+
+- ⚠️ **Breaking:** removed the enum value 'readonly' of the request property 'user/accessLevel'
+
+
+For details, refer to the <OperationLink operation="database-create-mysql-database" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a cronjob"
+
+
+- added the optional property 'concurrencyPolicy' to the response with the '200' status
+
+- added the optional property 'latestExecution/exitCode' to the response with the '200' status
+
+- added the optional property 'timeZone' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="cronjob-get-cronjob" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a cronjob"
+
+
+- added the new optional request property 'concurrencyPolicy'
+
+- added the new optional request property 'timeZone'
+
+
+For details, refer to the <OperationLink operation="cronjob-update-cronjob" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List cronjob executions belonging to a cronjob"
+
+
+- added the optional property '/items/exitCode' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="cronjob-list-executions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a cronjob execution"
+
+
+- added the optional property 'exitCode' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="cronjob-get-execution" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "cronjob-abort-execution"
+
+
+- api operation id 'cronjob-abort-execution' removed and replaced with 'deprecated-cronjob-abort-execution'
+
+
+For details, refer to the <OperationLink operation="cronjob-abort-execution" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List cronjobs belonging to a Project"
+
+
+- added the optional property '/items/concurrencyPolicy' to the response with the '200' status
+
+- added the optional property '/items/latestExecution/exitCode' to the response with the '200' status
+
+- added the optional property '/items/timeZone' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="cronjob-list-cronjobs" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a cronjob"
+
+
+- added the new optional request property 'concurrencyPolicy'
+
+- added the new optional request property 'timeZone'
+
+
+For details, refer to the <OperationLink operation="cronjob-create-cronjob" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List valid time zones"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="miscellaneous-list-time-zones" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK Release v2.1.168
+
+The latest release of the mittwald PHP SDK, [v2.1.168](https://github.com/mittwald/api-client-php/releases/tag/v2.1.168), introduces several new features and improvements:
+
+#### New Features
+- **Time Zone Support**: An endpoint to list valid time zones has been added, enhancing scheduling capabilities. Time zone and concurrency policy parameters are now available in cron job creation and update methods.
+- **Concurrency Policy Enhancements**: A `ConcurrencyPolicy` enum has been introduced to manage concurrent executions of cron jobs, with updates to cron job schemas to include these settings.
+
+#### Deprecated Features
+- The `abortExecution` method for cron jobs is deprecated and replaced with `deprecatedCronjobAbortExecution`, maintaining compatibility with previous calls.
+
+#### API Client Changes
+- **CronjobClient Modifications**: The `abortExecution` method has been removed, and the `CronjobClientImpl` has been updated accordingly.
+- **MiscellaneousClient Modifications**: A new method, `miscellaneousListTimeZones`, has been added to list time zones, with adjustments to response handling.
+
+#### Structural Changes
+- New request and response classes have been added for managing time zone-related operations.
+- Existing schemas for cron jobs have been updated to include new properties for concurrency policies and time zones.
+- Redundant code related to the deprecated abort execution functionality has been removed, streamlining the project.
+
+This release enhances cron job management by supporting time zones and task execution policies while organizing deprecated features to minimize disruption.
+
+### mittwald JavaScript SDK Release 4.279.0
+
+The mittwald JavaScript SDK has been updated to version 4.279.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.279.0).
+
