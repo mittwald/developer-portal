@@ -76,12 +76,10 @@ const config: Config = {
   },
   plugins: [
     [
-      '@cmfcmf/docusaurus-search-local',
+      'docusaurus-lunr-search',
       {
-        indexDocs: true,
-        indexBlog: false,
-        language: ["en", "de"],
-      },
+        languages: ['en', 'de'],
+      }
     ],
     [
       "@docusaurus/plugin-client-redirects",
