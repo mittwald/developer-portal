@@ -51,7 +51,7 @@ Hier passt du die Umgebungsvariablen `N8N_HOST` und `WEBHOOK_URL` auf den Host a
 
 ### Verwendung der CLI mit `mw container run`
 
-Du kannst auch einen PostgreSQL-Container mit der mittwald CLI und dem Befehl `mw container run` bereitstellen:
+Du kannst auch einen n8n-Container mit der mittwald CLI und dem Befehl `mw container run` bereitstellen:
 
 ```bash
 mw container run \
@@ -80,7 +80,7 @@ Wenn du Docker Compose bevorzugst, kannst du eine `docker-compose.yml`-Datei ers
    version: "3"
    services:
      mariadb:
-       image: n8nio/n8n:latest
+       image: n8nio/n8n:stable
        environment:
             - N8N_HOST=example.project.space
             - N8N_PORT=5678
