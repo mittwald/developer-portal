@@ -1,10 +1,6 @@
-`mw ddev`
-=========
+# `mw ddev`
 
 Integrate your mittwald projects with DDEV
-
-
-
 
 ## `mw ddev init [INSTALLATION-ID]`
 

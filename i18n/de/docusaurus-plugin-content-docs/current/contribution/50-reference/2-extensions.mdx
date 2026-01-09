@@ -13,36 +13,37 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
   schema={{
     type: "object",
     required: [
-        "id",
-        "name",
-        "contributorId",
-        "context",
-        "createdAt",
-        "description",
-        "scopes",
-        "assets",
-        "disabled",
-        "logoRefId",
-        "published",
-        "statistics",
-        "subTitle",
-        "support",
-        "tags",
-        "verificationRequested",
-        "verified",
-        "functional",
-        "webhookUrls",
-        "externalFrontends",
-        "frontendFragments",
-        "extensionStatistics",
-        "pricing",
-        "requestedChanges"
+      "id",
+      "name",
+      "contributorId",
+      "context",
+      "createdAt",
+      "description",
+      "scopes",
+      "assets",
+      "disabled",
+      "logoRefId",
+      "published",
+      "statistics",
+      "subTitle",
+      "support",
+      "tags",
+      "verificationRequested",
+      "verified",
+      "functional",
+      "webhookUrls",
+      "externalFrontends",
+      "frontendFragments",
+      "extensionStatistics",
+      "pricing",
+      "requestedChanges",
     ],
     properties: {
       id: {
         type: "string",
         format: "uuid",
-        description: "Globally eindeutig identifizierender Bezeichner der Extension",
+        description:
+          "Globally eindeutig identifizierender Bezeichner der Extension",
       },
       contributorId: {
         type: "string",
@@ -92,7 +93,8 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
             properties: {
               markdown: {
                 type: "string",
-                description: "Ein Beschreibungstext mit Markdown‑Formatierungen",
+                description:
+                  "Ein Beschreibungstext mit Markdown‑Formatierungen",
                 minLength: 1,
                 example:
                   "# Ein Beispiel\nDies ist eine Beispiel Extension‑Beschreibung.\n## Weitere Informationen\nHier könnten **weitere** Informationen stehen.",
@@ -113,7 +115,8 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
             properties: {
               markdown: {
                 type: "string",
-                description: "Ein Beschreibungstext mit Markdown‑Formatierungen",
+                description:
+                  "Ein Beschreibungstext mit Markdown‑Formatierungen",
                 minLength: 1,
                 example:
                   "# An example\nThis is an example Extension description.\n## Further information\nHere could be **further** information.",
@@ -224,15 +227,16 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
         type: "array",
         items: {
           type: "object",
-          properties:{
+          properties: {
             index: {
               type: "object",
               required: ["url"],
               properties: {
                 name: {
                   type: "string",
-                  description: "Der Name, den das Frontend in der Liste der Extension Frontends haben wird",
-                  example: "Beispiel"
+                  description:
+                    "Der Name, den das Frontend in der Liste der Extension Frontends haben wird",
+                  example: "Beispiel",
                 },
                 url: {
                   type: "string",
@@ -243,7 +247,7 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
                 },
               },
             },
-          }
+          },
         },
       },
       assets: {
@@ -252,38 +256,39 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
           type: "object",
           required: ["id", "index", "assetType"],
           properties: {
-            id:{
+            id: {
               type: "string",
               format: "uuid",
               description: "Die Datei‑ID des Assets",
-              example: "709049e1-f283-4ef8-a35b-1b2f672852b0"
+              example: "709049e1-f283-4ef8-a35b-1b2f672852b0",
             },
-            index:{
+            index: {
               type: "integer",
-              description: "Der Index des Assets. Muss nicht fortlaufend sein. Kann zur Reihenfolge der Assets benutzt werden.",
-              example: 1
+              description:
+                "Der Index des Assets. Muss nicht fortlaufend sein. Kann zur Reihenfolge der Assets benutzt werden.",
+              example: 1,
             },
-            assetType:{
+            assetType: {
               type: "string",
               enum: ["image", "video"],
-              example: "image"
-            }
-          }
-        }
+              example: "image",
+            },
+          },
+        },
       },
       disabled: {
         type: "boolean",
-        description: "Gibt an, ob die Extension deaktiviert ist"
+        description: "Gibt an, ob die Extension deaktiviert ist",
       },
       logoRefId: {
         type: "string",
         format: "uuid",
         description: "Die Datei‑ID des Logos",
-        example: "9b2af58a-2625-41eb-adc6-bb6f7be9b90a"
+        example: "9b2af58a-2625-41eb-adc6-bb6f7be9b90a",
       },
       published: {
         type: "boolean",
-        description: "Gibt an, ob diese Extension veröffentlicht wurde"
+        description: "Gibt an, ob diese Extension veröffentlicht wurde",
       },
       statistics: {
         type: "object",
@@ -291,9 +296,10 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
           amountOfInstances: {
             type: "integer",
             example: "42",
-            description: "Anzahl der Instanzen dieser Extension. Genau für den Contributor. Öffentlich gerundet auf die nächstgrößere hundert."
-          }
-        }
+            description:
+              "Anzahl der Instanzen dieser Extension. Genau für den Contributor. Öffentlich gerundet auf die nächstgrößere hundert.",
+          },
+        },
       },
       tags: {
         type: "array",
@@ -310,52 +316,57 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
           email: {
             type: "string",
             format: "email",
-            description: "E‑Mail‑Adresse, die für Supportanfragen genutzt werden kann",
+            description:
+              "E‑Mail‑Adresse, die für Supportanfragen genutzt werden kann",
           },
           phone: {
             type: "string",
             format: "phone",
-            description: "Telefonnummer, die für Supportanfragen genutzt werden kann",
+            description:
+              "Telefonnummer, die für Supportanfragen genutzt werden kann",
             example: "+49 170 123456",
           },
           inherited: {
             type: "boolean",
-            description: "Gibt an, ob die angegebene Unterstützung von dem Contributor übernommen wurde",
-            example: false
-          }
+            description:
+              "Gibt an, ob die angegebene Unterstützung von dem Contributor übernommen wurde",
+            example: false,
+          },
         },
       },
       verificationRequested: {
         type: "boolean",
-        description: "Gibt an, ob die Verifizierung der Extension angefordert wurde"
+        description:
+          "Gibt an, ob die Verifizierung der Extension angefordert wurde",
       },
       verified: {
         type: "boolean",
-        description: "Gibt an, ob die Extension verifiziert wurde"
+        description: "Gibt an, ob die Extension verifiziert wurde",
       },
       functional: {
         type: "boolean",
-        description: "Gibt an, ob die Extension funktionsfähig ist"
+        description: "Gibt an, ob die Extension funktionsfähig ist",
       },
       frontendFragments: {
         type: "object",
         additionalProperties: {
-          description:"Der Anker, an dem das Frontend‑Fragment eingebettet werden soll",
+          description:
+            "Der Anker, an dem das Frontend‑Fragment eingebettet werden soll",
           type: "object",
           properties: {
-            "additionalProperties": {
+            additionalProperties: {
               type: "object",
               additionalProperties: {
-                type: "string"
+                type: "string",
               },
             },
             url: {
               type: "string",
               format: "uri",
-              example: "URL des Frontend‑Fragments"
-            }
-          }
-        }
+              example: "URL des Frontend‑Fragments",
+            },
+          },
+        },
       },
       extensionStatistics: {
         type: "object",
@@ -363,15 +374,16 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
           amountOfInstances: {
             type: "integer",
             example: "42",
-            description: "Anzahl der Instanzen dieser Extension. Genau für den Contributor. Öffentlich gerundet auf die nächstgrößere hundert."
-          }
-        }
+            description:
+              "Anzahl der Instanzen dieser Extension. Genau für den Contributor. Öffentlich gerundet auf die nächstgrößere hundert.",
+          },
+        },
       },
       pricing: {
         type: "array",
         items: {
           type: "object",
-          required: [ "priceInCents", "variantKey" ],
+          required: ["priceInCents", "variantKey"],
           properties: {
             priceInCents: {
               type: "integer",
@@ -381,72 +393,78 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
             },
             variantKey: {
               type: "string",
-              description: "Identifikator des Preisvarianten‑Schlüssels"
+              description: "Identifikator des Preisvarianten‑Schlüssels",
             },
             name: {
               type: "string",
               description: "Bezeichnung der Variante (nur in der UI sichtbar)",
               example: "Standard",
-              maxLength: 80
+              maxLength: 80,
             },
-             description: {
+            description: {
               type: "string",
               description: "Beschreibung des Leistungsumfangs der Variante",
-              maxLength: 300
+              maxLength: 300,
             },
             isBookingStopped: {
               type: "boolean",
-              description: "Gibt an, ob die Variante nicht mehr gebucht werden kann",
-              example: false
-            }
-          }
-        }
+              description:
+                "Gibt an, ob die Variante nicht mehr gebucht werden kann",
+              example: false,
+            },
+          },
+        },
       },
       pricingDetails: {
         type: "object",
-        description: "Die Detailansicht des Preisplans. Gibt an, ob ein Upgrade oder Downgrade zu verschiedenen Varianten möglich ist.",
+        description:
+          "Die Detailansicht des Preisplans. Gibt an, ob ein Upgrade oder Downgrade zu verschiedenen Varianten möglich ist.",
         required: ["isUpgradeAllowed", "isDowngradeAllowed"],
         properties: {
           isUpgradeAllowed: {
             type: "boolean",
-            description: "Gibt an, ob ein Upgrade auf eine andere Variante erlaubt ist"
+            description:
+              "Gibt an, ob ein Upgrade auf eine andere Variante erlaubt ist",
           },
           isDowngradeAllowed: {
             type: "boolean",
-            description: "Gibt an, ob ein Downgrade auf eine andere Variante erlaubt ist"
-          }
-        }
+            description:
+              "Gibt an, ob ein Downgrade auf eine andere Variante erlaubt ist",
+          },
+        },
       },
       requestedChanges: {
         type: "object",
-        description:"Erlaubte Änderungen, die ein Contributor vorschlagen kann",
+        description:
+          "Erlaubte Änderungen, die ein Contributor vorschlagen kann",
         properties: {
           context: {
             type: "object",
             properties: {
               hidden: {
                 type: "boolean",
-                description: "Gibt an, ob die Extension im mStudio sichtbar ist"
+                description:
+                  "Gibt an, ob die Extension im mStudio sichtbar ist",
               },
               blocked: {
                 type: "boolean",
                 description:
-                  "Gibt an, ob die Extension zu einem Kontext hinzugefügt werden kann"
+                  "Gibt an, ob die Extension zu einem Kontext hinzugefügt werden kann",
               },
               disabled: {
                 type: "boolean",
                 description:
-                  "Gibt an, ob Extension‑Instanzen für diese Extension existieren dürfen"
-              }
-            }
+                  "Gibt an, ob Extension‑Instanzen für diese Extension existieren dürfen",
+              },
+            },
           },
           scopes: {
             type: "array",
             items: {
               type: "string",
-              example: "project:read"
+              example: "project:read",
             },
-            description: "Berechtigungen, die die Extension benötigt"
+            description: "Berechtigungen, die die Extension benötigt",
           },
           webhookUrls: {
             type: "object",
@@ -471,9 +489,9 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
                         description:
                           "URL, die aufgerufen wird, wenn die Extension zu einem Extension Context hinzugefügt wird. Kann Platzhalter enthalten",
                         example:
-                          "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/added"
-                      }
-                    }
+                          "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/added",
+                      },
+                    },
                   },
                   extensionInstanceUpdated: {
                     type: "object",
@@ -485,9 +503,9 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
                         description:
                           "URL, die aufgerufen wird, wenn eine Extension Instance aktualisiert wird. Kann Platzhalter enthalten",
                         example:
-                          "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/updated"
-                      }
-                    }
+                          "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/updated",
+                      },
+                    },
                   },
                   extensionInstanceSecretRotated: {
                     type: "object",
@@ -499,9 +517,9 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
                         description:
                           "URL, die aufgerufen wird, wenn das Secret einer Extension Instance rotiert wird. Kann Platzhalter enthalten",
                         example:
-                          "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/secret-rotated"
-                      }
-                    }
+                          "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/secret-rotated",
+                      },
+                    },
                   },
                   extensionInstanceRemovedFromContext: {
                     type: "object",
@@ -513,17 +531,18 @@ Für weitere Informationen zu den einzelnen Attributen siehe [Aus welchen Inform
                         description:
                           "URL, die aufgerufen wird, wenn die Extension aus einem Extension Context entfernt wird. Kann Platzhalter enthalten",
                         example:
-                          "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/removed"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
+                          "https://example.org/api/v1/extensions/:contextId/:extensionInstanceId/removed",
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
-        description:"Ein Vorschlag für die Änderungen, die ein Contributor vorschlagen kann"
-      }
+        description:
+          "Ein Vorschlag für die Änderungen, die ein Contributor vorschlagen kann",
+      },
     },
   }}
 />

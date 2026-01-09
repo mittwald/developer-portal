@@ -1,30 +1,6 @@
-`mw database`
-=============
+# `mw database`
 
 Manage databases (like MySQL and Redis) in your projects
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ## `mw database list`
 

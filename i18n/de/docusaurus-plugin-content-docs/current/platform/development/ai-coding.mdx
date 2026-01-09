@@ -19,13 +19,13 @@ Der Service bietet verschiedene KI-Modelle, die für unterschiedliche Entwicklun
 
 ### Übersicht
 
-| IDE/Tool                                 | Integrationen                                        |
-| ---------------------------------------- | ---------------------------------------------------- |
-| Jetbrains IDEs (IntelliJ, PHPStorm, ...) | [Continue](#continue), [Jetbrains AI](#jetbrains-ai) |
-| Visual Studio Code                       | [Continue](#continue), [Cline](#cline)               |
-| Cursor                                   | [Cline](#cline)                                      |
-| Windsurf                                 | [Cline](#cline)                                      |
-| CLI                                      | [Claude Code](#claude-code), [Kilo Code](#kilo-code) |
+| IDE/Tool                                 | Integrationen                                                               |
+| ---------------------------------------- | --------------------------------------------------------------------------- |
+| Jetbrains IDEs (IntelliJ, PHPStorm, ...) | [Continue](#continue), [Jetbrains AI](#jetbrains-ai)                        |
+| Visual Studio Code                       | [Continue](#continue), [Cline](#cline)                                      |
+| Cursor                                   | [Cline](#cline)                                                             |
+| Windsurf                                 | [Cline](#cline)                                                             |
+| CLI                                      | [Claude Code](#claude-code), [OpenCode](#opencode), [Kilo Code](#kilo-code) |
 
 ### Jetbrains AI (für Jetbrains IDEs, wie IntelliJ, PHPStorm, WebStorm, ...) {#jetbrains-ai}
 
@@ -99,6 +99,25 @@ export OPENAI_BASE_URL=https://llm.aihosting.mittwald.de/v1
 
 Wähle anschließend Devstral in Kilo Codes Modell-Auswahl für Agent-Aufgaben.
 
+### OpenCode (agentisches Coding) {#opencode}
+
+OpenCode unterstützt OpenAI-kompatible Anbieter. Konfiguration über Umgebung oder Config-Datei:
+
+- Provider: OpenAI Compatible
+- Base URL: `https://llm.aihosting.mittwald.de/v1`
+- API Key: dein LLM-API-Schlüssel aus dem mStudio
+- Modell: `Devstral-Small-2-24B-Instruct-2512`
+
+Beispiel-Umgebung:
+
+```sh
+export OPENAI_API_KEY=sk-...
+export OPENAI_BASE_URL=https://llm.aihosting.mittwald.de/v1
+export OPENAI_MODEL=Devstral-Small-2-24B-Instruct-2512
+```
+
+Für detaillierte Konfiguration einschließlich MCP-Server siehe den [CLI-Coding-Tools-Leitfaden](/docs/v2/platform/development/cli-coding-tools#opencode-cli).
+
 ### Continue: MCP-Server
 
 Continue kann über das Model Context Protocol (MCP) kontrollierten Zugriff auf externe Tools und Services erhalten.
@@ -149,6 +168,18 @@ mcpServers:
     args: ["solr-mcp"]
     env:
       SOLR_URL: "http://localhost:8983/solr"
+
+  # TYPO3: CMS-Content und Backend-Verwaltung (benötigt mittwald CLI)
+  typo3:
+    command: mw
+    args:
+      [
+        "app",
+        "exec",
+        "--quiet",
+        "--installation-id=a-XXXXX",
+        "vendor/bin/typo3 mcp:server",
+      ]
 ```
 
 **Context7** stellt aktuelle Dokumentation für beliebte Bibliotheken und Frameworks bereit und stellt sicher, dass das Modell Zugriff auf die neuesten API-Änderungen und Best Practices hat.
@@ -163,6 +194,8 @@ mcpServers:
 
 **Apache Solr MCP** ermöglicht der KI, leistungsstarke hybride Suchabfragen gegen Solr-Indizes durchzuführen, die sowohl Keyword- als auch Vektorsuche für Enterprise-Suchanwendungen kombinieren.
 
+**TYPO3 MCP** bietet KI-Assistenten kontrollierten Zugriff auf deine TYPO3-CMS-Installation und ermöglicht Content-Management, Seitenoperationen und Backend-Automatisierung durch natürliche Sprache. Verwendet den Befehl [`mw app exec`](/docs/v2/cli/reference/app#mw-app-exec-command) der [mittwald CLI](/docs/v2/cli) für die Verbindung via STDIO-Transport. Ersetze `a-XXXXX` durch deine TYPO3-App-Installations-ID (finden via `mw app list`). Benötigt das Composer-Paket [hn/typo3-mcp-server](https://github.com/hn/typo3-mcp-server), das in deiner TYPO3-Instanz installiert sein muss. **Hinweis:** Umgeht derzeit die TYPO3-Backend-Zugriffskontrollen und funktioniert nur mit lokalen MCP-Clients aufgrund von Plattformbeschränkungen bei der `.well-known/` OAuth-Discovery.
+
 Bitte den Assistenten explizit, ein Tool zu nutzen (z. B. „nutze Brave Search, um aktuelle Informationen über ... zu finden" oder „durchsuche unseren Solr-Index nach Dokumenten über ..."). Beschränke den Zugriff stets eng und überprüfe Datenzugriffe oder Änderungen.
 
 ### Kilo Code: MCP-Server
@@ -171,14 +204,15 @@ Kilo Code kann ebenfalls MCP-Server verwenden. Füge sie über die Einstellungen
 
 **Empfohlene SOTA MCP-Server:**
 
-| Server           | Zweck                             | Installation                                               |
-| ---------------- | --------------------------------- | ---------------------------------------------------------- |
-| **Context7**     | Aktuelle Bibliotheksdokumentation | `npx -y @context7/mcp-server --stdio`                      |
-| **Brave Search** | Datenschutzfreundliche Web-Suche  | `npx -y @modelcontextprotocol/server-brave-search --stdio` |
-| **PostgreSQL**   | Datenbank-Inspektion & Abfragen   | `npx -y @modelcontextprotocol/server-postgres --stdio`     |
-| **Directus**     | Headless CMS & Content-Management | `npx -y @directus/content-mcp --stdio`                     |
-| **OpenSearch**   | Such- & Analyse-Engine            | `npx -y @opensearch-project/mcp-server --stdio`            |
-| **Apache Solr**  | Enterprise-Suchplattform          | `uvx solr-mcp` (Python)                                    |
+| Server           | Zweck                             | Installation                                                                  |
+| ---------------- | --------------------------------- | ----------------------------------------------------------------------------- |
+| **Context7**     | Aktuelle Bibliotheksdokumentation | `npx -y @context7/mcp-server --stdio`                                         |
+| **Brave Search** | Datenschutzfreundliche Web-Suche  | `npx -y @modelcontextprotocol/server-brave-search --stdio`                    |
+| **PostgreSQL**   | Datenbank-Inspektion & Abfragen   | `npx -y @modelcontextprotocol/server-postgres --stdio`                        |
+| **Directus**     | Headless CMS & Content-Management | `npx -y @directus/content-mcp --stdio`                                        |
+| **OpenSearch**   | Such- & Analyse-Engine            | `npx -y @opensearch-project/mcp-server --stdio`                               |
+| **Apache Solr**  | Enterprise-Suchplattform          | `uvx solr-mcp` (Python)                                                       |
+| **TYPO3**        | TYPO3-CMS-Verwaltung              | `mw app exec --quiet --installation-id=a-XXXXX "vendor/bin/typo3 mcp:server"` |
 
 **Konfigurationsbeispiel:**
 
@@ -223,6 +257,16 @@ Kilo Code kann ebenfalls MCP-Server verwenden. Füge sie über die Einstellungen
       "env": {
         "SOLR_URL": "http://localhost:8983/solr"
       }
+    },
+    "typo3": {
+      "command": "mw",
+      "args": [
+        "app",
+        "exec",
+        "--quiet",
+        "--installation-id=a-XXXXX",
+        "vendor/bin/typo3 mcp:server"
+      ]
     }
   }
 }
@@ -245,6 +289,7 @@ Kilo Code kann ebenfalls MCP-Server verwenden. Füge sie über die Einstellungen
 - Directus MCP: https://www.npmjs.com/package/@directus/content-mcp
 - OpenSearch MCP: https://github.com/opensearch-project/opensearch-mcp-server-py
 - Apache Solr MCP: https://github.com/allenday/solr-mcp
+- TYPO3 MCP: https://github.com/hn/typo3-mcp-server
 - MCP-Server-Registry: https://github.com/modelcontextprotocol/servers
 
 ### Kilo Code: Web-Fetch & Browsing
@@ -380,6 +425,16 @@ MCP-Konfiguration in `~/.config/claude-code/mcp.json` erstellen:
       "env": {
         "SOLR_URL": "http://localhost:8983/solr"
       }
+    },
+    "typo3": {
+      "command": "mw",
+      "args": [
+        "app",
+        "exec",
+        "--quiet",
+        "--installation-id=a-XXXXX",
+        "vendor/bin/typo3 mcp:server"
+      ]
     }
   }
 }

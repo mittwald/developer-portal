@@ -19,13 +19,13 @@ The service offers several AI models optimized for different development tasks. 
 
 ### Overview
 
-| IDE/Tool                                 | Integrations                                         |
-| ---------------------------------------- | ---------------------------------------------------- |
-| Jetbrains IDEs (IntelliJ, PHPStorm, ...) | [Continue](#continue), [Jetbrains AI](#jetbrains-ai) |
-| Visual Studio Code                       | [Continue](#continue), [Cline](#cline)               |
-| Cursor                                   | [Cline](#cline)                                      |
-| Windsurf                                 | [Cline](#cline)                                      |
-| CLI                                      | [Claude Code](#claude-code), [Kilo Code](#kilo-code) |
+| IDE/Tool                                 | Integrations                                                                |
+| ---------------------------------------- | --------------------------------------------------------------------------- |
+| Jetbrains IDEs (IntelliJ, PHPStorm, ...) | [Continue](#continue), [Jetbrains AI](#jetbrains-ai)                        |
+| Visual Studio Code                       | [Continue](#continue), [Cline](#cline)                                      |
+| Cursor                                   | [Cline](#cline)                                                             |
+| Windsurf                                 | [Cline](#cline)                                                             |
+| CLI                                      | [Claude Code](#claude-code), [OpenCode](#opencode), [Kilo Code](#kilo-code) |
 
 ### Jetbrains AI (for Jetbrains IDEs, like IntelliJ, PHPStorm, WebStorm, ...) {#jetbrains-ai}
 
@@ -97,7 +97,26 @@ export OPENAI_API_KEY=sk-...
 export OPENAI_BASE_URL=https://llm.aihosting.mittwald.de/v1
 ```
 
-Then select Devstral in Kilo Code’s model picker for agent tasks.
+Then select Devstral in Kilo Code's model picker for agent tasks.
+
+### OpenCode (agentic coding) {#opencode}
+
+OpenCode supports OpenAI-compatible providers. Configure via environment or config file:
+
+- Provider: OpenAI Compatible
+- Base URL: `https://llm.aihosting.mittwald.de/v1`
+- API Key: your mStudio LLM API key
+- Model: `Devstral-Small-2-24B-Instruct-2512`
+
+Example environment:
+
+```sh
+export OPENAI_API_KEY=sk-...
+export OPENAI_BASE_URL=https://llm.aihosting.mittwald.de/v1
+export OPENAI_MODEL=Devstral-Small-2-24B-Instruct-2512
+```
+
+For detailed configuration including MCP servers, see the [CLI coding tools guide](/docs/v2/platform/development/cli-coding-tools#opencode-cli).
 
 ### Continue: MCP servers
 
@@ -149,6 +168,18 @@ mcpServers:
     args: ["solr-mcp"]
     env:
       SOLR_URL: "http://localhost:8983/solr"
+
+  # TYPO3: CMS content and backend management (requires mittwald CLI)
+  typo3:
+    command: mw
+    args:
+      [
+        "app",
+        "exec",
+        "--quiet",
+        "--installation-id=a-XXXXX",
+        "vendor/bin/typo3 mcp:server",
+      ]
 ```
 
 **Context7** provides fresh documentation for popular libraries and frameworks, ensuring the model has access to the latest API changes and best practices.
@@ -163,6 +194,8 @@ mcpServers:
 
 **Apache Solr MCP** allows AI to perform powerful hybrid search queries against Solr indexes, combining both keyword and vector search capabilities for enterprise search applications.
 
+**TYPO3 MCP** provides AI assistants with controlled access to your TYPO3 CMS installation, enabling content management, page operations, and backend automation through natural language. Uses the [mittwald CLI](/docs/v2/cli)'s [`mw app exec`](/docs/v2/cli/reference/app#mw-app-exec-command) command to connect via STDIO transport. Replace `a-XXXXX` with your TYPO3 app installation ID (find via `mw app list`). Requires the [hn/typo3-mcp-server](https://github.com/hn/typo3-mcp-server) Composer package installed in your TYPO3 instance. **Note:** Currently bypasses TYPO3 backend access controls and only works with local MCP clients due to platform limitations with `.well-known/` OAuth discovery.
+
 Ask the assistant explicitly to use a tool (e.g., "use Brave Search to find recent information about...", or "search our Solr index for documents about..."). Always scope access narrowly and review any data access or modifications.
 
 ### Kilo Code: MCP servers
@@ -171,14 +204,15 @@ Kilo Code can also use MCP servers. Add them via settings (Tools → Add MCP Ser
 
 **Recommended SOTA MCP Servers:**
 
-| Server           | Purpose                           | Installation                                               |
-| ---------------- | --------------------------------- | ---------------------------------------------------------- |
-| **Context7**     | Fresh library documentation       | `npx -y @context7/mcp-server --stdio`                      |
-| **Brave Search** | Privacy-focused web search        | `npx -y @modelcontextprotocol/server-brave-search --stdio` |
-| **PostgreSQL**   | Database introspection & queries  | `npx -y @modelcontextprotocol/server-postgres --stdio`     |
-| **Directus**     | Headless CMS & content management | `npx -y @directus/content-mcp --stdio`                     |
-| **OpenSearch**   | Search & analytics engine         | `npx -y @opensearch-project/mcp-server --stdio`            |
-| **Apache Solr**  | Enterprise search platform        | `uvx solr-mcp` (Python)                                    |
+| Server           | Purpose                           | Installation                                                                  |
+| ---------------- | --------------------------------- | ----------------------------------------------------------------------------- |
+| **Context7**     | Fresh library documentation       | `npx -y @context7/mcp-server --stdio`                                         |
+| **Brave Search** | Privacy-focused web search        | `npx -y @modelcontextprotocol/server-brave-search --stdio`                    |
+| **PostgreSQL**   | Database introspection & queries  | `npx -y @modelcontextprotocol/server-postgres --stdio`                        |
+| **Directus**     | Headless CMS & content management | `npx -y @directus/content-mcp --stdio`                                        |
+| **OpenSearch**   | Search & analytics engine         | `npx -y @opensearch-project/mcp-server --stdio`                               |
+| **Apache Solr**  | Enterprise search platform        | `uvx solr-mcp` (Python)                                                       |
+| **TYPO3**        | TYPO3 CMS management              | `mw app exec --quiet --installation-id=a-XXXXX "vendor/bin/typo3 mcp:server"` |
 
 **Configuration example:**
 
@@ -223,6 +257,16 @@ Kilo Code can also use MCP servers. Add them via settings (Tools → Add MCP Ser
       "env": {
         "SOLR_URL": "http://localhost:8983/solr"
       }
+    },
+    "typo3": {
+      "command": "mw",
+      "args": [
+        "app",
+        "exec",
+        "--quiet",
+        "--installation-id=a-XXXXX",
+        "vendor/bin/typo3 mcp:server"
+      ]
     }
   }
 }
@@ -245,6 +289,7 @@ Kilo Code can also use MCP servers. Add them via settings (Tools → Add MCP Ser
 - Directus MCP: https://www.npmjs.com/package/@directus/content-mcp
 - OpenSearch MCP: https://github.com/opensearch-project/opensearch-mcp-server-py
 - Apache Solr MCP: https://github.com/allenday/solr-mcp
+- TYPO3 MCP: https://github.com/hn/typo3-mcp-server
 - MCP Server Registry: https://github.com/modelcontextprotocol/servers
 
 ### Kilo Code: Web fetch & browsing
@@ -380,6 +425,16 @@ Create MCP configuration in `~/.config/claude-code/mcp.json`:
       "env": {
         "SOLR_URL": "http://localhost:8983/solr"
       }
+    },
+    "typo3": {
+      "command": "mw",
+      "args": [
+        "app",
+        "exec",
+        "--quiet",
+        "--installation-id=a-XXXXX",
+        "vendor/bin/typo3 mcp:server"
+      ]
     }
   }
 }

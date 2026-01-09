@@ -17,13 +17,13 @@ resource "mittwald_container_stack" "postgresql" {
       image       = data.mittwald_container_image.postgres.image
       entrypoint  = data.mittwald_container_image.postgres.entrypoint
       command     = data.mittwald_container_image.postgres.command
-      
+
       environment = {
         POSTGRES_DB       = "mydatabase"
         POSTGRES_USER     = "myuser"
         POSTGRES_PASSWORD = random_password.postgres_password.result
       }
-      
+
       volumes = [
         {
           volume = "postgresql_data"
@@ -34,7 +34,7 @@ resource "mittwald_container_stack" "postgresql" {
           mount_path = "/mnt"
         }
       ]
-      
+
       ports = [
         {
           container_port = 5432
