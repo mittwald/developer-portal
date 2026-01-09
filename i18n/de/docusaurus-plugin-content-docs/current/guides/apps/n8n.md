@@ -79,7 +79,7 @@ Wenn du Docker Compose bevorzugst, kannst du eine `docker-compose.yml`-Datei ers
    ```yaml
    version: "3"
    services:
-     mariadb:
+     n8n:
        image: n8nio/n8n:stable
        environment:
             - N8N_HOST=example.project.space
