@@ -1,0 +1,109 @@
+---
+sidebar_label: JavaScript
+description: JavaScript/TypeScript-Beispiele für das AI-Hosting
+title: JavaScript-Beispiele
+---
+
+## Chat Completions
+
+```ts
+import OpenAI from "openai";
+
+const client = new OpenAI({ baseURL: "https://llm.aihosting.mittwald.de/v1" });
+
+const resp = await client.chat.completions.create({
+  model: "Devstral-Small-2-24B-Instruct-2512",
+  messages: [{ role: "user", content: "Hallo aus JS!" }],
+});
+
+console.log(resp.choices[0].message.content);
+```
+
+## Vision (Bild + Text)
+
+```ts
+import OpenAI from "openai";
+
+const client = new OpenAI({ baseURL: "https://llm.aihosting.mittwald.de/v1" });
+
+const resp = await client.chat.completions.create({
+  model: "Ministral-3-14B-Instruct-2512",
+  messages: [
+    {
+      role: "user",
+      content: [
+        { type: "text", text: "Was siehst du?" },
+        {
+          type: "image_url",
+          image_url: { url: "https://example.com/photo.jpg" },
+        },
+      ],
+    },
+  ],
+  temperature: 0.1,
+});
+
+console.log(resp.choices[0].message.content);
+```
+
+## Tool-calling (Funktionsaufrufe)
+
+```ts
+import OpenAI from "openai";
+
+const client = new OpenAI({ baseURL: "https://llm.aihosting.mittwald.de/v1" });
+
+const tools = [
+  {
+    type: "function",
+    function: {
+      name: "get_weather",
+      description: "Aktuelle Wetterdaten für eine Stadt abrufen",
+      parameters: {
+        type: "object",
+        properties: {
+          city: { type: "string", description: "Stadtname" },
+        },
+        required: ["city"],
+      },
+    },
+  },
+];
+
+const resp = await client.chat.completions.create({
+  model: "Devstral-Small-2-24B-Instruct-2512",
+  messages: [{ role: "user", content: "Wie ist das Wetter in München?" }],
+  tools,
+  tool_choice: "auto",
+});
+
+const toolCall = resp.choices[0].message.tool_calls?.[0];
+if (toolCall) {
+  console.log(`Funktion: ${toolCall.function.name}`);
+  console.log(`Argumente: ${toolCall.function.arguments}`);
+}
+```
+
+## Streaming-Antworten
+
+```ts
+import OpenAI from "openai";
+
+const client = new OpenAI({ baseURL: "https://llm.aihosting.mittwald.de/v1" });
+
+const stream = await client.chat.completions.create({
+  model: "Devstral-Small-2-24B-Instruct-2512",
+  messages: [
+    {
+      role: "user",
+      content: "Schreibe ein kurzes Gedicht über das Programmieren",
+    },
+  ],
+  stream: true,
+});
+
+for await (const chunk of stream) {
+  const content = chunk.choices[0]?.delta?.content || "";
+  process.stdout.write(content);
+}
+```

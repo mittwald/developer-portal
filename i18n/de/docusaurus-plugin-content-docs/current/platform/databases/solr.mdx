@@ -129,7 +129,6 @@ Alternativ kannst du einen Solr-Container manuell einrichten:
 3. (optional, aber empfohlen) Um automatisch einen Solr-Core beim Container-Start zu erstellen, ändere das Command zu `solr-precreate <corename>`. Ersetze dabei `<corename>` durch einen Namen deiner Wahl.
 
 4. Um deine Solr-Daten persistent zu speichern, erstelle ein Volume unter **Volumes** wie folgt:
-
    - Volume: Neues Volume erstellen
    - Pfad im Container (Mount Point): `/var/solr`
 
@@ -341,14 +340,12 @@ TYPO3 CMS kann mit Solr über die [Erweiterung `solr`](https://extensions.typo3.
 1. Erstelle oder bearbeite deine Site-Konfiguration in TYPO3 (Site Management > Sites).
 
 2. In der Site-Konfiguration gehe zum Tab "Solr" und konfiguriere die Verbindung:
-
    - Scheme und Port: `http` und `8983`
    - Host: `solr` (der Hostname deines Solr-Containers)
    - Port: `8983` (der Standard-Solr-Port)
    - URL path to Apache solr server: `/`
 
 3. Konfiguriere dann pro Sprache deiner Site-Konfiguration den Namen des Solr-Cores. Wenn deine Website mehrere Sprachen hat, solltest du einen Core pro Sprache erstellen.
-
    - Corename: `typo3` (oder der Name des Cores, den du erstellt hast)
 
 4. Speichere die Konfiguration.

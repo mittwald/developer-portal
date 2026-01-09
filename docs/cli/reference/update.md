@@ -1,9 +1,6 @@
-`mw update`
-===========
+# `mw update`
 
 update the mw CLI
-
-
 
 ## `mw update [CHANNEL]`
 

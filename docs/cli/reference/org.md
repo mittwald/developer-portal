@@ -1,18 +1,6 @@
-`mw org`
-========
+# `mw org`
 
 Manage your organizations, and also any kinds of user memberships concerning these organizations.
-
-
-
-
-
-
-
-
-
-
-
 
 ## `mw org delete [ORG-ID]`
 

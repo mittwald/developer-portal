@@ -1,18 +1,6 @@
-`mw cronjob`
-============
+# `mw cronjob`
 
 Manage cronjobs of your projects
-
-
-
-
-
-
-
-
-
-
-
 
 ## `mw cronjob create`
 

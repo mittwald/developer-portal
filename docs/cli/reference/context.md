@@ -1,11 +1,6 @@
-`mw context`
-============
+# `mw context`
 
 Save certain environment parameters for later use
-
-
-
-
 
 ## `mw context get`
 

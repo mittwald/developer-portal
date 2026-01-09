@@ -3,7 +3,10 @@ interface ComparableOperation {
   method: string;
 }
 
-export default function compareOperation(a: ComparableOperation, b: ComparableOperation): number {
+export default function compareOperation(
+  a: ComparableOperation,
+  b: ComparableOperation,
+): number {
   const nameCompare = a.path.localeCompare(b.path);
   if (nameCompare !== 0) {
     return nameCompare;

@@ -1,18 +1,6 @@
-`mw mail`
-=========
+# `mw mail`
 
 Manage mailboxes and mail addresses in your projects
-
-
-
-
-
-
-
-
-
-
-
 
 ## `mw mail address create`
 

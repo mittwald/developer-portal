@@ -79,10 +79,11 @@ rsync -avz ./my-app/ user@server:/html/nodejs-container/
    - Oder deine gewünschte Versionsnummer
 
    **Command:**
+
    ```bash
    # Falls Code dupliziert wurde (und yarn install bereits durchgeführt wurde):
    sh -c "cd /app && yarn start"
-   
+
    # Falls Code neu deployed wurde (und noch kein yarn install durchgeführt wurde):
    sh -c "cd /app && yarn install && yarn start"
    ```
@@ -92,6 +93,7 @@ rsync -avz ./my-app/ user@server:/html/nodejs-container/
    - **Mount Point im Container**: `/app`
 
    **Umgebungsvariablen:**
+
    ```env
    NODE_ENV=production
    PORT=3000  # Port deiner Wahl
@@ -114,6 +116,7 @@ Nach erfolgreichem Start des Containers:
 3. **Monitoring**: Beobachte die Anwendung für einige Zeit
 
 Wenn alles einwandfrei funktioniert:
+
 - Lösche die alte Node.js-App aus deinem Projekt
 - Entferne nicht mehr benötigte Dateien
 
@@ -134,6 +137,7 @@ Wenn alles einwandfrei funktioniert:
 ### Abhängigkeiten fehlen
 
 Falls System-Dependencies fehlen, erwäge:
+
 - Ein anderes Base-Image zu verwenden
 - Ein eigenes Dockerfile zu erstellen mit den benötigten Dependencies
 

@@ -1,34 +1,6 @@
-`mw project`
-============
+# `mw project`
 
 Manage your projects, and also any kinds of user memberships concerning these projects.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ## `mw project backup create`
 

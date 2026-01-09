@@ -35,7 +35,7 @@ resource "mittwald_container_stack" "postgresql" {
           mount_path = "/mnt"
         }
       ]
-      
+
       ports = [
         {
           container_port = 5432

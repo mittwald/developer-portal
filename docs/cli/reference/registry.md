@@ -1,12 +1,6 @@
-`mw registry`
-=============
+# `mw registry`
 
 Manage container registries
-
-
-
-
-
 
 ## `mw registry create`
 

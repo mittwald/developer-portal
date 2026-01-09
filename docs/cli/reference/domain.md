@@ -1,17 +1,6 @@
-`mw domain`
-===========
+# `mw domain`
 
 Manage domains, virtual hosts and DNS settings in your projects
-
-
-
-
-
-
-
-
-
-
 
 ## `mw domain dnszone get DNSZONE-ID`
 

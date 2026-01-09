@@ -1,9 +1,6 @@
-`mw help`
-=========
+# `mw help`
 
 Display help for mw.
-
-
 
 ## `mw help [COMMAND]`
 

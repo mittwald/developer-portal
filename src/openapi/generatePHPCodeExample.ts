@@ -51,7 +51,9 @@ function generatePHPCodeExample(
 
   if (queryParams.length > 0) {
     for (const queryParam of queryParams) {
-      let example = generateSchemaExample(queryParam.schema as OpenAPIV3.SchemaObject);
+      let example = generateSchemaExample(
+        queryParam.schema as OpenAPIV3.SchemaObject,
+      );
       if (queryParam.name === "skip") {
         continue;
       } else if (queryParam.name === "limit") {
