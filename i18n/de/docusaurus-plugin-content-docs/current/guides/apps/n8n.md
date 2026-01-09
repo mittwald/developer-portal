@@ -27,7 +27,7 @@ Du kannst eine n8n in deiner mittwald Hosting-Umgebung mit Containern bereitstel
 
 Um die Daten deines n8n persistent zu speichern, definiere Volumes unter **Volumes** wie folgt:
 
-- Neues Volume erstellen, auf **Pfad im Container** (Mount Point): `/root/.n8n` 
+- Neues Volume erstellen, auf **Pfad im Container** (Mount Point): `/root/.n8n`
 
 
 #### Umgebungsvariablen
@@ -47,7 +47,7 @@ Hier passt du die Umgebungsvariablen `N8N_HOST` und `WEBHOOK_URL` auf den Host a
 
 #### Ports
 
-Übernehme den vorgeschlagenen Standardport `5687`.
+Übernehme den vorgeschlagenen Standardport `5678`.
 
 ### Verwendung der CLI mit `mw container run`
 
@@ -61,9 +61,9 @@ mw container run \
   --env N8N_PROTOCOL=https \
   --env NODE_ENV=production \
   --env WEBHOOK_URL=https://example.project.space/ \
-  --env GENERIC_TIMEZONE=Europe/Berlin \  
+  --env GENERIC_TIMEZONE=Europe/Berlin \
   --volume n8n-data:/root/.n8n \
-  --publish 5687:5687/tcp \
+  --publish 5678:5678/tcp \
   --create-volumes \
   n8nio/n8n:stable  # alternatives: https://hub.docker.com/r/n8nio/n8n/tags
 ```
@@ -89,7 +89,7 @@ Wenn du Docker Compose bevorzugst, kannst du eine `docker-compose.yml`-Datei ers
             - WEBHOOK_URL=https://example.project.space/
             - GENERIC_TIMEZONE=Europe/Berlin
        ports:
-         - "5687:5687"
+         - "5678:5678"
        volumes:
          - n8n_data:/root/.n8n
    volumes:
