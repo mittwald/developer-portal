@@ -116,3 +116,14 @@ The usage examples for OpenAPI operations are generated from the OpenAPI specifi
 [docs-en]: https://github.com/mittwald/developer-portal/tree/master/docs
 [docs-de]: https://github.com/mittwald/developer-portal/tree/master/i18n/de/docusaurus-plugin-content-docs/current
 [overlay]: https://spec.openapis.org/overlay/latest.html
+
+### Upgrading or introducing new nodejs packages
+
+Install new packages using your preferred way, e.g. `npm`.
+To make sure all docs pages are still visible and can be opened without errors, a crawler test has been added to visit all docs pages automatically:
+
+```bash
+npm test
+```
+
+This test takes quite some time, but it ensures nothing broke on package upgrades and no regression has been introduced. It is **not** part of the release process and is run manually by documentation maintainers. It does **not** check anything else but pages loading and showing content.
