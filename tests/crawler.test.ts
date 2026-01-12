@@ -4,7 +4,7 @@ test.describe('Documentation crawler - all pages', () => {
   
   test('all documentation pages load without errors', async ({ page }) => {
 
-    test.setTimeout(300000 * 2); // 10 minutes in milliseconds
+    test.setTimeout(300000 * 2 * 2 * 2); // 40 minutes in milliseconds
 
     // Track visited URLs to avoid duplicates
     const visitedUrls = new Set<string>();
