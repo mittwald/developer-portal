@@ -80,7 +80,7 @@ function OperationResponseHeader({
   const body = [];
 
   if (header.description) {
-    body.push(<Markdown>{header.description}</Markdown>);
+    body.push(<Markdown key="description">{header.description}</Markdown>);
   }
 
   return (
