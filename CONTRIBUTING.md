@@ -127,3 +127,17 @@ npm test
 ```
 
 This test takes quite some time, but it ensures nothing broke on package upgrades and no regression has been introduced. It is **not** part of the release process and is run manually by documentation maintainers. It does **not** check anything else but pages loading and showing content.
+
+## Caveats
+
+### File names
+
+For docs source files ( `mdx` ), do not use additional `.` characters in filename, as this will cause subtle errors building the page, possibly even causing 404 HTTP errors in certain circumstances, e.g. when reloading a page and/or call pages directly via URL instead of using navigation via react router. Examples:
+
+```
+mydocument.final.mxd -> mydocument_final.mxd
+```
+
+```
+newlibrary_v3.2.mxd -> newlibrary_v3_2.mxd
+```
