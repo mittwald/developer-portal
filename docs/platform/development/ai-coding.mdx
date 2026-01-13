@@ -22,16 +22,25 @@ The service offers several AI models optimized for different development tasks. 
 | IDE/Tool                                 | Integrations                                                                |
 | ---------------------------------------- | --------------------------------------------------------------------------- |
 | Jetbrains IDEs (IntelliJ, PHPStorm, ...) | [Continue](#continue), [Jetbrains AI](#jetbrains-ai)                        |
-| Visual Studio Code                       | [Continue](#continue), [Cline](#cline)                                      |
+| Visual Studio Code                       | [Continue](#continue), [Cline](#cline), [Kilo Code](#kilo-code)             |
 | Cursor                                   | [Cline](#cline)                                                             |
 | Windsurf                                 | [Cline](#cline)                                                             |
+| Zed                                      | [Zed](#zed)                                                                 |
 | CLI                                      | [Claude Code](#claude-code), [OpenCode](#opencode), [Kilo Code](#kilo-code) |
 
 ### Jetbrains AI (for Jetbrains IDEs, like IntelliJ, PHPStorm, WebStorm, ...) {#jetbrains-ai}
 
-To use the models, you need to set up a proxy service on your local machine to handle authentication and forward requests to the mittwald API.
+JetBrains AI Assistant supports OpenAI-compatible endpoints via Bring Your Own
+Key (BYOK). Configure it directly in the IDE:
 
-For detailed instructions on integrating the proxy with your IDE, refer to the [IDE integration section](https://github.com/mittwald/llm-proxy#ide-setup) in the project's README.
+1. Open `Settings | Tools | AI Assistant | Models & API keys`.
+2. Under "Third-party AI providers", select **OpenAI-compatible**.
+3. Enter your API key and the endpoint URL
+   `https://llm.aihosting.mittwald.de/v1`, then test the connection.
+4. (Optional) Enable "Tool calling" if the model should use MCP tools.
+
+Note: Some AI Assistant features may require a JetBrains AI subscription even
+when using third-party providers.
 
 ### Continue (for Visual Studio Code or Jetbrains IDEs) {#continue}
 
@@ -81,9 +90,47 @@ When configuring Cline via its UI, select the following options:
 - **OpenAI Compatible API Key**: Enter your LLM API key from the mStudio
 - **Model ID**: Enter `Devstral-Small-2-24B-Instruct-2512`
 
+### Zed (native LLM providers) {#zed}
+
+Zed supports OpenAI-compatible endpoints in its built-in Agent Panel.
+
+- Open Agent Panel settings (`agent: open settings`).
+- Under "LLM Providers", click "Add Provider" and choose "OpenAI API Compatible".
+- Use `mittwald` as the provider name, set the API URL to
+  `https://llm.aihosting.mittwald.de/v1`, and select
+  `Devstral-Small-2-24B-Instruct-2512`.
+
+You can also configure this in `settings.json`:
+
+```json
+{
+  "language_models": {
+    "openai_compatible": {
+      "mittwald": {
+        "api_url": "https://llm.aihosting.mittwald.de/v1",
+        "available_models": [
+          {
+            "name": "Devstral-Small-2-24B-Instruct-2512",
+            "display_name": "Devstral-Small-2-24B-Instruct-2512",
+            "max_tokens": 262144
+          }
+        ]
+      }
+    }
+  }
+}
+```
+
+Zed does not store API keys in `settings.json`. Set `MITTWALD_API_KEY` in your
+environment.
+
 ### Kilo Code (agentic coding) {#kilo-code}
 
-Kilo Code supports OpenAI-compatible providers. Configure Devstral as follows:
+Kilo Code is available as a Visual Studio Code extension and supports
+OpenAI-compatible providers. Configure Devstral as follows:
+
+- Install the extension from the
+  [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=kilocode.Kilo-Code).
 
 - Provider: OpenAI Compatible
 - Base URL: `https://llm.aihosting.mittwald.de/v1`
@@ -523,4 +570,4 @@ Third‑party tools, MCP servers and external links are provided for convenience
 
 ## Usage limits
 
-During the beta phase, each API key is limited to 300 requests per minute. The service is currently free while in beta, with full release expected in 2025.
+Usage limits are enforced by the booked tariff. Please look up your tariff and limits.

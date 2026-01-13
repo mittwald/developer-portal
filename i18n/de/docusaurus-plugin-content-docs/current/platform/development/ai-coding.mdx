@@ -22,16 +22,25 @@ Der Service bietet verschiedene KI-Modelle, die für unterschiedliche Entwicklun
 | IDE/Tool                                 | Integrationen                                                               |
 | ---------------------------------------- | --------------------------------------------------------------------------- |
 | Jetbrains IDEs (IntelliJ, PHPStorm, ...) | [Continue](#continue), [Jetbrains AI](#jetbrains-ai)                        |
-| Visual Studio Code                       | [Continue](#continue), [Cline](#cline)                                      |
+| Visual Studio Code                       | [Continue](#continue), [Cline](#cline), [Kilo Code](#kilo-code)             |
 | Cursor                                   | [Cline](#cline)                                                             |
 | Windsurf                                 | [Cline](#cline)                                                             |
+| Zed                                      | [Zed](#zed)                                                                 |
 | CLI                                      | [Claude Code](#claude-code), [OpenCode](#opencode), [Kilo Code](#kilo-code) |
 
 ### Jetbrains AI (für Jetbrains IDEs, wie IntelliJ, PHPStorm, WebStorm, ...) {#jetbrains-ai}
 
-Um die Modelle zu nutzen, musst du einen Proxy-Dienst auf deinem lokalen Rechner einrichten, der die Authentifizierung übernimmt und Anfragen an die mittwald-API weiterleitet.
+Der JetBrains AI Assistant unterstützt OpenAI-kompatible Endpunkte per
+Bring Your Own Key (BYOK). Konfiguriere ihn direkt in der IDE:
 
-Detaillierte Anweisungen zur Integration des Proxys in deine IDE findest du im [IDE-Setup-Abschnitt](https://github.com/mittwald/llm-proxy#ide-setup) der Projekt-README.
+1. Öffne `Settings | Tools | AI Assistant | Models & API keys`.
+2. Unter „Third-party AI providers“ **OpenAI-compatible** auswählen.
+3. API-Key und Endpunkt-URL
+   `https://llm.aihosting.mittwald.de/v1` eintragen und Verbindung testen.
+4. (Optional) „Tool calling“ aktivieren, wenn das Modell MCP-Tools nutzen soll.
+
+Hinweis: Einige AI-Assistant-Funktionen können trotz Drittanbieter-Setup eine
+JetBrains-AI-Subscription erfordern.
 
 ### Continue (für Visual Studio Code oder Jetbrains IDEs) {#continue}
 
@@ -81,9 +90,48 @@ Bei der Konfiguration von Cline über die Benutzeroberfläche wähle die folgend
 - **OpenAI Compatible API Key**: Gib deinen LLM-API-Schlüssel aus dem mStudio ein
 - **Model ID**: Gib `Devstral-Small-2-24B-Instruct-2512` ein
 
+### Zed (native LLM-Anbieter) {#zed}
+
+Zed unterstützt OpenAI-kompatible Endpunkte im integrierten Agent Panel.
+
+- Öffne die Agent-Panel-Einstellungen (`agent: open settings`).
+- Unter „LLM Providers“ auf „Add Provider“ klicken und „OpenAI API Compatible“
+  wählen.
+- Provider-Name `mittwald`, API-URL
+  `https://llm.aihosting.mittwald.de/v1`, Modell
+  `Devstral-Small-2-24B-Instruct-2512`.
+
+Du kannst das auch in `settings.json` konfigurieren:
+
+```json
+{
+  "language_models": {
+    "openai_compatible": {
+      "mittwald": {
+        "api_url": "https://llm.aihosting.mittwald.de/v1",
+        "available_models": [
+          {
+            "name": "Devstral-Small-2-24B-Instruct-2512",
+            "display_name": "Devstral-Small-2-24B-Instruct-2512",
+            "max_tokens": 262144
+          }
+        ]
+      }
+    }
+  }
+}
+```
+
+Zed speichert API-Keys nicht in `settings.json`. Setze `MITTWALD_API_KEY` in
+deiner Umgebung.
+
 ### Kilo Code (agentisches Coding) {#kilo-code}
 
-Kilo Code unterstützt OpenAI-kompatible Anbieter. Konfiguriere Devstral wie folgt:
+Kilo Code ist als Visual-Studio-Code-Extension verfügbar und unterstützt
+OpenAI-kompatible Anbieter. Konfiguriere Devstral wie folgt:
+
+- Installiere die Extension aus dem
+  [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=kilocode.Kilo-Code).
 
 - Provider: OpenAI Compatible
 - Base URL: `https://llm.aihosting.mittwald.de/v1`
@@ -523,4 +571,4 @@ Drittanbieter‑Tools, MCP‑Server und externe Links werden ohne Gewähr und oh
 
 ## Nutzungslimits
 
-Während der Beta-Phase ist jeder API-Schlüssel auf 300 Anfragen pro Minute begrenzt. Der Service ist derzeit kostenlos in der Beta-Phase, die vollständige Veröffentlichung ist für 2025 geplant.
+Nutzungslimits werden durch den jeweils gebuchten Tarif festgelegt. 
