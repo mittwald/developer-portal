@@ -44,7 +44,7 @@ export function generateSchemaExample(schema: OpenAPIV3.SchemaObject): any {
 
   if (schema.type === "string") {
     if (schema.format === "date-time") {
-      return new Date().toISOString();
+      return '1985-10-26T01:21:00.000Z';  // wait! i have a time machine!
     } else if (schema.format === "email" || schema.format === "idn-email") {
       return "email@mittwald.example";
     } else if (schema.format === "uuid") {
