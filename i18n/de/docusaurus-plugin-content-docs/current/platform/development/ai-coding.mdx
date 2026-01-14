@@ -19,18 +19,28 @@ Der Service bietet verschiedene KI-Modelle, die für unterschiedliche Entwicklun
 
 ### Übersicht
 
-| IDE                                      | Integrationen                                        |
-| ---------------------------------------- | ---------------------------------------------------- |
-| Jetbrains IDEs (IntelliJ, PHPStorm, ...) | [Continue](#continue), [Jetbrains AI](#jetbrains-ai) |
-| Visual Studio Code                       | [Continue](#continue), [Cline](#cline)               |
-| Cursor                                   | [Cline](#cline)                                      |
-| Windsurf                                 | [Cline](#cline)                                      |
+| IDE/Tool                                 | Integrationen                                                               |
+| ---------------------------------------- | --------------------------------------------------------------------------- |
+| Jetbrains IDEs (IntelliJ, PHPStorm, ...) | [Continue](#continue), [Jetbrains AI](#jetbrains-ai)                        |
+| Visual Studio Code                       | [Continue](#continue), [Cline](#cline), [Kilo Code](#kilo-code)             |
+| Cursor                                   | [Cline](#cline)                                                             |
+| Windsurf                                 | [Cline](#cline)                                                             |
+| Zed                                      | [Zed](#zed)                                                                 |
+| CLI                                      | [Claude Code](#claude-code), [OpenCode](#opencode), [Kilo Code](#kilo-code) |
 
 ### Jetbrains AI (für Jetbrains IDEs, wie IntelliJ, PHPStorm, WebStorm, ...) {#jetbrains-ai}
 
-Um die Modelle zu nutzen, musst du einen Proxy-Dienst auf deinem lokalen Rechner einrichten, der die Authentifizierung übernimmt und Anfragen an die mittwald-API weiterleitet.
+Der JetBrains AI Assistant unterstützt OpenAI-kompatible Endpunkte per
+Bring Your Own Key (BYOK). Konfiguriere ihn direkt in der IDE:
 
-Detaillierte Anweisungen zur Integration des Proxys in deine IDE findest du im [IDE-Setup-Abschnitt](https://github.com/mittwald/llm-proxy#ide-setup) der Projekt-README.
+1. Öffne `Settings | Tools | AI Assistant | Models & API keys`.
+2. Unter „Third-party AI providers“ **OpenAI-compatible** auswählen.
+3. API-Key und Endpunkt-URL
+   `https://llm.aihosting.mittwald.de/v1` eintragen und Verbindung testen.
+4. (Optional) „Tool calling“ aktivieren, wenn das Modell MCP-Tools nutzen soll.
+
+Hinweis: Einige AI-Assistant-Funktionen können trotz Drittanbieter-Setup eine
+JetBrains-AI-Subscription erfordern.
 
 ### Continue (für Visual Studio Code oder Jetbrains IDEs) {#continue}
 
@@ -41,16 +51,16 @@ Installiere zuerst das Plugin für deine IDE:
 - [Jetbrains IDEs](https://plugins.jetbrains.com/plugin/22707-continue)
 - [Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=Continue.continue)
 
-Modelle werden normalerweise in der `config.yaml`-Datei konfiguriert (normalerweise im `~/.continue/`-Verzeichnis in deinem Home-Verzeichnis zu finden). Du kannst die mittwald-Modelle (`Qwen3-Coder-30B-Instruct` funktioniert gut für Code-Generierung) mit der folgenden Konfiguration einrichten:
+Modelle werden normalerweise in der `config.yaml`-Datei konfiguriert (normalerweise im `~/.continue/`-Verzeichnis in deinem Home-Verzeichnis zu finden). Du kannst die mittwald-Modelle (`Devstral-Small-2-24B-Instruct-2512` funktioniert gut für Code-Generierung) mit der folgenden Konfiguration einrichten:
 
 ```yaml
 name: mittwald
 version: 1.0.0
 schema: v1
 models:
-  - name: Qwen3-Coder-30B-Instruct
+  - name: Devstral-Small-2-24B-Instruct-2512
     provider: openai
-    model: Qwen3-Coder-30B-Instruct
+    model: Devstral-Small-2-24B-Instruct-2512
     apiBase: https://llm.aihosting.mittwald.de/v1
     apiKey: <API-SCHLÜSSEL-EINFÜGEN>
     roles:
@@ -78,8 +88,487 @@ Bei der Konfiguration von Cline über die Benutzeroberfläche wähle die folgend
 - **API Provider**: Wähle "OpenAI Compatible"
 - **Base URL**: Gib `https://llm.aihosting.mittwald.de/v1` ein
 - **OpenAI Compatible API Key**: Gib deinen LLM-API-Schlüssel aus dem mStudio ein
-- **Model ID**: Gib `Qwen3-Coder-30B-Instruct` ein
+- **Model ID**: Gib `Devstral-Small-2-24B-Instruct-2512` ein
+
+### Zed (native LLM-Anbieter) {#zed}
+
+Zed unterstützt OpenAI-kompatible Endpunkte im integrierten Agent Panel.
+
+- Öffne die Agent-Panel-Einstellungen (`agent: open settings`).
+- Unter „LLM Providers“ auf „Add Provider“ klicken und „OpenAI API Compatible“
+  wählen.
+- Provider-Name `mittwald`, API-URL
+  `https://llm.aihosting.mittwald.de/v1`, Modell
+  `Devstral-Small-2-24B-Instruct-2512`.
+
+Du kannst das auch in `settings.json` konfigurieren:
+
+```json
+{
+  "language_models": {
+    "openai_compatible": {
+      "mittwald": {
+        "api_url": "https://llm.aihosting.mittwald.de/v1",
+        "available_models": [
+          {
+            "name": "Devstral-Small-2-24B-Instruct-2512",
+            "display_name": "Devstral-Small-2-24B-Instruct-2512",
+            "max_tokens": 262144
+          }
+        ]
+      }
+    }
+  }
+}
+```
+
+Zed speichert API-Keys nicht in `settings.json`. Setze `MITTWALD_API_KEY` in
+deiner Umgebung.
+
+### Kilo Code (agentisches Coding) {#kilo-code}
+
+Kilo Code ist als Visual-Studio-Code-Extension verfügbar und unterstützt
+OpenAI-kompatible Anbieter. Konfiguriere Devstral wie folgt:
+
+- Installiere die Extension aus dem
+  [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=kilocode.Kilo-Code).
+
+- Provider: OpenAI Compatible
+- Base URL: `https://llm.aihosting.mittwald.de/v1`
+- API Key: dein LLM-API-Schlüssel aus dem mStudio
+- Modell: `Devstral-Small-2-24B-Instruct-2512`
+
+Beispiel-Umgebung:
+
+```sh
+export OPENAI_API_KEY=sk-...
+export OPENAI_BASE_URL=https://llm.aihosting.mittwald.de/v1
+```
+
+Wähle anschließend Devstral in Kilo Codes Modell-Auswahl für Agent-Aufgaben.
+
+### OpenCode (agentisches Coding) {#opencode}
+
+OpenCode unterstützt OpenAI-kompatible Anbieter. Konfiguration über Umgebung oder Config-Datei:
+
+- Provider: OpenAI Compatible
+- Base URL: `https://llm.aihosting.mittwald.de/v1`
+- API Key: dein LLM-API-Schlüssel aus dem mStudio
+- Modell: `Devstral-Small-2-24B-Instruct-2512`
+
+Beispiel-Umgebung:
+
+```sh
+export OPENAI_API_KEY=sk-...
+export OPENAI_BASE_URL=https://llm.aihosting.mittwald.de/v1
+export OPENAI_MODEL=Devstral-Small-2-24B-Instruct-2512
+```
+
+Für detaillierte Konfiguration einschließlich MCP-Server siehe den [CLI-Coding-Tools-Leitfaden](/docs/v2/platform/development/cli-coding-tools#opencode-cli).
+
+### Continue: MCP-Server
+
+Continue kann über das Model Context Protocol (MCP) kontrollierten Zugriff auf externe Tools und Services erhalten.
+
+MCP-Server in `~/.continue/config.yaml` hinzufügen:
+
+```yaml
+mcpServers:
+  # Context7: Aktuelle Bibliotheksdokumentation
+  context7:
+    command: npx
+    args: ["-y", "@context7/mcp-server", "--stdio"]
+    env: { CONTEXT7_API_KEY: "dein-context7-api-key" }
+
+  # Brave Search: Web-Suche mit Datenschutz-Fokus
+  brave-search:
+    command: npx
+    args: ["-y", "@modelcontextprotocol/server-brave-search", "--stdio"]
+    env: { BRAVE_API_KEY: "dein-brave-api-key" }
+
+  # PostgreSQL: Datenbankabfragen und Schema-Inspektion
+  postgres:
+    command: npx
+    args: ["-y", "@modelcontextprotocol/server-postgres", "--stdio"]
+    env:
+      POSTGRES_CONNECTION_STRING: "postgresql://user:pass@localhost:5432/dbname"
+
+  # Directus: Headless CMS Datenverwaltung
+  directus:
+    command: npx
+    args: ["-y", "@directus/content-mcp", "--stdio"]
+    env:
+      DIRECTUS_URL: "https://deine-directus-instanz.com"
+      DIRECTUS_TOKEN: "dein-directus-token"
+
+  # OpenSearch: Such- und Analyse-Engine
+  opensearch:
+    command: npx
+    args: ["-y", "@opensearch-project/mcp-server", "--stdio"]
+    env:
+      OPENSEARCH_URL: "https://localhost:9200"
+      OPENSEARCH_USERNAME: "admin"
+      OPENSEARCH_PASSWORD: "admin"
+
+  # Apache Solr: Enterprise-Suchplattform
+  solr:
+    command: uvx
+    args: ["solr-mcp"]
+    env:
+      SOLR_URL: "http://localhost:8983/solr"
+
+  # TYPO3: CMS-Content und Backend-Verwaltung (benötigt mittwald CLI)
+  typo3:
+    command: mw
+    args:
+      [
+        "app",
+        "exec",
+        "--quiet",
+        "--installation-id=a-XXXXX",
+        "vendor/bin/typo3 mcp:server",
+      ]
+```
+
+**Context7** stellt aktuelle Dokumentation für beliebte Bibliotheken und Frameworks bereit und stellt sicher, dass das Modell Zugriff auf die neuesten API-Änderungen und Best Practices hat.
+
+**Brave Search** ermöglicht Web-Suchfunktionen mit starkem Datenschutz, nützlich für das Finden aktueller Lösungen, Dokumentationen oder zur Überprüfung aktueller Informationen.
+
+**PostgreSQL MCP** ermöglicht sichere Datenbank-Inspektion und Abfragen und hilft bei Schema-Design, Abfrage-Optimierung und Datenanalyse.
+
+**Directus MCP** bietet KI-Assistenten kontrollierten Zugriff auf dein Directus CMS und ermöglicht Content-Erstellung, Updates, Abfragen von Collections und Asset-Management durch natürliche Sprache. Ideal für Content-Editoren und Datenanalysten.
+
+**OpenSearch MCP** ermöglicht KI-Assistenten die Interaktion mit OpenSearch-Clustern, um Operationen wie das Durchsuchen von Indizes, Abrufen von Mappings, Analysieren der Cluster-Gesundheit und Verwalten von Shards über das Model Context Protocol durchzuführen.
+
+**Apache Solr MCP** ermöglicht der KI, leistungsstarke hybride Suchabfragen gegen Solr-Indizes durchzuführen, die sowohl Keyword- als auch Vektorsuche für Enterprise-Suchanwendungen kombinieren.
+
+**TYPO3 MCP** bietet KI-Assistenten kontrollierten Zugriff auf deine TYPO3-CMS-Installation und ermöglicht Content-Management, Seitenoperationen und Backend-Automatisierung durch natürliche Sprache. Verwendet den Befehl [`mw app exec`](/docs/v2/cli/reference/app#mw-app-exec-command) der [mittwald CLI](/docs/v2/cli) für die Verbindung via STDIO-Transport. Ersetze `a-XXXXX` durch deine TYPO3-App-Installations-ID (finden via `mw app list`). Benötigt das Composer-Paket [hn/typo3-mcp-server](https://github.com/hn/typo3-mcp-server), das in deiner TYPO3-Instanz installiert sein muss. **Hinweis:** Umgeht derzeit die TYPO3-Backend-Zugriffskontrollen und funktioniert nur mit lokalen MCP-Clients aufgrund von Plattformbeschränkungen bei der `.well-known/` OAuth-Discovery.
+
+Bitte den Assistenten explizit, ein Tool zu nutzen (z. B. „nutze Brave Search, um aktuelle Informationen über ... zu finden" oder „durchsuche unseren Solr-Index nach Dokumenten über ..."). Beschränke den Zugriff stets eng und überprüfe Datenzugriffe oder Änderungen.
+
+### Kilo Code: MCP-Server
+
+Kilo Code kann ebenfalls MCP-Server verwenden. Füge sie über die Einstellungen (Tools → Add MCP Server) oder in der Konfigurationsdatei hinzu.
+
+**Empfohlene SOTA MCP-Server:**
+
+| Server           | Zweck                             | Installation                                                                  |
+| ---------------- | --------------------------------- | ----------------------------------------------------------------------------- |
+| **Context7**     | Aktuelle Bibliotheksdokumentation | `npx -y @context7/mcp-server --stdio`                                         |
+| **Brave Search** | Datenschutzfreundliche Web-Suche  | `npx -y @modelcontextprotocol/server-brave-search --stdio`                    |
+| **PostgreSQL**   | Datenbank-Inspektion & Abfragen   | `npx -y @modelcontextprotocol/server-postgres --stdio`                        |
+| **Directus**     | Headless CMS & Content-Management | `npx -y @directus/content-mcp --stdio`                                        |
+| **OpenSearch**   | Such- & Analyse-Engine            | `npx -y @opensearch-project/mcp-server --stdio`                               |
+| **Apache Solr**  | Enterprise-Suchplattform          | `uvx solr-mcp` (Python)                                                       |
+| **TYPO3**        | TYPO3-CMS-Verwaltung              | `mw app exec --quiet --installation-id=a-XXXXX "vendor/bin/typo3 mcp:server"` |
+
+**Konfigurationsbeispiel:**
+
+```json
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@context7/mcp-server", "--stdio"],
+      "env": { "CONTEXT7_API_KEY": "dein-schlüssel" }
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search", "--stdio"],
+      "env": { "BRAVE_API_KEY": "dein-schlüssel" }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "--stdio"],
+      "env": { "POSTGRES_CONNECTION_STRING": "postgresql://..." }
+    },
+    "directus": {
+      "command": "npx",
+      "args": ["-y", "@directus/content-mcp", "--stdio"],
+      "env": {
+        "DIRECTUS_URL": "https://deine-directus-instanz.com",
+        "DIRECTUS_TOKEN": "dein-directus-token"
+      }
+    },
+    "opensearch": {
+      "command": "npx",
+      "args": ["-y", "@opensearch-project/mcp-server", "--stdio"],
+      "env": {
+        "OPENSEARCH_URL": "https://localhost:9200",
+        "OPENSEARCH_USERNAME": "admin",
+        "OPENSEARCH_PASSWORD": "admin"
+      }
+    },
+    "solr": {
+      "command": "uvx",
+      "args": ["solr-mcp"],
+      "env": {
+        "SOLR_URL": "http://localhost:8983/solr"
+      }
+    },
+    "typo3": {
+      "command": "mw",
+      "args": [
+        "app",
+        "exec",
+        "--quiet",
+        "--installation-id=a-XXXXX",
+        "vendor/bin/typo3 mcp:server"
+      ]
+    }
+  }
+}
+```
+
+**Best Practices für Sicherheit:**
+
+- Zugriff eng eingrenzen (spezifische Datenbanken, Domains, Pfade)
+- Alle Tool-Aufrufe zu Audit-Zwecken protokollieren
+- Niedrige Temperatur (≤ 0,2) für Tool-Planung nutzen, um Halluzinationen zu reduzieren
+- Diffs und Abfragen vor der Ausführung überprüfen
+- Wenn möglich, mit read-only Zugriff starten
+
+### MCP-Server-Links
+
+- Model Context Protocol: https://modelcontextprotocol.io/
+- Context7 MCP: https://www.npmjs.com/package/@context7/mcp-server
+- Brave Search MCP: https://www.npmjs.com/package/@modelcontextprotocol/server-brave-search
+- PostgreSQL MCP: https://www.npmjs.com/package/@modelcontextprotocol/server-postgres
+- Directus MCP: https://www.npmjs.com/package/@directus/content-mcp
+- OpenSearch MCP: https://github.com/opensearch-project/opensearch-mcp-server-py
+- Apache Solr MCP: https://github.com/allenday/solr-mcp
+- TYPO3 MCP: https://github.com/hn/typo3-mcp-server
+- MCP-Server-Registry: https://github.com/modelcontextprotocol/servers
+
+### Kilo Code: Web-Fetch & Browsing
+
+Kilo Code kann (falls in deinem Setup aktiviert) ein Web-Fetch-/Browsing-Tool verwenden, um externe Seiten abzurufen und zusammenzufassen.
+
+- Aktiviere das Web-/Browsing-Tool in den Kilo-Code-Einstellungen bzw. in der Tool-Liste.
+- Bevorzuge öffentliche URLs (ohne Auth) und gib die exakten Ziel-Links in deinem Prompt an.
+- Halte den Netzwerkscope klein: eine einzelne Seite oder geringe Tiefe; bitte den Agenten, Quellen zu zitieren.
+
+Prompt-Muster
+
+- „Rufe https://example.com/spec ab und fasse die wichtigsten Endpunkte in 10 Stichpunkten zusammen. Mit kanonischen Links."
+- „Öffne https://huggingface.co/mistralai/Ministral-3-14B-Instruct-2512 und extrahiere Kontextlänge, Modalitäten und Lizenz. Als JSON zurückgeben."
+
+Tipps
+
+- Bitte den Agenten, neben jeder Aussage die Quell-URL zu nennen.
+- Für faktenbasierte Extraktion deterministisch samplen: `temperature <= 0.2`.
+- Bei langen Seiten erst ein Inhaltsverzeichnis erstellen lassen und dann abschnittsweise (per Anker) vertiefen.
+
+### Claude Code (CLI): Vollständige Konfiguration {#claude-code}
+
+[Claude Code](https://github.com/anthropics/claude-code) ist Anthropics offizielles CLI-Tool für agentisches Coding. Um es mit mittwalds AI-Hosting zu nutzen, konfiguriere es als OpenAI-kompatiblen Anbieter.
+
+**Installation:**
+
+```sh
+# Claude Code CLI installieren
+npm install -g @anthropic/claude-code
+
+# Oder npx verwenden (keine Installation erforderlich)
+npx @anthropic/claude-code
+```
+
+**Konfiguration:**
+
+Claude Code verwendet eine Konfigurationsdatei unter `~/.config/claude-code/settings.json` (oder `%APPDATA%\claude-code\settings.json` unter Windows).
+
+```json
+{
+  "apiProvider": "openai-compatible",
+  "baseURL": "https://llm.aihosting.mittwald.de/v1",
+  "apiKey": "sk-dein-mittwald-api-key",
+  "model": "Devstral-Small-2-24B-Instruct-2512",
+  "temperature": 0.15,
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@context7/mcp-server", "--stdio"],
+      "env": {
+        "CONTEXT7_API_KEY": "dein-context7-api-key"
+      }
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search", "--stdio"],
+      "env": {
+        "BRAVE_API_KEY": "dein-brave-api-key"
+      }
+    }
+  },
+  "webFetch": {
+    "enabled": true,
+    "maxDepth": 2,
+    "followRedirects": true,
+    "timeout": 10000
+  }
+}
+```
+
+**Umgebungsvariablen (Alternative):**
+
+```sh
+# Über Umgebungsvariablen setzen
+export CLAUDE_CODE_API_PROVIDER=openai-compatible
+export CLAUDE_CODE_BASE_URL=https://llm.aihosting.mittwald.de/v1
+export CLAUDE_CODE_API_KEY=sk-dein-mittwald-api-key
+export CLAUDE_CODE_MODEL=Devstral-Small-2-24B-Instruct-2512
+
+# Claude Code ausführen
+claude-code "refactoriere das Authentifizierungsmodul"
+```
+
+**MCP-Server-Setup für Claude Code:**
+
+MCP-Konfiguration in `~/.config/claude-code/mcp.json` erstellen:
+
+```json
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@context7/mcp-server", "--stdio"],
+      "env": {
+        "CONTEXT7_API_KEY": "dein-context7-api-key"
+      }
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search", "--stdio"],
+      "env": {
+        "BRAVE_API_KEY": "dein-brave-api-key"
+      }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "--stdio"],
+      "env": {
+        "POSTGRES_CONNECTION_STRING": "postgresql://user:password@localhost:5432/dbname"
+      }
+    },
+    "directus": {
+      "command": "npx",
+      "args": ["-y", "@directus/content-mcp", "--stdio"],
+      "env": {
+        "DIRECTUS_URL": "https://deine-directus-instanz.com",
+        "DIRECTUS_TOKEN": "dein-directus-token"
+      }
+    },
+    "opensearch": {
+      "command": "npx",
+      "args": ["-y", "@opensearch-project/mcp-server", "--stdio"],
+      "env": {
+        "OPENSEARCH_URL": "https://localhost:9200",
+        "OPENSEARCH_USERNAME": "admin",
+        "OPENSEARCH_PASSWORD": "admin"
+      }
+    },
+    "solr": {
+      "command": "uvx",
+      "args": ["solr-mcp"],
+      "env": {
+        "SOLR_URL": "http://localhost:8983/solr"
+      }
+    },
+    "typo3": {
+      "command": "mw",
+      "args": [
+        "app",
+        "exec",
+        "--quiet",
+        "--installation-id=a-XXXXX",
+        "vendor/bin/typo3 mcp:server"
+      ]
+    }
+  }
+}
+```
+
+**WebFetch-Konfiguration:**
+
+Claude Code unterstützt integrierte Web-Fetching-Funktionen. Konfiguration in `settings.json`:
+
+```json
+{
+  "webFetch": {
+    "enabled": true,
+    "allowedDomains": [
+      "github.com",
+      "stackoverflow.com",
+      "docs.python.org",
+      "developer.mozilla.org"
+    ],
+    "blockedDomains": [],
+    "maxDepth": 2,
+    "followRedirects": true,
+    "timeout": 10000,
+    "userAgent": "ClaudeCode/1.0",
+    "maxContentLength": 1048576
+  }
+}
+```
+
+**WebFetch-Verwendungsbeispiele:**
+
+```sh
+# API-Dokumentation abrufen und analysieren
+claude-code "rufe https://api.github.com/docs ab und fasse die Authentifizierungsmethoden zusammen"
+
+# Implementierungen vergleichen
+claude-code "rufe https://github.com/user/repo/blob/main/auth.py ab und vergleiche mit unserer aktuellen auth.py-Implementierung"
+
+# Best Practices recherchieren
+claude-code "rufe https://docs.python.org/3/library/asyncio.html ab und hilf mir, unseren Code für async/await umzuschreiben"
+```
+
+**WebFetch-Verhalten feinabstimmen:**
+
+```json
+{
+  "webFetch": {
+    "enabled": true,
+    "allowedDomains": ["*.github.com", "docs.*", "*.readthedocs.io"],
+    "maxDepth": 1,
+    "extractionRules": {
+      "removeSelectors": [".sidebar", ".footer", "nav"],
+      "focusSelectors": ["article", "main", ".documentation"]
+    },
+    "caching": {
+      "enabled": true,
+      "ttl": 3600
+    }
+  }
+}
+```
+
+**Tipps für Claude Code:**
+
+- Nutze das `--verbose`-Flag, um detaillierte MCP-Server-Kommunikation zu sehen
+- Nutze `--dry-run`, um Änderungen vor dem Anwenden in der Vorschau anzuzeigen
+- Setze `temperature: 0.1-0.2` für deterministische Code-Bearbeitungen
+- Nutze Streaming-Modus für große Refactorings: `--stream`
+- Aktiviere Audit-Logging: `"auditLog": { "enabled": true, "path": "~/.claude-code/audit.log" }`
+
+## Modellauswahl
+
+- Ministral-3-14B-Instruct-2512: Chat + Vision, allgemeine Assistenten, multimodale UX.
+- Devstral-Small-2-24B-Instruct-2512: Agentisches Coding, Tool-Use, Multi-File-Edits; unterstützt Vision.
+
+## Long-Context-Tipps (256k)
+
+- Sende nicht das gesamte Repository; nur relevante Dateien/Funktionsinhalte.
+- Fasse vorherige Schritte zusammen und nutze IDs/Anker zur Kontextrekonstruktion.
+- Nutze Streaming; `max_tokens` nur erhöhen, wenn nötig.
+- Für Tools und Edits deterministisch samplen: `temperature <= 0.2`.
+
+## Haftungsausschluss
+
+Drittanbieter‑Tools, MCP‑Server und externe Links werden ohne Gewähr und ohne Empfehlung bereitgestellt. Nutzung auf eigenes Risiko; prüfe Lizenzen und Datenschutzhinweise und setze Zugriffe restriktiv (Least Privilege). Sende keine sensiblen Daten an externe Dienste, sofern nicht erforderlich und zulässig.
 
 ## Nutzungslimits
 
-Während der Beta-Phase ist jeder API-Schlüssel auf 300 Anfragen pro Minute begrenzt. Der Service ist derzeit kostenlos in der Beta-Phase, die vollständige Veröffentlichung ist für 2025 geplant.
+Nutzungslimits werden durch den jeweils gebuchten Tarif festgelegt. 

@@ -34,8 +34,8 @@ Es wird ein Dictionary mit einer Liste von verfügbaren Modellen zurückgeliefer
 curl -i -X POST https://llm.aihosting.mittwald.de/v1/chat/completions \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $APIKEY" \
-    -d '{ 
-        "model": "Mistral-Small-3.2-24B-Instruct",
+    -d '{
+        "model": "Ministral-3-14B-Instruct-2512",
         "messages": [
             {
                 "role": "user",
@@ -54,8 +54,8 @@ Für eine Stream-Response muss die Option `stream: true` gesetzt werden.
 curl -i -N -X POST https://llm.aihosting.mittwald.de/v1/chat/completions \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $APIKEY" \
-    -d '{ 
-        "model": "Mistral-Small-3.2-24B-Instruct",
+    -d '{
+        "model": "Ministral-3-14B-Instruct-2512",
         "messages": [
             {
                 "role": "user",
@@ -68,6 +68,54 @@ curl -i -N -X POST https://llm.aihosting.mittwald.de/v1/chat/completions \
         "top_p": 0.5
     }'
 ```
+
+### Vision (Bild + Text)
+
+```sh
+curl -i -X POST https://llm.aihosting.mittwald.de/v1/chat/completions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $APIKEY" \
+    -d '{
+        "model": "Ministral-3-14B-Instruct-2512",
+        "messages": [{
+          "role": "user",
+          "content": [
+            {"type": "text", "text": "Was ist auf diesem Bild?"},
+            {"type": "image_url", "image_url": {"url": "https://example.com/photo.jpg"}}
+          ]
+        }],
+        "temperature": 0.1
+    }'
+```
+
+### Function Calling (Tools)
+
+Das Modell kann Funktionen/Tools aufrufen, die du definierst. Die API gibt den Funktionsnamen und die Argumente zurück, die aufgerufen werden sollen - du musst die eigentliche Funktion selbst implementieren und ausführen.
+
+```sh
+curl -i -X POST https://llm.aihosting.mittwald.de/v1/chat/completions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $APIKEY" \
+    -d '{
+      "model": "Devstral-Small-2-24B-Instruct-2512",
+      "messages": [{"role": "user", "content": "Wetter in Berlin?"}],
+      "tools": [{
+        "type": "function",
+        "function": {
+          "name": "get_weather",
+          "description": "Aktuelles Wetter abrufen",
+          "parameters": {
+            "type": "object",
+            "properties": {"city": {"type": "string"}},
+            "required": ["city"]
+          }
+        }
+      }],
+      "tool_choice": "auto"
+    }'
+```
+
+**Wichtig**: Die Funktion `get_weather` (oder jedes andere Tool, das du definierst) muss in deiner Anwendung implementiert werden. Die API teilt dir nur mit, welche Funktion mit welchen Argumenten aufgerufen werden soll - du bist dafür verantwortlich, die Funktion auszuführen und die Ergebnisse bei Bedarf an das Modell zurückzugeben.
 
 ## /v1/responses (experimentell)
 
@@ -82,10 +130,10 @@ curl -i -X POST https://llm.aihosting.mittwald.de/v1/responses \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $APIKEY" \
     -d '{
-        "model": "Mistral-Small-3.2-24B-Instruct",
+        "model": "Ministral-3-14B-Instruct-2512",
         "input": "Erkläre den Zweck dieses experimentellen Endpunkts."
     }'
-````
+```
 
 Die Antwort enthält den generierten Text sowie Metadaten.
 Da der Endpunkt noch in Entwicklung ist, können einzelne Felder fehlen oder abweichend umgesetzt sein.
@@ -97,7 +145,7 @@ curl -i -N -X POST https://llm.aihosting.mittwald.de/v1/responses \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $APIKEY" \
     -d '{
-        "model": "Mistral-Small-3.2-24B-Instruct",
+        "model": "Ministral-3-14B-Instruct-2512",
         "input": "Sende eine kurze gestreamte Nachricht.",
         "stream": true,
         "temperature": 0.2,
@@ -116,7 +164,7 @@ Mit dieser Route können Embeddings für Texte erstellt werden.
 curl -i -X POST https://llm.aihosting.mittwald.de/v1/embeddings \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $APIKEY" \
-    -d '{ 
+    -d '{
         "model": "Qwen3-Embedding-8B",
         "input": "Ein wichtiges Dokument"
     }'
@@ -158,4 +206,3 @@ curl -X POST https://llm.aihosting.mittwald.de/v1/audio/transcriptions \
 - Übersetzungsfunktion (`to_language`-Parameter) wird nicht unterstützt
 - Für beste Ergebnisse sollte der `language`-Parameter immer explizit angegeben werden
 - Segmentiere große Audiodateien bei Bedarf in Teile kleiner als 25 MB
-

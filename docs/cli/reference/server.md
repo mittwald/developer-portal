@@ -1,10 +1,6 @@
-`mw server`
-===========
+# `mw server`
 
 Manage your servers
-
-
-
 
 ## `mw server get [SERVER-ID]`
 

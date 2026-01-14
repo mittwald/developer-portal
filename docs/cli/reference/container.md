@@ -1,23 +1,6 @@
-`mw container`
-==============
+# `mw container`
 
 Manage containers
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ## `mw container cp SOURCE DEST`
 

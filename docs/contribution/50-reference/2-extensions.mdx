@@ -13,20 +13,20 @@ For more information about the individual attributes, see [which information an 
   schema={{
     type: "object",
     required: [
-        "id",
-        "name",
-        "contributorId",
-        "context",
-        "createdAt",
-        "description",
-        "scopes",
-        "assets",
-        "logoRefId",
-        "published",
-        "statistics",
-        "subTitle",
-        "support",
-        "tags"
+      "id",
+      "name",
+      "contributorId",
+      "context",
+      "createdAt",
+      "description",
+      "scopes",
+      "assets",
+      "logoRefId",
+      "published",
+      "statistics",
+      "subTitle",
+      "support",
+      "tags",
     ],
     properties: {
       id: {
@@ -214,15 +214,16 @@ For more information about the individual attributes, see [which information an 
         type: "array",
         items: {
           type: "object",
-          properties:{
+          properties: {
             index: {
               type: "object",
               required: ["url"],
               properties: {
                 name: {
                   type: "string",
-                  description: "The name the frontend will have in the list of Extension Frontends",
-                  example: "Example"
+                  description:
+                    "The name the frontend will have in the list of Extension Frontends",
+                  example: "Example",
                 },
                 url: {
                   type: "string",
@@ -233,7 +234,7 @@ For more information about the individual attributes, see [which information an 
                 },
               },
             },
-          }
+          },
         },
       },
       support: {
@@ -253,9 +254,10 @@ For more information about the individual attributes, see [which information an 
           },
           inherited: {
             type: "boolean",
-            description: "Weather the provided support information was inherited from the conrtributor",
-            example: false
-          }
+            description:
+              "Weather the provided support information was inherited from the conrtributor",
+            example: false,
+          },
         },
       },
       tags: {
@@ -268,25 +270,25 @@ For more information about the individual attributes, see [which information an 
       },
       published: {
         type: "boolean",
-        description: "Weather this Extension has been published"
+        description: "Weather this Extension has been published",
       },
       verificationRequested: {
         type: "boolean",
-        description: "Weather verification of the Extension has been requested"
+        description: "Weather verification of the Extension has been requested",
       },
       verified: {
         type: "boolean",
-        description: "Weather the Extension has been verified"
+        description: "Weather the Extension has been verified",
       },
       logoRefId: {
         type: "string",
         format: "uuid",
         description: "The fileId of the the Logo",
-        example: "9b2af58a-2625-41eb-adc6-bb6f7be9b90a"
+        example: "9b2af58a-2625-41eb-adc6-bb6f7be9b90a",
       },
       functional: {
         type: "boolean",
-        description: "weather the extension is functional"
+        description: "weather the extension is functional",
       },
       assets: {
         type: "array",
@@ -294,24 +296,25 @@ For more information about the individual attributes, see [which information an 
           type: "object",
           required: ["id", "index", "assetType"],
           properties: {
-            id:{
+            id: {
               type: "string",
               format: "uuid",
               description: "The fileId of the asset",
-              example: "709049e1-f283-4ef8-a35b-1b2f672852b0"
+              example: "709049e1-f283-4ef8-a35b-1b2f672852b0",
             },
-            index:{
+            index: {
               type: "integer",
-              description: "The index of the asset. Does not have to be successive. Can be used to order the assets.",
-              example: 1
+              description:
+                "The index of the asset. Does not have to be successive. Can be used to order the assets.",
+              example: 1,
             },
-            assetType:{
+            assetType: {
               type: "string",
               enum: ["image", "video"],
-              example: "image"
-            }
-          }
-        }
+              example: "image",
+            },
+          },
+        },
       },
       secrets: {
         type: "array",
@@ -321,36 +324,39 @@ For more information about the individual attributes, see [which information an 
             secretId: {
               type: "string",
               format: "uuid",
-              example: "6b87abc1-f0fd-4518-a21e-7c8bca3c7c25"
+              example: "6b87abc1-f0fd-4518-a21e-7c8bca3c7c25",
             },
-            usableUntil:{
+            usableUntil: {
               type: "string",
-              format: "date-time"
-            }
-          }
-        }
+              format: "date-time",
+            },
+          },
+        },
       },
       frontendFragments: {
         type: "object",
-        description: "This is a map of anchros to urls. The key of the map is the anchor of a frontend fragment.",
+        description:
+          "This is a map of anchros to urls. The key of the map is the anchor of a frontend fragment.",
         additionalProperties: {
-          description:"The URL of the frontend fragment and additional properties for display in the mStudio.",
+          description:
+            "The URL of the frontend fragment and additional properties for display in the mStudio.",
           type: "object",
           properties: {
-            "additionalProperties": {
+            additionalProperties: {
               type: "object",
               additionalProperties: {
                 type: "string",
-                description:"Some Information needed for the mStudio like the icon.",
+                description:
+                  "Some Information needed for the mStudio like the icon.",
               },
             },
             url: {
               type: "string",
               format: "uri",
-              example: "The URL of the frontend fragment."
-            }
-          }
-        }
+              example: "The URL of the frontend fragment.",
+            },
+          },
+        },
       },
       extensionStatistics: {
         type: "object",
@@ -358,15 +364,16 @@ For more information about the individual attributes, see [which information an 
           amountOfInstances: {
             type: "integer",
             example: "42",
-            description: "The amount of instances for this extension. Accurate for the Contributor. Publicly rounded to the next lower hundred."
-          }
-        }
+            description:
+              "The amount of instances for this extension. Accurate for the Contributor. Publicly rounded to the next lower hundred.",
+          },
+        },
       },
       pricing: {
         type: "array",
         items: {
           type: "object",
-          required: [ "priceInCents", "variantKey" ],
+          required: ["priceInCents", "variantKey"],
           properties: {
             priceInCents: {
               type: "integer",
@@ -376,53 +383,55 @@ For more information about the individual attributes, see [which information an 
             },
             variantKey: {
               type: "string",
-              description: "Identifier of the pricing variant."
+              description: "Identifier of the pricing variant.",
             },
             name: {
               type: "string",
               description: "Name of the pricing variant.",
-              maxLength: 80
+              maxLength: 80,
             },
             description: {
               type: "string",
               description: "description of the provided services",
-              maxLength: 300
+              maxLength: 300,
             },
             isBookingStopped: {
               type: "boolean",
               description: "Weather the Variant can be installed",
-              example: false
-            }
-          }
-        }
+              example: false,
+            },
+          },
+        },
       },
       pricingDetails: {
         type: "object",
-        description: "The details section of the price plan. It informs if choosing different variants as a upgrade or downgrade is possible.",
+        description:
+          "The details section of the price plan. It informs if choosing different variants as a upgrade or downgrade is possible.",
         required: ["isUpgradeAllowed", "isDowngradeAllowed"],
         properties: {
           isUpgradeAllowed: {
             type: "boolean",
-            description: "Weather upgrading to a different variant is allowed"
+            description: "Weather upgrading to a different variant is allowed",
           },
           isDowngradeAllowed: {
             type: "boolean",
-            description: "Weather downgrading to a different variant is allowed"
-          }
-        }
+            description:
+              "Weather downgrading to a different variant is allowed",
+          },
+        },
       },
       requestedChanges: {
         type: "object",
         properties: {
-          context:{
+          context: {
             type: "string",
-            enum: ["project", "customer"]
+            enum: ["project", "customer"],
           },
           scopes: {
             type: "array",
             items: {
-              type: "string"
-            }
+              type: "string",
+            },
           },
           webhookUrls: {
             type: "object",
@@ -500,9 +509,10 @@ For more information about the individual attributes, see [which information an 
                 },
               },
             },
-          }, 
+          },
         },
-        description: "Requested Changes which have to be revied by a Mittwald Employee."
+        description:
+          "Requested Changes which have to be revied by a Mittwald Employee.",
       },
     },
   }}

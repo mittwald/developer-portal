@@ -1,0 +1,218 @@
+---
+sidebar_label: CLI coding tools
+title: CLI coding tools with AI hosting
+description: Use mittwald’s AI models with popular CLI coding tools
+---
+
+This guide shows how to use our OpenAI‑compatible endpoint with CLI tools that support agentic coding.
+
+Base configuration
+
+- Base URL: `https://llm.aihosting.mittwald.de/v1`
+- API key: your mStudio LLM key
+- Model IDs:
+  - `Devstral-Small-2-24B-Instruct-2512` (agentic coding + tools + vision)
+  - `Ministral-3-14B-Instruct-2512` (chat + vision)
+
+Environment:
+
+```sh
+export OPENAI_API_KEY=sk-...
+export OPENAI_BASE_URL=https://llm.aihosting.mittwald.de/v1
+```
+
+## Claude Code (CLI)
+
+Configure Claude Code in `~/.config/claude-code/settings.json`:
+
+```json
+{
+  "apiProvider": "openai-compatible",
+  "baseURL": "https://llm.aihosting.mittwald.de/v1",
+  "apiKey": "sk-your-mittwald-api-key",
+  "model": "Devstral-Small-2-24B-Instruct-2512",
+  "temperature": 0.15
+}
+```
+
+**With MCP servers:**
+
+```json
+{
+  "apiProvider": "openai-compatible",
+  "baseURL": "https://llm.aihosting.mittwald.de/v1",
+  "apiKey": "sk-your-mittwald-api-key",
+  "model": "Devstral-Small-2-24B-Instruct-2512",
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@context7/mcp-server", "--stdio"],
+      "env": { "CONTEXT7_API_KEY": "your-key" }
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search", "--stdio"],
+      "env": { "BRAVE_API_KEY": "your-key" }
+    },
+    "directus": {
+      "command": "npx",
+      "args": ["-y", "@directus/content-mcp", "--stdio"],
+      "env": {
+        "DIRECTUS_URL": "https://your-directus-instance.com",
+        "DIRECTUS_TOKEN": "your-directus-token"
+      }
+    },
+    "opensearch": {
+      "command": "npx",
+      "args": ["-y", "@opensearch-project/mcp-server", "--stdio"],
+      "env": {
+        "OPENSEARCH_URL": "https://localhost:9200",
+        "OPENSEARCH_USERNAME": "admin",
+        "OPENSEARCH_PASSWORD": "admin"
+      }
+    },
+    "solr": {
+      "command": "uvx",
+      "args": ["solr-mcp"],
+      "env": {
+        "SOLR_URL": "http://localhost:8983/solr"
+      }
+    },
+    "typo3": {
+      "command": "mw",
+      "args": [
+        "app",
+        "exec",
+        "--quiet",
+        "--installation-id=a-XXXXX",
+        "vendor/bin/typo3 mcp:server"
+      ]
+    }
+  },
+  "webFetch": {
+    "enabled": true,
+    "allowedDomains": ["github.com", "stackoverflow.com", "*.readthedocs.io"],
+    "maxDepth": 2
+  }
+}
+```
+
+**Usage:**
+
+```sh
+# Run with configuration file
+claude-code "refactor authentication module to use JWT"
+
+# Run with environment variables
+CLAUDE_CODE_BASE_URL=https://llm.aihosting.mittwald.de/v1 \
+CLAUDE_CODE_API_KEY=sk-... \
+CLAUDE_CODE_MODEL=Devstral-Small-2-24B-Instruct-2512 \
+claude-code "add error handling to API endpoints"
+
+# Fetch external docs and apply
+claude-code "fetch https://fastapi.tiangolo.com/tutorial/ and update our API to use async endpoints"
+```
+
+## OpenCode (CLI)
+
+OpenCode supports OpenAI-compatible providers. Configure via environment or config file:
+
+**Environment variables:**
+
+```sh
+export OPENAI_API_KEY=sk-...
+export OPENAI_BASE_URL=https://llm.aihosting.mittwald.de/v1
+export OPENAI_MODEL=Devstral-Small-2-24B-Instruct-2512
+```
+
+**Configuration file** (`~/.opencode/config.json`):
+
+```json
+{
+  "provider": "openai-compatible",
+  "baseURL": "https://llm.aihosting.mittwald.de/v1",
+  "apiKey": "sk-your-mittwald-api-key",
+  "model": "Devstral-Small-2-24B-Instruct-2512",
+  "temperature": 0.15,
+  "tools": {
+    "enabled": true,
+    "allowedTools": ["file_read", "file_write", "search", "web_fetch"]
+  }
+}
+```
+
+**With MCP servers:**
+
+```json
+{
+  "provider": "openai-compatible",
+  "baseURL": "https://llm.aihosting.mittwald.de/v1",
+  "apiKey": "sk-your-mittwald-api-key",
+  "model": "Devstral-Small-2-24B-Instruct-2512",
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@context7/mcp-server", "--stdio"],
+      "env": { "CONTEXT7_API_KEY": "your-key" }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "--stdio"],
+      "env": { "POSTGRES_CONNECTION_STRING": "postgresql://..." }
+    },
+    "directus": {
+      "command": "npx",
+      "args": ["-y", "@directus/content-mcp", "--stdio"],
+      "env": {
+        "DIRECTUS_URL": "https://your-directus-instance.com",
+        "DIRECTUS_TOKEN": "your-directus-token"
+      }
+    },
+    "opensearch": {
+      "command": "npx",
+      "args": ["-y", "@opensearch-project/mcp-server", "--stdio"],
+      "env": {
+        "OPENSEARCH_URL": "https://localhost:9200",
+        "OPENSEARCH_USERNAME": "admin",
+        "OPENSEARCH_PASSWORD": "admin"
+      }
+    },
+    "solr": {
+      "command": "uvx",
+      "args": ["solr-mcp"],
+      "env": {
+        "SOLR_URL": "http://localhost:8983/solr"
+      }
+    },
+    "typo3": {
+      "command": "mw",
+      "args": [
+        "app",
+        "exec",
+        "--quiet",
+        "--installation-id=a-XXXXX",
+        "vendor/bin/typo3 mcp:server"
+      ]
+    }
+  }
+}
+```
+
+**Usage:**
+
+```sh
+opencode "migrate database schema to add user roles table"
+opencode "optimize the database queries in user_service.py"
+```
+
+Tips
+
+- Deterministic edits: `temperature <= 0.2` for tooling and refactors.
+- Streaming output for long diffs/logs.
+- Limit repo scope; request specific files/functions to keep context efficient.
+- Prefer JSON/tool outputs when orchestrating multi‑step changes.
+
+Related
+
+- IDE setups: see AI‑assisted development and Kilo Code sections.
+- MCP overview: https://modelcontextprotocol.io/

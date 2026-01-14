@@ -7,15 +7,27 @@ interface Props {
   variant?: "compact";
 }
 
-export default function OperationDocCardById({ operationId, apiVersion = "v2", variant }: Props) {
+export default function OperationDocCardById({
+  operationId,
+  apiVersion = "v2",
+  variant,
+}: Props) {
   const spec = useSpec(apiVersion);
   const operation = getOperationById(spec, operationId);
 
   if (operation) {
     return (
-      <OperationDocCard apiVersion={apiVersion} operation={operation} variant={variant} />
+      <OperationDocCard
+        apiVersion={apiVersion}
+        operation={operation}
+        variant={variant}
+      />
     );
   }
 
-  return <>unknown operation <code>{operationId}</code></>;
+  return (
+    <>
+      unknown operation <code>{operationId}</code>
+    </>
+  );
 }

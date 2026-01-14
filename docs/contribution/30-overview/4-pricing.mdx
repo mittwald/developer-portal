@@ -7,20 +7,20 @@ title: Price Variants of an Extension
 Extensions in mStudio can be offered with different pricing models.  
 A contributor can decide whether an extension is:
 
-- **Free of charge**  
-- Has a **single fixed price**  
-- Or offers **multiple price variants**  
+- **Free of charge**
+- Has a **single fixed price**
+- Or offers **multiple price variants**
 
 A price variant makes it possible to offer different **feature scopes** of an extension at different prices.
 
 Each variant consists of the following properties:
 
-| Property | Description |
-|--------------|---------------|
-| **Name** | Display name of the variant (e.g. "Basic", "Pro", "Enterprise") |
-| **Price** | Monthly price charged to the customer |
-| **Features** | Description of the feature scope of the variant. This is more specific than the extension description |
-| **variantKey** | Technical key of the variant (must be unique and cannot be changed after creation) |
+| Property       | Description                                                                                           |
+| -------------- | ----------------------------------------------------------------------------------------------------- |
+| **Name**       | Display name of the variant (e.g. "Basic", "Pro", "Enterprise")                                       |
+| **Price**      | Monthly price charged to the customer                                                                 |
+| **Features**   | Description of the feature scope of the variant. This is more specific than the extension description |
+| **variantKey** | Technical key of the variant (must be unique and cannot be changed after creation)                    |
 
 When customers install an extension, they can choose one of the available variants.  
 The selected variant determines both the price and the feature scope.
@@ -49,8 +49,8 @@ In the **Price Details** section, contributors can:
 
 ### Rules for Variant Management
 
-- The **variantKey** is assigned by the contributor and uniquely identifies the variant **within an extension**.  
-- After creation, the **variantKey cannot be changed**.  
+- The **variantKey** is assigned by the contributor and uniquely identifies the variant **within an extension**.
+- After creation, the **variantKey cannot be changed**.
 - If the extension previously had a single price, the **first created price** can be continued as a variant with the **"default" key**. This variant must now also include a description of its features.
 
 ### User Interface Behavior
@@ -68,9 +68,9 @@ After an extension has been published, any modification of price data triggers a
 
 This lockout affects:
 
-- Adding new variants  
-- Changing **Name**, **Features**, or **Price** of existing variants  
-- Switching between **free**, **single price**, or **price variants**  
+- Adding new variants
+- Changing **Name**, **Features**, or **Price** of existing variants
+- Switching between **free**, **single price**, or **price variants**
 - Changing the single price
 
 After 30 days, changes can be made again.  
@@ -85,15 +85,15 @@ If the customer declines or does not respond within 30 days, their instance will
 
 ### Customer interaction is required when:
 
-- An extension changes from **free → single price** or **free → variants**  
-- A **single price** is changed  
+- An extension changes from **free → single price** or **free → variants**
+- A **single price** is changed
 - The user’s selected **variant** is changed. This only applies to changes in price or feature scope. If only cosmetic changes (e.g., typo corrections) are made, the contributor can choose not to announce a feature change.
 
 ### Process
 
-1. The affected customer receives a **notification in mStudio** as well as an **email**.  
-2. On the extension detail page and in their instance list, the customer will see a notice prompting interaction.  
-3. The customer must respond within **30 days**.  
+1. The affected customer receives a **notification in mStudio** as well as an **email**.
+2. On the extension detail page and in their instance list, the customer will see a notice prompting interaction.
+3. The customer must respond within **30 days**.
 4. If no response is received within this period, the corresponding **extension instance is automatically deleted**.
 
 Contributors are informed about these events via **Lifecycle Webhooks**.
@@ -121,31 +121,31 @@ This allows the extension’s frontend to dynamically adjust its display or func
 
 Contributors are responsible for:
 
-- Creating and maintaining their variants in mStudio  
-- Properly handling the `variantKey` in their backend, if necessary  
-- Handling lifecycle webhooks  
-- Technically mapping the selected variant in their feature or billing system  
-- Complying with the **30-day lockout** after a price change  
+- Creating and maintaining their variants in mStudio
+- Properly handling the `variantKey` in their backend, if necessary
+- Handling lifecycle webhooks
+- Technically mapping the selected variant in their feature or billing system
+- Complying with the **30-day lockout** after a price change
 
 ---
 
 ## Best Practices
 
-- Use **descriptive keys** for variants (e.g., `basic`, `pro`, `enterprise`).  
-- Clearly and transparently describe the **feature scope** of each variant.  
-- Log all events related to variant changes internally.  
-- Thoroughly test all variant switches and feature scopes before publication.  
+- Use **descriptive keys** for variants (e.g., `basic`, `pro`, `enterprise`).
+- Clearly and transparently describe the **feature scope** of each variant.
+- Log all events related to variant changes internally.
+- Thoroughly test all variant switches and feature scopes before publication.
 
 ---
 
 ## Troubleshooting
 
-| Problem | Possible Cause | Solution |
-|----------|------------------|--------|
-| Variant not recognized in backend | Missing or incorrect `variantKey` | Correctly process webhook payload (if used) and verify mapping |
-| Changes not possible | 30-day lockout active | Wait until the lockout period expires |
-| Customer loses access to extension | No response to price change within 30 days | Extension instance was automatically deleted |
-| Incorrect feature scope active | Variant not correctly handled in business logic | Check `variantKey` mapping in backend |
+| Problem                            | Possible Cause                                  | Solution                                                       |
+| ---------------------------------- | ----------------------------------------------- | -------------------------------------------------------------- |
+| Variant not recognized in backend  | Missing or incorrect `variantKey`               | Correctly process webhook payload (if used) and verify mapping |
+| Changes not possible               | 30-day lockout active                           | Wait until the lockout period expires                          |
+| Customer loses access to extension | No response to price change within 30 days      | Extension instance was automatically deleted                   |
+| Incorrect feature scope active     | Variant not correctly handled in business logic | Check `variantKey` mapping in backend                          |
 
 ---
 

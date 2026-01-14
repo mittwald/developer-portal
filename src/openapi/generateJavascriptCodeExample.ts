@@ -17,11 +17,13 @@ function generateJavascriptCodeExample(
     Object.keys(spec.responses).find((status) => status.startsWith("2")) ??
     "200";
 
-  const tagPrefixRegex = new RegExp(`^${spec.tags[0]}-`, 'i');
+  const tagPrefixRegex = new RegExp(`^${spec.tags[0]}-`, "i");
 
   const requestObject: any = {};
   const tag = camelcase(tsTypeName(spec.tags[0]));
-  const operationId = camelcase(tsTypeName(spec.operationId.replace(tagPrefixRegex, "")));
+  const operationId = camelcase(
+    tsTypeName(spec.operationId.replace(tagPrefixRegex, "")),
+  );
 
   for (const pathParam of pathParams) {
     requestObject[pathParam.name] = generateSchemaExample(
@@ -41,7 +43,9 @@ function generateJavascriptCodeExample(
   if (queryParams.length > 0) {
     requestObject.queryParameters = {};
     for (const queryParam of queryParams) {
-      let example = generateSchemaExample(queryParam.schema as OpenAPIV3.SchemaObject);
+      let example = generateSchemaExample(
+        queryParam.schema as OpenAPIV3.SchemaObject,
+      );
 
       if (queryParam.name === "skip") {
         continue;
