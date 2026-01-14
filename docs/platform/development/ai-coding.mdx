@@ -150,22 +150,41 @@ Then select Devstral in Kilo Code's model picker for agent tasks.
 
 ### OpenCode {#opencode}
 
-[OpenCode](https://opencode.ai) supports OpenAI-compatible providers. Configure via environment or config file:
+[OpenCode](https://opencode.ai) supports OpenAI-compatible providers. These
+are either configured globally in the `~/config/opencode/opencode.json` file,
+or per-project in an `opencode.json` file in the project root.
 
-- Provider: OpenAI Compatible
-- Base URL: `https://llm.aihosting.mittwald.de/v1`
-- API Key: your mStudio LLM API key
-- Model: `Devstral-Small-2-24B-Instruct-2512`
+Regardless of the location, the respective provider configuration could look like this:
 
-Example environment:
-
-```sh
-export OPENAI_API_KEY=sk-...
-export OPENAI_BASE_URL=https://llm.aihosting.mittwald.de/v1
-export OPENAI_MODEL=Devstral-Small-2-24B-Instruct-2512
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "mittwald": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "mittwald AI",
+      "options": {
+        "baseURL": "https://llm.aihosting.mittwald.de/v1",
+        "apiKey": "sk-..."
+      },
+      "models": {
+        "Devstral-Small-2-24B-Instruct-2512": {
+          "name": "Devstral-Small-2-24B-Instruct-2512"
+        }
+      }
+    }
+  }
+}
 ```
 
-For detailed configuration including MCP servers, see the [CLI coding tools guide](/docs/v2/platform/development/cli-coding-tools#opencode-cli).
+Usage:
+
+```sh
+opencode run "migrate database schema to add user roles table"
+opencode run "optimize the database queries in user_service.py"
+```
+
+For MCP server configuration, see the [OpenCode MCP section](#opencode-mcp) below.
 
 ### Claude Code {#claude-code}
 
@@ -215,6 +234,22 @@ export CLAUDE_CODE_MODEL=Devstral-Small-2-24B-Instruct-2512
 claude-code "refactor the authentication module"
 ```
 
+**Usage:**
+
+```sh
+# Run with configuration file
+claude-code "refactor authentication module to use JWT"
+
+# Run with environment variables
+CLAUDE_CODE_BASE_URL=https://llm.aihosting.mittwald.de/v1 \
+CLAUDE_CODE_API_KEY=sk-... \
+CLAUDE_CODE_MODEL=Devstral-Small-2-24B-Instruct-2512 \
+claude-code "add error handling to API endpoints"
+
+# Fetch external docs and apply
+claude-code "fetch https://fastapi.tiangolo.com/tutorial/ and update our API to use async endpoints"
+```
+
 **Tips for Claude Code:**
 
 - Use `--verbose` flag to see detailed MCP server communication
@@ -222,6 +257,8 @@ claude-code "refactor the authentication module"
 - Set `temperature: 0.1-0.2` for deterministic code edits
 - Use streaming mode for large refactors: `--stream`
 - Enable audit logging: `"auditLog": { "enabled": true, "path": "~/.claude-code/audit.log" }`
+
+For MCP server configuration, see the [Claude Code MCP section](#claude-code-mcp) below.
 
 ## MCP and tool usage
 
@@ -396,6 +433,65 @@ Prompt patterns
 
 :::
 
+### OpenCode {#opencode-mcp}
+
+OpenCode supports MCP servers through its configuration file at `~/.opencode/config.json`:
+
+```json
+{
+  "provider": "openai-compatible",
+  "baseURL": "https://llm.aihosting.mittwald.de/v1",
+  "apiKey": "sk-your-mittwald-api-key",
+  "model": "Devstral-Small-2-24B-Instruct-2512",
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@context7/mcp-server", "--stdio"],
+      "env": { "CONTEXT7_API_KEY": "your-key" }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "--stdio"],
+      "env": { "POSTGRES_CONNECTION_STRING": "postgresql://..." }
+    },
+    "directus": {
+      "command": "npx",
+      "args": ["-y", "@directus/content-mcp", "--stdio"],
+      "env": {
+        "DIRECTUS_URL": "https://your-directus-instance.com",
+        "DIRECTUS_TOKEN": "your-directus-token"
+      }
+    },
+    "opensearch": {
+      "command": "npx",
+      "args": ["-y", "@opensearch-project/mcp-server", "--stdio"],
+      "env": {
+        "OPENSEARCH_URL": "https://localhost:9200",
+        "OPENSEARCH_USERNAME": "admin",
+        "OPENSEARCH_PASSWORD": "admin"
+      }
+    },
+    "solr": {
+      "command": "uvx",
+      "args": ["solr-mcp"],
+      "env": {
+        "SOLR_URL": "http://localhost:8983/solr"
+      }
+    },
+    "typo3": {
+      "command": "mw",
+      "args": [
+        "app",
+        "exec",
+        "--quiet",
+        "--installation-id=a-XXXXX",
+        "vendor/bin/typo3 mcp:server"
+      ]
+    }
+  }
+}
+```
+
 ### Claude code {#claude-code-mcp}
 
 In Claude Code, MCP servers are configured either globally (in the `~/.claude.json` file in your home directory) or per-project (in a `.mcp.json` file in the project root).
@@ -532,6 +628,8 @@ claude-code "fetch https://docs.python.org/3/library/asyncio.html and help me re
 - Summarize prior steps and include IDs/anchors to rehydrate context on demand.
 - Stream responses; raise `max_tokens` only when necessary.
 - Prefer deterministic sampling for tools and edits: `temperature <= 0.2`.
+- Limit repo scope; request specific files/functions to keep context efficient.
+- Prefer JSON/tool outputs when orchestrating multi-step changes.
 
 ## Disclaimer
 
