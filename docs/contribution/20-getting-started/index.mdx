@@ -1,0 +1,161 @@
+---
+title: Getting Started mit Extension-Entwicklung
+sidebar_position: 0
+---
+
+# Getting Started mit Extension-Entwicklung
+
+Willkommen beim Getting Started Guide für die Entwicklung von mittwald Extensions!
+
+## Was ist eine Extension?
+
+Eine **Extension** ist eine Web-Anwendung, die das mStudio um zusätzliche Funktionen erweitert.
+Extensions werden von Contributoren entwickelt und im mStudio Marketplace bereitgestellt - entweder nur für die eigene Organisation oder öffentlich
+
+Technisch gesehen besteht eine klassische Extension aus:
+
+- **Backend** - Deine Server-Anwendung
+- **Frontend Fragment** - UI-Komponenten, die im mStudio gerendert werden
+- **Datenbank** - Für die Persistierung von Extension-Daten
+
+Extensions kommunizieren über die mittwald API mit dem mStudio und können auf Projekt- oder Organisationsdaten zugreifen.
+
+:::info Weitere Details zur Entwicklung von Extensions
+Mehr Details zu Extensions findest du in der [Extension-Übersicht](../overview/extensions).
+:::
+
+## Was du in diesem Guide lernen wirst
+
+In diesem Guide lernst du, wie du:
+
+- Eine vollständige Extension-Entwicklungsumgebung einrichtest
+- Die Reference Extension als Basis für deine eigene Extension nutzt
+- Deine Extension lokal entwickelst und testest
+- Eine Extension im mStudio bereitstellst und veröffentlichst
+- Die Reference Extension auf deine eigenen Bedürfnisse und Ideen anpasst
+
+Die Reference Extension, die als Basis für diesen Guide verwendet wird, zeigt wie:
+
+- Mit der mittwald API interagiert werden kann
+- Eigene Daten in einer Datenbank speichert werden
+- Flow Remote Components eingesetzt werden
+
+Da der Marktplatz relativ flexibel ist und verschiedene Arten von Extensions ermöglicht, können nicht alle Ansätze innerhalb dieses Guides vermittelt werden.
+Dieser Guide konzentriert sich auf eine im mStudio per [Frontend Fragment](../overview/concepts/frontend-development#frontend-fragments) integrierte Extension.
+
+[//]: # "TODO Verweis auf den Ausblick für Externe Frontends"
+
+## Voraussetzungen
+
+Grundsätzlich ist es mit fast jeder Web-Technologie möglich, Extensions zu entwickeln.
+Auf Basis der Erfahrungen bestehender Contributoren sowie bestehender Libraries haben sich jedoch einige Technologien und Frameworks als besonders geeignet herauskristallisiert.
+
+Um diesem Guide gut folgen zu können und darauf basierend deine eigene Extension entwickeln zu können,
+stelle sicher, dass du die folgenden Voraussetzungen erfüllst.
+
+### Technische Anforderungen
+
+#### Software
+
+Du benötigst folgende Software auf deinem Entwicklungssystem:
+
+##### Node.js
+
+- **Version:** 22.x oder höher
+- **Prüfen:**
+
+```bash
+node --version
+# Sollte v22.x.x oder höher ausgeben
+```
+
+##### pnpm
+
+- **Version:** 9.14.4 oder höher
+- **Prüfen:**
+
+```bash
+pnpm --version
+# Sollte 9.14.4 oder höher ausgeben
+```
+
+##### Docker & Docker Compose
+
+- Zumindest für die lokale PostgreSQL-Datenbank
+- **Prüfen:**
+
+```bash
+docker --version
+docker compose version
+```
+
+##### Git
+
+- Für das Klonen der Reference Extension
+- **Prüfen:**
+
+```bash
+git --version
+```
+
+#### Editor/IDE (Optional)
+
+Wir empfehlen einen modernen Code-Editor mit TypeScript-Unterstützung.
+Unter Anderem aber nicht ausschließlich, kommen Folgende dafür in Frage:
+
+- [Visual Studio Code](https://code.visualstudio.com/)
+- [WebStorm](https://www.jetbrains.com/webstorm/)
+- [Cursor](https://cursor.sh/)
+
+### Erforderliches Vorwissen
+
+Dieser Guide richtet sich an Entwickler mit praktischer Erfahrung in:
+
+- **React** - Du solltest mit React Hooks und Komponenten vertraut sein
+- **TypeScript** - Grundlegendes Verständnis von Types und Interfaces
+- **Tanstack Start** - Verständnis für die Funktionsweise des Fullstack Frameworks hinsichtlich Routing, Server Functions, Middlewares etc.
+- **Docker** - Grundkenntnisse im Umgang mit Docker Images und Containern
+
+Falls du in einem dieser Bereiche noch Auffrischung benötigst, empfehlen wir, dich zunächst mit den Grundlagen vertraut zu machen.
+
+### mittwald User & Organisation
+
+#### mStudio User
+
+Um eine Extension zu entwickeln, benötigst du einen mStudio User.
+
+- **Noch kein User vorhanden?** Registriere dich unter [studio.mittwald.de](https://studio.mittwald.de)
+
+#### Organisation im mStudio
+
+Extensions werden immer im Kontext einer Organisation entwickelt und bereitgestellt, um dem Nutzer anzeigen zu können,
+von wem die Extension stammt und potenziell die Abrechnung abwickeln zu können.
+
+- Erstelle oder wähle eine Organisation in deinem mStudio
+- Du benötigst Inhaberrechte für diese Organisation
+- Die Organisation muss einen Vertragspartner hinterlegt haben
+
+## Guide-Struktur
+
+Dieser Guide ist chronologisch aufgebaut. Arbeite die Schritte der Reihe nach durch:
+
+[//]: # "TODO Struktur final anpassen"
+
+1. [Contributor](./become-contributor) - Contributor für das mStudio werden
+2. [Reference Extension](./reference-extension) - Klone die Reference Extension und starte sie lokal
+3. [Extension erreichbar machen](./expose-extension) - Extension von außen erreichbar machen, um Webhooks empfangen zu können
+4. [Konfiguration](./configure-extension) - Extension registrieren und für die Reference Extension einrichten
+5. [Testing im mStudio](./test-in-mstudio) - Extension Instance erstellen und im mStudio testen
+6. [Production Deployment](./deploy) - Extension veröffentlichen
+7. [Nächste Schritte](./next-steps) - Die Reference Extension an deine eigenen Bedürfnisse und Ideen anpassen.
+
+## Hilfe benötigt?
+
+Falls du während des Guides auf Probleme stößt:
+
+- Nutze das [GitHub Repository für Contributoren-Support](https://github.com/mittwald/contributor-support)
+- Kontaktiere den mittwald Support per E-Mail: contributorwerden@mittwald.de
+
+## Los geht's!
+
+Bereit? Dann starte damit [Contributor zu werden](./become-contributor)!
