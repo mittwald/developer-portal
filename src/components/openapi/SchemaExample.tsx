@@ -107,11 +107,6 @@ function renderExample(format: ExampleFormat, example: any): string {
           let contentType: string = undefined;
           let valueStr: string = value.toString();
 
-          if (value instanceof Uint8Array) {
-            contentType = "image/jpeg";
-            valueStr = "[binary file contents]";
-          }
-
           let example =
             boundary +
             "\r\n" +

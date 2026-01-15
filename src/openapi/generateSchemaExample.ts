@@ -3,7 +3,7 @@ import { OpenAPIV3 } from "openapi-types";
 export function generateSchemaExample(schema: OpenAPIV3.SchemaObject): any {
   if (schema.example) {
     if (schema.format === "binary") {
-      return new TextEncoder().encode(schema.example.toString());
+      return '[Binary Example]';
     }
     return schema.example;
   }
