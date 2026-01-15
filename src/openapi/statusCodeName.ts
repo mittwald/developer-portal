@@ -51,5 +51,7 @@ export function statusCodeName(code: string): string | undefined {
       return "Service Unavailable";
     case "504":
       return "Gateway Timeout";
+    default:
+      return "";
   }
 }
