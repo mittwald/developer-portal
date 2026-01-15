@@ -128,6 +128,39 @@ npm test
 
 This test takes quite some time, but it ensures nothing broke on package upgrades and no regression has been introduced. It is **not** part of the release process and is run manually by documentation maintainers. It does **not** check anything else but pages loading and showing content.
 
+### Testing
+
+For small changes to the content present in `mdx` files, a manual build and visual
+inspection of the result afterwards is all you need to do.
+
+In case of large changes, it is wise to run tests in order to keep manual testing
+effort low. [Install playwright](https://playwright.dev/docs/intro) and run:
+
+```bash
+npx playwright test crawler
+```
+
+This test will crawl **all** docs pages, looking for plain HTTP errors, but also
+for JavaScript errors which may hint entirely broken pages. It takes ~ 40 minutes
+to run, so do this only if you have to under the criteria just defined.
+
+As many developers use browser plugins to escalate JavaScript errors to make them more
+visible, we should work hard to keep developer docs free from such distracting errors.
+
+If you've worked on a very special page, a single page tester is also available:
+
+```bash
+TEST_URL=http://localhost:3000/docs/v2/reference/file/file-create-file npx playwright test tests/single-url.test.ts
+```
+
+Remember, this test only checks for technical issues. It does **not** tell you anything
+at all about the correctness of your documentation! To achieve that, it is strongly
+recommended to go through your guides and apply them yourself at least once. Expect
+reviewers to do the same, so doing that directly while writing guides is the best thing to do.
+
+Feel free to expand on those tools as needed, using existing test scripts for reference
+and to build upon.
+
 ## Caveats
 
 ### File names
