@@ -1,0 +1,71 @@
+---
+title: Konfiguration der Extension
+---
+
+## Extension registrieren
+
+Sobald man Contributor ist, kann eine Extension im mStudio angelegt werden.
+Dazu muss innerhalb der Organisation der **"Entwicklung" Tab** aufgerufen werden und über den **"Anlegen" Button** eine neue Extension registriert werden.
+Zu diesem Zeitpunkt muss lediglich ein **Name** eingegeben werden, der auch im **Nachhinein noch ändern** kann.
+
+Extension Namen müssen **eindeutig** sein.
+Da es sich empfiehlt, für die **Entwicklung vorerst eine eigene** und später für produktive Zwecke eine weitere Extension anzulegen,
+ist es sinnvoll, dies im Namen zu vermerken, indem bspw. "(DEV)" an den Namen angehangen wird.
+
+:::info Lebenszyklus von Extensions
+Extensions sind erst im Marktplatz **sichtbar**, wenn sie **veröffentlicht** wurden.
+Deswegen können problemlos für eigene Entwicklungsprozesse Entwicklungs- bzw. Staging-Extensions angelegt werden.
+Weitere Informationen zum Lebenszyklus von Extensions sind im [Extension Konzept](../../overview/extensions#lifecycle-of-an-extension) erklärt.
+:::
+
+![Extension registrieren](/img/contribution/getting-started-guide/register-extension.png)
+
+## Setzen des Extension Context
+
+Für jede Extension muss festgelegt werden, in **welchem Kontext** sie **installierbar** sein soll.
+Zur Auswahl stehen **Organisation** und **Projekt**.
+Die Reference Extension ist als Projekt-Extension gebaut.
+
+Im **Tab "Berechtigungen"** muss also in der Sektion **Extension Context** auf **Bearbeiten** geklickt werden.
+Nun wird **Projekt** gewählt und gespeichert.
+
+:::info Wahl des Extension Context
+Die Reference Extension ist als Projekt-Extension gebaut.
+Es ergibt jedoch nicht für jede Extension-Idee sinn, sie als Projekt-Extension zu implementieren.
+
+Welche Auswirkungen die Wahl hat und welche Faktoren für die Wahl entscheidend sind, haben wir im ["Wie wähle ich den richtigen Extension Context?"-Guide](../../how-to/choose-a-context) beschrieben.
+:::
+
+![Frontend Fragment hinzufügen](/img/contribution/getting-started-guide/extension-context.png)
+
+## Konfigurieren der Frontend-URL
+
+Die Reference Extension verwendet ein **Frontend Fragment**.
+Das bedeutet, sie implementiert ein Frontend, dass nahtlos in das mStudio integriert werden soll.
+
+:::info Frontend Fragment vs. External Frontend
+Frontend Fragmente sind nicht die einzige Möglichkeit, ein Frontend für eine Extension anzubieten.
+Wenn die Anforderungen an Frontend Fragmenten für dich zu restriktiv sind oder nicht zu deinem Anwendungsfall geeignet sind,
+gibt es auch die Möglichkeit, ein externes Frontend zu implementieren.
+
+Die Eigenschaften und Unterschiede zwischen Frontend Fragmenten und externen Frontends sind im [Konzept zur Frontend Entwicklung](../../overview/concepts/frontend-development) erklärt
+:::
+
+Um die URL für das Frontend Fragment der Reference Extension einzustellen, muss im **Tab "Frontend"** der Extension in der Sektion zu **Frontend Fragments** auf **Hinzufügen** geclickt werden.
+
+![Frontend Fragment hinzufügen](/img/contribution/getting-started-guide/frontend-fragments.png)
+
+Für ein Frontend Fragment muss ein **Ankerpunkt** gewählt werden.
+Dieser bestimmt, an welcher Stelle das Frontend deiner Extension eingebunden werden soll.
+Die Reference Extension ist gebaut, um an dem Ankerpunkt `/projects/project/menu/section/extensions/item` eingehangen zu werden,
+also als Menüpunkt innerhalb eines Projekts.
+
+Für den Ankerpunkt muss außerdem ein **Anzeigename** definiert werden.
+Dieser bestimmt bspw. bei Ankerpunkten, die als Menüpunkte fungieren, wie der Menüpunkt heißt.
+Für Sektionen bestimmt der Anzeigename die Überschrift der Sektion.
+
+Schließlich muss eine **URL** angegeben werden.
+Für die in Entwicklung befindliche Extension kann hier auch eine auf dem **lokalen Client erreichbare Adresse** eingegeben werden.
+Da die Reference Extension Standardmäßig auf Port 3000 läuft, fügen wir hier `http://localhost:3000` ein.
+
+![Konfiguration des Frontend Fragments](/img/contribution/getting-started-guide/frontend-fragment-configuration.png)
