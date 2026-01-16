@@ -163,3 +163,47 @@ mydocument.final.mxd -> mydocument_final.mxd
 ```
 newlibrary_v3.2.mxd -> newlibrary_v3_2.mxd
 ```
+
+### Translation
+
+#### Anchors
+
+When translating docs, make sure anchors are stable. Do not **translate**
+anchors.
+
+A good way to achieve that is to use explicit anchor names instead of
+derived ones from markdown headlines.
+
+Instead of ...
+
+```
+[My link to interesting anchor](../other-document#interesting-headline)
+```
+
+... with source document ...
+
+```
+## Interesting headline
+
+Linked content here ...
+```
+
+... prefer explicit anchor IDs:
+
+```
+## Interesting headline {#interesting-headline}
+
+Linked content here ...
+```
+
+and link via stable anchor:
+
+```
+[My link to interesting anchor](../other-document#interesting-headline)
+```
+
+This allows you to keep anchors stable, even when content changes
+or gets translated. Another advantage is that the same technical
+anchor id can be used in all translated version, making it easier
+to recognize the document structure even if not familiar with the
+language.

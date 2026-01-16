@@ -261,6 +261,13 @@ generator/
 
 ### Internationalization
 
+#### Anchors
+
+Do not translate anchors indirectly via markdown headlines.
+Better use explicit, technical anchor IDs to keep them from being
+translated and stable against content changes, e.g. headline
+renaming. Visit contribution guide for a more detailed example.
+
 #### Translation Usage
 
 ```typescript

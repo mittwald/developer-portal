@@ -20,13 +20,13 @@ Als Voraussetzung benötigst du eine mStudio-Anwendung, die einen Webserver enth
 - Er sollte einen lokalen TCP-Port öffnen, auf dem der Webserver auf eingehende HTTP-Anfragen lauscht; der Port wird über die Umgebungsvariable `PORT` vorgegeben.
 - Der Befehl sollte den Webserver im Vordergrund ausführen, damit der Prozess nicht sofort beendet wird.
 
-## Deine Anwendung über HTTP zugänglich machen
+## Deine Anwendung über HTTP zugänglich machen {#http-access}
 
 Nachdem du deine Anwendung erstellt hast, kannst du sie über HTTP zugänglich machen. Unsere Plattform stellt sicher, dass der Prozess, den du in dem vorherigen Schritt als "Einstiegspunkt" konfiguriert hast, jederzeit ausgeführt wird.
 
 :::info
 
-Es besteht die Möglichkeit, dass deine Anwendung nicht sofort gestartet wird, wenn du deine Anwendung _vor_ dem Deployment von Code erstellst. In diesem Fall versucht unsere Automatisierung, deinen Prozess für eine bestimmte Anzahl von Versuchen zu starten und dann abzubrechen. Wenn du mit einer Shell in deiner Hosting-Umgebung verbunden bist, kannst du das `mittnitectl job status`-Kommando verwenden, um den Status deines Prozesses zu überprüfen und dann `mittnitectl job start`, um deinen Prozess zu starten. Siehe den Abschnitt über [das Verwalten deines Prozesslebenszyklus](#das-verwalten-deines-prozesslebenszyklus) für weitere Informationen.
+Es besteht die Möglichkeit, dass deine Anwendung nicht sofort gestartet wird, wenn du deine Anwendung _vor_ dem Deployment von Code erstellst. In diesem Fall versucht unsere Automatisierung, deinen Prozess für eine bestimmte Anzahl von Versuchen zu starten und dann abzubrechen. Wenn du mit einer Shell in deiner Hosting-Umgebung verbunden bist, kannst du das `mittnitectl job status`-Kommando verwenden, um den Status deines Prozesses zu überprüfen und dann `mittnitectl job start`, um deinen Prozess zu starten. Siehe den Abschnitt über [das Verwalten deines Prozesslebenszyklus](#process-lc) für weitere Informationen.
 
 :::
 
@@ -40,7 +40,7 @@ Bitte mache **KEINE** Annahmen über den Port, auf dem deine Anwendung hören so
 
 :::
 
-## Das Verwalten deines Prozesslebenszyklus
+## Das Verwalten deines Prozesslebenszyklus {#process-lc}
 
 Bei einer Anwendung mit eigenem Webserver wird der gesamte Lebenszyklus deines Prozesses innerhalb der Anwendung selbst verwaltet. Innerhalb deiner Hosting-Umgebung wird dein Prozess vom [mittnite-Initsystem](https://github.com/mittwald/mittnite), einem leichtgewichtigen Prozessmanager verwaltet, der für das Starten, Stoppen und Neustarten deiner Anwendung verantwortlich ist.
 
