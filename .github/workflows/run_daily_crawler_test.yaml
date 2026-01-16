@@ -1,0 +1,34 @@
+name: Run Daily Crawler Test
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # Runs every day at midnight UTC
+  workflow_dispatch: # Allows manual triggering of the workflow
+
+jobs:
+  run-crawler-test:
+    name: Run crawler test
+    runs-on: ubuntu-latest
+
+    steps:
+      # Check out the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20' # Minimum required version is 20
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Install Playwright browsers
+      - name: Install Playwright Browsers
+        run: npx playwright install
+
+      # Run the Crawler Test
+      - name: Run Crawler Test
+        run: npx playwright test crawler
