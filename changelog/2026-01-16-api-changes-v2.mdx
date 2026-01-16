@@ -1,0 +1,478 @@
+---
+title: Breaking (!) API changes for v2 API, January 9 to January 16
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - AI hosting
+  - Conversation
+  - Contract
+  - Page Insights
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+During the week of January 9 to January 16, 2026, the mittwald API underwent significant changes, including the removal of several API paths without deprecation, the introduction of new endpoints for managing AI hosting keys and usage, and the addition of optional request parameters to enhance conversation listing capabilities.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The following API paths have been removed without deprecation, resulting in breaking changes:
+  - `GET /v2/llm-models` (Operation ID: `misc-get-llm-models-experimental`)
+  - `GET /v2/projects/{projectId}/llm-licences` (Operation ID: `project-get-llm-licences-experimental`)
+  - `POST /v2/projects/{projectId}/llm-licences` (Operation ID: `project-create-llm-beta-licence-experimental`)
+  - `GET /v2/projects/{projectId}/llm-licences/{licenceId}` (Operation ID: `project-get-llm-licence-experimental`)
+  - `PUT /v2/projects/{projectId}/llm-licences/{licenceId}` (Operation ID: `project-update-llm-licence-experimental`)
+
+- A new endpoint has been added to retrieve a list of currently active models:
+  - `GET /v2/ai-hosting-models` (Operation ID: `ai-hosting-get-models`)
+
+- The `GET /v2/conversations` operation has new optional request parameters:
+  - `fullTextSearch`
+  - `limit`
+  - `page`
+  - `skip`
+  - `status`
+
+- New endpoints have been added for AI hosting customer management:
+  - `GET /v2/customers/{customerId}/ai-hosting` (Operation ID: `ai-hosting-customer-get-usage`)
+  - `GET /v2/customers/{customerId}/ai-hosting-keys` (Operation ID: `ai-hosting-customer-get-keys`)
+  - `POST /v2/customers/{customerId}/ai-hosting-keys` (Operation ID: `ai-hosting-customer-create-key`)
+  - `DELETE /v2/customers/{customerId}/ai-hosting-keys/{keyId}` (Operation ID: `ai-hosting-customer-delete-key`)
+  - `GET /v2/customers/{customerId}/ai-hosting-keys/{keyId}` (Operation ID: `ai-hosting-customer-get-key`)
+  - `PUT /v2/customers/{customerId}/ai-hosting-keys/{keyId}` (Operation ID: `ai-hosting-customer-update-key`)
+
+- New endpoints have been added for AI hosting project management:
+  - `GET /v2/projects/{projectId}/ai-hosting` (Operation ID: `ai-hosting-project-get-usage`)
+  - `GET /v2/projects/{projectId}/ai-hosting-keys` (Operation ID: `ai-hosting-project-get-keys`)
+  - `POST /v2/projects/{projectId}/ai-hosting-keys` (Operation ID: `ai-hosting-project-create-key`)
+  - `DELETE /v2/projects/{projectId}/ai-hosting-keys/{keyId}` (Operation ID: `ai-hosting-project-delete-key`)
+  - `GET /v2/projects/{projectId}/ai-hosting-keys/{keyId}` (Operation ID: `ai-hosting-project-get-key`)
+  - `PUT /v2/projects/{projectId}/ai-hosting-keys/{keyId}` (Operation ID: `ai-hosting-project-update-key`)
+
+- The `POST /v2/order-previews` operation has received several updates:
+  - Added the new `aiHosting` enum value to the `orderType` request property.
+  - Added `#/components/schemas/de.mittwald.v1.order.AIHostingOrderPreview` to the `orderData` request property `oneOf` list.
+  - Added `#/components/schemas/de.mittwald.v1.order.AIHostingOrderPreviewResponse` to the response body `anyOf` list for the response status `200`.
+
+- The `POST /v2/orders` operation has received similar updates:
+  - Added the new `aiHosting` enum value to the `orderType` request property.
+  - Added `#/components/schemas/de.mittwald.v1.order.AIHostingOrder` to the `orderData` request property `oneOf` list.
+
+- The `POST /v2/projects/{projectId}/straces` operation has a new non-success response with the status `412`.
+
+- The `POST /v2/tariff-change-previews` operation has received updates:
+  - Added the new `aiHosting` enum value to the `tariffChangeType` request property.
+  - Added `#/components/schemas/de.mittwald.v1.order.AIHostingTariffChange` to the `tariffChangeData` request property `oneOf` list.
+
+- The `POST /v2/tariff-changes` operation has similar updates:
+  - Added the new `aiHosting` enum value to the `tariffChangeType` request property.
+  - Added `#/components/schemas/de.mittwald.v1.order.AIHostingTariffChange` to the `tariffChangeData` request property `oneOf` list.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "misc-get-llm-models-experimental"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+
+For details, refer to the <OperationLink operation="misc-get-llm-models-experimental" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "project-get-llm-licences-experimental"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+
+For details, refer to the <OperationLink operation="project-get-llm-licences-experimental" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "project-create-llm-beta-licence-experimental"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+
+For details, refer to the <OperationLink operation="project-create-llm-beta-licence-experimental" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "project-get-llm-licence-experimental"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+
+For details, refer to the <OperationLink operation="project-get-llm-licence-experimental" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "project-update-llm-licence-experimental"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+
+For details, refer to the <OperationLink operation="project-update-llm-licence-experimental" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in ""
+
+
+- removed the schema 'de.mittwald.v1.aihosting.Licence'
+
+
+For details, refer to the <OperationLink operation="" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a list of currently active models"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ai-hosting-get-models" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all conversation the authenticated user has created or has access to"
+
+
+- added the new optional 'query' request parameter 'fullTextSearch'
+
+- added the new optional 'query' request parameter 'limit'
+
+- added the new optional 'query' request parameter 'page'
+
+- added the new optional 'query' request parameter 'skip'
+
+- added the new optional 'query' request parameter 'status'
+
+
+For details, refer to the <OperationLink operation="conversation-list-conversations" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get ai hosting plan and usages of a customer"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ai-hosting-customer-get-usage" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a list of already created keys"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ai-hosting-customer-get-keys" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Creates a new key"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ai-hosting-customer-create-key" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Delete a key for a customer"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ai-hosting-customer-delete-key" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a key of a customer"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ai-hosting-customer-get-key" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a key for a customer"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ai-hosting-customer-update-key" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Preview Order"
+
+
+- added the new 'aiHosting' enum value to the request property 'orderType'
+
+- added '#/components/schemas/de.mittwald.v1.order.AIHostingOrderPreview' to the 'orderData' request property 'oneOf' list
+
+- added '#/components/schemas/de.mittwald.v1.order.AIHostingOrderPreviewResponse' to the response body 'anyOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="order-preview-order" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create an Order"
+
+
+- added the new 'aiHosting' enum value to the request property 'orderType'
+
+- added '#/components/schemas/de.mittwald.v1.order.AIHostingOrder' to the 'orderData' request property 'oneOf' list
+
+
+For details, refer to the <OperationLink operation="order-create-order" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get ai hosting plan and usages of a project. Same as the customer route, but less details"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ai-hosting-project-get-usage" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a list of keys of a project"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ai-hosting-project-get-keys" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Creates a new key for a project"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ai-hosting-project-create-key" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Delete a key for a project"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ai-hosting-project-delete-key" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a key of a project"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ai-hosting-project-get-key" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a key for a project"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ai-hosting-project-update-key" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Schedule a strace measurement for a single http request"
+
+
+- added the non-success response with the status '412'
+
+
+For details, refer to the <OperationLink operation="pageinsights-schedule-strace" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Preview TariffChange"
+
+
+- added the new 'aiHosting' enum value to the request property 'tariffChangeType'
+
+- added '#/components/schemas/de.mittwald.v1.order.AIHostingTariffChange' to the 'tariffChangeData' request property 'oneOf' list
+
+
+For details, refer to the <OperationLink operation="order-preview-tariff-change" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create TariffChange Order"
+
+
+- added the new 'aiHosting' enum value to the request property 'tariffChangeType'
+
+- added '#/components/schemas/de.mittwald.v1.order.AIHostingTariffChange' to the 'tariffChangeData' request property 'oneOf' list
+
+
+For details, refer to the <OperationLink operation="order-create-tariff-change" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK Release v2.1.173
+
+The mittwald PHP SDK has been updated to version v2.1.173. This release includes a change in the method naming conventions within the `Client` interface and its implementation. Specifically, the method `aIHosting` has been renamed to `aiHosting` to enhance consistency and clarity in the codebase.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.173).
+
+### mittwald PHP SDK Release v2.1.172
+
+The latest release of the mittwald PHP SDK, version [v2.1.172](https://github.com/mittwald/api-client-php/releases/tag/v2.1.172), introduces several new features and improvements:
+
+#### Features
+- A new `AIHostingClient` interface and its implementation have been added to manage AI hosting API functionalities. This includes managing customer and project keys, retrieving usage, and accessing models.
+- Methods for creating, deleting, and updating keys for customers and projects have been introduced, along with error handling for various error responses.
+- Enhanced handling of requests and responses related to customer usage and project creation, improving interaction with the AI hosting service.
+
+#### Breaking Changes
+- The naming convention for imported classes has been standardized from `AIhosting` to `AIHosting`, affecting both interface definitions and client implementation files.
+- Method names within the `Client` interface have been updated to match the new naming convention, changing `aIhosting()` to `aIHosting()`.
+
+#### New Classes
+- **AIHostingClient**: Interface for AI hosting operations.
+- **AIHostingClientImpl**: Implementation of the `AIHostingClient` interface.
+- New response classes for key operations, such as `CustomerCreateKeyCreatedResponse`, `CustomerDeleteKeyBadRequestResponse`, and others.
+
+#### Changes to Existing Functionality
+- Existing request and response classes have been renamed and refactored within the `CustomerGetKeys`, `CustomerGetUsage`, and `ProjectCreateKey` namespaces to align with the new naming scheme, ensuring clearer semantics and consistency.
+
+This release enhances the API client's structure and usability for developers working with AI hosting features, while maintaining backward compatibility where possible.
+
+### mittwald PHP SDK Release v2.1.171
+
+The latest release of the mittwald PHP SDK, version [v2.1.171](https://github.com/mittwald/api-client-php/releases/tag/v2.1.171), introduces several updates and improvements:
+
+#### Added Features
+- **AI Hosting Terminology Updates**: The term "tariff" has been replaced with "plan" throughout the codebase to align with industry standards.
+
+#### Changes
+
+- **AI Hosting Client Updates**: Method comments in `AIhostingClient.php` and `AIhostingClientImpl.php` have been updated to reflect the terminology change from "tariff" to "plan" for functions like `aiHostingCustomerGetUsage` and `aiHostingProjectGetUsage`.
+
+- **Response Class Adjustments**: The response classes `AiHostingCustomerGetUsageOKResponse.php` and `AiHostingProjectGetUsageOKResponse.php` now use `PlanOptions` and `PlanUsage` instead of `TariffOptions` and `TariffUsage`.
+
+- **New Properties and Methods in `ListConversationsRequest`**: New properties have been introduced to support full text search, filtering by conversation status, and pagination controls. Corresponding getter and setter methods have been added.
+
+- **Schema Renaming and Updates**: Related schema files have been renamed for consistency, and a `planLimit` parameter has been added to the `PlanUsage` and `PlanUsageBig` classes, with a deprecation notice for `tariffLimit`.
+
+These updates enhance clarity and improve functionality in managing AI hosting plans.
+
+### mittwald PHP SDK v2.1.170 Release
+
+The mittwald PHP SDK has been updated to version v2.1.170. This release introduces significant enhancements, particularly in the management of AI hosting services. The new features include a dedicated client for handling AI hosting keys, allowing operations such as creating, retrieving, updating, and deleting keys. This addition enhances the API's capability to manage customer-specific keys for AI hosting.
+
+#### New Features
+
+- **AI Hosting Client**: 
+  - Implemented `AIhostingClient` and `AIhostingClientImpl` for managing AI hosting keys.
+  
+- **AI Hosting Customer Keys**:
+  - Introduced several request and response classes for key management, including:
+    - `AiHostingCustomerCreateKeyRequest`
+    - `AiHostingCustomerCreateKeyCreatedResponse`
+    - `AiHostingCustomerDeleteKeyRequest`
+    - `AiHostingCustomerGetKeyRequest`
+    - `AiHostingCustomerGetKeysRequest`
+    - `AiHostingCustomerGetUsageRequest`
+  - Enhanced error handling for operations with responses for `BadRequest`, `NotFound`, `Forbidden`, and `TooManyRequests`.
+
+#### Updated Interfaces
+
+- The `Client` interface now includes the `aIhosting()` method to access AI hosting functionalities.
+
+#### Detailed Changes
+
+- New files added for AI hosting client and customer key management.
+- The `ClientImpl` has been updated to incorporate the new AI hosting methods.
+- Improved error handling for AI hosting operations.
+
+For more details, please visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.170).
+
+### mittwald PHP SDK Release v2.1.169
+
+The latest release of the mittwald PHP SDK, version 2.1.169, introduces new features and changes aimed at improving error handling and response management.
+
+#### New Features
+- **Precondition Failed Response Handling**: A new response class, `PageinsightsScheduleStracePreconditionFailedResponse`, has been added to handle HTTP 412 status codes specifically for the Page Insights API. This enhancement allows for better management of client-side conditions that fail during requests.
+
+#### Changes
+- **Added Precondition Failed Response**: The `PageInsightsClientImpl` class now includes handling for the 412 HTTP status code, utilizing the new `PageinsightsScheduleStracePreconditionFailedResponse` for more detailed error context.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.169).
+
+### mittwald JavaScript SDK Release 4.284.0
+
+The mittwald JavaScript SDK version 4.284.0 has been released. This update includes a feature enhancement with an updated generated client. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.284.0).
+
+### mittwald JavaScript SDK Release 4.283.0
+
+The mittwald JavaScript SDK version 4.283.0 has been released on January 15, 2026. This update includes a feature enhancement with an updated generated client. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.283.0](https://github.com/mittwald/api-client-js/releases/tag/4.283.0).
+
+### mittwald JavaScript SDK Release 4.282.0
+
+The mittwald JavaScript SDK has been updated to version 4.282.0. This release includes an update to the generated client, enhancing the functionality and performance of the SDK. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.282.0).
+
+### mittwald JavaScript SDK Release 4.281.0
+
+The mittwald JavaScript SDK has been updated to version 4.281.0. This release includes an update to the generated client, enhancing its functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.281.0).
+
+### mittwald JavaScript SDK Release 4.280.0
+
+The mittwald JavaScript SDK has been updated to version 4.280.0. This release includes an update to the generated client, enhancing its functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.280.0).
+
