@@ -21,14 +21,20 @@ jobs:
         with:
           node-version: '20' # Minimum required version is 20
 
-      # Install dependencies
       - name: Install dependencies
         run: npm install
 
-      # Install Playwright browsers
+      - name: Install Playwright Browsers Dependencies
+        run: npx playwright install-deps
+
       - name: Install Playwright Browsers
         run: npx playwright install
 
-      # Run the Crawler Test
+      - name: Generate API reference
+        run: npm run generate
+
+      - name: Build docs
+        run: npm run build
+
       - name: Run Crawler Test
         run: npx playwright test crawler
