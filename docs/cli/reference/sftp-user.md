@@ -1,6 +1,12 @@
-# `mw sftp-user`
+`mw sftp-user`
+==============
 
 Manage SFTP users of your projects
+
+
+
+
+
 
 ## `mw sftp-user create`
 

@@ -1,6 +1,12 @@
-# `mw extension`
+`mw extension`
+==============
 
 Install and manage extensions in your organisations and projects
+
+
+
+
+
 
 ## `mw extension install EXTENSION-ID`
 

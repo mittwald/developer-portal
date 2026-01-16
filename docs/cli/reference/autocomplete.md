@@ -1,6 +1,9 @@
-# `mw autocomplete`
+`mw autocomplete`
+=================
 
 Display autocomplete installation instructions.
+
+
 
 ## `mw autocomplete [SHELL]`
 

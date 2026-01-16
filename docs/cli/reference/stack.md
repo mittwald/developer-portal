@@ -1,6 +1,15 @@
-# `mw stack`
+`mw stack`
+==========
 
 Manage container stacks
+
+
+
+
+
+
+
+
 
 ## `mw stack delete [STACK-ID]`
 

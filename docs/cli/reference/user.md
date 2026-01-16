@@ -1,6 +1,20 @@
-# `mw user`
+`mw user`
+=========
 
 Manage your own user account
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## `mw user api-token create`
 

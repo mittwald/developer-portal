@@ -1,6 +1,38 @@
-# `mw app`
+`mw app`
+========
 
 Manage apps, and app installations in your projects
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## `mw app copy [INSTALLATION-ID]`
 

@@ -1,6 +1,11 @@
-# `mw login`
+`mw login`
+==========
 
 Manage your client authentication
+
+
+
+
 
 ## `mw login reset`
 
