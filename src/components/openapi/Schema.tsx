@@ -87,5 +87,9 @@ export default function Schema({ schema }: Props) {
     return <ArraySchema schema={schema} />;
   }
 
-  return <PropertyValue name="*" schema={schema} required={false} />;
+  return (
+    <ul className={styles.parameterList}>
+      <PropertyValue name="*" schema={schema} required={false} />
+    </ul>
+  );
 }

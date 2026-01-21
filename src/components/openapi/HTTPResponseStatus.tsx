@@ -17,7 +17,7 @@ function getClassNameByCode(code: string): string {
 function HTTPResponseStatus({ code }: { code: string }) {
   return (
     <span className={clsx(styles.responseStatus, getClassNameByCode(code))}>
-      {code} {statusCodeName(code)}
+      {`${code} ${statusCodeName(code)}`}
     </span>
   );
 }

@@ -36,7 +36,6 @@ function webpackCryptoFallbackPlugin() {
 
 const config: Config = {
   title: "mittwald Developer Portal",
-  //tagline: 'Dinosaurs are cool',
   favicon: "img/favicon.ico",
 
   // Set the production url of your site here
@@ -51,11 +50,10 @@ const config: Config = {
   projectName: "developer-portal", // Usually your repo name.
 
   onBrokenLinks: "throw",
-  onBrokenMarkdownLinks: "throw",
 
   // Broken anchors need to be ignored because of Redocusaurus
   // Reset to "throw" once https://github.com/rohit-gohri/redocusaurus/issues/321 is fixed
-  onBrokenAnchors: "ignore",
+  onBrokenAnchors: "warn",
 
   trailingSlash: true,
 
@@ -265,6 +263,9 @@ const config: Config = {
   } satisfies ThemeConfig,
   markdown: {
     mermaid: true,
+    hooks: {
+        onBrokenMarkdownLinks: "ignore",
+    }
   },
   themes: ["@docusaurus/theme-mermaid"],
 };

@@ -3,7 +3,7 @@ import { OpenAPIV3 } from "openapi-types";
 export function generateSchemaExample(schema: OpenAPIV3.SchemaObject): any {
   if (schema.example) {
     if (schema.format === "binary") {
-      return new TextEncoder().encode(schema.example.toString());
+      return '[Binary Example]';
     }
     return schema.example;
   }
@@ -42,9 +42,11 @@ export function generateSchemaExample(schema: OpenAPIV3.SchemaObject): any {
     return [generateSchemaExample(schema.items as OpenAPIV3.SchemaObject)];
   }
 
+  // ATTN: Keep this output static in order to avoid hydration issues,
+  // as the examples are (re-)generated on the client side!
   if (schema.type === "string") {
     if (schema.format === "date-time") {
-      return new Date().toISOString();
+      return '1985-10-26T01:21:00.000Z';
     } else if (schema.format === "email" || schema.format === "idn-email") {
       return "email@mittwald.example";
     } else if (schema.format === "uuid") {

@@ -48,7 +48,9 @@ export function ArrayValue({ schema }: { schema: OpenAPIV3.SchemaObject }) {
         <span className={styles.parameterAlternative}>Array[</span>
       </div>
       <div className={styles.parameterListBody}>{body}</div>
-      <PropertyValue name="*" schema={schema} required={false} />
+      <ul className={styles.parameterList}>
+        <PropertyValue name="*" schema={schema} required={false} />
+      </ul>
       <div className={styles.parameterListHeader}>
         <span className={styles.parameterAlternative}>]</span>
       </div>

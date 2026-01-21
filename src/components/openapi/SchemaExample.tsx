@@ -104,13 +104,8 @@ function renderExample(format: ExampleFormat, example: any): string {
     return (
       Object.entries(example)
         .map(([key, value]) => {
-          let contentType: string = undefined;
+          let contentType: string = 'image/jpeg';
           let valueStr: string = value.toString();
-
-          if (value instanceof Uint8Array) {
-            contentType = "image/jpeg";
-            valueStr = "[binary file contents]";
-          }
 
           let example =
             boundary +

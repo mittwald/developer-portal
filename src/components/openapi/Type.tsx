@@ -11,7 +11,8 @@ function Type({
   if (schema.type === "array") {
     return (
       <span className={className}>
-        array of <Type schema={schema.items as OpenAPIV3.SchemaObject} />
+        {"array of "}
+        <Type schema={schema.items as OpenAPIV3.SchemaObject} />
       </span>
     );
   }
@@ -19,7 +20,7 @@ function Type({
   if (schema.oneOf !== undefined) {
     return (
       <span className={className}>
-        one of {schema.oneOf.length} alternatives
+        {`one of ${schema.oneOf.length} alternatives`}
       </span>
     );
   }
@@ -43,7 +44,7 @@ function Type({
 
   if (schema.enum !== undefined) {
     if (schema.enum.length === 1 && typeof schema.enum[0] === "string") {
-      return <span className={className}>"{schema.enum[0]}"</span>;
+      return <span className={className}>{`"${schema.enum[0]}"`}</span>;
     }
     addendums.push(`one of: ${schema.enum.join(", ")}`);
   }
@@ -51,7 +52,7 @@ function Type({
   if (addendums.length > 0) {
     return (
       <span className={className}>
-        {schema.type} ({addendums.join(", ")})
+        {`${schema.type} (${addendums.join(", ")})`}
       </span>
     );
   }
