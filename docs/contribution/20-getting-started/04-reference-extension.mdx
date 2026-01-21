@@ -173,37 +173,23 @@ Mehr dazu in
 
 :::
 
-### Starten der Datenbank
+### Starten der Entwicklungsumgebung
 
-Die Reference Extension verwendet **[PostgreSQL](https://www.postgresql.org/)** für die Datenpersistierung.
-Sie bietet außerdem eine `docker-compose.yml`, mit der eine Datenbank lokal hochgefahren werden kann.
+Die Reference Extension ist auf eine Datenbank angewiesen für die Persistierung ihrer Daten.
+Sie verwendet dazu **[PostgreSQL](https://www.postgresql.org/)**.
 
-Um die Datenbank hochzufahren und das Datenbank-Schema anzuwenden, führe folgendes aus:
+Um das Starten der Extension zu vereinfachen, liefert die Reference Extension eine `docker-compose.yml` sowie eine `docker-compose.dev.yml`.
+Beide können dazu werden, die Extension vollständig mit ihren Abhängigkeiten zu starten.
+Die `docker-compose.dev.yml` startet die Extension jedoch in einem Development Modus mit Hot Reloading.
 
-```bash
-# PostgreSQL Container starten (läuft auf Port 5433)
-pnpm run docker:dev db -d
-
-# Datenbank-Schema initialisieren
-pnpm run db:push
-```
-
-### Development Server starten
-
-Nachdem alle Voraussetzungen erfüllt sind, kann der Development Server gestartet werden:
+Um die Extension zu starten, führe den folgenden Befehl aus:
 
 ```bash
-pnpm run dev
+pnpm run docker:dev
 ```
 
-Der Server startet standardmäßig auf **Port 3000** und ist unter `http://localhost:3000` erreichbar.
-
-**Was passiert beim Start:**
-
-- Vite Development Server wird gestartet
-- TanStack Start lädt die Server-seitigen Routes
-- Datenbank-Verbindung wird hergestellt
-- Webhook-Endpoints werden unter `/api/webhooks.mittwald` verfügbar
+Das **Datenbank Schema** wird durch die Extension automatisch über **Migrations** angewandt.
+Die Extension läuft nun auf **Port 3000** und ist unter `http://localhost:3000` erreichbar.
 
 :::warning Public URL erforderlich
 Damit die Extension im mStudio funktioniert, muss die lokal laufende Extension eine tatsächliche Extension Instance speichern.
