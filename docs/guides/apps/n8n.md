@@ -84,16 +84,16 @@ Wenn du Docker Compose bevorzugst, kannst du eine `docker-compose.yml`-Datei ers
      n8n:
        image: n8nio/n8n:stable
        environment:
-            - N8N_HOST=example.project.space
-            - N8N_PORT=5678
-            - N8N_PROTOCOL=https
-            - NODE_ENV=production
-            - WEBHOOK_URL=https://example.project.space/
-            - GENERIC_TIMEZONE=Europe/Berlin
+          - N8N_HOST=example.project.space
+          - N8N_PORT=5678
+          - N8N_PROTOCOL=https
+          - NODE_ENV=production
+          - WEBHOOK_URL=https://example.project.space/
+          - GENERIC_TIMEZONE=Europe/Berlin
        ports:
-         - "5678:5678"
+          - "5678:5678"
        volumes:
-         - n8n_data:/root/.n8n
+          - n8n_data:/root/.n8n
    volumes:
      n8n_data:
    ```
@@ -110,4 +110,66 @@ Dieser Ansatz ist besonders nützlich, wenn du mehrere Container deployen möcht
 
 Deine n8n-Daten werden im Rahmen des regelmäßigen Projektbackups gesichert und entsprechend auch wiederhergestellt werden.
 
-### Use cases
+### Use case: RAG mit postgreSQL
+
+```
+version: "3.9"
+services:
+  pgvector:
+    image: ankane/pgvector:latest
+    container_name: pgvector
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: n8n
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgvector_data:/var/lib/postgresql/data
+
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    restart: unless-stopped
+    environment:
+      N8N_HOST: example.project.space
+      N8N_PROTOCOL: https
+      WEBHOOK_URL: https://example.project.space/
+      GENERIC_TIMEZONE: Europe/Berlin
+      N8N_BASIC_AUTH_ACTIVE: "true"
+      N8N_BASIC_AUTH_USER: "admin"
+      N8N_BASIC_AUTH_PASSWORD: "admin"
+      N8N_DATABASE_POSTGRESDB_HOST: pgvector
+      N8N_DATABASE_POSTGRESDB_PORT: 5432
+      N8N_DATABASE_POSTGRESDB_DATABASE: n8n
+      N8N_DATABASE_POSTGRESDB_USER: postgres
+      N8N_DATABASE_POSTGRESDB_PASSWORD: postgres
+      N8N_PORT: 5678
+    ports:
+      - "5678:5678"
+    depends_on:
+      - pgvector
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+volumes:
+  pgvector_data:
+    driver: local
+  n8n_data:
+    driver: local
+```
+
+CREATE TABLE document_metadata (
+    id TEXT PRIMARY KEY,
+    title TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    schema TEXT
+);
+
+
+CREATE TABLE document_rows (
+    id SERIAL PRIMARY KEY,
+    dataset_id TEXT REFERENCES document_metadata(id),
+    row_data JSONB  -- Store the actual row data
+);
