@@ -1,33 +1,35 @@
-# MariaDB ausführen
+---
+sidebar_label: n8n
+description: Erfahre, wie du einen n8n-Container aufsetzt, einzeln oder im Verbund mit anderen Apps
+---
+
+# n8n ausführen
 
 ## Einführung
 
-n8n ist eine Automatisierungsplattform, mit der sich verschiedene Dienste und Anwendungen über sogenannte Workflows miteinander verbinden lassen. Sie funktioniert ähnlich wie Tools wie Zapier oder Make (ehemals Integromat), bietet aber mehr Flexibilität und Kontrolle – besonders für Entwickler:innen.
+n8n ist eine Automatisierungsplattform, mit der sich verschiedene Dienste und Anwendungen über sogenannte Workflows miteinander verbinden lassen. Sie funktioniert ähnlich zu Tools wie Zapier oder Make (ehemals Integromat), bietet aber mehr Flexibilität und Kontrolle – besonders für Entwickler:innen.
 
 Mit n8n kannst du:
 
 - Automatisierte Abläufe zwischen über 300+ Diensten (z. B. Slack, Google Sheets, GitHub, Datenbanken etc.) erstellen.
-
 - Eigene Logik einbauen – z. B. mit Bedingungen, Schleifen, benutzerdefiniertem JavaScript.
-
 - Die Software selbst hosten (Self-Hosting), was volle Datenhoheit ermöglicht.
 
 ## n8n Container erstellen
 
-Du kannst eine n8n in deiner mittwald Hosting-Umgebung mit Containern bereitstellen. Es gibt verschiedene Hauptansätze:
-
+Du kannst n8n in deiner mittwald Hosting-Umgebung mit Containern bereitstellen. Es gibt verschiedene Hauptansätze:
 
 ### Verwendung der mStudio-Benutzeroberfläche
 
 1. Gehe in deinem Projekt in mStudio auf den **Container**-Menüpunkt und erstelle einen neuen Container. Du kannst einen beliebigen Namen wählen.
 
-2. Gib das Image `n8nio/n8n:latest` ein. Du kannst den Entrypoint und das Command wie vorgeschlagen beibehalten.
+2. Gib das Image `n8nio/n8n:stable` ein. Du kannst den Entrypoint und das Command wie vorgeschlagen beibehalten.
 
 #### Volumes
 
 Um die Daten deines n8n persistent zu speichern, definiere Volumes unter **Volumes** wie folgt:
 
-- Neues Volume erstellen, auf **Pfad im Container** (Mount Point): `/root/.n8n` 
+- Neues Volume erstellen, auf **Pfad im Container** (Mount Point): `/root/.n8n`
 
 
 #### Umgebungsvariablen
@@ -35,11 +37,11 @@ Um die Daten deines n8n persistent zu speichern, definiere Volumes unter **Volum
 Setze die folgenden Umgebungsvariablen für den Container:
 
 ```dotenv
-N8N_HOST=p-dqyafd.project.space
+N8N_HOST=example.project.space
 N8N_PORT=5678
 N8N_PROTOCOL=https
 NODE_ENV=production
-WEBHOOK_URL=https://p-dqyafd.project.space/
+WEBHOOK_URL=https://example.project.space/
 GENERIC_TIMEZONE=Europe/Berlin
 ```
 
@@ -47,25 +49,25 @@ Hier passt du die Umgebungsvariablen `N8N_HOST` und `WEBHOOK_URL` auf den Host a
 
 #### Ports
 
-Übernehme den vorgeschlagenen Standardport `5687`.
+Übernehme den vorgeschlagenen Standardport `5678`.
 
 ### Verwendung der CLI mit `mw container run`
 
-Du kannst auch einen PostgreSQL-Container mit der mittwald CLI und dem Befehl `mw container run` bereitstellen:
+Du kannst auch einen n8n-Container mit der mittwald CLI und dem Befehl `mw container run` bereitstellen:
 
 ```bash
 mw container run \
   --name n8n \
-  --env N8N_HOST=p-dqyafd.project.space \
+  --env N8N_HOST=example.project.space \
   --env N8N_PORT=5678 \
   --env N8N_PROTOCOL=https \
   --env NODE_ENV=production \
-  --env WEBHOOK_URL=https://p-dqyafd.project.space/ \
-  --env GENERIC_TIMEZONE=Europe/Berlin \  
+  --env WEBHOOK_URL=https://example.project.space/ \
+  --env GENERIC_TIMEZONE=Europe/Berlin \
   --volume n8n-data:/root/.n8n \
-  --publish 5687:5687/tcp \
+  --publish 5678:5678/tcp \
   --create-volumes \
-  n8nio/n8n:latest
+  n8nio/n8n:stable  # alternatives: https://hub.docker.com/r/n8nio/n8n/tags
 ```
 
 Dieser Befehl erstellt einen neuen Container namens "n8n" mit dem n8n-Image, setzt alle notwendigen Umgebungsvariablen und mountet Volumes für die persistente Datenspeicherung.
@@ -79,17 +81,17 @@ Wenn du Docker Compose bevorzugst, kannst du eine `docker-compose.yml`-Datei ers
    ```yaml
    version: "3"
    services:
-     mariadb:
-       image: n8nio/n8n:latest
+     n8n:
+       image: n8nio/n8n:stable
        environment:
-            -N8N_HOST=p-dqyafd.project.space
+            - N8N_HOST=example.project.space
             - N8N_PORT=5678
             - N8N_PROTOCOL=https
             - NODE_ENV=production
-            - WEBHOOK_URL=https://p-dqyafd.project.space/
+            - WEBHOOK_URL=https://example.project.space/
             - GENERIC_TIMEZONE=Europe/Berlin
        ports:
-         - "5687:5687"
+         - "5678:5678"
        volumes:
          - n8n_data:/root/.n8n
    volumes:
@@ -107,3 +109,5 @@ Dieser Ansatz ist besonders nützlich, wenn du mehrere Container deployen möcht
 ## Betrieb
 
 Deine n8n-Daten werden im Rahmen des regelmäßigen Projektbackups gesichert und entsprechend auch wiederhergestellt werden.
+
+### Use cases

@@ -1,21 +1,23 @@
+---
+sidebar_label: n8n
+description: Erfahre, wie du einen n8n-Container aufsetzt, einzeln oder im Verbund mit anderen Apps
+---
+
 # n8n ausführen
 
 ## Einführung
 
-n8n ist eine Automatisierungsplattform, mit der sich verschiedene Dienste und Anwendungen über sogenannte Workflows miteinander verbinden lassen. Sie funktioniert ähnlich wie Tools wie Zapier oder Make (ehemals Integromat), bietet aber mehr Flexibilität und Kontrolle – besonders für Entwickler:innen.
+n8n ist eine Automatisierungsplattform, mit der sich verschiedene Dienste und Anwendungen über sogenannte Workflows miteinander verbinden lassen. Sie funktioniert ähnlich zu Tools wie Zapier oder Make (ehemals Integromat), bietet aber mehr Flexibilität und Kontrolle – besonders für Entwickler:innen.
 
 Mit n8n kannst du:
 
 - Automatisierte Abläufe zwischen über 300+ Diensten (z. B. Slack, Google Sheets, GitHub, Datenbanken etc.) erstellen.
-
 - Eigene Logik einbauen – z. B. mit Bedingungen, Schleifen, benutzerdefiniertem JavaScript.
-
 - Die Software selbst hosten (Self-Hosting), was volle Datenhoheit ermöglicht.
 
 ## n8n Container erstellen
 
-Du kannst eine n8n in deiner mittwald Hosting-Umgebung mit Containern bereitstellen. Es gibt verschiedene Hauptansätze:
-
+Du kannst n8n in deiner mittwald Hosting-Umgebung mit Containern bereitstellen. Es gibt verschiedene Hauptansätze:
 
 ### Verwendung der mStudio-Benutzeroberfläche
 
