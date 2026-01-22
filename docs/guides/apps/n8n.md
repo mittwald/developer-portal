@@ -112,11 +112,16 @@ Deine n8n-Daten werden im Rahmen des regelmäßigen Projektbackups gesichert und
 
 ### Use case: RAG mit postgreSQL
 
+Random idea in a random place: We could create a special "example" react component,
+wrapping such examples in a way they can be downloaded and directly passed to mw cli
+without manual copy&paste. I miss the first or last line all the time because i dont
+even read properly.
+
 ```
 version: "3.9"
 services:
   pgvector:
-    image: ankane/pgvector:latest
+    image: ankane/pgvector:latest  # avoid manual pgvector extension installation, use proper image directly
     container_name: pgvector
     restart: always
     environment:
@@ -160,16 +165,15 @@ volumes:
     driver: local
 ```
 
-CREATE TABLE document_metadata (
+CREATE TABLE meta (
     id TEXT PRIMARY KEY,
     title TEXT,
     created_at TIMESTAMP DEFAULT NOW(),
     schema TEXT
 );
 
-
-CREATE TABLE document_rows (
+CREATE TABLE rows (
     id SERIAL PRIMARY KEY,
-    dataset_id TEXT REFERENCES document_metadata(id),
+    meta_id TEXT REFERENCES meta(id),
     row_data JSONB  -- Store the actual row data
 );
