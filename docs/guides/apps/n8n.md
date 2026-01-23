@@ -108,25 +108,51 @@ Dieser Ansatz ist besonders nützlich, wenn du mehrere Container deployen möcht
 
 ## Betrieb
 
-Deine n8n-Daten werden im Rahmen des regelmäßigen Projektbackups gesichert und entsprechend auch wiederhergestellt werden.
+Deine n8n-Daten werden im Rahmen des regelmäßigen Projektbackups gesichert und können entsprechend auch wiederhergestellt werden.
 
-### Use case: RAG mit postgreSQL
+### Use case: RAG mit postgreSQL und Mittwald AI-Hosting
 
-Random idea in a random place: We could create a special "example" react component,
-wrapping such examples in a way they can be downloaded and directly passed to mw cli
-without manual copy&paste. I miss the first or last line all the time because i dont
-even read properly.
+n8n kann benutzt werden, um RAG Systeme verschiedenster Form aufzubauen. Das folgende Beispiel zeigt einen möglichen Aufbau, aufgrund des großen n8n-Ökosystems ist dies aber lediglich einer von vielen Wegen. Viel mehr soll dieses Beispiel als Einstieg dienen, um im Anschluss komplexere und vor allem produktionsreife Systeme aufzusetzen.
+
+#### Vorraussetzungen
+
+- Mittwald Container Hosting
+- Mittwald AI-Hosting
+- mStudio Zugriff, per Webapp und API-Token
+- `mw` CLI, Deployment des Container Verbunds
+
+#### Einführung, grundlegender Aufbau
+
+Das Ziel ist, einem KI-Agenten Zugriff auf Informationen aus Dokumenten zu gewähren, sodass sich Agenten in ihren Aktionen / Anworten auf eben diese Dokumente beziehen können. Solche Dukumente können konkret vieles sein, z.B. Anleitungen, Handbücher oder gar Excel-Mappen mit vielen Daten.
+
+Um dieses Ziel zu erriechen ist eine Persistenzschicht nötig, in der Informationen "KI-freundlich" abgelegt werden können. Unter der Haube kommen mindestens zwei KI-Modelle zum Einsatz: Eines zum Erzeugen sog. "Embeddings" und ein weiteres um den Agenten zu steuern. Embeddings sind dabei die "KI-freundliche" Art, Texte und Dokumente für KIs zu persistieren, sodass diese schnell zum Kontext einer Unterhaltung beigesteuert werden können.
+
+Im Beispiel kommen diese zwei Modelle aus dem Mittwald KI-Hosting zum Einsatz:
+
+- **Embedding**: `Qwen3-Embedding-8B`
+- **Agent**: `Devstral-Small-2-24B-Instruct-2512`
+
+Zum Speichern der Embeddings wird eine Vektordatenbank benötigt. Hier gibts es mehrere Möglichkeiten, das Beispiel nutzt `postgreSQL` mit der `pgvector` Extension. Dafür gibt es ein vorbereitetes Docker Image, das hier benutzt werden kann.
+
+Der aufgebaute Verbund von Containern besteht also mindestens aus:
+
+- **n8n**: Erstellung und Betrieb RAG
+- **pgvector**: Vektordatenbank für Embeddings
+
+#### Installation
+
+Sind alle Vorraussetzungen gegeben, kann mit der Installation begonnen werden. Zunächst erstellen wir die Docker Compose Datei:
 
 ```
 version: "3.9"
 services:
   pgvector:
-    image: ankane/pgvector:latest  # avoid manual pgvector extension installation, use proper image directly
+    image: ankane/pgvector:latest
     container_name: pgvector
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: n8n
     ports:
       - "5432:5432"
@@ -138,18 +164,19 @@ services:
     container_name: n8n
     restart: unless-stopped
     environment:
-      N8N_HOST: example.project.space
+      N8N_BASIC_AUTH_USER: ${N8N_BASIC_AUTH_USER}
+      N8N_BASIC_AUTH_PASSWORD: ${N8N_BASIC_AUTH_PASSWORD}
+      N8N_HOST: ${N8N_HOST}
+      WEBHOOK_URL: ${WEBHOOK_URL}
+      N8N_DATABASE_POSTGRESDB_USER: ${POSTGRES_USER}
+      N8N_DATABASE_POSTGRESDB_PASSWORD: ${POSTGRES_PASSWORD}
+      NODES_EXCLUDE: ${NODES_EXCLUDE}
       N8N_PROTOCOL: https
-      WEBHOOK_URL: https://example.project.space/
       GENERIC_TIMEZONE: Europe/Berlin
       N8N_BASIC_AUTH_ACTIVE: "true"
-      N8N_BASIC_AUTH_USER: "admin"
-      N8N_BASIC_AUTH_PASSWORD: "admin"
       N8N_DATABASE_POSTGRESDB_HOST: pgvector
       N8N_DATABASE_POSTGRESDB_PORT: 5432
       N8N_DATABASE_POSTGRESDB_DATABASE: n8n
-      N8N_DATABASE_POSTGRESDB_USER: postgres
-      N8N_DATABASE_POSTGRESDB_PASSWORD: postgres
       N8N_PORT: 5678
     ports:
       - "5678:5678"
@@ -165,15 +192,71 @@ volumes:
     driver: local
 ```
 
-CREATE TABLE meta (
-    id TEXT PRIMARY KEY,
-    title TEXT,
-    created_at TIMESTAMP DEFAULT NOW(),
-    schema TEXT
-);
+Alle kritischen Einstellungen wie z.B. Passwörter werden als Umgebungsvariablen eingegeben. Dies erlaubt u.a. das schnelle Aufsetzen mehrerer Umgebungen, z.B. für Test- und Produktivbetrieb.
 
-CREATE TABLE rows (
-    id SERIAL PRIMARY KEY,
-    meta_id TEXT REFERENCES meta(id),
-    row_data JSONB  -- Store the actual row data
-);
+Die konkreten Einstellungen schreiben wir dann in eine `.env` Datei:
+
+```
+N8N_HOST=example.project.space
+WEBHOOK_URL=https://example.project.space/
+N8N_BASIC_AUTH_USER=<basic auth user>
+N8N_BASIC_AUTH_PASSWORD=<basic auth password>
+POSTGRES_USER=<postgres user>
+POSTGRES_PASSWORD=<postgres password>
+NODES_EXCLUDE=[]
+```
+
+Zur einfachen Unterscheidung wird empfohlen, den `.env` Dateien sprechende Namen zu geben, z.B. `test.env` oder `prod.env`.
+
+ATTN: `NODES_EXCLUDE=[]` aktiviert **alle** Knoten für die Benutzung. Einige dieser Knoten können ein Sicherheitsrisiko darstellen. Zum Testen kann dies sehr nützlich sein, für produktive Umgebungen wird empfohlen, eine genaue Liste unerwünschter Knoten zu pflegen.
+
+Sind alle Einstellungen vorbereitet, kann der Verbund ausgeliefert werden:
+
+```
+mw stack deploy -c path/to/n8n/docker-compose.yml --env-file path/to/n8n/example.env
+```
+
+Sehen wir in der Konsole eine Erfolgsmeldung, kontrollieren wir die neuen Container im mStudio und haben somit den Installationsschritt abgeschlossen!
+
+#### Beispiel-Workflow
+
+**HIER EINFÜGEN / LINK**
+
+#### Einrichtung
+
+Nach der Installation setzen wir das RAG-System in n8n auf und richten das System ein. Zunächst aktivieren wir einen n8n-Lizenzschlüssel und laden die Basisknoten zur Workflowerstellung herunter. Die benötigten Knoten liegen in `n8n-nodes-base`und können direkt aus der Applikation heraus heruntergeladen und installiert werden.
+
+ATTN: Prüfe stets **vor** dem Ausführen eines Workflows, ob alle beteiligten Knoten vorhanden und korrekt verbunden sind. n8n-Fehlermeldungen können sehr technisch oder gar irreführend sein, eine Kontrolle im Vorfeld lohnt sich um Arbeit bei der Fehlersuche zu sparen.
+
+Neben dem bloßen Vorhandensein müssen einige der Knoten korrekt konfiguriert werden.
+
+Benötigt wird:
+- Zugang zum Mittwald AI-Hosting ( oder vergleichbarer, OpenAI-kompatibler Host ) mit API-Key
+- Zugang zur Datenbank, Benutzer und Passwort haben wir bereits im Container-Verbund vorbereitet
+
+ATTN: für den Produktivbetrieb ist es sauberer, mehrere Datenbankbenutzer mit unterschiedlichen Privilegien zu pflegen. Dies bedarf allerdings händischer Anpassungen am Datenbank-Container, diee hier aus Komplexitätsgründen nicht weiter ausgeführt werden. Grundsätzlich sollte der mit Benutzereingaben arbeitende Datenbankbenutzer des KI-Agenten **keine** Berechtigung haben, das Datenbankschema zu ändern!
+
+Wir erstellen also Zugangsdaten für die Datenbank und den KI-Host, anschließend weisen wir diese den entsprechenden Knoten zu. Beim Anlegen der Zugangsdaten wird bereits die Verbindung geprüft, d.h. wir sehen direkt, ob unser Verbund sauber arbeitet.
+
+#### Betrieb - Webhook
+
+Lasse den initialen Webhook lauschen in Test-Modus, dann kann man testen, z.B. per postman oder curl, die genaue URL wird dabei angezeigt:
+
+```
+curl -X POST -d '{
+  "chatInput": "Hello World!",
+  "sessionId": 42
+}' -H "Content-Type: application/json" https://example.project.space/webhook-test/<webhook uuid>
+```
+
+Solange unser RAG noch nicht mit Dokumenten befüllt ist, haben wir hier einen einfachen Chatbot mit dem im Model eingebackenen Weltwissen. Fragen wir explizit, erklärt sich der Agent auch:
+
+```
+curl -X POST -d '{
+  "chatInput": "How many documents do you know?",
+  "sessionId": 42
+}' -H "Content-Type: application/json" https://n8n.p-zrxbea.project.space/webhook-test/bf4dd093-bb02-472c-9454-7ab9af97bd1d
+{"output":"I currently do not have access to any documents in my knowledge base. If you'd like, I can help answer questions based on general knowledge or assist with other tasks."}
+```
+
+#### Betrieb - RAG, Dateisystem
