@@ -1,0 +1,155 @@
+---
+title: Breaking (!) API changes for v2 API, January 16 to January 23
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Cronjob
+  - Domain
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API introduces several updates, including the addition of optional properties to responses, a new endpoint for updating Cronjob app installation IDs, and the removal of an outdated API path.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The API path `/v2/cronjobs/{cronjobId}/app-id` has been removed without deprecation for the `PATCH` operation `cronjob-update-cronjob-app-id`. This is a breaking change.
+- An endpoint has been added at `/v2/cronjobs/{cronjobId}/app-installation-id` for the `PATCH` operation `cronjob-update-cronjob-app-id`.
+- The optional property `appInstallationId` has been added to the response with the `200` status for the `GET` operation `cronjob-get-cronjob`.
+- The optional property `expirationDate` has been added to the response with the `201` status for the `POST` operation `domain-create-domain-auth-code`.
+- The optional property `/items/appInstallationId` has been added to the response with the `200` status for the `GET` operation `cronjob-list-cronjobs`.
+- A new optional request property `appInstallationId` has been added for the `POST` operation `cronjob-create-cronjob`.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Update a cronjob's app installation id"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="cronjob-update-cronjob-app-id" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a cronjob"
+
+
+- added the optional property 'appInstallationId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="cronjob-get-cronjob" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create an auth code for a Domains transfer-out process"
+
+
+- added the optional property 'expirationDate' to the response with the '201' status
+
+
+For details, refer to the <OperationLink operation="domain-create-domain-auth-code" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List cronjobs belonging to a Project"
+
+
+- added the optional property '/items/appInstallationId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="cronjob-list-cronjobs" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a cronjob"
+
+
+- added the new optional request property 'appInstallationId'
+
+
+For details, refer to the <OperationLink operation="cronjob-create-cronjob" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK Release v2.1.175
+
+The mittwald PHP SDK has released version v2.1.175, which introduces significant updates and deprecations. 
+
+#### Deprecation Notice
+- The `appId` field is now deprecated and will be replaced by `appInstallationId`. Future versions will remove `appId` entirely.
+
+#### Key Changes
+
+**API Updates:**
+- Documentation and schemas have been updated to reflect the transition from `appId` to `appInstallationId`.
+
+**Code Modifications:**
+- Fields related to `appId` in classes such as `UpdateCronjobAppIdRequest`, `Cronjob`, and `CronjobRequest` are marked as deprecated.
+- New field `appInstallationId` has been introduced in these classes.
+- New methods have been added to handle `appInstallationId`, while methods related to `appId` are deprecated.
+
+**Validation Schema Updates:**
+- Validation schemas now include `appInstallationId` and mark `appId` as deprecated, with clarifications provided.
+
+This release aims to enhance the API's clarity and facilitate a smoother transition for developers. For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.175).
+
+### mittwald PHP SDK Release v2.1.174
+
+The latest release of the mittwald PHP SDK, [v2.1.174](https://github.com/mittwald/api-client-php/releases/tag/v2.1.174), introduces a significant enhancement to the Create Domain Authentication Code endpoint. This update adds an expiration date to the response data, providing users with critical information about the validity period of the authentication code.
+
+#### Key Updates:
+
+- **Expiration Date for Auth Code**: 
+  - The `CreateDomainAuthCodeCreatedResponse` now includes an `expirationDate` field formatted as a `date-time` string.
+  - The response body class has been updated to incorporate methods for setting and retrieving the expiration date.
+
+#### Enhancements:
+
+- The structure of response objects has been updated to include the new `expirationDate` attribute.
+- New methods `withExpirationDate` and `withoutExpirationDate` have been added to the `CreateDomainAuthCodeCreatedResponseBody` class for improved management of the expiration date field.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.174).
+
+### mittwald JavaScript SDK Release 4.287.0
+
+The mittwald JavaScript SDK has been updated to version 4.287.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.287.0).
+
+### mittwald JavaScript SDK Release 4.286.0
+
+The mittwald JavaScript SDK has been updated to version 4.286.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald SDK 4.286.0](https://github.com/mittwald/api-client-js/releases/tag/4.286.0).
+
+### mittwald JavaScript SDK Release 4.285.0
+
+The mittwald JavaScript SDK has been updated to version 4.285.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.285.0](https://github.com/mittwald/api-client-js/releases/tag/4.285.0).
+
