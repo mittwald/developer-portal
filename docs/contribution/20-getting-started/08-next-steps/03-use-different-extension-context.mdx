@@ -1,0 +1,36 @@
+---
+title: Einen anderen Extension Context verwenden
+---
+
+Die Reference Extension ist als **Projekt-Extension** gebaut und wird im Kontext eines Projekts installiert.
+Je nach Anwendungsfall kann es jedoch sinnvoller sein, eine **Organisations-Extension** zu entwickeln.
+
+:::warning Änderung löscht bestehende Extension Instances
+Beim Ändern des Extension Context werden alle bestehenden Extension Instances gelöscht.
+Nach der Änderung muss eine neue Extension Instance erstellt werden, um die Extension weiter zu testen.
+:::
+
+:::info Extension Context nach Veröffentlichung nicht mehr änderbar
+Der Extension Context kann nach der Veröffentlichung der Extension nicht mehr geändert werden.
+Falls du unsicher bist, welcher Context für deine Extension der richtige ist, hilft dir der [Guide zur Wahl des Extension Context](../../../how-to/choose-a-context) bei der Entscheidung.
+Die Wahl bestimmt nämlich auch, auf welche Funktionen du innerhalb deiner Extension Zugriff hast.
+:::
+
+## Extension Context wechseln
+
+Der Extension Context wird im mStudio konfiguriert.
+Das Vorgehen ist identisch zu dem im Schritt [Extension konfigurieren](../configure-extension#setzen-des-extension-context) beschriebenen Ablauf.
+Wähle dort statt **Projekt** den Context **Organisation**.
+
+:::warning Webhook Erreichbarkeit
+Damit die Extension Instance gelöscht werden kann, muss auch der Webhook von deiner Extension verarbeitet werden.
+Wenn du also den Context deiner DEV Umgebung änderst, denk vorher daran, den Tunnel wie im [Guide, die Extension erreichbar zu machen](../../expose-extension) beschrieben.
+
+Falls du den Tunnel vergessen hast, zu starten, ist das kein Problem.
+Die Webhooks werden immer wieder erneut versucht.
+Dabei wird ein exponentieller Backoff angewandt.
+Du musst maximal 5 Minuten auf den Retry warten.
+:::
+
+Deine Extension Instance wird nun gelöscht und danach wird der Context deiner Extension geändert.
+Sobald du sehen kannst, dass deine Extension Instance entfernt wurde, kannst du eine neue erstellen.

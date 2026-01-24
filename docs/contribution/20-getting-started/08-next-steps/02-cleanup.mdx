@@ -1,0 +1,195 @@
+---
+title: Cleanup - Entfernen der Demo Inhalte
+---
+
+## Überblick: Was ist Demo, was ist Infrastruktur?
+
+Bevor du mit dem Aufräumen beginnst, ist es wichtig zu verstehen, welche Teile der Referenz-Extension zur Demo-Funktionalität gehören und welche die wiederverwendbare Infrastruktur bilden.
+
+### Demo-Funktionalität (kann entfernt werden)
+
+Die Referenz-Extension enthält mehrere Demo-Features, die zeigen, wie verschiedene Aspekte einer Extension implementiert werden. **All diese können komplett entfernt werden:**
+
+| Bereich          | Pfad                    | Beschreibung                                    |
+| ---------------- | ----------------------- | ----------------------------------------------- |
+| Components       | `src/components/*`      | Alle UI-Komponenten (außer `ErrorFallback.tsx`) |
+| Server Functions | `src/serverFunctions/*` | Alle Server Functions                           |
+| Domain-Logik     | `src/domain/comments/`  | Datenbankzugriffs-Logik für Kommentare          |
+| Domain-Logik     | `src/domain/project.ts` | Projekt-API-Integration                         |
+| Schema           | `src/db/schema.ts`      | Die `comments`-Tabellendefinition               |
+
+Die Demo Funktionen, die in diesen Dateien demonstriert werden, können sorglos entfernt werden.
+Wenn du nochmal nachvollziehen möchtest, wie die Referenz Extension gewisse Dinge umgesetzt hat,
+kannst du jederzeit im [Upstream Repository](https://github.com/mittwald/reference-extension) nachschauen.
+
+### Infrastruktur (sollte behalten werden)
+
+Die folgenden Komponenten bilden das Fundament deiner Extension und sollten **nicht entfernt** werden:
+
+| Bereich             | Pfad                                                    | Funktion                                          |
+| ------------------- | ------------------------------------------------------- | ------------------------------------------------- |
+| Error-UI            | `src/components/ErrorFallback.tsx`                      | Error-Boundary-Fallback für die gesamte App       |
+| Authentifizierung   | `src/middleware/auth.ts`                                | Session-Verifizierung und Access-Token-Management |
+| Fehlerbehandlung    | `src/middleware/error-handling.ts`                      | Globales Error-Handling mit Zod-Validierung       |
+| Datenbank-Setup     | `src/db/index.ts`                                       | PostgreSQL-Connection-Pool                        |
+| Migrationen         | `src/db/migrate.ts`, `src/server/plugins/migrations.ts` | Automatische Schema-Migrationen                   |
+| Router              | `src/router.tsx`, `src/routes/__root.tsx`               | TanStack Router Konfiguration                     |
+| Haupt-Route         | `src/routes/index.tsx`                                  | Einstiegspunkt (Inhalt anpassen, Datei behalten)  |
+| Webhook-Route       | `src/routes/api/webhooks.mittwald.ts`                   | Webhook-Handler für Extension-Lifecycle           |
+| Environment         | `src/env.ts`                                            | Umgebungsvariablen-Validierung                    |
+| Fehler-Definitionen | `src/global-errors.ts`                                  | Wiederverwendbare Error-Klassen                   |
+| Ghost-Setup         | `src/ghosts.ts`                                         | RPC-Layer (Inhalt anpassen, Datei behalten)       |
+| Hooks               | `src/hooks/useFormErrorHandling.tsx`                    | Wiederverwendbarer Form-Error-Hook                |
+
+Die `extension_instance`-Tabelle in `src/db/schema.ts` ist ebenfalls Infrastruktur – sie speichert die Instanz-spezifischen Daten und den verschlüsselten Access-Token.
+
+## Demo-Funktionalität entfernen
+
+### Frontend-Komponenten
+
+Lösche alle Dateien und Ordner in `src/components/` **außer** `ErrorFallback.tsx`:
+
+**Ordner komplett löschen:**
+
+- `src/components/comments/` – Kommentar-Feature (Chat-UI, Formulare, Loading-States)
+- `src/components/project/` – Projekt-Anzeige und -Bearbeitung
+
+**Einzelne Dateien löschen:**
+
+- `GreetingCard.tsx` – Willkommens-Karte
+- `APIReferenceCard.tsx` – Link zur API-Dokumentation
+- `DeveloperPortalCard.tsx` – Link zum Developer Portal
+- `FlowDocumentationCard.tsx` – Link zur Flow-Dokumentation
+- `ReadmeCard.tsx` – README-Anzeige
+- `EditProjectDescriptionModal.tsx` – Modal zur Projekt-Bearbeitung
+
+Anschließend musst du `src/routes/index.tsx` anpassen.
+Entferne alle Imports und Verwendungen der gelöschten Komponenten und ersetze den Inhalt mit deiner eigenen UI.
+
+Wenn du erstmal nur aufräumen möchtest, kannst du die vollständige Section mit dem Card Layout löschen und den Title stehen lassen.
+Du kannst auch ein eigenes Test UI einfügen, um zu sehen, ob noch alles funktioniert.
+Das könnte in etwa so aussehen:
+
+```tsx
+import { Title } from "@mittwald/mstudio-ext-react-components";
+import { LayoutCard, Text } from "@mittwald/flow-remote-react-components";
+
+function App() {
+  return (
+    <>
+      <Title>Hallo Contributor!</Title>
+      <LayoutCard>
+        <Text>Test</Text>
+      </LayoutCard>
+    </>
+  );
+}
+```
+
+### Server Functions
+
+Lösche den gesamten Inhalt von `src/serverFunctions/`:
+
+**Ordner komplett löschen:**
+
+- `src/serverFunctions/comments/` – Enthält alle Kommentar-bezogenen Server Functions:
+- `get-comments.ts` – Lädt Kommentare
+- `add-comment.ts` – Erstellt Kommentare
+- `delete-comment.ts` – Löscht Kommentare
+- `get-user-name.ts` – Holt Benutzernamen von der mittwald API
+- `get-user-avatar.ts` – Holt Avatar-URL von der mittwald API
+
+**Einzelne Dateien löschen:**
+
+- `edit-project-description.ts` – Bearbeitet die Projekt-Beschreibung
+- `get-project-of-extension-instance.ts` – Lädt Projekt-Informationen
+
+Passe dann `src/ghosts.ts` an und entferne alle Imports und Ghost-Definitionen der gelöschten Server Functions. Die Datei selbst solltest du behalten – hier registrierst du später deine eigenen Server Functions.
+
+Lösche außerdem die Domain-Logik:
+
+- `src/domain/comments/` – Gesamter Ordner mit `comments.ts`
+- `src/domain/project.ts` – Projekt-API-Integration
+
+### Datenbank-Schema
+
+In `src/db/schema.ts` musst du die `comments`-Tabelle entfernen:
+
+```typescript
+// Diese Tabellendefinition entfernen:
+export const comments = pgTable("comments", {
+  id: varchar({ length: 36 }).primaryKey(),
+  extensionInstanceId: varchar({ length: 36 })
+    .notNull()
+    .references(() => extensionInstances.id),
+  userId: varchar({ length: 36 }).notNull(),
+  text: text().notNull(),
+  createdAt: timestamp().defaultNow().notNull(),
+});
+```
+
+Erstelle anschließend eine neue Migration, um die Tabelle aus der Datenbank zu entfernen:
+
+```bash
+# Generiere eine neue Migration basierend auf dem aktualisierten Schema
+pnpm run db:generate-migrations
+```
+
+Die generierte Migration sollte in etwa so aussehen:
+
+```sql
+DROP TABLE IF EXISTS "comments";
+```
+
+## Tipps zum sauberen Aufräumen
+
+### 1. Schrittweise vorgehen
+
+Entferne die Komponenten in der umgekehrten Reihenfolge ihrer Abhängigkeiten:
+
+1. **Zuerst**: Frontend-Komponenten und deren Imports in `index.tsx`
+2. **Dann**: Server Functions und Ghost-Exporte
+3. **Dann**: Domain-Logik
+4. **Zuletzt**: Datenbank-Schema und Migration
+
+So vermeidest du TypeScript-Fehler während des Aufräumens.
+
+### 2. TypeScript als Helfer nutzen
+
+Nach dem Löschen von Dateien zeigt dir TypeScript alle Stellen, an denen noch Referenzen existieren. Führe regelmäßig `pnpm check` oder `pnpm build` aus:
+
+```bash
+pnpm check
+```
+
+Behebe alle gemeldeten Fehler, bevor du zum nächsten Schritt gehst.
+
+### 3. Git-Historie nutzen
+
+Falls du später nachschauen möchtest, wie ein bestimmtes Feature implementiert war, bleibt die Demo-Implementierung in der Git-Historie erhalten. Du kannst jederzeit in die Historie schauen:
+
+```bash
+git log --oneline --all -- src/components/
+git show <commit-hash>:src/components/comments/CommentsCard.tsx
+```
+
+Außerdem kannst du jederzeit im [Upstream Repository](https://github.com/mittwald/reference-extension) nachschauen.
+
+### 6. Vor dem Commit testen
+
+Stelle sicher, dass nach dem Cleanup alles funktioniert:
+
+```bash
+# TypeScript-Check
+pnpm check
+
+# Build testen
+pnpm build
+
+# Lokal starten und manuell prüfen
+pnpm docker:dev:build
+```
+
+Nun kannst du mit deiner DEV Extension Instance ausprobieren, ob irgendwelche Fehler geworfen werden oder ob das UI korrekt gerendert wird.
+Wenn alles funktioniert, kannst du deine Änderungen committen und pushen.
+Deine deployte Variante der Extension sollte nun auch aktualisiert werden.
