@@ -234,13 +234,13 @@ Benötigt wird:
 - Zugang zum Mittwald AI-Hosting ( oder vergleichbarer, OpenAI-kompatibler Host ) mit API-Key
 - Zugang zur Datenbank, Benutzer und Passwort haben wir bereits im Container-Verbund vorbereitet
 
-ATTN: für den Produktivbetrieb ist es sauberer, mehrere Datenbankbenutzer mit unterschiedlichen Privilegien zu pflegen. Dies bedarf allerdings händischer Anpassungen am Datenbank-Container, diee hier aus Komplexitätsgründen nicht weiter ausgeführt werden. Grundsätzlich sollte der mit Benutzereingaben arbeitende Datenbankbenutzer des KI-Agenten **keine** Berechtigung haben, das Datenbankschema zu ändern!
+**Security:** Für den Produktivbetrieb ist es sauberer, mehrere Datenbankbenutzer mit unterschiedlichen Privilegien zu pflegen. Dies bedarf allerdings händischer Anpassungen am Datenbank-Container, diee hier aus Komplexitätsgründen nicht weiter ausgeführt werden. Grundsätzlich sollte der mit Benutzereingaben arbeitende Datenbankbenutzer des KI-Agenten **keine** Berechtigung haben, das Datenbankschema zu ändern!
 
 Wir erstellen also Zugangsdaten für die Datenbank und den KI-Host, anschließend weisen wir diese den entsprechenden Knoten zu. Beim Anlegen der Zugangsdaten wird bereits die Verbindung geprüft, d.h. wir sehen direkt, ob unser Verbund sauber arbeitet.
 
 #### Betrieb - Webhook
 
-Lasse den initialen Webhook lauschen in Test-Modus, dann kann man testen, z.B. per postman oder curl, die genaue URL wird dabei angezeigt:
+Lasse den initialen Webhook lauschen im Test-Modus, dann kann man testen, z.B. per postman oder curl, die genaue URL wird dabei angezeigt:
 
 ```
 curl -X POST -d '{
@@ -249,7 +249,7 @@ curl -X POST -d '{
 }' -H "Content-Type: application/json" https://example.project.space/webhook-test/<webhook uuid>
 ```
 
-Solange unser RAG noch nicht mit Dokumenten befüllt ist, haben wir hier einen einfachen Chatbot mit dem im Model eingebackenen Weltwissen. Fragen wir explizit, erklärt sich der Agent auch:
+Solange unser RAG noch nicht mit Dokumenten befüllt ist, haben wir hier einen einfachen Chatbot mit dem im Model "eingebackenen" Weltwissen. Fragen wir explizit, erklärt sich der Agent auch:
 
 ```
 curl -X POST -d '{
@@ -258,5 +258,7 @@ curl -X POST -d '{
 }' -H "Content-Type: application/json" https://n8n.p-zrxbea.project.space/webhook-test/bf4dd093-bb02-472c-9454-7ab9af97bd1d
 {"output":"I currently do not have access to any documents in my knowledge base. If you'd like, I can help answer questions based on general knowledge or assist with other tasks."}
 ```
+
+**Security:** Für produktiven Betrieb müssen Webhooks mit einer Authentifizierungsmethode abgesichert werden. Nach Möglichkeit sollten Webhooks nicht weiter exponiert, sondern von einer anderen Applikation des Stakcs konsumiert werden.
 
 #### Betrieb - RAG, Dateisystem
