@@ -108,7 +108,20 @@ Dieser Ansatz ist besonders nützlich, wenn du mehrere Container deployen möcht
 
 ## Betrieb
 
-Deine n8n-Daten werden im Rahmen des regelmäßigen Projektbackups gesichert und können entsprechend auch wiederhergestellt werden.
+Deine n8n-Daten werden im Rahmen des regelmäßigen Projektbackups gesichert und können entsprechend auch wiederhergestellt werden. Achte darauf, Containern separate Volumes für ihre Daten zuzuordnen, um Container unabhängig von den Daten neu aufsetzen zu können.
+
+:::caution
+Für einen sicheren Produktivbetrieb sind weitere Maßnahmen bzw. Klärungen erforderlich, die vom konkreten Anwendungsfall abhängen:
+
+- Zugriff auf n8n: Wer darf Workflows erstellen, bearbeiten, anstoßen, ...
+- Authentifizierung n8n, Benutzer- und Rollenkonzept
+- Konfiguration n8n: Erlaubte Knoten, Systembenutzer, ...
+- Zugriff Vektordatenbank: lesen/schreiben, Schema-Veränderungen
+- Zugriff auf Dokumente: Wer darf lesen/schreiben/löschen?
+- Zugriff auf Webhooks: Authorisierung und Authentifizierung, Konsumenten bzw. Clients
+
+Im Entwicklungs- und Testbetrieb können einige dieser Aspekte vereinfacht werden, im produktiven Betrieb müssen alle diese Aspekte zweifelsfrei geklärt werden. Ohne genaue Klärung dieser Sicherheitsfragen besteht das Risiko, ungewollt zu viele Informationen preiszugeben und im schlimmsten Falle interne Dokumente öffentlich einsehbar zu machen oder gar Prozesse anzustoßen.
+:::
 
 ### Use case: RAG mit postgreSQL und Mittwald AI-Hosting
 
@@ -119,7 +132,7 @@ n8n kann benutzt werden, um RAG Systeme verschiedenster Form aufzubauen. Das fol
 - Mittwald Container Hosting
 - Mittwald AI-Hosting
 - mStudio Zugriff, per Webapp und API-Token
-- `mw` CLI, Deployment des Container Verbunds
+- Installiertes und eingerichtetes `mw` CLI, Deployment des Container Verbunds
 
 #### Einführung, grundlegender Aufbau
 
@@ -236,7 +249,7 @@ Benötigt wird:
 
 **Security:** Für den Produktivbetrieb ist es sauberer, mehrere Datenbankbenutzer mit unterschiedlichen Privilegien zu pflegen. Dies bedarf allerdings händischer Anpassungen am Datenbank-Container, diee hier aus Komplexitätsgründen nicht weiter ausgeführt werden. Grundsätzlich sollte der mit Benutzereingaben arbeitende Datenbankbenutzer des KI-Agenten **keine** Berechtigung haben, das Datenbankschema zu ändern!
 
-Wir erstellen also Zugangsdaten für die Datenbank und den KI-Host, anschließend weisen wir diese den entsprechenden Knoten zu. Beim Anlegen der Zugangsdaten wird bereits die Verbindung geprüft, d.h. wir sehen direkt, ob unser Verbund sauber arbeitet.
+Wir erstellen also Zugangsdaten für die Datenbank und den KI-Host, anschließend weisen wir diese den entsprechenden Knoten zu. Beim Anlegen der Zugangsdaten wird bereits die Verbindung geprüft, d.h. wir sehen direkt, ob unser Verbund sauber arbeitet. Für die Authentifizierung der Webhooks richten wir JWT ein, für die Erzeugung eines konkreten Tokens zur Simuation eines Clients eignet sich [der JWT encoder auf jwt.io](https://www.jwt.io/).
 
 #### Betrieb - Webhook
 
@@ -291,7 +304,7 @@ Durch die neu erstellte Datei stoßen wir den Workflow dahinter an, die Datei l�
 Zum Testen eignen sich bekannte Dokumente, zu denen einfach Testfragen gestellt werden können:
 
 ```shellsession
-# Biespieldokumente ablegen
+# Beispieldokumente ablegen
 scp -r python3_docs/*.txt <Mittwald SSH URL n8n Container, siehe mStudio>:/home/node/rag_documents/
 # Workflow wird angestoßen in n8n ...
 # Kontrolle nach Abschluss:
@@ -314,3 +327,15 @@ curl -X POST -d '{
 https://example.project.space/webhook-test/<webhook uuid>
 {"output":"The document source for reporting bugs in Python is titled \"bugs\" and is located at `/home/node/rag_documents/python3_docs/bugs.txt`."}
 ```
+
+#### Ausblick
+
+Mit dem bis hier hin aufgebauten System haben wir eine gute Grundlage, unser RAG-System bis zur Produktionsreife auszuimplementieren.
+
+Neben den bereits genannten Sicherheitsaspekten gibt es weitere Erwägungen:
+- Datenquellen für Dokumente: Weitere Quellen, wie z.B. Femddatenbanken, Netzlaufwerke, …
+- Verfeinerung des Agents: Model-Einstellungen, Prompt, Dokumentenfilter
+- Anbindung weiterer Werkzeuge an den KI-Agenten: Internetsuche, Bilderkennung, …
+- Skalierung: Speicherbedarf für Dokumente und Embeddings, Verhalten unter Last, …
+
+Diese Liste hat keinen Anspruch auf Vollständigkeit, sondern zeigt lediglich weitere Anknüpfungspunkte auf, die beim Ausrollen solcher Systeme bis in die Produktion beachtet werden müssen.
