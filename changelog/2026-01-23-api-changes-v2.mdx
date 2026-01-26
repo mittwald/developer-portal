@@ -19,20 +19,10 @@ This week, the mittwald API introduces several updates, including the addition o
 
 
 
-:::caution Breaking changes
-
-This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
-
-While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
-
-:::
-
-
-
 ## Summary
 
 
-- The API path `/v2/cronjobs/{cronjobId}/app-id` has been removed without deprecation for the `PATCH` operation `cronjob-update-cronjob-app-id`. This is a breaking change.
+- The API path `/v2/cronjobs/{cronjobId}/app-id` has been deprecated by `/v2/cronjobs/{cronjobId}/app-installation-id` for the `PATCH` operation `cronjob-update-cronjob-app-id`.
 - An endpoint has been added at `/v2/cronjobs/{cronjobId}/app-installation-id` for the `PATCH` operation `cronjob-update-cronjob-app-id`.
 - The optional property `appInstallationId` has been added to the response with the `200` status for the `GET` operation `cronjob-get-cronjob`.
 - The optional property `expirationDate` has been added to the response with the `201` status for the `POST` operation `domain-create-domain-auth-code`.
@@ -49,7 +39,7 @@ _Disclaimer: This summary is AI-generated. If you find any discrepancies, please
 ### Changes in "Update a cronjob's app installation id"
 
 
-- ⚠️ **Breaking:** api path removed without deprecation
+- endpoint deprecated
 
 - endpoint added
 
