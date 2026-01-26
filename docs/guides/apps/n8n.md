@@ -240,13 +240,18 @@ Wir erstellen also Zugangsdaten für die Datenbank und den KI-Host, anschließen
 
 #### Betrieb - Webhook
 
+**Security:** Für produktiven Betrieb müssen Webhooks mit einer Authentifizierungsmethode abgesichert werden. Nach Möglichkeit sollten Webhooks nicht weiter exponiert, sondern von einer anderen Applikation des Stacks konsumiert werden. Sollen gezielt Webhooks exponiert werden, lohnt sich ein Proxy-Server im Stack, über den nur definierte Webhook-URLs an n8n weitergegeben werden.
+
 Lasse den initialen Webhook lauschen im Test-Modus, dann kann man testen, z.B. per postman oder curl, die genaue URL wird dabei angezeigt:
 
 ```
 curl -X POST -d '{
   "chatInput": "Hello World!",
   "sessionId": 42
-}' -H "Content-Type: application/json" https://example.project.space/webhook-test/<webhook uuid>
+}'
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer xxx.yyy.zzz" \
+https://example.project.space/webhook-test/<webhook uuid>
 ```
 
 Solange unser RAG noch nicht mit Dokumenten befüllt ist, haben wir hier einen einfachen Chatbot mit dem im Model "eingebackenen" Weltwissen. Fragen wir explizit, erklärt sich der Agent auch:
@@ -255,10 +260,57 @@ Solange unser RAG noch nicht mit Dokumenten befüllt ist, haben wir hier einen e
 curl -X POST -d '{
   "chatInput": "How many documents do you know?",
   "sessionId": 42
-}' -H "Content-Type: application/json" https://n8n.p-zrxbea.project.space/webhook-test/bf4dd093-bb02-472c-9454-7ab9af97bd1d
+}'
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer xxx.yyy.zzz" \
+https://example.project.space/webhook-test/<webhook uuid>
 {"output":"I currently do not have access to any documents in my knowledge base. If you'd like, I can help answer questions based on general knowledge or assist with other tasks."}
 ```
 
-**Security:** Für produktiven Betrieb müssen Webhooks mit einer Authentifizierungsmethode abgesichert werden. Nach Möglichkeit sollten Webhooks nicht weiter exponiert, sondern von einer anderen Applikation des Stakcs konsumiert werden.
-
 #### Betrieb - RAG, Dateisystem
+
+Nach der Herstellung der Grundfunktion kann das RAG mit Dokumenten gefüllt werden. Im Beispiel werden Dokumente im Dateisystem abgelegt, verarbeitet und für den KI-Agenten sichtbar gemacht. In der Praxis lohnt es sich, neben dem Dateisystem auch andere Quellen in Erwägung zu ziehen, oder das Dateisystem gegen einen Dienst, bzw. einen Internet-Share ( Google Share ), zu konfigurieren.
+
+Im ersten Knoten der Dateisystemüberwachung ( `Local file trigger` ) richten wir das Verzeichnis auf dem n8n-Container ein, das Dokumente enthalten soll. Hier tragen wir beispielsweise `/home/node/rag_documents` ein.
+
+Im Anschluss können wir die Überwachung testen, indem wir Dokumente im eingrichteten Ordner ablegen. Die Auslieferung der Dokumente kann dabei auf verschiedenen Wegen erfolgen, ( per SSH, SFTP, ), im Beispiel beschränken wir uns auf eine `SSH`-Verbindung und liefern unsere Dokumente per `scp` aus. Ordner vorbereiten:
+
+```shellsession
+ssh <Mittwald SSH URL, siehe mStudio>
+mkdir -p /home/node/rag_documents
+```
+
+Überwachungsknoten aktivieren in n8n, Dokumente ausliefern:
+
+```shellsession
+scp my_documents/example_manual.txt <Mittwald SSH URL n8n Container, siehe mStudio>:/home/node/rag_documents/
+```
+
+Durch die neu erstellte Datei stoßen wir den Workflow dahinter an, die Datei läuft durch das Embedding, Dokument, Metadaten und Embeddings werden in der Datenbank hinterlegt und stehen im Chat zur Verfügung.
+
+Zum Testen eignen sich bekannte Dokumente, zu denen einfach Testfragen gestellt werden können:
+
+```shellsession
+# Biespieldokumente ablegen
+scp -r python3_docs/*.txt <Mittwald SSH URL n8n Container, siehe mStudio>:/home/node/rag_documents/
+# Workflow wird angestoßen in n8n ...
+# Kontrolle nach Abschluss:
+curl -X POST -d '{
+  "chatInput": "How to report bugs in Python?",
+  "sessionId": 42
+}'
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer xxx.yyy.zzz" \
+https://example.project.space/webhook-test/<webhook uuid>
+{"output":"To report bugs in Python, you can use the Python issue tracker on GitHub. Here’s how you can do it:\n\n1. **GitHub Issues Tracker**: Submit bug reports for Python via the GitHub issues tracker at [https://github.com/python/cpython/issues](https://github.com/python/cpython/issues). This platform provides a web form where you can enter pertinent information and submit it to the developers.\n\n2. **Bug Writing Guidelines**: When writing a bug report, include as much detail as possible to help the developers understand and reproduce the issue. While some guidelines are specific to the Mozilla project, they describe general best practices for writing effective bug reports.\n\n3. **Documentation Bugs**: If you find a bug in the Python documentation or have suggestions for improvements, you can also submit a bug report on the issue tracker. …
+
+# Quellenangabe:
+curl -X POST -d '{
+  "chatInput": "Name your document source",
+  "sessionId": 42
+}'
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer xxx.yyy.zzz" \
+https://example.project.space/webhook-test/<webhook uuid>
+{"output":"The document source for reporting bugs in Python is titled \"bugs\" and is located at `/home/node/rag_documents/python3_docs/bugs.txt`."}
+```
