@@ -1,0 +1,37 @@
+---
+title: Implementieren eines externen Frontends
+---
+
+## Anwendungsfälle für ein externes Frontend
+
+Grundsätzlich sind Frontend Fragments der bevorzugte Weg, um eine UI für deine Extension bereitzustellen.
+Sie bieten eine nahtlose Integration in das mStudio und ein konsistentes Nutzererlebnis.
+
+Gewisse Anwendungsfälle erfordern jedoch ein externes Frontend.
+Beispiele dafür sind:
+
+- **Eigene Nutzerverwaltung** – Wenn deine Extension eine Nutzerverwaltung benötigt, die unabhängig von mStudio-Usern ist
+- **Spezielle UI-Features** – Wenn UI-Anforderungen bestehen, die nicht mit Flow-Komponenten umsetzbar sind
+- **Integration bestehender Produkte** – Wenn ein bestehendes SaaS-Produkt lose in das mStudio integriert werden soll
+
+## Wie externe Frontends funktionieren
+
+Ein externes Frontend ist grundsätzlich nur ein Link zu einer anderen Web-Applikation.
+Diese kann mit einem beliebigen Tech-Stack gebaut sein – es gibt keine Einschränkungen bezüglich Framework oder Technologie.
+
+Auch über externe Frontends ist eine Authentifizierung gegen die mStudio API möglich.
+Dafür stehen zwei Mechanismen zur Verfügung:
+
+| Mechanismus                                                                                        | Beschreibung                                                                                                                                                                                           |
+| -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [OAuth2](../../../overview/concepts/authentication#oauth2)                                         | Eignet sich, wenn es dem User möglich sein soll, ohne das mStudio besuchen zu müssen, direkt auf das externe Frontend zugreifen zu können.                                                             |
+| [Access Token Retrieval Key](../../../overview/concepts/authentication#access-token-retrieval-key) | Ein kurzlebiges Token, das in Kombination mit einer User-ID gegen ein Access Token ausgetauscht werden kann. Eignet sich, wenn die User über das mStudio zum externen Frontend geleitet werden sollen. |
+
+:::info Kombination mit Frontend Fragments
+Externe Frontends und Frontend Fragments schließen sich nicht gegenseitig aus.
+Beides kann parallel verwendet werden, um unterschiedliche Teile deiner Extension abzubilden.
+:::
+
+## Auf die Reference Extension aufbauen
+
+[//]: # "# TODO: hier darauf eingehen, wie ausgehend von der Reference Extension ein externes Frontend gebaut werden kann."
