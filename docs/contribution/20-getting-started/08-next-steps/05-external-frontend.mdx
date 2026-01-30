@@ -22,10 +22,10 @@ Diese kann mit einem beliebigen Tech-Stack gebaut sein – es gibt keine Einschr
 Auch über externe Frontends ist eine Authentifizierung gegen die mStudio API möglich.
 Dafür stehen zwei Mechanismen zur Verfügung:
 
-| Mechanismus                                                                                        | Beschreibung                                                                                                                                                                                           |
-| -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [OAuth2](../../../overview/concepts/authentication#oauth2)                                         | Eignet sich, wenn es dem User möglich sein soll, ohne das mStudio besuchen zu müssen, direkt auf das externe Frontend zugreifen zu können.                                                             |
-| [Access Token Retrieval Key](../../../overview/concepts/authentication#access-token-retrieval-key) | Ein kurzlebiges Token, das in Kombination mit einer User-ID gegen ein Access Token ausgetauscht werden kann. Eignet sich, wenn die User über das mStudio zum externen Frontend geleitet werden sollen. |
+| Mechanismus                                                                                               | Beschreibung                                                                                                                                                                                           |
+| --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [OAuth2](../../../overview/concepts/authentication#oauth2)                                                | Eignet sich, wenn es dem User möglich sein soll, ohne das mStudio besuchen zu müssen, direkt auf das externe Frontend zugreifen zu können.                                                             |
+| [Access Token Retrieval Key (ATReK](../../../overview/concepts/authentication#access-token-retrieval-key) | Ein kurzlebiges Token, das in Kombination mit einer User-ID gegen ein Access Token ausgetauscht werden kann. Eignet sich, wenn die User über das mStudio zum externen Frontend geleitet werden sollen. |
 
 :::info Kombination mit Frontend Fragments
 Externe Frontends und Frontend Fragments schließen sich nicht gegenseitig aus.
@@ -34,4 +34,361 @@ Beides kann parallel verwendet werden, um unterschiedliche Teile deiner Extensio
 
 ## Auf die Reference Extension aufbauen
 
-[//]: # "# TODO: hier darauf eingehen, wie ausgehend von der Reference Extension ein externes Frontend gebaut werden kann."
+### Komponenten
+
+Für externe Frontends müssen keine mStudio UI Komponenten verwendet werden.
+Falls jedoch das externe Frontend in React geschrieben werden soll, **können** die mStudio Komponenten verwendet werden.
+Dafür werden nicht die `@mittwald/flow-remote-react-components` verwendet, sondern die `@mittwald/flow-react-components` (ohne remote).
+
+:::warning Imports prüfen
+Wenn du beide Packages im Projekt hast, musst du bei den Imports aufpassen, dass du nicht versehentlich die falschen Komponenten importierst.
+Frontend Fragmente funktionieren nur mit den `@mittwald/flow-remote-react-components`.
+Externe Frontends funktionieren hingegen nur mit den `@mittwald/flow-react-components`
+:::
+
+### Authentifizierung
+
+[OAuth2](https://datatracker.ietf.org/doc/html/rfc6749) ist ein gut dokumentierter Standard, für den viele Client Libraries existieren, unter anderem [`oidc-client-ts`](https://github.com/authts/oidc-client-ts), dass neben OIDC auch OAuth2 unterstützt.
+
+```typescript
+import { UserManager } from "oidc-client-ts";
+
+const userMangager = new UserManager({
+  authority: "https://api.mittwald.de/v2/oauth2/",
+  client_id: process.env.OAUTH_CLIENT_ID,
+  redirect_uri: process.env.OAUTH_REDIRECT_URL,
+  scope: "user:read project:read project:write",
+  response_type: "code",
+  metadata: {
+    authorization_endpoint: "https://api.mittwald.de/v2/oauth2/authorize",
+    token_endpoint: "https://api.mittwald.de/v2/oauth2/token",
+  },
+});
+```
+
+:::info OAuth2 Clients erstellen
+OAuth2 Clients können derzeit nicht über das mStudio erstellt werden.
+Wir haben einen Guide geschrieben, [wie ein OAuth2 Client registriert werden kann](../../how-to/manage-oauth-clients).
+:::
+
+Die Authentifizierung mittels ATReK hingegen ist ein Authentifizierungsprozess,
+den wir entwickelt haben, um ohne Redirects, also schnell wechselnden Seiten direkt in einem externen Frontend authentifiziert zu sein.
+
+Die grundsätzliche Funktionsweise des ATReK ist ein sehr kurzlebiger Token, der in Kombination mit der User ID gegen ein Access- und ein Refresh-Token ausgetauscht werden kann.
+Dieses Access-Token ist genauso wie die Access-Tokens, die aus Session-Tokens generiert werden, nutzerbezogen und durch die Extension Scopes eingeschränkt.
+
+Im Folgenden soll einmal grob der Weg aufgezeichnet werden, wie ein externes Frontend mit ATReK auf Basis der Reference Extension implementiert werden kann.
+
+### Implementierung eines externen Frontends auf Basis der Reference Extension
+
+:::info Vereinfachung
+Wir gehen im Folgenden davon aus, dass du **statt** einem Frontend Fragment ein externes Frontend implementieren willst.
+Wenn du beides parallel betreiben möchtest, ist ein wenig mehr Code Umstrukturierung nötig.
+:::
+
+#### UI Komponenten
+
+Die React Komponenten können mit folgendem Befehl zur Reference Extension hinzugefügt werden.
+
+```bash
+pnpm add @mittwald/flow-react-components
+```
+
+Außerdem müssen wir die Styles der Komponenten importieren.
+Das können wir in der `src/start.ts` machen.
+
+```typescript title="src/start.ts"
+import "@mittwald/flow-react-components/all.css";
+```
+
+Schließlich müssen wir aus dem Root-Layout (`src/routes/__root.tsx`) noch den `RemoteRoot`-Provider entfernen.
+Dieser wird nur für Frontend Fragments benötigt.
+
+:::info Frontend Fragmente und externe Frontends parallel nutzen
+Wenn du sowohl Frontend Fragmente als auch ein externes Frontend anbieten willst, musst du das `RemoteRoot`-Element aus dem Root-Layout entfernen und über getrennte `_pathlessLayout.tsx` arbeiten.
+Mehr dazu findest du in der [Layout Routes Dokumentation von tanstack Router](https://tanstack.com/router/v1/docs/framework/react/routing/routing-concepts#layout-routes)
+:::
+
+#### Cookie Handling
+
+Wir speichern Access-Token, Refresh-Token sowie Session Informationen als Cookies, also bereiten wir ein wenig Library Code zur Speicherung der Cookies vor.
+
+```typescript title="src/lib/auth-cookies.ts"
+import { getCookie, setCookie } from "@tanstack/react-start/server";
+
+export interface TokenData {
+  accessToken: string;
+  refreshToken: string;
+  expiresAt: string;
+}
+
+export interface SessionContext {
+  userId: string;
+  contextId: string;
+  extensionInstanceId: string;
+}
+
+export type AuthData = TokenData & SessionContext;
+
+const COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: true,
+  sameSite: "strict" as const,
+  path: "/",
+  maxAge: 60 * 60 * 24, // 1 day
+};
+
+export function setTokenCookies(tokens: TokenData): void {
+  setCookie("accessToken", tokens.accessToken, COOKIE_OPTIONS);
+  setCookie("refreshToken", tokens.refreshToken, COOKIE_OPTIONS);
+  setCookie("expiresAt", tokens.expiresAt, COOKIE_OPTIONS);
+}
+
+export function setSessionCookies(session: SessionContext): void {
+  setCookie("userId", session.userId, COOKIE_OPTIONS);
+  setCookie("contextId", session.contextId, COOKIE_OPTIONS);
+  setCookie("extensionInstanceId", session.extensionInstanceId, COOKIE_OPTIONS);
+}
+
+export function setAuthCookies(auth: AuthData): void {
+  setTokenCookies(auth);
+  setSessionCookies(auth);
+}
+
+export function getTokenCookies(): TokenData | null {
+  const accessToken = getCookie("accessToken");
+  const refreshToken = getCookie("refreshToken");
+  const expiresAt = getCookie("expiresAt");
+
+  if (!accessToken || !refreshToken || !expiresAt) {
+    return null;
+  }
+
+  return { accessToken, refreshToken, expiresAt };
+}
+
+export function getSessionCookies(): SessionContext | null {
+  const userId = getCookie("userId");
+  const contextId = getCookie("contextId");
+  const extensionInstanceId = getCookie("extensionInstanceId");
+
+  if (!userId || !contextId || !extensionInstanceId) {
+    return null;
+  }
+
+  return { userId, contextId, extensionInstanceId };
+}
+
+export function getAuthCookies(): AuthData | null {
+  const tokens = getTokenCookies();
+  const session = getSessionCookies();
+
+  if (!tokens || !session) {
+    return null;
+  }
+
+  return { ...tokens, ...session };
+}
+
+export function isTokenExpiringSoon(
+  expiresAt: string,
+  thresholdMs: number,
+): boolean {
+  const expiresAtDate = new Date(expiresAt);
+  const timeUntilExpiry = expiresAtDate.getTime() - Date.now();
+  return timeUntilExpiry <= thresholdMs;
+}
+```
+
+#### ATReK Authentifizierung und Landing Page
+
+Als nächstes implementieren wir eine Server Function, die die benötigten Parameter entgegen nimmt,
+die Authentifizierung durchführt und die Ergebnisse als Cookies speichert.
+
+```typescript title="src/serverFunctions/authenticate-with-atrek.ts"
+import { createServerFn } from "@tanstack/react-start";
+import { assertStatus, MittwaldAPIV2Client } from "@mittwald/api-client";
+import { setAuthCookies } from "@/lib/auth-cookies.ts";
+import { z } from "zod/v4";
+
+export const searchSchema = z.object({
+  userId: z.string(),
+  atrek: z.string(),
+  contextId: z.string(),
+  extensionInstanceId: z.string(),
+});
+
+type SearchParams = z.infer<typeof searchSchema>;
+
+export const authenticateWithAtrek = createServerFn({ method: "POST" })
+  .inputValidator(searchSchema)
+  .handler(async ({ data }: { data: SearchParams }) => {
+    const { userId, atrek, contextId, extensionInstanceId } = data;
+
+    const client = MittwaldAPIV2Client.newUnauthenticated();
+
+    const response = await client.user.authenticateWithAccessTokenRetrievalKey({
+      data: {
+        userId,
+        accessTokenRetrievalKey: atrek,
+      },
+    });
+
+    assertStatus(response, 200);
+
+    const { token, refreshToken, expiresAt } = response.data;
+
+    setAuthCookies({
+      accessToken: token,
+      refreshToken,
+      expiresAt,
+      userId,
+      contextId,
+      extensionInstanceId,
+    });
+  });
+```
+
+Die Server-Function rufen wir direkt auf der Landing Page auf und leiten anschließend auf die eigentliche Seite, die HTML rendert weiter.
+
+```typescript title="src/routes/index.tsx"
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import {
+  authenticateWithAtrek,
+  searchSchema,
+} from "@/serverFunctions/authenticate-with-atrek.ts";
+
+export const Route = createFileRoute("/")({
+  validateSearch: searchSchema,
+  loaderDeps: ({ search }) => search,
+  loader: async ({ deps }) => {
+    await authenticateWithAtrek({ data: deps });
+    throw redirect({ to: "/project" });
+  },
+  component: () => null,
+});
+```
+
+## Authentication Middleware und Erstellen einer ersten Seite
+
+Um das Access-Token sowie Refresh-Token automatisch zu nutzen, wenn eine Server-Function aufgerufen wird, stellen wir eine middleware zur Verfügung.
+
+```typescript title="src/middleware/atrek.ts"
+import { createMiddleware } from "@tanstack/react-start";
+import { assertStatus, MittwaldAPIV2Client } from "@mittwald/api-client";
+import {
+  getTokenCookies,
+  getSessionCookies,
+  setTokenCookies,
+  isTokenExpiringSoon,
+} from "@/lib/auth-cookies";
+
+const REFRESH_THRESHOLD_MS = 5 * 60 * 1000; // 5 minutes
+
+async function getValidAccessToken(): Promise<string | null> {
+  const tokens = getTokenCookies();
+
+  if (!tokens) {
+    return null;
+  }
+
+  if (!isTokenExpiringSoon(tokens.expiresAt, REFRESH_THRESHOLD_MS)) {
+    return tokens.accessToken;
+  }
+
+  return await refreshTokens(tokens.accessToken, tokens.refreshToken);
+}
+
+async function refreshTokens(
+  accessToken: string,
+  refreshToken: string,
+): Promise<string> {
+  const client = MittwaldAPIV2Client.newUnauthenticated();
+
+  const response = await client.user.refreshSession({
+    data: { refreshToken },
+    headers: { "x-access-token": accessToken },
+  });
+
+  assertStatus(response, 200);
+
+  const { token, refreshToken: newRefreshToken, expiresAt } = response.data;
+
+  setTokenCookies({
+    accessToken: token,
+    refreshToken: newRefreshToken,
+    expiresAt,
+  });
+
+  return token;
+}
+
+export const authenticationMiddlewareWithAtrek = createMiddleware({
+  type: "function",
+}).server(async ({ next }) => {
+  const accessToken = await getValidAccessToken();
+  const session = getSessionCookies();
+
+  if (!accessToken || !session) {
+    throw new Error("Not authenticated. Missing cookies.");
+  }
+
+  const mittwaldClient = MittwaldAPIV2Client.newWithToken(accessToken);
+
+  return next({
+    context: {
+      ...session,
+      accessToken,
+      mittwaldClient,
+    },
+  });
+});
+```
+
+Nun können wir in einer Server-Function die Middleware verwenden.
+Dazu passen wir die `getProjectOfExtensionInstanceServerFunction` Server-Function aus der Reference Extension an.
+
+```typescript title="src/serverFunctions/get-project-of-extension-instance.ts"
+import { createServerFn } from "@tanstack/react-start";
+import { getProject } from "@/domain/project.ts";
+import { authenticationMiddlewareWithAtrek } from "@/middleware/atrek.ts";
+
+export const getProjectOfExtensionInstanceServerFunction = createServerFn({
+  method: "GET",
+})
+  .middleware([authenticationMiddlewareWithAtrek]) //hier nutzen wir die Middleware, der Rest bleibt identisch
+  .handler(
+    async ({ context: { mittwaldClient, extensionInstanceId, contextId } }) => {
+      return getProject(mittwaldClient, extensionInstanceId, contextId);
+    },
+  );
+```
+
+Eine einfache Seite, die diese Server-Function nutzt, könnte so aussehen:
+
+```tsx title="src/routes/project.tsx"
+import { createFileRoute } from "@tanstack/react-router";
+import { LayoutCard } from "@mittwald/flow-react-components";
+import { ProjectClientGhost } from "@/ghosts.ts";
+import { Content, Label, LabeledValue } from "@mittwald/flow-react-components";
+
+export const Route = createFileRoute("/project")({
+  component: App,
+  ssr: false,
+});
+
+function App() {
+  const project = ProjectClientGhost.getProjectOfExtensionInstance().use();
+
+  return (
+    <>
+      <LayoutCard>
+        <LabeledValue>
+          <Label>Project Name</Label>
+          <Content>{project.description}</Content>
+        </LabeledValue>
+      </LayoutCard>
+    </>
+  );
+}
+```
