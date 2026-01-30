@@ -1,0 +1,215 @@
+---
+title: API changes for v2 API, January 23 to January 30
+authors:
+  - machine
+tags:
+  - apiv2
+  - Cronjob
+  - Marketplace
+  - Backup
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+During the week of January 23 to January 30, 2026, the mittwald API underwent several changes, including the removal of specific operation IDs and schemas, the addition of multiple new endpoints, and the introduction of optional properties in responses for various backup-related operations.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- The schema 'de.mittwald.v1.backup.RestorePathPhase' has been removed from the API components.
+- The API operation ID 'cronjob-update-cronjob-app-id' has been removed and replaced with 'cronjob-update-cronjob-app-id-deprecated' for the PATCH operation at the path '/v2/cronjobs/{cronjobId}/app-installation-id'.
+- A new endpoint has been added to update a Cronjob's app installation ID with the PUT operation at the path '/v2/cronjobs/{cronjobId}/app-installation-id'.
+- A new endpoint has been added to check if an Extension is unchargable for a specific context with the GET operation at the path '/v2/extensions/{extensionId}/contexts/{contextId}/chargability'.
+- The optional property 'restore' has been added to the response with the '200' status for the GET operation at the path '/v2/project-backups/{projectBackupId}'.
+- A new endpoint has been added to list database dumps for a ProjectBackup with the GET operation at the path '/v2/project-backups/{projectBackupId}/database-dumps'.
+- A new endpoint has been added to restore a ProjectBackup with the POST operation at the path '/v2/project-backups/{projectBackupId}/restore'.
+- The API operation ID 'backup-request-project-backup-restore-path' has been removed and replaced with 'backup-request-project-backup-restore-path-deprecated' for the POST operation at the path '/v2/project-backups/{projectBackupId}/restore-path'.
+- A new optional request parameter 'runningRestoresOnly' has been added to the GET operation for listing backups belonging to a Project at the path '/v2/projects/{projectId}/backups'.
+- The optional property '/items/restore' has been added to the response with the '200' status for the GET operation at the path '/v2/projects/{projectId}/backups'.
+- The optional property 'restore' has been added to the response with the '201' status for the POST operation at the path '/v2/projects/{projectId}/backups'.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in ""
+
+
+- removed the schema 'de.mittwald.v1.backup.RestorePathPhase'
+
+
+For details, refer to the <OperationLink operation="" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "cronjob-update-cronjob-app-id"
+
+
+- api operation id 'cronjob-update-cronjob-app-id' removed and replaced with 'cronjob-update-cronjob-app-id-deprecated'
+
+
+For details, refer to the <OperationLink operation="cronjob-update-cronjob-app-id" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a cronjob's app installation id"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="cronjob-replace-cronjob-app-installation-id" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Check if an Extension is unchargable for this specific context or if it must be charged"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="extension-check-extension-is-chargable" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a project backup"
+
+
+- added the optional property 'restore' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="backup-get-project-backup" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List database dump's for a project backup"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="backup-get-project-backup-database-dumps-v2-experimental" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Restore a project backup"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="backup-request-project-backup-restore-v2-experimental" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "backup-request-project-backup-restore-path"
+
+
+- api operation id 'backup-request-project-backup-restore-path' removed and replaced with 'backup-request-project-backup-restore-path-deprecated'
+
+
+For details, refer to the <OperationLink operation="backup-request-project-backup-restore-path" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Backups belonging to a Project"
+
+
+- added the new optional 'query' request parameter 'runningRestoresOnly'
+
+- added the optional property '/items/restore' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="backup-list-project-backups" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a Backup of a Project"
+
+
+- added the optional property 'restore' to the response with the '201' status
+
+
+For details, refer to the <OperationLink operation="backup-create-project-backup" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### Release Summary: mittwald PHP SDK v2.1.177
+
+The mittwald PHP SDK has been updated to version 2.1.177. This release introduces several new features and improvements:
+
+- **Features:**
+  - Added functionality to list database dumps for a Project Backup.
+  - Introduced a new API endpoint for restoring a Project Backup.
+  - Deprecated the old restore path request in favor of a new structure.
+
+- **Changes:**
+  - **New Endpoints:**
+    - `getProjectBackupDatabaseDumpsV2Experimental`: Lists database dumps associated with a specific Project Backup.
+  - **Renamed and Deprecated Endpoints:**
+    - `requestProjectBackupRestorePath` is deprecated in favor of `requestProjectBackupRestoreV2Experimental`.
+  - **New Data Structures:**
+    - `ProjectBackupRestore` and `ProjectBackupRestorePath` have been enhanced for better functionality.
+  - **Architecture Changes:**
+    - Added new response handling classes for error management.
+    - Refactored validation schemas for improved error handling and data integrity.
+
+- **Miscellaneous:**
+  - Enhanced validation and error handling across APIs.
+  - Added documentation links and examples for clarity.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.177).
+
+### mittwald PHP SDK Release v2.1.176
+
+The latest release of the mittwald PHP SDK, version [v2.1.176](https://github.com/mittwald/api-client-php/releases/tag/v2.1.176), introduces several enhancements and new features to the Cronjob and Marketplace APIs.
+
+#### Features
+
+- **Cronjob API Updates**: A new method, `replaceCronjobAppInstallationId`, has been added to enhance the Cronjob API by allowing the replacement of a Cronjob's app installation ID. This update includes improved request validation and handling.
+  
+- **Marketplace API Enhancements**: New functionality has been introduced to check if an extension is chargeable for specific contexts. This includes two new types of responses to manage success and error scenarios effectively.
+
+#### Changes
+
+- **Cronjob API Enhancements**:
+  - The `replaceCronjobAppInstallationId` method has been added to the `CronjobClient` interface.
+  - The `updateCronjobAppId` method is now deprecated in favor of the new method.
+
+- **Marketplace API Enhancements**:
+  - A new method, `extensionCheckExtensionIsChargable`, has been added to the `MarketplaceClient` interface.
+  - New response classes have been introduced to handle default, not found, and too many requests scenarios.
+
+- **Response Handling**: Enhanced handling for new response classes to manage various states and errors in both Cronjob and Marketplace APIs.
+
+- **Request and Response Models**: New classes have been added in the `ExtensionCheckExtensionIsChargable` namespace to support the new functionalities.
+
+- **Validation Improvements**: Improved validation schemas ensure more robust and reliable API input handling.
+
+These updates enhance the SDK's capabilities, providing more versatile interactions with Cronjobs and Marketplace extensions.
+
+### mittwald JavaScript SDK Release 4.290.0
+
+The mittwald JavaScript SDK has been updated to version 4.290.0. This release includes an update to the generated client, enhancing the functionality and performance of the SDK. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.290.0](https://github.com/mittwald/api-client-js/releases/tag/4.290.0).
+
+### mittwald JavaScript SDK Release 4.289.0
+
+The mittwald JavaScript SDK version 4.289.0 has been released. This update includes a feature enhancement with an updated generated client. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.289.0).
+
+### mittwald JavaScript SDK Release 4.288.0
+
+The mittwald JavaScript SDK has been updated to version 4.288.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.288.0).
+
