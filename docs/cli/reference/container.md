@@ -497,7 +497,7 @@ FLAG DESCRIPTIONS
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
 
-## `mw container run [--token <value>] [-q] [-p <value>] [-e <value>...] [--env-file <value>...] [--description <value>] [--entrypoint <value>] [--name <value>] [-p <value>...] [-P] [-v <value>...] IMAGE [COMMAND] [ARGS...]`
+## `mw container run [--token <value>] [-q] [-p <value>] [-e <value>...] [--env-file <value>...] [--description <value>] [--entrypoint <value>] [--name <value>] [-p <value>...] [-P] [-v <value>...] IMAGE [COMMAND] [ARGS...]` {#mw-container-run-image-command-args}
 
 Creates and starts a new container.
 
