@@ -1,40 +1,39 @@
 ---
 sidebar_label: n8n
-description: Erfahre, wie du einen n8n-Container aufsetzt, einzeln oder im Verbund mit anderen Apps
+description: Learn how to set up an n8n container, either standalone or in conjunction with other apps
 ---
 
-# n8n ausführen
+# Running n8n
 
-## Einführung
+## Introduction
 
-n8n ist eine Automatisierungsplattform, mit der sich verschiedene Dienste und Anwendungen über sogenannte Workflows miteinander verbinden lassen. Sie funktioniert ähnlich zu Tools wie Zapier oder Make (ehemals Integromat), bietet aber mehr Flexibilität und Kontrolle – besonders für Entwickler:innen.
+n8n is an automation platform that allows you to connect different services and applications via so-called workflows. It works similarly to tools like Zapier or Make (formerly Integromat), but offers more flexibility and control – especially for developers.
 
-Mit n8n kannst du:
+With n8n you can:
 
-- Automatisierte Abläufe zwischen über 300 Diensten (z. B. Slack, Google Sheets, GitHub, Datenbanken etc.) erstellen.
-- Eigene Logik einbauen – z. B. mit Bedingungen, Schleifen, benutzerdefiniertem JavaScript.
-- Die Software selbst hosten (Self-Hosting), was volle Datenhoheit ermöglicht.
+- Create automated workflows between over 300 services (e.g. Slack, Google Sheets, GitHub, databases, etc.)
+- Add your own logic – for example, with conditions, loops, custom JavaScript
+- Self-host the software, which allows for complete data sovereignty
 
-## n8n Container erstellen
+## Creating an n8n Container
 
-Du kannst n8n in deiner mittwald Hosting-Umgebung mit Containern bereitstellen. Es gibt verschiedene Hauptansätze:
+You can provide n8n in your mittwald hosting environment using containers. There are several main approaches:
 
-### Verwendung der mStudio-Benutzeroberfläche
+### Using the mStudio user interface
 
-1. Gehe in deinem Projekt in mStudio auf den **Container**-Menüpunkt und erstelle einen neuen Container. Du kannst einen beliebigen Namen wählen.
+1. In your project, go to the **Container** menu item in mStudio and create a new container. You can choose any name you like.
 
-2. Gib das Image `n8nio/n8n:stable` ein. Du kannst den Entrypoint und das Command wie vorgeschlagen beibehalten.
+2. Enter the image `n8nio/n8n:stable`. You can leave the entrypoint and command as suggested.
 
 #### Volumes
 
-Um die Daten deines n8n persistent zu speichern, definiere Volumes unter **Volumes** wie folgt:
+To persistently store your n8n data, define volumes under **Volumes** as follows:
 
-- Neues Volume erstellen, auf **Pfad im Container** (Mount Point): `/home/node/.n8n`
+- Create a new volume, with **Path in container** (Mount Point): `/home/node/.n8n`
 
+#### Environment Variables
 
-#### Umgebungsvariablen
-
-Setze die folgenden Umgebungsvariablen für den Container:
+Set the following environment variables for the container:
 
 ```dotenv
 N8N_HOST=example.project.space
@@ -45,15 +44,15 @@ WEBHOOK_URL=https://example.project.space/
 GENERIC_TIMEZONE=Europe/Berlin
 ```
 
-Hier passt du die Umgebungsvariablen `N8N_HOST` und `WEBHOOK_URL` auf den Host an, über den du die Weboberfläche von n8n erreichen möchtest.
+Here, adjust the environment variables `N8N_HOST` and `WEBHOOK_URL` to match the host where you want to access the n8n web interface.
 
 #### Ports
 
-Übernehme den vorgeschlagenen Standardport `5678`.
+Use the suggested default port `5678`.
 
-### Verwendung der CLI mit `mw container run`
+### Using the CLI with `mw container run`
 
-Du kannst auch einen n8n-Container mit der mittwald CLI und dem Befehl `mw container run` bereitstellen:
+You can also deploy an n8n container with the mittwald CLI and the command `mw container run`:
 
 ```bash
 mw container run \
@@ -70,13 +69,13 @@ mw container run \
   n8nio/n8n:stable  # alternatives: https://hub.docker.com/r/n8nio/n8n/tags
 ```
 
-Dieser Befehl erstellt einen neuen Container namens "n8n" mit dem n8n-Image, setzt alle notwendigen Umgebungsvariablen und mountet Volumes für die persistente Datenspeicherung.
+This command creates a new container named "n8n" with the n8n image, sets all necessary environment variables, and mounts volumes for persistent data storage.
 
-### Verwendung der CLI mit `mw stack deploy`
+### Using the CLI with `mw stack deploy`
 
-Wenn du Docker Compose bevorzugst, kannst du eine `docker-compose.yml`-Datei erstellen und sie mit dem Befehl `mw stack deploy` bereitstellen:
+If you prefer Docker Compose, you can create a `docker-compose.yml` file and deploy it with the `mw stack deploy` command:
 
-1. Erstelle eine `docker-compose.yml`-Datei mit folgendem Inhalt:
+1. Create a `docker-compose.yml` file with the following content:
 
    ```yaml
    version: "3"
@@ -98,63 +97,92 @@ Wenn du Docker Compose bevorzugst, kannst du eine `docker-compose.yml`-Datei ers
      n8n-data:
    ```
 
-2. Stelle den Stack mit der CLI bereit:
+2. Deploy the stack with the CLI:
 
    ```bash
    mw stack deploy
    ```
 
-Dieser Ansatz ist besonders nützlich, wenn du mehrere Container deployen möchtest, die zusammenarbeiten.
+This approach is especially useful if you want to deploy multiple containers that work together.
 
-## Betrieb
+## Operation
 
-Deine n8n-Daten werden im Rahmen des regelmäßigen Projektbackups gesichert und können entsprechend auch wiederhergestellt werden. Achte darauf, jedem Container separate Volumes für ihre Daten zuzuordnen, um Container unabhängig von den Daten neu aufsetzen zu können.
+Your n8n data is secured as part of the regular project backups and can be restored accordingly. Make sure to assign separate volumes to each container for their data so that you can re-create containers independently of their data.
 
 :::caution
-Für einen sicheren Produktivbetrieb sind weitere Maßnahmen bzw. Klärungen erforderlich, die vom konkreten Anwendungsfall abhängen:
+For secure production operation, further measures or clarifications are required, depending on the specific use case:
 
-- Zugriff auf n8n: Wer darf Workflows erstellen, bearbeiten, anstoßen, ...
-- Authentifizierung n8n, Benutzer- und Rollenkonzept
-- Konfiguration n8n: Erlaubte Knoten, Systembenutzer, ...
-- Zugriff Vektordatenbank: lesen/schreiben, Schema-Veränderungen
-- Zugriff auf Dokumente: Wer darf lesen/schreiben/löschen?
-- Zugriff auf Webhooks: Authorisierung und Authentifizierung, Konsumenten bzw. Clients
+- Access to n8n: Who is allowed to create, edit, trigger workflows, etc.?
+- Authentication for n8n, user and role management concepts
+- Configuration of n8n: Allowed nodes, system users, etc.
+- Access to the vector database: read/write, schema changes
+- Access to documents: Who is allowed to read/write/delete?
+- Access to webhooks: Authorization and authentication, consumers or clients
 
-Im Entwicklungs- und Testbetrieb können einige dieser Aspekte vereinfacht werden, im produktiven Betrieb müssen alle diese Aspekte zweifelsfrei geklärt werden. Ohne genaue Klärung dieser Sicherheitsfragen besteht das Risiko, ungewollt zu viele Informationen preiszugeben und im schlimmsten Falle interne Dokumente öffentlich einsehbar zu machen oder gar Prozesse anzustoßen.
+During development and testing, some of these aspects can be simplified, but for production use, all these aspects must be clearly regulated. Without clear resolution of these security issues, there is a risk of unintentionally disclosing too much information, potentially making internal documents publicly accessible or even triggering processes.
 :::
 
-### Use case: RAG mit postgreSQL und Mittwald AI-Hosting
+### Use case: RAG with PostgreSQL and Mittwald AI Hosting
 
-n8n kann benutzt werden, um RAG Systeme verschiedenster Form aufzubauen. Das folgende Beispiel zeigt einen möglichen Aufbau, aufgrund des großen n8n-Ökosystems ist dies aber lediglich einer von vielen Wegen. Viel mehr soll dieses Beispiel als Einstieg dienen, um im Anschluss komplexere und vor allem produktionsreife Systeme aufzusetzen.
+n8n can be used to build RAG systems of various forms. The following example shows one possible setup, but due to the large n8n ecosystem, it is only one of many approaches. This example is intended to serve as a starting point for building more complex and especially production-ready systems.
 
-#### Vorraussetzungen
+#### Requirements
 
 - Mittwald Container Hosting
-- Mittwald AI-Hosting
-- mStudio Zugriff, per Webapp und API-Token
-- Installiertes und eingerichtetes `mw` CLI, Deployment des Container Verbunds
+- Mittwald AI Hosting
+- mStudio access, via webapp and API token
+- A set up and configured `mw` CLI, deployment of the container stack
 
-#### Einführung, grundlegender Aufbau
+#### Introduction, Basic Setup
 
-Das Ziel ist, einem KI-Agenten Zugriff auf Informationen aus Dokumenten zu gewähren, sodass sich Agenten in ihren Aktionen / Antworten auf eben diese Dokumente beziehen können. Solche Dokumente können konkret vieles sein, z. B. Anleitungen, Handbücher oder gar Excel-Mappen mit vielen Daten.
+The goal is to give a chat agent access to information from documents, so that the agent’s actions and answers can refer specifically to those documents. Such documents can be, for example, manuals, guides, or even Excel workbooks with lots of data.
 
-Um dieses Ziel zu erreichen, ist eine Persistenzschicht nötig, in der Informationen "KI-freundlich" abgelegt werden können. Unter der Haube kommen mindestens zwei KI-Modelle zum Einsatz: Eines zum Erzeugen sog. "Embeddings" und ein weiteres um den Agenten zu steuern. Embeddings sind dabei die "KI-freundliche" Art, Texte und Dokumente für KIs zu persistieren, sodass diese schnell zum Kontext einer Unterhaltung beigesteuert werden können.
+To achieve this, a persistence layer is needed where information can be stored in a "AI-friendly" way. Under the hood, at least two AI models are used: one for generating so-called "embeddings" and another to control the agent. Embeddings are the "AI-friendly" way to persist text and documents, so they can be quickly provided as context for conversations.
 
-Im Beispiel kommen diese zwei Modelle aus dem Mittwald KI-Hosting zum Einsatz:
+In the example, these two models from Mittwald AI Hosting are used:
 
 - **Embedding**: `Qwen3-Embedding-8B`
 - **Agent**: `Devstral-Small-2-24B-Instruct-2512`
 
-Zum Speichern der Embeddings wird eine Vektordatenbank benötigt. Hier gibt es mehrere Möglichkeiten, das Beispiel nutzt `postgreSQL` mit der `pgvector` Extension. Hierfür gibt es ein vorbereitetes Docker-Image.
+Embeddings are stored in a vector database. Several options exist for this; the example uses `PostgreSQL` with the `pgvector` extension. A prepared Docker image is available for this.
 
-Der aufgebaute Verbund von Containern besteht also mindestens aus:
+The stack consists of at least these containers:
 
-- **n8n**: Erstellung und Betrieb RAG
-- **pgvector**: Vektordatenbank für Embeddings
+- **n8n**: creating and operating the RAG system
+- **pgvector**: vector database for embeddings **and** n8n persistence layer
+
+```mermaid
+flowchart TD
+  subgraph Client
+    U[User]
+    EXT[External API/Client]
+  end
+
+  subgraph "Mittwald Hosting (Container Stack)"
+    N8N[n8n]
+    PG[PostgreSQL + pgvector]
+    AIHOST[AI Hosting]
+  end
+
+  %% User uses n8n UI
+  U -- "HTTPS" --> N8N
+
+  %% External system triggers
+  EXT -- "Webhook/API" --> N8N
+
+  %% n8n uses Postgres for workflow and persistence
+  N8N -- "n8n data" --> PG
+
+  %% n8n RAG: stores/retrieves vectors
+  N8N -- "Embeddings (RAG)" --> PG
+
+  %% n8n calls external LLM host
+  N8N -- "API Calls" --> AIHOST
+```
 
 #### Installation
 
-Sind alle Voraussetzungen gegeben, kann mit der Installation begonnen werden. Zunächst erstellen wir die Docker Compose Datei:
+If all prerequisites are met, you can start the installation. First, create the Docker Compose file:
 
 ```
 version: "3.9"
@@ -177,8 +205,6 @@ services:
     container_name: n8n
     restart: unless-stopped
     environment:
-      N8N_BASIC_AUTH_USER: ${N8N_BASIC_AUTH_USER}
-      N8N_BASIC_AUTH_PASSWORD: ${N8N_BASIC_AUTH_PASSWORD}
       N8N_HOST: ${N8N_HOST}
       WEBHOOK_URL: ${WEBHOOK_URL}
       N8N_DATABASE_POSTGRESDB_USER: ${POSTGRES_USER}
@@ -186,7 +212,6 @@ services:
       NODES_EXCLUDE: ${NODES_EXCLUDE}
       N8N_PROTOCOL: https
       GENERIC_TIMEZONE: Europe/Berlin
-      N8N_BASIC_AUTH_ACTIVE: "true"
       N8N_DATABASE_POSTGRESDB_HOST: pgvector
       N8N_DATABASE_POSTGRESDB_PORT: 5432
       N8N_DATABASE_POSTGRESDB_DATABASE: n8n
@@ -205,9 +230,9 @@ volumes:
     driver: local
 ```
 
-Alle kritischen Einstellungen wie z. B. Passwörter werden als Umgebungsvariablen eingegeben. Dies erlaubt u.a. das schnelle Aufsetzen mehrerer Umgebungen, z. B. für Test- und Produktivbetrieb.
+All critical settings, such as passwords, are set as environment variables. This allows, among other things, quick setup of multiple environments, e.g., for testing and production.
 
-Die konkreten Einstellungen schreiben wir dann in eine `.env` Datei:
+We write the specific settings into a `.env` file:
 
 ```
 N8N_HOST=example.project.space
@@ -219,53 +244,53 @@ POSTGRES_PASSWORD=<postgres password>
 NODES_EXCLUDE=[]
 ```
 
-Zur einfachen Unterscheidung wird empfohlen, den `.env` Dateien sprechende Namen zu geben, z. B. `test.env` oder `prod.env`.
+For easy differentiation, it’s recommended to give the `.env` files descriptive names, such as `test.env` or `prod.env`.
 
 :::caution
-`NODES_EXCLUDE=[]` aktiviert **alle** Knoten für die Benutzung. Einige dieser Knoten können ein Sicherheitsrisiko darstellen. Zum Testen kann dies sehr nützlich sein, für produktive Umgebungen wird empfohlen, eine genaue Liste unerwünschter Knoten zu pflegen.
+`NODES_EXCLUDE=[]` enables **all** nodes for use. Some of these nodes may pose a security risk. While this is very useful for testing, for production environments it is advisable to maintain a detailed list of nodes to exclude.
 :::
 
-Sind alle Einstellungen vorbereitet, kann der Verbund ausgeliefert werden:
+Once all settings are prepared, the stack can be deployed:
 
 ```
 mw stack deploy -c path/to/n8n/docker-compose.yml --env-file path/to/n8n/example.env
 ```
 
-Sehen wir in der Konsole eine Erfolgsmeldung, kontrollieren wir die neuen Container im mStudio und haben somit den Installationsschritt abgeschlossen!
+If you see a success message in the console, check the new containers in mStudio – the installation step is complete!
 
-#### Beispiel-Workflow
+#### Example Workflow
 
 <a href="/examples/mw_ai_host_n8n_rag_demo.json" download>
-  Download Beispiel Workflow (JSON)
+  Download example workflow (JSON)
 </a>
 
-Basierend auf [Quelle](https://n8n.io/workflows/10157-local-document-question-answering-with-ollama-ai-agentic-rag-and-pgvector/)
+Based on [source](https://n8n.io/workflows/10157-local-document-question-answering-with-ollama-ai-agentic-rag-and-pgvector/)
 
-#### Einrichtung
+#### Setup
 
-Nach der Installation setzen wir das RAG-System in n8n auf und richten das System ein. Zunächst aktivieren wir einen n8n-Lizenzschlüssel und laden die Basisknoten zur Workflowerstellung herunter. Die benötigten Knoten liegen in `n8n-nodes-base` und können direkt aus der Applikation heraus heruntergeladen und installiert werden.
+After installation, we set up the RAG system in n8n and configure it. First, activate an n8n license key and download the base nodes for workflow creation. The required nodes are in `n8n-nodes-base` and can be downloaded and installed directly from the application.
 
 :::note
 
-Prüfe stets **vor** dem Ausführen eines Workflows, ob alle beteiligten Knoten vorhanden und korrekt verbunden sind. n8n-Fehlermeldungen können sehr technisch oder gar irreführend sein, eine Kontrolle im Vorfeld lohnt sich um Arbeit bei der Fehlersuche zu sparen.
+Always check **before** running a workflow whether all involved nodes are present and correctly connected. n8n error messages can be very technical or even misleading—taking a moment to check in advance can save debugging effort.
 
 :::
 
-Neben dem bloßen Vorhandensein müssen einige der Knoten korrekt konfiguriert werden.
+Besides being present, some nodes must be configured correctly.
 
-Benötigt wird:
-- Zugang zum Mittwald AI-Hosting ( oder vergleichbarer, OpenAI-kompatibler Host ) mit API-Key
-- Zugang zur Datenbank, Benutzer und Passwort haben wir bereits im Container-Verbund vorbereitet
+You will need:
+- Access to Mittwald AI Hosting (or a comparable, OpenAI-compatible host) with API key
+- Access to the database; user and password have already been prepared in the container stack
 
-**Security:** Für den Produktivbetrieb ist es sauberer, mehrere Datenbankbenutzer mit unterschiedlichen Privilegien zu pflegen. Dies bedarf allerdings händischer Anpassungen am Datenbank-Container, die hier aus Komplexitätsgründen nicht weiter ausgeführt werden. Grundsätzlich sollte der mit Benutzereingaben arbeitende Datenbankbenutzer des KI-Agenten **keine** Berechtigung haben, das Datenbankschema zu ändern!
+**Security:** For production, it’s best practice to manage multiple database users with different privileges. However, this requires manual adjustments to the database container, which are not covered here for simplicity. As a rule, the database user utilized by the AI agent for user input should **not** have permission to change the database schema!
 
-Wir erstellen also Zugangsdaten für die Datenbank und den KI-Host, anschließend weisen wir diese den entsprechenden Knoten zu. Beim Anlegen der Zugangsdaten wird bereits die Verbindung geprüft - so siehst du direkt, ob unser Verbund sauber arbeitet. Für die Authentifizierung der Webhooks richten wir JWT ein, für die Erzeugung eines konkreten Tokens zur Simulation eines Clients eignet sich [der JWT encoder auf jwt.io](https://www.jwt.io/).
+So, create credentials for the database and the AI host, then assign them to the appropriate nodes. When creating credentials, the connection is already checked—so you can immediately see whether the stack is working correctly. For webhook authentication, set up JWT; to generate a token for simulating a client, you can use [the JWT encoder on jwt.io](https://www.jwt.io/).
 
-#### Betrieb - Webhook
+#### Operation – Webhook
 
-**Security:** Für produktiven Betrieb müssen Webhooks mit einer Authentifizierungsmethode abgesichert werden. Nach Möglichkeit sollten Webhooks nicht weiter exponiert, sondern von einer anderen Applikation des Stacks konsumiert werden. Sollen gezielt Webhooks exponiert werden, lohnt sich ein Proxy-Server im Stack, über den nur definierte Webhook-URLs an n8n weitergegeben werden.
+**Security:** For production, webhooks must be protected with an authentication method. If possible, don’t expose webhooks directly, but consume them from another application in the stack. If you want to expose webhooks on purpose, it’s worthwhile to include a proxy server in your stack, which only forwards defined webhook URLs to n8n.
 
-Lasse den initialen Webhook lauschen im Test-Modus, dann kann man testen, z. B. per postman oder curl, wobei dir die genaue URL angezeigt wird:
+Let the initial webhook listen in test mode—you can test it, for example with Postman or curl, and you’ll see the exact URL:
 
 ```
 curl -X POST -d '{
@@ -277,7 +302,7 @@ curl -X POST -d '{
 https://example.project.space/webhook-test/<webhook uuid>
 ```
 
-Solange unser RAG noch nicht mit Dokumenten befüllt ist, haben wir hier einen einfachen Chatbot mit dem im Model "eingebackenen" Weltwissen. Fragen wir explizit, erklärt sich der Agent auch:
+As long as our RAG setup isn’t loaded with documents, we have a simple chatbot here, using the "baked-in" knowledge of the model. If you ask explicitly, the agent will explain:
 
 ```
 curl -X POST -d '{
@@ -290,62 +315,10 @@ https://example.project.space/webhook-test/<webhook uuid>
 {"output":"I currently do not have access to any documents in my knowledge base. If you'd like, I can help answer questions based on general knowledge or assist with other tasks."}
 ```
 
-#### Betrieb - RAG, Dateisystem
+#### Operation – RAG, Filesystem
 
-Nach der Herstellung der Grundfunktion kann das RAG mit Dokumenten gefüllt werden. Im Beispiel werden Dokumente im Dateisystem abgelegt, verarbeitet und für den KI-Agenten sichtbar gemacht. In der Praxis lohnt es sich, neben dem Dateisystem auch andere Quellen in Erwägung zu ziehen, oder das Dateisystem gegen einen Dienst, bzw. einen Internet-Share ( Google Share ), zu konfigurieren.
+After basic operation is confirmed, the RAG system can be populated with documents. In the example, documents are stored, processed, and made accessible to the AI agent in the filesystem. In practice, it can be worthwhile to also consider other sources in addition to the filesystem, or configure the filesystem against a service, or an Internet share (e.g., Google Share).
 
-Im ersten Knoten der Dateisystemüberwachung ( `Local file trigger` ) richten wir das Verzeichnis auf dem n8n-Container ein, das die Dokumente enthalten soll. Hier tragen wir beispielsweise `/home/node/rag_documents` ein.
+In the first node ("Local file trigger") for file system monitoring, set the directory in the n8n container where the documents should be placed. For example, enter `/home/node/rag_documents`.
 
-Im Anschluss können wir die Überwachung testen, indem wir Dokumente im eingerichteten Ordner ablegen. Die Auslieferung der Dokumente kann dabei auf verschiedenen Wegen erfolgen, ( per SSH, SFTP, ), im Beispiel beschränken wir uns auf eine `SSH`-Verbindung und liefern unsere Dokumente per `scp` aus. Ordner vorbereiten:
-
-```shellsession
-ssh <Mittwald SSH URL, siehe mStudio>
-mkdir -p /home/node/rag_documents
-```
-
-Überwachungsknoten aktivieren in n8n, Dokumente ausliefern:
-
-```shellsession
-scp my_documents/example_manual.txt <Mittwald SSH URL n8n Container, siehe mStudio>:/home/node/rag_documents/
-```
-
-Mit der neuen Datei wird der nachfolgende Workflow ausgelöst. Das Dokument, die Metadaten und die Embeddings werden in der Datenbank hinterlegt und stehen im Chat zur Verfügung.
-
-Zum Testen eignen sich bekannte Dokumente, zu denen einfach Testfragen gestellt werden können:
-
-```shellsession
-# Beispieldokumente ablegen
-scp -r python3_docs/*.txt <Mittwald SSH URL n8n Container, siehe mStudio>:/home/node/rag_documents/
-# Workflow wird angestoßen in n8n ...
-# Kontrolle nach Abschluss:
-curl -X POST -d '{
-  "chatInput": "How to report bugs in Python?",
-  "sessionId": 42
-}'
--H "Content-Type: application/json" \
--H "Authorization: Bearer xxx.yyy.zzz" \
-https://example.project.space/webhook-test/<webhook uuid>
-{"output":"To report bugs in Python, you can use the Python issue tracker on GitHub. Here’s how you can do it:\n\n1. **GitHub Issues Tracker**: Submit bug reports for Python via the GitHub issues tracker at [https://github.com/python/cpython/issues](https://github.com/python/cpython/issues). This platform provides a web form where you can enter pertinent information and submit it to the developers.\n\n2. **Bug Writing Guidelines**: When writing a bug report, include as much detail as possible to help the developers understand and reproduce the issue. While some guidelines are specific to the Mozilla project, they describe general best practices for writing effective bug reports.\n\n3. **Documentation Bugs**: If you find a bug in the Python documentation or have suggestions for improvements, you can also submit a bug report on the issue tracker. …
-
-# Quellenangabe:
-curl -X POST -d '{
-  "chatInput": "Name your document source",
-  "sessionId": 42
-}'
--H "Content-Type: application/json" \
--H "Authorization: Bearer xxx.yyy.zzz" \
-https://example.project.space/webhook-test/<webhook uuid>
-{"output":"The document source for reporting bugs in Python is titled \"bugs\" and is located at `/home/node/rag_documents/python3_docs/bugs.txt`."}
-```
-
-#### Ausblick
-
-Mit dem bis hier hin aufgebauten System haben wir eine gute Grundlage, unser RAG-System bis zur Produktionsreife auszuimplementieren.
-
-Neben den bereits genannten Sicherheitsaspekten gibt es weitere Erwägungen:
-- Datenquellen für Dokumente: Weitere Quellen, wie z. B. Fremddatenbanken, Netzlaufwerke, …
-- Verfeinerung des Agents: Model-Einstellungen, Prompt, Dokumentenfilter
-- Anbindung weiterer Werkzeuge an den KI-Agenten: Internetsuche, Bilderkennung, …
-- Skalierung: Speicherbedarf für Dokumente und Embeddings, Verhalten unter Last, …
-
-Diese Liste hat keinen Anspruch auf Vollständigkeit, sondern zeigt lediglich weitere Anknüpfungspunkte auf, die beim Ausrollen solcher Systeme bis in die Produktion beachtet werden müssen.
+You can now test monitoring by placing documents in this directory. Delivery of the documents can happen in various ways (e.g., via
