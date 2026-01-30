@@ -158,7 +158,7 @@ flowchart TD
     EXT[External API/Client]
   end
 
-  subgraph "Mittwald Hosting (Container Stack)"
+  subgraph "Mittwald Hosting"
     N8N[n8n]
     PG[PostgreSQL + pgvector]
     AIHOST[AI Hosting]
@@ -237,8 +237,6 @@ We write the specific settings into a `.env` file:
 ```
 N8N_HOST=example.project.space
 WEBHOOK_URL=https://example.project.space/
-N8N_BASIC_AUTH_USER=<basic auth user>
-N8N_BASIC_AUTH_PASSWORD=<basic auth password>
 POSTGRES_USER=<postgres user>
 POSTGRES_PASSWORD=<postgres password>
 NODES_EXCLUDE=[]
@@ -321,4 +319,56 @@ After basic operation is confirmed, the RAG system can be populated with documen
 
 In the first node ("Local file trigger") for file system monitoring, set the directory in the n8n container where the documents should be placed. For example, enter `/home/node/rag_documents`.
 
-You can now test monitoring by placing documents in this directory. Delivery of the documents can happen in various ways (e.g., via
+Afterwards, you can test the monitoring by placing documents in the designated folder. Document delivery can take place in several ways (via SSH, SFTP, etc.); in this example, we are restricting ourselves to an `SSH` connection and deliver our documents using `scp`. Prepare the directory:
+
+```shellsession
+ssh <Mittwald SSH URL, see mStudio>
+mkdir -p /home/node/rag_documents
+```
+
+Activate the monitoring node in n8n, deliver documents:
+
+```shellsession
+scp my_documents/example_manual.txt <Mittwald SSH URL n8n Container, see mStudio>:/home/node/rag_documents/
+```
+
+With the new file, the subsequent workflow is triggered. The document, its metadata, and the embeddings are stored in the database and are then available in the chat.
+
+For testing, known documents to which you can easily ask test questions are especially useful:
+
+```shellsession
+# Place sample documents
+scp -r python3_docs/*.txt <Mittwald SSH URL n8n Container, see mStudio>:/home/node/rag_documents/
+# Workflow will be triggered in n8n ...
+# Check after completion:
+curl -X POST -d '{
+  "chatInput": "How to report bugs in Python?",
+  "sessionId": 42
+}'
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer xxx.yyy.zzz" \
+https://example.project.space/webhook-test/<webhook uuid>
+{"output":"To report bugs in Python, you can use the Python issue tracker on GitHub. Here’s how you can do it:\n\n1. **GitHub Issues Tracker**: Submit bug reports for Python via the GitHub issues tracker at [https://github.com/python/cpython/issues](https://github.com/python/cpython/issues). This platform provides a web form where you can enter pertinent information and submit it to the developers.\n\n2. **Bug Writing Guidelines**: When writing a bug report, include as much detail as possible to help the developers understand and reproduce the issue. While some guidelines are specific to the Mozilla project, they describe general best practices for writing effective bug reports.\n\n3. **Documentation Bugs**: If you find a bug in the Python documentation or have suggestions for improvements, you can also submit a bug report on the issue tracker. …
+
+# Source Reference:
+curl -X POST -d '{
+  "chatInput": "Name your document source",
+  "sessionId": 42
+}'
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer xxx.yyy.zzz" \
+https://example.project.space/webhook-test/<webhook uuid>
+{"output":"The document source for reporting bugs in Python is titled \"bugs\" and is located at `/home/node/rag_documents/python3_docs/bugs.txt`."}
+```
+
+#### Outlook
+
+With the system set up up to this point, you have a solid foundation to further develop your RAG system into a production-ready solution.
+
+In addition to the already mentioned security aspects, there are other considerations:
+- Data sources for documents: other sources such as external databases, network drives, etc.
+- Refinement of the agent: model settings, prompt, document filters
+- Integration of additional tools with the AI agent: web search, image recognition, etc.
+- Scaling: storage requirements for documents and embeddings, system behavior under load, etc.
+
+This list is not exhaustive, but rather shows additional points of contact that should be considered when rolling out such systems into production.
