@@ -5,7 +5,7 @@ applyTo: "docs/**/*.md,docs/**/*.mdx,i18n/de/docusaurus-plugin-content-docs/**/*
 Pay special attention to these guidelines when reviewing documentation changes:
 
 - Documentation changes must include updates to both English and German versions
-- Headings must have explicit anchor IDs for stable linking; suggest changes during code review if missing
+- Markdown sub-headings within a document must have explicit anchor IDs for stable linking (this does not apply to the markdown front matter); suggest changes during code review if missing
 - Text must not have spelling or grammar mistakes and must be worded clearly, concisely and professionally, but not overly formal. Make suggestions for improvements during code review.
 - In German, use the informal "du" form consistently.
 - Make sure that code/deployment examples do not contain insecure default credentials
