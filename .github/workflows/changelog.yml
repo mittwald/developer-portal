@@ -45,6 +45,9 @@ jobs:
             git add docs/cli
             git commit -m "Synchronize CLI documentation from mittwald/cli";
           fi
+      - name: Run build
+        run: |
+          npm run build
       - name: Push changes
         run: |
           git remote add publish "https://mittwald-machine:${{ secrets.RELEASE_USER_TOKEN }}@github.com/mittwald/developer-portal.git"
