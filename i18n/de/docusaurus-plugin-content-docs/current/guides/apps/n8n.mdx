@@ -185,7 +185,7 @@ flowchart TD
 
 Sind alle Voraussetzungen gegeben, kann mit der Installation begonnen werden. Zunächst erstellen wir die Docker Compose Datei:
 
-```
+```yaml
 version: "3.9"
 services:
   pgvector:
@@ -235,7 +235,7 @@ Alle kritischen Einstellungen wie z. B. Passwörter werden als Umgebungsvariab
 
 Die konkreten Einstellungen schreiben wir dann in eine `.env` Datei:
 
-```
+```dotenv
 N8N_HOST=example.project.space
 WEBHOOK_URL=https://example.project.space/
 POSTGRES_USER=<postgres user>
@@ -291,7 +291,7 @@ Wir erstellen also Zugangsdaten für die Datenbank und den KI-Host, anschließen
 
 Lasse den initialen Webhook lauschen im Test-Modus, dann kann man testen, z. B. per postman oder curl, wobei dir die genaue URL angezeigt wird:
 
-```
+```bash
 curl -X POST -d '{
   "chatInput": "Hello World!",
   "sessionId": 42
