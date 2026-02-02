@@ -93,7 +93,8 @@ async function generateAPIChangeSummary(
           "When multiple changes affect a single API operation, summarize them into a single list item. " +
           "When an identical change affects multiple API operations, summarize them into a single list item. " +
           "When an items `level` property is 3, also include a note that a breaking change has occurred. " +
-          "Form complete sentences. Do not include a heading.",
+          "Form complete sentences. Do not include a heading. " +
+          "Use backticks to wrap example URLs, avoid singe quotes if curly braces are used for example variables.",
       },
       { role: "user", content: JSON.stringify(changelog) },
     ],
