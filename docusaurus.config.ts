@@ -76,10 +76,10 @@ const config: Config = {
   },
   plugins: [
     [
-      'docusaurus-lunr-search',
+      "docusaurus-lunr-search",
       {
-        languages: ['en', 'de'],
-      }
+        languages: ["en", "de"],
+      },
     ],
     [
       "@docusaurus/plugin-client-redirects",
@@ -146,7 +146,10 @@ const config: Config = {
           onInlineTags: "ignore",
         },
         theme: {
-          customCss: require.resolve("./src/css/custom.css"),
+          customCss: [
+            require.resolve("./src/css/custom.css"),
+            require.resolve("./src/css/search.css"),
+          ],
         },
       } satisfies Options,
     ],
