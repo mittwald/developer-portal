@@ -2,6 +2,8 @@
 title: Reference Extension
 ---
 
+[//]: # "TODO man vs du, imperative mood vs passive voice"
+
 ## Die Reference Extension
 
 Die [Reference Extension](https://github.com/mittwald/reference-extension) ist eine umfassende Beispiel-Extension,
@@ -41,7 +43,7 @@ Die Reference Extension verwendet moderne Web-Technologien, die auch für die En
 **Development Tools:**
 
 - **[Vite](https://vite.dev/)** - Schnelles Build-Tool
-- **[Biome](https://orm.drizzle.team/)** - Linting & Formatting
+- **[Biome](https://biomejs.dev/)** - Linting & Formatting
 - **[Vitest](https://vitest.dev/)** - Unit Testing Framework
 
 ### Implementierte Konzepte des mStudio Marktplatzes
@@ -103,7 +105,7 @@ Um die Reference Extension lokal zu entwickeln und zu testen, müssen zunächst 
 
 **Voraussetzungen:**
 
-- **Node.js 22** (erforderlich)
+- **Node.js 22+** (erforderlich)
 - **pnpm 9.14.4+** (Package Manager)
 - **Docker & Docker Compose** (für PostgreSQL)
 
@@ -146,6 +148,7 @@ Die Extension ID ist eine bei der Registrierung der Extension generierte UUID un
 #### EXTENSION_SECRET
 
 [//]: # "TODO Extension Secret über das Frontend"
+[//]: # "TODO Contributor Verification needed?!"
 
 #### ENCRYPTION_MASTER_PASSWORD und ENCRYPTION_SALT
 
@@ -163,7 +166,7 @@ Um dieses **Secret-Paar** zu **generieren**, rufe in der Reference Extension fol
 pnpm init:encryption
 ```
 
-Dabei werden die generierten Secrets in die eben erstellte .env Datei geschrieben.
+Dabei werden die generierten Secrets in die eben erstellte `.env` Datei geschrieben.
 
 :::info Verschlüsselung von eigenen schützenswerten Feldern
 Die Verschlüsselung der Tabellenspalte ist ausreichend modular gebaut, um sie auch für **eigene schützenswerte Felder** verwenden zu können.
@@ -179,7 +182,7 @@ Die Reference Extension ist auf eine Datenbank angewiesen für die Persistierung
 Sie verwendet dazu **[PostgreSQL](https://www.postgresql.org/)**.
 
 Um das Starten der Extension zu vereinfachen, liefert die Reference Extension eine `docker-compose.yml` sowie eine `docker-compose.dev.yml`.
-Beide können dazu werden, die Extension vollständig mit ihren Abhängigkeiten zu starten.
+Beide können dazu genutzt werden, die Extension vollständig mit ihren Abhängigkeiten zu starten.
 Die `docker-compose.dev.yml` startet die Extension jedoch in einem Development Modus mit Hot Reloading.
 
 Um die Extension zu starten, führe den folgenden Befehl aus:
