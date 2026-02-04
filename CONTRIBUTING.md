@@ -1,5 +1,36 @@
 # mittwald Developer Portal -- Contribution guide
 
+## How We Write Docs
+
+Good documentation is clear, concrete, and welcoming—for every reader, not just experts.
+Our best guides feel like they’re written by your past self for someone brand new (and curious, but occasionally confused).
+
+**Our documentation principles:**
+
+- **Empathy:**
+  Write from the perspective of someone new to the project. If any step or term requires background knowledge, briefly introduce or link it.
+- **No “Magic Steps”:**
+  Don’t assume “everyone just knows”; if there are exceptions, limitations, or special cases, mention them or provide a link.
+- **Assumptions Are Bugs:**
+  If you write “simply”, “as usual”, or “just”, double check: is something being skipped?
+- **Consistency:**
+  Use the same terms throughout and stick to our tone (“du” in German, informal but clear in English).
+- **Concrete Examples:**
+  Prefer one fully worked, real-world example over several hand-wavey ones.
+- **Beginner’s Mind:**
+  Review your docs as if you have never seen the code or platform before. What would confuse you?
+- **Collaboration:**
+  If you trip over docs, make a note and suggest an improvement—or even just open an issue with your confusion.
+- **Document Gaps:**
+  If you uncover any “forbidden knowledge” or mistakes only an expert could know, *write it down for future contributors*.
+- **Respect the Reader’s Focus:**
+  Avoid leaving readers guessing by referencing “exceptions” or “special rules” without links, examples, or lists.
+
+**Remember:**
+Every bit of clear, concrete documentation you contribute saves time and frustration for the next team member—even if that person is you!
+
+If you’re unsure about something, ask for feedback: your “stupid question” might be the most valuable thing for future docs.
+
 ## Contributing docs
 
 The main documentation files are written in [Markdown][md] or [MDX][mdx] (also have a look at the [Docusaurus-specific Markdown features][docu-md]). You can find the documentation files in the following folders:
