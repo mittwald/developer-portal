@@ -74,6 +74,12 @@ const config: Config = {
   },
   plugins: [
     [
+      "docusaurus-lunr-search",
+      {
+        languages: ["en", "de"],
+      },
+    ],
+    [
       "@docusaurus/plugin-client-redirects",
       {
         createRedirects(path) {
@@ -138,7 +144,10 @@ const config: Config = {
           onInlineTags: "ignore",
         },
         theme: {
-          customCss: require.resolve("./src/css/custom.css"),
+          customCss: [
+            require.resolve("./src/css/custom.css"),
+            require.resolve("./src/css/search.css"),
+          ],
         },
       } satisfies Options,
     ],
