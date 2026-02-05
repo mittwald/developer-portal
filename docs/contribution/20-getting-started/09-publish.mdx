@@ -1,3 +1,127 @@
 ---
 title: (Optional) Extension veröffentlichen
 ---
+
+Um eine Extension zu veröffentlichen, müssen sowohl der **Contributor** als auch die **Extension verifiziert** werden.
+Dazu sind im mStudio zunächst einige Informationen zu hinterlegen.
+
+## Contributor
+
+Der Contributor wird dem Kunden als **Anbieter** einer Extension angezeigt.
+Er dient als **Kontakt für Rückfragen** und tritt als **Vertragspartner** auf.
+Auch bei einer kostenlosen Extension schließt der Kunde einen Vertrag mit dem Contributor.
+mittwald stellt lediglich die **Plattform** für Extensions bereit — Verträge für die Nutzung werden direkt zwischen Kunde und Contributor geschlossen.
+
+Für den Contributor werden standardmäßig einige Informationen aus dem **Vertragspartner der Organisation** übernommen:
+
+- **Stammdaten**: Informationen über die natürliche oder juristische Person, mit der der Vertrag geschlossen wird.
+- **Support-Informationen**: Kontaktmöglichkeiten für Support-Zwecke, die ebenfalls aus der Organisation übernommen werden.
+
+Diese Informationen lassen sich im **Contributor-Menü unter Details** anpassen.
+
+![Contributor Details pflegen](/img/contribution/getting-started-guide/contributor-details.png)
+
+### Kurzbeschreibung und Avatar
+
+Wir empfehlen jedem Contributor, eine **Kurzbeschreibung** sowie einen **Avatar** zu hinterlegen, um sich als Anbieter vorzustellen.
+Das stärkt das **Vertrauen** potenzieller Kunden.
+Beides ist jedoch **optional**.
+
+### Support-Informationen
+
+Dem Kunden einer Extension werden zwecks Rückfragen oder dem Melden von Problemen **Kontaktdaten** zum Contributor angezeigt.
+Diese bestehen aus einer **E-Mail-Adresse** (verpflichtend) sowie einer **Telefonnummer** (optional).
+
+Wenn in den Contributor-Details **keine abweichenden Informationen** hinterlegt wurden,
+werden die Kontaktdaten aus dem **Vertragspartner der Organisation** übernommen.
+Änderungen in der Organisation wirken sich in diesem Fall auch auf die angezeigten Support-Informationen aus.
+Sobald **abweichende Support-Informationen** definiert wurden, bleiben diese von Änderungen in der Organisation **unberührt**.
+
+### Anbieterkennzeichnung
+
+Jeder Contributor, der verifiziert werden möchte, ist verpflichtet, eine **Anbieterkennzeichnung nach §5 DDG** zu hinterlegen,
+um den Informationspflichten digitaler Dienste nachzukommen.
+Dies kann entweder in Form eines **Links zu einem bestehenden Impressum** oder durch **einfache Texteingabe** erfolgen.
+
+:::info Rechtssichere Anbieterkennzeichnung generieren
+Mit [Dieter macht den Datenschutz](https://studio.mittwald.de/app/marketplace/marketplace/62cfdf0b-9e64-4d48-ae3d-dfa3ba433df4) existiert eine Extension in unserem Marktplatz, mit der bspw. rechtssichere Impressen generiert werden können.
+:::
+
+### Stripe Onboarding
+
+Die Abrechnung kostenpflichtiger Extensions findet über den Zahlungsdienstleister **Stripe** statt.
+Falls du eine **kostenpflichtige Extension** auf dem Marktplatz anbieten möchtest,
+musst du an dieser Stelle ein **Stripe Onboarding** durchführen.
+
+Bei Durchführung des Stripe Onboardings stimmst du zu, dass deine Contributor-Daten an Stripe **übertragen** werden.
+
+Dieser Schritt ist für die Verifizierung **nicht nötig**, wenn du nur **kostenlose Extensions** anbieten möchtest, und kann **jederzeit nachgeholt** werden.
+
+### Verifizierung anfragen
+
+Wenn alle Informationen hinterlegt wurden, kann in der **Contributor-Übersicht** die **Verifizierung** angefragt werden.
+Wir prüfen deine Angaben und kontaktieren dich ggf., um dich kennenzulernen oder Rückfragen zu stellen.
+Uns ist wichtig, den Marktplatz mit Extensions von **vertrauenswürdigen Contributoren** zu füllen.
+
+## Extension
+
+Nachdem du als Contributor verifiziert wurdest, kannst du auch eine **Verifizierung deiner Extension** anfragen.
+Zuvor müssen jedoch einige Details zur Extension hinterlegt werden.
+
+![Extension Details pflegen](/img/contribution/getting-started-guide/extension-details.png)
+
+### Extension-Name
+
+Du hast bereits bei der Registrierung einer neuen Extension einen Namen vergeben,
+kannst diesen aber **jederzeit ändern**.
+Vor der Veröffentlichung ist ein guter Moment, den Namen noch einmal zu überdenken.
+Er sollte möglichst **eingängig** beschreiben, was das Ziel oder die Aufgabe der Extension ist.
+
+### Untertitel
+
+In der Marktplatz-Übersicht wird unter jedem Extension-Namen ein **Untertitel** angezeigt.
+Dieser ist sinnvoll, weil viele Extensions Produktnamen enthalten, die nicht auf den ersten Blick erkennen lassen,
+wofür eine Extension nützlich ist.
+
+### Kurzbeschreibung
+
+In der Kurzbeschreibung erklärst du in maximal **300 Zeichen**, welches Problem die Extension löst.
+Sie soll einen schnellen Einblick in den **Funktionsumfang** geben
+und dem potenziellen Nutzer helfen herauszufinden,
+ob die Extension für die eigenen Anwendungsfälle interessant ist.
+
+### Detailbeschreibung
+
+Die Detailbeschreibung ermöglicht es, im **Markdown-Format** eine ausführliche Beschreibung über das Produkt, Funktionsumfänge und ggf. ein Changelog bereitzustellen.
+
+### Logo und weitere Medien
+
+Das **Logo** wird in der Marktplatz-Übersicht angezeigt und ist daher empfehlenswert,
+um in der Menge von Extensions hervorzustechen.
+
+Neben dem Logo können **weitere Medien** hochgeladen werden,
+die dem Nutzer einen Einblick in Features und Look & Feel geben.
+Unterstützt werden derzeit die Formate **JPG, PNG und WEBP**.
+
+### Preisplan
+
+Wenn du deine Extension (teilweise) **kostenpflichtig** anbieten möchtest,
+musst du vorher das **Stripe Onboarding** durchgeführt haben.
+Schau dazu nochmal im [Stripe Onboarding](./#stripe-onboarding) nach, falls du das Onboarding noch nicht durchgeführt hast.
+
+Sobald du onboarded und als Contributor verifiziert bist,
+kannst du für deine Extension einen **festen Preis** oder einen **Preisplan mit mehreren Varianten** anlegen.
+
+In einem Preisplan hat jede Variante einen `key`, der sowohl bei den **Context-Informationen der Session-Token** als auch den **Lifecycle-Webhooks** übermittelt wird.
+So können Funktions- oder Leistungsumfänge jeweils an die vom Kunden gewählte Variante angepasst werden.
+
+Wir haben das Thema Preispläne ausführlich im [Überblick über Preisvarianten einer Extension](../../overview/pricing) beschrieben.
+
+### Verifizierung und Veröffentlichung
+
+Sobald du alle Informationen zu deiner Extension hinterlegt hast, kannst du in der **Extension-Übersicht** die **Verifizierung durch mittwald** anfragen.
+Wir installieren deine Extension und prüfen sie auf **inhaltliche Eignung** für das mStudio, um zu verhindern,
+dass unangemessene Inhalte in den Marktplatz gelangen.
+
+Nach erfolgreicher Verifizierung kannst du deine Extension **jederzeit veröffentlichen**.
+Damit ist sie für potenzielle Kunden im Marktplatz sichtbar.
