@@ -2,18 +2,92 @@
 title: Backend-Logik erweitern
 ---
 
+In diesem Kapitel erfährst du, wie du die Backend-Logik deiner Extension anpassen und erweitern kannst.
+Wir behandeln das Datenbankschema, Migrationen und Server Functions.
+
 ## Datenbankschema anpassen
 
 ### Eigene Entitäten erstellen
 
+Das Datenbankschema deiner Extension befindet sich in der Datei `src/db/schema.ts`.
+Hier definierst du alle Tabellen und deren Spalten, die deine Extension benötigt.
+Du kannst das Datenbank-Schema auch in mehrere Dateien aufteilen, musst die Tabellen jedoch in der `schema.ts` reexportieren.
+
+Die Reference Extension verwendet [Drizzle ORM](https://orm.drizzle.team/) für die Datenbankinteraktion.
+Drizzle ermöglicht es dir, dein Schema typsicher in TypeScript zu definieren.
+Eine Tabellendefinition sieht beispielsweise so aus:
+
+```typescript
+export const comments = pgTable("comments", {
+  id: varchar({ length: 36 }).primaryKey(),
+  extensionInstanceId: varchar({ length: 36 })
+    .notNull()
+    .references(() => extensionInstances.id, { onDelete: "cascade" }),
+  userId: varchar({ length: 36 }).notNull(),
+  text: text().notNull(),
+  createdAt: timestamp().defaultNow().notNull(),
+});
+```
+
+Für eine vollständige Übersicht aller verfügbaren Spaltentypen und Optionen empfehlen wir die [offizielle Drizzle-Dokumentation zur Schema-Deklaration](https://orm.drizzle.team/docs/sql-schema-declaration).
+
 ### Migrationen mit Drizzle
+
+Nachdem du das Schema im Code angepasst hast, müssen Migrationen generiert werden.
+Migrationen sind SQL-Skripte, die eine Datenbank Schritt für Schritt auf den gewünschten Zielzustand bringen.
+Jede Schemaänderung erhält dabei ihre eigene Migration.
+
+Die Reference Extension stellt folgende Befehle für die Arbeit mit Migrationen bereit:
+
+| Befehl                        | Beschreibung                                                          |
+| ----------------------------- | --------------------------------------------------------------------- |
+| `pnpm db:generate-migrations` | Generiert neue Migrationsdateien basierend auf den Schemaänderungen   |
+| `pnpm db:migrate`             | Wendet ausstehende Migrationen auf die Datenbank an                   |
+| `pnpm db:push`                | Synchronisiert das Schema direkt ohne Migration (nur für Entwicklung) |
+| `pnpm db:studio`              | Startet ein Web-Frontend zur Inspektion der Datenbank                 |
+
+Standardmäßig wendet die Reference Extension Migrationen automatisch beim Start an.
+Du musst also für das Produktivsystem **nicht** manuell `pnpm db:migrate` ausführen.
+Dieses Verhalten kannst du mit der Umgebungsvariable `RUN_MIGRATIONS_ON_STARTUP=false` deaktivieren.
+
+:::warning
+Der Befehl `pnpm db:push` sollte nur für lokale Entwicklungszwecke verwendet werden.
+Da dabei das Schema direkt angewendet wird, können Daten verloren gehen.
+Für Produktivsysteme solltest du ausschließlich Migrationen verwenden.
+:::
 
 ### Beziehung zu Extension Instances
 
+Die Reference Extension implementiert eine Tabelle für Kommentare, die über einen Foreign Key mit der Extension Instance verknüpft ist.
+Diese Verknüpfung erhöht die Datenisolierung: Jeder Datensatz ist eindeutig einer Extension Instance zugeordnet.
+
+Wichtig ist dabei die Konfiguration eines **Cascade Delete** auf dem Foreign Key Constraint.
+Ohne Cascade Delete können Extension Instances nicht über Webhooks deinstalliert werden, solange noch verknüpfte Datensätze existieren.
+
+Mit Cascade Delete delegierst du die Löschung der zugehörigen Daten an die Datenbank.
+Wird eine Extension Instance gelöscht, entfernt die Datenbank automatisch alle verknüpften Datensätze.
+Das erspart dir die manuelle und fehleranfällige Implementierung der Datenlöschung.
+
 ## Server Functions hinzufügen
 
-### Neue Endpunkte erstellen
+Server Functions ermöglichen es deinem Frontend, Backend-Logik aufzurufen.
+Die Reference Extension zeigt eine empfohlene Struktur für die Organisation deines Codes:
 
-### Middleware nutzen
+| Verzeichnis           | Zweck                                                |
+| --------------------- | ---------------------------------------------------- |
+| `src/domain`          | Fachliche Logik und Geschäftsregeln                  |
+| `src/serverFunctions` | API-Schicht, die die fachliche Logik exponiert       |
+| `src/ghosts.ts`       | Bereitstellung der Server Functions für das Frontend |
 
-## Datenbereinigung beim Deinstallieren
+### Integration mit react-ghostmaker
+
+Die Reference Extension nutzt [`@mittwald/react-ghostmaker`](https://github.com/mittwald/react-ghostmaker), eine Utility-Library,
+die den Zugriff vom Frontend auf Backend-Funktionalität erheblich vereinfacht.
+
+react-ghostmaker bietet folgende Vorteile:
+
+- **Automatische Hook-Generierung**: Für jede Server Function werden React Hooks generiert
+- **Integriertes State Management**: Die Library kümmert sich um react-query, sodass Caching, Revalidierung und Loading States automatisch funktionieren
+- **Weniger Boilerplate**: Du schreibst deutlich weniger repetitiven Code für die Frontend-Backend-Kommunikation
+
+Für weitere Informationen und Beispiele besuche das [react-ghostmaker Repository auf GitHub](https://github.com/mittwald/react-ghostmaker).
