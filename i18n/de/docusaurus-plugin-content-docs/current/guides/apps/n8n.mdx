@@ -17,7 +17,7 @@ Mit n8n kannst du:
 
 ## n8n Container erstellen
 
-Du kannst n8n in deiner mittwald Hosting-Umgebung mit Containern bereitstellen. Es gibt verschiedene Hauptansätze:
+Du kannst n8n in deiner Mittwald Hosting-Umgebung mit Containern bereitstellen. Es gibt verschiedene Hauptansätze:
 
 ### Verwendung der mStudio-Benutzeroberfläche
 
@@ -37,11 +37,11 @@ Um die Daten deines n8n persistent zu speichern, definiere Volumes unter **Volum
 Setze die folgenden Umgebungsvariablen für den Container:
 
 ```dotenv
-N8N_HOST=example.project.space
+N8N_HOST=p-XXXXXX.project.space
 N8N_PORT=5678
 N8N_PROTOCOL=https
 NODE_ENV=production
-WEBHOOK_URL=https://example.project.space/
+WEBHOOK_URL=https://p-XXXXXX.project.space/
 GENERIC_TIMEZONE=Europe/Berlin
 ```
 
@@ -53,16 +53,16 @@ Hier passt du die Umgebungsvariablen `N8N_HOST` und `WEBHOOK_URL` auf den Host a
 
 ### Verwendung der CLI mit `mw container run`
 
-Du kannst auch einen n8n-Container mit der mittwald CLI und dem Befehl `mw container run` bereitstellen:
+Du kannst auch einen n8n-Container mit der Mittwald CLI und dem Befehl `mw container run` bereitstellen:
 
 ```bash
 mw container run \
   --name n8n \
-  --env N8N_HOST=example.project.space \
+  --env N8N_HOST=p-XXXXXX.project.space \
   --env N8N_PORT=5678 \
   --env N8N_PROTOCOL=https \
   --env NODE_ENV=production \
-  --env WEBHOOK_URL=https://example.project.space/ \
+  --env WEBHOOK_URL=https://p-XXXXXX.project.space/ \
   --env GENERIC_TIMEZONE=Europe/Berlin \
   --volume n8n-data:/home/node/.n8n \
   --publish 5678:5678/tcp \
@@ -79,16 +79,15 @@ Wenn du Docker Compose bevorzugst, kannst du eine `docker-compose.yml`-Datei ers
 1. Erstelle eine `docker-compose.yml`-Datei mit folgendem Inhalt:
 
    ```yaml
-   version: "3"
    services:
      n8n:
        image: n8nio/n8n:stable
        environment:
-         - N8N_HOST=example.project.space
+         - N8N_HOST=p-XXXXXX.project.space
          - N8N_PORT=5678
          - N8N_PROTOCOL=https
          - NODE_ENV=production
-         - WEBHOOK_URL=https://example.project.space/
+         - WEBHOOK_URL=https://p-XXXXXX.project.space/
          - GENERIC_TIMEZONE=Europe/Berlin
        ports:
          - "5678:5678"
@@ -125,7 +124,7 @@ Im Entwicklungs- und Testbetrieb können einige dieser Aspekte vereinfacht werde
 
 ### Use case: RAG mit postgreSQL und Mittwald AI-Hosting
 
-n8n kann benutzt werden, um RAG Systeme verschiedenster Form aufzubauen. Das folgende Beispiel zeigt einen möglichen Aufbau, aufgrund des großen n8n-Ökosystems ist dies aber lediglich einer von vielen Wegen. Viel mehr soll dieses Beispiel als Einstieg dienen, um im Anschluss komplexere und vor allem produktionsreife Systeme aufzusetzen.
+n8n kann benutzt werden, um [Retrieval-Augmented Generation (RAG)](https://de.wikipedia.org/wiki/Retrieval-Augmented_Generation) Systeme verschiedenster Form aufzubauen. Das folgende Beispiel zeigt einen möglichen Aufbau, aufgrund des großen n8n-Ökosystems ist dies aber lediglich einer von vielen Wegen. Viel mehr soll dieses Beispiel als Einstieg dienen, um im Anschluss komplexere und vor allem produktionsreife Systeme aufzusetzen.
 
 #### Vorraussetzungen
 
@@ -186,7 +185,6 @@ flowchart TD
 Sind alle Voraussetzungen gegeben, kann mit der Installation begonnen werden. Zunächst erstellen wir die Docker Compose Datei:
 
 ```yaml
-version: "3.9"
 services:
   pgvector:
     image: ankane/pgvector:latest
@@ -202,7 +200,7 @@ services:
       - pgvector-data:/var/lib/postgresql/data
 
   n8n:
-    image: n8nio/n8n:latest
+    image: n8nio/n8n:stable
     container_name: n8n
     restart: unless-stopped
     environment:
@@ -236,8 +234,8 @@ Alle kritischen Einstellungen wie z. B. Passwörter werden als Umgebungsvariab
 Die konkreten Einstellungen schreiben wir dann in eine `.env` Datei:
 
 ```dotenv
-N8N_HOST=example.project.space
-WEBHOOK_URL=https://example.project.space/
+N8N_HOST=p-XXXXXX.project.space
+WEBHOOK_URL=https://p-XXXXXX.project.space/
 POSTGRES_USER=<postgres user>
 POSTGRES_PASSWORD=<postgres password>
 NODES_EXCLUDE=[]
@@ -298,7 +296,7 @@ curl -X POST -d '{
 }'
 -H "Content-Type: application/json" \
 -H "Authorization: Bearer xxx.yyy.zzz" \
-https://example.project.space/webhook-test/<webhook uuid>
+https://p-XXXXXX.project.space/webhook-test/<webhook uuid>
 ```
 
 Solange unser RAG noch nicht mit Dokumenten befüllt ist, haben wir hier einen einfachen Chatbot mit dem im Model "eingebackenen" Weltwissen. Fragen wir explizit, erklärt sich der Agent auch:
@@ -310,7 +308,7 @@ curl -X POST -d '{
 }'
 -H "Content-Type: application/json" \
 -H "Authorization: Bearer xxx.yyy.zzz" \
-https://example.project.space/webhook-test/<webhook uuid>
+https://p-XXXXXX.project.space/webhook-test/<webhook uuid>
 {"output":"I currently do not have access to any documents in my knowledge base. If you'd like, I can help answer questions based on general knowledge or assist with other tasks."}
 ```
 
@@ -323,7 +321,7 @@ Im ersten Knoten der Dateisystemüberwachung ( `Local file trigger` ) richten wi
 Im Anschluss können wir die Überwachung testen, indem wir Dokumente im eingerichteten Ordner ablegen. Die Auslieferung der Dokumente kann dabei auf verschiedenen Wegen erfolgen, ( per SSH, SFTP, ), im Beispiel beschränken wir uns auf eine `SSH`-Verbindung und liefern unsere Dokumente per `scp` aus. Ordner vorbereiten:
 
 ```shellsession
-ssh <Mittwald SSH URL, siehe mStudio>
+mw container ssh <CONTAINER-ID>
 mkdir -p /home/node/rag_documents
 ```
 
@@ -348,7 +346,7 @@ curl -X POST -d '{
 }'
 -H "Content-Type: application/json" \
 -H "Authorization: Bearer xxx.yyy.zzz" \
-https://example.project.space/webhook-test/<webhook uuid>
+https://p-XXXXXX.project.space/webhook-test/<webhook uuid>
 {"output":"To report bugs in Python, you can use the Python issue tracker on GitHub. Here’s how you can do it:\n\n1. **GitHub Issues Tracker**: Submit bug reports for Python via the GitHub issues tracker at [https://github.com/python/cpython/issues](https://github.com/python/cpython/issues). This platform provides a web form where you can enter pertinent information and submit it to the developers.\n\n2. **Bug Writing Guidelines**: When writing a bug report, include as much detail as possible to help the developers understand and reproduce the issue. While some guidelines are specific to the Mozilla project, they describe general best practices for writing effective bug reports.\n\n3. **Documentation Bugs**: If you find a bug in the Python documentation or have suggestions for improvements, you can also submit a bug report on the issue tracker. …
 
 # Quellenangabe:
@@ -358,7 +356,7 @@ curl -X POST -d '{
 }'
 -H "Content-Type: application/json" \
 -H "Authorization: Bearer xxx.yyy.zzz" \
-https://example.project.space/webhook-test/<webhook uuid>
+https://p-XXXXXX.project.space/webhook-test/<webhook uuid>
 {"output":"The document source for reporting bugs in Python is titled \"bugs\" and is located at `/home/node/rag_documents/python3_docs/bugs.txt`."}
 ```
 

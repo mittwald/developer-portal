@@ -17,7 +17,7 @@ With n8n you can:
 
 ## Creating an n8n Container
 
-You can deploy n8n in your Mittwald hosting environment as a container. There are several main approaches:
+You can deploy n8n in your mittwald hosting environment as a container. There are several main approaches:
 
 ### Using the mStudio user interface
 
@@ -36,11 +36,11 @@ To persistently store your n8n data, define volumes under **Volumes** as follows
 Set the following environment variables for the container:
 
 ```dotenv
-N8N_HOST=example.project.space
+N8N_HOST=p-XXXXXX.project.space
 N8N_PORT=5678
 N8N_PROTOCOL=https
 NODE_ENV=production
-WEBHOOK_URL=https://example.project.space/
+WEBHOOK_URL=https://p-XXXXXX.project.space/
 GENERIC_TIMEZONE=Europe/Berlin
 ```
 
@@ -57,11 +57,11 @@ You can also deploy an n8n container with the mittwald CLI and the command `mw c
 ```bash
 mw container run \
   --name n8n \
-  --env N8N_HOST=example.project.space \
+  --env N8N_HOST=p-XXXXXX.project.space \
   --env N8N_PORT=5678 \
   --env N8N_PROTOCOL=https \
   --env NODE_ENV=production \
-  --env WEBHOOK_URL=https://example.project.space/ \
+  --env WEBHOOK_URL=https://p-XXXXXX.project.space/ \
   --env GENERIC_TIMEZONE=Europe/Berlin \
   --volume n8n-data:/home/node/.n8n \
   --publish 5678:5678/tcp \
@@ -78,16 +78,15 @@ If you prefer Docker Compose, you can create a `docker-compose.yml` file and dep
 1. Create a `docker-compose.yml` file with the following content:
 
    ```yaml
-   version: "3"
    services:
      n8n:
        image: n8nio/n8n:stable
        environment:
-         - N8N_HOST=example.project.space
+         - N8N_HOST=p-XXXXXX.project.space
          - N8N_PORT=5678
          - N8N_PROTOCOL=https
          - NODE_ENV=production
-         - WEBHOOK_URL=https://example.project.space/
+         - WEBHOOK_URL=https://p-XXXXXX.project.space/
          - GENERIC_TIMEZONE=Europe/Berlin
        ports:
          - "5678:5678"
@@ -122,14 +121,14 @@ For secure production operation, further measures or clarifications are required
 During development and testing, some of these aspects can be simplified, but for production use, all these aspects must be clearly regulated. Without clear resolution of these security issues, there is a risk of unintentionally disclosing too much information, potentially making internal documents publicly accessible or even triggering processes.
 :::
 
-### Use case: RAG with PostgreSQL and Mittwald AI Hosting
+### Use case: RAG with PostgreSQL and mittwald AI Hosting
 
-n8n can be used to build RAG systems of various forms. The following example shows one possible setup, but due to the large n8n ecosystem, it is only one of many approaches. This example is intended to serve as a starting point for building more complex and especially production-ready systems.
+n8n can be used to build [Retrieval-Augmented Generation (RAG)](https://en.wikipedia.org/wiki/Retrieval-augmented_generation) systems of various forms. The following example shows one possible setup, but due to the large n8n ecosystem, it is only one of many approaches. This example is intended to serve as a starting point for building more complex and especially production-ready systems.
 
 #### Requirements
 
-- Mittwald Container Hosting
-- Mittwald AI Hosting
+- mittwald Container Hosting
+- mittwald AI Hosting
 - mStudio access, via webapp and API token
 - A set up and configured `mw` CLI, deployment of the container stack
 
@@ -139,7 +138,7 @@ The goal is to give a chat agent access to information from documents, so that t
 
 To achieve this, a persistence layer is needed where information can be stored in a "AI-friendly" way. Under the hood, at least two AI models are used: one for generating so-called "embeddings" and another to control the agent. Embeddings are the "AI-friendly" way to persist text and documents, so they can be quickly provided as context for conversations.
 
-In the example, these two models from Mittwald AI Hosting are used:
+In the example, these two models from mittwald AI Hosting are used:
 
 - **Embedding**: `Qwen3-Embedding-8B`
 - **Agent**: `Devstral-Small-2-24B-Instruct-2512`
@@ -158,7 +157,7 @@ flowchart TD
     EXT[External API/Client]
   end
 
-  subgraph "Mittwald Hosting"
+  subgraph "mittwald Hosting"
     N8N[n8n]
     PG[PostgreSQL + pgvector]
     AIHOST[AI Hosting]
@@ -185,7 +184,6 @@ flowchart TD
 If all prerequisites are met, you can start the installation. First, create the Docker Compose file:
 
 ```yaml
-version: "3.9"
 services:
   pgvector:
     image: ankane/pgvector:latest
@@ -201,7 +199,7 @@ services:
       - pgvector-data:/var/lib/postgresql/data
 
   n8n:
-    image: n8nio/n8n:latest
+    image: n8nio/n8n:stable
     container_name: n8n
     restart: unless-stopped
     environment:
@@ -235,8 +233,8 @@ All critical settings, such as passwords, are set as environment variables. This
 We write the specific settings into a `.env` file:
 
 ```dotenv
-N8N_HOST=example.project.space
-WEBHOOK_URL=https://example.project.space/
+N8N_HOST=p-XXXXXX.project.space
+WEBHOOK_URL=https://p-XXXXXX.project.space/
 POSTGRES_USER=<postgres user>
 POSTGRES_PASSWORD=<postgres password>
 NODES_EXCLUDE=[]
@@ -277,7 +275,7 @@ Always check **before** running a workflow whether all involved nodes are presen
 Besides being present, some nodes must be configured correctly.
 
 You will need:
-- Access to Mittwald AI Hosting (or a comparable, OpenAI-compatible host) with API key
+- Access to mittwald AI Hosting (or a comparable, OpenAI-compatible host) with API key
 - Access to the database; user and password have already been prepared in the container stack
 
 **Security:** For production, it’s best practice to manage multiple database users with different privileges. However, this requires manual adjustments to the database container, which are not covered here for simplicity. As a rule, the database user utilized by the AI agent for user input should **not** have permission to change the database schema!
@@ -297,7 +295,7 @@ curl -X POST -d '{
 }'
 -H "Content-Type: application/json" \
 -H "Authorization: Bearer xxx.yyy.zzz" \
-https://example.project.space/webhook-test/<webhook uuid>
+https://p-XXXXXX.project.space/webhook-test/<webhook uuid>
 ```
 
 As long as our RAG setup isn’t loaded with documents, we have a simple chatbot here, using the "baked-in" knowledge of the model. If you ask explicitly, the agent will explain:
@@ -309,7 +307,7 @@ curl -X POST -d '{
 }'
 -H "Content-Type: application/json" \
 -H "Authorization: Bearer xxx.yyy.zzz" \
-https://example.project.space/webhook-test/<webhook uuid>
+https://p-XXXXXX.project.space/webhook-test/<webhook uuid>
 {"output":"I currently do not have access to any documents in my knowledge base. If you'd like, I can help answer questions based on general knowledge or assist with other tasks."}
 ```
 
@@ -322,14 +320,14 @@ In the first node ("Local file trigger") for file system monitoring, set the dir
 Afterwards, you can test the monitoring by placing documents in the designated folder. Document delivery can take place in several ways (via SSH, SFTP, etc.); in this example, we are restricting ourselves to an `SSH` connection and deliver our documents using `scp`. Prepare the directory:
 
 ```shellsession
-ssh <Mittwald SSH URL, see mStudio>
+mw container ssh <CONTAINER-ID>
 mkdir -p /home/node/rag_documents
 ```
 
 Activate the monitoring node in n8n, deliver documents:
 
 ```shellsession
-scp my_documents/example_manual.txt <Mittwald SSH URL n8n Container, see mStudio>:/home/node/rag_documents/
+scp my_documents/example_manual.txt <mittwald SSH URL n8n Container, see mStudio>:/home/node/rag_documents/
 ```
 
 With the new file, the subsequent workflow is triggered. The document, its metadata, and the embeddings are stored in the database and are then available in the chat.
@@ -338,7 +336,7 @@ For testing, known documents to which you can easily ask test questions are espe
 
 ```shellsession
 # Place sample documents
-scp -r python3_docs/*.txt <Mittwald SSH URL n8n Container, see mStudio>:/home/node/rag_documents/
+scp -r python3_docs/*.txt <mittwald SSH URL n8n Container, see mStudio>:/home/node/rag_documents/
 # Workflow will be triggered in n8n ...
 # Check after completion:
 curl -X POST -d '{
@@ -347,7 +345,7 @@ curl -X POST -d '{
 }'
 -H "Content-Type: application/json" \
 -H "Authorization: Bearer xxx.yyy.zzz" \
-https://example.project.space/webhook-test/<webhook uuid>
+https://p-XXXXXX.project.space/webhook-test/<webhook uuid>
 {"output":"To report bugs in Python, you can use the Python issue tracker on GitHub. Here’s how you can do it:\n\n1. **GitHub Issues Tracker**: Submit bug reports for Python via the GitHub issues tracker at [https://github.com/python/cpython/issues](https://github.com/python/cpython/issues). This platform provides a web form where you can enter pertinent information and submit it to the developers.\n\n2. **Bug Writing Guidelines**: When writing a bug report, include as much detail as possible to help the developers understand and reproduce the issue. While some guidelines are specific to the Mozilla project, they describe general best practices for writing effective bug reports.\n\n3. **Documentation Bugs**: If you find a bug in the Python documentation or have suggestions for improvements, you can also submit a bug report on the issue tracker. …
 
 # Source Reference:
@@ -357,7 +355,7 @@ curl -X POST -d '{
 }'
 -H "Content-Type: application/json" \
 -H "Authorization: Bearer xxx.yyy.zzz" \
-https://example.project.space/webhook-test/<webhook uuid>
+https://p-XXXXXX.project.space/webhook-test/<webhook uuid>
 {"output":"The document source for reporting bugs in Python is titled \"bugs\" and is located at `/home/node/rag_documents/python3_docs/bugs.txt`."}
 ```
 
