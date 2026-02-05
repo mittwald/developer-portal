@@ -234,7 +234,7 @@ All critical settings, such as passwords, are set as environment variables. This
 
 We write the specific settings into a `.env` file:
 
-```
+```dotenv
 N8N_HOST=example.project.space
 WEBHOOK_URL=https://example.project.space/
 POSTGRES_USER=<postgres user>
@@ -250,7 +250,7 @@ For easy differentiation, it’s recommended to give the `.env` files descriptiv
 
 Once all settings are prepared, the stack can be deployed:
 
-```
+```bash
 mw stack deploy -c path/to/n8n/docker-compose.yml --env-file path/to/n8n/example.env
 ```
 
@@ -302,7 +302,7 @@ https://example.project.space/webhook-test/<webhook uuid>
 
 As long as our RAG setup isn’t loaded with documents, we have a simple chatbot here, using the "baked-in" knowledge of the model. If you ask explicitly, the agent will explain:
 
-```
+```bash
 curl -X POST -d '{
   "chatInput": "How many documents do you know?",
   "sessionId": 42
