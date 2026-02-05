@@ -18,16 +18,25 @@ Dieser Artikel beschreibt, wie Du eine Redis-Datenbank über die API erstellst.
 
 Um eine Redis-Datenbank zu erstellen, benötigst Du Zugriff auf ein Projekt. Wie Du ein Projekt erstellst, erfährst Du [hier](../create-project). Du benötigst die **Projekt-ID** für die folgenden Schritte.
 
-## Liste verfügbarer Redis-Versionen
+## Liste verfügbarer Redis-Versionen {#list-available-redis-versions}
 
 Sende eine `GET`-Anfrage an den <OperationLink operation="database-list-redis-versions" />-Endpunkt, um eine Liste der verfügbaren Redis-Versionen zu erhalten.
 
-## Erstellen einer Redis-Datenbank
+Jedes zurückgegebene Versionsobjekt enthält die folgenden Eigenschaften:
+
+- `id` enthält die eindeutige Kennung der Version
+- `number` enthält die Versionsnummer (z. B. "7.0")
+- `name` enthält einen für Menschen lesbaren Namen für die Version
+- `disabled` gibt an, ob die Version zur Verwendung verfügbar ist
+
+**Wichtig:** Bei der Auswahl einer Version für Deine Datenbank musst Du eine Version wählen, bei der `disabled` den Wert `false` hat.
+
+## Erstellen einer Redis-Datenbank {#creating-redis-database}
 
 Um eine Redis-Datenbank zu erstellen, sende eine Anfrage an den <OperationLink operation="database-create-redis-database" />-Endpunkt. Der Anfrage-Body muss ein JSON-Objekt mit den folgenden Eigenschaften enthalten:
 
 - `description` sollte eine für Menschen lesbare Beschreibung der Datenbank enthalten. Dies ist ein Pflichtwert.
-- `version` sollte die Version der Datenbank enthalten. Dies ist ein Pflichtwert und muss auf eine vorhandene Version verweisen, die vom Endpunkt <OperationLink operation="database-list-redis-versions" /> zurückgegeben wird.
+- `version` sollte die **Versionsnummer** der Datenbank enthalten (z. B. "7.0"). Dies ist ein Pflichtwert und muss mit der `number`-Eigenschaft einer Version übereinstimmen, die vom Endpunkt <OperationLink operation="database-list-redis-versions" /> zurückgegeben wird (nicht mit der `id`-Eigenschaft).
 
 Die Antwort enthält die folgenden Eigenschaften:
 

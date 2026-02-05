@@ -16,16 +16,25 @@ This article describes how to create a Redis database via the API.
 
 To create a Redis database, you will need to have access to a project. Refer to the [guide "create a project"](../create-project) for this. You will need the **project ID** for the subsequent operations.
 
-## List available Redis versions
+## List available Redis versions {#list-available-redis-versions}
 
 Set a request to the <OperationLink operation="database-list-redis-versions" /> endpoint to get a list of available Redis versions.
 
-## Creating a Redis database
+Each returned version object contains the following properties:
+
+- `id` contains the unique identifier of the version
+- `number` contains the version number (e.g., "7.0")
+- `name` contains a human-readable name for the version
+- `disabled` indicates whether the version is available for use
+
+**Important:** When selecting a version for your database, you must choose a version where `disabled` is `false`.
+
+## Creating a Redis database {#creating-redis-database}
 
 To create a Redis database, send a request to the <OperationLink operation="database-create-redis-database" /> endpoint. The request body must contain a JSON object with the following properties:
 
 - `description` should contain a human-readable description of the database. This is a required value.
-- `version` should contain the version of the database. This is a required value, and must reference an existing version as returned by the <OperationLink operation="database-list-redis-versions" /> endpoint.
+- `version` should contain the **version number** of the database (e.g., "7.0"). This is a required value, and must match the `number` property of a version returned by the <OperationLink operation="database-list-redis-versions" /> endpoint (not the `id` property).
 
 The response will contain the following properties:
 
