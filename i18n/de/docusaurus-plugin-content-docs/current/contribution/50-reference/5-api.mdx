@@ -37,6 +37,17 @@ Wenn das Token abgelaufen ist, muss ein neues Token bezogen werden.
 Wenn eine Extension von einem Context entfernt wird oder eine Extension Instance deaktiviert wird,
 werden alle Access Tokens automatisch invalidiert.
 
+Außerdem ist das Access Token nicht an einen Nutzer gebunden.
+Es autorisiert lediglich die Extension auf Ressourcen des Extension Context zuzugreifen.
+
+:::warning Einschränkungen von nutzerungebundenen Access-Tokens
+Die mStudio API bietet GET Routen an, die alle Ressourcen einer gewissen Entität zurückgeben, auf die ein Nutzer Zugriff hat.
+Beispielsweise lässt sich über <OperationLink operation="project-list-projects" /> eine Liste an allen Projekten zurückgeben, auf die ein User zugriff hat.
+
+Diese Art von Routen funktionieren nicht mit nutzerungebundenen Access-Tokens, da diese nicht einen mStudio User authentifizieren,
+sondern lediglich auf Ressourcen des Extension Context autorisieren.
+:::
+
 ## OAuth2
 
 Das mStudio implementiert konform zu [RFC 6749](https://tools.ietf.org/html/rfc6749) OAuth2 als Authentifizierungsmechanismus für die öffentliche API.
