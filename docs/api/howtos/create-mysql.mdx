@@ -56,10 +56,16 @@ When creating a MySQL database, you must also create an initial user. The user p
     database: {
       description: "My Application Database",
       version: "8.0",
+      characterSettings: {
+        characterSet: "utf8mb4",
+        collation: "utf8mb4_unicode_ci",
+      },
     },
     user: {
       password: "your-secure-password",
       accessLevel: "full",
+      externalAccess: true,
+      accessIpMask: "0.0.0.0/0",
     },
   }}
 />

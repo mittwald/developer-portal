@@ -58,10 +58,16 @@ Beim Erstellen einer MySQL-Datenbank musst Du auch einen initialen Benutzer erst
     database: {
       description: "Meine Anwendungsdatenbank",
       version: "8.0",
+      characterSettings: {
+        characterSet: "utf8mb4",
+        collation: "utf8mb4_unicode_ci",
+      },
     },
     user: {
       password: "dein-sicheres-passwort",
       accessLevel: "full",
+      externalAccess: true,
+      accessIpMask: "0.0.0.0/0",
     },
   }}
 />
