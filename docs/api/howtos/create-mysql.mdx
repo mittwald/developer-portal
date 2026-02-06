@@ -1,0 +1,85 @@
+---
+sidebar_label: Creating a MySQL database
+title: Creating a MySQL database using the API
+description: This article describes how to create a MySQL database via the API
+tags:
+  - MySQL
+  - Databases
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This article describes how to create a MySQL database via the API.
+
+## Prerequisites
+
+To create a MySQL database, you will need to have access to a project. Refer to the [guide "create a project"](../create-project) for this. You will need the **project ID** for the subsequent operations.
+
+## List available MySQL versions {#list-available-mysql-versions}
+
+Send a request to the <OperationLink operation="database-list-mysql-versions" /> endpoint to get a list of available MySQL versions.
+
+Each returned version object contains the following properties:
+
+- `id` contains the unique identifier of the version
+- `number` contains the version number (e.g., "8.0")
+- `name` contains a human-readable name for the version
+- `disabled` indicates whether the version is available for use
+
+**Important:** When selecting a version for your database, you must choose a version where `disabled` is `false`.
+
+## Creating a MySQL database {#creating-mysql-database}
+
+To create a MySQL database, send a request to the <OperationLink operation="database-create-mysql-database" /> endpoint. The request body must contain a JSON object with the following properties:
+
+### Database properties
+
+- `database.description` should contain a human-readable description of the database. This is a required value.
+- `database.version` should contain the **version number** of the database (e.g., "8.0"). This is a required value, and must match the `number` property of a version returned by the <OperationLink operation="database-list-mysql-versions" /> endpoint (not the `id` property).
+- `database.characterSettings` (optional) allows you to specify the character set and collation for the database.
+
+### User properties
+
+When creating a MySQL database, you must also create an initial user. The user properties include:
+
+- `user.password` should contain the password for the database user. This is a required value.
+- `user.accessLevel` must be set to `"full"` for the initial user. This is a required value.
+- `user.externalAccess` (optional) indicates whether the user can access the database from outside the hosting environment.
+- `user.accessIpMask` (optional) specifies IP address restrictions for external access.
+
+The response will contain the following properties:
+
+- `id` contains the ID of the created database.
+- `userId` contains the ID of the created user.
+
+<OperationHint tag="Database" operation="database-create-mysql-database" />
+
+## Monitoring database readiness {#monitoring-database-readiness}
+
+After creating a database, it may take a few moments before it is ready to use. You can monitor the readiness status by sending a request to the <OperationLink operation="database-get-mysql-database" /> endpoint.
+
+The response contains a `mainUser` object with a `status` field. This field can have the following values:
+
+- `pending` - The user is being created
+- `ready` - The user is ready and the database can be used
+- `error` - An error occurred during user creation
+- `terminating` - The user is being deleted
+- `disabled` - The user has been disabled
+
+**Important:** Wait until the `mainUser.status` field is `"ready"` before attempting to connect to the database.
+
+## Accessing the database {#accessing-database}
+
+Once the database is ready, you can retrieve connection information by sending a request to the <OperationLink operation="database-get-mysql-database" /> endpoint.
+
+Among others, the response will contain the following values:
+
+- `hostname` contains the hostname of the database server. You can use this value to connect to the database from within your hosting environment.
+- `name` contains the name of the database.
+- `mainUser.name` contains the username for database authentication.
+- `characterSettings` allows you to inspect the character set and collation settings applied to your database.
+
+**Note:** The password is set during database creation and cannot be retrieved via the API. To change the password, use the <OperationLink operation="database-update-mysql-user-password" /> endpoint.
+
+<OperationHint tag="Database" operation="database-get-mysql-database" />
