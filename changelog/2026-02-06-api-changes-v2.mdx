@@ -1,0 +1,395 @@
+---
+title: Breaking (!) API changes for v2 API, January 30 to February 6
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Domain
+  - Customer
+  - Project
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API introduces several changes including updates to request and response properties, the addition of new optional parameters, and modifications to existing request body formats across various endpoints.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The request body type for the `POST` operation at the path `/v2/actions/list-ingresses-compatible-with-certificate` has changed from 'object' to an empty format. This is a breaking change.
+- The response property `contact` has become optional for the status '201' in the `POST` operation at the path `/v2/certificate-requests`.
+- Several response properties have become optional for the status '200' in the `GET` operation at the path `/v2/certificates`: 
+  - `/items/certificate`
+  - `/items/isExpired`
+  - `/items/lastExpirationThresholdHit`
+  - `/items/validFrom`
+  - `/items/validTo`
+- The response property `certificate` has become optional for the status '200' in the `GET` operation at the path `/v2/certificates/{certificateId}`.
+- The response property `isExpired` has become optional for the status '200' in the `GET` operation at the path `/v2/certificates/{certificateId}`.
+- The response property `lastExpirationThresholdHit` has become optional for the status '200' in the `GET` operation at the path `/v2/certificates/{certificateId}`.
+- The response property `validFrom` has become optional for the status '200' in the `GET` operation at the path `/v2/certificates/{certificateId}`.
+- The response property `validTo` has become optional for the status '200' in the `GET` operation at the path `/v2/certificates/{certificateId}`.
+- A default value of '10000.00' has been added for the `query` request parameter `limit` in the `GET` operation at the path `/v2/domains`.
+- The request property `certificate` has been removed from the `POST` operation at the path `/v2/actions/list-ingresses-compatible-with-certificate`.
+- The request property `projectId` has been removed from the `POST` operation at the path `/v2/actions/list-ingresses-compatible-with-certificate`.
+- A new enum value '3.00' has been added to the `/items/certificateType` response property for the status '200' in the `GET` operation at the path `/v2/certificate-requests`.
+- A new enum value '3.00' has been added to the `certificateType` response property for the status '200' in the `GET` operation at the path `/v2/certificate-requests/{certificateRequestId}`.
+- A new enum value '3.00' has been added to the `/items/certificateType` response property for the status '200' in the `GET` operation at the path `/v2/certificates`.
+- A new enum value '3.00' has been added to the `certificateType` response property for the status '200' in the `GET` operation at the path `/v2/certificates/{certificateId}`.
+- The optional property `/items/information/userId` has been removed from the response with the '200' status in the `GET` operation at the path `/v2/customer-invites`.
+- The optional property `information/userId` has been removed from the response with the '200' status in the `GET` operation at the path `/v2/customer-invites/{customerInviteId}`.
+- The optional property `information/userId` has been removed from the response with the '200' status in the `GET` operation at the path `/v2/customer-token-invite`.
+- The optional property `/items/information/userId` has been removed from the response with the '200' status in the `GET` operation at the path `/v2/customers/{customerId}/invites`.
+- The optional property `information/userId` has been removed from the response with the '201' status in the `POST` operation at the path `/v2/customers/{customerId}/invites`.
+- The optional property `/items/information/userId` has been removed from the response with the '200' status in the `GET` operation at the path `/v2/project-invites`.
+- The optional property `information/userId` has been removed from the response with the '200' status in the `GET` operation at the path `/v2/project-invites/{projectInviteId}`.
+- The optional property `information/userId` has been removed from the response with the '200' status in the `GET` operation at the path `/v2/project-token-invite`.
+- The optional property `/items/information/userId` has been removed from the response with the '200' status in the `GET` operation at the path `/v2/projects/{projectId}/invites`.
+- The optional property `information/userId` has been removed from the response with the '201' status in the `POST` operation at the path `/v2/projects/{projectId}/invites`.
+- The request body has been updated to include `#/components/schemas/de.mittwald.v1.ingress.ListIngressesCompatibleWithCertificateRequest` and `#/components/schemas/de.mittwald.v1.ingress.ListIngressesCompatibleWithCertificateIDRequest` in the `oneOf` list for the `POST` operation at the path `/v2/actions/list-ingresses-compatible-with-certificate`.
+- The request body has been updated to include `#/components/schemas/de.mittwald.v1.ssl.CertificateRequestCreateWithDNSRequest` in the `oneOf` list for the `POST` operation at the path `/v2/certificate-requests`.
+- A non-success response with the status '409' has been added for the `POST` operation at the path `/v2/certificate-requests`.
+- A non-success response with the status '412' has been added for the `POST` operation at the path `/v2/certificate-requests`.
+- The optional property `/items/dnsCertSpec` has been added to the response with the '200' status in the `GET` operation at the path `/v2/certificates`.
+- The optional property `dnsCertSpec` has been added to the response with the '200' status in the `GET` operation at the path `/v2/certificates/{certificateId}`.
+- The optional property `/items/isMailAddressInvalid` has been added to the response with the '200' status in the `GET` operation at the path `/v2/customers`.
+- The optional property `isMailAddressInvalid` has been added to the response with the '200' status in the `GET` operation at the path `/v2/customers/{customerId}`.
+- A new optional request parameter `skip` has been added in the `GET` operation at the path `/v2/domains`.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "List Ingresses compatible with a certificate"
+
+
+- ⚠️ **Breaking:** the request's body type/format changed from 'object'/'' to ''/''
+
+- removed the request property 'certificate'
+
+- removed the request property 'projectId'
+
+- added '#/components/schemas/de.mittwald.v1.ingress.ListIngressesCompatibleWithCertificateRequest, #/components/schemas/de.mittwald.v1.ingress.ListIngressesCompatibleWithCertificateIDRequest' to the request body 'oneOf' list
+
+
+For details, refer to the <OperationLink operation="ingress-list-ingresses-compatible-with-certificate" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a CertificateRequest"
+
+
+- ⚠️ **Breaking:** the response property 'contact' became optional for the status '201'
+
+- added '#/components/schemas/de.mittwald.v1.ssl.CertificateRequestCreateWithDNSRequest' to the request body 'oneOf' list
+
+- added the non-success response with the status '409'
+
+- added the non-success response with the status '412'
+
+
+For details, refer to the <OperationLink operation="ssl-create-certificate-request" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Certificates belonging to a Project or an Ingress"
+
+
+- ⚠️ **Breaking:** the response property '/items/certificate' became optional for the status '200'
+
+- ⚠️ **Breaking:** the response property '/items/isExpired' became optional for the status '200'
+
+- ⚠️ **Breaking:** the response property '/items/lastExpirationThresholdHit' became optional for the status '200'
+
+- ⚠️ **Breaking:** the response property '/items/validFrom' became optional for the status '200'
+
+- ⚠️ **Breaking:** the response property '/items/validTo' became optional for the status '200'
+
+- added the new '3.00' enum value to the '/items/certificateType' response property for the response status '200'
+
+- added the optional property '/items/dnsCertSpec' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ssl-list-certificates" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Certificate"
+
+
+- ⚠️ **Breaking:** the response property 'certificate' became optional for the status '200'
+
+- ⚠️ **Breaking:** the response property 'isExpired' became optional for the status '200'
+
+- ⚠️ **Breaking:** the response property 'lastExpirationThresholdHit' became optional for the status '200'
+
+- ⚠️ **Breaking:** the response property 'validFrom' became optional for the status '200'
+
+- ⚠️ **Breaking:** the response property 'validTo' became optional for the status '200'
+
+- added the new '3.00' enum value to the 'certificateType' response property for the response status '200'
+
+- added the optional property 'dnsCertSpec' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ssl-get-certificate" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Domains"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', default value '10000.00' was added
+
+- added the new optional 'query' request parameter 'skip'
+
+
+For details, refer to the <OperationLink operation="domain-list-domains" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List CertificateRequests belonging to a Project or an Ingress"
+
+
+- added the new '3.00' enum value to the '/items/certificateType' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="ssl-list-certificate-requests" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a CertificateRequest"
+
+
+- added the new '3.00' enum value to the 'certificateType' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="ssl-get-certificate-request" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List customer invites belonging to the executing user"
+
+
+- removed the optional property '/items/information/userId' from the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="customer-list-customer-invites" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a customer invite"
+
+
+- removed the optional property 'information/userId' from the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="customer-get-customer-invite" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a customer invite by token"
+
+
+- removed the optional property 'information/userId' from the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="customer-get-customer-token-invite" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Invites belonging to a Customer"
+
+
+- removed the optional property '/items/information/userId' from the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="customer-list-invites-for-customer" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a customer invite"
+
+
+- removed the optional property 'information/userId' from the response with the '201' status
+
+
+For details, refer to the <OperationLink operation="customer-create-customer-invite" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List ProjectInvites belonging to the executing user"
+
+
+- removed the optional property '/items/information/userId' from the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-list-project-invites" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a ProjectInvite"
+
+
+- removed the optional property 'information/userId' from the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-get-project-invite" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a ProjectInvite by token"
+
+
+- removed the optional property 'information/userId' from the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-get-project-token-invite" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Invites belonging to a Project"
+
+
+- removed the optional property '/items/information/userId' from the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-list-invites-for-project" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a ProjectInvite"
+
+
+- removed the optional property 'information/userId' from the response with the '201' status
+
+
+For details, refer to the <OperationLink operation="project-create-project-invite" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all customer profiles the authenticated user has access to"
+
+
+- added the optional property '/items/isMailAddressInvalid' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="customer-list-customers" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a customer profile"
+
+
+- added the optional property 'isMailAddressInvalid' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="customer-get-customer" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK v2.1.180 Release Summary
+
+The latest release of the mittwald PHP SDK, version v2.1.180, introduces several enhancements and new features focused on improving SSL certificate management and API interaction. Key updates include:
+
+- **Features**: 
+  - Support for conflict and precondition failed responses in SSL certificate creation requests.
+  - New request schemas for listing ingresses compatible with certificates.
+  - Enhanced SSL certificate schema with new DNS certificate specifications and detailed statuses.
+
+- **Additions**:
+  - New response classes: `SslCreateCertificateRequestConflictResponse` and `SslCreateCertificateRequestPreconditionFailedResponse`.
+  - New schemas: `ListIngressesCompatibleWithCertificateIDRequest`, `CertificateRequestCreateWithDNSRequest`, `DNSCertStatus`, and `ProjectCertificateStatus`.
+  - Updates to existing classes to support new request types and enhance flexibility in SSL certificate requests.
+
+- **Changes**:
+  - Refactoring of existing classes for improved clarity and structure.
+  - Nullable class properties for compatibility with optional parameters.
+  - Adjusted validation schemas to prevent invalid attributes in requests.
+
+These updates aim to enhance error handling and expand capabilities in defining requests and responses related to SSL certificates.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.180).
+
+### mittwald PHP SDK Release v2.1.179
+
+The mittwald PHP SDK has been updated to version v2.1.179. This release includes several enhancements and bug fixes aimed at improving functionality and code clarity.
+
+#### Features
+- **MySQL Database Retrieval Enhancement**: The `getMySQLDatabase` function in `DatabaseClient` and `DatabaseClientImpl` now includes detailed comments. These comments clarify that the method returns a MySQLDatabase resource along with its current status, and emphasize that the linked user must have a status of "ready" for a successful connection.
+
+#### Bug Fixes and Improvements
+- **Customer Invite Schema Adjustment**: The description for the `avatarRefId` field in the `CustomerInvite` class has been updated for clarity, changing from "Reference to the Project's avatar" to "Reference to the Customer's avatar."
+- **Invite Information Schema Simplification**: The `userId` field, along with its associated methods and validations, has been removed from the `InviteInformation` class to streamline the invite process and enhance the data model.
+- **Code Cleanup**: Deprecated properties and methods related to `userId` in the `InviteInformation` class have been removed to ensure cleaner and more maintainable code.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.179).
+
+### mittwald PHP SDK Release v2.1.178
+
+The mittwald PHP SDK has been updated to version v2.1.178. This release introduces several enhancements and changes aimed at improving functionality and user experience.
+
+#### Features
+
+- **ListDomainsRequest Enhancements**: The `ListDomainsRequest` class now supports enhanced pagination and filtering with the addition of a `skip` property and a default limit set to 10,000. The handling of domain search and contact hash has been restructured for better efficiency.
+
+- **Customer Schema Updates**: A new boolean property, `isMailAddressInvalid`, has been added to the `Customer` class to track the validity of a customer's email address.
+
+#### Changes
+
+- **ListDomainsRequest Class**: The structure of the `ListDomainsRequest` has been refactored, introducing a `skip` property for improved pagination control and removing default handling for `page` and `limit` to allow for more user-defined flexibility.
+
+- **UserClient Interface and Implementation**: Documentation updates include a revised description for the method of creating an API token, changing from "Store a new ApiToken." to "Create a new ApiToken."
+
+- **Customer Class**: The `isMailAddressInvalid` property has been integrated with corresponding getter and setter methods, and the constructor and methods have been updated to include validation logic for this new property.
+
+For more details, please visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.178).
+
+### mittwald JavaScript SDK Release 4.296.0
+
+The mittwald JavaScript SDK version 4.296.0 has been released on February 5, 2026. This update includes a feature enhancement with an updated generated client. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.296.0).
+
+### mittwald JavaScript SDK Release 4.295.0
+
+The mittwald JavaScript SDK has been updated to version 4.295.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.295.0).
+
+### mittwald JavaScript SDK Release 4.294.0
+
+The mittwald JavaScript SDK has been updated to version 4.294.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.294.0](https://github.com/mittwald/api-client-js/releases/tag/4.294.0).
+
+### mittwald JavaScript SDK Release 4.293.0
+
+The mittwald JavaScript SDK has been updated to version 4.293.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.293.0](https://github.com/mittwald/api-client-js/releases/tag/4.293.0).
+
+### mittwald JavaScript SDK Release 4.292.0
+
+The mittwald JavaScript SDK has been updated to version 4.292.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.292.0).
+
+### mittwald JavaScript SDK Release 4.291.0
+
+The mittwald JavaScript SDK has been updated to version 4.291.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.291.0](https://github.com/mittwald/api-client-js/releases/tag/4.291.0).
+
