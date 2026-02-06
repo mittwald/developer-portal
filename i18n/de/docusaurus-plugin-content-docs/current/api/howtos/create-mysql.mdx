@@ -1,0 +1,109 @@
+---
+sidebar_label: Erstellen einer MySQL-Datenbank
+title: Erstellen einer MySQL-Datenbank über die API
+description: |
+  In diesem Artikel wird beschrieben, wie Du eine MySQL-Datenbank über die API
+  erstellst
+tags:
+  - MySQL
+  - Databases
+---
+
+import OperationExample from "@site/src/components/OperationExample";
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+Dieser Artikel beschreibt, wie Du eine MySQL-Datenbank über die API erstellst.
+
+## Voraussetzungen
+
+Um eine MySQL-Datenbank zu erstellen, benötigst Du Zugriff auf ein Projekt. Wie Du ein Projekt erstellst, erfährst Du [hier](../create-project). Du benötigst die **Projekt-ID** für die folgenden Schritte.
+
+## Liste verfügbarer MySQL-Versionen {#list-available-mysql-versions}
+
+Sende eine Anfrage an den <OperationLink operation="database-list-mysql-versions" />-Endpunkt, um eine Liste der verfügbaren MySQL-Versionen zu erhalten.
+
+Jedes zurückgegebene Versionsobjekt enthält die folgenden Eigenschaften:
+
+- `id` enthält die eindeutige Kennung der Version
+- `number` enthält die Versionsnummer (z. B. "8.0")
+- `name` enthält einen für Menschen lesbaren Namen für die Version
+- `disabled` gibt an, ob die Version zur Verwendung verfügbar ist
+
+**Wichtig:** Bei der Auswahl einer Version für Deine Datenbank musst Du eine Version wählen, bei der `disabled` den Wert `false` hat.
+
+## Erstellen einer MySQL-Datenbank {#creating-mysql-database}
+
+Um eine MySQL-Datenbank zu erstellen, sende eine Anfrage an den <OperationLink operation="database-create-mysql-database" />-Endpunkt. Der Anfrage-Body muss ein JSON-Objekt mit den folgenden Eigenschaften enthalten:
+
+### Datenbank-Eigenschaften
+
+- `database.description` sollte eine für Menschen lesbare Beschreibung der Datenbank enthalten. Dies ist ein Pflichtwert.
+- `database.version` sollte die **Versionsnummer** der Datenbank enthalten (z. B. "8.0"). Dies ist ein Pflichtwert und muss mit der `number`-Eigenschaft einer Version übereinstimmen, die vom Endpunkt <OperationLink operation="database-list-mysql-versions" /> zurückgegeben wird (nicht mit der `id`-Eigenschaft).
+- `database.characterSettings` (optional) ermöglicht es Dir, den Zeichensatz und die Sortierung für die Datenbank anzugeben.
+
+### Benutzer-Eigenschaften
+
+Beim Erstellen einer MySQL-Datenbank musst Du auch einen initialen Benutzer erstellen. Die Benutzer-Eigenschaften umfassen:
+
+- `user.password` sollte das Passwort für den Datenbankbenutzer enthalten. Dies ist ein Pflichtwert.
+- `user.accessLevel` muss für den initialen Benutzer auf `"full"` gesetzt werden. Dies ist ein Pflichtwert.
+- `user.externalAccess` (optional) gibt an, ob der Benutzer von außerhalb der Hosting-Umgebung auf die Datenbank zugreifen kann.
+- `user.accessIpMask` (optional) legt IP-Adressbeschränkungen für den externen Zugriff fest.
+
+<OperationExample
+  operation="database-create-mysql-database"
+  pathParameters={{ projectId: "DEINE_PROJEKT_ID" }}
+  example={{
+    database: {
+      description: "Meine Anwendungsdatenbank",
+      version: "8.0",
+      characterSettings: {
+        characterSet: "utf8mb4",
+        collation: "utf8mb4_unicode_ci",
+      },
+    },
+    user: {
+      password: "dein-sicheres-passwort",
+      accessLevel: "full",
+      externalAccess: true,
+      accessIpMask: "0.0.0.0/0",
+    },
+  }}
+/>
+
+Die Antwort enthält die folgenden Eigenschaften:
+
+- `id` enthält die ID der erstellten Datenbank.
+- `userId` enthält die ID des erstellten Benutzers.
+
+<OperationHint tag="Database" operation="database-create-mysql-database" />
+
+## Überwachen der Datenbankbereitschaft {#monitoring-database-readiness}
+
+Nach dem Erstellen einer Datenbank kann es einige Augenblicke dauern, bis sie einsatzbereit ist. Du kannst den Bereitschaftsstatus überwachen, indem Du eine Anfrage an den <OperationLink operation="database-get-mysql-database" />-Endpunkt sendest.
+
+Die Antwort enthält ein `mainUser`-Objekt mit einem `status`-Feld. Dieses Feld kann die folgenden Werte haben:
+
+- `pending` - Der Benutzer wird erstellt
+- `ready` - Der Benutzer ist bereit und die Datenbank kann verwendet werden
+- `error` - Bei der Benutzererstellung ist ein Fehler aufgetreten
+- `terminating` - Der Benutzer wird gelöscht
+- `disabled` - Der Benutzer wurde deaktiviert
+
+**Wichtig:** Warte, bis das Feld `mainUser.status` den Wert `"ready"` hat, bevor Du versuchst, Dich mit der Datenbank zu verbinden.
+
+## Zugriff auf die Datenbank {#accessing-database}
+
+Sobald die Datenbank bereit ist, kannst Du die Verbindungsinformationen abrufen, indem Du eine Anfrage an den <OperationLink operation="database-get-mysql-database" />-Endpunkt sendest.
+
+Die Antwort enthält unter anderem die folgenden Werte:
+
+- `hostname` enthält den Hostnamen des Datenbankservers. Du kannst diesen Wert verwenden, um Dich von Deiner Hosting-Umgebung aus mit der Datenbank zu verbinden.
+- `name` enthält den Namen der Datenbank.
+- `mainUser.name` enthält den Benutzernamen für die Datenbankauthentifizierung.
+- `characterSettings` ermöglicht es Dir, die Zeichensatz- und Sortierungseinstellungen einzusehen, die auf Deine Datenbank angewendet wurden.
+
+**Hinweis:** Das Passwort wird bei der Datenbankerstellung festgelegt und kann nicht über die API abgerufen werden. Um das Passwort zu ändern, verwende den <OperationLink operation="database-update-mysql-user-password" />-Endpunkt.
+
+<OperationHint tag="Database" operation="database-get-mysql-database" />
