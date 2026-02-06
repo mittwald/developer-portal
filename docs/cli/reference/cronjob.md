@@ -92,6 +92,7 @@ FLAG DESCRIPTIONS
     'https://my-website.com/cron-job'. Not required if a command and interpreter is defined.
 ```
 
+
 ## `mw cronjob delete CRONJOB-ID`
 
 Delete a cron job
@@ -121,6 +122,7 @@ FLAG DESCRIPTIONS
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
 
+
 ## `mw cronjob execute CRONJOB-ID`
 
 Manually run a cron job
@@ -142,6 +144,7 @@ FLAG DESCRIPTIONS
     This flag controls if you want to see the process output or only a summary. When using mw non-interactively (e.g. in
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
+
 
 ## `mw cronjob execution get CRONJOB-ID EXECUTION-ID`
 
@@ -169,6 +172,7 @@ DESCRIPTION
 ALIASES
   $ mw project cronjob execution get
 ```
+
 
 ## `mw cronjob execution list`
 
@@ -200,6 +204,7 @@ DESCRIPTION
 ALIASES
   $ mw project cronjob execution list
 ```
+
 
 ## `mw cronjob execution logs CRONJOB-ID EXECUTION-ID`
 
@@ -233,6 +238,7 @@ ALIASES
   $ mw project cronjob execution logs
 ```
 
+
 ## `mw cronjob get CRONJOB-ID`
 
 Get details of a cron job
@@ -256,6 +262,7 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   Get details of a cron job
 ```
+
 
 ## `mw cronjob list`
 
@@ -294,6 +301,7 @@ FLAG DESCRIPTIONS
     May contain a short ID or a full ID of a project; you can also use the "mw context set --project-id=<VALUE>" command
     to persistently set a default project for all commands that accept this flag.
 ```
+
 
 ## `mw cronjob update CRONJOB-ID`
 
@@ -373,3 +381,4 @@ FLAG DESCRIPTIONS
     Define a URL with protocol to which a request will be dispatched when the cron job is executed. For example:
     'https://my-website.com/cron-job'. Not required if a command and interpreter is defined.
 ```
+

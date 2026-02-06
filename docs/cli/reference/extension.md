@@ -39,6 +39,7 @@ FLAG DESCRIPTIONS
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
 
+
 ## `mw extension list`
 
 Get all available extensions.
@@ -65,6 +66,7 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   Get all available extensions.
 ```
+
 
 ## `mw extension list-installed`
 
@@ -95,6 +97,7 @@ DESCRIPTION
   List installed extensions in an organization or project.
 ```
 
+
 ## `mw extension uninstall EXTENSION-INSTANCE-ID`
 
 Remove an extension from an organization
@@ -122,3 +125,4 @@ FLAG DESCRIPTIONS
     This flag controls if you want to see the process output or only a summary. When using mw non-interactively (e.g. in
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
+

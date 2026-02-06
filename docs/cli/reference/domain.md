@@ -37,6 +37,7 @@ DESCRIPTION
   gets a specific zone
 ```
 
+
 ## `mw domain dnszone list`
 
 list all DNS zones by project ID
@@ -71,6 +72,7 @@ FLAG DESCRIPTIONS
     May contain a short ID or a full ID of a project; you can also use the "mw context set --project-id=<VALUE>" command
     to persistently set a default project for all commands that accept this flag.
 ```
+
 
 ## `mw domain dnszone update DNSZONE-ID RECORD-SET`
 
@@ -134,6 +136,7 @@ FLAG DESCRIPTIONS
     - for "txt" records, the parameter should be a string containing the TXT record value.
 ```
 
+
 ## `mw domain get DOMAIN-ID`
 
 gets a specific domain
@@ -157,6 +160,7 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   gets a specific domain
 ```
+
 
 ## `mw domain list`
 
@@ -192,6 +196,7 @@ FLAG DESCRIPTIONS
     May contain a short ID or a full ID of a project; you can also use the "mw context set --project-id=<VALUE>" command
     to persistently set a default project for all commands that accept this flag.
 ```
+
 
 ## `mw domain virtualhost create`
 
@@ -262,6 +267,7 @@ FLAG DESCRIPTIONS
     times to map multiple paths to different external URLs, and also combine it with the other --path-to-* flags.
 ```
 
+
 ## `mw domain virtualhost delete VIRTUAL-HOST-ID`
 
 Delete a virtual host
@@ -291,6 +297,7 @@ FLAG DESCRIPTIONS
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
 
+
 ## `mw domain virtualhost get INGRESS-ID`
 
 Get a virtual host.
@@ -311,6 +318,7 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   Get a virtual host.
 ```
+
 
 ## `mw domain virtualhost list`
 
@@ -347,3 +355,4 @@ FLAG DESCRIPTIONS
     May contain a short ID or a full ID of a project; you can also use the "mw context set --project-id=<VALUE>" command
     to persistently set a default project for all commands that accept this flag.
 ```
+

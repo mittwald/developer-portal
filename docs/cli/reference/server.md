@@ -29,6 +29,7 @@ DESCRIPTION
   Get a server.
 ```
 
+
 ## `mw server list`
 
 List servers for an organization or user.
@@ -55,3 +56,4 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   List servers for an organization or user.
 ```
+

@@ -292,6 +292,7 @@ FLAG DESCRIPTIONS
     to persistently set a default server for all commands that accept this flag.
 ```
 
+
 ## `mw project cronjob execution get CRONJOB-ID EXECUTION-ID`
 
 Get a cron job execution.
@@ -449,6 +450,7 @@ FLAG DESCRIPTIONS
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
 
+
 ## `mw project filesystem usage [PROJECT-ID]`
 
 Get a project directory filesystem usage.
@@ -474,6 +476,7 @@ DESCRIPTION
   Get a project directory filesystem usage.
 ```
 
+
 ## `mw project get [PROJECT-ID]`
 
 Get details of a project
@@ -498,6 +501,7 @@ DESCRIPTION
   Get details of a project
 ```
 
+
 ## `mw project invite get INVITE-ID`
 
 Get a ProjectInvite.
@@ -520,6 +524,7 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   Get a ProjectInvite.
 ```
+
 
 ## `mw project invite list`
 
@@ -556,6 +561,7 @@ FLAG DESCRIPTIONS
     to persistently set a default project for all commands that accept this flag.
 ```
 
+
 ## `mw project invite list-own`
 
 List all project invites for the executing user.
@@ -582,6 +588,7 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   List all project invites for the executing user.
 ```
+
 
 ## `mw project list`
 
@@ -610,6 +617,7 @@ DESCRIPTION
   List all projects that you have access to
 ```
 
+
 ## `mw project membership get MEMBERSHIP-ID`
 
 Get a ProjectMembership
@@ -632,6 +640,7 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   Get a ProjectMembership
 ```
+
 
 ## `mw project membership get-own`
 
@@ -660,6 +669,7 @@ FLAG DESCRIPTIONS
     May contain a short ID or a full ID of a project; you can also use the "mw context set --project-id=<VALUE>" command
     to persistently set a default project for all commands that accept this flag.
 ```
+
 
 ## `mw project membership list`
 
@@ -696,6 +706,7 @@ FLAG DESCRIPTIONS
     to persistently set a default project for all commands that accept this flag.
 ```
 
+
 ## `mw project membership list-own`
 
 List ProjectMemberships belonging to the executing user.
@@ -722,6 +733,7 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   List ProjectMemberships belonging to the executing user.
 ```
+
 
 ## `mw project sftp-user list`
 
@@ -810,6 +822,7 @@ FLAG DESCRIPTIONS
     You can also set this value by setting the MITTWALD_SSH_USER environment variable.
 ```
 
+
 ## `mw project ssh-user list`
 
 List all SSH users for a project.
@@ -883,3 +896,4 @@ FLAG DESCRIPTIONS
     This flag controls if you want to see the process output or only a summary. When using mw non-interactively (e.g. in
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
+

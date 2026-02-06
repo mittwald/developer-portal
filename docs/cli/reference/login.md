@@ -23,6 +23,7 @@ DESCRIPTION
   Reset your local authentication state
 ```
 
+
 ## `mw login status`
 
 Checks your current authentication status
@@ -38,6 +39,7 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   Checks your current authentication status
 ```
+
 
 ## `mw login token`
 
@@ -64,3 +66,4 @@ FLAG DESCRIPTIONS
     This flag controls if you want to see the process output or only a summary. When using mw non-interactively (e.g. in
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
+

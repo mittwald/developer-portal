@@ -51,6 +51,7 @@ FLAG DESCRIPTIONS
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
 
+
 ## `mw backup delete BACKUP-ID`
 
 Delete a backup
@@ -82,6 +83,7 @@ FLAG DESCRIPTIONS
     This flag controls if you want to see the process output or only a summary. When using mw non-interactively (e.g. in
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
+
 
 ## `mw backup download BACKUP-ID`
 
@@ -135,6 +137,7 @@ FLAG DESCRIPTIONS
     CAUTION: this is not stored anywhere.
 ```
 
+
 ## `mw backup get BACKUP-ID`
 
 Show details of a backup.
@@ -161,6 +164,7 @@ DESCRIPTION
 ALIASES
   $ mw project backup get
 ```
+
 
 ## `mw backup list`
 
@@ -199,6 +203,7 @@ FLAG DESCRIPTIONS
     May contain a short ID or a full ID of a project; you can also use the "mw context set --project-id=<VALUE>" command
     to persistently set a default project for all commands that accept this flag.
 ```
+
 
 ## `mw backup schedule create`
 
@@ -247,6 +252,7 @@ FLAG DESCRIPTIONS
     define the number of days the backup will be kept.
 ```
 
+
 ## `mw backup schedule delete BACKUP-SCHEDULE-ID`
 
 Delete a backup schedule
@@ -275,6 +281,7 @@ FLAG DESCRIPTIONS
     This flag controls if you want to see the process output or only a summary. When using mw non-interactively (e.g. in
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
+
 
 ## `mw backup schedule list`
 
@@ -313,6 +320,7 @@ FLAG DESCRIPTIONS
     May contain a short ID or a full ID of a project; you can also use the "mw context set --project-id=<VALUE>" command
     to persistently set a default project for all commands that accept this flag.
 ```
+
 
 ## `mw backup schedule update BACKUP-SCHEDULE-ID`
 
@@ -359,3 +367,4 @@ FLAG DESCRIPTIONS
     Must be specified as an amount of days between 7 and 400 in the format [amount]d - e.g. '7d' for 7 days. This will
     define the number of days the backup will be kept.
 ```
+

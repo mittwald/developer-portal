@@ -105,6 +105,7 @@ FLAG DESCRIPTIONS
     You can also set this value by setting the MITTWALD_SSH_USER environment variable.
 ```
 
+
 ## `mw container delete CONTAINER-ID`
 
 Delete a container
@@ -143,6 +144,7 @@ FLAG DESCRIPTIONS
     This flag controls if you want to see the process output or only a summary. When using mw non-interactively (e.g. in
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
+
 
 ## `mw container exec CONTAINER-ID COMMAND`
 
@@ -207,6 +209,7 @@ FLAG DESCRIPTIONS
     You can also set this value by setting the MITTWALD_SSH_USER environment variable.
 ```
 
+
 ## `mw container list`
 
 List containers belonging to a project.
@@ -244,6 +247,7 @@ FLAG DESCRIPTIONS
     May contain a short ID or a full ID of a project; you can also use the "mw context set --project-id=<VALUE>" command
     to persistently set a default project for all commands that accept this flag.
 ```
+
 
 ## `mw container logs CONTAINER-ID`
 
@@ -284,6 +288,7 @@ FLAG DESCRIPTIONS
     May contain a short ID or a full ID of a project; you can also use the "mw context set --project-id=<VALUE>" command
     to persistently set a default project for all commands that accept this flag.
 ```
+
 
 ## `mw container ls`
 
@@ -393,6 +398,7 @@ FLAG DESCRIPTIONS
     You can also set this value by setting the MITTWALD_SSH_USER environment variable.
 ```
 
+
 ## `mw container recreate CONTAINER-ID`
 
 Recreates a container.
@@ -427,6 +433,7 @@ FLAG DESCRIPTIONS
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
 
+
 ## `mw container restart CONTAINER-ID`
 
 Restarts a container.
@@ -458,6 +465,7 @@ FLAG DESCRIPTIONS
     This flag controls if you want to see the process output or only a summary. When using mw non-interactively (e.g. in
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
+
 
 ## `mw container rm CONTAINER-ID`
 
@@ -607,6 +615,7 @@ FLAG DESCRIPTIONS
     --project flag.
 ```
 
+
 ## `mw container ssh CONTAINER-ID`
 
 Connect to a container via SSH
@@ -669,6 +678,7 @@ FLAG DESCRIPTIONS
     You can also set this value by setting the MITTWALD_SSH_USER environment variable.
 ```
 
+
 ## `mw container start CONTAINER-ID`
 
 Starts a stopped container.
@@ -701,6 +711,7 @@ FLAG DESCRIPTIONS
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
 
+
 ## `mw container stop CONTAINER-ID`
 
 Stops a running container.
@@ -732,6 +743,7 @@ FLAG DESCRIPTIONS
     This flag controls if you want to see the process output or only a summary. When using mw non-interactively (e.g. in
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
+
 
 ## `mw container update CONTAINER-ID`
 
@@ -826,3 +838,4 @@ FLAG DESCRIPTIONS
 
     If set, the container will be automatically recreated after updating its configuration.
 ```
+
