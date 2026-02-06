@@ -115,14 +115,18 @@ Für einen sicheren Produktivbetrieb sind weitere Maßnahmen bzw. Klärungen erf
 - Zugriff auf n8n: Wer darf Workflows erstellen, bearbeiten, anstoßen, ...
 - Authentifizierung n8n, Benutzer- und Rollenkonzept
 - Konfiguration n8n: Erlaubte Knoten, Systembenutzer, ...
+- Persistenz n8n Daten: Für größere Installationen lohnt sich eine (Separate Datenbank für n8n Daten)[https://docs.n8n.io/hosting/configuration/supported-databases-settings/]
 - Zugriff Vektordatenbank: lesen/schreiben, Schema-Veränderungen
 - Zugriff auf Dokumente: Wer darf lesen/schreiben/löschen?
 - Zugriff auf Webhooks: Authorisierung und Authentifizierung, Konsumenten bzw. Clients
 
 Im Entwicklungs- und Testbetrieb können einige dieser Aspekte vereinfacht werden, im produktiven Betrieb müssen alle diese Aspekte zweifelsfrei geklärt werden. Ohne genaue Klärung dieser Sicherheitsfragen besteht das Risiko, ungewollt zu viele Informationen preiszugeben und im schlimmsten Falle interne Dokumente öffentlich einsehbar zu machen oder gar Prozesse anzustoßen.
+n8n bietet auch ein (Werkzeug für Security Audits)[https://docs.n8n.io/hosting/securing/security-audit/], mit dem Produktivumgebungen geprüft werden können.
 :::
 
-### Use case: RAG mit postgreSQL und Mittwald AI-Hosting
+## Use cases
+
+### RAG mit postgreSQL und Mittwald AI-Hosting
 
 n8n kann benutzt werden, um [Retrieval-Augmented Generation (RAG)](https://de.wikipedia.org/wiki/Retrieval-Augmented_Generation) Systeme verschiedenster Form aufzubauen. Das folgende Beispiel zeigt einen möglichen Aufbau, aufgrund des großen n8n-Ökosystems ist dies aber lediglich einer von vielen Wegen. Viel mehr soll dieses Beispiel als Einstieg dienen, um im Anschluss komplexere und vor allem produktionsreife Systeme aufzusetzen.
 
@@ -224,9 +228,7 @@ services:
 
 volumes:
   pgvector-data:
-    driver: local
   n8n-data:
-    driver: local
 ```
 
 Alle kritischen Einstellungen wie z. B. Passwörter werden als Umgebungsvariablen eingegeben. Dies erlaubt u.a. das schnelle Aufsetzen mehrerer Umgebungen, z. B. für Test- und Produktivbetrieb.
@@ -290,25 +292,25 @@ Wir erstellen also Zugangsdaten für die Datenbank und den KI-Host, anschließen
 Lasse den initialen Webhook lauschen im Test-Modus, dann kann man testen, z. B. per postman oder curl, wobei dir die genaue URL angezeigt wird:
 
 ```bash
-curl -X POST -d '{
-  "chatInput": "Hello World!",
-  "sessionId": 42
-}'
--H "Content-Type: application/json" \
--H "Authorization: Bearer xxx.yyy.zzz" \
-https://p-XXXXXX.project.space/webhook-test/<webhook uuid>
+$ curl -X POST -d '{
+    "chatInput": "Hello World!",
+    "sessionId": 42
+  }'
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer xxx.yyy.zzz" \
+  https://p-XXXXXX.project.space/webhook-test/<webhook uuid>
 ```
 
 Solange unser RAG noch nicht mit Dokumenten befüllt ist, haben wir hier einen einfachen Chatbot mit dem im Model "eingebackenen" Weltwissen. Fragen wir explizit, erklärt sich der Agent auch:
 
 ```bash
-curl -X POST -d '{
-  "chatInput": "How many documents do you know?",
-  "sessionId": 42
-}'
--H "Content-Type: application/json" \
--H "Authorization: Bearer xxx.yyy.zzz" \
-https://p-XXXXXX.project.space/webhook-test/<webhook uuid>
+$ curl -X POST -d '{
+    "chatInput": "How many documents do you know?",
+    "sessionId": 42
+  }'
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer xxx.yyy.zzz" \
+  https://p-XXXXXX.project.space/webhook-test/<webhook uuid>
 {"output":"I currently do not have access to any documents in my knowledge base. If you'd like, I can help answer questions based on general knowledge or assist with other tasks."}
 ```
 
@@ -337,26 +339,26 @@ Zum Testen eignen sich bekannte Dokumente, zu denen einfach Testfragen gestellt 
 
 ```shellsession
 # Beispieldokumente ablegen
-scp -r python3_docs/*.txt <Mittwald SSH URL n8n Container, siehe mStudio>:/home/node/rag_documents/
+$ scp -r python3_docs/*.txt <Mittwald SSH URL n8n Container, siehe mStudio>:/home/node/rag_documents/
 # Workflow wird angestoßen in n8n ...
 # Kontrolle nach Abschluss:
-curl -X POST -d '{
-  "chatInput": "How to report bugs in Python?",
-  "sessionId": 42
-}'
--H "Content-Type: application/json" \
--H "Authorization: Bearer xxx.yyy.zzz" \
-https://p-XXXXXX.project.space/webhook-test/<webhook uuid>
+$ curl -X POST -d '{
+    "chatInput": "How to report bugs in Python?",
+    "sessionId": 42
+  }'
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer xxx.yyy.zzz" \
+  https://p-XXXXXX.project.space/webhook-test/<webhook uuid>
 {"output":"To report bugs in Python, you can use the Python issue tracker on GitHub. Here’s how you can do it:\n\n1. **GitHub Issues Tracker**: Submit bug reports for Python via the GitHub issues tracker at [https://github.com/python/cpython/issues](https://github.com/python/cpython/issues). This platform provides a web form where you can enter pertinent information and submit it to the developers.\n\n2. **Bug Writing Guidelines**: When writing a bug report, include as much detail as possible to help the developers understand and reproduce the issue. While some guidelines are specific to the Mozilla project, they describe general best practices for writing effective bug reports.\n\n3. **Documentation Bugs**: If you find a bug in the Python documentation or have suggestions for improvements, you can also submit a bug report on the issue tracker. …
 
 # Quellenangabe:
-curl -X POST -d '{
-  "chatInput": "Name your document source",
-  "sessionId": 42
-}'
--H "Content-Type: application/json" \
--H "Authorization: Bearer xxx.yyy.zzz" \
-https://p-XXXXXX.project.space/webhook-test/<webhook uuid>
+$ curl -X POST -d '{
+    "chatInput": "Name your document source",
+    "sessionId": 42
+  }'
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer xxx.yyy.zzz" \
+  https://p-XXXXXX.project.space/webhook-test/<webhook uuid>
 {"output":"The document source for reporting bugs in Python is titled \"bugs\" and is located at `/home/node/rag_documents/python3_docs/bugs.txt`."}
 ```
 
@@ -369,5 +371,6 @@ Neben den bereits genannten Sicherheitsaspekten gibt es weitere Erwägungen:
 - Verfeinerung des Agents: Model-Einstellungen, Prompt, Dokumentenfilter
 - Anbindung weiterer Werkzeuge an den KI-Agenten: Internetsuche, Bilderkennung, …
 - Skalierung: Speicherbedarf für Dokumente und Embeddings, Verhalten unter Last, …
+- Aufteilung der Datenbanken: Separate Datenbanken für n8n Daten und RAG Vektorspeicher. Dies erlaubt präzisere Ressourcenzuweisung und gezielte Backups
 
 Diese Liste hat keinen Anspruch auf Vollständigkeit, sondern zeigt lediglich weitere Anknüpfungspunkte auf, die beim Ausrollen solcher Systeme bis in die Produktion beachtet werden müssen.

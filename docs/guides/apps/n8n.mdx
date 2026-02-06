@@ -114,14 +114,18 @@ For secure production operation, further measures or clarifications are required
 - Access to n8n: Who is allowed to create, edit, trigger workflows, etc.?
 - Authentication for n8n, user and role management concepts
 - Configuration of n8n: Allowed nodes, system users, etc.
+- Persistence n8n data: For larger installations we recommend (a separate database for n8n data)[https://docs.n8n.io/hosting/configuration/supported-databases-settings/]
 - Access to the vector database: read/write, schema changes
 - Access to documents: Who is allowed to read/write/delete?
 - Access to webhooks: Authorization and authentication, consumers or clients
 
 During development and testing, some of these aspects can be simplified, but for production use, all these aspects must be clearly regulated. Without clear resolution of these security issues, there is a risk of unintentionally disclosing too much information, potentially making internal documents publicly accessible or even triggering processes.
+n8n ships with a (security audit tool)[https://docs.n8n.io/hosting/securing/security-audit/], which is recommended for productive environment checks.
 :::
 
-### Use case: RAG with PostgreSQL and mittwald AI Hosting
+## Use cases
+
+### RAG with PostgreSQL and mittwald AI Hosting
 
 n8n can be used to build [Retrieval-Augmented Generation (RAG)](https://en.wikipedia.org/wiki/Retrieval-augmented_generation) systems of various forms. The following example shows one possible setup, but due to the large n8n ecosystem, it is only one of many approaches. This example is intended to serve as a starting point for building more complex and especially production-ready systems.
 
@@ -223,9 +227,7 @@ services:
 
 volumes:
   pgvector-data:
-    driver: local
   n8n-data:
-    driver: local
 ```
 
 All critical settings, such as passwords, are set as environment variables. This allows, among other things, quick setup of multiple environments, e.g., for testing and production.
@@ -289,25 +291,25 @@ So, create credentials for the database and the AI host, then assign them to the
 Let the initial webhook listen in test mode—you can test it, for example with Postman or curl, and you’ll see the exact URL:
 
 ```bash
-curl -X POST -d '{
-  "chatInput": "Hello World!",
-  "sessionId": 42
-}'
--H "Content-Type: application/json" \
--H "Authorization: Bearer xxx.yyy.zzz" \
-https://p-XXXXXX.project.space/webhook-test/<webhook uuid>
+$ curl -X POST -d '{
+    "chatInput": "Hello World!",
+    "sessionId": 42
+  }'
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer xxx.yyy.zzz" \
+  https://p-XXXXXX.project.space/webhook-test/<webhook uuid>
 ```
 
 As long as our RAG setup isn’t loaded with documents, we have a simple chatbot here, using the "baked-in" knowledge of the model. If you ask explicitly, the agent will explain:
 
 ```bash
-curl -X POST -d '{
-  "chatInput": "How many documents do you know?",
-  "sessionId": 42
-}'
--H "Content-Type: application/json" \
--H "Authorization: Bearer xxx.yyy.zzz" \
-https://p-XXXXXX.project.space/webhook-test/<webhook uuid>
+$ curl -X POST -d '{
+    "chatInput": "How many documents do you know?",
+    "sessionId": 42
+  }'
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer xxx.yyy.zzz" \
+  https://p-XXXXXX.project.space/webhook-test/<webhook uuid>
 {"output":"I currently do not have access to any documents in my knowledge base. If you'd like, I can help answer questions based on general knowledge or assist with other tasks."}
 ```
 
@@ -336,26 +338,26 @@ For testing, known documents to which you can easily ask test questions are espe
 
 ```shellsession
 # Place sample documents
-scp -r python3_docs/*.txt <mittwald SSH URL n8n Container, see mStudio>:/home/node/rag_documents/
+$ scp -r python3_docs/*.txt <mittwald SSH URL n8n Container, see mStudio>:/home/node/rag_documents/
 # Workflow will be triggered in n8n ...
 # Check after completion:
-curl -X POST -d '{
-  "chatInput": "How to report bugs in Python?",
-  "sessionId": 42
-}'
--H "Content-Type: application/json" \
--H "Authorization: Bearer xxx.yyy.zzz" \
-https://p-XXXXXX.project.space/webhook-test/<webhook uuid>
+$ curl -X POST -d '{
+    "chatInput": "How to report bugs in Python?",
+    "sessionId": 42
+  }'
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer xxx.yyy.zzz" \
+  https://p-XXXXXX.project.space/webhook-test/<webhook uuid>
 {"output":"To report bugs in Python, you can use the Python issue tracker on GitHub. Here’s how you can do it:\n\n1. **GitHub Issues Tracker**: Submit bug reports for Python via the GitHub issues tracker at [https://github.com/python/cpython/issues](https://github.com/python/cpython/issues). This platform provides a web form where you can enter pertinent information and submit it to the developers.\n\n2. **Bug Writing Guidelines**: When writing a bug report, include as much detail as possible to help the developers understand and reproduce the issue. While some guidelines are specific to the Mozilla project, they describe general best practices for writing effective bug reports.\n\n3. **Documentation Bugs**: If you find a bug in the Python documentation or have suggestions for improvements, you can also submit a bug report on the issue tracker. …
 
 # Source Reference:
-curl -X POST -d '{
-  "chatInput": "Name your document source",
-  "sessionId": 42
-}'
--H "Content-Type: application/json" \
--H "Authorization: Bearer xxx.yyy.zzz" \
-https://p-XXXXXX.project.space/webhook-test/<webhook uuid>
+$ curl -X POST -d '{
+    "chatInput": "Name your document source",
+    "sessionId": 42
+  }'
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer xxx.yyy.zzz" \
+  https://p-XXXXXX.project.space/webhook-test/<webhook uuid>
 {"output":"The document source for reporting bugs in Python is titled \"bugs\" and is located at `/home/node/rag_documents/python3_docs/bugs.txt`."}
 ```
 
@@ -368,5 +370,6 @@ In addition to the already mentioned security aspects, there are other considera
 - Refinement of the agent: model settings, prompt, document filters
 - Integration of additional tools with the AI agent: web search, image recognition, etc.
 - Scaling: storage requirements for documents and embeddings, system behavior under load, etc.
+- Split database setup: Sepearate n8n data and RAG vector databases, allowing more precise ressource allocation and focussed backups
 
 This list is not exhaustive, but rather shows additional points of contact that should be considered when rolling out such systems into production.
