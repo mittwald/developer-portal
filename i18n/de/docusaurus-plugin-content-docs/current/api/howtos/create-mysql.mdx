@@ -9,6 +9,7 @@ tags:
   - Databases
 ---
 
+import OperationExample from "@site/src/components/OperationExample";
 import OperationHint from "@site/src/components/OperationHint";
 import OperationLink from "@site/src/components/OperationLink";
 
@@ -49,6 +50,21 @@ Beim Erstellen einer MySQL-Datenbank musst Du auch einen initialen Benutzer erst
 - `user.accessLevel` muss für den initialen Benutzer auf `"full"` gesetzt werden. Dies ist ein Pflichtwert.
 - `user.externalAccess` (optional) gibt an, ob der Benutzer von außerhalb der Hosting-Umgebung auf die Datenbank zugreifen kann.
 - `user.accessIpMask` (optional) legt IP-Adressbeschränkungen für den externen Zugriff fest.
+
+<OperationExample
+  operation="database-create-mysql-database"
+  pathParameters={{ projectId: "DEINE_PROJEKT_ID" }}
+  example={{
+    database: {
+      description: "Meine Anwendungsdatenbank",
+      version: "8.0",
+    },
+    user: {
+      password: "dein-sicheres-passwort",
+      accessLevel: "full",
+    },
+  }}
+/>
 
 Die Antwort enthält die folgenden Eigenschaften:
 
