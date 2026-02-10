@@ -33,26 +33,18 @@ While we generally strive to avoid breaking changes in accordance with our [API 
 ## Summary
 
 
-- The request body type for the `POST` operation at the path `/v2/actions/list-ingresses-compatible-with-certificate` has changed from 'object' to an empty format. This is a breaking change.
+- The `POST` operation at the path `/v2/actions/list-ingresses-compatible-with-certificate` now has an alternative request body containing only a `certificateId`.
+- The `POST` operation at the path `/v2/certificate-requests` now has an alternative request body for the creation of 'DNS' certificates.
+- Several required response properties have become optional for the status '200' in the `GET` operations at the paths `/v2/certificates` and `/v2/certificates/{certificateId}`:
+  - `certificate`
+  - `isExpired`
+  - `lastExpirationThresholdHit`
+  - `validFrom`
+  - `validTo`
+- A new value '3' (representing 'DNS') has been added to the enum `certificateType` of component `certificate-request`.
+- The optional property `dnsCertSpec` has been added to the `certificate-request` component.
 - The response property `contact` has become optional for the status '201' in the `POST` operation at the path `/v2/certificate-requests`.
-- Several response properties have become optional for the status '200' in the `GET` operation at the path `/v2/certificates`: 
-  - `/items/certificate`
-  - `/items/isExpired`
-  - `/items/lastExpirationThresholdHit`
-  - `/items/validFrom`
-  - `/items/validTo`
-- The response property `certificate` has become optional for the status '200' in the `GET` operation at the path `/v2/certificates/{certificateId}`.
-- The response property `isExpired` has become optional for the status '200' in the `GET` operation at the path `/v2/certificates/{certificateId}`.
-- The response property `lastExpirationThresholdHit` has become optional for the status '200' in the `GET` operation at the path `/v2/certificates/{certificateId}`.
-- The response property `validFrom` has become optional for the status '200' in the `GET` operation at the path `/v2/certificates/{certificateId}`.
-- The response property `validTo` has become optional for the status '200' in the `GET` operation at the path `/v2/certificates/{certificateId}`.
-- A default value of '10000.00' has been added for the `query` request parameter `limit` in the `GET` operation at the path `/v2/domains`.
-- The request property `certificate` has been removed from the `POST` operation at the path `/v2/actions/list-ingresses-compatible-with-certificate`.
-- The request property `projectId` has been removed from the `POST` operation at the path `/v2/actions/list-ingresses-compatible-with-certificate`.
-- A new enum value '3.00' has been added to the `/items/certificateType` response property for the status '200' in the `GET` operation at the path `/v2/certificate-requests`.
-- A new enum value '3.00' has been added to the `certificateType` response property for the status '200' in the `GET` operation at the path `/v2/certificate-requests/{certificateRequestId}`.
-- A new enum value '3.00' has been added to the `/items/certificateType` response property for the status '200' in the `GET` operation at the path `/v2/certificates`.
-- A new enum value '3.00' has been added to the `certificateType` response property for the status '200' in the `GET` operation at the path `/v2/certificates/{certificateId}`.
+- Non-success responses of the status '409' and '412' have been added for the `POST` operation at the path `/v2/certificate-requests`.
 - The optional property `/items/information/userId` has been removed from the response with the '200' status in the `GET` operation at the path `/v2/customer-invites`.
 - The optional property `information/userId` has been removed from the response with the '200' status in the `GET` operation at the path `/v2/customer-invites/{customerInviteId}`.
 - The optional property `information/userId` has been removed from the response with the '200' status in the `GET` operation at the path `/v2/customer-token-invite`.
@@ -63,15 +55,11 @@ While we generally strive to avoid breaking changes in accordance with our [API 
 - The optional property `information/userId` has been removed from the response with the '200' status in the `GET` operation at the path `/v2/project-token-invite`.
 - The optional property `/items/information/userId` has been removed from the response with the '200' status in the `GET` operation at the path `/v2/projects/{projectId}/invites`.
 - The optional property `information/userId` has been removed from the response with the '201' status in the `POST` operation at the path `/v2/projects/{projectId}/invites`.
-- The request body has been updated to include `#/components/schemas/de.mittwald.v1.ingress.ListIngressesCompatibleWithCertificateRequest` and `#/components/schemas/de.mittwald.v1.ingress.ListIngressesCompatibleWithCertificateIDRequest` in the `oneOf` list for the `POST` operation at the path `/v2/actions/list-ingresses-compatible-with-certificate`.
-- The request body has been updated to include `#/components/schemas/de.mittwald.v1.ssl.CertificateRequestCreateWithDNSRequest` in the `oneOf` list for the `POST` operation at the path `/v2/certificate-requests`.
-- A non-success response with the status '409' has been added for the `POST` operation at the path `/v2/certificate-requests`.
-- A non-success response with the status '412' has been added for the `POST` operation at the path `/v2/certificate-requests`.
-- The optional property `/items/dnsCertSpec` has been added to the response with the '200' status in the `GET` operation at the path `/v2/certificates`.
-- The optional property `dnsCertSpec` has been added to the response with the '200' status in the `GET` operation at the path `/v2/certificates/{certificateId}`.
 - The optional property `/items/isMailAddressInvalid` has been added to the response with the '200' status in the `GET` operation at the path `/v2/customers`.
 - The optional property `isMailAddressInvalid` has been added to the response with the '200' status in the `GET` operation at the path `/v2/customers/{customerId}`.
+- A default value of '10000' has been added for the `query` request parameter `limit` in the `GET` operation at the path `/v2/domains`.
 - A new optional request parameter `skip` has been added in the `GET` operation at the path `/v2/domains`.
+- The intended functionality of parameters `page` and `limit` of the `GET` operation at the path `/v2/domains` has been fixed, it previously did not work.
 
 _Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
 
@@ -83,13 +71,11 @@ _Disclaimer: This summary is AI-generated. If you find any discrepancies, please
 ### Changes in "List Ingresses compatible with a certificate"
 
 
-- ⚠️ **Breaking:** the request's body type/format changed from 'object'/'' to ''/''
+- changed the request body to a 'oneOf' list
 
-- removed the request property 'certificate'
+- moved the previous alternative-less request body into '#/components/schemas/de.mittwald.v1.ingress.ListIngressesCompatibleWithCertificateRequest'
 
-- removed the request property 'projectId'
-
-- added '#/components/schemas/de.mittwald.v1.ingress.ListIngressesCompatibleWithCertificateRequest, #/components/schemas/de.mittwald.v1.ingress.ListIngressesCompatibleWithCertificateIDRequest' to the request body 'oneOf' list
+- added the alternative '#/components/schemas/de.mittwald.v1.ingress.ListIngressesCompatibleWithCertificateIDRequest'
 
 
 For details, refer to the <OperationLink operation="ingress-list-ingresses-compatible-with-certificate" apiVersion="v2" /> endpoint.
@@ -99,7 +85,7 @@ For details, refer to the <OperationLink operation="ingress-list-ingresses-compa
 ### Changes in "Create a CertificateRequest"
 
 
-- ⚠️ **Breaking:** the response property 'contact' became optional for the status '201'
+- the response property 'contact' became optional for the status '201', since the new certificate requests of type '3' (DNS), do not have a contact
 
 - added '#/components/schemas/de.mittwald.v1.ssl.CertificateRequestCreateWithDNSRequest' to the request body 'oneOf' list
 
@@ -112,44 +98,18 @@ For details, refer to the <OperationLink operation="ssl-create-certificate-reque
 
 
 
-### Changes in "List Certificates belonging to a Project or an Ingress"
+### Changes in component "Certificate"
 
+- added the optional property 'dnsCertSpec'
 
-- ⚠️ **Breaking:** the response property '/items/certificate' became optional for the status '200'
+- added the new '3' (DNS) enum value to the 'certificateType' property.
 
-- ⚠️ **Breaking:** the response property '/items/isExpired' became optional for the status '200'
-
-- ⚠️ **Breaking:** the response property '/items/lastExpirationThresholdHit' became optional for the status '200'
-
-- ⚠️ **Breaking:** the response property '/items/validFrom' became optional for the status '200'
-
-- ⚠️ **Breaking:** the response property '/items/validTo' became optional for the status '200'
-
-- added the new '3.00' enum value to the '/items/certificateType' response property for the response status '200'
-
-- added the optional property '/items/dnsCertSpec' to the response with the '200' status
-
-
-For details, refer to the <OperationLink operation="ssl-list-certificates" apiVersion="v2" /> endpoint.
-
-
-
-### Changes in "Get a Certificate"
-
-
-- ⚠️ **Breaking:** the response property 'certificate' became optional for the status '200'
-
-- ⚠️ **Breaking:** the response property 'isExpired' became optional for the status '200'
-
-- ⚠️ **Breaking:** the response property 'lastExpirationThresholdHit' became optional for the status '200'
-
-- ⚠️ **Breaking:** the response property 'validFrom' became optional for the status '200'
-
-- ⚠️ **Breaking:** the response property 'validTo' became optional for the status '200'
-
-- added the new '3.00' enum value to the 'certificateType' response property for the response status '200'
-
-- added the optional property 'dnsCertSpec' to the response with the '200' status
+- such DNS certificates do not contain previously required properties, which therefore became optional:
+  - 'certificate'
+  - 'isExpired'
+  - 'lastExpirationThresholdHit'
+  - 'validFrom'
+  - 'validTo'
 
 
 For details, refer to the <OperationLink operation="ssl-get-certificate" apiVersion="v2" /> endpoint.
@@ -159,32 +119,13 @@ For details, refer to the <OperationLink operation="ssl-get-certificate" apiVers
 ### Changes in "List Domains"
 
 
-- ⚠️ **Breaking:** for the 'query' request parameter 'limit', default value '10000.00' was added
+- for the 'query' request parameter 'limit', default value '10000' was added
 
 - added the new optional 'query' request parameter 'skip'
 
+- the intended functionality of parameters `page` and `limit` has been fixed, it previously did not work.
 
 For details, refer to the <OperationLink operation="domain-list-domains" apiVersion="v2" /> endpoint.
-
-
-
-### Changes in "List CertificateRequests belonging to a Project or an Ingress"
-
-
-- added the new '3.00' enum value to the '/items/certificateType' response property for the response status '200'
-
-
-For details, refer to the <OperationLink operation="ssl-list-certificate-requests" apiVersion="v2" /> endpoint.
-
-
-
-### Changes in "Get a CertificateRequest"
-
-
-- added the new '3.00' enum value to the 'certificateType' response property for the response status '200'
-
-
-For details, refer to the <OperationLink operation="ssl-get-certificate-request" apiVersion="v2" /> endpoint.
 
 
 
