@@ -17,7 +17,7 @@ Mit n8n kannst du:
 
 ## n8n Container erstellen
 
-Du kannst n8n in deiner Mittwald Hosting-Umgebung mit Containern bereitstellen. Es gibt verschiedene Hauptansätze:
+Du kannst n8n in deiner mittwald Hosting-Umgebung mit Containern bereitstellen. Es gibt verschiedene Hauptansätze:
 
 ### Verwendung der mStudio-Benutzeroberfläche
 
@@ -53,7 +53,7 @@ Hier passt du die Umgebungsvariablen `N8N_HOST` und `WEBHOOK_URL` auf den Host a
 
 ### Verwendung der CLI mit `mw container run`
 
-Du kannst auch einen n8n-Container mit der Mittwald CLI und dem Befehl `mw container run` bereitstellen:
+Du kannst auch einen n8n-Container mit der mittwald CLI und dem Befehl `mw container run` bereitstellen:
 
 ```bash
 mw container run \
@@ -126,14 +126,14 @@ n8n bietet auch ein (Werkzeug für Security Audits)[https://docs.n8n.io/hosting/
 
 ## Use cases
 
-### RAG mit postgreSQL und Mittwald AI-Hosting
+### RAG mit postgreSQL und mittwald AI-Hosting
 
 n8n kann benutzt werden, um [Retrieval-Augmented Generation (RAG)](https://de.wikipedia.org/wiki/Retrieval-Augmented_Generation) Systeme verschiedenster Form aufzubauen. Das folgende Beispiel zeigt einen möglichen Aufbau, aufgrund des großen n8n-Ökosystems ist dies aber lediglich einer von vielen Wegen. Viel mehr soll dieses Beispiel als Einstieg dienen, um im Anschluss komplexere und vor allem produktionsreife Systeme aufzusetzen.
 
 #### Vorraussetzungen
 
-- Mittwald Container Hosting
-- Mittwald AI-Hosting
+- mittwald Container Hosting
+- mittwald AI-Hosting
 - mStudio Zugriff, per Webapp und API-Token
 - Installiertes und eingerichtetes `mw` CLI, Deployment des Container Verbunds
 
@@ -143,7 +143,7 @@ Das Ziel ist, einem KI-Agenten Zugriff auf Informationen aus Dokumenten zu gewä
 
 Um dieses Ziel zu erreichen, ist eine Persistenzschicht nötig, in der Informationen "KI-freundlich" abgelegt werden können. Unter der Haube kommen mindestens zwei KI-Modelle zum Einsatz: Eines zum Erzeugen sog. "Embeddings" und ein weiteres um den Agenten zu steuern. Embeddings sind dabei die "KI-freundliche" Art, Texte und Dokumente für KIs zu persistieren, sodass diese schnell zum Kontext einer Unterhaltung beigesteuert werden können.
 
-Im Beispiel kommen diese zwei Modelle aus dem Mittwald KI-Hosting zum Einsatz:
+Im Beispiel kommen diese zwei Modelle aus dem mittwald KI-Hosting zum Einsatz:
 
 - **Embedding**: `Qwen3-Embedding-8B`
 - **Agent**: `Devstral-Small-2-24B-Instruct-2512`
@@ -162,7 +162,7 @@ flowchart TD
     EXT[External API/Client]
   end
 
-  subgraph "Mittwald Hosting"
+  subgraph "mittwald Hosting"
     N8N[n8n]
     PG[PostgreSQL + pgvector]
     AIHOST[AI Hosting]
@@ -278,7 +278,7 @@ Prüfe stets **vor** dem Ausführen eines Workflows, ob alle beteiligten Knoten 
 Neben dem bloßen Vorhandensein müssen einige der Knoten korrekt konfiguriert werden.
 
 Benötigt wird:
-- Zugang zum Mittwald AI-Hosting ( oder vergleichbarer, OpenAI-kompatibler Host ) mit API-Key
+- Zugang zum mittwald AI-Hosting ( oder vergleichbarer, OpenAI-kompatibler Host ) mit API-Key
 - Zugang zur Datenbank, Benutzer und Passwort haben wir bereits im Container-Verbund vorbereitet
 
 **Security:** Für den Produktivbetrieb ist es sauberer, mehrere Datenbankbenutzer mit unterschiedlichen Privilegien zu pflegen. Dies bedarf allerdings händischer Anpassungen am Datenbank-Container, die hier aus Komplexitätsgründen nicht weiter ausgeführt werden. Grundsätzlich sollte der mit Benutzereingaben arbeitende Datenbankbenutzer des KI-Agenten **keine** Berechtigung haben, das Datenbankschema zu ändern!
@@ -330,7 +330,7 @@ mkdir -p /home/node/rag_documents
 Überwachungsknoten aktivieren in n8n, Dokumente ausliefern:
 
 ```shellsession
-scp my_documents/example_manual.txt <Mittwald SSH URL n8n Container, siehe mStudio>:/home/node/rag_documents/
+scp my_documents/example_manual.txt <mittwald SSH URL n8n Container, siehe mStudio>:/home/node/rag_documents/
 ```
 
 Mit der neuen Datei wird der nachfolgende Workflow ausgelöst. Das Dokument, die Metadaten und die Embeddings werden in der Datenbank hinterlegt und stehen im Chat zur Verfügung.
@@ -339,7 +339,7 @@ Zum Testen eignen sich bekannte Dokumente, zu denen einfach Testfragen gestellt 
 
 ```shellsession
 # Beispieldokumente ablegen
-$ scp -r python3_docs/*.txt <Mittwald SSH URL n8n Container, siehe mStudio>:/home/node/rag_documents/
+$ scp -r python3_docs/*.txt <mittwald SSH URL n8n Container, siehe mStudio>:/home/node/rag_documents/
 # Workflow wird angestoßen in n8n ...
 # Kontrolle nach Abschluss:
 $ curl -X POST -d '{
