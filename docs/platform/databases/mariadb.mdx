@@ -1,0 +1,170 @@
+---
+title: MariaDB
+sidebar_position: 15
+description: |
+  MariaDB is a free, open-source relational database management system. Start and operate a MariaDB database containerized in your project.
+---
+
+import TerraformExample from "@site/docs/platform/databases/examples/_mariadb-terraform.md";
+import TerraformExampleGeneratedPassword from "@site/docs/platform/databases/examples/_mariadb-terraform-pwdgen.md";
+import TerraformResourceHint from "@site/src/components/TerraformResourceHint";
+import PlanCompatibility from "@site/src/components/PlanCompatibility";
+
+<PlanCompatibility features={["container"]} />
+
+## What is MariaDB?
+
+MariaDB is a free, open-source database management system (DBMS) that originated as a fork of MySQL. It was founded by the original developers of MySQL after Oracle acquired MySQL, with the goal of providing a fully open alternative.
+
+MariaDB is designed to be highly compatible with MySQL while offering additional features, performance improvements, and a commitment to remaining open source. It's widely used for web applications, data warehousing, and enterprise applications.
+
+## Creating a MariaDB database {#creating-mariadb-database}
+
+You can deploy a MariaDB database in your mittwald hosting environment using [containers](../../workloads/containers). There are several main approaches:
+
+### Using Terraform (Recommended)
+
+The most convenient way to deploy a MariaDB database is using [Terraform](/docs/v2/guides/deployment/terraform). The following example shows how to use a MariaDB container in your own Terraform deployment:
+
+<TerraformExample />
+
+You can also use the `random_password` resource to generate a password dynamically. Note that in this case you should also store this password securely in a secret manager, as it will not be retrievable afterwards.
+
+<TerraformExampleGeneratedPassword />
+
+After creating the resource, you can access the MariaDB database from within your hosting environment via the URL `mysql://mariadb:3306`.
+
+<TerraformResourceHint resource="container_stack" />
+
+### Using the mStudio UI
+
+Alternatively, you can set up a MariaDB container manually:
+
+1. Go to the **Container** menu item in your project in mStudio and create a new container. You can choose any name.
+
+2. Enter the image `mariadb:lts-ubi9`. You can keep the entrypoint and command as suggested.
+
+#### Volumes
+
+To persistently store your MariaDB database data, define volumes under **Volumes** as follows:
+
+- Create new volume, on **Path in Container** (Mount Point): `/var/lib/mysql` (Stores the database data)
+- Project path `/files/mariadb-backups`, on **Path in Container** (Mount Point): `/mnt` (This path is used to store database dumps or backups)
+
+#### Environment Variables
+
+Set the following environment variables for the container:
+
+```dotenv
+MARIADB_ROOT_PASSWORD=my_root_password
+MARIADB_DATABASE=mydatabase
+MARIADB_USER=myuser
+MARIADB_PASSWORD=mypassword
+```
+
+:::caution
+
+Remember to replace the default credentials in those environment variables with secure values!
+
+:::
+
+#### Ports
+
+Accept the suggested default port `3306`.
+
+### Using CLI with `mw container run`
+
+You can also deploy a MariaDB container with the mittwald CLI and the `mw container run` command:
+
+```shellsession
+user@local $ mw container run \
+  --name mariadb \
+  --env MARIADB_ROOT_PASSWORD=my_root_password \
+  --env MARIADB_DATABASE=mydatabase \
+  --env MARIADB_USER=myuser \
+  --env MARIADB_PASSWORD=mypassword \
+  --volume mariadb-data:/var/lib/mysql \
+  --volume /files/mariadb-backups:/mnt \
+  --publish 3306:3306/tcp \
+  --create-volumes \
+  mariadb:lts-ubi9
+```
+
+This command creates a new container named "mariadb" with the MariaDB image, sets all necessary environment variables and mounts volumes for persistent data storage.
+
+### Using CLI with `mw stack deploy`
+
+If you prefer Docker Compose, you can create a `docker-compose.yml` file and deploy it with the `mw stack deploy` command:
+
+1. Create a `docker-compose.yml` file with the following content:
+
+   ```yaml
+   services:
+     mariadb:
+       image: mariadb:lts-ubi9
+       environment:
+         - MARIADB_ROOT_PASSWORD=my_root_password
+         - MARIADB_DATABASE=mydatabase
+         - MARIADB_USER=myuser
+         - MARIADB_PASSWORD=mypassword
+       ports:
+         - "3306:3306"
+       volumes:
+         - mariadb_data:/var/lib/mysql
+         - /files/mariadb-backups:/mnt
+   volumes:
+     mariadb_data:
+   ```
+
+2. Deploy the stack with the CLI:
+
+   ```shellsession
+   user@local $ mw stack deploy
+   ```
+
+This approach is particularly useful when you want to deploy multiple containers that work together.
+
+### Accessing your container within your hosting environment {#accessing-container}
+
+Once the container is running, you can verify that the MariaDB instance is available. There are two main options:
+
+#### Option 1: Direct access via container shell
+
+```shellsession
+user@local $ mw container ssh mariadb
+user@mariadb $ mysql -umyuser -p -hlocalhost mydatabase
+```
+
+#### Option 2: Port forwarding for local access
+
+```shellsession
+user@local $ mw container port-forward mariadb 3306:3306
+```
+
+In a separate terminal, you can then connect locally:
+
+```shellsession
+user@local $ mysql -umyuser -P 3306 -p -hlocalhost mydatabase
+```
+
+With both options, you should be redirected to the MariaDB prompt where you can execute SQL commands.
+
+## Operations {#operations}
+
+Your MariaDB data is backed up as part of regular project backups. However, for databases it is **strongly recommended** to create additional dumps to ensure consistency and recoverability.
+
+A dump can be created directly in the container. Example command for a manual backup:
+
+```shellsession
+user@local $ mw container exec mariadb "mysqldump --column-statistics=0 --opt --no-tablespaces -u'myuser' -p'mypassword' 'mydatabase' > /mnt/mydatabase.sql"
+```
+
+The backup file will then be available in the project under `/files/mariadb-backups/`.
+
+Automation is easily possible via cronjobs.
+
+## Further Resources {#further-resources}
+
+- [Official MariaDB Documentation](https://mariadb.com/kb/en/documentation/)
+- [MariaDB Docker Hub](https://hub.docker.com/_/mariadb)
+- [Container Workloads Documentation](/docs/v2/platform/workloads/containers)
