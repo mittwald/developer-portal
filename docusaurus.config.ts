@@ -273,7 +273,7 @@ const config: Config = {
   markdown: {
     mermaid: true,
     hooks: {
-        onBrokenMarkdownLinks: "ignore",
+        onBrokenMarkdownLinks: "warn",
     }
   },
   themes: ["@docusaurus/theme-mermaid"],
