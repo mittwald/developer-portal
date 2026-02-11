@@ -1,12 +1,12 @@
 ---
-applyTo: "docs/guides/apps/**/*.md,docs/guides/apps/**/*.mdx,i18n/de/docusaurus-plugin-content-docs/**/guides/apps/**/*.md,i18n/de/docusaurus-plugin-content-docs/**/guides/apps/**/*.mdx"
+applyTo: "docs/guides/apps/*.md,docs/guides/apps/*.mdx,docs/platform/databases/*.md,docs/platform/databases/*.mdx,i18n/de/docusaurus-plugin-content-docs/**/guides/apps/*.md,i18n/de/docusaurus-plugin-content-docs/**/guides/apps/*.mdx,i18n/de/docusaurus-plugin-content-docs/**/platform/databases/*.md,i18n/de/docusaurus-plugin-content-docs/**/platform/databases/*.mdx"
 ---
 
-These guidelines apply specifically to app deployment guides in the `docs/guides/apps` directory. Follow the general documentation guidelines in `DOCS.instructions.md` as well.
+These guidelines apply specifically to app and database deployment guides in the `docs/guides/apps` and `docs/platform/databases` directories. Follow the general documentation guidelines in `DOCS.instructions.md` as well.
 
 ## Front Matter
 
-App deployment guides must include the following front matter properties:
+Deployment guides must include the following front matter properties:
 
 ```yaml
 ---
@@ -307,6 +307,7 @@ We assume that [prerequisite condition]. If not, [instructions to resolve].
 Consider the following technical constraints which might be relevant for container commands:
 
 - Exposing a port only makes that port accessible from _within_ the hosting environment (meaning, Containers or managed Apps running within the same project). To access the port from outside the hosting environment, a user can either use the `mw container port-forward` command to forward the port to their local machine, or connect a domain to the port. The latter only supports HTTP ports.
+- Exposing a port _within_ the hosting environment is NOT a security issue. The platform has network policies that ensure that no unauthorized access is possible.
 
 ## Linking Conventions
 
