@@ -54,8 +54,8 @@ Use the suggested default port `5678`.
 
 You can also deploy an n8n container with the mittwald CLI and the command `mw container run`:
 
-```bash
-mw container run \
+```shellsession
+user@local $ mw container run \
   --name n8n \
   --env N8N_HOST=p-XXXXXX.project.space \
   --env N8N_PORT=5678 \
@@ -98,8 +98,8 @@ If you prefer Docker Compose, you can create a `docker-compose.yml` file and dep
 
 2. Deploy the stack with the CLI:
 
-   ```bash
-   mw stack deploy
+   ```shellsession
+   user@local $ mw stack deploy
    ```
 
 This approach is especially useful if you want to deploy multiple containers that work together.
@@ -250,8 +250,8 @@ For easy differentiation, it’s recommended to give the `.env` files descriptiv
 
 Once all settings are prepared, the stack can be deployed:
 
-```bash
-mw stack deploy -c path/to/n8n/docker-compose.yml --env-file path/to/n8n/example.env
+```shellsession
+user@local $ mw stack deploy -c path/to/n8n/docker-compose.yml --env-file path/to/n8n/example.env
 ```
 
 If you see a success message in the console, check the new containers in mStudio – the installation step is complete!
@@ -288,10 +288,10 @@ So, create credentials for the database and the AI host, then assign them to the
 
 **Security:** For production, webhooks must be protected with an authentication method. If possible, don’t expose webhooks directly, but consume them from another application in the stack. If you want to expose webhooks on purpose, it’s worthwhile to include a proxy server in your stack, which only forwards defined webhook URLs to n8n.
 
-Let the initial webhook listen in test mode—you can test it, for example with Postman or curl, and you’ll see the exact URL:
+Let the initial webhook listen in test mode. You can test it, for example with Postman or curl, and you’ll see the exact URL:
 
-```bash
-$ curl -X POST -d '{
+```shellsession
+user@local $ curl -X POST -d '{
     "chatInput": "Hello World!",
     "sessionId": 42
   }'
@@ -302,8 +302,8 @@ $ curl -X POST -d '{
 
 As long as our RAG setup isn’t loaded with documents, we have a simple chatbot here, using the "baked-in" knowledge of the model. If you ask explicitly, the agent will explain:
 
-```bash
-$ curl -X POST -d '{
+```shellsession
+user@local $ curl -X POST -d '{
     "chatInput": "How many documents do you know?",
     "sessionId": 42
   }'
@@ -322,14 +322,14 @@ In the first node ("Local file trigger") for file system monitoring, set the dir
 Afterwards, you can test the monitoring by placing documents in the designated folder. Document delivery can take place in several ways (via SSH, SFTP, etc.); in this example, we are restricting ourselves to an `SSH` connection and deliver our documents using `scp`. Prepare the directory:
 
 ```shellsession
-mw container ssh <CONTAINER-ID>
-mkdir -p /home/node/rag_documents
+user@local $ mw container ssh <CONTAINER-ID>
+user@n8n $ mkdir -p /home/node/rag_documents
 ```
 
 Activate the monitoring node in n8n, deliver documents:
 
 ```shellsession
-scp my_documents/example_manual.txt <mittwald SSH URL n8n Container, see mStudio>:/home/node/rag_documents/
+user@local $ scp my_documents/example_manual.txt <mittwald SSH URL n8n Container, see mStudio>:/home/node/rag_documents/
 ```
 
 With the new file, the subsequent workflow is triggered. The document, its metadata, and the embeddings are stored in the database and are then available in the chat.
@@ -338,10 +338,12 @@ For testing, known documents to which you can easily ask test questions are espe
 
 ```shellsession
 # Place sample documents
-$ scp -r python3_docs/*.txt <mittwald SSH URL n8n Container, see mStudio>:/home/node/rag_documents/
+user@local $ scp -r python3_docs/*.txt <mittwald SSH URL n8n Container, see mStudio>:/home/node/rag_documents/
+
 # Workflow will be triggered in n8n ...
+
 # Check after completion:
-$ curl -X POST -d '{
+user@local $ curl -X POST -d '{
     "chatInput": "How to report bugs in Python?",
     "sessionId": 42
   }'
@@ -351,7 +353,7 @@ $ curl -X POST -d '{
 {"output":"To report bugs in Python, you can use the Python issue tracker on GitHub. Here’s how you can do it:\n\n1. **GitHub Issues Tracker**: Submit bug reports for Python via the GitHub issues tracker at [https://github.com/python/cpython/issues](https://github.com/python/cpython/issues). This platform provides a web form where you can enter pertinent information and submit it to the developers.\n\n2. **Bug Writing Guidelines**: When writing a bug report, include as much detail as possible to help the developers understand and reproduce the issue. While some guidelines are specific to the Mozilla project, they describe general best practices for writing effective bug reports.\n\n3. **Documentation Bugs**: If you find a bug in the Python documentation or have suggestions for improvements, you can also submit a bug report on the issue tracker. …
 
 # Source Reference:
-$ curl -X POST -d '{
+user@local $ curl -X POST -d '{
     "chatInput": "Name your document source",
     "sessionId": 42
   }'

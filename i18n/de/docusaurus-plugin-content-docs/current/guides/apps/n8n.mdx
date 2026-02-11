@@ -17,7 +17,7 @@ Mit n8n kannst du:
 
 ## n8n Container erstellen
 
-Du kannst n8n in deiner mittwald Hosting-Umgebung mit Containern bereitstellen. Es gibt verschiedene Hauptansätze:
+Du kannst n8n in deiner mittwald Hosting-Umgebung mit Containern bereitstellen. Es gibt verschiedene Ansätze:
 
 ### Verwendung der mStudio-Benutzeroberfläche
 
@@ -55,8 +55,8 @@ Hier passt du die Umgebungsvariablen `N8N_HOST` und `WEBHOOK_URL` auf den Host a
 
 Du kannst auch einen n8n-Container mit der mittwald CLI und dem Befehl `mw container run` bereitstellen:
 
-```bash
-mw container run \
+```shellsession
+user@local $ mw container run \
   --name n8n \
   --env N8N_HOST=p-XXXXXX.project.space \
   --env N8N_PORT=5678 \
@@ -74,7 +74,7 @@ Dieser Befehl erstellt einen neuen Container namens "n8n" mit dem n8n-Image, set
 
 ### Verwendung der CLI mit `mw stack deploy`
 
-Wenn du Docker Compose bevorzugst, kannst du eine `docker-compose.yml`-Datei erstellen und sie mit dem Befehl `mw stack deploy` bereitstellen:
+Wenn du Docker Compose bevorzugst, kannst du eine `docker-compose.yml`-Datei erstellen und sie mit dem Befehl `mw stack deploy` deployen:
 
 1. Erstelle eine `docker-compose.yml`-Datei mit folgendem Inhalt:
 
@@ -97,10 +97,10 @@ Wenn du Docker Compose bevorzugst, kannst du eine `docker-compose.yml`-Datei ers
      n8n-data:
    ```
 
-2. Stelle den Stack mit der CLI bereit:
+2. Deploye den Stack mit der CLI:
 
-   ```bash
-   mw stack deploy
+   ```shellsession
+   user@local $ mw stack deploy
    ```
 
 Dieser Ansatz ist besonders nützlich, wenn du mehrere Container deployen möchtest, die zusammenarbeiten.
@@ -246,13 +246,13 @@ NODES_EXCLUDE=[]
 Zur einfachen Unterscheidung wird empfohlen, den `.env` Dateien sprechende Namen zu geben, z. B. `test.env` oder `prod.env`.
 
 :::caution
-`NODES_EXCLUDE=[]` aktiviert **alle** Knoten für die Benutzung. Einige dieser Knoten können ein Sicherheitsrisiko darstellen. Zum Testen kann dies sehr nützlich sein, für produktive Umgebungen wird empfohlen, eine genaue Liste unerwünschter Knoten zu pflegen.
+`NODES_EXCLUDE=[]` aktiviert **alle** Nodes für die Benutzung. Einige dieser Nodes können ein Sicherheitsrisiko darstellen. Zum Testen kann das sehr nützlich sein, für produktive Umgebungen wird empfohlen, eine genaue Liste unerwünschter Nodes zu pflegen.
 :::
 
-Sind alle Einstellungen vorbereitet, kann der Verbund ausgeliefert werden:
+Sind alle Einstellungen vorbereitet, kann der Stack deployed werden:
 
-```bash
-mw stack deploy -c path/to/n8n/docker-compose.yml --env-file path/to/n8n/example.env
+```shellsession
+user@local $ mw stack deploy -c path/to/n8n/docker-compose.yml --env-file path/to/n8n/example.env
 ```
 
 Sehen wir in der Konsole eine Erfolgsmeldung, kontrollieren wir die neuen Container im mStudio und haben somit den Installationsschritt abgeschlossen!
@@ -267,7 +267,7 @@ Basierend auf [Quelle](https://n8n.io/workflows/10157-local-document-question-an
 
 #### Einrichtung
 
-Nach der Installation setzen wir das RAG-System in n8n auf und richten das System ein. Zunächst aktivieren wir einen n8n-Lizenzschlüssel und laden die Basisknoten zur Workflowerstellung herunter. Die benötigten Knoten liegen in `n8n-nodes-base` und können direkt aus der Applikation heraus heruntergeladen und installiert werden.
+Nach der Installation setzen wir das RAG-System in n8n auf und richten das System ein. Zunächst aktivieren wir einen n8n-Lizenzschlüssel und laden die Basisnodes zur Workflowerstellung herunter. Die benötigten Nodes liegen in `n8n-nodes-base` und können direkt aus der Applikation heraus heruntergeladen und installiert werden.
 
 :::note
 
@@ -275,10 +275,10 @@ Prüfe stets **vor** dem Ausführen eines Workflows, ob alle beteiligten Knoten 
 
 :::
 
-Neben dem bloßen Vorhandensein müssen einige der Knoten korrekt konfiguriert werden.
+Neben dem bloßen Vorhandensein müssen einige der Nodes korrekt konfiguriert werden.
 
 Benötigt wird:
-- Zugang zum mittwald AI-Hosting ( oder vergleichbarer, OpenAI-kompatibler Host ) mit API-Key
+- Zugang zum mittwald AI-Hosting (oder vergleichbarer, OpenAI-kompatibler Host) mit API-Key
 - Zugang zur Datenbank, Benutzer und Passwort haben wir bereits im Container-Verbund vorbereitet
 
 **Security:** Für den Produktivbetrieb ist es sauberer, mehrere Datenbankbenutzer mit unterschiedlichen Privilegien zu pflegen. Dies bedarf allerdings händischer Anpassungen am Datenbank-Container, die hier aus Komplexitätsgründen nicht weiter ausgeführt werden. Grundsätzlich sollte der mit Benutzereingaben arbeitende Datenbankbenutzer des KI-Agenten **keine** Berechtigung haben, das Datenbankschema zu ändern!
@@ -289,10 +289,10 @@ Wir erstellen also Zugangsdaten für die Datenbank und den KI-Host, anschließen
 
 **Security:** Für produktiven Betrieb müssen Webhooks mit einer Authentifizierungsmethode abgesichert werden. Nach Möglichkeit sollten Webhooks nicht weiter exponiert, sondern von einer anderen Applikation des Stacks konsumiert werden. Sollen gezielt Webhooks exponiert werden, lohnt sich ein Proxy-Server im Stack, über den nur definierte Webhook-URLs an n8n weitergegeben werden.
 
-Lasse den initialen Webhook lauschen im Test-Modus, dann kann man testen, z. B. per postman oder curl, wobei dir die genaue URL angezeigt wird:
+Lass den initialen Webhook im Test-Modus lauschen, dann kannst du z. B. per postman oder curl testen. Die genaue URL wird dir in der Trigger-Node angezeigt:
 
-```bash
-$ curl -X POST -d '{
+```shellsession
+user@local $ curl -X POST -d '{
     "chatInput": "Hello World!",
     "sessionId": 42
   }'
@@ -303,8 +303,8 @@ $ curl -X POST -d '{
 
 Solange unser RAG noch nicht mit Dokumenten befüllt ist, haben wir hier einen einfachen Chatbot mit dem im Model "eingebackenen" Weltwissen. Fragen wir explizit, erklärt sich der Agent auch:
 
-```bash
-$ curl -X POST -d '{
+```shellsession
+user@local $ curl -X POST -d '{
     "chatInput": "How many documents do you know?",
     "sessionId": 42
   }'
@@ -316,21 +316,21 @@ $ curl -X POST -d '{
 
 #### Betrieb - RAG, Dateisystem
 
-Nach der Herstellung der Grundfunktion kann das RAG mit Dokumenten gefüllt werden. Im Beispiel werden Dokumente im Dateisystem abgelegt, verarbeitet und für den KI-Agenten sichtbar gemacht. In der Praxis lohnt es sich, neben dem Dateisystem auch andere Quellen in Erwägung zu ziehen, oder das Dateisystem gegen einen Dienst, bzw. einen Internet-Share ( Google Share ), zu konfigurieren.
+Nach der Herstellung der Grundfunktion kann das RAG mit Dokumenten gefüllt werden. Im Beispiel werden Dokumente im Dateisystem abgelegt, verarbeitet und für den KI-Agenten sichtbar gemacht. In der Praxis lohnt es sich, neben dem Dateisystem auch andere Quellen in Erwägung zu ziehen, oder das Dateisystem gegen einen Dienst, bzw. einen Internet-Share (Google Share), zu konfigurieren.
 
-Im ersten Knoten der Dateisystemüberwachung ( `Local file trigger` ) richten wir das Verzeichnis auf dem n8n-Container ein, das die Dokumente enthalten soll. Hier tragen wir beispielsweise `/home/node/rag_documents` ein.
+Im ersten Knoten der Dateisystemüberwachung (`Local file trigger`) richten wir das Verzeichnis auf dem n8n-Container ein, das die Dokumente enthalten soll. Hier tragen wir beispielsweise `/home/node/rag_documents` ein.
 
-Im Anschluss können wir die Überwachung testen, indem wir Dokumente im eingerichteten Ordner ablegen. Die Auslieferung der Dokumente kann dabei auf verschiedenen Wegen erfolgen, ( per SSH, SFTP, ), im Beispiel beschränken wir uns auf eine `SSH`-Verbindung und liefern unsere Dokumente per `scp` aus. Ordner vorbereiten:
+Im Anschluss können wir die Überwachung testen, indem wir Dokumente im eingerichteten Ordner ablegen. Die Auslieferung der Dokumente kann dabei auf verschiedenen Wegen erfolgen, (per SSH, SFTP), im Beispiel beschränken wir uns auf eine `SSH`-Verbindung und liefern unsere Dokumente per `scp` aus. Ordner vorbereiten:
 
 ```shellsession
-mw container ssh <CONTAINER-ID>
-mkdir -p /home/node/rag_documents
+user@local $ mw container ssh <CONTAINER-ID>
+user@n8n $ mkdir -p /home/node/rag_documents
 ```
 
 Überwachungsknoten aktivieren in n8n, Dokumente ausliefern:
 
 ```shellsession
-scp my_documents/example_manual.txt <mittwald SSH URL n8n Container, siehe mStudio>:/home/node/rag_documents/
+user@local $ scp my_documents/example_manual.txt <mittwald SSH URL n8n Container, siehe mStudio>:/home/node/rag_documents/
 ```
 
 Mit der neuen Datei wird der nachfolgende Workflow ausgelöst. Das Dokument, die Metadaten und die Embeddings werden in der Datenbank hinterlegt und stehen im Chat zur Verfügung.
@@ -339,10 +339,12 @@ Zum Testen eignen sich bekannte Dokumente, zu denen einfach Testfragen gestellt 
 
 ```shellsession
 # Beispieldokumente ablegen
-$ scp -r python3_docs/*.txt <mittwald SSH URL n8n Container, siehe mStudio>:/home/node/rag_documents/
+user@local $ scp -r python3_docs/*.txt <mittwald SSH URL n8n Container, siehe mStudio>:/home/node/rag_documents/
+
 # Workflow wird angestoßen in n8n ...
+
 # Kontrolle nach Abschluss:
-$ curl -X POST -d '{
+user@local $ curl -X POST -d '{
     "chatInput": "How to report bugs in Python?",
     "sessionId": 42
   }'
@@ -352,7 +354,7 @@ $ curl -X POST -d '{
 {"output":"To report bugs in Python, you can use the Python issue tracker on GitHub. Here’s how you can do it:\n\n1. **GitHub Issues Tracker**: Submit bug reports for Python via the GitHub issues tracker at [https://github.com/python/cpython/issues](https://github.com/python/cpython/issues). This platform provides a web form where you can enter pertinent information and submit it to the developers.\n\n2. **Bug Writing Guidelines**: When writing a bug report, include as much detail as possible to help the developers understand and reproduce the issue. While some guidelines are specific to the Mozilla project, they describe general best practices for writing effective bug reports.\n\n3. **Documentation Bugs**: If you find a bug in the Python documentation or have suggestions for improvements, you can also submit a bug report on the issue tracker. …
 
 # Quellenangabe:
-$ curl -X POST -d '{
+user@local $ curl -X POST -d '{
     "chatInput": "Name your document source",
     "sessionId": 42
   }'
