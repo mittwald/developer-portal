@@ -41,7 +41,7 @@ test.describe('Documentation crawler - all pages', () => {
     const shouldVisit = (url: string): boolean => {
       if (! isInternalDocLink(url)) return false;
       if (url.startsWith('#')) return false;
-      if (url.match(/\.(png|jpg|jpeg|gif|svg|pdf|zip|ico|css|js)$/i)) return false;
+      if (url.match(/\.(png|jpg|jpeg|gif|svg|pdf|zip|ico|css|js|json)$/i)) return false;
 
       const normalized = normalizeUrl(url);
       if (visitedUrls. has(normalized)) return false;
