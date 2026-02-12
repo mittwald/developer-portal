@@ -26,20 +26,20 @@ kannst du jederzeit im [Upstream Repository](https://github.com/mittwald/referen
 
 Die folgenden Komponenten bilden das Fundament deiner Extension und sollten **nicht entfernt** werden:
 
-| Bereich             | Pfad                                                    | Funktion                                          |
-| ------------------- | ------------------------------------------------------- | ------------------------------------------------- |
-| Error-UI            | `src/components/ErrorFallback.tsx`                      | Error-Boundary-Fallback für die gesamte App       |
-| Authentifizierung   | `src/middleware/auth.ts`                                | Session-Verifizierung und Access-Token-Management |
-| Fehlerbehandlung    | `src/middleware/error-handling.ts`                      | Globales Error-Handling mit Zod-Validierung       |
-| Datenbank-Setup     | `src/db/index.ts`                                       | PostgreSQL-Connection-Pool                        |
-| Migrationen         | `src/db/migrate.ts`, `src/server/plugins/migrations.ts` | Automatische Schema-Migrationen                   |
-| Router              | `src/router.tsx`, `src/routes/__root.tsx`               | TanStack Router Konfiguration                     |
-| Haupt-Route         | `src/routes/index.tsx`                                  | Einstiegspunkt (Inhalt anpassen, Datei behalten)  |
-| Webhook-Route       | `src/routes/api/webhooks.mittwald.ts`                   | Webhook-Handler für Extension-Lifecycle           |
-| Environment         | `src/env.ts`                                            | Umgebungsvariablen-Validierung                    |
-| Fehler-Definitionen | `src/global-errors.ts`                                  | Wiederverwendbare Error-Klassen                   |
-| Ghost-Setup         | `src/ghosts.ts`                                         | RPC-Layer (Inhalt anpassen, Datei behalten)       |
-| Hooks               | `src/hooks/useFormErrorHandling.tsx`                    | Wiederverwendbarer Form-Error-Hook                |
+| Bereich             | Pfad                                                    | Funktion                                                                                                                   |
+| ------------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Error-UI            | `src/components/ErrorFallback.tsx`                      | Error-Boundary-Fallback für die gesamte App                                                                                |
+| Authentifizierung   | `src/middleware/auth.ts`                                | Session-Verifizierung und Access-Token-Management                                                                          |
+| Fehlerbehandlung    | `src/middleware/error-handling.ts`                      | Globales Error-Handling mit Zod-Validierung                                                                                |
+| Datenbank-Setup     | `src/db/index.ts`                                       | PostgreSQL-Connection-Pool                                                                                                 |
+| Migrationen         | `src/db/migrate.ts`, `src/server/plugins/migrations.ts` | Automatische Schema-Migrationen                                                                                            |
+| Router              | `src/router.tsx`, `src/routes/__root.tsx`               | TanStack Router Konfiguration                                                                                              |
+| Haupt-Route         | `src/routes/index.tsx`                                  | Einstiegspunkt (Inhalt anpassen, Datei behalten)                                                                           |
+| Webhook-Route       | `src/routes/api/webhooks.mittwald.ts`                   | Webhook-Handler für Extension-Lifecycle                                                                                    |
+| Environment         | `src/env.ts`                                            | Umgebungsvariablen-Validierung                                                                                             |
+| Fehler-Definitionen | `src/global-errors.ts`                                  | Wiederverwendbare Error-Klassen                                                                                            |
+| Ghost-Setup         | `src/ghosts.ts`                                         | RPC-Layer mit [@mittwald/react-ghostmaker](https://github.com/mittwald/react-ghostmaker) (Inhalt anpassen, Datei behalten) |
+| Hooks               | `src/hooks/useFormErrorHandling.tsx`                    | Wiederverwendbarer Form-Error-Hook                                                                                         |
 
 Die `extension_instance`-Tabelle in `src/db/schema.ts` ist ebenfalls Infrastruktur – sie speichert die Instanz-spezifischen Daten und den verschlüsselten Access-Token.
 
