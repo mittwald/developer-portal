@@ -7,8 +7,6 @@ description: Lerne, wie du Open WebUI in einer Container-Umgebung einrichtest un
 
 ## Einführung
 
-Open WebUI ist eine erweiterbare, funktionsreiche und benutzerfreundliche selbst gehostete Web-Oberfläche, die vollständig offline betrieben werden kann. Es unterstützt verschiedene LLM-Runner, einschließlich Ollama und OpenAI-kompatible APIs.
-
 > Open WebUI ist eine erweiterbare, funktionsreiche und benutzerfreundliche selbst gehostete WebUI, die vollständig offline betrieben werden kann. Es unterstützt verschiedene LLM-Runner, einschließlich Ollama und OpenAI-kompatible APIs.
 > – [Open WebUI GitHub](https://github.com/open-webui/open-webui)
 
@@ -68,8 +66,8 @@ Sobald du alle Umgebungsvariablen eingegeben hast, klicke auf **„Weiter"**. Im
 
 Du kannst auch den Befehl `mw container run` verwenden, um direkt einen Open WebUI-Container über die Kommandozeile zu erstellen und zu starten. Dieser Ansatz ist ähnlich wie die Verwendung der Docker-CLI und ermöglicht es dir, alle Container-Parameter in einem einzigen Befehl anzugeben.
 
-```bash
-mw container run \
+```shellsession
+user@local $ mw container run \
   --name openwebui \
   --description "Open WebUI - AI Chat Interface" \
   --publish 8080:8080 \
@@ -103,8 +101,8 @@ volumes:
 
 Stelle dann den Container mit dem Befehl `mw stack deploy` bereit:
 
-```bash
-mw stack deploy
+```shellsession
+user@local $ mw stack deploy
 ```
 
 Dieser Befehl liest die `docker-compose.yml`-Datei aus dem aktuellen Verzeichnis und stellt sie in deinem Standard-Stack bereit.
@@ -113,7 +111,53 @@ Dieser Befehl liest die `docker-compose.yml`-Datei aus dem aktuellen Verzeichnis
 
 Wenn du einen [mittwald AI Hosting](/docs/v2/platform/aihosting/)-API-Key hast, kannst du Open WebUI mit den gehosteten KI-Modellen verbinden.
 
-Nachdem Open WebUI läuft und du ein Konto erstellt hast, folge diesen Schritten:
+### Verwendung von Umgebungsvariablen (Empfohlen)
+
+Der empfohlene Weg, Open WebUI mit mittwald AI Hosting zu verbinden, ist die Verwendung von Umgebungsvariablen während der Container-Erstellung. Füge folgende Umgebungsvariablen hinzu:
+
+```
+OPENAI_API_BASE_URL=https://llm.aihosting.mittwald.de/v1
+OPENAI_API_KEY=dein_api_key_hier
+```
+
+Wenn du das mStudio UI verwendest, füge diese Variablen im Bereich Umgebungsvariablen während des Container-Setups hinzu. Für CLI-Deployments füge sie in deinen `mw container run`-Befehl oder deine `docker-compose.yml`-Datei ein:
+
+```shellsession
+user@local $ mw container run \
+  --name openwebui \
+  --description "Open WebUI - AI Chat Interface" \
+  --publish 8080:8080 \
+  --env "OPENAI_API_BASE_URL=https://llm.aihosting.mittwald.de/v1" \
+  --env "OPENAI_API_KEY=dein_api_key_hier" \
+  --volume "openwebui-data:/app/backend/data" \
+  --create-volumes \
+  ghcr.io/open-webui/open-webui:main
+```
+
+Oder in deiner `docker-compose.yml`:
+
+```yaml
+services:
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    ports:
+      - "8080:8080"
+    volumes:
+      - "openwebui-data:/app/backend/data"
+    environment:
+      PORT: "8080"
+      WEBUI_NAME: "mittwald AI Chat"
+      OPENAI_API_BASE_URL: "https://llm.aihosting.mittwald.de/v1"
+      OPENAI_API_KEY: "dein_api_key_hier"
+volumes:
+  openwebui-data: {}
+```
+
+Mit dieser Konfiguration wird Open WebUI beim Start automatisch mit mittwald AI Hosting verbunden und erkennt alle verfügbaren Modelle.
+
+### Verwendung des Admin Panels
+
+Alternativ kannst du die Verbindung konfigurieren, nachdem Open WebUI läuft:
 
 1. Öffne das Open WebUI Admin Panel, indem du auf dein Profilsymbol klickst
 2. Navigiere zu **„Settings"** und wähle **„Connections"**

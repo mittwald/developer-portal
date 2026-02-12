@@ -22,7 +22,7 @@ Pay special attention to these guidelines when authoring and reviewing documenta
 
 ## Understandability, clarity and completeness
 
-- Commands intended to be executed by the reader in a terminal must clearly indicate if they should be run in a local terminal, or in any kind of remote environment.
+- Commands intended to be executed by the reader in a terminal must clearly indicate if they should be run in a local terminal, or in any kind of remote environment. Use the `shellsession` code type for shell commands, and prefix commands with `user@local $ ` for commands run on the local machine, or an appropriate other prefix for remote environments.
 - Instructions that involve starting or managing containers should document all available ways of doing so: The mStudio UI and the CLI tool using its imperative (`mw container run`) and declarative (`mw stack deploy`) commands.
 - When referring to specific API operations, ALWAYS look up the relevant documentation in the OpenAPI specification in `/static/specs/openapi-v2.json`.
 
