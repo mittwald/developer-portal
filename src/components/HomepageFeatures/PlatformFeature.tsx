@@ -94,7 +94,14 @@ function PlatformCoreFeatures() {
             }
             links={[
               <Link to="/docs/v2/platform/aihosting/introduction">
-                Introduction
+                <Translate id="index.deploy.platform.aihosting.intro">
+                  Introduction
+                </Translate>
+              </Link>,
+              <Link to="/docs/v2/platform/aihosting/cms">
+                <Translate id="index.deploy.platform.aihosting.cms">
+                  CMS integrations
+                </Translate>
               </Link>,
             ]}
           />
