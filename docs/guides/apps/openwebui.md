@@ -162,10 +162,7 @@ Alternatively, you can configure the connection after Open WebUI is running:
 1. Open the Open WebUI admin panel by clicking on your profile icon
 2. Navigate to **"Settings"** and choose **"Connections"**
 3. In the **"OpenAI API"** section, add a new connection
-4. Enter the base URL:
-   ```
-   https://llm.aihosting.mittwald.de/v1
-   ```
+4. Enter the base URL: `https://llm.aihosting.mittwald.de/v1`
 5. Enter your API key from mittwald AI Hosting
 6. Save the configuration
 
