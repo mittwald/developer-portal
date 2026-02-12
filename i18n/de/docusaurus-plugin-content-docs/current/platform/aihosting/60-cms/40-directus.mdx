@@ -1,0 +1,47 @@
+---
+sidebar_label: Directus
+description: Erfahre, wie du mittwald AI Hosting mit dem Directus AI-Assistenten verwendest
+title: Directus
+---
+
+## mittwald AI Hosting mit Directus verwenden {#using-mittwald-ai-hosting}
+
+[Directus v11.15](https://github.com/directus/directus/releases/tag/v11.15.0) und höher enthält integrierte KI-Assistenten-Funktionen mit Unterstützung für OpenAI-kompatible Provider. Da mittwald AI Hosting eine OpenAI-kompatible API bereitstellt, kannst du es direkt mit Directus verwenden, ohne zusätzliche Erweiterungen zu installieren.
+
+### Voraussetzungen {#prerequisites}
+
+Stelle sicher, dass du Directus Version 11.15.0 oder höher verwendest, da diese Version die Multi-Provider-KI-Unterstützung einschließlich OpenAI-kompatibler Endpunkte eingeführt hat.
+
+Falls du noch keinen API-Schlüssel hast, folge der [mittwald AI Hosting Zugangsanleitung](../access-and-usage/access), um einen über dein mStudio-Dashboard zu generieren.
+
+### Konfiguration {#configuration}
+
+Der KI-Assistent in Directus wird über die Admin-Einstellungsoberfläche konfiguriert. Navigiere zu **Einstellungen** → **AI** in deinem Directus-Admin-Panel, um die [OpenAI-kompatible Provider-Konfiguration](https://directus.io/docs/guides/ai/assistant/setup#openai-compatible-providers) aufzurufen.
+
+#### Schritt 1: Provider konfigurieren {#step-1-configure-provider}
+
+Konfiguriere in den KI-Einstellungen den OpenAI-kompatiblen Provider mit den folgenden Werten:
+
+- **Base URL**: Gib `https://llm.aihosting.mittwald.de/v1` ein
+- **API Key**: Gib deinen mittwald AI Hosting API-Schlüssel ein
+- **Model**: Gib die Modell-ID ein, die du verwenden möchtest, z.B. `ministral-3-14b-instruct-2512`
+
+Das System hängt automatisch `/chat/completions` an die Base URL an, wenn Anfragen gestellt werden. Füge dieses Pfadsegment daher nicht im Base URL-Feld ein.
+
+#### Schritt 2: KI-Assistenten aktivieren {#step-2-enable-assistant}
+
+Stelle nach der Konfiguration des Providers sicher, dass der KI-Assistent aktiviert ist. Wenn KI-Funktionen auf Systemebene über die Umgebungsvariable `AI_ENABLED` deaktiviert sind, wird die KI-Assistenten-Seitenleiste ausgeblendet und das Einstellungsformular zeigt einen Deaktiviert-Hinweis an.
+
+### Verfügbare Modelle {#available-models}
+
+Du kannst jedes chat-fähige Modell von mittwald AI Hosting mit Directus verwenden. Empfohlene Modelle sind:
+
+- `ministral-3-14b-instruct-2512` — Allzweckmodell mit Vision-Unterstützung
+- `devstral-small-2-24b-instruct-2512` — Optimiert für code-bezogene Aufgaben
+- `gpt-oss-120b` — Großes Modell für komplexe Reasoning-Aufgaben
+
+Eine vollständige Liste der verfügbaren Modelle und ihrer Funktionen findest du in der [Modellübersicht](../models/).
+
+### Nutzungslimits {#usage-limits}
+
+Der mittwald AI Hosting-Dienst hat Nutzungslimits basierend auf deiner Kontostufe. Details zu Rate Limits und Kontingenten findest du in den [Nutzungsbedingungen](../access-and-usage/terms-of-use).
