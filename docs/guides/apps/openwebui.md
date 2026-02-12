@@ -169,85 +169,10 @@ Alternatively, you can configure the connection after Open WebUI is running:
 5. Enter your API key from mittwald AI Hosting
 6. Save the configuration
 
-Open WebUI will automatically detect all available models from mittwald AI Hosting. You can now select these models in your conversations.
-
-### Optimizing Model Parameters
-
-For optimal results, you may need to adjust the default parameters for each model. You can modify these parameters in the **"Models"** section:
-
-1. Select the model you want to configure
-2. Under **"Advanced Params"**, apply the recommended parameters documented in the [models section](/docs/v2/platform/aihosting/models/), such as `top_p`, `top_k`, and `temperature`
+Open WebUI will automatically connect to mittwald AI Hosting and detect all available models.
 
 :::note
-We recommend hiding embedding models in the model selection, as they are automatically detected by Open WebUI but cannot be used for chat conversations.
-:::
-
-## Using Retrieval-Augmented Generation (RAG)
-
-Open WebUI offers the ability to store knowledge in the form of documents, which can be accessed as needed using retrieval-augmented generation (RAG).
-
-### Uploading Documents
-
-1. In the left menu bar, navigate to **"Workspace"**
-2. Select the **"Knowledge"** tab
-3. Upload documents that you want to make available
-4. In your chats, you can access these documents using a hashtag reference
-
-### Configuring an Embedding Model
-
-To enable more efficient document processing, you can configure an embedding model:
-
-1. In the Admin Panel under **"Settings"**, go to the **"Documents"** menu item
-2. In the **"Embedding"** section, select **"OpenAI"** in the dropdown menu as the embedding model engine
-3. Enter the endpoint: `https://llm.aihosting.mittwald.de/v1`
-4. Enter your mittwald AI Hosting API key
-5. Select one of the available [embedding models](/docs/v2/platform/aihosting/models/) (such as Qwen3-Embedding-8B)
-6. In the **"Retrieval"** section, adjust **"Top K"** and **"RAG Template"** for optimal results
-
-## Configuring Speech-to-Text
-
-Whisper-Large-V3-Turbo can be configured in Open WebUI for speech-to-text (STT) functionality. This model supports over 99 languages and is optimized for audio transcription.
-
-### Admin Panel Configuration
-
-In the Admin Panel under **"Settings"** > **"Audio"**, configure the following:
-
-- **Engine**: Select "OpenAI"
-- **API Base URL**: `https://llm.aihosting.mittwald.de/v1`
-- **API Key**: Enter your mittwald AI Hosting API key
-- **STT Model**: Enter the model name `whisper-large-v3-turbo`
-
-### Hiding Whisper from Chat Models
-
-Whisper will appear in the model list after connection, but it should be hidden from chat model selection since it's designed for audio transcription, not conversational AI:
-
-1. Navigate to **"Workspace"** > **"Models"**
-2. Select **Whisper-Large-V3-Turbo**
-3. Choose **"Hide"** to prevent it from appearing as a chat option
-
-### User Settings
-
-You can further specify how Open WebUI interacts with the Whisper model in the user settings (not Administrator panel) under **"Audio"**:
-
-- **Language**: Explicitly set the language code (e.g., "en" for English, "de" for German)
-- **Directly Send Speech**: Enable to send transcriptions directly without confirmation
-
-### Recommended Parameters
-
-For optimal transcription quality, configure these parameters in the admin panel or chat settings:
-
-- **Additional Parameters**: Set `temperature=1.0`, `top_p=1.0`
-
-### Testing Speech-to-Text
-
-To test the speech-to-text functionality:
-
-1. Click the microphone icon in a chat interface
-2. Speak in the configured language
-3. The transcription will use the `/v1/audio/transcriptions` endpoint with support for MP3, OGG, WAV, and FLAC formats (maximum 25 MB file size)
-
-:::note
-Always set the language parameter explicitly for best accuracy, especially for non-German audio inputs.
+For detailed information on using Open WebUI with mittwald AI Hosting, including model configuration, RAG setups, and speech-to-text functionality, see the [Open WebUI AI Hosting guide](/docs/v2/platform/aihosting/examples/openwebui).
 :::
 
 ## Operation
