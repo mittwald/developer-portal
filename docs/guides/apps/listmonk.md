@@ -30,6 +30,107 @@ You can create a PostgreSQL database using a separate container. For instruction
 
 We use the `listmonk/listmonk` image from [Docker Hub](https://hub.docker.com/r/listmonk/listmonk) for the container.
 
+### Using Terraform (Recommended)
+
+The most convenient way to provision a production-ready Listmonk instance is using [Terraform](/docs/v2/guides/deployment/terraform). The following example shows how you can deploy Listmonk along with a PostgreSQL database as a container stack:
+
+```hcl
+data "mittwald_container_image" "postgres" {
+  name = "postgres:17"
+}
+
+data "mittwald_container_image" "listmonk" {
+  name = "listmonk/listmonk:latest"
+}
+
+variable "project_id" {
+  type = string
+}
+
+variable "postgres_password" {
+  type      = string
+  sensitive = true
+}
+
+resource "mittwald_container_stack" "listmonk" {
+  project_id    = var.project_id
+  default_stack = true
+
+  containers = {
+    database = {
+      description = "PostgreSQL database for Listmonk"
+      image       = data.mittwald_container_image.postgres.name
+
+      entrypoint = data.mittwald_container_image.postgres.entrypoint
+      command    = data.mittwald_container_image.postgres.command
+
+      environment = {
+        POSTGRES_DB       = "listmonk"
+        POSTGRES_USER     = "listmonk"
+        POSTGRES_PASSWORD = var.postgres_password
+      }
+
+      volumes = [
+        {
+          volume     = "database"
+          mount_path = "/var/lib/postgresql/data"
+        }
+      ]
+
+      ports = [
+        {
+          container_port = 5432
+          protocol       = "tcp"
+        }
+      ]
+    }
+
+    listmonk = {
+      description = "Listmonk newsletter application"
+      image       = data.mittwald_container_image.listmonk.name
+
+      entrypoint = data.mittwald_container_image.listmonk.entrypoint
+      command    = data.mittwald_container_image.listmonk.command
+
+      environment = {
+        LISTMONK_app__address = "0.0.0.0:9000"
+        LISTMONK_db__host     = "database"
+        LISTMONK_db__port     = "5432"
+        LISTMONK_db__user     = "listmonk"
+        LISTMONK_db__password = var.postgres_password
+        LISTMONK_db__database = "listmonk"
+      }
+
+      volumes = [
+        {
+          volume     = "uploads"
+          mount_path = "/listmonk/uploads"
+        }
+      ]
+
+      ports = [
+        {
+          container_port = 9000
+          public_port    = 9000
+          protocol       = "tcp"
+        }
+      ]
+    }
+  }
+
+  volumes = {
+    database = {}
+    uploads  = {}
+  }
+}
+```
+
+:::note
+
+For the initial installation, Listmonk must be initialized with `./listmonk --install --yes`. This can be done manually after deployment via the container console or by temporarily changing the `command` field.
+
+:::
+
 ### Using the mStudio UI
 
 In mStudio, go to your project and select **"Create container"**. A guided dialog will open to assist you with the container setup.
