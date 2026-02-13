@@ -1,0 +1,186 @@
+---
+sidebar_label: Open WebUI
+description: Learn how to set up and run Open WebUI in a containerized environment
+---
+
+# Running Open WebUI
+
+## Introduction
+
+> Open WebUI is an extensible, feature-rich, and user-friendly self-hosted WebUI designed to operate entirely offline. It supports various LLM runners, including Ollama and OpenAI-compatible APIs.
+> – [Open WebUI GitHub](https://github.com/open-webui/open-webui)
+
+Open WebUI can be used as a ChatGPT-like interface within mittwald's container hosting. It can be automatically installed and configured when an API key is created for [mittwald AI Hosting](/docs/v2/platform/aihosting/) if your hosting product supports containers.
+
+## Prerequisites
+
+- Access to a mittwald mStudio project
+- A hosting plan that supports [containerized workloads](/docs/v2/platform/workloads/containers)
+- (Optional) A [mittwald AI Hosting API key](/docs/v2/platform/aihosting/access-and-usage/access) for connecting to hosted AI models
+
+## How do I start the container?
+
+We use the `ghcr.io/open-webui/open-webui:main` image from [GitHub Container Registry](https://github.com/open-webui/open-webui/pkgs/container/open-webui) for the container.
+
+### Using the mStudio UI
+
+In mStudio, go to your project and select **"Create container"**. A guided dialog will open to assist you with the container setup.
+
+First, enter a description – this is a free text field used to identify the container. For example, enter **"Open WebUI"** and click **"Next"**.
+
+Next, you'll be asked for the image name. Enter `ghcr.io/open-webui/open-webui:main` and confirm with **"Next"**.
+
+#### Entrypoint and Command
+
+- **Entrypoint:** No changes required
+- **Command:** No changes required
+
+#### Volumes
+
+For persistent data storage, configure the following volume:
+
+- `/app/backend/data` - This volume stores all Open WebUI data including conversations, configurations, and uploaded documents.
+
+:::note
+You can add new volumes via the mStudio UI. The path above should be set as a mount point.
+:::
+
+#### Environment Variables
+
+Open WebUI can be configured with various environment variables. For basic operation, no environment variables are strictly required, but you may want to configure some settings:
+
+```
+# Optional: Custom port (default is 8080)
+PORT=8080
+
+# Optional: WebUI name
+WEBUI_NAME=mittwald AI Chat
+
+# Optional: Disable signup for new users
+ENABLE_SIGNUP=false
+```
+
+Once you've entered all the environment variables, click **"Next"**. In the final dialog, you'll be asked for the **port** – enter `8080`. Click **"Create container"** to create and start the container.
+
+### Alternative: Using the `mw container run` command
+
+You can also use the `mw container run` command to directly create and start an Open WebUI container from the command line. This approach is similar to using the Docker CLI and allows you to specify all container parameters in a single command.
+
+```shellsession
+user@local $ mw container run \
+  --name openwebui \
+  --description "Open WebUI - AI Chat Interface" \
+  --publish 8080:8080 \
+  --volume "openwebui-data:/app/backend/data" \
+  --create-volumes \
+  ghcr.io/open-webui/open-webui:main
+```
+
+After creating the container, you'll still need to assign a domain to it.
+
+### Alternative: Using the `mw stack deploy` command
+
+Alternatively, you can use the `mw stack deploy` command, which is compatible with Docker Compose. This approach allows you to define your container configuration in a YAML file and deploy it with a single command.
+
+First, create a `docker-compose.yml` file with the following content:
+
+```yaml
+services:
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    ports:
+      - "8080:8080"
+    volumes:
+      - "openwebui-data:/app/backend/data"
+    environment:
+      PORT: "8080"
+      WEBUI_NAME: "mittwald AI Chat"
+volumes:
+  openwebui-data: {}
+```
+
+Then, deploy the container using the `mw stack deploy` command:
+
+```shellsession
+user@local $ mw stack deploy
+```
+
+This command will read the `docker-compose.yml` file from the current directory and deploy it to your default stack.
+
+## Connecting to mittwald AI Hosting
+
+If you have a [mittwald AI Hosting](/docs/v2/platform/aihosting/) API key, you can connect Open WebUI to use the hosted AI models.
+
+### Using Environment Variables (Recommended)
+
+The recommended way to connect Open WebUI to mittwald AI Hosting is by setting environment variables during container creation. Add the following environment variables:
+
+```
+OPENAI_API_BASE_URL=https://llm.aihosting.mittwald.de/v1
+OPENAI_API_KEY=your_api_key_here
+```
+
+When using the mStudio UI, add these variables in the environment variables section during container setup. For CLI deployments, include them in your `mw container run` command or `docker-compose.yml` file:
+
+```shellsession
+user@local $ mw container run \
+  --name openwebui \
+  --description "Open WebUI - AI Chat Interface" \
+  --publish 8080:8080 \
+  --env "OPENAI_API_BASE_URL=https://llm.aihosting.mittwald.de/v1" \
+  --env "OPENAI_API_KEY=your_api_key_here" \
+  --volume "openwebui-data:/app/backend/data" \
+  --create-volumes \
+  ghcr.io/open-webui/open-webui:main
+```
+
+Or in your `docker-compose.yml`:
+
+```yaml
+services:
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    ports:
+      - "8080:8080"
+    volumes:
+      - "openwebui-data:/app/backend/data"
+    environment:
+      PORT: "8080"
+      WEBUI_NAME: "mittwald AI Chat"
+      OPENAI_API_BASE_URL: "https://llm.aihosting.mittwald.de/v1"
+      OPENAI_API_KEY: "your_api_key_here"
+volumes:
+  openwebui-data: {}
+```
+
+With this configuration, Open WebUI will automatically connect to mittwald AI Hosting on startup and detect all available models.
+
+### Using the Admin Panel
+
+Alternatively, you can configure the connection after Open WebUI is running:
+
+1. Open the Open WebUI admin panel by clicking on your profile icon
+2. Navigate to **"Settings"** and choose **"Connections"**
+3. In the **"OpenAI API"** section, add a new connection
+4. Enter the base URL: `https://llm.aihosting.mittwald.de/v1`
+5. Enter your API key from mittwald AI Hosting
+6. Save the configuration
+
+Open WebUI will automatically connect to mittwald AI Hosting and detect all available models.
+
+:::note
+For detailed information on using Open WebUI with mittwald AI Hosting, including model configuration, RAG setups, and speech-to-text functionality, see the [Open WebUI AI Hosting guide](/docs/v2/platform/aihosting/examples/openwebui).
+:::
+
+## Operation
+
+To make your Open WebUI instance reachable from the public internet, it needs to be connected to a domain. After that, you can access Open WebUI via `https://<your-domain>/`.
+
+As part of the project backup, the data from your volumes is secured and can be restored if needed.
+
+## Further Resources
+
+- [Open WebUI GitHub Repository](https://github.com/open-webui/open-webui)
+- [Open WebUI Documentation](https://docs.openwebui.com/)
+- [mittwald AI Hosting Documentation](/docs/v2/platform/aihosting/)
+- [Container Workloads Documentation](/docs/v2/platform/workloads/containers)
