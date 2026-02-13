@@ -1,0 +1,50 @@
+---
+sidebar_label: Drupal CMS
+description: Erfahre, wie du den mittwald AI Provider mit Drupal AI verwendest
+title: Drupal CMS
+---
+
+## Den mittwald AI Provider für Drupal verwenden {#using-mittwald-ai-provider}
+
+Die mittwald AI Provider-Integration bringt leistungsstarke KI-Funktionen direkt in dein Drupal CMS. Dieses Modul ermöglicht es dir, die KI-Modelle von mittwald für verschiedene Aufgaben wie Textübersetzung, Chat-Schnittstellen, Bildverarbeitung und Embedding-Generierung zu nutzen. Das offizielle Modul findest du auf der [Drupal-Projektseite](https://www.drupal.org/project/ai_provider_mittwald).
+
+### Installation {#installation}
+
+Um mit dem mittwald AI Provider zu beginnen, musst du das Modul mit Composer installieren und über Drush aktivieren. Dies erfordert eine aktive Drupal-Installation mit Composer-Unterstützung.
+
+Führe die folgenden Befehle in deinem Drupal-Projektverzeichnis aus:
+
+```shellsession
+user@ssh $ composer require drupal/ai_provider_mittwald
+user@ssh $ drush en ai_provider_mittwald
+```
+
+Der erste Befehl lädt das mittwald AI Provider-Modul und seine Abhängigkeiten herunter, während der zweite Befehl das Modul in deiner Drupal-Installation aktiviert. Alternativ kannst du das Modul auch über die Drupal-Administrationsoberfläche unter **Erweitern** aktivieren.
+
+### Konfiguration {#configuration}
+
+Nach der Installation des Moduls musst du es mit deinem mittwald AI Hosting API-Schlüssel konfigurieren. Der Konfigurationsprozess umfasst drei Hauptschritte: Einrichtung der sicheren Schlüsselspeicherung, Konfiguration der Provider-Authentifizierung und Auswahl von mittwald als Standard-KI-Provider.
+
+#### Schritt 1: API-Schlüssel sicher speichern {#step-1-store-api-key}
+
+Navigiere zu **Konfiguration** -> **System** -> **Schlüssel** in deiner Drupal-Administrationsoberfläche. Klicke auf **Schlüssel hinzufügen**, um einen neuen Schlüsseleintrag zu erstellen. Gib deinem Schlüssel einen beschreibenden Namen (z.B. „mittwald AI API-Schlüssel") und füge deinen mittwald AI Hosting API-Schlüssel in das Schlüsselwert-Feld ein. Dieser Ansatz stellt sicher, dass deine API-Zugangsdaten sicher gespeichert und zentral verwaltet werden können.
+
+Falls du noch keinen API-Schlüssel hast, kannst du einen über dein mittwald-Konto-Dashboard im Bereich AI Hosting generieren.
+
+#### Schritt 2: Provider-Authentifizierung konfigurieren {#step-2-configure-authentication}
+
+Als Nächstes verbindest du den gespeicherten API-Schlüssel mit dem mittwald AI Provider. Gehe zu **Konfiguration** -> **AI** -> **Provider-Einstellungen** und suche den Bereich **mittwald-Authentifizierung**. Wähle im Dropdown-Feld **mittwald API-Schlüssel** den Schlüssel aus, den du im vorherigen Schritt erstellt hast. Speichere die Konfiguration, um die Verbindung zwischen deiner Drupal-Website und den mittwald AI-Diensten herzustellen.
+
+#### Schritt 3: mittwald als Standard-Provider festlegen {#step-3-set-default-provider}
+
+Konfiguriere abschließend, welche KI-Funktionen standardmäßig den mittwald-Provider verwenden sollen. Navigiere zu **Konfiguration** -> **AI** -> **AI-Standardeinstellungen**. Hier kannst du **mittwald** als Standard-Provider für mehrere KI-Funktionen auswählen:
+
+- **Text übersetzen**: Aktiviere KI-gestützte Übersetzungsfunktionen für deine Drupal-Inhalte
+- **Chat**: Richte konversationelle KI-Schnittstellen ein, einschließlich erweiterter Funktionen wie Image Vision und Tool Calling-Unterstützung
+- **Embeddings**: Generiere Vektor-Embeddings für semantische Suche und Inhaltsempfehlungen
+
+Durch die Festlegung von mittwald als Standard-Provider werden alle KI-gestützten Funktionen in deiner Drupal-Installation automatisch die KI-Modelle von mittwald verwenden, sofern du für bestimmte Anwendungsfälle nichts anderes festlegst.
+
+## Vektordatenbanken verwenden {#vector-databases}
+
+Die Unterstützung für Vektordatenbanken befindet sich derzeit in der Entwicklung und wird zu einem späteren Zeitpunkt verfügbar sein. Vektordatenbanken ermöglichen erweiterte semantische Suchfunktionen und Inhaltsempfehlungen durch effizientes Speichern und Abfragen von KI-generierten Embeddings.

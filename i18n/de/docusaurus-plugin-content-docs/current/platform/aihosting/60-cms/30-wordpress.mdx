@@ -1,0 +1,82 @@
+---
+sidebar_label: WordPress
+description: Erfahre, wie du den mittwald AI Provider mit WordPress AI Experiments verwendest
+title: WordPress
+---
+
+## Den mittwald AI Provider für WordPress verwenden {#using-mittwald-ai-provider}
+
+Das mittwald AI Provider-Plugin ermöglicht die Integration zwischen [WordPress AI Experiments](https://wordpress.org/plugins/ai/) und mittwald AI Hosting. Dies erlaubt es dir, die KI-Modelle von mittwald direkt im WordPress-Editor für Content-Generierungsaufgaben wie das Erstellen von Titeln, Auszügen und Alt-Texten zu nutzen. Das offizielle Plugin findest du im [WordPress-Plugin-Verzeichnis](https://wordpress.org/plugins/mittwald-ai-provider).
+
+### Voraussetzungen {#prerequisites}
+
+Vor der Installation des mittwald AI Providers musst du das WordPress AI Experiments-Plugin installiert und aktiviert haben. Dieses Basis-Plugin stellt das KI-Framework bereit, das der mittwald-Provider mit mittwald-gehosteten Modellen erweitert.
+
+Das AI Experiments-Plugin erfordert WordPress 6.9 oder höher und PHP 7.4 oder höher. Es bringt experimentelle KI-gestützte Funktionen in die WordPress-Bearbeitungsoberfläche, einschließlich Titelgenerierung, Auszugserstellung und Alt-Text-Vorschläge.
+
+### Installation {#installation}
+
+Der Installationsprozess umfasst zwei Plugins: zuerst das AI Experiments-Basis-Plugin, dann den mittwald AI Provider.
+
+#### Schritt 1: AI Experiments-Plugin installieren {#step-1-install-ai-experiments}
+
+Navigiere zu **Plugins** -> **Installieren** in deiner WordPress-Administrationsoberfläche und suche nach „AI Experiments". Installiere und aktiviere das Plugin.
+
+Alternativ kannst du WP-CLI verwenden, um das Plugin über die Kommandozeile zu installieren und zu aktivieren:
+
+```shellsession
+user@ssh $ wp plugin install ai --activate
+```
+
+#### Schritt 2: mittwald AI Provider installieren {#step-2-install-mittwald-provider}
+
+Mit aktiviertem AI Experiments-Plugin installierst du den mittwald AI Provider. Navigiere in deiner WordPress-Administration zu **Plugins** -> **Installieren** und suche nach „mittwald AI provider". Installiere und aktiviere das Plugin, um mittwald AI Hosting als Provider-Option zu aktivieren.
+
+Mit WP-CLI kannst du dies folgendermaßen erreichen:
+
+```shellsession
+user@ssh $ wp plugin install mittwald-ai-provider --activate
+```
+
+### Konfiguration {#configuration}
+
+Sobald beide Plugins installiert sind, musst du deine mittwald-API-Zugangsdaten konfigurieren und die gewünschten KI-Experimente aktivieren.
+
+#### Schritt 1: API-Schlüssel beschaffen {#step-1-obtain-api-key}
+
+Falls du noch keinen API-Schlüssel hast, folge der [mittwald AI Hosting Zugangsanleitung](../../access-and-usage/access), um einen über dein mStudio-Dashboard zu generieren.
+
+#### Schritt 2: API-Zugangsdaten speichern {#step-2-store-credentials}
+
+Navigiere zu **Einstellungen** -> **AI Credentials** in deiner WordPress-Administrationsoberfläche. Gib deinen mittwald AI Hosting API-Schlüssel in das entsprechende Feld ein und speichere deine Einstellungen. Dies stellt die Verbindung zwischen deiner WordPress-Website und den mittwald AI-Diensten her.
+
+#### Schritt 3: KI-Experimente aktivieren {#step-3-enable-experiments}
+
+Navigiere zu **Einstellungen** -> **AI Experiments** und klicke auf die Schaltfläche, um Experimente global zu aktivieren. Anschließend kannst du einzelne Experimente je nach gewünschten Funktionen ein- oder ausschalten. Verfügbare Experimente umfassen:
+
+- **Titelgenerierung**: Generiere Titelvorschläge mit einem einzigen Klick im Beitragseditor
+- **Auszugsgenerierung**: Erstelle automatisch prägnante Zusammenfassungen für deine Beiträge
+- **Inhaltszusammenfassung**: Fasse lange Inhalte in übersichtliche Übersichten zusammen
+- **Alt-Text-Generierung**: Generiere beschreibende Alt-Texte für Bilder zur Verbesserung der Barrierefreiheit
+
+Speichere deine Einstellungen nach dem Aktivieren der gewünschten Experimente.
+
+### KI-Funktionen verwenden {#using-ai-features}
+
+Alle KI-Funktionen in WordPress sind Opt-in und erfordern manuelle Auslösung. Nichts geschieht automatisch ohne deine ausdrückliche Aktion.
+
+Beim Bearbeiten eines Beitrags findest du KI-gestützte Schaltflächen an relevanten Stellen im Editor. Beispielsweise erhält das Titelfeld eine „Generieren"-Schaltfläche, die ein Modal mit KI-generierten Titelvorschlägen öffnet. Die Beitrags-Seitenleiste enthält eine „Auszug generieren"-Schaltfläche für die automatische Zusammenfassungserstellung. Bildblöcke zeigen eine „Alt-Text generieren"-Option zur Erstellung barrierefreier Beschreibungen.
+
+### Unterstützte Modelle und Funktionen {#supported-models}
+
+Der mittwald AI Provider unterstützt Chat-Completions mit mehreren für unterschiedliche Aufgaben optimierten Modellen:
+
+- **GPT-OSS-Modelle**: Open-Source GPT-kompatible Modelle für allgemeine Content-Generierung
+- **Ministral**: Unterstützt Vision- und Bildeingabe-Funktionen
+- **Devstral**: Optimiert für Code-Generierungsaufgaben
+
+Diese Modelle unterstützen Standard-Textgenerierung, JSON-Ausgabeformatierung, Tool Calling und Streaming-Antworten. Die Ministral-Modelle unterstützen zusätzlich Bildverarbeitungsfunktionen zur Analyse und Beschreibung von Bildern.
+
+### Nutzungslimits {#usage-limits}
+
+Der mittwald AI Hosting-Dienst hat Nutzungslimits basierend auf deiner Kontostufe. Details zu Rate Limits und Kontingenten findest du in den [Nutzungsbedingungen](../../access-and-usage/terms-of-use).

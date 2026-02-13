@@ -1,0 +1,82 @@
+---
+sidebar_label: WordPress
+description: Learn how to use the mittwald AI provider with WordPress AI Experiments
+title: WordPress
+---
+
+## Using the mittwald AI provider for WordPress {#using-mittwald-ai-provider}
+
+The mittwald AI provider plugin enables integration between [WordPress AI Experiments](https://wordpress.org/plugins/ai/) and mittwald AI Hosting. This allows you to leverage mittwald's AI models directly within the WordPress editor for content generation tasks such as generating titles, excerpts, and alt texts. You can find the official plugin on the [WordPress plugin directory](https://wordpress.org/plugins/mittwald-ai-provider).
+
+### Prerequisites {#prerequisites}
+
+Before installing the mittwald AI provider, you need to have the WordPress AI Experiments plugin installed and activated. This base plugin provides the AI framework that the mittwald provider extends with mittwald-hosted models.
+
+The AI Experiments plugin requires WordPress 6.9 or higher and PHP 7.4 or higher. It brings experimental AI-powered features into the WordPress editing experience, including title generation, excerpt creation, and alt text suggestions.
+
+### Installation {#installation}
+
+The installation process involves two plugins: first the AI Experiments base plugin, then the mittwald AI provider.
+
+#### Step 1: Install the AI Experiments plugin {#step-1-install-ai-experiments}
+
+Navigate to **Plugins** -> **Add New** in your WordPress admin interface and search for "AI Experiments". Install and activate the plugin.
+
+Alternatively, you can use WP-CLI to install and activate the plugin from the command line:
+
+```shellsession
+user@ssh $ wp plugin install ai --activate
+```
+
+#### Step 2: Install the mittwald AI provider {#step-2-install-mittwald-provider}
+
+With the AI Experiments plugin active, install the mittwald AI provider. In your WordPress admin, navigate to **Plugins** -> **Add New** and search for "mittwald AI provider". Install and activate the plugin to enable mittwald AI Hosting as a provider option.
+
+Using WP-CLI, you can accomplish this with:
+
+```shellsession
+user@ssh $ wp plugin install mittwald-ai-provider --activate
+```
+
+### Configuration {#configuration}
+
+Once both plugins are installed, you'll need to configure your mittwald API credentials and enable the AI experiments you want to use.
+
+#### Step 1: Obtain your API key {#step-1-obtain-api-key}
+
+If you don't have an API key yet, follow the [mittwald AI Hosting access guide](../../access-and-usage/access) to generate one through your mStudio dashboard.
+
+#### Step 2: Store your API credentials {#step-2-store-credentials}
+
+Navigate to **Settings** -> **AI Credentials** in your WordPress admin interface. Enter your mittwald AI Hosting API key in the appropriate field and save your settings. This establishes the connection between your WordPress site and mittwald's AI services.
+
+#### Step 3: Enable AI experiments {#step-3-enable-experiments}
+
+Navigate to **Settings** -> **AI Experiments** and click the button to enable experiments globally. You can then toggle individual experiments based on which features you want to use. Available experiments include:
+
+- **Title Generation**: Generate title suggestions with a single click in the post editor
+- **Excerpt Generation**: Automatically create concise summaries for your posts
+- **Content Summarization**: Summarize long-form content into digestible overviews
+- **Alt Text Generation**: Generate descriptive alt text for images to improve accessibility
+
+Save your settings after enabling the desired experiments.
+
+### Using AI features {#using-ai-features}
+
+All AI features in WordPress are opt-in and require manual triggering. Nothing happens automatically without your explicit action.
+
+When editing a post, you'll find AI-powered buttons in relevant locations throughout the editor. For example, the title field gains a "Generate" button that opens a modal with AI-generated title suggestions. The post sidebar includes a "Generate Excerpt" button for automatic summary creation. Image blocks display a "Generate Alt Text" option to create accessibility-friendly descriptions.
+
+### Supported models and capabilities {#supported-models}
+
+The mittwald AI provider supports chat completions with several models optimized for different tasks:
+
+- **GPT-OSS models**: Open-source GPT-compatible models for general content generation
+- **Ministral**: Supports vision and image input capabilities
+- **Devstral**: Optimized for code generation tasks
+
+These models support standard text generation, JSON output formatting, tool calling, and streaming responses. The Ministral models additionally support image vision capabilities for analyzing and describing images.
+
+### Usage limits {#usage-limits}
+
+The mittwald AI Hosting service has usage limits based on your account tier. For details on rate limits and quotas, refer to the [terms of use](../../access-and-usage/terms-of-use).
