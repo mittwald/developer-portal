@@ -1,0 +1,170 @@
+---
+title: MariaDB
+sidebar_position: 15
+description: |
+  MariaDB ist ein freies, quelloffenes relationales Datenbankmanagementsystem. Starte und betreibe eine MariaDB-Datenbank containerisiert in deinem Projekt.
+---
+
+import TerraformExample from "@site/docs/platform/databases/examples/_mariadb-terraform.md";
+import TerraformExampleGeneratedPassword from "@site/docs/platform/databases/examples/_mariadb-terraform-pwdgen.md";
+import TerraformResourceHint from "@site/src/components/TerraformResourceHint";
+import PlanCompatibility from "@site/src/components/PlanCompatibility";
+
+<PlanCompatibility features={["container"]} />
+
+## Was ist MariaDB? {#what-is-mariadb}
+
+MariaDB ist ein freies, quelloffenes Datenbankmanagementsystem (DBMS), das ursprünglich als Fork von MySQL entstanden ist. Es wurde von den ursprünglichen Entwicklern von MySQL gegründet, nachdem Oracle MySQL übernommen hatte. Ziel war es, eine vollständig offene Alternative zu MySQL bereitzustellen.
+
+MariaDB ist so konzipiert, dass es hochgradig kompatibel mit MySQL ist und gleichzeitig zusätzliche Funktionen, Leistungsverbesserungen und ein Bekenntnis zu Open Source bietet. Es wird häufig für Webanwendungen, Data Warehousing und Unternehmensanwendungen eingesetzt.
+
+## Eine MariaDB-Datenbank erstellen {#creating-mariadb-database}
+
+Du kannst eine MariaDB-Datenbank in deiner mittwald Hosting-Umgebung mit [Containern](../../workloads/containers) bereitstellen. Es gibt verschiedene Hauptansätze:
+
+### Verwendung von Terraform (Empfohlen) {#using-terraform}
+
+Der bequemste Weg, eine MariaDB-Datenbank bereitzustellen, ist die Verwendung von [Terraform](/docs/v2/guides/deployment/terraform). Das folgende Beispiel zeigt, wie du einen MariaDB-Container in deinem eigenen Terraform-Deployment verwenden kannst:
+
+<TerraformExample />
+
+Du kannst auch die `random_password`-Ressource verwenden, um ein Passwort dynamisch zu generieren. Beachte, dass du in diesem Fall das Passwort auch sicher in einem Secret Manager speichern solltest, da es danach nicht mehr abrufbar ist.
+
+<TerraformExampleGeneratedPassword />
+
+Nach dem Erstellen der Ressource kannst du innerhalb deiner Hosting-Umgebung über die URL `mysql://mariadb:3306` auf die MariaDB-Datenbank zugreifen.
+
+<TerraformResourceHint resource="container_stack" />
+
+### Verwendung der mStudio-Benutzeroberfläche {#using-mstudio-ui}
+
+Alternativ kannst du einen MariaDB-Container manuell einrichten:
+
+1. Gehe in deinem Projekt in mStudio auf den **Container**-Menüpunkt und erstelle einen neuen Container. Du kannst einen beliebigen Namen wählen.
+
+2. Gib das Image `mariadb:lts-ubi9` ein. Du kannst den Entrypoint und das Command wie vorgeschlagen beibehalten.
+
+#### Volumes {#volumes}
+
+Um die Daten deiner MariaDB-Datenbank persistent zu speichern, definiere Volumes unter **Volumes** wie folgt:
+
+- Neues Volume erstellen, auf **Pfad im Container** (Mount Point): `/var/lib/mysql` (Speichert die Nutzdaten der Datenbank)
+- Pfad im Projekt `/files/mariadb-backups`, auf **Pfad im Container** (Mount Point): `/mnt` (Dieser Pfad dient dazu, Datenbank-Dumps oder Backups zu speichern)
+
+#### Umgebungsvariablen {#environment-variables}
+
+Setze die folgenden Umgebungsvariablen für den Container:
+
+```dotenv
+MARIADB_ROOT_PASSWORD=my_root_password
+MARIADB_DATABASE=mydatabase
+MARIADB_USER=myuser
+MARIADB_PASSWORD=mypassword
+```
+
+:::caution
+
+Denke daran, die Standard-Zugangsdaten in diesen Umgebungsvariablen durch sichere Werte zu ersetzen!
+
+:::
+
+#### Ports {#ports}
+
+Übernehme den vorgeschlagenen Standardport `3306`.
+
+### Verwendung der CLI mit `mw container run` {#using-cli-container-run}
+
+Du kannst auch einen MariaDB-Container mit der mittwald CLI und dem Befehl `mw container run` bereitstellen:
+
+```shellsession
+user@local $ mw container run \
+  --name mariadb \
+  --env MARIADB_ROOT_PASSWORD=my_root_password \
+  --env MARIADB_DATABASE=mydatabase \
+  --env MARIADB_USER=myuser \
+  --env MARIADB_PASSWORD=mypassword \
+  --volume mariadb-data:/var/lib/mysql \
+  --volume /files/mariadb-backups:/mnt \
+  --publish 3306:3306/tcp \
+  --create-volumes \
+  mariadb:lts-ubi9
+```
+
+Dieser Befehl erstellt einen neuen Container namens "mariadb" mit dem MariaDB-Image, setzt alle notwendigen Umgebungsvariablen und mountet Volumes für die persistente Datenspeicherung.
+
+### Verwendung der CLI mit `mw stack deploy` {#using-cli-stack-deploy}
+
+Wenn du Docker Compose bevorzugst, kannst du eine `docker-compose.yml`-Datei erstellen und sie mit dem Befehl `mw stack deploy` deployen:
+
+1. Erstelle eine `docker-compose.yml`-Datei mit folgendem Inhalt:
+
+   ```yaml
+   services:
+     mariadb:
+       image: mariadb:lts-ubi9
+       environment:
+         - MARIADB_ROOT_PASSWORD=my_root_password
+         - MARIADB_DATABASE=mydatabase
+         - MARIADB_USER=myuser
+         - MARIADB_PASSWORD=mypassword
+       ports:
+         - "3306:3306"
+       volumes:
+         - mariadb_data:/var/lib/mysql
+         - /files/mariadb-backups:/mnt
+   volumes:
+     mariadb_data:
+   ```
+
+2. Deploye den Stack mit der CLI:
+
+   ```shellsession
+   user@local $ mw stack deploy
+   ```
+
+Dieser Ansatz ist besonders nützlich, wenn du mehrere Container deployen möchtest, die zusammenarbeiten.
+
+### Zugriff auf deinen Container innerhalb deiner Hosting-Umgebung {#accessing-container}
+
+Sobald der Container läuft, kannst du überprüfen, ob die MariaDB-Instanz verfügbar ist. Es gibt zwei Möglichkeiten dafür:
+
+#### Option 1: Direkter Zugriff über Container-Shell {#direct-access-container-shell}
+
+```shellsession
+user@local $ mw container ssh mariadb
+user@mariadb $ mysql -umyuser -p -hlocalhost mydatabase
+```
+
+#### Option 2: Port-Weiterleitung für lokalen Zugriff {#port-forwarding-local-access}
+
+```shellsession
+user@local $ mw container port-forward mariadb 3306:3306
+```
+
+In einem separaten Terminal kannst du dann lokal eine Verbindung herstellen:
+
+```shellsession
+user@local $ mysql -umyuser -P 3306 -p -hlocalhost mydatabase
+```
+
+Bei beiden Optionen solltest du zur MariaDB-Befehlszeile weitergeleitet werden, in der du SQL-Befehle ausführen kannst.
+
+## Betrieb {#operations}
+
+Deine MariaDB-Daten werden im Rahmen des regelmäßigen Projektbackups gesichert. Für Datenbanken wird jedoch **dringend empfohlen**, zusätzlich eigene Dumps zu erstellen, um Konsistenz und Wiederherstellbarkeit sicherzustellen.
+
+Ein Dump kann direkt im Container erstellt werden. Beispielbefehl für ein manuelles Backup:
+
+```shellsession
+user@local $ mw container exec mariadb "mysqldump --column-statistics=0 --opt --no-tablespaces -u'myuser' -p'mypassword' 'mydatabase' > /mnt/mydatabase.sql"
+```
+
+Die Backup-Datei wird dann im Projekt unter `/files/mariadb-backups/` verfügbar sein.
+
+Automatisierungen sind über Cronjobs problemlos möglich.
+
+## Weitere Ressourcen {#further-resources}
+
+- [Offizielle MariaDB-Dokumentation](https://mariadb.com/kb/en/documentation/)
+- [MariaDB Docker Hub](https://hub.docker.com/_/mariadb)
+- [Container Workloads Dokumentation](/docs/v2/platform/workloads/containers)

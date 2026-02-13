@@ -177,6 +177,7 @@ DB_PORT=3306
 - Use placeholder values that are clearly recognizable (e.g., `your_secret_password`, `XXXXXX`)
 - Group related variables with comments
 - Document which variables are required vs optional
+- Use a `:::caution` callout to make users aware of default credentials that *MUST* be replaced with a user-provided value.
 
 ## CLI Command Examples
 
