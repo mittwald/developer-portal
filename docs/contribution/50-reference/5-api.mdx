@@ -15,7 +15,7 @@ Note, that the mStudio API is only accessible via an external **backend** becaus
 
 ## Authenticating with the Extension Instance Secret
 
-Every Extension receives an Extension secret via lifecycle webhooks.
+Every Extension receives an Extension Instance Secret via lifecycle webhooks.
 The Extension can then use this secret to authenticate against the mStudio API.
 Initially, the mStudio transmits the secret via the `ExtensionAddedToContext` webhook.
 Periodically, it rotates the secret and then sends the new secret via the `ExtensionsInstanceSecretRotated` webhook.
@@ -33,6 +33,17 @@ Additionally, it returns an `expiry` property, which defines the date the token 
 An Extension access token is short-lived and cannot be extended.
 If a token expires, you have to request a new token.
 When an Extension is removed from a context or an Extension Instance is deactivated, all access tokens are invalidated automatically.
+
+Additionally, the access token is not bound to a user.
+It only authorizes the Extension to access resources of the Extension Context.
+
+:::warning Limitations of user-unbound access tokens
+The mStudio API offers GET routes that return all resources of a certain entity that a user has access to.
+For example, <OperationLink operation="project-list-projects" /> returns a list of all projects a user has access to.
+
+These types of routes do not work with user-unbound access tokens, as they do not authenticate an mStudio user,
+but only authorize access to resources of the Extension Context.
+:::
 
 ## OAuth2
 
