@@ -1,0 +1,258 @@
+---
+sidebar_label: Listmonk
+description: Learn how to set up and run Listmonk in a containerized environment
+---
+
+# Running Listmonk
+
+## Introduction
+
+Listmonk is a self-hosted newsletter and mailing list manager. It is a standalone, self-contained application that you can deploy on your own server. It offers a modern web interface for managing subscribers, creating campaigns, and tracking metrics. Listmonk is designed to be fast, efficient, and feature-rich, making it an excellent open-source alternative to commercial email marketing platforms.
+
+> listmonk is a standalone, self-hosted, newsletter and mailing list manager. It is fast, feature-rich and packed into a single binary. It uses a PostgreSQL (⩾ v12) database as its data store.  
+> – [Listmonk Documentation](https://listmonk.app/docs/)
+
+## Prerequisites
+
+To run Listmonk, you will need:
+
+- Access to a mittwald mStudio project
+- A hosting plan that supports [containerized workloads](/docs/v2/platform/workloads/containers)
+- A PostgreSQL database (version 12 or higher)
+
+:::note
+
+You can create a PostgreSQL database using a separate container. For instructions on setting up PostgreSQL in a container, refer to the [PostgreSQL guide](./postgresql).
+
+:::
+
+## How do I start the container?
+
+We use the `listmonk/listmonk` image from [Docker Hub](https://hub.docker.com/r/listmonk/listmonk) for the container.
+
+### Using the mStudio UI
+
+In mStudio, go to your project and select **"Create container"**. A guided dialog will open to assist you with the container setup.
+
+First, enter a description – this is a free text field used to identify the container. For example, enter **"Listmonk"** and click **"Next"**.
+
+Next, you'll be asked for the image name. Enter `listmonk/listmonk` and confirm with **"Next"**.
+
+#### Entrypoint and Command {#ui-entrypoint-and-command}
+
+For the initial installation, Listmonk needs to initialize the database schema:
+
+- **Entrypoint:** No changes required
+- **Command:** Select **"Custom"** and enter `./listmonk --install --yes`
+
+:::note
+
+This command will create the necessary database tables and prepare Listmonk for first use. After the initial installation is complete, you will need to change the command back to the default (`./listmonk`) and restart the container.
+
+:::
+
+#### Volumes {#ui-volumes}
+
+To persist uploaded files and media, add a volume:
+
+- **Path in container:** `/listmonk/uploads`
+
+:::caution
+
+Without this volume, any files uploaded through Listmonk (such as images for campaigns) will be lost when the container is recreated or restarted.
+
+:::
+
+#### Environment Variables {#ui-environment-variables}
+
+Configure Listmonk to connect to your PostgreSQL database. Click on **"Text input"** and enter the following environment variables:
+
+```
+# Application settings
+LISTMONK_app__address=0.0.0.0:9000
+
+# Database configuration
+LISTMONK_db__host=<DB_HOST>
+LISTMONK_db__port=5432
+LISTMONK_db__user=<DB_USER>
+LISTMONK_db__password=<DB_PASSWORD>
+LISTMONK_db__database=<DB_NAME>
+```
+
+Replace the placeholders (`<DB_HOST>`, `<DB_USER>`, `<DB_PASSWORD>`, `<DB_NAME>`) with your PostgreSQL database connection details.
+
+:::caution
+
+Make sure to use a secure password for your database connection. The database password will be stored in plain text in the container configuration.
+
+:::
+
+Once you've entered all the environment variables, click **"Next"**. In the final dialog, you'll be asked for the **port** – you can leave this unchanged at `9000`. Click **"Create container"** to create and start the container.
+
+#### Post-Installation Steps {#ui-post-installation}
+
+After the initial installation is complete and the container is running, you need to change the startup command:
+
+1. In mStudio, navigate to your Listmonk container
+2. Click on **"Settings"** or **"Edit"**
+3. Change the **Command** from `./listmonk --install --yes` back to `./listmonk`
+4. Save the changes and restart the container
+
+### Alternative: Using the `mw container run` command
+
+You can also use the `mw container run` command to directly create and start a Listmonk container from the command line. This approach is similar to using the Docker CLI and allows you to specify all container parameters in a single command.
+
+For the initial installation, use the following command:
+
+```shellsession
+user@local $ mw container run \
+  --name listmonk \
+  --description "Listmonk Newsletter Manager" \
+  --publish 9000:9000 \
+  --env "LISTMONK_app__address=0.0.0.0:9000" \
+  --env "LISTMONK_db__host=<DB_HOST>" \
+  --env "LISTMONK_db__port=5432" \
+  --env "LISTMONK_db__user=<DB_USER>" \
+  --env "LISTMONK_db__password=<DB_PASSWORD>" \
+  --env "LISTMONK_db__database=<DB_NAME>" \
+  --volume "listmonk-uploads:/listmonk/uploads" \
+  --create-volumes \
+  -- \
+  listmonk/listmonk ./listmonk --install --yes
+```
+
+Make sure to replace the placeholder values with your actual database configuration details.
+
+After the installation is complete, update the container to use the normal startup command:
+
+```shellsession
+user@local $ mw container update listmonk --command "./listmonk" --recreate
+```
+
+After creating the container, you'll still need to assign a domain to it.
+
+### Alternative: Using the `mw stack deploy` command
+
+Alternatively, you can use the `mw stack deploy` command, which is compatible with Docker Compose. This approach allows you to define your container configuration in a YAML file and deploy it with a single command.
+
+First, create a `docker-compose.yml` file with the following content:
+
+```yaml
+services:
+  listmonk:
+    image: listmonk/listmonk
+    command: ["./listmonk"]
+    ports:
+      - "9000:9000"
+    volumes:
+      - "listmonk-uploads:/listmonk/uploads"
+    environment:
+      LISTMONK_app__address: "0.0.0.0:9000"
+      LISTMONK_db__host: "<DB_HOST>"
+      LISTMONK_db__port: "5432"
+      LISTMONK_db__user: "<DB_USER>"
+      LISTMONK_db__password: "<DB_PASSWORD>"
+      LISTMONK_db__database: "<DB_NAME>"
+
+volumes:
+  listmonk-uploads: {}
+```
+
+Make sure to replace the placeholder values with your actual database configuration details.
+
+:::note
+
+For the initial installation, temporarily change the command to `["./listmonk", "--install", "--yes"]`, deploy the stack, wait for the installation to complete, then change it back to `["./listmonk"]` and redeploy.
+
+:::
+
+Then, deploy the container using the `mw stack deploy` command:
+
+```shellsession
+user@local $ mw stack deploy
+```
+
+This command will read the `docker-compose.yml` file from the current directory and deploy it to your default stack.
+
+## Assign a Domain {#assign-domain}
+
+To make Listmonk accessible from the public internet, you need to connect it to a domain:
+
+1. In mStudio, navigate to **"Domains"** in the left sidebar
+2. Select the domain you want to use (e.g., `listmonk.example.com`)
+3. Under **"Set domain target"**, select **"Container"**
+4. Choose your Listmonk container from the dropdown menu
+5. The port will be automatically set to `9000`
+6. Click the green **"Save"** button to apply the changes
+
+After a few moments, you should be able to access Listmonk at your configured domain. The first time you access the web interface, you'll need to create an administrator account.
+
+:::caution
+
+When you first access the Listmonk web interface, you will be prompted to create an administrator account. Make sure to use a strong password, as this account will have full access to all features and subscriber data.
+
+:::
+
+## Operation
+
+### Database Setup {#database-setup}
+
+If you're deploying Listmonk alongside a PostgreSQL database in a container stack, you can use the following example to deploy both containers together:
+
+```yaml
+services:
+  database:
+    image: postgres:17
+    ports:
+      - "5432:5432"
+    volumes:
+      - "listmonk-database:/var/lib/postgresql/data"
+    environment:
+      POSTGRES_DB: "listmonk"
+      POSTGRES_USER: "listmonk"
+      POSTGRES_PASSWORD: "<SECURE_PASSWORD>"
+
+  listmonk:
+    image: listmonk/listmonk
+    command: ["./listmonk"]
+    ports:
+      - "9000:9000"
+    volumes:
+      - "listmonk-uploads:/listmonk/uploads"
+    environment:
+      LISTMONK_app__address: "0.0.0.0:9000"
+      LISTMONK_db__host: "database"
+      LISTMONK_db__port: "5432"
+      LISTMONK_db__user: "listmonk"
+      LISTMONK_db__password: "<SECURE_PASSWORD>"
+      LISTMONK_db__database: "listmonk"
+    depends_on:
+      - database
+
+volumes:
+  listmonk-database: {}
+  listmonk-uploads: {}
+```
+
+:::caution
+
+Replace `<SECURE_PASSWORD>` with a strong, randomly generated password. Do not use default passwords in production environments.
+
+:::
+
+### Backups {#backups}
+
+Your Listmonk data is stored in two places:
+
+1. **PostgreSQL database**: Contains subscribers, campaigns, and settings
+2. **Uploads volume**: Contains media files uploaded through the web interface
+
+Both are included in the regular project backups and can be restored if needed. For additional protection, consider setting up automated database backups using PostgreSQL's built-in tools.
+
+## Further Resources
+
+- [Official Listmonk Website](https://listmonk.app/)
+- [Listmonk Documentation](https://listmonk.app/docs/)
+- [Listmonk on Docker Hub](https://hub.docker.com/r/listmonk/listmonk)
+- [Listmonk GitHub Repository](https://github.com/knadh/listmonk)
+- [Container Workloads Documentation](/docs/v2/platform/workloads/containers)
