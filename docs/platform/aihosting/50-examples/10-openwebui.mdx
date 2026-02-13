@@ -44,20 +44,20 @@ Open WebUI offers the ability to store knowledge in the form of documents, which
 ### Uploading Documents {#rag-documents}
 
 1. In the left menu bar, navigate to **"Workspace"**
-2. Select the **"Knowledge"** tab
+2. Select the **"Knowledge"** tab and create a new knowledge base using the **"New Knowledge"** button
 3. Upload documents that you want to make available
-4. In your chats, you can access these documents using a hashtag reference
+4. In your chats, you can access these documents by using the **"Attach knowledge"** option on the chat input field.
 
 ### Configuring an Embedding Model {#rag-embedding}
 
 To enable more efficient document processing, you can use an embedding model:
 
-1. In the Admin Panel under **"Settings"**, go to the **"Documents"** menu item
+1. In the **"Admin Settings"**, go to the **"Documents"** menu item
 2. In the **"Embedding"** section, select **"OpenAI"** in the dropdown menu as the embedding model engine
 3. Enter the endpoint: `https://llm.aihosting.mittwald.de/v1`
 4. Enter your generated API key
 5. Select one of the available [embedding models](/docs/v2/platform/aihosting/models/) (such as Qwen3-Embedding-8B) under **"Embedding Model"**
-6. In the **"Retrieval"** section, adjust the parameters **"Top K"** and **"RAG Template"** for optimal results
+6. In the **"Retrieval"** section, optionally adjust the parameters **"Top K"** and **"RAG Template"** for optimal results
 
 ## Configuring Speech-to-Text {#speech-to-text}
 
@@ -65,9 +65,9 @@ Whisper-Large-V3-Turbo can be configured in Open WebUI for speech-to-text (STT) 
 
 ### Admin Panel Configuration {#stt-setup}
 
-In the Admin Panel under **"Settings"** > **"Audio"**, configure the following:
+In the Admin Settings under **"Audio"**, configure the following:
 
-- **Engine**: Select "OpenAI"
+- **Speech-to-Text Engine**: Select "OpenAI"
 - **API Base URL**: Enter `https://llm.aihosting.mittwald.de/v1`
 - **API Key**: Enter your API key
 - **STT Model**: Enter the model name `whisper-large-v3-turbo`
@@ -76,16 +76,16 @@ In the Admin Panel under **"Settings"** > **"Audio"**, configure the following:
 
 Whisper will appear in the model list after connection, but it should be hidden from chat model selection since it's designed for audio transcription, not conversational AI:
 
-1. Navigate to **"Workspace"** > **"Models"**
-2. Select **Whisper-Large-V3-Turbo**
-3. Choose **"Hide"** to prevent it from appearing as a chat option
+1. Navigate to **"Admin settings"** > **"Models"**
+2. Select **whisper-large-v3-turbo**
+3. Choose **"Hide model"** to prevent it from appearing as a chat option
 
 ### User Settings {#stt-user-settings}
 
 You can further specify how Open WebUI interacts with the Whisper model in the user settings (not Administrator panel) under **"Audio"**:
 
 - **Language**: Explicitly set the language code (e.g., "de" for German, "en" for English)
-- **Directly Send Speech**: Enable to send transcriptions directly without confirmation
+- **Instant Auto-Send After Voice Transcription**: Enable to send transcriptions directly without confirmation
 
 ### Recommended Parameters {#stt-parameters}
 

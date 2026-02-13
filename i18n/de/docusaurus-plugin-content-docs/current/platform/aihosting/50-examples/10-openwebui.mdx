@@ -8,11 +8,11 @@ Open WebUI lässt sich als ChatGPT-ähnliches Interface mit mittwald AI Hosting 
 
 ## Verbindung mit mittwald AI Hosting {#connecting}
 
-Wenn du das Managed Deployment, wird dein Open WebUI bereits mit einer Verbindung zum mittwald AI-Hosting vorkonfiguriert. Ansonsten gibt es zwei Möglichkeiten, Open WebUI mit mittwald AI Hosting zu verbinden:
+Wenn du das Managed Deployment nutzt, wird dein Open WebUI automatisch mit deinem mittwald AI Hosting-Konto konfiguriert. Ansonsten kannst du eine der hier empfohlenen Methoden verwenden.
 
 ### Verwendung von Umgebungsvariablen (Empfohlen) {#env-variables}
 
-Die empfohlene Methode ist die Konfiguration der Verbindung während des Container-Deployments mittels Umgebungsvariablen. Siehe die [Deployment-Anleitung](/docs/v2/guides/apps/openwebui#verbindung-mit-mittwald-ai-hosting) für detaillierte Anweisungen.
+Die empfohlene Methode ist die Konfiguration der Verbindung während des Container-Deployments mittels Umgebungsvariablen. Siehe die [Deployment-Anleitung](/docs/v2/guides/apps/openwebui#connecting-to-mittwald-ai-hosting) für detaillierte Anweisungen.
 
 ### Verwendung des Admin Panels {#admin-panel}
 
@@ -44,20 +44,20 @@ Open WebUI bietet die Funktion an, Wissen in Form von Dokumenten zu hinterlegen,
 ### Hochladen von Dokumenten {#rag-documents}
 
 1. Navigiere in der linken Menüleiste zu **„Workspace"**
-2. Wähle den Reiter **„Knowledge"**
+2. Wähle den Reiter **„Knowledge"** und erstelle eine neue Wissensdatenbank mit dem **„New Knowledge"**-Button
 3. Lade Dokumente hoch, die du verfügbar machen möchtest
-4. In deinen Chats kannst du mit einem Hashtag auf diese Dokumente zugreifen
+4. In deinen Chats kannst du über die Option **„Attach knowledge"** im Chat-Eingabefeld auf diese Dokumente zugreifen
 
 ### Konfiguration eines Embedding-Modells {#rag-embedding}
 
 Für performantere Verarbeitung kann ein Embedding-Modell genutzt werden:
 
-1. Im Admin Panel unter **„Settings"** findet sich der Menüpunkt **„Documents"**
-2. Im Bereich **„Embedding"** wähle zunächst im Dropdown-Menü **„OpenAI"** für die Embedding Model Engine aus
+1. In den **„Admin Settings"** navigiere zum Menüpunkt **„Documents"**
+2. Im Bereich **„Embedding"** wähle im Dropdown-Menü **„OpenAI"** als Embedding Model Engine aus
 3. Gib den Endpunkt ein: `https://llm.aihosting.mittwald.de/v1`
 4. Gib deinen generierten API-Key ein
 5. Wähle unter **„Embedding Model"** ein von uns angebotenes [Embedding-Modell](/docs/v2/platform/aihosting/models/) aus (wie z.B. Qwen3-Embedding-8B)
-6. Passe im Bereich **„Retrieval"** die Parameter **„Top K"** und **„RAG Template"** für optimale Ergebnisse an
+6. Im Bereich **„Retrieval"** kannst du optional die Parameter **„Top K"** und **„RAG Template"** für optimale Ergebnisse anpassen
 
 ## Konfiguration von Speech-to-Text {#speech-to-text}
 
@@ -65,9 +65,9 @@ Whisper-Large-V3-Turbo kann in Open WebUI für Speech-to-Text (STT) Funktionalit
 
 ### Konfiguration im Admin Panel {#stt-setup}
 
-Im Admin Panel unter **„Settings"** > **„Audio"** sind folgende Einstellungen vorzunehmen:
+In den Admin Settings unter **„Audio"** konfiguriere folgende Einstellungen:
 
-- **Engine**: Wähle „OpenAI"
+- **Speech-to-Text Engine**: Wähle „OpenAI"
 - **API Base URL**: Gib `https://llm.aihosting.mittwald.de/v1` ein
 - **API Key**: Gib deinen API-Key ein
 - **STT Model**: Gib den Modellnamen `whisper-large-v3-turbo` ein
@@ -76,16 +76,16 @@ Im Admin Panel unter **„Settings"** > **„Audio"** sind folgende Einstellunge
 
 Whisper wird nach der Verbindung in der Modellliste erscheinen, sollte aber aus der Chat-Modell-Auswahl ausgeblendet werden, da es für Audio-Transkription entwickelt wurde, nicht für konversationelle KI:
 
-1. Navigiere zu **„Workspace"** > **„Models"**
-2. Wähle **Whisper-Large-V3-Turbo** aus
-3. Wähle **„Hide"**, um zu verhindern, dass es als Chat-Option erscheint
+1. Navigiere zu **„Admin settings"** > **„Models"**
+2. Wähle **whisper-large-v3-turbo** aus
+3. Wähle **„Hide model"**, um zu verhindern, dass es als Chat-Option erscheint
 
 ### Benutzereinstellungen {#stt-user-settings}
 
 Du kannst weiter spezifizieren, wie Open WebUI mit dem Whisper-Modell interagiert in den Benutzereinstellungen (nicht im Administrator-Panel) unter **„Audio"**:
 
 - **Language**: Setze den Sprachcode explizit (z.B. „de" für Deutsch, „en" für Englisch)
-- **Directly Send Speech**: Aktiviere, um Transkriptionen direkt ohne Bestätigung zu senden
+- **Instant Auto-Send After Voice Transcription**: Aktiviere, um Transkriptionen direkt ohne Bestätigung zu senden
 
 ### Empfohlene Parameter {#stt-parameters}
 
