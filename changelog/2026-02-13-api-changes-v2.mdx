@@ -1,0 +1,273 @@
+---
+title: Breaking (!) API changes for v2 API, February 6 to February 13
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - User
+  - Project
+  - Misc
+  - App
+  - Marketplace
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API introduces several changes, including the removal of the required 'name' property from the '409' response, the addition of the 'migrating' enum value to various response properties, and updates to non-success response statuses for address and company verification actions.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The required property `name` has been removed from the response with the `409` status for the `DELETE` operation on the path `/v2/users/self`. This is a breaking change.
+- The optional property `info` has been removed from the response with the `409` status for the `DELETE` operation on the path `/v2/users/self`.
+- The required property `type` has been added to the response with the `409` status for the `DELETE` operation on the path `/v2/users/self`.
+- The new `migrating` enum value has been added to the `/items/status` response property for the `200` status in the `GET` operation on the path `/v2/servers`.
+- The new `migrating` enum value has also been added to the `status` response property for the `200` status in the `GET` operation on the path `/v2/servers/{serverId}`.
+- A non-success response with the status `400` has been added for the `POST` operation on the path `/v2/actions/verify-address`.
+- The non-success response with the status `500` has been removed for the `POST` operation on the path `/v2/actions/verify-address`.
+- The non-success response with the status `500` has also been removed for the `POST` operation on the path `/v2/actions/verify-company`.
+- The optional property `/items/lastError` has been added to the response with the `200` status for the `GET` operation on the path `/v2/app-installations`.
+- The optional property `lastError` has been added to the response with the `200` status for the `GET` operation on the path `/v2/app-installations/{appInstallationId}`.
+- A non-success response with the status `403` has been added for the `GET` operation on the path `/v2/contributors/{contributorId}/dashboard`.
+- The optional property `/items/lastError` has been added to the response with the `200` status for the `GET` operation on the path `/v2/projects/{projectId}/app-installations`.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Delete your account and all your personal data"
+
+
+- ⚠️ **Breaking:** removed the required property 'name' from the response with the '409' status
+
+- removed the optional property 'info' from the response with the '409' status
+
+- added the required property 'type' to the response with the '409' status
+
+
+For details, refer to the <OperationLink operation="user-delete-user" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Servers belonging to the executing user"
+
+
+- added the new 'migrating' enum value to the '/items/status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="project-list-servers" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Server"
+
+
+- added the new 'migrating' enum value to the 'status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="project-get-server" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Check if an address exists"
+
+
+- added the non-success response with the status '400'
+
+- removed the non-success response with the status '500'
+
+
+For details, refer to the <OperationLink operation="verification-verify-address" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Check if a company exists"
+
+
+- removed the non-success response with the status '500'
+
+
+For details, refer to the <OperationLink operation="verification-verify-company" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app installations that a user has access to"
+
+
+- added the optional property '/items/lastError' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations-for-user" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an app installation"
+
+
+- added the optional property 'lastError' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-get-appinstallation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the Stripe Dashboard Link for a contributor"
+
+
+- added the non-success response with the status '403'
+
+
+For details, refer to the <OperationLink operation="contributor-get-login-link" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app installations belonging to a Project"
+
+
+- added the optional property '/items/lastError' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### Release Summary: mittwald PHP SDK v2.1.185
+
+The mittwald PHP SDK has been updated to version v2.1.185. This release introduces several enhancements and schema updates aimed at improving the clarity and functionality of the SDK.
+
+#### Enhancements
+
+- **DatabaseClient Interface and Implementation**: The `Create a MySQLDatabase with a MySQLUser` method now includes detailed descriptions emphasizing its asynchronous nature and guidance on checking the database status post-creation.
+- **New Response Class**: A `ContributorGetLoginLinkForbiddenResponse` class has been added to handle 403 Forbidden responses during the login link process.
+
+#### Schema Updates
+
+- **CharacterSettings**: Descriptions and examples for `characterSet` and `collation` properties have been added to clarify valid values and sources.
+- **CreateMySqlDatabase**: The schema now includes descriptions for `description` and `version` properties, providing users with contextual information.
+- **CreateMySqlUser**: Detailed descriptions and examples for `accessIpMask`, `accessLevel`, and `externalAccess` have been added.
+- **CreateMySqlUserWithDatabase**: The schema has been updated with detailed descriptions for `accessLevel` and `externalAccess`, clarifying user permissions and external connectivity scenarios.
+- **MySqlDatabase**: Enhanced descriptions for properties like `description`, `externalHostname`, `hostname`, `name`, and `version` to provide more context.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.185).
+
+### mittwald PHP SDK Release v2.1.184
+
+The mittwald PHP SDK has been updated to version v2.1.184. This release introduces several enhancements and updates to improve error tracking and management within the `AppInstallation` class.
+
+#### Added
+- **lastError Property**: A new `lastError` property has been added to the `AppInstallation` class. This property records the last error encountered during an update and resets upon a successful update, aiding in better issue tracking.
+
+#### Enhanced
+- **Getter and Setter for lastError**: New methods `getLastError()`, `withLastError(string $lastError)`, and `withoutLastError()` have been introduced to facilitate the management of the `lastError` property.
+
+#### Updated
+- **Input Processing**: The input processing for the `AppInstallation` class now includes the `lastError` property, allowing it to be set and retrieved as part of the installation state.
+- **Output Serialization**: The output serialization method has been updated to include the `lastError`, enabling external clients to view any errors that occurred during the last update.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.184).
+
+### mittwald PHP SDK Release v2.1.183
+
+The latest release of the mittwald PHP SDK, version 2.1.183, introduces significant improvements in response handling, particularly for address verification and user deletion processes. 
+
+#### Key Updates:
+
+- **New Additions:**
+  - A new class, `VerificationVerifyAddressBadRequestResponse`, has been added to enhance error handling for invalid address verification requests.
+
+- **Changes:**
+  - The `UnexpectedResponseException` in `MiscClientImpl` now properly handles HTTP status code `400` for bad requests, utilizing the new `VerificationVerifyAddressBadRequestResponse`.
+  - The `DeleteUserConflictResponse` has been updated to adopt a more generalized error response structure based on the `Error` schema, replacing the previous `DeleteUserConflictResponseBody`.
+  - The obsolete `DeleteUserConflictResponseBody` and its associated properties, including the `DeleteUserConflictResponseBodyName` enumeration, have been removed.
+  - Documentation in the `UserClient` and `UserClientImpl` interfaces has been corrected to fix typos in the authentication method descriptions.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.183).
+
+### mittwald PHP SDK Release v2.1.182
+
+The latest release of the mittwald PHP SDK, version [v2.1.182](https://github.com/mittwald/api-client-php/releases/tag/v2.1.182), introduces several changes aimed at simplifying the address verification response structure:
+
+- **Removed Confidence Property**: The `confidence` property has been removed from the `VerificationVerifyAddressOKResponse` and `VerificationVerifyAddressOKResponseBody` classes. The response now focuses solely on the `exists` boolean value to indicate address existence.
+  
+- **Updated Constructor**: The constructor for `VerificationVerifyAddressOKResponseBody` has been updated to remove the `confidence` parameter, now only requiring the `exists` boolean flag.
+
+- **Removed Getter and Setter for Confidence**: Methods for accessing and modifying the `confidence` property have been eliminated, streamlining the class to focus on the `exists` property.
+
+These updates are designed to enhance the clarity and usability of the API's address verification response. For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.182).
+
+### mittwald PHP SDK Release v2.1.181
+
+The mittwald PHP SDK has been updated to version v2.1.181. This release introduces new features and changes aimed at enhancing the functionality of the SDK.
+
+#### Added Features
+
+- **Verification of Address Response**: The `VerificationVerifyAddressOKResponse` class now includes a `confidence` property, providing a measure of confidence in the address verification results.
+  
+- **Server Status Enumeration**: The `ServerStatus` enum has been expanded with a new case, `migrating`, to indicate an ongoing migration process.
+
+#### Changes
+
+- **VerificationVerifyAddressOKResponse**: The `confidence` property is now a required part of the response body, alongside `exists`.
+
+- **VerificationVerifyAddressOKResponseBody**: 
+  - The constructor now accepts a `confidence` parameter.
+  - A `getConfidence()` method has been added to retrieve the confidence level.
+  - A `withConfidence()` method is available for validating and setting the confidence level.
+  - JSON serialization now includes the confidence level.
+
+- **ServerStatus Enum**: A new case `migrating` has been added to reflect an additional server status.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.181).
+
+### mittwald JavaScript SDK Release 4.301.0
+
+The mittwald JavaScript SDK has been updated to version 4.301.0. This release includes an update to the generated client, enhancing its functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.301.0).
+
+### mittwald JavaScript SDK Release 4.300.0
+
+The mittwald JavaScript SDK has been updated to version 4.300.0. This release includes the following feature:
+
+- Updated generated client ([commit 9da879a](https://github.com/mittwald/api-client-js/commit/9da879a2f63e364953c8a959dcd033d465a9118c)).
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.300.0).
+
+### mittwald JavaScript SDK Release 4.299.0
+
+The mittwald JavaScript SDK has been updated to version 4.299.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald/api-client-js 4.299.0](https://github.com/mittwald/api-client-js/releases/tag/4.299.0).
+
+### mittwald JavaScript SDK Release 4.298.0
+
+The mittwald JavaScript SDK version 4.298.0 has been released. This update includes the following feature:
+
+- Updated the generated client to enhance functionality and performance ([commit 07dd179](https://github.com/mittwald/api-client-js/commit/07dd179064221dc96b6fa8934dc1eb5bfe31d769)).
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.298.0).
+
+### mittwald JavaScript SDK Release 4.297.0
+
+The mittwald JavaScript SDK has been updated to version 4.297.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.297.0).
+
