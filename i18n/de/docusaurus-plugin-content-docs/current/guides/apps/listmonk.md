@@ -22,7 +22,7 @@ Um Listmonk auszuführen, benötigst du:
 
 :::note
 
-Du kannst eine PostgreSQL-Datenbank in einem separaten Container erstellen. Eine Anleitung zum Einrichten von PostgreSQL in einem Container findest du im [PostgreSQL-Leitfaden](./postgresql).
+Du kannst eine PostgreSQL-Datenbank in einem separaten Container erstellen. Eine Anleitung zum Einrichten von PostgreSQL in einem Container findest du im [PostgreSQL-Leitfaden](../databases/postgresql).
 
 :::
 
@@ -47,9 +47,9 @@ variable "project_id" {
   type = string
 }
 
-variable "postgres_password" {
-  type      = string
-  sensitive = true
+resource "random_password" "postgres_password" {
+  length  = 24
+  special = true
 }
 
 resource "mittwald_container_stack" "listmonk" {
@@ -67,7 +67,7 @@ resource "mittwald_container_stack" "listmonk" {
       environment = {
         POSTGRES_DB       = "listmonk"
         POSTGRES_USER     = "listmonk"
-        POSTGRES_PASSWORD = var.postgres_password
+        POSTGRES_PASSWORD = random_password.postgres_password.result
       }
 
       volumes = [
@@ -90,14 +90,14 @@ resource "mittwald_container_stack" "listmonk" {
       image       = data.mittwald_container_image.listmonk.name
 
       entrypoint = data.mittwald_container_image.listmonk.entrypoint
-      command    = data.mittwald_container_image.listmonk.command
+      command    = ["/bin/sh", "-c", "./listmonk --install --idempotent --yes --config '' && ./listmonk --upgrade --yes --config '' && ./listmonk --config ''"]
 
       environment = {
         LISTMONK_app__address = "0.0.0.0:9000"
         LISTMONK_db__host     = "database"
         LISTMONK_db__port     = "5432"
         LISTMONK_db__user     = "listmonk"
-        LISTMONK_db__password = var.postgres_password
+        LISTMONK_db__password = random_password.postgres_password.result
         LISTMONK_db__database = "listmonk"
       }
 
@@ -127,7 +127,7 @@ resource "mittwald_container_stack" "listmonk" {
 
 :::note
 
-Für die Erstinstallation muss Listmonk mit `./listmonk --install --yes` initialisiert werden. Dies kann nach dem Deployment manuell über die Container-Konsole oder durch temporäres Ändern des `command`-Feldes durchgeführt werden.
+Diese Konfiguration verwendet das `--install --idempotent`-Flag, das sicherstellt, dass die Datenbankinstallation nur einmal bei einer leeren Datenbank während des ersten Starts erfolgt. Das `--upgrade`-Flag führt automatisch alle Datenbankmigrationen aus, wenn ein neues Image gezogen wird.
 
 :::
 
@@ -141,14 +141,14 @@ Als Nächstes wirst du nach dem Image-Namen gefragt. Gib `listmonk/listmonk` ein
 
 #### Entrypoint und Command {#ui-entrypoint-und-command}
 
-Für die initiale Installation muss Listmonk das Datenbankschema initialisieren:
+Konfiguriere Listmonk so, dass es mit automatischer Datenbankinitialisierung und -upgrades startet:
 
-- **Entrypoint:** Keine Änderungen erforderlich
-- **Command:** Wähle **"Benutzerdefiniert"** aus und gib `./listmonk --install --yes` ein
+- **Entrypoint:** Wähle **"Benutzerdefiniert"** aus und gib `/bin/sh` ein
+- **Command:** Wähle **"Benutzerdefiniert"** aus und gib `-c ./listmonk --install --idempotent --yes --config '' && ./listmonk --upgrade --yes --config '' && ./listmonk --config ''` ein
 
 :::note
 
-Dieser Befehl erstellt die notwendigen Datenbanktabellen und bereitet Listmonk für die erste Verwendung vor. Nach Abschluss der initialen Installation musst du den Befehl zurück auf den Standard (`./listmonk`) ändern und den Container neu starten.
+Dieser Befehl verwendet das `--install --idempotent`-Flag, das sicherstellt, dass die Datenbankinstallation nur einmal bei einer leeren Datenbank während des ersten Starts erfolgt. Das `--upgrade`-Flag führt automatisch alle Datenbankmigrationen aus, wenn der Container aktualisiert wird. Dieser Ansatz eliminiert die Notwendigkeit, die Datenbank manuell zu initialisieren oder den Befehl nach dem ersten Durchlauf zu ändern.
 
 :::
 
@@ -190,20 +190,9 @@ Stelle sicher, dass du ein sicheres Passwort für deine Datenbankverbindung verw
 
 Nachdem du alle Umgebungsvariablen eingegeben hast, klicke auf **"Weiter"**. Im letzten Dialog wirst du nach dem **Port** gefragt – du kannst diesen unverändert bei `9000` lassen. Klicke auf **"Container erstellen"**, um den Container zu erstellen und zu starten.
 
-#### Schritte nach der Installation {#ui-schritte-nach-installation}
-
-Nachdem die initiale Installation abgeschlossen ist und der Container läuft, musst du den Startbefehl ändern:
-
-1. In mStudio navigierst du zu deinem Listmonk-Container
-2. Klicke auf **"Einstellungen"** oder **"Bearbeiten"**
-3. Ändere das **Command** von `./listmonk --install --yes` zurück auf `./listmonk`
-4. Speichere die Änderungen und starte den Container neu
-
 ### Alternative: Über den Befehl `mw container run`
 
 Du kannst auch den Befehl `mw container run` verwenden, um direkt von der Kommandozeile aus einen Listmonk-Container zu erstellen und zu starten. Dieser Ansatz ist ähnlich wie die Verwendung der Docker-CLI und ermöglicht es dir, alle Container-Parameter in einem einzigen Befehl anzugeben.
-
-Für die initiale Installation verwende den folgenden Befehl:
 
 ```shellsession
 user@local $ mw container run \
@@ -218,19 +207,13 @@ user@local $ mw container run \
   --env "LISTMONK_db__database=<DB_NAME>" \
   --volume "listmonk-uploads:/listmonk/uploads" \
   --create-volumes \
+  --entrypoint "/bin/sh" \
   -- \
-  listmonk/listmonk ./listmonk --install --yes
+  listmonk/listmonk \
+  -c "./listmonk --install --idempotent --yes --config '' && ./listmonk --upgrade --yes --config '' && ./listmonk --config ''"
 ```
 
-Stelle sicher, dass du die Platzhalterwerte durch deine tatsächlichen Datenbankkonfigurationsdetails ersetzt.
-
-Nachdem die Installation abgeschlossen ist, aktualisiere den Container, um den normalen Startbefehl zu verwenden:
-
-```shellsession
-user@local $ mw container update listmonk --command "./listmonk" --recreate
-```
-
-Nach dem Erstellen des Containers musst du noch eine Domain zuweisen.
+Stelle sicher, dass du die Platzhalterwerte durch deine tatsächlichen Datenbankkonfigurationsdetails ersetzt. Nach dem Erstellen des Containers musst du noch eine Domain zuweisen.
 
 ### Alternative: Über den Befehl `mw stack deploy`
 
@@ -242,7 +225,12 @@ Erstelle zunächst eine `docker-compose.yml`-Datei mit folgendem Inhalt:
 services:
   listmonk:
     image: listmonk/listmonk
-    command: ["./listmonk"]
+    command:
+      [
+        "sh",
+        "-c",
+        "./listmonk --install --idempotent --yes --config '' && ./listmonk --upgrade --yes --config '' && ./listmonk --config ''",
+      ]
     ports:
       - "9000:9000"
     volumes:
@@ -260,12 +248,6 @@ volumes:
 ```
 
 Stelle sicher, dass du die Platzhalterwerte durch deine tatsächlichen Datenbankkonfigurationsdetails ersetzt.
-
-:::note
-
-Für die initiale Installation ändere den Befehl vorübergehend auf `["./listmonk", "--install", "--yes"]`, stelle den Stack bereit, warte bis die Installation abgeschlossen ist, ändere ihn dann zurück auf `["./listmonk"]` und stelle erneut bereit.
-
-:::
 
 Dann stelle den Container mit dem Befehl `mw stack deploy` bereit:
 
@@ -315,7 +297,12 @@ services:
 
   listmonk:
     image: listmonk/listmonk
-    command: ["./listmonk"]
+    command:
+      [
+        "sh",
+        "-c",
+        "./listmonk --install --idempotent --yes --config '' && ./listmonk --upgrade --yes --config '' && ./listmonk --config ''",
+      ]
     ports:
       - "9000:9000"
     volumes:
