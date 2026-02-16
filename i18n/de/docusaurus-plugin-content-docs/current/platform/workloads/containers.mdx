@@ -116,6 +116,51 @@ Wenn dein Container-Image aus einer privaten Registry geladen werden soll, musst
   </TabItem>
 </Tabs>
 
+:::note
+Verwechsle nicht "private" Registry mit selbst-gehostet, was im nächsten Kapitel erklärt wird.
+:::
+
+## Eigene, selbst-gehostete Docker-Image-Registry {#self-hosted-registries}
+
+Wenn keine private Registry existiert oder aus irgendeinem Grund nicht verfügbar ist, kannst du deine eigene Docker-Image-Registry im mittwald Container-Hosting hosten.
+
+Weitere detaillierte Anweisungen und Konfigurationsoptionen findest du in [dieser Anleitung](https://distribution.github.io/distribution/about/deploying/).
+
+<Tabs groupId="access-mode">
+  <TabItem value="gui" label="mStudio UI">
+    Um eine neue Container-Registry über das mStudio zu erstellen, folge diesen Schritten:
+
+    1. Navigiere zu dem Projekt, in dem du den Container erstellen möchtest.
+    2. Wähle den Menüpunkt "Container" in der Seitenleiste aus.
+    3. Klicke im geöffneten "Container"-Tab auf die Schaltfläche "Erstellen".
+    4. Konfiguriere den Container nach Bedarf und verwende das Image `library/registry:3`.
+    5. Richte Umgebungsvariablen nach deinen Wünschen ein, siehe die obige Anleitung für Details.
+
+  </TabItem>
+  <TabItem value="cli" label="CLI">
+    Um eine neue Container-Registry über die CLI zu erstellen, verwende den Befehl `mw registry create`:
+
+    ```shellsession
+    (user@local) $ mw container run \
+      --name example-registry \
+      --volume registry-data:/var/lib/registry \
+      --publish 5000:5000/tcp \
+      --create-volumes \
+      library/registry:3
+    ```
+
+    Umgebungsvariablen für die Konfiguration können über die Option `--env` hinzugefügt werden, siehe die obige Anleitung für Konfigurationsoptionen.
+    Weitere Informationen findest du in der Dokumentation zum [`mw container run` Befehl](/docs/v2/cli/reference/container/#mw-container-run).
+
+  </TabItem>
+  <TabItem value="api" label="API">
+    Um zu erfahren, wie man eine Container-Registry über die API erstellt oder ändert, lies den Artikel ["Einen Container starten"](../../../api/howtos/create-container).
+  </TabItem>
+</Tabs>
+
+Die in diesem Kapitel eingerichtete Registry kann als private Registry verwendet werden. Stelle daher sicher, dass die Registry erreichbar ist, z.B. indem du eine Subdomain in deinem Projekt erstellst, die auf die eigene Registry verweist.
+Eine eigene Registry könnte beispielsweise eine Domain wie `docker.p-XXXXXX.project.space` haben, die als Registry für zukünftige Container-Deployments konfiguriert werden kann.
+
 ## Deployment-Strategien {#deployment-strategies}
 
 Wenn du deine Anwendung mithilfe von Containern deployst, wirst du typischerweise neue Versionen deiner Anwendung bereitstellen, indem du ein neues Container-Image erstellst und es im selben Container-Stack bereitstellst. Dies ist eine gängige Praxis in containerisierten Umgebungen, da sie eine einfache Versionierung und Rückgängigmachung ermöglicht.
