@@ -1,16 +1,14 @@
 ---
-title: Breaking (!) API changes for v2 API, February 6 to February 13
+title: API changes for v2 API, February 6 to February 13
 authors:
   - machine
 tags:
   - apiv2
-  - breaking
   - User
   - Project
   - Misc
   - App
   - Marketplace
-
 ---
 
 import OperationHint from "@site/src/components/OperationHint";
@@ -20,22 +18,17 @@ This week, the mittwald API introduces several changes, including the removal of
 
 {/* truncate */}
 
+:::info
 
+This document contains changes that can under certain circumstances be considered breaking regarding an error responses of the `users` resource.
 
-:::caution Breaking changes
-
-This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
-
-While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+However, we have only adjusted the type to match the actual response.
 
 :::
 
-
-
 ## Summary
 
-
-- The required property `name` has been removed from the response with the `409` status for the `DELETE` operation on the path `/v2/users/self`. This is a breaking change.
+- The required property `name` has been removed from the response schema with the `409` status for the `DELETE` operation on the path `/v2/users/self`. This is now compliant to the common Error type that was already returned.
 - The optional property `info` has been removed from the response with the `409` status for the `DELETE` operation on the path `/v2/users/self`.
 - The required property `type` has been added to the response with the `409` status for the `DELETE` operation on the path `/v2/users/self`.
 - The new `migrating` enum value has been added to the `/items/status` response property for the `200` status in the `GET` operation on the path `/v2/servers`.
@@ -50,110 +43,69 @@ While we generally strive to avoid breaking changes in accordance with our [API 
 
 _Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
 
-
 ## Detailed changes
-
-
 
 ### Changes in "Delete your account and all your personal data"
 
-
-- ⚠️ **Breaking:** removed the required property 'name' from the response with the '409' status
+- removed the required property 'name' from the response with the '409' status, which was never actually returned
 
 - removed the optional property 'info' from the response with the '409' status
 
 - added the required property 'type' to the response with the '409' status
 
-
 For details, refer to the <OperationLink operation="user-delete-user" apiVersion="v2" /> endpoint.
-
-
 
 ### Changes in "List Servers belonging to the executing user"
 
-
 - added the new 'migrating' enum value to the '/items/status' response property for the response status '200'
-
 
 For details, refer to the <OperationLink operation="project-list-servers" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get a Server"
-
 
 - added the new 'migrating' enum value to the 'status' response property for the response status '200'
 
-
 For details, refer to the <OperationLink operation="project-get-server" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Check if an address exists"
-
 
 - added the non-success response with the status '400'
 
 - removed the non-success response with the status '500'
 
-
 For details, refer to the <OperationLink operation="verification-verify-address" apiVersion="v2" /> endpoint.
-
-
 
 ### Changes in "Check if a company exists"
 
-
 - removed the non-success response with the status '500'
-
 
 For details, refer to the <OperationLink operation="verification-verify-company" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "List app installations that a user has access to"
 
-
 - added the optional property '/items/lastError' to the response with the '200' status
-
 
 For details, refer to the <OperationLink operation="app-list-appinstallations-for-user" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get an app installation"
-
 
 - added the optional property 'lastError' to the response with the '200' status
 
-
 For details, refer to the <OperationLink operation="app-get-appinstallation" apiVersion="v2" /> endpoint.
-
-
 
 ### Changes in "Get the Stripe Dashboard Link for a contributor"
 
-
 - added the non-success response with the status '403'
-
 
 For details, refer to the <OperationLink operation="contributor-get-login-link" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "List app installations belonging to a Project"
-
 
 - added the optional property '/items/lastError' to the response with the '200' status
 
-
 For details, refer to the <OperationLink operation="app-list-appinstallations" apiVersion="v2" /> endpoint.
 
-
-
-
 ## Client package releases
-
 
 ### Release Summary: mittwald PHP SDK v2.1.185
 
@@ -179,12 +131,15 @@ For more details, visit the [release page](https://github.com/mittwald/api-clien
 The mittwald PHP SDK has been updated to version v2.1.184. This release introduces several enhancements and updates to improve error tracking and management within the `AppInstallation` class.
 
 #### Added
+
 - **lastError Property**: A new `lastError` property has been added to the `AppInstallation` class. This property records the last error encountered during an update and resets upon a successful update, aiding in better issue tracking.
 
 #### Enhanced
+
 - **Getter and Setter for lastError**: New methods `getLastError()`, `withLastError(string $lastError)`, and `withoutLastError()` have been introduced to facilitate the management of the `lastError` property.
 
 #### Updated
+
 - **Input Processing**: The input processing for the `AppInstallation` class now includes the `lastError` property, allowing it to be set and retrieved as part of the installation state.
 - **Output Serialization**: The output serialization method has been updated to include the `lastError`, enabling external clients to view any errors that occurred during the last update.
 
@@ -192,7 +147,7 @@ For more details, visit the [release page](https://github.com/mittwald/api-clien
 
 ### mittwald PHP SDK Release v2.1.183
 
-The latest release of the mittwald PHP SDK, version 2.1.183, introduces significant improvements in response handling, particularly for address verification and user deletion processes. 
+The latest release of the mittwald PHP SDK, version 2.1.183, introduces significant improvements in response handling, particularly for address verification and user deletion processes.
 
 #### Key Updates:
 
@@ -212,7 +167,7 @@ For more details, visit the [release page](https://github.com/mittwald/api-clien
 The latest release of the mittwald PHP SDK, version [v2.1.182](https://github.com/mittwald/api-client-php/releases/tag/v2.1.182), introduces several changes aimed at simplifying the address verification response structure:
 
 - **Removed Confidence Property**: The `confidence` property has been removed from the `VerificationVerifyAddressOKResponse` and `VerificationVerifyAddressOKResponseBody` classes. The response now focuses solely on the `exists` boolean value to indicate address existence.
-  
+
 - **Updated Constructor**: The constructor for `VerificationVerifyAddressOKResponseBody` has been updated to remove the `confidence` parameter, now only requiring the `exists` boolean flag.
 
 - **Removed Getter and Setter for Confidence**: Methods for accessing and modifying the `confidence` property have been eliminated, streamlining the class to focus on the `exists` property.
@@ -226,14 +181,14 @@ The mittwald PHP SDK has been updated to version v2.1.181. This release introduc
 #### Added Features
 
 - **Verification of Address Response**: The `VerificationVerifyAddressOKResponse` class now includes a `confidence` property, providing a measure of confidence in the address verification results.
-  
+
 - **Server Status Enumeration**: The `ServerStatus` enum has been expanded with a new case, `migrating`, to indicate an ongoing migration process.
 
 #### Changes
 
 - **VerificationVerifyAddressOKResponse**: The `confidence` property is now a required part of the response body, alongside `exists`.
 
-- **VerificationVerifyAddressOKResponseBody**: 
+- **VerificationVerifyAddressOKResponseBody**:
   - The constructor now accepts a `confidence` parameter.
   - A `getConfidence()` method has been added to retrieve the confidence level.
   - A `withConfidence()` method is available for validating and setting the confidence level.
@@ -270,4 +225,3 @@ For more details, visit the [release page](https://github.com/mittwald/api-clien
 ### mittwald JavaScript SDK Release 4.297.0
 
 The mittwald JavaScript SDK has been updated to version 4.297.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.297.0).
-
