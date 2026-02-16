@@ -90,7 +90,7 @@ resource "mittwald_container_stack" "listmonk" {
       image       = data.mittwald_container_image.listmonk.name
 
       entrypoint = data.mittwald_container_image.listmonk.entrypoint
-      command    = ["/bin/sh", "-c", "./listmonk --install --idempotent --yes --config '' && ./listmonk --upgrade --yes --config '' && ./listmonk --config ''"]
+      command    = ["sh", "-c", "./listmonk --install --idempotent --yes --config '' && ./listmonk --upgrade --yes --config '' && ./listmonk --config ''"]
 
       environment = {
         LISTMONK_app__address = "0.0.0.0:9000"
@@ -143,8 +143,8 @@ Next, you'll be asked for the image name. Enter `listmonk/listmonk` and confirm 
 
 Configure Listmonk to start with automatic database initialization and upgrades:
 
-- **Entrypoint:** Select **"Custom"** and enter `/bin/sh`
-- **Command:** Select **"Custom"** and enter `-c ./listmonk --install --idempotent --yes --config '' && ./listmonk --upgrade --yes --config '' && ./listmonk --config ''`
+- **Entrypoint:** No changes required
+- **Command:** Select **"Custom"** and enter `sh -c "./listmonk --install --idempotent --yes --config '' && ./listmonk --upgrade --yes --config '' && ./listmonk --config ''"`
 
 :::note
 
@@ -207,10 +207,9 @@ user@local $ mw container run \
   --env "LISTMONK_db__database=<DB_NAME>" \
   --volume "listmonk-uploads:/listmonk/uploads" \
   --create-volumes \
-  --entrypoint "/bin/sh" \
   -- \
   listmonk/listmonk \
-  -c "./listmonk --install --idempotent --yes --config '' && ./listmonk --upgrade --yes --config '' && ./listmonk --config ''"
+  sh -c "./listmonk --install --idempotent --yes --config '' && ./listmonk --upgrade --yes --config '' && ./listmonk --config ''"
 ```
 
 Make sure to replace the placeholder values with your actual database configuration details. After creating the container, you'll still need to assign a domain to it.
@@ -268,11 +267,21 @@ To make Listmonk accessible from the public internet, you need to connect it to 
 5. The port will be automatically set to `9000`
 6. Click the green **"Save"** button to apply the changes
 
-After a few moments, you should be able to access Listmonk at your configured domain. The first time you access the web interface, you'll need to create an administrator account.
+After a few moments, you should be able to access Listmonk at your configured domain.
 
-:::caution
+:::danger
 
-When you first access the Listmonk web interface, you will be prompted to create an administrator account. Make sure to use a strong password, as this account will have full access to all features and subscriber data.
+**IMPORTANT: Secure your installation immediately!**
+
+Upon first access to the Listmonk web interface, you will be prompted to create an administrator account. **You must do this immediately** after connecting the domain, before anyone else can access your instance.
+
+Until you create an administrator account, your Listmonk installation is completely unsecured and anyone who discovers the URL can set up the admin account and gain full control over your newsletter system, including access to all subscriber data.
+
+Make sure to:
+
+- Access the web interface immediately after domain assignment
+- Use a strong, unique password for the administrator account
+- Complete the setup process without delay
 
 :::
 
