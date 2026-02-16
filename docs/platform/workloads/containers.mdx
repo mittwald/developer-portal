@@ -116,6 +116,51 @@ If your container image should be loaded from a private registry, you first need
   </TabItem>
 </Tabs>
 
+:::note
+Do not confuse "private" registry with self-hosted, which is explained in the next chapter.
+:::
+
+## Custom, self-hosted docker image registry {#self-hosted-registries}
+
+If no private registry exists or is unavailable for any reason, it is possible to host your own docker image registry in the mittwald container hosting.
+
+Check [this guide](https://distribution.github.io/distribution/about/deploying/) for detailed instructions and configuration.
+
+<Tabs groupId="access-mode">
+  <TabItem value="gui" label="mStudio UI">
+    To create a new container registry via the mStudio, follow these steps:
+
+    1. Navigate to the project that you want to create the container in.
+    2. Select the "Containers" menu item in the sidebar.
+    3. In the open "Container" tab, click the "Create" button.
+    4. Configure the container as needed, use `library/registry:3` image.
+    5. Set up environment variables to your likings, check guide above for details.
+
+  </TabItem>
+  <TabItem value="cli" label="CLI">
+    To create a new container registry via the CLI, use the `mw registry create` command:
+
+    ```shellsession
+    (user@local) $ mw container run \
+      --name example-registry \
+      --volume registry-data:/var/lib/registry \
+      --publish 5000:5000/tcp \
+      --create-volumes \
+      library/registry:3
+    ```
+
+    Environment variables for configuration can be added via `--env` option, check guide above for configuration options.
+    See the documentation on the [`mw container run` command](/docs/v2/cli/reference/container/#mw-container-run) for more information.
+
+  </TabItem>
+  <TabItem value="api" label="API">
+    To learn how to create or modify a container registry via the API, read the article ["Starting a container"](../../../api/howtos/create-container).
+  </TabItem>
+</Tabs>
+
+The registry set up in this chapter can be used as private registry, so make sure to make registry reachable, e.g. by creating a subdomain in your project pointing towoards custom registry.
+A custom registry might end up with a domain like `docker.p-XXXXXX.project.space`, which can be configured as registry for future container deployments.
+
 ## Deployment strategies
 
 When using containers for deployment, you will typically roll out new versions of your application by creating a new container image and deploying it to the same container stack. This is a common practice in containerized environments, as it allows for easy versioning and rollback.
