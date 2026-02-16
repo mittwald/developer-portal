@@ -90,7 +90,7 @@ resource "mittwald_container_stack" "listmonk" {
       image       = data.mittwald_container_image.listmonk.name
 
       entrypoint = data.mittwald_container_image.listmonk.entrypoint
-      command    = ["/bin/sh", "-c", "./listmonk --install --idempotent --yes --config '' && ./listmonk --upgrade --yes --config '' && ./listmonk --config ''"]
+      command    = ["sh", "-c", "./listmonk --install --idempotent --yes --config '' && ./listmonk --upgrade --yes --config '' && ./listmonk --config ''"]
 
       environment = {
         LISTMONK_app__address = "0.0.0.0:9000"
@@ -143,8 +143,8 @@ Als Nächstes wirst du nach dem Image-Namen gefragt. Gib `listmonk/listmonk` ein
 
 Konfiguriere Listmonk so, dass es mit automatischer Datenbankinitialisierung und -upgrades startet:
 
-- **Entrypoint:** Wähle **"Benutzerdefiniert"** aus und gib `/bin/sh` ein
-- **Command:** Wähle **"Benutzerdefiniert"** aus und gib `-c ./listmonk --install --idempotent --yes --config '' && ./listmonk --upgrade --yes --config '' && ./listmonk --config ''` ein
+- **Entrypoint:** Keine Änderungen erforderlich
+- **Command:** Wähle **"Benutzerdefiniert"** aus und gib `sh -c "./listmonk --install --idempotent --yes --config '' && ./listmonk --upgrade --yes --config '' && ./listmonk --config ''"` ein
 
 :::note
 
@@ -207,10 +207,9 @@ user@local $ mw container run \
   --env "LISTMONK_db__database=<DB_NAME>" \
   --volume "listmonk-uploads:/listmonk/uploads" \
   --create-volumes \
-  --entrypoint "/bin/sh" \
   -- \
   listmonk/listmonk \
-  -c "./listmonk --install --idempotent --yes --config '' && ./listmonk --upgrade --yes --config '' && ./listmonk --config ''"
+  sh -c "./listmonk --install --idempotent --yes --config '' && ./listmonk --upgrade --yes --config '' && ./listmonk --config ''"
 ```
 
 Stelle sicher, dass du die Platzhalterwerte durch deine tatsächlichen Datenbankkonfigurationsdetails ersetzt. Nach dem Erstellen des Containers musst du noch eine Domain zuweisen.
@@ -268,11 +267,21 @@ Um Listmonk vom öffentlichen Internet aus zugänglich zu machen, musst du es mi
 5. Der Port wird automatisch auf `9000` gesetzt
 6. Klicke auf den grünen **"Speichern"**-Button, um die Änderungen anzuwenden
 
-Nach einigen Augenblicken solltest du in der Lage sein, auf Listmonk über deine konfigurierte Domain zuzugreifen. Beim ersten Zugriff auf die Weboberfläche musst du ein Administratorkonto erstellen.
+Nach einigen Augenblicken solltest du in der Lage sein, auf Listmonk über deine konfigurierte Domain zuzugreifen.
 
-:::caution
+:::danger
 
-Wenn du zum ersten Mal auf die Listmonk-Weboberfläche zugreifst, wirst du aufgefordert, ein Administratorkonto zu erstellen. Stelle sicher, dass du ein starkes Passwort verwendest, da dieses Konto vollen Zugriff auf alle Funktionen und Abonnentendaten hat.
+**WICHTIG: Sichere deine Installation sofort!**
+
+Beim ersten Zugriff auf die Listmonk-Weboberfläche wirst du aufgefordert, ein Administratorkonto zu erstellen. **Du musst dies sofort tun**, nachdem du die Domain verbunden hast, bevor jemand anderes auf deine Instanz zugreifen kann.
+
+Bis du ein Administratorkonto erstellst, ist deine Listmonk-Installation vollständig ungesichert und jeder, der die URL entdeckt, kann das Admin-Konto einrichten und die volle Kontrolle über dein Newsletter-System erlangen, einschließlich Zugriff auf alle Abonnentendaten.
+
+Stelle sicher, dass du:
+
+- Die Weboberfläche sofort nach der Domain-Zuweisung aufrufst
+- Ein starkes, einzigartiges Passwort für das Administratorkonto verwendest
+- Den Einrichtungsprozess ohne Verzögerung abschließt
 
 :::
 
