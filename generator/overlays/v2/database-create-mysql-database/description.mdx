@@ -1,0 +1,9 @@
+This operation creates a MySQL database and an associated MySQL user.
+
+:::note
+
+This operation is asynchronous. Even after a successful response, you will still need to wait until the database is successfully provisioned. Currently, the recommended way for that is to poll the <OperationLink operation="database-get-mysql-database" /> endpoint and observe the `mainUser.status` field in the response.
+
+Both the database itself (`.status`) and the linked user (`.mainUser.status`) must have a status of ready to ensure a successful connection.
+
+:::
