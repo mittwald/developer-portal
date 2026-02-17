@@ -223,7 +223,7 @@ To persist the credentials file, we start with creating a new volume for our reg
 
     ::note
     Command above does not yet include environment variables needed for basic auth. This will follow in next step.
-    Feel free to skip this step in favor of a full update command in the next section. 
+    Feel free to skip this step in favor of a full update command in the next section.
     ::
 
   </TabItem>
@@ -231,12 +231,6 @@ To persist the credentials file, we start with creating a new volume for our reg
     To learn how to create or modify a container registry via the API, read the article ["Starting a container"](../../../api/howtos/create-container).
   </TabItem>
 </Tabs>
-
-After volume creation, we can ship our prepared auth folder:
-
-```shellsession
-(user@local) $ mw container cp -r auth/ example-registry:/
-```
 
 After that, we reconfigure our registry to use new basic auth credentials.
 
@@ -284,15 +278,19 @@ After that, we reconfigure our registry to use new basic auth credentials.
       library/registry:3
     ```
 
-    Make sure to prepare and ship `auth` folder as described earlier.
-
   </TabItem>
   <TabItem value="api" label="API">
     To learn how to create or modify a container registry via the API, read the article ["Starting a container"](../../../api/howtos/create-container).
   </TabItem>
 </Tabs>
 
-Recreate the container with volumes and environment variables set.
+(Re)create the container with volumes and environment variables set.
+Then we ship our credentials file, overriding default user credentials ( to be found in logs if needed ).
+
+```shellsession
+(user@local) $ mw container cp -r auth/ example-registry:/
+```
+
 As final step, create a subdomain in your project and point it to registry container.
 
 <Tabs groupId="access-mode">
@@ -328,15 +326,28 @@ registry to actually use it. Build and tag an arbitrary Docker image, then push 
 (user@local) $ docker push docker.p-XXXXXX.project.space/<Your Image>:latest
 ```
 
-Your push **must** be `rejected` due to missing basic auth credentials. Now log in:
+Your push **must** be `rejected` due to missing basic auth credentials:
+
+```shellsession
+(user@local) $ docker push docker.p-XXXXXX.project.space/<Your Image>:latest
+...
+push access denied, repository does not exist or may require authorization: authorization failed: no basic auth credentials
+```
+
+Now log in:
 
 ```shellsession
 (user@local) $ docker login docker.p-XXXXXX.project.space
 ```
 
+::note
+When testing, remember to log out specifically from your registry via `docker logout docker.p-XXXXXX.project.space`
+::
+
 Retry `docker push`, which now works after successful login!
 Congratulations, you have successfully created your own private, self-hosted docker registry.
-Depending on your project structure and use case, one generic docker registry in a separate project **or** one registry per project can be created and used. 
+Depending on your project structure and use case, one generic docker registry in a separate project,
+**or** one registry per project can be created and used.
 
 ## Deployment strategies
 
