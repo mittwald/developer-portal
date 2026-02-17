@@ -59,7 +59,7 @@ resource "mittwald_container_stack" "listmonk" {
   containers = {
     database = {
       description = "PostgreSQL database for Listmonk"
-      image       = data.mittwald_container_image.postgres.name
+      image       = data.mittwald_container_image.postgres.image
 
       entrypoint = data.mittwald_container_image.postgres.entrypoint
       command    = data.mittwald_container_image.postgres.command
@@ -87,7 +87,7 @@ resource "mittwald_container_stack" "listmonk" {
 
     listmonk = {
       description = "Listmonk newsletter application"
-      image       = data.mittwald_container_image.listmonk.name
+      image       = data.mittwald_container_image.listmonk.image
 
       entrypoint = data.mittwald_container_image.listmonk.entrypoint
       command    = ["sh", "-c", "./listmonk --install --idempotent --yes --config '' && ./listmonk --upgrade --yes --config '' && ./listmonk --config ''"]
