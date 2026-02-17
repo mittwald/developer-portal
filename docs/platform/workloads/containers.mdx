@@ -124,6 +124,11 @@ Do not confuse "private" registry with self-hosted, which is explained in the ne
 
 If no private registry exists or is unavailable for any reason, it is possible to host your own docker image registry in the mittwald container hosting.
 
+::note
+In order to work through this guide, we need to ship files via `mw container cp` command.
+Make sure to prepare SSH access to your environment, check [this guide](../../../cli/usage/intro).
+::
+
 Check [this guide](https://distribution.github.io/distribution/about/deploying/) for detailed instructions and configuration.
 
 <Tabs groupId="access-mode">
@@ -160,6 +165,178 @@ Check [this guide](https://distribution.github.io/distribution/about/deploying/)
 
 The registry set up in this chapter can be used as private registry, so make sure to make registry reachable, e.g. by creating a subdomain in your project pointing towoards custom registry.
 A custom registry might end up with a domain like `docker.p-XXXXXX.project.space`, which can be configured as registry for future container deployments.
+
+::warning
+Without additional configuration this registry is publicly available without authentification.
+If login via credentials is desired, follow next steps to set up basic authentication.
+::
+
+### Basic auth for self-hosted docker registry
+
+In order to add basic authentication to our registry we need to prepare credentials which we then deploy into our registry.
+
+First step is to create the credentials file **locally**:
+
+```shellsession
+(user@local) $ mkdir -p auth
+(user@local) $ docker run \
+  --entrypoint htpasswd \
+  httpd:2 -Bbn exampleuser examplepassword > auth/htpasswd
+```
+
+This will create the `htpasswd` credentials file, which we now have to ship.
+
+::note
+This guide shows setup steps separately, although in `CLI` mode much can be done with one command.
+When you are already familiar with `CLI` and just need the right commands, feel free to skip ahead to the end
+of the guide, which will provide the full commands to be used without intermediate steps for explanation.
+::
+
+To persist the credentials file, we start with creating a new volume for our registry container:
+
+<Tabs groupId="access-mode">
+  <TabItem value="gui" label="mStudio UI">
+    To create a new container volume via the mStudio, follow these steps:
+
+    1. Navigate to the project that you have created the registry in.
+    2. Select the "Containers" menu item in the sidebar, then select the registry container.
+    3. In the open "Container" tab, navigate to "Volumes" tab.
+    4. In the "Volumes" tab, click "Create".
+    5. Configure new volume mount point to `/auth` and click "Save".
+
+  </TabItem>
+  <TabItem value="cli" label="CLI">
+    To create a new volume via the CLI, use the `mw volume create` command:
+
+    ```shellsession
+    (user@local) $ mw volume create registry-auth
+    ```
+
+    After volume creation we can attach it to our container via `mw container update`:
+
+    ```shellsession
+    (user@local) $ mw container update \
+      c-XXXXXX \
+      -v registry-auth:/auth \
+      -v registry-data:/var/lib/registry
+    ```
+
+    ::note
+    Command above does not yet include environment variables needed for basic auth. This will follow in next step.
+    Feel free to skip this step in favor of a full update command in the next section. 
+    ::
+
+  </TabItem>
+  <TabItem value="api" label="API">
+    To learn how to create or modify a container registry via the API, read the article ["Starting a container"](../../../api/howtos/create-container).
+  </TabItem>
+</Tabs>
+
+After volume creation, we can ship our prepared auth folder:
+
+```shellsession
+(user@local) $ mw container cp -r auth/ example-registry:/
+```
+
+After that, we reconfigure our registry to use new basic auth credentials.
+
+<Tabs groupId="access-mode">
+  <TabItem value="gui" label="mStudio UI">
+    To finalize self-hosted registry container configuration, follow these steps:
+
+    1. Navigate to the project that you have created the registry in.
+    2. Select the "Containers" menu item in the sidebar, then select the registry container.
+    3. In the open "Container" tab, navigate to "Environment Variables" tab.
+    4. Use the "Add" button to create environment variables as follows:
+
+    ```env
+    REGISTRY_AUTH=htpasswd
+    REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm
+    REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
+    ```
+
+  </TabItem>
+  <TabItem value="cli" label="CLI">
+    To add or update environment variables via the CLI, use the `mw continaer update` command:
+
+    ```shellsession
+    (user@local) $ mw container update \
+      c-XXXXXX \
+      -v registry-auth:/auth \
+      -v registry-data:/var/lib/registry \
+      -e "REGISTRY_AUTH=htpasswd" \
+      -e "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm" \
+      -e "REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd"
+    ```
+
+    Here is a full `container run` command if you start from scratch or skipped ahead:
+
+    ```shellsession
+    (user@local) $ mw container run \
+      --name example-registry \
+      --volume registry-data:/var/lib/registry \
+      --volume registry-auth:/auth
+      --publish 5000:5000/tcp \
+      --create-volumes \
+      -e "REGISTRY_AUTH=htpasswd" \
+      -e "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm" \
+      -e "REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd" \
+      library/registry:3
+    ```
+
+    Make sure to prepare and ship `auth` folder as described earlier.
+
+  </TabItem>
+  <TabItem value="api" label="API">
+    To learn how to create or modify a container registry via the API, read the article ["Starting a container"](../../../api/howtos/create-container).
+  </TabItem>
+</Tabs>
+
+Recreate the container with volumes and environment variables set.
+As final step, create a subdomain in your project and point it to registry container.
+
+<Tabs groupId="access-mode">
+  <TabItem value="gui" label="mStudio UI">
+    To add and link a subdomain in your project, follow these steps:
+
+    1. Navigate to the project that you have created the registry in.
+    2. Select the "Domains" menu item in the sidebar, then click "Add" -> "Subdomain".
+    3. As subdomain, for example use `docker.p-XXXXXX.project.space`.
+    4. Select the registry container as target and click "Create".
+
+  </TabItem>
+  <TabItem value="cli" label="CLI">
+
+    ```shellsession
+    (user@local) $ mw domain virtualhost create \
+      --hostname docker.p-XXXXXX.project.space \
+      --path-to-container /:<Container-UUID>:5000/tcp
+    ```
+
+  </TabItem>
+  <TabItem value="api" label="API">
+    To learn how to create or modify a container registry via the API, read the article ["Starting a container"](../../../api/howtos/create-container).
+  </TabItem>
+</Tabs>
+
+Now, after domain has been set up, we can start testing. As we have configured basic auth, we should check our
+registry to actually use it. Build and tag an arbitrary Docker image, then push to new registry:
+
+```shellsession
+(user@local) $ docker build -t <Your Image> .
+(user@local) $ docker tag <Your Image>:latest docker.p-XXXXXX.project.space/<Your Image>
+(user@local) $ docker push docker.p-XXXXXX.project.space/<Your Image>:latest
+```
+
+Your push **must** be `rejected` due to missing basic auth credentials. Now log in:
+
+```shellsession
+(user@local) $ docker login docker.p-XXXXXX.project.space
+```
+
+Retry `docker push`, which now works after successful login!
+Congratulations, you have successfully created your own private, self-hosted docker registry.
+Depending on your project structure and use case, one generic docker registry in a separate project **or** one registry per project can be created and used. 
 
 ## Deployment strategies
 
