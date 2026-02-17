@@ -30,7 +30,7 @@ Du kannst eine PostgreSQL-Datenbank in einem separaten Container erstellen. Eine
 
 Wir verwenden das `listmonk/listmonk`-Image von [Docker Hub](https://hub.docker.com/r/listmonk/listmonk) für den Container.
 
-### Mit Terraform (Empfohlen)
+### Mit Terraform (Empfohlen) {#terraform}
 
 Die komfortabelste Methode, um eine produktionsreife Listmonk-Instanz bereitzustellen, ist die Verwendung von [Terraform](/docs/v2/guides/deployment/terraform). Das folgende Beispiel zeigt, wie du Listmonk zusammen mit einer PostgreSQL-Datenbank als Container-Stack bereitstellen kannst:
 
@@ -132,7 +132,7 @@ Diese Konfiguration verwendet das `--install --idempotent`-Flag, das sicherstell
 
 :::
 
-### Über die mStudio-Oberfläche
+### Über die mStudio-Oberfläche {#mstudio-ui}
 
 In mStudio gehst du zu deinem Projekt und wählst **"Container erstellen"** aus. Ein geführter Dialog öffnet sich, um dich bei der Container-Einrichtung zu unterstützen.
 
@@ -140,7 +140,7 @@ Gib zuerst eine Beschreibung ein – dies ist ein Freitextfeld, das zur Identifi
 
 Als Nächstes wirst du nach dem Image-Namen gefragt. Gib `listmonk/listmonk` ein und bestätige mit **"Weiter"**.
 
-#### Entrypoint und Command {#ui-entrypoint-und-command}
+#### Entrypoint und Command {#entrypoint-and-command}
 
 Konfiguriere Listmonk so, dass es mit automatischer Datenbankinitialisierung und -upgrades startet:
 
@@ -153,7 +153,7 @@ Dieser Befehl verwendet das `--install --idempotent`-Flag, das sicherstellt, das
 
 :::
 
-#### Volumes {#ui-volumes}
+#### Volumes {#volumes}
 
 Um hochgeladene Dateien und Medien dauerhaft zu speichern, füge ein Volume hinzu:
 
@@ -165,7 +165,7 @@ Ohne dieses Volume gehen alle über Listmonk hochgeladenen Dateien (wie Bilder f
 
 :::
 
-#### Umgebungsvariablen {#ui-umgebungsvariablen}
+#### Umgebungsvariablen {#environment-variables}
 
 Konfiguriere Listmonk für die Verbindung zu deiner PostgreSQL-Datenbank. Klicke auf **"Texteingabe"** und gib die folgenden Umgebungsvariablen ein:
 
@@ -192,7 +192,7 @@ Stelle sicher, dass du ein sicheres Passwort für deine Datenbankverbindung verw
 
 Nachdem du alle Umgebungsvariablen eingegeben hast, klicke auf **"Weiter"**. Im letzten Dialog wirst du nach dem **Port** gefragt – du kannst diesen unverändert bei `9000` lassen. Klicke auf **"Container erstellen"**, um den Container zu erstellen und zu starten.
 
-### Alternative: Über den Befehl `mw container run`
+### Alternative: Über den Befehl `mw container run` {#mw-container-run}
 
 Du kannst auch den Befehl `mw container run` verwenden, um direkt von der Kommandozeile aus einen Listmonk-Container zu erstellen und zu starten. Dieser Ansatz ist ähnlich wie die Verwendung der Docker-CLI und ermöglicht es dir, alle Container-Parameter in einem einzigen Befehl anzugeben.
 
@@ -217,7 +217,7 @@ user@local $ mw container run \
 
 Stelle sicher, dass du die Platzhalterwerte durch deine tatsächlichen Datenbankkonfigurationsdetails ersetzt. Nach dem Erstellen des Containers musst du noch eine Domain zuweisen.
 
-### Alternative: Über den Befehl `mw stack deploy`
+### Alternative: Über den Befehl `mw stack deploy` {#mw-stack-deploy}
 
 Alternativ kannst du den Befehl `mw stack deploy` verwenden, der mit Docker Compose kompatibel ist. Dieser Ansatz ermöglicht es dir, deine Container-Konfiguration in einer YAML-Datei zu definieren und mit einem einzigen Befehl bereitzustellen.
 
@@ -260,7 +260,7 @@ user@local $ mw stack deploy
 
 Dieser Befehl liest die `docker-compose.yml`-Datei aus dem aktuellen Verzeichnis und stellt sie auf deinem Standard-Stack bereit.
 
-## Domain zuweisen {#domain-zuweisen}
+## Domain zuweisen {#assign-domain}
 
 Um Listmonk vom öffentlichen Internet aus zugänglich zu machen, musst du es mit einer Domain verbinden:
 
@@ -291,7 +291,7 @@ Stelle sicher, dass du:
 
 ## Betrieb
 
-### Datenbank-Setup {#datenbank-setup}
+### Datenbank-Setup {#database-setup}
 
 Wenn du Listmonk zusammen mit einer PostgreSQL-Datenbank in einem Container-Stack bereitstellst, kannst du das folgende Beispiel verwenden, um beide Container gemeinsam bereitzustellen:
 
