@@ -30,7 +30,7 @@ You can create a PostgreSQL database using a separate container. For instruction
 
 We use the `listmonk/listmonk` image from [Docker Hub](https://hub.docker.com/r/listmonk/listmonk) for the container.
 
-### Using Terraform (Recommended)
+### Using Terraform (Recommended) {#terraform}
 
 The most convenient way to provision a production-ready Listmonk instance is using [Terraform](/docs/v2/guides/deployment/terraform). The following example shows how you can deploy Listmonk along with a PostgreSQL database as a container stack:
 
@@ -132,7 +132,7 @@ This configuration uses the `--install --idempotent` flag, which ensures that da
 
 :::
 
-### Using the mStudio UI
+### Using the mStudio UI {#mstudio-ui}
 
 In mStudio, go to your project and select **"Create container"**. A guided dialog will open to assist you with the container setup.
 
@@ -140,7 +140,7 @@ First, enter a description – this is a free text field used to identify the co
 
 Next, you'll be asked for the image name. Enter `listmonk/listmonk` and confirm with **"Next"**.
 
-#### Entrypoint and Command {#ui-entrypoint-and-command}
+#### Entrypoint and Command {#entrypoint-and-command}
 
 Configure Listmonk to start with automatic database initialization and upgrades:
 
@@ -153,7 +153,7 @@ This command uses the `--install --idempotent` flag, which ensures that database
 
 :::
 
-#### Volumes {#ui-volumes}
+#### Volumes {#volumes}
 
 To persist uploaded files and media, add a volume:
 
@@ -165,7 +165,7 @@ Without this volume, any files uploaded through Listmonk (such as images for cam
 
 :::
 
-#### Environment Variables {#ui-environment-variables}
+#### Environment Variables {#environment-variables}
 
 Configure Listmonk to connect to your PostgreSQL database. Click on **"Text input"** and enter the following environment variables:
 
@@ -192,7 +192,7 @@ Make sure to use a secure password for your database connection. The database pa
 
 Once you've entered all the environment variables, click **"Next"**. In the final dialog, you'll be asked for the **port** – you can leave this unchanged at `9000`. Click **"Create container"** to create and start the container.
 
-### Alternative: Using the `mw container run` command
+### Alternative: Using the `mw container run` command {#mw-container-run}
 
 You can also use the `mw container run` command to directly create and start a Listmonk container from the command line. This approach is similar to using the Docker CLI and allows you to specify all container parameters in a single command.
 
@@ -217,7 +217,7 @@ user@local $ mw container run \
 
 Make sure to replace the placeholder values with your actual database configuration details. After creating the container, you'll still need to assign a domain to it.
 
-### Alternative: Using the `mw stack deploy` command
+### Alternative: Using the `mw stack deploy` command {#mw-stack-deploy}
 
 Alternatively, you can use the `mw stack deploy` command, which is compatible with Docker Compose. This approach allows you to define your container configuration in a YAML file and deploy it with a single command.
 
