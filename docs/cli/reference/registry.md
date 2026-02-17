@@ -1,12 +1,6 @@
-`mw registry`
-=============
+# `mw registry`
 
 Manage container registries
-
-
-
-
-
 
 ## `mw registry create`
 
@@ -48,7 +42,6 @@ FLAG DESCRIPTIONS
     CAUTION: providing this flag may log your password in your shell history!
 ```
 
-
 ## `mw registry delete REGISTRY-ID`
 
 Delete a container registry
@@ -74,7 +67,6 @@ FLAG DESCRIPTIONS
     This flag controls if you want to see the process output or only a summary. When using mw non-interactively (e.g. in
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
-
 
 ## `mw registry list`
 
@@ -111,7 +103,6 @@ FLAG DESCRIPTIONS
     to persistently set a default project for all commands that accept this flag.
 ```
 
-
 ## `mw registry update REGISTRY-ID`
 
 Update an existing container registry
@@ -147,4 +138,3 @@ FLAG DESCRIPTIONS
 
     CAUTION: providing this flag may log your password in your shell history!
 ```
-

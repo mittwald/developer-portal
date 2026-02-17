@@ -1,38 +1,6 @@
-`mw app`
-========
+# `mw app`
 
 Manage apps, and app installations in your projects
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ## `mw app copy [INSTALLATION-ID]`
 
@@ -65,7 +33,6 @@ FLAG DESCRIPTIONS
     This flag controls if you want to see the process output or only a summary. When using mw non-interactively (e.g. in
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
-
 
 ## `mw app create node`
 
@@ -124,7 +91,6 @@ FLAG DESCRIPTIONS
     If unspecified, the application name and the given project ID will be used. The title can be changed after the
     installation is finished
 ```
-
 
 ## `mw app create php`
 
@@ -186,7 +152,6 @@ FLAG DESCRIPTIONS
     installation is finished
 ```
 
-
 ## `mw app create php-worker`
 
 Creates new PHP worker installation.
@@ -244,7 +209,6 @@ FLAG DESCRIPTIONS
     installation is finished
 ```
 
-
 ## `mw app create python`
 
 Creates new custom python site installation.
@@ -301,7 +265,6 @@ FLAG DESCRIPTIONS
     If unspecified, the application name and the given project ID will be used. The title can be changed after the
     installation is finished
 ```
-
 
 ## `mw app create static`
 
@@ -363,7 +326,6 @@ FLAG DESCRIPTIONS
     installation is finished
 ```
 
-
 ## `mw app dependency list`
 
 Get all available dependencies
@@ -390,7 +352,6 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   Get all available dependencies
 ```
-
 
 ## `mw app dependency update [INSTALLATION-ID]`
 
@@ -434,7 +395,6 @@ FLAG DESCRIPTIONS
     This flag may be specified multiple times to update multiple dependencies.
 ```
 
-
 ## `mw app dependency versions SYSTEMSOFTWARE`
 
 Get all available versions of a particular dependency
@@ -464,7 +424,6 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   Get all available versions of a particular dependency
 ```
-
 
 ## `mw app download [INSTALLATION-ID]`
 
@@ -553,7 +512,6 @@ FLAG DESCRIPTIONS
     You can also set this value by setting the MITTWALD_SSH_USER environment variable.
 ```
 
-
 ## `mw app exec COMMAND`
 
 Execute a command in an app installation via SSH non-interactively.
@@ -618,7 +576,6 @@ FLAG DESCRIPTIONS
     You can also set this value by setting the MITTWALD_SSH_USER environment variable.
 ```
 
-
 ## `mw app get [INSTALLATION-ID]`
 
 Get details about an app installation
@@ -643,7 +600,6 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   Get details about an app installation
 ```
-
 
 ## `mw app install contao`
 
@@ -747,7 +703,6 @@ FLAG DESCRIPTIONS
     If unspecified, the Contao will be installed in the latest available version.
 ```
 
-
 ## `mw app install joomla`
 
 Creates new Joomla! installation.
@@ -850,7 +805,6 @@ FLAG DESCRIPTIONS
     If unspecified, the Joomla! will be installed in the latest available version.
 ```
 
-
 ## `mw app install matomo`
 
 Creates new Matomo installation.
@@ -937,7 +891,6 @@ FLAG DESCRIPTIONS
     Specify the version in which your Matomo will be installed.
     If unspecified, the Matomo will be installed in the latest available version.
 ```
-
 
 ## `mw app install nextcloud`
 
@@ -1026,7 +979,6 @@ FLAG DESCRIPTIONS
     Specify the version in which your Nextcloud will be installed.
     If unspecified, the Nextcloud will be installed in the latest available version.
 ```
-
 
 ## `mw app install shopware5`
 
@@ -1152,7 +1104,6 @@ FLAG DESCRIPTIONS
     If unspecified, the Shopware 5 will be installed in the latest available version.
 ```
 
-
 ## `mw app install shopware6`
 
 Creates new Shopware 6 installation.
@@ -1277,7 +1228,6 @@ FLAG DESCRIPTIONS
     If unspecified, the Shopware 6 will be installed in the latest available version.
 ```
 
-
 ## `mw app install typo3`
 
 Creates new TYPO3 installation.
@@ -1373,7 +1323,6 @@ FLAG DESCRIPTIONS
     If unspecified, the TYPO3 will be installed in the latest available version.
 ```
 
-
 ## `mw app install wordpress`
 
 Creates new WordPress installation.
@@ -1462,7 +1411,6 @@ FLAG DESCRIPTIONS
     If unspecified, the WordPress will be installed in the latest available version.
 ```
 
-
 ## `mw app list`
 
 List installed apps in a project.
@@ -1498,7 +1446,6 @@ FLAG DESCRIPTIONS
     to persistently set a default project for all commands that accept this flag.
 ```
 
-
 ## `mw app list-upgrade-candidates [INSTALLATION-ID]`
 
 List upgrade candidates for an app installation.
@@ -1529,7 +1476,6 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   List upgrade candidates for an app installation.
 ```
-
 
 ## `mw app open [INSTALLATION-ID]`
 
@@ -1562,7 +1508,6 @@ FLAG DESCRIPTIONS
     If this flag is set, the backend of the app installation will be opened instead of the frontend. This flag is only
     available for some types of apps (like PHP and Node.js).
 ```
-
 
 ## `mw app ssh [INSTALLATION-ID]`
 
@@ -1621,7 +1566,6 @@ FLAG DESCRIPTIONS
     You can also set this value by setting the MITTWALD_SSH_USER environment variable.
 ```
 
-
 ## `mw app uninstall [INSTALLATION-ID]`
 
 Uninstall an app
@@ -1651,7 +1595,6 @@ FLAG DESCRIPTIONS
     This flag controls if you want to see the process output or only a summary. When using mw non-interactively (e.g. in
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
-
 
 ## `mw app update [INSTALLATION-ID]`
 
@@ -1697,7 +1640,6 @@ FLAG DESCRIPTIONS
     is only available for some types of apps (like Python and Node.js).
 ```
 
-
 ## `mw app upgrade [INSTALLATION-ID]`
 
 Upgrade app installation to target version
@@ -1741,7 +1683,6 @@ FLAG DESCRIPTIONS
     This flag controls if you want to see the process output or only a summary. When using mw non-interactively (e.g. in
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
-
 
 ## `mw app upload [INSTALLATION-ID]`
 
@@ -1824,7 +1765,6 @@ FLAG DESCRIPTIONS
     You can also set this value by setting the MITTWALD_SSH_USER environment variable.
 ```
 
-
 ## `mw app version-info APP VERSION`
 
 This command shows information about a specific app version. It is useful to get information about the user inputs that are required for the version to be deployed successfully.
@@ -1848,7 +1788,6 @@ DESCRIPTION
   show information about specific app versions
 ```
 
-
 ## `mw app versions [APP]`
 
 List supported Apps and Versions
@@ -1867,4 +1806,3 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   List supported Apps and Versions
 ```
-
