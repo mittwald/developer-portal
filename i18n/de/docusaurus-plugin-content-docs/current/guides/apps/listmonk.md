@@ -36,11 +36,11 @@ Die komfortabelste Methode, um eine produktionsreife Listmonk-Instanz bereitzust
 
 ```hcl
 data "mittwald_container_image" "postgres" {
-  name = "postgres:17"
+  image = "postgres:17"
 }
 
 data "mittwald_container_image" "listmonk" {
-  name = "listmonk/listmonk:latest"
+  image = "listmonk/listmonk:latest"
 }
 
 variable "project_id" {
@@ -99,6 +99,7 @@ resource "mittwald_container_stack" "listmonk" {
         LISTMONK_db__user     = "listmonk"
         LISTMONK_db__password = random_password.postgres_password.result
         LISTMONK_db__database = "listmonk"
+        LISTMONK_db__ssl_mode = "disable"
       }
 
       volumes = [
@@ -178,6 +179,7 @@ LISTMONK_db__port=5432
 LISTMONK_db__user=<DB_USER>
 LISTMONK_db__password=<DB_PASSWORD>
 LISTMONK_db__database=<DB_NAME>
+LISTMONK_db__ssl_mode=disable
 ```
 
 Ersetze die Platzhalter (`<DB_HOST>`, `<DB_USER>`, `<DB_PASSWORD>`, `<DB_NAME>`) durch deine PostgreSQL-Datenbankverbindungsdetails.
@@ -205,6 +207,7 @@ user@local $ mw container run \
   --env "LISTMONK_db__user=<DB_USER>" \
   --env "LISTMONK_db__password=<DB_PASSWORD>" \
   --env "LISTMONK_db__database=<DB_NAME>" \
+  --env "LISTMONK_db__ssl_mode=disable" \
   --volume "listmonk-uploads:/listmonk/uploads" \
   --create-volumes \
   -- \
@@ -241,6 +244,7 @@ services:
       LISTMONK_db__user: "<DB_USER>"
       LISTMONK_db__password: "<DB_PASSWORD>"
       LISTMONK_db__database: "<DB_NAME>"
+      LISTMONK_db__ssl_mode: "disable"
 
 volumes:
   listmonk-uploads: {}
@@ -323,6 +327,7 @@ services:
       LISTMONK_db__user: "listmonk"
       LISTMONK_db__password: "<SICHERES_PASSWORT>"
       LISTMONK_db__database: "listmonk"
+      LISTMONK_db__ssl_mode: "disable"
     depends_on:
       - database
 
