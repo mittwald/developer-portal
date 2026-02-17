@@ -1,6 +1,18 @@
-# `mw mail`
+`mw mail`
+=========
 
 Manage mailboxes and mail addresses in your projects
+
+
+
+
+
+
+
+
+
+
+
 
 ## `mw mail address create`
 
@@ -89,6 +101,7 @@ FLAG DESCRIPTIONS
     --quiet, the address ID and the password will be printed to stdout, separated by a tab character.
 ```
 
+
 ## `mw mail address delete ID`
 
 Delete a mail address
@@ -118,6 +131,7 @@ FLAG DESCRIPTIONS
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
 
+
 ## `mw mail address get ID`
 
 Get a specific mail address
@@ -140,6 +154,7 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   Get a specific mail address
 ```
+
 
 ## `mw mail address list`
 
@@ -175,6 +190,7 @@ FLAG DESCRIPTIONS
     May contain a short ID or a full ID of a project; you can also use the "mw context set --project-id=<VALUE>" command
     to persistently set a default project for all commands that accept this flag.
 ```
+
 
 ## `mw mail address update MAILADDRESS-ID`
 
@@ -254,6 +270,7 @@ FLAG DESCRIPTIONS
     --quiet, the password will be printed to stdout.
 ```
 
+
 ## `mw mail deliverybox create`
 
 Create a new mail delivery box
@@ -317,6 +334,7 @@ FLAG DESCRIPTIONS
     --quiet, the delivery box ID and the password will be printed to stdout, separated by a tab character.
 ```
 
+
 ## `mw mail deliverybox delete ID`
 
 Delete a mail delivery box
@@ -346,6 +364,7 @@ FLAG DESCRIPTIONS
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
 
+
 ## `mw mail deliverybox get ID`
 
 Get a specific delivery box
@@ -368,6 +387,7 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   Get a specific delivery box
 ```
+
 
 ## `mw mail deliverybox list`
 
@@ -403,6 +423,7 @@ FLAG DESCRIPTIONS
     May contain a short ID or a full ID of a project; you can also use the "mw context set --project-id=<VALUE>" command
     to persistently set a default project for all commands that accept this flag.
 ```
+
 
 ## `mw mail deliverybox update MAILDELIVERYBOX-ID`
 
@@ -467,3 +488,4 @@ FLAG DESCRIPTIONS
     This flag will cause the command to generate a random 32-character password for the delivery box; when running with
     --quiet, the password will be printed to stdout.
 ```
+

@@ -1,6 +1,14 @@
-# `mw conversation`
+`mw conversation`
+=================
 
 Manage your support cases
+
+
+
+
+
+
+
 
 ## `mw conversation categories`
 
@@ -29,6 +37,7 @@ DESCRIPTION
   Get all conversation categories.
 ```
 
+
 ## `mw conversation close [CONVERSATION-ID]`
 
 Close a conversation
@@ -47,6 +56,7 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   Close a conversation
 ```
+
 
 ## `mw conversation create`
 
@@ -76,6 +86,7 @@ DESCRIPTION
   Create a new conversation
 ```
 
+
 ## `mw conversation list`
 
 Get all conversations the authenticated user has created or has access to.
@@ -102,6 +113,7 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   Get all conversations the authenticated user has created or has access to.
 ```
+
 
 ## `mw conversation reply [CONVERSATION-ID]`
 
@@ -131,6 +143,7 @@ DESCRIPTION
   Reply to a conversation
 ```
 
+
 ## `mw conversation show [CONVERSATION-ID]`
 
 Show a conversation and message history
@@ -149,3 +162,4 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   Show a conversation and message history
 ```
+

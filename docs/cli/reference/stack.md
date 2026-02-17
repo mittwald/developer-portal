@@ -1,6 +1,15 @@
-# `mw stack`
+`mw stack`
+==========
 
 Manage container stacks
+
+
+
+
+
+
+
+
 
 ## `mw stack delete [STACK-ID]`
 
@@ -34,6 +43,7 @@ FLAG DESCRIPTIONS
     This flag controls if you want to see the process output or only a summary. When using mw non-interactively (e.g. in
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
+
 
 ## `mw stack deploy`
 
@@ -87,6 +97,7 @@ FLAG DESCRIPTIONS
     This flag is mutually exclusive with --compose-file.
 ```
 
+
 ## `mw stack list`
 
 List container stacks for a given project.
@@ -124,6 +135,7 @@ FLAG DESCRIPTIONS
     May contain a short ID or a full ID of a project; you can also use the "mw context set --project-id=<VALUE>" command
     to persistently set a default project for all commands that accept this flag.
 ```
+
 
 ## `mw stack ls`
 
@@ -196,6 +208,7 @@ FLAG DESCRIPTIONS
     May contain a ID of a stack; you can also use the "mw context set --stack-id=<VALUE>" command to persistently set a
     default stack for all commands that accept this flag.
 ```
+
 
 ## `mw stack rm [STACK-ID]`
 

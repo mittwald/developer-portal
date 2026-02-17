@@ -1,6 +1,10 @@
-# `mw ddev`
+`mw ddev`
+=========
 
 Integrate your mittwald projects with DDEV
+
+
+
 
 ## `mw ddev init [INSTALLATION-ID]`
 
@@ -87,6 +91,7 @@ FLAG DESCRIPTIONS
     database.
 ```
 
+
 ## `mw ddev render-config [INSTALLATION-ID]`
 
 Generate a DDEV configuration YAML file for the current app.
@@ -140,3 +145,4 @@ FLAG DESCRIPTIONS
     Use this flag to create a DDEV project without a database; this is useful for projects that do not require a
     database.
 ```
+

@@ -1,6 +1,11 @@
-# `mw context`
+`mw context`
+============
 
 Save certain environment parameters for later use
+
+
+
+
 
 ## `mw context get`
 
@@ -26,6 +31,7 @@ DESCRIPTION
   don't have to specify them on every command.
 ```
 
+
 ## `mw context reset`
 
 Reset context values
@@ -43,6 +49,7 @@ DESCRIPTION
 
   This command resets any values for common parameters that you've previously set with 'context set'.
 ```
+
 
 ## `mw context set`
 
@@ -70,3 +77,4 @@ DESCRIPTION
   The context allows you to persistently set values for common parameters, like --project-id or --server-id, so you
   don't have to specify them on every command.
 ```
+

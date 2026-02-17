@@ -1,6 +1,12 @@
-# `mw sftp-user`
+`mw sftp-user`
+==============
 
 Manage SFTP users of your projects
+
+
+
+
+
 
 ## `mw sftp-user create`
 
@@ -63,6 +69,7 @@ FLAG DESCRIPTIONS
     authentication.
 ```
 
+
 ## `mw sftp-user delete SFTP-USER-ID`
 
 Delete an SFTP user
@@ -91,6 +98,7 @@ FLAG DESCRIPTIONS
     This flag controls if you want to see the process output or only a summary. When using mw non-interactively (e.g. in
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
+
 
 ## `mw sftp-user list`
 
@@ -129,6 +137,7 @@ FLAG DESCRIPTIONS
     May contain a short ID or a full ID of a project; you can also use the "mw context set --project-id=<VALUE>" command
     to persistently set a default project for all commands that accept this flag.
 ```
+
 
 ## `mw sftp-user update SFTP-USER-ID`
 
@@ -199,3 +208,4 @@ FLAG DESCRIPTIONS
     through this user. Using a public key for authentication prevents this user from also using a password for
     authentication.
 ```
+

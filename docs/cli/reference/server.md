@@ -1,6 +1,10 @@
-# `mw server`
+`mw server`
+===========
 
 Manage your servers
+
+
+
 
 ## `mw server get [SERVER-ID]`
 
@@ -24,6 +28,7 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   Get a server.
 ```
+
 
 ## `mw server list`
 
@@ -51,3 +56,4 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   List servers for an organization or user.
 ```
+

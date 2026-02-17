@@ -1,6 +1,12 @@
-# `mw ssh-user`
+`mw ssh-user`
+=============
 
 Manage SSH users of your projects
+
+
+
+
+
 
 ## `mw ssh-user create`
 
@@ -51,6 +57,7 @@ FLAG DESCRIPTIONS
     authentication.
 ```
 
+
 ## `mw ssh-user delete SSH-USER-ID`
 
 Delete an SSH user
@@ -79,6 +86,7 @@ FLAG DESCRIPTIONS
     This flag controls if you want to see the process output or only a summary. When using mw non-interactively (e.g. in
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
+
 
 ## `mw ssh-user list`
 
@@ -117,6 +125,7 @@ FLAG DESCRIPTIONS
     May contain a short ID or a full ID of a project; you can also use the "mw context set --project-id=<VALUE>" command
     to persistently set a default project for all commands that accept this flag.
 ```
+
 
 ## `mw ssh-user update SSH-USER-ID`
 
@@ -175,3 +184,4 @@ FLAG DESCRIPTIONS
     through this user. Using a public key for authentication prevents this user from also using a password for
     authentication.
 ```
+

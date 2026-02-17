@@ -1,6 +1,20 @@
-# `mw user`
+`mw user`
+=========
 
 Manage your own user account
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## `mw user api-token create`
 
@@ -32,6 +46,7 @@ FLAG DESCRIPTIONS
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
 
+
 ## `mw user api-token get TOKEN-ID`
 
 Get a specific API token
@@ -54,6 +69,7 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   Get a specific API token
 ```
+
 
 ## `mw user api-token list`
 
@@ -81,6 +97,7 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   List all API tokens of the user
 ```
+
 
 ## `mw user api-token revoke ID`
 
@@ -111,6 +128,7 @@ FLAG DESCRIPTIONS
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
 
+
 ## `mw user get USER-ID`
 
 Get profile information for a user.
@@ -135,6 +153,7 @@ DESCRIPTION
   Get profile information for a user.
 ```
 
+
 ## `mw user session get TOKEN-ID`
 
 Get a specific session
@@ -157,6 +176,7 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   Get a specific session
 ```
+
 
 ## `mw user session list`
 
@@ -184,6 +204,7 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   List all active sessions
 ```
+
 
 ## `mw user ssh-key create`
 
@@ -215,6 +236,7 @@ FLAG DESCRIPTIONS
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
 
+
 ## `mw user ssh-key delete ID`
 
 Delete an SSH key
@@ -244,6 +266,7 @@ FLAG DESCRIPTIONS
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
 
+
 ## `mw user ssh-key get KEY-ID`
 
 Get a specific SSH key
@@ -266,6 +289,7 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   Get a specific SSH key
 ```
+
 
 ## `mw user ssh-key import`
 
@@ -294,6 +318,7 @@ FLAG DESCRIPTIONS
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
 
+
 ## `mw user ssh-key list`
 
 Get your stored ssh keys
@@ -320,3 +345,4 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   Get your stored ssh keys
 ```
+

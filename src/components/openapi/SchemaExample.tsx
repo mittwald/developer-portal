@@ -104,7 +104,7 @@ function renderExample(format: ExampleFormat, example: any): string {
     return (
       Object.entries(example)
         .map(([key, value]) => {
-          let contentType: string = "image/jpeg";
+          let contentType: string = 'image/jpeg';
           let valueStr: string = value.toString();
 
           let example =

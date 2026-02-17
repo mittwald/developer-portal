@@ -1,6 +1,30 @@
-# `mw database`
+`mw database`
+=============
 
 Manage databases (like MySQL and Redis) in your projects
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## `mw database list`
 
@@ -37,6 +61,7 @@ FLAG DESCRIPTIONS
     to persistently set a default project for all commands that accept this flag.
 ```
 
+
 ## `mw database mysql charsets`
 
 List available MySQL character sets and collations, optionally filtered by a MySQLVersion.
@@ -63,6 +88,7 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   List available MySQL character sets and collations, optionally filtered by a MySQLVersion.
 ```
+
 
 ## `mw database mysql create`
 
@@ -106,6 +132,7 @@ FLAG DESCRIPTIONS
     Use the "database mysql versions" command to list available versions
 ```
 
+
 ## `mw database mysql delete DATABASE-ID`
 
 Delete a MySQL database
@@ -134,6 +161,7 @@ FLAG DESCRIPTIONS
     This flag controls if you want to see the process output or only a summary. When using mw non-interactively (e.g. in
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
+
 
 ## `mw database mysql dump DATABASE-ID`
 
@@ -231,6 +259,7 @@ FLAG DESCRIPTIONS
     flag or via the MYSQL_PWD environment variable.
 ```
 
+
 ## `mw database mysql get DATABASE-ID`
 
 Get a MySQLDatabase.
@@ -253,6 +282,7 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   Get a MySQLDatabase.
 ```
+
 
 ## `mw database mysql import DATABASE-ID`
 
@@ -349,6 +379,7 @@ FLAG DESCRIPTIONS
     flag or via the MYSQL_PWD environment variable.
 ```
 
+
 ## `mw database mysql list`
 
 List MySQLDatabases belonging to a Project.
@@ -384,6 +415,7 @@ FLAG DESCRIPTIONS
     to persistently set a default project for all commands that accept this flag.
 ```
 
+
 ## `mw database mysql phpmyadmin DATABASE-ID`
 
 Open phpMyAdmin for a MySQL database.
@@ -399,6 +431,7 @@ AUTHENTICATION FLAGS
   --token=<value>  API token to use for authentication (overrides environment and config file). NOTE: watch out that
                    tokens passed via this flag might be logged in your shell history.
 ```
+
 
 ## `mw database mysql port-forward DATABASE-ID`
 
@@ -460,6 +493,7 @@ FLAG DESCRIPTIONS
 
     You can also set this value by setting the MITTWALD_SSH_USER environment variable.
 ```
+
 
 ## `mw database mysql shell DATABASE-ID`
 
@@ -535,6 +569,7 @@ FLAG DESCRIPTIONS
     You can also set this value by setting the MITTWALD_SSH_USER environment variable.
 ```
 
+
 ## `mw database mysql user create`
 
 Create a new MySQL user
@@ -596,6 +631,7 @@ FLAG DESCRIPTIONS
     Specify a password to use for authentication when connecting to the database with this user.
 ```
 
+
 ## `mw database mysql user delete USER-ID`
 
 Delete a MySQL user
@@ -625,6 +661,7 @@ FLAG DESCRIPTIONS
     scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
 
+
 ## `mw database mysql user get ID`
 
 Get a MySQL user.
@@ -647,6 +684,7 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   Get a MySQL user.
 ```
+
 
 ## `mw database mysql user list`
 
@@ -675,6 +713,7 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   List MySQL users belonging to a database.
 ```
+
 
 ## `mw database mysql user update USER-ID`
 
@@ -739,6 +778,7 @@ FLAG DESCRIPTIONS
     Specify a password to use for authentication when connecting to the database with this user.
 ```
 
+
 ## `mw database mysql versions`
 
 List available MySQL versions.
@@ -765,6 +805,7 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   List available MySQL versions.
 ```
+
 
 ## `mw database redis create`
 
@@ -819,6 +860,7 @@ FLAG DESCRIPTIONS
     Use the "database redis versions" command to list available versions
 ```
 
+
 ## `mw database redis get ID`
 
 Get a Redis database.
@@ -841,6 +883,7 @@ AUTHENTICATION FLAGS
 DESCRIPTION
   Get a Redis database.
 ```
+
 
 ## `mw database redis list`
 
@@ -876,6 +919,7 @@ FLAG DESCRIPTIONS
     May contain a short ID or a full ID of a project; you can also use the "mw context set --project-id=<VALUE>" command
     to persistently set a default project for all commands that accept this flag.
 ```
+
 
 ## `mw database redis shell DATABASE-ID`
 
@@ -935,6 +979,7 @@ FLAG DESCRIPTIONS
     You can also set this value by setting the MITTWALD_SSH_USER environment variable.
 ```
 
+
 ## `mw database redis versions`
 
 List available Redis versions.
@@ -969,3 +1014,4 @@ FLAG DESCRIPTIONS
     May contain a short ID or a full ID of a project; you can also use the "mw context set --project-id=<VALUE>" command
     to persistently set a default project for all commands that accept this flag.
 ```
+
