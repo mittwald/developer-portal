@@ -22,7 +22,7 @@ Um Listmonk auszuführen, benötigst du:
 
 :::note
 
-Du kannst eine PostgreSQL-Datenbank in einem separaten Container erstellen. Eine Anleitung zum Einrichten von PostgreSQL in einem Container findest du im [PostgreSQL-Leitfaden](../databases/postgresql).
+Du kannst eine PostgreSQL-Datenbank in einem separaten Container erstellen. Eine Anleitung zum Einrichten von PostgreSQL in einem Container findest du im [PostgreSQL-Leitfaden](/docs/v2/platform/databases/postgresql/).
 
 :::
 

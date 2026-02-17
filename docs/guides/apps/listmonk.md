@@ -22,7 +22,7 @@ To run Listmonk, you will need:
 
 :::note
 
-You can create a PostgreSQL database using a separate container. For instructions on setting up PostgreSQL in a container, refer to the [PostgreSQL guide](../databases/postgresql).
+You can create a PostgreSQL database using a separate container. For instructions on setting up PostgreSQL in a container, refer to the [PostgreSQL guide](/docs/v2/platform/databases/postgresql/).
 
 :::
 
