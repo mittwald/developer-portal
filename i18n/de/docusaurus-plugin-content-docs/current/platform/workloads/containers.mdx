@@ -68,6 +68,83 @@ import OperationExample from "@site/src/components/OperationExample";
   </TabItem>
 </Tabs>
 
+## Container mit Ressourcenlimits starten {#resource-limits}
+
+Du kannst Container mit CPU- und Arbeitsspeicher-Limits starten, um die Ressourcen zu kontrollieren, die deine containerisierte Anwendung verbrauchen kann. Dies ist nützlich, um sicherzustellen, dass deine Container nicht mehr Ressourcen verbrauchen als erwartet, und um die Ressourcenzuweisung über mehrere Container hinweg zu optimieren.
+
+<Tabs groupId="access-mode">
+  <TabItem value="cli" label="CLI">
+    Um einen Container mit Ressourcenlimits über die CLI zu starten, kannst du die Flags `--cpus` und `--memory` mit dem Befehl `mw container run` verwenden:
+
+    ```shellsession
+    $ mw container run \
+      --name my-container \
+      --cpus 0.5 \
+      --memory 512m \
+      --env FOO=BAR \
+      -p 8000:8000/tcp \
+      my-registry/my-container:latest
+    ```
+
+    Das `--cpus`-Flag gibt die maximale Anzahl an CPUs an, die der Container verwenden kann (z. B. `0.5` für eine halbe CPU, `2` für zwei CPUs). Das `--memory`-Flag gibt die maximale Menge an Arbeitsspeicher an, die der Container verwenden kann (z. B. `512m` für 512 Megabyte, `1g` für 1 Gigabyte).
+
+    Wenn du eine Docker Compose-kompatible Datei hast, kannst du Ressourcenlimits auch mit der standardmäßigen Docker Compose-Syntax angeben:
+
+    ```yaml
+    services:
+      mycontainer:
+        image: my-registry/my-container:latest
+        ports:
+          - "8000:8000/tcp"
+        environment:
+          FOO: BAR
+        deploy:
+          resources:
+            limits:
+              cpus: '0.5'
+              memory: 512m
+    ```
+
+    Dann deploye den Stack mit dem Befehl `mw stack deploy`:
+
+    ```shellsession
+    $ mw stack deploy
+    ```
+
+    Weitere Informationen findest du in der Dokumentation zum [`mw container run` Befehl](/docs/v2/cli/reference/container#mw-container-run-image-command-args).
+
+  </TabItem>
+  <TabItem value="api" label="API">
+    Um einen Container mit Ressourcenlimits über die API zu starten, verwende die <OperationLink operation="container-declare-stack" apiVersion="v2" />-Operation mit dem Feld `deploy.resources.limits` in der Service-Definition:
+
+    <OperationExample
+      operation="container-declare-stack"
+      example={{
+        services: {
+          mycontainer: {
+            image: "my-registry/my-container:latest",
+            ports: ["8000:8000/tcp"],
+            environment: {
+              FOO: "BAR",
+            },
+            deploy: {
+              resources: {
+                limits: {
+                  cpus: "0.5",
+                  memory: "512m",
+                },
+              },
+            },
+          },
+        },
+      }}
+    />
+
+    Das Feld `cpus` gibt die maximale Anzahl an CPUs an, die der Container verwenden kann (als String, z. B. `"0.5"` für eine halbe CPU). Das Feld `memory` gibt die maximale Menge an Arbeitsspeicher an, die der Container verwenden kann (z. B. `"512m"` für 512 Megabyte, `"1g"` für 1 Gigabyte).
+
+  </TabItem>
+</Tabs>
+
 ## Verwendung privater Registries {#private-registries}
 
 Wenn dein Container-Image aus einer privaten Registry geladen werden soll, musst du diese Registry zuerst für das jeweilige Projekt definieren. Du kannst eine Registry wie folgt erstellen:
