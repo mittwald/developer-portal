@@ -2,13 +2,11 @@
 title: Konfiguration der Extension
 ---
 
-[//]: # "TODO man vs du, imperative mood vs passive voice"
-
 ## Extension registrieren
 
-Sobald du Contributor bist, kannst du eine Extension im mStudio angelegt werden.
-Dazu muss innerhalb der Organisation der **"Entwicklung" Tab** aufgerufen werden und über den **"Anlegen" Button** eine neue Extension registriert werden.
-Zu diesem Zeitpunkt muss nur ein **Name** eingetragen werden. Dieser kann auch **nachträglich geändert werden**.
+Sobald du Contributor bist, kannst du im mStudio eine Extension anlegen.
+Rufe dafür in deiner Organisation den Tab **"Entwicklung"** auf und registriere über den Button **"Anlegen"** eine neue Extension.
+Zu diesem Zeitpunkt trägst du nur einen **Namen** ein. Diesen kannst du später jederzeit ändern.
 
 Extension Namen müssen **eindeutig** sein.
 Für Entwicklungs- und Produktivzwecke empfiehlt es sich, getrennte Extensions anzulegen.
@@ -26,14 +24,14 @@ Weitere Informationen zum Lebenszyklus von Extensions sind im [Extension Konzept
 
 Für jede Extension muss festgelegt werden, in **welchem Kontext** sie **installierbar** sein soll.
 Zur Auswahl stehen **Organisation** und **Projekt**.
-Die Reference Extension ist als Projekt-Extension gebaut.
+Die Reference Extension ist als Projekt-Extension aufgebaut.
 
-Im **Tab "Berechtigungen"** muss also in der Sektion **Extension Context** auf **Bearbeiten** geklickt werden.
-Nun wird **Projekt** gewählt und gespeichert.
+Im **Tab "Berechtigungen"** klickst du in der Sektion **Extension Context** auf **Bearbeiten**.
+Wähle dann **Projekt** und speichere.
 
 :::info Wahl des Extension Context
-Die Reference Extension ist als Projekt-Extension gebaut.
-Es ergibt jedoch nicht für jede Extension-Idee sinn, sie als Projekt-Extension zu implementieren.
+Die Reference Extension ist als Projekt-Extension aufgebaut.
+Das ist aber nicht für jede Extension-Idee sinnvoll.
 
 Welche Auswirkungen die Wahl hat und welche Faktoren für die Wahl entscheidend sind, haben wir im ["Wie wähle ich den richtigen Extension Context?"-Guide](../../how-to/choose-a-context) beschrieben.
 :::
@@ -47,9 +45,9 @@ Außerdem bietet sie die Möglichkeit, den Namen des Projekts anzupassen.
 Um dazu in der Lage zu sein, müssen für die Extension Berechtigungen in Form von Scopes konfiguriert werden.
 Das muss immer gemacht werden, wenn Extensions auf die mStudio API zugreifen wollen.
 
-Genauso wie der Extension Context werden auch die Berechtigungen im **Tab "Berechtigungen"** konfiguriert.
-Dazu muss in der entsprechende Sektion auf "Bearbeiten" geklickt werden.
-Wir stellen nun **Projekt lesen** und **schreiben** sowie **Benutzer lesen** ein.
+Genauso wie den Extension Context konfigurierst du auch die Berechtigungen im **Tab "Berechtigungen"**.
+Klicke dazu in der entsprechenden Sektion auf **"Bearbeiten"**.
+Stelle nun **Projekt lesen** und **Projekt schreiben** sowie **Benutzer lesen** ein.
 
 :::info Verfügbare Scopes
 Im [Guide zu Scopes](../../overview/concepts/scopes) haben wir ausführlicher beschrieben, welche Scopes verfügbar sind und wie der richtige Scope identifiziert werden kann.
@@ -86,23 +84,23 @@ kannst du das alte auch schon früher händisch invalidieren.
 ## Konfigurieren der Frontend-URL
 
 Die Reference Extension verwendet ein **Frontend Fragment**.
-Das bedeutet, sie implementiert ein Frontend, dass nahtlos in das mStudio integriert werden soll.
+Das bedeutet, sie implementiert ein Frontend, das nahtlos in das mStudio integriert wird.
 
 :::info Frontend Fragment vs. External Frontend
 Frontend Fragmente sind nicht die einzige Möglichkeit, ein Frontend für eine Extension anzubieten.
-Wenn die Anforderungen an Frontend Fragmenten für dich zu restriktiv sind oder nicht zu deinem Anwendungsfall geeignet sind,
+Wenn die Anforderungen an Frontend Fragmente für dich zu restriktiv sind oder nicht zu deinem Anwendungsfall passen,
 gibt es auch die Möglichkeit, ein externes Frontend zu implementieren.
 
 Die Eigenschaften und Unterschiede zwischen Frontend Fragmenten und externen Frontends sind im [Konzept zur Frontend Entwicklung](../../overview/concepts/frontend-development) erklärt
 :::
 
-Um die URL für das Frontend Fragment der Reference Extension einzustellen, muss im **Tab "Frontend"** der Extension in der Sektion zu **Frontend Fragments** auf **Hinzufügen** geklickt werden.
+Um die URL für das Frontend Fragment der Reference Extension einzustellen, klicke im **Tab "Frontend"** der Extension in der Sektion **Frontend Fragments** auf **Hinzufügen**.
 
 ![Frontend Fragment hinzufügen](/img/contribution/getting-started-guide/frontend-fragments.png)
 
 Für ein Frontend Fragment muss ein **Ankerpunkt** gewählt werden.
 Dieser bestimmt, an welcher Stelle das Frontend deiner Extension eingebunden werden soll.
-Die Reference Extension ist gebaut, um an dem Ankerpunkt `/projects/project/menu/section/extensions/item` eingehangen zu werden,
+Die Reference Extension ist dafür gebaut, am Ankerpunkt `/projects/project/menu/section/extensions/item` eingehängt zu werden,
 also als Menüpunkt innerhalb eines Projekts.
 
 Für den Ankerpunkt muss außerdem ein **Anzeigename** definiert werden.
@@ -111,6 +109,6 @@ Für Sektionen bestimmt der Anzeigename die Überschrift der Sektion.
 
 Schließlich muss eine **URL** angegeben werden.
 Für die in Entwicklung befindliche Extension kann hier auch eine auf dem **lokalen Client erreichbare Adresse** eingegeben werden.
-Da die Reference Extension Standardmäßig auf Port 3000 läuft, fügen wir hier `http://localhost:3000` ein.
+Da die Reference Extension standardmäßig auf Port 3000 läuft, trägst du hier `http://localhost:3000` ein.
 
 ![Konfiguration des Frontend Fragments](/img/contribution/getting-started-guide/frontend-fragment-configuration.png)
