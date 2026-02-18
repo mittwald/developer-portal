@@ -163,8 +163,12 @@ Check [this guide](https://distribution.github.io/distribution/about/deploying/)
   </TabItem>
 </Tabs>
 
-The registry set up in this chapter can be used as private registry, so make sure to make registry reachable, e.g. by creating a subdomain in your project pointing towoards custom registry.
-A custom registry might end up with a domain like `docker.p-XXXXXX.project.space`, which can be configured as registry for future container deployments.
+The registry set up in this chapter can be used as private registry,
+so make sure to make registry reachable, e.g. by creating a subdomain
+in your project pointing towoards custom registry.
+
+A custom registry might end up with a domain like `docker.p-XXXXXX.project.space`,
+which can be configured as registry for future container deployments.
 
 ::warning
 Without additional configuration this registry is publicly available without authentification.
@@ -184,7 +188,8 @@ First step is to create the credentials file **locally**:
   httpd:2 -Bbn exampleuser examplepassword > auth/htpasswd
 ```
 
-This will create the `htpasswd` credentials file, which we now have to ship.
+This will create the `htpasswd` credentials file, which we now have to ship. Remember to replace `exampleuser`
+and `examplepassword` with proper credentials.
 
 ::note
 This guide shows setup steps separately, although in `CLI` mode much can be done with one command.
