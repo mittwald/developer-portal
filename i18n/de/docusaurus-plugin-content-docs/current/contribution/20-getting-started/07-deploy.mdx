@@ -15,7 +15,7 @@ Der hier beschriebene Deployment-Weg nutzt folgende Bestandteile:
 | ------------------------------------ | ----------------------------------------------------------------------- |
 | **GitHub**                           | Das Repository mit dem Quellcode der Extension                          |
 | **GitHub Actions**                   | CI/CD-Pipeline, die das Container-Image baut und das Deployment auslöst |
-| **GitHub Container Registry**        | Private Registry, in der das gebaute Container-Image gespeichert wird    |
+| **GitHub Container Registry**        | Private Registry, in der das gebaute Container-Image gespeichert wird   |
 | **mStudio Container Hosting**        | Zielumgebung, in der die Extension als Container betrieben wird         |
 | **mittwald/deploy-container-action** | GitHub Action, die das Deployment ins mStudio durchführt                |
 
@@ -35,7 +35,7 @@ Die grundlegenden Schritte bleiben dabei ähnlich.
 
 Damit nach Deployment und Umbau auch das lokale Entwicklungssystem weiterhin verwendet werden kann,
 empfiehlt es sich, für die **Prod Umgebung eine eigene Extension** anzulegen.
-Folge den Schritten aus der [Extension Konfiguration](./configure-extension) erneut mit einer zweiten Extension.
+Folge den Schritten aus der [Extension Konfiguration](../configure-extension) erneut mit einer zweiten Extension.
 Die **URLs** brauchst du zu diesem Zeitpunkt **noch nicht konfigurieren**, die werden sich für das produktive System unterscheiden.
 
 ## Buchen eines Servers
@@ -125,7 +125,7 @@ Damit das mStudio Container Hosting auf das private Image zugreifen kann, muss d
    - **Passwort/Access-Token**: Der zuvor erstellte Personal Access Token
 6. Klicke auf **Speichern**
 
-Weitere Details zur Einrichtung privater Registries findest du in der [Dokumentation zum Container Hosting](/docs/v2/platform/workloads/containers/#private-registries).
+Weitere Details zur Einrichtung privater Registries findest du in der [Dokumentation zum Container Hosting](../../../platform/workloads/containers/#private-registries).
 
 ## Stack-Definition erstellen
 
@@ -165,7 +165,7 @@ volumes:
   postgres-data: {}
 ```
 
-:::tip
+:::tip Platzhalter
 Die Platzhalter `{{ .Env.VARIABLE }}` werden durch die Umgebungsvariablen ersetzt, die im GitHub Actions Workflow definiert sind.
 :::
 
@@ -262,8 +262,8 @@ Falls du, wie empfohlen, eine **zweite Extension** angelegt hast, wähle für di
 | `POSTGRES_USER`              | Benutzername für die PostgreSQL-Datenbank                                                                                            |
 | `POSTGRES_PASSWORD`          | Passwort für die PostgreSQL-Datenbank                                                                                                |
 | `POSTGRES_DB`                | Name der PostgreSQL-Datenbank                                                                                                        |
-| `ENCRYPTION_MASTER_PASSWORD` | Master-Passwort für die Ableitung des symmetrischen Schlüssels zur Verschlüsselung der Datenbank                                    |
-| `ENCRYPTION_SALT`            | Salt für die Ableitung des symmetrischen Schlüssels zur Verschlüsselung der Datenbank                                               |
+| `ENCRYPTION_MASTER_PASSWORD` | Master-Passwort für die Ableitung des symmetrischen Schlüssels zur Verschlüsselung der Datenbank                                     |
+| `ENCRYPTION_SALT`            | Salt für die Ableitung des symmetrischen Schlüssels zur Verschlüsselung der Datenbank                                                |
 | `EXTENSION_SECRET`           | Extension Secret zur Authentifizierung von Frontend Fragmenten; wenn du eine zweite Extension angelegt hast, wähle das Secret dieser |
 
 ### Repository variables
@@ -314,7 +314,7 @@ Im "Domains"-Menü kann nun für diese Domain das Ziel auf den Extension-Contain
 
 ## Extension Endpunkte konfigurieren
 
-Genau wie bei der [Extension Konfiguration](./configure-extension) müssen nun die Endpunkte für die Webhooks sowie des Frontend Fragments konfiguriert werden.
+Genau wie bei der [Extension Konfiguration](../configure-extension) müssen nun die Endpunkte für die Webhooks sowie des Frontend Fragments konfiguriert werden.
 Statt localhost- bzw. zrok-Adresse wird nun die Projekt-Domain verwendet.
 
 ![Frontend Fragment Prod Extension](/img/contribution/getting-started-guide/prod-extension-frontend-fragment.png)
@@ -324,6 +324,6 @@ Damit ist die Extension fertig bereitgestellt.
 Wenn du testen willst, ob alles wie erwartet funktioniert, kannst du erneut eine Extension Instance erstellen und die Extension ausprobieren.
 
 Das Bereitstellen der Reference Extension wird in den wenigsten Fällen das Ziel eines Contributors sein.
-Wie du an diesem Punkt weiter machst, wenn du deine eigene Extension entwickeln willst, wird in den [nächsten Schritten](./next-steps/) beschrieben.
+Wie du an diesem Punkt weiter machst, wenn du deine eigene Extension entwickeln willst, wird in den [nächsten Schritten](../next-steps/introduction) beschrieben.
 
 **Das Gute ist: Bei jedem `git push` in den `main`-Branch wird deine Extension automatisch aktualisiert!**
