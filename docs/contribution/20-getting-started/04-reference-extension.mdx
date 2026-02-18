@@ -67,15 +67,15 @@ Im ["Wie man ein Frontend-Fragment entwickelt"](../../how-to/develop-frontend-fr
 :::info Wichtiger Hinweis zu Frontend Fragments
 Um Frontend direkt in das mStudio integrieren zu können, muss ein Remote DOM bereitgestellt werden.
 Das Bootstrapping der Reference Extension übernimmt das für dich.
-Das Remote DOM im mStudio erfordert die Verwendung von **Flow Design System Komponenten**.
+Das Remote DOM im mStudio erfordert die Verwendung von **flow Design System Komponenten**.
 Standard HTML-Elemente wie `<div>` oder `<button>` funktionieren **nicht** im Remote DOM.
-Verwende stattdessen Flow-Komponenten wie `<Section>`, `<Button>` aus `@mittwald/flow-remote-react-components`.
+Verwende stattdessen flow-Komponenten wie `<Section>`, `<Button>` aus `@mittwald/flow-remote-react-components`.
 :::
 
 **3. mStudio API Integration**
 
-- Session Token Handling für sichere Kommunikation
-- Verwendung von Access Tokens für API-Authentifizierung
+- Session-Token-Handling für sichere Kommunikation
+- Verwendung von Access-Tokens für API-Authentifizierung
 - Abrufen und Modifizieren von Projekt-Daten
 
 Die Reference Extension implementiert für dich eine Middleware,
@@ -91,7 +91,7 @@ Wenn du tiefer in Session-Token-basierte Authentifizierung einsteigen willst, li
 - Drizzle ORM für typsichere Datenbankoperationen
 - Schema-Migrations mit Drizzle Kit
 
-:::info Repository Dokumentation
+:::info Repository-Dokumentation
 Für eine detaillierte Übersicht der Repository-Struktur und Architektur-Patterns,
 siehe die [umfangreiche Dokumentation im Reference Extension Repository](https://github.com/mittwald/reference-extension).
 :::
@@ -106,7 +106,7 @@ Um die Reference Extension lokal zu entwickeln und zu testen, müssen zunächst 
 - **pnpm 9.14.4+** (Package Manager)
 - **Docker & Docker Compose** (für PostgreSQL)
 
-### Clonen der Reference Extension und Installieren der Dependencies
+### Klonen der Reference Extension und Installieren der Dependencies
 
 Klone zunächst die Reference Extension und installiere die Dependencies:
 
@@ -121,7 +121,7 @@ pnpm install
 
 ### Umgebungsvariablen konfigurieren
 
-Die Reference Extension benötigt verschiedene Umgebungsvariablen für die Konfiguration. Erstelle eine `.env` Datei im Projekt-Root:
+Die Reference Extension benötigt verschiedene Umgebungsvariablen für die Konfiguration. Erstelle eine `.env`-Datei im Projekt-Root:
 
 ```bash
 cp .env.example .env
@@ -144,25 +144,25 @@ Die Extension ID ist eine bei der Registrierung der Extension generierte UUID un
 
 #### EXTENSION_SECRET
 
-Das zuvor in der [Extension Konfiguration](../configure-extension#extension-secret-generieren) generierte Extension Secret, kann nun hier als Umgebungsvariable eingefügt werden.
+Das zuvor in der [Extension Konfiguration](../configure-extension#extension-secret-generieren) generierte Extension Secret kann nun hier als Umgebungsvariable eingefügt werden.
 
 #### ENCRYPTION_MASTER_PASSWORD und ENCRYPTION_SALT
 
 Die Reference Extension verwendet Lifecycle Webhooks, um in der eigenen Datenbank einen State über die laufenden Extension-Instanzen aufzubauen.
 Dabei wird ein Extension Instance Secret ausgetauscht, das verschlüsselt und sicher gespeichert werden muss.
 Die Reference Extension übernimmt die eigentliche Verschlüsselung.
-Dafür wird ein **Master Password** und ein **Salt** benötigt, aus denen ein symmetrischer Schlüssel abgeleitet wird.
+Dafür werden ein **Master Password** und ein **Salt** benötigt, aus denen ein symmetrischer Schlüssel abgeleitet wird.
 
 Master Password & Salt gelten **pro Extension** und müssen nicht für jede Extension Instance unterschiedlich sein.
-Der **Initialization Vektor** bzw. die Nonce wird automatisch für jede Verschlüsselung neu erzeugt, um gleiche Klartexte sicher zu differenzieren.
+Der **Initialisierungsvektor** bzw. die Nonce wird automatisch für jede Verschlüsselung neu erzeugt, um gleiche Klartexte sicher zu differenzieren.
 
-Um dieses **Secret-Paar** zu **generieren**, rufe in der Reference Extension folgendes Package Script auf:
+Um dieses **Secret-Paar** zu **generieren**, rufe in der Reference Extension folgendes Package-Script auf:
 
 ```bash
 pnpm init:encryption
 ```
 
-Dabei werden die generierten Secrets in die eben erstellte `.env` Datei geschrieben.
+Dabei werden die generierten Secrets in die eben erstellte `.env`-Datei geschrieben.
 
 :::info Verschlüsselung von eigenen schützenswerten Feldern
 Die Verschlüsselung der Tabellenspalte ist ausreichend modular gebaut, um sie auch für **eigene schützenswerte Felder** verwenden zu können.
@@ -171,12 +171,12 @@ Die Verschlüsselung der Tabellenspalte ist ausreichend modular gebaut, um sie a
 
 ### Starten der Entwicklungsumgebung
 
-Die Reference Extension ist auf eine Datenbank angewiesen für die Persistierung ihrer Daten.
+Die Reference Extension ist für die Persistierung ihrer Daten auf eine Datenbank angewiesen.
 Sie verwendet dazu **[PostgreSQL](https://www.postgresql.org/)**.
 
 Um das Starten der Extension zu vereinfachen, liefert die Reference Extension eine `docker-compose.yml` sowie eine `docker-compose.dev.yml`.
 Beide können dazu genutzt werden, die Extension vollständig mit ihren Abhängigkeiten zu starten.
-Die `docker-compose.dev.yml` startet die Extension jedoch in einem Development Modus mit Hot Reloading.
+Die `docker-compose.dev.yml` startet die Extension jedoch in einem Development-Modus mit Hot Reloading.
 
 Um die Extension zu starten, führe den folgenden Befehl aus:
 
@@ -184,7 +184,7 @@ Um die Extension zu starten, führe den folgenden Befehl aus:
 pnpm run docker:dev
 ```
 
-Das **Datenbank Schema** wird durch die Extension automatisch über **Migrations** angewandt.
+Das **Datenbankschema** wird durch die Extension automatisch über **Migrations** angewandt.
 Die Extension läuft nun auf **Port 3000** und ist unter `http://localhost:3000` erreichbar.
 
 :::warning Public URL erforderlich

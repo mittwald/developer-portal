@@ -11,7 +11,7 @@ Gewisse Anwendungsfälle erfordern jedoch ein externes Frontend.
 Beispiele dafür sind:
 
 - **Eigene Nutzerverwaltung** – Wenn deine Extension eine Nutzerverwaltung benötigt, die unabhängig von mStudio-Usern ist
-- **Spezielle UI-Features** – Wenn UI-Anforderungen bestehen, die nicht mit Flow-Komponenten umsetzbar sind
+- **Spezielle UI-Features** – Wenn UI-Anforderungen bestehen, die nicht mit flow-Komponenten umsetzbar sind
 - **Integration bestehender Produkte** – Wenn ein bestehendes SaaS-Produkt lose in das mStudio integriert werden soll
 
 ## Wie externe Frontends funktionieren
@@ -36,24 +36,24 @@ Beides kann parallel verwendet werden, um unterschiedliche Teile deiner Extensio
 
 ### Komponenten
 
-Für externe Frontends müssen keine mStudio UI Komponenten verwendet werden.
-Falls jedoch das externe Frontend in React geschrieben werden soll, **können** die mStudio Komponenten verwendet werden.
+Für externe Frontends müssen keine mStudio-UI-Komponenten verwendet werden.
+Falls jedoch das externe Frontend in React geschrieben werden soll, **können** die mStudio-Komponenten verwendet werden.
 Dafür werden nicht die `@mittwald/flow-remote-react-components` verwendet, sondern die `@mittwald/flow-react-components` (ohne remote).
 
 :::warning Imports prüfen
 Wenn du beide Packages im Projekt hast, musst du bei den Imports aufpassen, dass du nicht versehentlich die falschen Komponenten importierst.
 Frontend Fragmente funktionieren nur mit den `@mittwald/flow-remote-react-components`.
-Externe Frontends funktionieren hingegen nur mit den `@mittwald/flow-react-components`
+Externe Frontends funktionieren hingegen nur mit den `@mittwald/flow-react-components`.
 :::
 
 ### Authentifizierung
 
-[OAuth2](https://datatracker.ietf.org/doc/html/rfc6749) ist ein gut dokumentierter Standard, für den viele Client Libraries existieren, unter anderem [`oidc-client-ts`](https://github.com/authts/oidc-client-ts), dass neben OIDC auch OAuth2 unterstützt.
+[OAuth2](https://datatracker.ietf.org/doc/html/rfc6749) ist ein gut dokumentierter Standard, für den viele Client Libraries existieren, unter anderem [`oidc-client-ts`](https://github.com/authts/oidc-client-ts), das neben OIDC auch OAuth2 unterstützt.
 
 ```typescript
 import { UserManager } from "oidc-client-ts";
 
-const userMangager = new UserManager({
+const userManager = new UserManager({
   authority: "https://api.mittwald.de/v2/oauth2/",
   client_id: process.env.OAUTH_CLIENT_ID,
   redirect_uri: process.env.OAUTH_REDIRECT_URL,
@@ -72,7 +72,7 @@ Wir haben einen Guide geschrieben, [wie ein OAuth2 Client registriert werden kan
 :::
 
 Die Authentifizierung mittels ATReK hingegen ist ein Authentifizierungsprozess,
-den wir entwickelt haben, um ohne Redirects, also schnell wechselnden Seiten direkt in einem externen Frontend authentifiziert zu sein.
+den wir entwickelt haben, um ohne Redirects, also ohne schnell wechselnde Seiten, direkt in einem externen Frontend authentifiziert zu sein.
 
 Die grundsätzliche Funktionsweise des ATReK ist ein sehr kurzlebiger Token, der in Kombination mit der User ID gegen ein Access- und ein Refresh-Token ausgetauscht werden kann.
 Dieses Access-Token ist genauso wie die Access-Tokens, die aus Session-Tokens generiert werden, nutzerbezogen und durch die Extension Scopes eingeschränkt.
@@ -86,9 +86,9 @@ Wir gehen im Folgenden davon aus, dass du **statt** einem Frontend Fragment ein 
 Wenn du beides parallel betreiben möchtest, ist ein wenig mehr Code Umstrukturierung nötig.
 :::
 
-#### UI Komponenten
+#### UI-Komponenten
 
-Die React Komponenten können mit folgendem Befehl zur Reference Extension hinzugefügt werden.
+Die React-Komponenten können mit folgendem Befehl zur Reference Extension hinzugefügt werden.
 
 ```bash
 pnpm add @mittwald/flow-react-components
@@ -106,7 +106,7 @@ Dieser wird nur für Frontend Fragments benötigt.
 
 :::info Frontend Fragmente und externe Frontends parallel nutzen
 Wenn du sowohl Frontend Fragmente als auch ein externes Frontend anbieten willst, musst du das `RemoteRoot`-Element aus dem Root-Layout entfernen und über getrennte `_pathlessLayout.tsx` arbeiten.
-Mehr dazu findest du in der [Layout Routes Dokumentation von tanstack Router](https://tanstack.com/router/v1/docs/framework/react/routing/routing-concepts#layout-routes)
+Mehr dazu findest du in der [Layout-Routes-Dokumentation von TanStack Router](https://tanstack.com/router/v1/docs/framework/react/routing/routing-concepts#layout-routes)
 :::
 
 #### Cookie Handling
@@ -202,7 +202,7 @@ export function isTokenExpiringSoon(
 
 #### ATReK Authentifizierung und Landing Page
 
-Als nächstes implementieren wir eine Server Function, die die benötigten Parameter entgegen nimmt,
+Als Nächstes implementieren wir eine Server Function, die die benötigten Parameter entgegennimmt,
 die Authentifizierung durchführt und die Ergebnisse als Cookies speichert.
 
 ```typescript title="src/serverFunctions/authenticate-with-atrek.ts"
@@ -249,7 +249,7 @@ export const authenticateWithAtrek = createServerFn({ method: "POST" })
   });
 ```
 
-Die Server-Function rufen wir direkt auf der Landing Page auf und leiten anschließend auf die eigentliche Seite, die HTML rendert weiter.
+Die Server-Function rufen wir direkt auf der Landing-Page auf und leiten anschließend auf die eigentliche Seite, die HTML rendert, weiter.
 
 ```typescript title="src/routes/index.tsx"
 import { createFileRoute, redirect } from "@tanstack/react-router";
@@ -271,7 +271,7 @@ export const Route = createFileRoute("/")({
 
 ## Authentication Middleware und Erstellen einer ersten Seite
 
-Um das Access-Token sowie Refresh-Token automatisch zu nutzen, wenn eine Server-Function aufgerufen wird, stellen wir eine middleware zur Verfügung.
+Um das Access-Token sowie Refresh-Token automatisch zu nutzen, wenn eine Server-Function aufgerufen wird, stellen wir eine Middleware zur Verfügung.
 
 ```typescript title="src/middleware/atrek.ts"
 import { createMiddleware } from "@tanstack/react-start";
@@ -346,7 +346,7 @@ export const authenticationMiddlewareWithAtrek = createMiddleware({
 ```
 
 Nun können wir in einer Server-Function die Middleware verwenden.
-Dazu passen wir die `getProjectOfExtensionInstanceServerFunction` Server-Function aus der Reference Extension an.
+Dazu passen wir die `getProjectOfExtensionInstanceServerFunction` aus der Reference Extension an.
 
 ```typescript title="src/serverFunctions/get-project-of-extension-instance.ts"
 import { createServerFn } from "@tanstack/react-start";
