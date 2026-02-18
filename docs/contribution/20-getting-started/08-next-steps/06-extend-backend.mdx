@@ -1,0 +1,94 @@
+---
+title: Extend Backend Logic
+---
+
+In this chapter, you will learn how to adapt and extend your Extension backend logic.
+We cover database schema, migrations, and server functions.
+
+## Adapt the Database Schema
+
+### Create Custom Entities
+
+Your Extension database schema is located in `src/db/schema.ts`.
+Here you define all required tables and columns.
+You can split the schema across multiple files, but you must re-export the tables in `schema.ts`.
+
+The Reference Extension uses [Drizzle ORM](https://orm.drizzle.team/) for database interaction.
+Drizzle lets you define your schema in a type-safe way with TypeScript.
+A table definition can look like this:
+
+```typescript
+export const comments = pgTable("comments", {
+  id: varchar({ length: 36 }).primaryKey(),
+  extensionInstanceId: varchar({ length: 36 })
+    .notNull()
+    .references(() => extensionInstances.id, { onDelete: "cascade" }),
+  userId: varchar({ length: 36 }).notNull(),
+  text: text().notNull(),
+  createdAt: timestamp().defaultNow().notNull(),
+});
+```
+
+For a complete overview of available column types and options,
+see the [official Drizzle schema declaration docs](https://orm.drizzle.team/docs/sql-schema-declaration).
+
+### Migrations with Drizzle
+
+After adjusting your schema in code, you must generate migrations.
+Migrations are SQL scripts that evolve your database step by step to the target state.
+Each schema change gets its own migration.
+
+The Reference Extension provides the following commands:
+
+| Command                       | Description                                                           |
+| ---------------------------- | --------------------------------------------------------------------- |
+| `pnpm db:generate-migrations` | Generates migration files based on schema changes                     |
+| `pnpm db:migrate`             | Applies pending migrations to the database                            |
+| `pnpm db:push`                | Syncs schema directly without migration (development only)            |
+| `pnpm db:studio`              | Starts a web UI for database inspection                               |
+
+By default, the Reference Extension applies migrations automatically at startup.
+So in production you do **not** need to run `pnpm db:migrate` manually.
+You can disable this behavior with `RUN_MIGRATIONS_ON_STARTUP=false`.
+
+:::warning
+The `pnpm db:push` command should only be used for local development.
+Because it applies schema changes directly, data loss may occur.
+For production systems, always use migrations.
+:::
+
+### Relation to Extension Instances
+
+The Reference Extension implements a comments table linked to Extension Instances via foreign key.
+This linkage increases data isolation: each data record is clearly assigned to one Extension Instance.
+
+A crucial part is configuring **cascade delete** on the foreign key constraint.
+Without cascade delete, Extension Instances cannot be removed via webhook while related records still exist.
+
+With cascade delete, data cleanup is delegated to the database.
+When an Extension Instance is deleted, all linked records are automatically deleted as well.
+This avoids manual and error-prone deletion logic.
+
+## Add Server Functions
+
+Server functions let your frontend call backend logic.
+The Reference Extension demonstrates a recommended project structure:
+
+| Directory            | Purpose                                               |
+| -------------------- | ----------------------------------------------------- |
+| `src/domain`         | Domain logic and business rules                       |
+| `src/serverFunctions`| API layer exposing domain logic                       |
+| `src/ghosts.ts`      | Exposes server functions to the frontend              |
+
+### Integration with react-ghostmaker
+
+The Reference Extension uses [`@mittwald/react-ghostmaker`](https://github.com/mittwald/react-ghostmaker),
+a utility library that simplifies frontend-to-backend interaction significantly.
+
+react-ghostmaker provides these advantages:
+
+- **Automatic hook generation**: React hooks are generated for each server function
+- **Integrated state management**: Handles React Query concerns such as caching, revalidation, and loading states
+- **Less boilerplate**: You write much less repetitive frontend-backend glue code
+
+For more details and examples, visit the [react-ghostmaker repository on GitHub](https://github.com/mittwald/react-ghostmaker).
