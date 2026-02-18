@@ -274,7 +274,7 @@ After that, we reconfigure our registry to use new basic auth credentials.
     (user@local) $ mw container run \
       --name example-registry \
       --volume registry-data:/var/lib/registry \
-      --volume registry-auth:/auth
+      --volume registry-auth:/auth \
       --publish 5000:5000/tcp \
       --create-volumes \
       -e "REGISTRY_AUTH=htpasswd" \
@@ -326,12 +326,13 @@ Now, after domain has been set up, we can start testing. As we have configured b
 registry to actually use it. Build and tag an arbitrary Docker image, then push to new registry:
 
 ```shellsession
+(user@local) $ cd path/to/your/project
 (user@local) $ docker build -t <Your Image> .
 (user@local) $ docker tag <Your Image>:latest docker.p-XXXXXX.project.space/<Your Image>
 (user@local) $ docker push docker.p-XXXXXX.project.space/<Your Image>:latest
 ```
 
-Your push **must** be `rejected` due to missing basic auth credentials:
+Your push **must** be rejected due to missing basic auth credentials:
 
 ```shellsession
 (user@local) $ docker push docker.p-XXXXXX.project.space/<Your Image>:latest
@@ -339,6 +340,7 @@ Your push **must** be `rejected` due to missing basic auth credentials:
 push access denied, repository does not exist or may require authorization: authorization failed: no basic auth credentials
 ```
 
+If it worked without errors, your setup is incomplete and no authentification is active!
 Now log in:
 
 ```shellsession
