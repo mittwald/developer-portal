@@ -21,8 +21,6 @@ Claude Code supports two ways to authenticate with mittwald MCP:
 - **OAuth (recommended)**: Secure browser-based flow with automatic token refresh.
 - **API key**: Best for headless/CI environments where OAuth is not practical.
 
----
-
 ## Option A: OAuth Authentication (Recommended)
 
 Claude Code handles OAuth automatically using Dynamic Client Registration (DCR), so you do **not** need to register a client manually.
@@ -48,8 +46,6 @@ user@local $ claude mcp add --transport http --scope project mittwald https://mi
 user@local $ claude mcp add --transport http --scope user mittwald https://mittwald-mcp-fly2.fly.dev/mcp
 ```
 
----
-
 ### Step 2: Authenticate with mittwald
 
 In Claude Code, run the `/mcp` command:
@@ -59,8 +55,6 @@ In Claude Code, run the `/mcp` command:
 3. Claude Code opens your browser for OAuth authorization
 
 If the browser doesn't open, Claude Code will show a URL you can copy and paste manually.
-
----
 
 ### Step 3: Complete Authorization
 
@@ -73,8 +67,6 @@ If the browser doesn't open, Claude Code will show a URL you can copy and paste 
 - The authorization is captured automatically
 - Tokens are stored securely
 - Tokens refresh automatically when they expire
-
----
 
 ### Step 4: Verify Your Connection
 
@@ -97,8 +89,6 @@ You should see output similar to:
 
 ✅ **Success!** mittwald MCP is now connected to Claude Code.
 
----
-
 ## Option B: API Key Authentication
 
 Use this option for headless servers or CI environments where OAuth is not practical.
@@ -109,8 +99,6 @@ Use this option for headless servers or CI environments where OAuth is not pract
 2. Create a new token with the permissions you need
 3. Copy and store the token securely
 
----
-
 ### Step 2: Add mittwald MCP with API Key
 
 ```shellsession
@@ -120,8 +108,6 @@ user@local $ claude mcp add --transport http mittwald https://mittwald-mcp-fly2.
 
 **Important**: API tokens do **not** auto-refresh. Rotate them regularly and keep them secret.
 
----
-
 ### Step 3: Verify Connection
 
 Use the same test as OAuth:
@@ -129,8 +115,6 @@ Use the same test as OAuth:
 ```
 Use mittwald MCP to get my user information
 ```
-
----
 
 ## Common Tasks with mittwald MCP
 
@@ -166,8 +150,6 @@ Get server status for [server-id]
 Create a backup for project [project-id]
 ```
 
----
-
 ## Troubleshooting
 
 ### Error: "Browser Didn't Open"
@@ -181,8 +163,6 @@ Create a backup for project [project-id]
 2. Paste it into your browser manually
 3. Complete authorization and return to Claude Code
 
----
-
 ### Error: "OAuth Authorization Failed"
 
 **Symptom**: OAuth flow completes in the browser, but Claude Code reports authorization failed.
@@ -193,8 +173,6 @@ Create a backup for project [project-id]
 1. Run `/mcp` again and retry the flow
 2. Ensure your network allows access to the OAuth server
 3. If it persists, contact mittwald support with the error message
-
----
 
 ### Error: "Connection Refused"
 
@@ -207,8 +185,6 @@ Create a backup for project [project-id]
 2. Retry the command from a different network
 3. Check proxy or firewall rules
 
----
-
 ### Error: "Invalid Token"
 
 **Symptom**: Requests fail with 401 Unauthorized after previously working.
@@ -218,8 +194,6 @@ Create a backup for project [project-id]
 **Fix**:
 - **OAuth**: Run `/mcp` and re-authenticate
 - **API Key**: Generate a new API token and re-add the server
-
----
 
 ### Error: "Permission Denied"
 
@@ -231,8 +205,6 @@ Create a backup for project [project-id]
 1. Re-authenticate and approve the required scopes
 2. For API keys, create a new token with the correct permissions
 
----
-
 ### Error: "Server Not Found"
 
 **Symptom**: Claude Code says the MCP server doesn't exist.
@@ -242,8 +214,6 @@ Create a backup for project [project-id]
 **Fix**:
 1. Run `claude mcp list` to check configured servers
 2. Re-add the server with the correct URL and scope
-
----
 
 ## FAQ
 
@@ -268,14 +238,10 @@ Create a backup for project [project-id]
 ### Q: How does Claude Code differ from Claude Desktop?
 **A**: Claude Code is a CLI with MCP support and terminal workflows. Claude Desktop is a GUI app with a different configuration model.
 
----
-
 ## Next Steps
 
 - **[Tutorials](../tutorials/)**: See real-world examples
 - **[Other Tools](./)**: Set up GitHub Copilot, Cursor, or Codex CLI
-
----
 
 ## Official Documentation
 
@@ -283,8 +249,6 @@ This guide is based on official Claude Code capabilities:
 - [Claude Code IAM Documentation](https://code.claude.com/docs/en/iam) - OAuth 2.1 with DCR support
 - [Claude Code MCP Setup](https://code.claude.com/docs/en/mcp) - MCP server configuration
 - [OAuth for MCP Server Guide](https://www.buildwithmatija.com/blog/oauth-mcp-server-claude) - Community implementation guide
-
----
 
 ## Still Need Help?
 
