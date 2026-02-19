@@ -16,8 +16,8 @@ This guide shows the current Codex CLI flow for connecting to mittwald MCP.
 
 ## Confirm Your CLI Supports MCP
 
-```bash
-codex mcp --help
+```shellsession
+user@local $ codex mcp --help
 ```
 
 You should see commands like `add`, `list`, `get`, `login`, `logout`, and `remove`.
@@ -26,8 +26,8 @@ You should see commands like `add`, `list`, `get`, `login`, `logout`, and `remov
 
 ### 1. Add mittwald MCP server
 
-```bash
-codex mcp add mittwald --url https://mittwald-mcp-fly2.fly.dev/mcp
+```shellsession
+user@local $ codex mcp add mittwald --url https://mittwald-mcp-fly2.fly.dev/mcp
 ```
 
 Current Codex CLI behavior:
@@ -43,15 +43,15 @@ Current Codex CLI behavior:
 
 ### 3. Verify server registration
 
-```bash
-codex mcp list
-codex mcp get mittwald
+```shellsession
+user@local $ codex mcp list
+user@local $ codex mcp get mittwald
 ```
 
 ### 4. Re-authenticate later (if needed)
 
-```bash
-codex mcp login mittwald
+```shellsession
+user@local $ codex mcp login mittwald
 ```
 
 Use this when tokens are revoked/expired and you need a fresh OAuth session.
@@ -66,36 +66,36 @@ Use this when tokens are revoked/expired and you need a fresh OAuth session.
 
 ### 2. Export token locally
 
-```bash
-export MITTWALD_API_TOKEN="<your_token>"
+```shellsession
+user@local $ export MITTWALD_API_TOKEN="<your_token>"
 ```
 
 ### 3. Add server with token env var
 
-```bash
-codex mcp add mittwald \
-  --url https://mittwald-mcp-fly2.fly.dev/mcp \
-  --bearer-token-env-var MITTWALD_API_TOKEN
+```shellsession
+user@local $ codex mcp add mittwald \
+    --url https://mittwald-mcp-fly2.fly.dev/mcp \
+    --bearer-token-env-var MITTWALD_API_TOKEN
 ```
 
 ## Manage the Connection
 
 ### Show configured server
 
-```bash
-codex mcp get mittwald
+```shellsession
+user@local $ codex mcp get mittwald
 ```
 
 ### Logout OAuth session
 
-```bash
-codex mcp logout mittwald
+```shellsession
+user@local $ codex mcp logout mittwald
 ```
 
 ### Remove server config
 
-```bash
-codex mcp remove mittwald
+```shellsession
+user@local $ codex mcp remove mittwald
 ```
 
 ## Troubleshooting
@@ -106,14 +106,14 @@ This error appears when `add` is called without a server name and URL/command.
 
 Correct format:
 
-```bash
-codex mcp add <name> --url <mcp_endpoint>
+```shellsession
+user@local $ codex mcp add <name> --url <mcp_endpoint>
 ```
 
 Example:
 
-```bash
-codex mcp add mittwald --url https://mittwald-mcp-fly2.fly.dev/mcp
+```shellsession
+user@local $ codex mcp add mittwald --url https://mittwald-mcp-fly2.fly.dev/mcp
 ```
 
 ### OAuth browser step did not open
@@ -128,9 +128,9 @@ codex mcp add mittwald --url https://mittwald-mcp-fly2.fly.dev/mcp
 - rotate token in mStudio if needed
 - remove and re-add server configuration
 
-```bash
-codex mcp remove mittwald
-codex mcp add mittwald --url https://mittwald-mcp-fly2.fly.dev/mcp --bearer-token-env-var MITTWALD_API_TOKEN
+```shellsession
+user@local $ codex mcp remove mittwald
+user@local $ codex mcp add mittwald --url https://mittwald-mcp-fly2.fly.dev/mcp --bearer-token-env-var MITTWALD_API_TOKEN
 ```
 
 ## Security Notes

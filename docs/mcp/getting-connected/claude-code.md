@@ -31,21 +31,21 @@ Claude Code handles OAuth automatically using Dynamic Client Registration (DCR),
 
 Run this command in your terminal:
 
-```bash
-claude mcp add --transport http mittwald https://mittwald-mcp-fly2.fly.dev/mcp
+```shellsession
+user@local $ claude mcp add --transport http mittwald https://mittwald-mcp-fly2.fly.dev/mcp
 ```
 
 **Optional: choose a configuration scope** (default is `local`):
 
-```bash
+```shellsession
 # Local (default, private)
-claude mcp add --transport http --scope local mittwald https://mittwald-mcp-fly2.fly.dev/mcp
+user@local $ claude mcp add --transport http --scope local mittwald https://mittwald-mcp-fly2.fly.dev/mcp
 
 # Project (shared via .mcp.json)
-claude mcp add --transport http --scope project mittwald https://mittwald-mcp-fly2.fly.dev/mcp
+user@local $ claude mcp add --transport http --scope project mittwald https://mittwald-mcp-fly2.fly.dev/mcp
 
 # User (available across projects)
-claude mcp add --transport http --scope user mittwald https://mittwald-mcp-fly2.fly.dev/mcp
+user@local $ claude mcp add --transport http --scope user mittwald https://mittwald-mcp-fly2.fly.dev/mcp
 ```
 
 ---
@@ -113,9 +113,9 @@ Use this option for headless servers or CI environments where OAuth is not pract
 
 ### Step 2: Add mittwald MCP with API Key
 
-```bash
-claude mcp add --transport http mittwald https://mittwald-mcp-fly2.fly.dev/mcp \
-  --header "Authorization: Bearer YOUR_MITTWALD_API_TOKEN"
+```shellsession
+user@local $ claude mcp add --transport http mittwald https://mittwald-mcp-fly2.fly.dev/mcp \
+    --header "Authorization: Bearer YOUR_MITTWALD_API_TOKEN"
 ```
 
 **Important**: API tokens do **not** auto-refresh. Rotate them regularly and keep them secret.
