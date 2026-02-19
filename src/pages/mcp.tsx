@@ -2,18 +2,19 @@ import React from "react";
 import clsx from "clsx";
 import Link from "@docusaurus/Link";
 import Layout from "@theme/Layout";
-import { Icon } from "@mittwald/flow-react-components";
+import { CodeBlock, Icon } from "@mittwald/flow-react-components";
 import {
-  IconRocket,
   IconBook,
   IconBrandGithub,
+  IconListCheck,
   IconPlugConnected,
   IconRobot,
-  IconListCheck,
+  IconRocket,
   IconUsers,
 } from "@tabler/icons-react";
 
 import styles from "./cli.module.css";
+import mcpStyles from "./mcp.module.css";
 import demo from "@site/static/img/mcp-demo.png";
 import featureStyles from "@site/src/components/HomepageFeatures/styles.module.css";
 import FeatureRow from "@site/src/components/FeatureRow";
@@ -25,8 +26,8 @@ function MCPPageHeader() {
       <div className="container">
         <h1 className="hero__title">mittwald MCP</h1>
         <p className={styles.heroDescription}>
-          Prompt your agent with intent. Let mittwald MCP execute the
-          infrastructure work with safe, auditable tool calls.
+          Prompt your agent with intent. Let your AI agent interact with the
+          mittwald mStudio with safe, auditable tool calls.
           <img
             src={demo}
             alt="An example of using mittwald MCP with an AI assistant to manage infrastructure."
@@ -42,7 +43,10 @@ function MCPPageHeader() {
             </Icon>
             Run First Workflow
           </Link>
-          <Link className="button button--secondary button--lg" to="/docs/v2/mcp">
+          <Link
+            className="button button--secondary button--lg"
+            to="/docs/v2/mcp"
+          >
             <Icon>
               <IconBook />
             </Icon>
@@ -60,6 +64,34 @@ function MCPPageHeader() {
         </div>
       </div>
     </header>
+  );
+}
+
+function ServerURLSection() {
+  return (
+    <section
+      style={{
+        padding: "2rem 0",
+        background: "var(--ifm-color-emphasis-100)",
+      }}
+    >
+      <div className={clsx("container", mcpStyles.urlContainer)}>
+        <p>
+          <strong>Just want to get started quickly?</strong>&nbsp; Use this MCP
+          URL in the AI assistant of your choice:
+        </p>
+        <CodeBlock
+          copyable
+          code="https://mcp.mittwald.de/mcp"
+          language="text"
+          className={mcpStyles.urlField}
+        />
+        <p>
+          See our <Link to="/docs/v2/mcp/getting-connected">setup guides</Link>{" "}
+          for more detailed instructions.
+        </p>
+      </div>
+    </section>
   );
 }
 
@@ -146,9 +178,7 @@ function GettingStartedFeature() {
           <div className={clsx("col col--4")}>
             <div className={clsx("padding--md", featureStyles.feature)}>
               <h3>Connect Your Assistant</h3>
-              <p>
-                Step-by-step setup guides for popular AI coding tools:
-              </p>
+              <p>Step-by-step setup guides for popular AI coding tools:</p>
               <ul>
                 <li>
                   <Link to="/docs/v2/mcp/getting-connected/claude-code">
@@ -317,6 +347,7 @@ export default function MCPPage() {
       <div>
         <MCPPageHeader />
         <main className="index">
+          <ServerURLSection />
           <OverviewFeature />
           <GettingStartedFeature />
           <WorkflowFeature />
