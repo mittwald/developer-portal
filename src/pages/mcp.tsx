@@ -9,20 +9,21 @@ import {
   IconBrandGithub,
   IconPlugConnected,
   IconRobot,
-  IconDatabase,
-  IconMail,
-  IconShield,
-  IconTerminal2,
+  IconListCheck,
+  IconUsers,
 } from "@tabler/icons-react";
 
-import styles from "./mcp.module.css";
+import styles from "./cli.module.css";
+import featureStyles from "@site/src/components/HomepageFeatures/styles.module.css";
+import FeatureRow from "@site/src/components/FeatureRow";
+import Intro, { IntroHeader } from "@site/src/components/Intro";
 
 function MCPPageHeader() {
   return (
     <header className={clsx("hero hero--primary", styles.heroBanner)}>
       <div className="container">
         <h1 className="hero__title">mittwald MCP</h1>
-        <p className={styles.heroTagline}>
+        <p className={styles.heroDescription}>
           Prompt your agent with intent. Let mittwald MCP execute the
           infrastructure work with safe, auditable tool calls.
         </p>
@@ -36,10 +37,7 @@ function MCPPageHeader() {
             </Icon>
             Run First Workflow
           </Link>
-          <Link
-            className="button button--secondary button--lg"
-            to="/docs/mcp"
-          >
+          <Link className="button button--secondary button--lg" to="/docs/mcp">
             <Icon>
               <IconBook />
             </Icon>
@@ -60,167 +58,248 @@ function MCPPageHeader() {
   );
 }
 
-function KPISection() {
+function OverviewFeature() {
   return (
-    <section className={styles.kpiSection}>
+    <FeatureRow variant>
       <div className="container">
-        <div className={styles.kpiGrid}>
-          <div className={styles.kpi}>
-            <span className={styles.kpiMetric}>Comprehensive Toolset</span>
-            <span className={styles.kpiLabel}>
-              Across projects, apps, databases, DNS, mail, security, and
-              automation
-            </span>
+        <div className="row">
+          <div className={clsx("col col--4")}>
+            <Intro>
+              <IntroHeader>
+                <Icon>
+                  <IconRobot />
+                </Icon>
+                <h3>Agent-First Infrastructure</h3>
+              </IntroHeader>
+              <p>
+                mittwald MCP connects your AI coding assistant to mittwald's
+                infrastructure. Describe what you want in natural language, and
+                let your agent handle the API calls.
+              </p>
+            </Intro>
           </div>
-          <div className={styles.kpi}>
-            <span className={styles.kpiMetric}>OAuth + API Token</span>
-            <span className={styles.kpiLabel}>
-              Use OAuth for interactive agents and API tokens for headless
-              pipelines
-            </span>
-          </div>
-          <div className={styles.kpi}>
-            <span className={styles.kpiMetric}>Agent-First Workflows</span>
-            <span className={styles.kpiLabel}>
-              Human intent in prompts, MCP tools for execution, approvals for
-              risky actions
-            </span>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-interface CardProps {
-  title: string;
-  description: string;
-  link: string;
-  linkText: string;
-  icon: React.ReactNode;
-}
-
-function Card({ title, description, link, linkText, icon }: CardProps) {
-  return (
-    <div className={styles.card}>
-      <div className={styles.cardIcon}>
-        <Icon>{icon}</Icon>
-      </div>
-      <h3>{title}</h3>
-      <p>{description}</p>
-      <Link to={link}>{linkText}</Link>
-    </div>
-  );
-}
-
-function GettingStartedSection() {
-  return (
-    <section className={styles.section}>
-      <div className="container">
-        <h2>Start from what you want done</h2>
-        <div className={styles.cardGrid}>
-          <Card
-            title="Connect Your Assistant"
-            description="Set up Claude Code, GitHub Copilot, Cursor, or Codex with the mittwald MCP endpoint."
-            link="/docs/mcp/getting-connected"
-            linkText="Open setup guides →"
-            icon={<IconPlugConnected />}
-          />
-          <Card
-            title="Run Human-Intent Prompts"
-            description="Learn the pattern: you describe the outcome, the agent discovers tools and executes the plan."
-            link="/docs/mcp/tutorials"
-            linkText="See practical workflows →"
-            icon={<IconRobot />}
-          />
-          <Card
-            title="Use Task Playbooks"
-            description="Use outcome-focused how-to guides mapped to real functional use cases."
-            link="/docs/mcp/how-to"
-            linkText="Browse how-to playbooks →"
-            icon={<IconBook />}
-          />
-          <Card
-            title="Runbook for Incidents"
-            description="Use incident recovery procedures with verification and rollback prompts."
-            link="/docs/mcp/runbooks"
-            linkText="Browse runbooks →"
-            icon={<IconShield />}
-          />
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function WorkflowSection() {
-  const steps = [
-    { id: "1. Intent", description: "You prompt the outcome you want on mittwald." },
-    { id: "2. Discovery", description: "Your agent discovers relevant MCP tools and required inputs." },
-    { id: "3. Auth", description: "OAuth or token auth is used for each tool call." },
-    { id: "4. Execution", description: "The agent performs tool calls and reports results and IDs." },
-    { id: "5. Verify", description: "You run read checks and decide whether to proceed, retry, or roll back." },
-  ];
-
-  return (
-    <section className={clsx(styles.section, styles.sectionAlt)}>
-      <div className="container">
-        <h2>How an agent-driven mittwald task works</h2>
-        <div className={styles.workflowGrid}>
-          {steps.map((step) => (
-            <div key={step.id} className={styles.workflowStep}>
-              <div className={styles.stepId}>{step.id}</div>
-              <p>{step.description}</p>
+          <div className={clsx("col col--4")}>
+            <div className={clsx("padding--md", featureStyles.feature)}>
+              <h3>Comprehensive Toolset</h3>
+              <p>
+                Full coverage across projects, apps, databases, DNS, mail,
+                security, and automation. One MCP endpoint for all mittwald
+                operations.
+              </p>
+              <ul>
+                <li>Project and app management</li>
+                <li>Database provisioning</li>
+                <li>Domain and SSL configuration</li>
+                <li>Backup and restore</li>
+              </ul>
             </div>
-          ))}
+          </div>
+          <div className={clsx("col col--4")}>
+            <div className={clsx("padding--md", featureStyles.feature)}>
+              <h3>Flexible Authentication</h3>
+              <p>Choose the auth method that fits your workflow:</p>
+              <ul>
+                <li>
+                  <strong>OAuth 2.1</strong> for interactive agents with
+                  automatic token refresh
+                </li>
+                <li>
+                  <strong>API tokens</strong> for CI/CD pipelines and headless
+                  environments
+                </li>
+              </ul>
+              <p>
+                <Link to="/docs/mcp/getting-connected">Setup guides →</Link>
+              </p>
+            </div>
+          </div>
         </div>
-        <p className={styles.workflowNote}>
-          <strong>Human responsibility:</strong> destructive or cost-impacting
-          changes should be approved explicitly. Treat the agent as an operator,
-          not as an unattended process.
-        </p>
       </div>
-    </section>
+    </FeatureRow>
   );
 }
 
-function TutorialsSection() {
+function GettingStartedFeature() {
   return (
-    <section className={styles.section}>
+    <FeatureRow>
       <div className="container">
-        <h2>Tutorials by Team</h2>
-        <div className={styles.cardGrid}>
-          <Card
-            title="Freelance Workflows"
-            description="Client onboarding, backup monitoring, and repetitive operations without dashboard hopping."
-            link="/docs/mcp/tutorials"
-            linkText="View playbooks →"
-            icon={<IconTerminal2 />}
-          />
-          <Card
-            title="Agency Workflows"
-            description="Cross-project visibility, team onboarding, access audits, and support handoffs."
-            link="/docs/mcp/tutorials"
-            linkText="View playbooks →"
-            icon={<IconDatabase />}
-          />
-          <Card
-            title="E-Commerce Workflows"
-            description="Launch readiness, backup confidence, and database checks under deadline pressure."
-            link="/docs/mcp/tutorials"
-            linkText="View playbooks →"
-            icon={<IconRocket />}
-          />
-          <Card
-            title="Modern Stack / DevOps"
-            description="Container stacks, cron automation, and deployment pipelines with MCP."
-            link="/docs/mcp/tutorials"
-            linkText="View playbooks →"
-            icon={<IconMail />}
-          />
+        <div className="row">
+          <div className={clsx("col col--4")}>
+            <Intro>
+              <IntroHeader>
+                <Icon>
+                  <IconPlugConnected />
+                </Icon>
+                <h3>Get Started</h3>
+              </IntroHeader>
+              <p>
+                Connect your preferred AI assistant to mittwald MCP and start
+                managing infrastructure with natural language prompts.
+              </p>
+            </Intro>
+          </div>
+          <div className={clsx("col col--4")}>
+            <div className={clsx("padding--md", featureStyles.feature)}>
+              <h3>Connect Your Assistant</h3>
+              <p>
+                Step-by-step setup guides for popular AI coding tools:
+              </p>
+              <ul>
+                <li>
+                  <Link to="/docs/mcp/getting-connected/claude-code">
+                    Claude Code
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/docs/mcp/getting-connected/github-copilot">
+                    GitHub Copilot
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/docs/mcp/getting-connected/cursor">Cursor</Link>
+                </li>
+                <li>
+                  <Link to="/docs/mcp/getting-connected/codex-cli">
+                    Codex CLI
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className={clsx("col col--4")}>
+            <div className={clsx("padding--md", featureStyles.feature)}>
+              <h3>Learn the Pattern</h3>
+              <p>
+                Human intent in prompts, MCP tools for execution, explicit
+                approvals for risky actions.
+              </p>
+              <ul>
+                <li>
+                  <Link to="/docs/mcp/tutorials">Tutorials</Link> — guided
+                  walkthroughs
+                </li>
+                <li>
+                  <Link to="/docs/mcp/how-to">How-To Playbooks</Link> — task
+                  recipes
+                </li>
+                <li>
+                  <Link to="/docs/mcp/runbooks">Runbooks</Link> — incident
+                  recovery
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
-    </section>
+    </FeatureRow>
+  );
+}
+
+function WorkflowFeature() {
+  return (
+    <FeatureRow variant>
+      <div className="container">
+        <div className="row">
+          <div className={clsx("col col--4")}>
+            <Intro>
+              <IntroHeader>
+                <Icon>
+                  <IconListCheck />
+                </Icon>
+                <h3>How It Works</h3>
+              </IntroHeader>
+              <p>
+                Agent-driven workflows follow a consistent pattern: you provide
+                intent, the agent discovers and executes tools, you verify
+                results.
+              </p>
+            </Intro>
+          </div>
+          <div className={clsx("col col--8")}>
+            <div className={clsx("padding--md", featureStyles.feature)}>
+              <h3>The Agent Workflow</h3>
+              <ol>
+                <li>
+                  <strong>Intent</strong> — You prompt the outcome you want on
+                  mittwald
+                </li>
+                <li>
+                  <strong>Discovery</strong> — Your agent discovers relevant MCP
+                  tools and required inputs
+                </li>
+                <li>
+                  <strong>Auth</strong> — OAuth or token auth is used for each
+                  tool call
+                </li>
+                <li>
+                  <strong>Execution</strong> — The agent performs tool calls and
+                  reports results
+                </li>
+                <li>
+                  <strong>Verify</strong> — You run read checks and decide
+                  whether to proceed, retry, or roll back
+                </li>
+              </ol>
+              <p>
+                <strong>Human responsibility:</strong> Destructive or
+                cost-impacting changes should be approved explicitly. Treat the
+                agent as an operator, not as an unattended process.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </FeatureRow>
+  );
+}
+
+function TutorialsFeature() {
+  return (
+    <FeatureRow>
+      <div className="container">
+        <div className="row">
+          <div className={clsx("col col--4")}>
+            <Intro>
+              <IntroHeader>
+                <Icon>
+                  <IconUsers />
+                </Icon>
+                <h3>Tutorials by Team</h3>
+              </IntroHeader>
+              <p>
+                Outcome-driven walkthroughs organized by team context and use
+                case.
+              </p>
+              <p>
+                <Link to="/docs/mcp/tutorials">Browse all tutorials →</Link>
+              </p>
+            </Intro>
+          </div>
+          <div className={clsx("col col--4")}>
+            <div className={clsx("padding--md", featureStyles.feature)}>
+              <h3>Freelancers & Agencies</h3>
+              <ul>
+                <li>Client onboarding automation</li>
+                <li>Cross-project visibility</li>
+                <li>Team access management</li>
+                <li>Backup monitoring</li>
+              </ul>
+            </div>
+          </div>
+          <div className={clsx("col col--4")}>
+            <div className={clsx("padding--md", featureStyles.feature)}>
+              <h3>E-Commerce & DevOps</h3>
+              <ul>
+                <li>Launch day preparation</li>
+                <li>Database performance checks</li>
+                <li>Container stack deployment</li>
+                <li>CI/CD pipeline integration</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </FeatureRow>
   );
 }
 
@@ -230,13 +309,13 @@ export default function MCPPage() {
       title="mittwald MCP"
       description="Prompt your agent with intent. Let mittwald MCP execute the infrastructure work with safe, auditable tool calls."
     >
-      <div className={styles.wrapper}>
+      <div>
         <MCPPageHeader />
-        <main>
-          <KPISection />
-          <GettingStartedSection />
-          <WorkflowSection />
-          <TutorialsSection />
+        <main className="index">
+          <OverviewFeature />
+          <GettingStartedFeature />
+          <WorkflowFeature />
+          <TutorialsFeature />
         </main>
       </div>
     </Layout>
