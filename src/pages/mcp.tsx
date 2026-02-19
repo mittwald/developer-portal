@@ -30,14 +30,14 @@ function MCPPageHeader() {
         <div className={styles.buttons}>
           <Link
             className="button button--success button--lg"
-            to="/docs/mcp/getting-connected"
+            to="/docs/v2/mcp/getting-connected"
           >
             <Icon>
               <IconRocket />
             </Icon>
             Run First Workflow
           </Link>
-          <Link className="button button--secondary button--lg" to="/docs/mcp">
+          <Link className="button button--secondary button--lg" to="/docs/v2/mcp">
             <Icon>
               <IconBook />
             </Icon>
@@ -109,7 +109,7 @@ function OverviewFeature() {
                 </li>
               </ul>
               <p>
-                <Link to="/docs/mcp/getting-connected">Setup guides →</Link>
+                <Link to="/docs/v2/mcp/getting-connected">Setup guides →</Link>
               </p>
             </div>
           </div>
@@ -146,20 +146,20 @@ function GettingStartedFeature() {
               </p>
               <ul>
                 <li>
-                  <Link to="/docs/mcp/getting-connected/claude-code">
+                  <Link to="/docs/v2/mcp/getting-connected/claude-code">
                     Claude Code
                   </Link>
                 </li>
                 <li>
-                  <Link to="/docs/mcp/getting-connected/github-copilot">
+                  <Link to="/docs/v2/mcp/getting-connected/github-copilot">
                     GitHub Copilot
                   </Link>
                 </li>
                 <li>
-                  <Link to="/docs/mcp/getting-connected/cursor">Cursor</Link>
+                  <Link to="/docs/v2/mcp/getting-connected/cursor">Cursor</Link>
                 </li>
                 <li>
-                  <Link to="/docs/mcp/getting-connected/codex-cli">
+                  <Link to="/docs/v2/mcp/getting-connected/codex-cli">
                     Codex CLI
                   </Link>
                 </li>
@@ -175,15 +175,15 @@ function GettingStartedFeature() {
               </p>
               <ul>
                 <li>
-                  <Link to="/docs/mcp/tutorials">Tutorials</Link> — guided
+                  <Link to="/docs/v2/mcp/tutorials">Tutorials</Link> — guided
                   walkthroughs
                 </li>
                 <li>
-                  <Link to="/docs/mcp/how-to">How-To Playbooks</Link> — task
+                  <Link to="/docs/v2/mcp/how-to">How-To Playbooks</Link> — task
                   recipes
                 </li>
                 <li>
-                  <Link to="/docs/mcp/runbooks">Runbooks</Link> — incident
+                  <Link to="/docs/v2/mcp/runbooks">Runbooks</Link> — incident
                   recovery
                 </li>
               </ul>
@@ -271,7 +271,7 @@ function TutorialsFeature() {
                 case.
               </p>
               <p>
-                <Link to="/docs/mcp/tutorials">Browse all tutorials →</Link>
+                <Link to="/docs/v2/mcp/tutorials">Browse all tutorials →</Link>
               </p>
             </Intro>
           </div>
