@@ -14,6 +14,7 @@ import {
 } from "@tabler/icons-react";
 
 import styles from "./cli.module.css";
+import demo from "@site/static/img/mcp-demo.png";
 import featureStyles from "@site/src/components/HomepageFeatures/styles.module.css";
 import FeatureRow from "@site/src/components/FeatureRow";
 import Intro, { IntroHeader } from "@site/src/components/Intro";
@@ -26,6 +27,10 @@ function MCPPageHeader() {
         <p className={styles.heroDescription}>
           Prompt your agent with intent. Let mittwald MCP execute the
           infrastructure work with safe, auditable tool calls.
+          <img
+            src={demo}
+            alt="An example of using mittwald MCP with an AI assistant to manage infrastructure."
+          />
         </p>
         <div className={styles.buttons}>
           <Link
