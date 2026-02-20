@@ -1,0 +1,93 @@
+---
+title: Developing Frontend Fragments
+---
+
+## Use Other Anchor Points
+
+The Reference Extension uses `/projects/project/menu/section/extensions/item` to appear as a menu item within a project.
+However, mStudio provides additional anchor points that you can use for your Extension.
+
+The basic anchor-point concept is:
+
+- You can add a menu item in each menu
+- You can embed a custom section on each page
+
+Available anchor points can be viewed directly in mStudio.
+For more information, see the [Frontend Development concept](../../../overview/concepts/frontend-development#anchors).
+
+:::info Multiple Frontend Fragments
+An Extension is not limited to one anchor point.
+Besides your internal Extension navigation, you can embed multiple Frontend Fragments in different places in mStudio.
+:::
+
+## flow Design System
+
+The **flow Design System** is the UI framework behind mStudio.
+It provides a broad set of React components for developing Frontend Fragments.
+
+- **Documentation**: [mittwald.github.io/flow](https://mittwald.github.io/flow/)
+- **GitHub repository**: [github.com/mittwald/flow](https://github.com/mittwald/flow)
+
+The flow Design System includes, among others, these packages:
+
+| Package                                  | Usage                                              |
+| ---------------------------------------- | -------------------------------------------------- |
+| `@mittwald/flow-react-components`        | React components for regular frontends             |
+| `@mittwald/flow-remote-react-components` | React components for use inside Frontend Fragments |
+
+Under [UI Patterns](https://mittwald.github.io/flow/03-patterns/anlegeprozess) and follow-up pages,
+you will find common UX patterns that help you implement typical use cases.
+If you follow these patterns, your Extension will not only look like mStudio,
+it will also feel like it.
+
+### Available Components
+
+mStudio itself is fully built on flow components.
+Everything possible in mStudio can also be implemented with flow components in your Extension.
+
+Available components include categories such as:
+
+- **Form controls** - Inputs, radio groups, checkboxes, etc.
+- **Content** - Text, headings, images, etc.
+- **Structure** - LayoutCards, Sections, Lists, ColumnLayouts, etc.
+- **Navigation** - Tabs, links, breadcrumbs, etc.
+- **Overlays** - Modals, tooltips, lightboxes, etc.
+- **Data visualization** - Cartesian charts, donut charts, etc.
+
+The [flow documentation](https://mittwald.github.io/flow/) provides docs, examples, and guidelines for all components.
+You can also use the Reference Extension as orientation.
+
+:::warning No native HTML elements
+When developing Frontend Fragments, native HTML elements such as `<div>`, `<span>`, or `<button>` cannot be used,
+except for a few [exceptions](../../../how-to/develop-frontend-fragment#limited-components).
+Use the corresponding flow components instead.
+:::
+
+### Custom Styling
+
+Custom CSS styling is intentionally not possible in Frontend Fragments.
+Frontend Fragments should feel like a core part of mStudio.
+Using flow components ensures a consistent look and feel.
+
+Everything needed for layout design is possible through flow components.
+If something does not work as expected or a component is missing,
+you can share feedback in the [flow GitHub repository](https://github.com/mittwald/flow).
+
+If flow components are not suitable for your use case, you can also build an [External Frontend](./05-external-frontend.mdx).
+
+## Routing and Navigation
+
+The Reference Extension uses [TanStack Start](https://tanstack.com/start/latest) as full-stack framework,
+which includes TanStack Router for routing.
+
+Within your Extension, you can define as many routes as needed and navigate between them.
+Routes are defined in `src/routes/`.
+
+### Context Parameters
+
+Via the Ext Bridge, you can access context information like `projectId` or `customerId`,
+depending on the Extension Context.
+You can use this data to adapt Extension behavior and UI.
+
+In our [Frontend Fragment guide](../../../how-to/develop-frontend-fragment/#getconfig--useconfig-react),
+we explain in detail how Ext Bridge works and which information is available.

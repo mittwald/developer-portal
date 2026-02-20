@@ -1,0 +1,90 @@
+---
+title: Extension erreichbar machen
+---
+
+## Warum die lokal laufende Extension erreichbar sein muss
+
+Die Reference Extension hängt die eigenen Daten (in diesem Fall Kommentare) an die Extension Instance, um sie einfach und sicher löschen zu können.
+Dafür muss die Extension Instance über bestehende Extension Instances Bescheid wissen.
+Extensions können über **Lifecycle Webhooks** über hinzugefügte, bearbeitete oder entfernte Extension Instances informiert werden.
+Diese werden aus dem mStudio Backend heraus aufgerufen, also muss die API der **Extension öffentlich erreichbar** sein.
+
+Grundsätzlich kann **jede Tunneling-Technik** verwendet werden, um die API öffentlich erreichbar zu machen.
+Wenn bspw. [ngrok](https://ngrok.com/) oder [Cloudflare tunnel](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/) bereits bekannt und im Einsatz ist,
+können die folgenden Schritte übersprungen werden und stattdessen mit diesen ein Tunnel hergestellt werden.
+
+Wir empfehlen [zrok](https://zrok.io/) als Open Source und kostenlose Variante.
+
+## zrok einrichten
+
+zrok ist eine **Open-Source-Alternative** zu ngrok, die sowohl **self-hosted** als auch als **SaaS-Lösung** verwendet werden kann.
+Der Einfachheit halber nutzen wir **in diesem Guide die SaaS-Lösung**, da diese kostenlos ist.
+Unser Ziel ist es, eine **stabile URL** herzustellen, die sich bei einem erneuten Öffnen des Tunnels nicht ändert.
+
+:::info Getting Started Guide für zrok
+Grundsätzlich folgen wir [dem offiziellen Guide](https://docs.zrok.io/docs/getting-started/).
+:::
+
+### zrok-Account erstellen
+
+Um die SaaS-Lösung von zrok zu nutzen, musst du dich bei [myzrok.io](https://myzrok.io/) registrieren.
+
+### Device in die Umgebung einbinden
+
+Direkt nach der Registrierung wird dir ein Befehl zum **Einbinden deines Clients** in die Umgebung angezeigt.
+Führe diesen bei dir auf deinem Client aus.
+
+```bash
+zrok enable <your-token>
+```
+
+![zrok enable device](/img/contribution/getting-started-guide/zrok-enable.png)
+
+### Reserved Share erstellen
+
+Um eine **stabile URL** zu erhalten, muss eine URL reserviert werden.
+Dies geschieht durch folgenden Befehl:
+
+```bash
+zrok reserve public 3000
+```
+
+Dies erstellt eine stabile URL wie `https://<token>.share.zrok.io`, die auf `http://localhost:3000` zeigt.
+
+:::warning Token notieren!
+Der Token aus der URL ist wichtig für die folgenden Schritte, bitte notiere ihn dir.
+:::
+
+Unter Umständen kann es nötig sein, root-Rechte für diese Operation zu verwenden.
+Vor allem unter macOS haben wir beobachten können, dass dies nötig ist,
+um das zu erstellende Zertifikat in den Trusted Root Certificate Store einzutragen.
+Wenn du auf Probleme diesbezüglich stößt, ergänze den Befehl mit `sudo`:
+
+```bash
+sudo zrok reserve public 3000
+```
+
+### Token in `.env` eintragen
+
+Die Reference Extension stellt ein Package Script bereit, mit dem der Tunnel einfach gestartet werden kann.
+Damit dieses funktioniert, muss der Token in die `.env` eingetragen werden.
+
+```
+ZROK_RESERVED_TOKEN=<token>
+```
+
+### Tunnel starten
+
+```bash
+pnpm run dev:expose
+```
+
+Deine Extension ist nun unter `https://<token>.share.zrok.io` öffentlich erreichbar!
+
+### Webhook URL konfigurieren
+
+Im **Tab "Webhooks"** deiner Extension kann nun die URL eingetragen werden.
+Die Reference Extension verwendet einheitlich für alle Webhooks den Pfad `/api/webhooks/mittwald`.
+Die URL ist also `https://<token>.share.zrok.io/api/webhooks/mittwald`.
+
+![Webhook URL konfigurieren](/img/contribution/getting-started-guide/webhook-url.png)

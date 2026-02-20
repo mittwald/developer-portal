@@ -1,0 +1,199 @@
+---
+title: Cleanup - Remove Demo Content
+---
+
+## Overview: What Is Demo and What Is Infrastructure?
+
+Before cleaning up, it is important to understand which parts of the Reference Extension are demo functionality and which parts are reusable infrastructure.
+
+### Demo Functionality (Can Be Removed)
+
+The Reference Extension contains several demo features showing different implementation patterns.
+**All of these can be removed completely:**
+
+| Area             | Path                    | Description                                      |
+| ---------------- | ----------------------- | ------------------------------------------------ |
+| Components       | `src/components/*`      | All UI components (except `ErrorFallback.tsx`)   |
+| Server Functions | `src/serverFunctions/*` | All server functions                             |
+| Domain Logic     | `src/domain/comments/`  | Database access logic for comments               |
+| Domain Logic     | `src/domain/project.ts` | Project API integration                           |
+| Schema           | `src/db/schema.ts`      | The `comments` table definition                  |
+
+The demo functionality shown in these files can be removed safely.
+If you want to revisit how certain parts were implemented,
+you can always inspect the [upstream repository](https://github.com/mittwald/reference-extension).
+
+### Infrastructure (Should Be Kept)
+
+The following components are your Extension foundation and should **not** be removed:
+
+| Area               | Path                                                    | Purpose                                                                                                                      |
+| ------------------ | ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Error UI           | `src/components/ErrorFallback.tsx`                      | Error-boundary fallback for the entire app                                                                                  |
+| Authentication     | `src/middleware/auth.ts`                                | Session verification and access-token handling                                                                              |
+| Error handling     | `src/middleware/error-handling.ts`                      | Global error handling with Zod validation                                                                                   |
+| Database setup     | `src/db/index.ts`                                       | PostgreSQL connection pool                                                                                                  |
+| Migrations         | `src/db/migrate.ts`, `src/server/plugins/migrations.ts` | Automatic schema migrations                                                                                                 |
+| Router             | `src/router.tsx`, `src/routes/__root.tsx`               | TanStack Router configuration                                                                                               |
+| Main route         | `src/routes/index.tsx`                                  | Entry point (adjust content, keep file)                                                                                    |
+| Webhook route      | `src/routes/api/webhooks.mittwald.ts`                   | Webhook handler for Extension lifecycle                                                                                     |
+| Environment        | `src/env.ts`                                            | Environment variable validation                                                                                             |
+| Error definitions  | `src/global-errors.ts`                                  | Reusable error classes                                                                                                      |
+| Ghost setup        | `src/ghosts.ts`                                         | RPC layer using [@mittwald/react-ghostmaker](https://github.com/mittwald/react-ghostmaker) (adjust content, keep file)   |
+| Hooks              | `src/hooks/useFormErrorHandling.tsx`                    | Reusable form-error hook                                                                                                    |
+
+The `extension_instance` table in `src/db/schema.ts` is also infrastructure.
+It stores instance-specific data and the encrypted access token.
+
+## Remove Demo Functionality
+
+### Frontend Components
+
+Delete all files and folders in `src/components/` **except** `ErrorFallback.tsx`.
+
+**Delete complete folders:**
+
+- `src/components/comments/` - Comment feature (chat UI, forms, loading states)
+- `src/components/project/` - Project display and editing
+
+**Delete individual files:**
+
+- `GreetingCard.tsx` - Welcome card
+- `APIReferenceCard.tsx` - Link to API documentation
+- `DeveloperPortalCard.tsx` - Link to developer portal
+- `FlowDocumentationCard.tsx` - Link to flow documentation
+- `ReadmeCard.tsx` - README display
+- `EditProjectDescriptionModal.tsx` - Modal for editing project description
+
+Then update `src/routes/index.tsx`.
+Remove imports and usages of deleted components and replace the content with your own UI.
+
+If you only want to clean up first, you can remove the full section with card layout and keep only the title.
+You can also add a temporary test UI to verify everything still works.
+For example:
+
+```tsx
+import { Title } from "@mittwald/mstudio-ext-react-components";
+import { LayoutCard, Text } from "@mittwald/flow-remote-react-components";
+
+function App() {
+  return (
+    <>
+      <Title>Hello Contributor!</Title>
+      <LayoutCard>
+        <Text>Test</Text>
+      </LayoutCard>
+    </>
+  );
+}
+```
+
+### Server Functions
+
+Delete everything in `src/serverFunctions/`.
+
+**Delete complete folder:**
+
+- `src/serverFunctions/comments/` - Contains all comment-related server functions:
+- `get-comments.ts` - Load comments
+- `add-comment.ts` - Create comments
+- `delete-comment.ts` - Delete comments
+- `get-user-name.ts` - Fetch user name from mittwald API
+- `get-user-avatar.ts` - Fetch avatar URL from mittwald API
+
+**Delete individual files:**
+
+- `edit-project-description.ts` - Edit project description
+- `get-project-of-extension-instance.ts` - Load project information
+
+Then adjust `src/ghosts.ts` and remove all imports and ghost definitions for deleted server functions.
+Keep the file itself, because you will register your own server functions there later.
+
+Also remove domain logic:
+
+- `src/domain/comments/` - Entire folder including `comments.ts`
+- `src/domain/project.ts` - Project API integration
+
+### Database Schema
+
+In `src/db/schema.ts`, remove the `comments` table:
+
+```typescript
+// Remove this table definition:
+export const comments = pgTable("comments", {
+  id: varchar({ length: 36 }).primaryKey(),
+  extensionInstanceId: varchar({ length: 36 })
+    .notNull()
+    .references(() => extensionInstances.id),
+  userId: varchar({ length: 36 }).notNull(),
+  text: text().notNull(),
+  createdAt: timestamp().defaultNow().notNull(),
+});
+```
+
+Then create a migration that removes the table from the database:
+
+```bash
+# Generate a new migration based on the updated schema
+pnpm run db:generate-migrations
+```
+
+The generated migration should look roughly like this:
+
+```sql
+DROP TABLE IF EXISTS "comments";
+```
+
+## Tips for a Clean Cleanup
+
+### 1. Work Step by Step
+
+Remove components in reverse dependency order:
+
+1. **First**: Frontend components and imports in `index.tsx`
+2. **Then**: Server functions and ghost exports
+3. **Then**: Domain logic
+4. **Finally**: Database schema and migration
+
+This avoids TypeScript errors during cleanup.
+
+### 2. Use TypeScript as a Helper
+
+After deleting files, TypeScript will show all remaining references.
+Run `pnpm check` or `pnpm build` regularly:
+
+```bash
+pnpm check
+```
+
+Fix all reported errors before moving on.
+
+### 3. Use Git History
+
+If you later want to inspect how a feature was implemented, demo code is still available in Git history:
+
+```bash
+git log --oneline --all -- src/components/
+git show <commit-hash>:src/components/comments/CommentsCard.tsx
+```
+
+You can also inspect the [upstream repository](https://github.com/mittwald/reference-extension) any time.
+
+### 4. Test Before Committing
+
+Make sure everything still works after cleanup:
+
+```bash
+# TypeScript check
+pnpm check
+
+# Build check
+pnpm build
+
+# Start locally and verify manually
+pnpm docker:dev:build
+```
+
+Now test your DEV Extension Instance to ensure no errors are thrown and the UI renders correctly.
+If everything works, commit and push your changes.
+Your deployed Extension should then update as well.

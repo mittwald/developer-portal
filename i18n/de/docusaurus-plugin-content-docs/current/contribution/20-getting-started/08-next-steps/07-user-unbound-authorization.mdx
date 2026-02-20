@@ -1,0 +1,26 @@
+---
+title: Nutzerungebundene Autorisierung
+---
+
+In den vorherigen Kapiteln hast du nutzergebundene Autorisierungsmethoden kennengelernt:
+Session-Tokens, OAuth2 und den Access Token Retrieval Key (ATReK).
+All diese Methoden haben eines gemeinsam:
+Jede Interaktion mit der mStudio API findet im Namen eines mStudio-Users statt.
+
+Nutzergebundene Autorisierung passt jedoch nicht zu jedem Anwendungsfall.
+Betrachte folgende Szenarien:
+
+- **Eigene Nutzerverwaltung**: Deine Extension implementiert eine eigene Nutzerverwaltung, die unabhängig von mStudio-Usern ist, beispielsweise bei Whitelabeling-Lösungen.
+- **Hintergrund-Automatisierung**: Deine Extension soll automatisch mStudio-Aktionen im Hintergrund ausführen, etwa automatisierte Workflows, geplante Aufgaben oder Benachrichtigungen.
+
+Für diese Szenarien bietet das mStudio eine alternative Autorisierungsmethode: **Extension Instance Secrets**.
+
+## Wie Extension Instance Secrets funktionieren
+
+Das mStudio übermittelt das Extension Instance Secret über Lifecycle-Webhooks für jede Extension Instance.
+Die Reference Extension speichert diese Secrets verschlüsselt in der Datenbank.
+
+Mit der Extension Instance ID und dem Extension Instance Secret kann deine Extension ein kurzlebiges Access Token beziehen.
+Dieses Token autorisiert die Extension, auf Ressourcen des Extension Context zuzugreifen, ohne dass ein User eingeloggt sein muss.
+
+Detaillierte Informationen zum Beziehen eines Access-Tokens und dessen Einschränkungen findest du unter [Authentifizierung mit dem Extension Instance Secret](../../50-reference/5-api.mdx).

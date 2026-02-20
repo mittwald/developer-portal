@@ -1,0 +1,194 @@
+---
+title: Reference Extension
+---
+
+## Die Reference Extension
+
+Die [Reference Extension](https://github.com/mittwald/reference-extension) ist eine umfassende Beispiel-Extension,
+die alle wichtigen Features für die Entwicklung von Extensions, die sich direkt in das mStudio integrieren, demonstriert.
+Sie dient als praktische Vorlage und Lernressource für Entwickler.
+
+### Idee und Motivation
+
+Die Reference Extension wurde entwickelt, um:
+
+- **Best Practices** für Extension-Entwicklung zu zeigen
+- Alle wichtigen **Marketplace-Konzepte** praktisch zu demonstrieren
+- Die Integration mit der mittwald API und dem mStudio zu illustrieren
+- Als **Ausgangspunkt** für eigene Extension-Projekte zu dienen
+
+Die Extension ist vollständig dokumentiert und kann als Template verwendet werden, um eigene Extensions zu entwickeln.
+Der Code ist so strukturiert, dass er leicht verstanden, angepasst und erweitert werden kann.
+
+### Technologischer Stack
+
+Die Reference Extension verwendet moderne Web-Technologien, die auch für die Entwicklung eigener Extensions empfohlen werden:
+
+**Frontend:**
+
+- **[React 19](https://react.dev/)** - Für die Entwicklung der Benutzeroberfläche
+- **[TanStack Router & Query](https://tanstack.com/)** - Routing und State Management
+- **[@mittwald/flow-remote-react-components](https://mittwald.github.io/flow/)** - UI-Framework, das mit Frontend Fragmenten kompatibel ist
+- **[React Ghostmaker](https://github.com/mittwald/react-ghostmaker)** - Server Function Abstraktion
+
+**Backend:**
+
+- **[TanStack Start](https://tanstack.com/start/latest)** - Full-stack React Framework
+- **[Drizzle ORM](https://orm.drizzle.team/)** - Typsichere Datenbankoperationen mit PostgreSQL
+- **[@mittwald/api-client](https://www.npmjs.com/package/@mittwald/api-client)** - Client für die mittwald API
+- **[@weissaufschwarz/mitthooks](https://www.npmjs.com/package/@weissaufschwarz/mitthooks)** - Webhook-Verarbeitung
+
+**Development Tools:**
+
+- **[Vite](https://vite.dev/)** - Schnelles Build-Tool
+- **[Biome](https://biomejs.dev/)** - Linting & Formatting
+- **[Vitest](https://vitest.dev/)** - Unit Testing Framework
+
+### Implementierte Konzepte des mStudio Marktplatzes
+
+Die Reference Extension demonstriert alle wichtigen Konzepte, die für die Entwicklung von Extensions, die direkt im mStudio eingebunden werden sollen, relevant sind:
+
+**1. Lifecycle Webhooks**
+
+- Verarbeitung von Lifecycle Events (create, update, remove), um einen State über bestehende Extension Instances aufbauen zu können
+- Speicherung der Instance-Daten in eigener Datenbank
+- Validierung der Webhook Signatur, um Missbrauch zu verhindern
+
+Weitere Informationen zum Zweck und der Funktionsweise von Lifecycle Webhooks können im [Konzeptdokument zu Lifecycle Webhooks](../../overview/concepts/lifecycle-webhooks) nachgelesen werden.
+
+**2. Frontend Fragments**
+
+- Rendering von UI-Komponenten im mStudio via Remote DOM
+- Integration als Menüeintrag im Projekt-Kontext
+- Verwendung des Anchor Points: `/projects/project/menu/section/extensions/item`
+
+Im ["Wie man ein Frontend-Fragment entwickelt"](../../how-to/develop-frontend-fragment)-Guide findest du detailliertere Informationen zur Funktionsweise von Frontend Fragmenten und dem Remote-DOM.
+
+:::info Wichtiger Hinweis zu Frontend Fragments
+Um Frontend direkt in das mStudio integrieren zu können, muss ein Remote DOM bereitgestellt werden.
+Das Bootstrapping der Reference Extension übernimmt das für dich.
+Das Remote DOM im mStudio erfordert die Verwendung von **flow Design System Komponenten**.
+Standard HTML-Elemente wie `<div>` oder `<button>` funktionieren **nicht** im Remote DOM.
+Verwende stattdessen flow-Komponenten wie `<Section>`, `<Button>` aus `@mittwald/flow-remote-react-components`.
+:::
+
+**3. mStudio API Integration**
+
+- Session-Token-Handling für sichere Kommunikation
+- Verwendung von Access-Tokens für API-Authentifizierung
+- Abrufen und Modifizieren von Projekt-Daten
+
+Die Reference Extension implementiert für dich eine Middleware,
+die dir sowohl ein Access Token als auch einen bereits authentifizierten API-Client für die mStudio API bereitstellt.
+Dieser API-Client kann verwendet werden, um Ressourcen aus dem mStudio abzurufen oder zu modifizieren.
+
+Außerdem sind ein paar Server Functions implementiert, die den Einsatz der Middleware sowie die Nutzung des API-Clients demonstrieren.
+Wenn du tiefer in Session-Token-basierte Authentifizierung einsteigen willst, lies den Abschnitt [Authentication and session handling using session tokens](../../overview/concepts/frontend-development#authentication-and-session-handling-using-session-tokens).
+
+**4. Custom Data Persistence**
+
+- Eigene PostgreSQL-Datenbank für Extension-spezifische Daten
+- Drizzle ORM für typsichere Datenbankoperationen
+- Schema-Migrations mit Drizzle Kit
+
+:::info Repository-Dokumentation
+Für eine detaillierte Übersicht der Repository-Struktur und Architektur-Patterns,
+siehe die [umfangreiche Dokumentation im Reference Extension Repository](https://github.com/mittwald/reference-extension).
+:::
+
+## Die Reference Extension lokal hochfahren
+
+Um die Reference Extension lokal zu entwickeln und zu testen, müssen zunächst einige Voraussetzungen erfüllt und Schritte durchgeführt werden.
+
+**Voraussetzungen:**
+
+- **Node.js 22+** (erforderlich)
+- **pnpm 9.14.4+** (Package Manager)
+- **Docker & Docker Compose** (für PostgreSQL)
+
+### Klonen der Reference Extension und Installieren der Dependencies
+
+Klone zunächst die Reference Extension und installiere die Dependencies:
+
+```bash
+# Repository klonen
+git clone https://github.com/mittwald/reference-extension.git
+cd reference-extension
+
+# Dependencies installieren
+pnpm install
+```
+
+### Umgebungsvariablen konfigurieren
+
+Die Reference Extension benötigt verschiedene Umgebungsvariablen für die Konfiguration. Erstelle eine `.env`-Datei im Projekt-Root:
+
+```bash
+cp .env.example .env
+```
+
+Auch wenn noch nicht alle der erforderlichen Umgebungsvariablen gesetzt werden können, können die folgenden bereits gesetzt werden:
+
+```env
+EXTENSION_ID=
+EXTENSION_SECRET=
+ENCRYPTION_MASTER_PASSWORD=
+ENCRYPTION_SALT=
+```
+
+#### EXTENSION_ID
+
+Die Extension ID ist eine bei der Registrierung der Extension generierte UUID und kann im mStudio im **Tab "Details"** eingesehen werden.
+
+![Extension ID](/img/contribution/getting-started-guide/extension-id.png)
+
+#### EXTENSION_SECRET
+
+Das zuvor in der [Extension Konfiguration](../configure-extension#extension-secret-generieren) generierte Extension Secret kann nun hier als Umgebungsvariable eingefügt werden.
+
+#### ENCRYPTION_MASTER_PASSWORD und ENCRYPTION_SALT
+
+Die Reference Extension verwendet Lifecycle Webhooks, um in der eigenen Datenbank einen State über die laufenden Extension-Instanzen aufzubauen.
+Dabei wird ein Extension Instance Secret ausgetauscht, das verschlüsselt und sicher gespeichert werden muss.
+Die Reference Extension übernimmt die eigentliche Verschlüsselung.
+Dafür werden ein **Master Password** und ein **Salt** benötigt, aus denen ein symmetrischer Schlüssel abgeleitet wird.
+
+Master Password & Salt gelten **pro Extension** und müssen nicht für jede Extension Instance unterschiedlich sein.
+Der **Initialisierungsvektor** bzw. die Nonce wird automatisch für jede Verschlüsselung neu erzeugt, um gleiche Klartexte sicher zu differenzieren.
+
+Um dieses **Secret-Paar** zu **generieren**, rufe in der Reference Extension folgendes Package-Script auf:
+
+```bash
+pnpm init:encryption
+```
+
+Dabei werden die generierten Secrets in die eben erstellte `.env`-Datei geschrieben.
+
+:::info Verschlüsselung von eigenen schützenswerten Feldern
+Die Verschlüsselung der Tabellenspalte ist ausreichend modular gebaut, um sie auch für **eigene schützenswerte Felder** verwenden zu können.
+
+:::
+
+### Starten der Entwicklungsumgebung
+
+Die Reference Extension ist für die Persistierung ihrer Daten auf eine Datenbank angewiesen.
+Sie verwendet dazu **[PostgreSQL](https://www.postgresql.org/)**.
+
+Um das Starten der Extension zu vereinfachen, liefert die Reference Extension eine `docker-compose.yml` sowie eine `docker-compose.dev.yml`.
+Beide können dazu genutzt werden, die Extension vollständig mit ihren Abhängigkeiten zu starten.
+Die `docker-compose.dev.yml` startet die Extension jedoch in einem Development-Modus mit Hot Reloading.
+
+Um die Extension zu starten, führe den folgenden Befehl aus:
+
+```bash
+pnpm run docker:dev
+```
+
+Das **Datenbankschema** wird durch die Extension automatisch über **Migrations** angewandt.
+Die Extension läuft nun auf **Port 3000** und ist unter `http://localhost:3000` erreichbar.
+
+:::warning Public URL erforderlich
+Damit die Extension im mStudio funktioniert, muss die lokal laufende Extension eine tatsächliche Extension Instance speichern.
+Dafür muss sie über eine **öffentlich erreichbare URL** verfügbar sein.
+Im nächsten Schritt erfährst du, wie du mit einem Tunneling-Service wie **zrok** eine öffentliche URL bereitstellst.
+:::

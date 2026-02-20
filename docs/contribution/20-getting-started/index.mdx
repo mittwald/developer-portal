@@ -1,0 +1,163 @@
+---
+title: Getting Started with Extension Development
+sidebar_position: 0
+---
+
+# Getting Started with Extension Development
+
+Welcome to the getting started guide for building mittwald Extensions.
+
+## What Is an Extension?
+
+An **Extension** is a web application that adds functionality to mStudio.
+Extensions are developed by Contributors and provided in the mStudio marketplace, either for your own organization only or publicly.
+
+Technically, a classic Extension consists of:
+
+- **Backend** - your server application
+- **Frontend Fragment** - UI components rendered inside mStudio
+- **Database** - for persisting Extension data
+
+Extensions communicate with mStudio through the mittwald API and can access project or organization data.
+
+:::info More details on Extension development
+You can find more details in the [Extension Overview](../overview/extensions).
+:::
+
+## What You Will Learn in This Guide
+
+In this guide, you will learn how to:
+
+- set up a complete Extension development environment
+- use the Reference Extension as a foundation for your own Extension
+- develop and test your Extension locally
+- deploy and publish an Extension in mStudio
+- adapt the Reference Extension to your own requirements and ideas
+
+The Reference Extension used in this guide demonstrates how to:
+
+- interact with the mittwald API
+- persist custom data in a database
+- use flow Remote Components
+
+Because the marketplace supports different kinds of Extensions, this guide uses a representative example: an Extension that integrates a [Frontend Fragment](../overview/concepts/frontend-development#frontend-fragments) into mStudio. Other approaches are not covered in full detail.
+
+A more extensive explanation of External Frontends is available in the [Next Steps](./next-steps/external-frontend).
+
+## Prerequisites
+
+In principle, you can build Extensions with almost any web technology.
+Based on Contributor experience and existing libraries, however, some technologies and frameworks have proven especially suitable.
+
+To follow this guide smoothly and build your own Extension on top of it,
+make sure you meet the following prerequisites.
+
+### Technical Requirements
+
+#### Software
+
+You need the following software on your development machine:
+
+##### Node.js
+
+- **Version:** 22.x or higher
+- **Check:**
+
+```bash
+node --version
+# Should return v22.x.x or higher
+```
+
+##### pnpm
+
+- **Version:** 9.14.4 or higher
+- **Check:**
+
+```bash
+pnpm --version
+# Should return 9.14.4 or higher
+```
+
+##### Docker & Docker Compose
+
+- At least for the local PostgreSQL database
+- **Check:**
+
+```bash
+docker --version
+docker compose version
+```
+
+##### Git
+
+- For cloning the Reference Extension
+- **Check:**
+
+```bash
+git --version
+```
+
+#### Editor/IDE (Optional)
+
+We recommend a modern code editor with TypeScript support.
+Examples include:
+
+- [Visual Studio Code](https://code.visualstudio.com/)
+- [WebStorm](https://www.jetbrains.com/webstorm/)
+- [Cursor](https://cursor.sh/)
+
+### Required Background Knowledge
+
+This guide targets developers with practical experience in:
+
+- **React** - You should be familiar with hooks and components
+- **TypeScript** - Basic understanding of types and interfaces
+- **TanStack Start** - Understanding of the full-stack framework, including routing, server functions, and middleware
+- **Docker** - Basic knowledge of working with images and containers
+
+If any of these topics are unfamiliar, we recommend reviewing up-to-date intro material first. A solid foundation in these areas will make the rest of the guide significantly easier.
+
+### mittwald User & Organization
+
+#### mStudio User
+
+To develop an Extension, you need an mStudio user account.
+
+- **No account yet?** Register at [studio.mittwald.de](https://studio.mittwald.de)
+
+#### Organization in mStudio
+
+Extensions are always developed and published in the context of an organization, so users can see who built the Extension and, if relevant, billing can be handled correctly.
+
+- Create or select an organization in mStudio
+- You need owner permissions for this organization
+- The organization must have a contract partner configured
+
+#### Project in mStudio
+
+In addition to an organization, you also need at least one project.
+If you plan to follow the [deployment step](./deploy), you should avoid a project plan and instead book a server and create the project there, because otherwise you cannot use mStudio container hosting.
+
+## Guide Structure
+
+This guide is designed as a chronological sequence. Work through the steps in order:
+
+1. [Become a Contributor](./become-contributor) - Become a Contributor in mStudio
+2. [Configure Extension](./configure-extension) - Register and configure your Extension
+3. [Reference Extension](./reference-extension) - Clone and start the Reference Extension locally
+4. [Expose Extension](./expose-extension) - Make the Extension reachable from outside so webhooks can be received
+5. [Testing in mStudio](./test-in-mstudio) - Create an Extension Instance and test in mStudio
+6. [Deployment](./deploy) - Deploy your Extension
+7. [Next Steps](./next-steps/introduction) - Adapt the Reference Extension to your own requirements and ideas
+8. [(Optional) Publish Extension](./publish) - Publish your Extension in the marketplace
+
+## Need Help?
+
+If you run into issues while following the guide:
+
+- Use the [GitHub repository for Contributor support](https://github.com/mittwald/contributor-support)
+- Contact mittwald support via email: contributorwerden@mittwald.de
+
+## Let's Start
+
+Ready? Then begin with [Becoming a Contributor](./become-contributor).

@@ -1,0 +1,89 @@
+---
+title: Entwickeln von Frontend Fragmenten
+---
+
+## Andere Ankerpunkte nutzen
+
+Die Reference Extension verwendet den Ankerpunkt `/projects/project/menu/section/extensions/item`, um als Menüeintrag innerhalb eines Projekts angezeigt zu werden.
+Das mStudio bietet jedoch weitere Ankerpunkte, die du für deine Extension nutzen kannst.
+
+Der Grundgedanke hinter Ankerpunkten ist:
+
+- In jedem Menü kann ein eigener Menüpunkt hinzugefügt werden
+- Auf jeder Seite kann eine eigene Section eingebunden werden
+
+Die verfügbaren Ankerpunkte sind direkt im mStudio einsehbar.
+Weitere Informationen findest du im [Frontend Development Konzept](../../../overview/concepts/frontend-development).
+
+:::info Mehrere Frontend Fragments
+Eine Extension ist nicht auf einen einzelnen Ankerpunkt beschränkt.
+Neben der eigenen Menüführung innerhalb der Extension können auch mehrere Frontend Fragments an verschiedenen Stellen im mStudio eingebunden werden.
+:::
+
+## flow Design System
+
+Das **flow Design System** ist das UI-Framework, das dem mStudio zugrunde liegt.
+Es stellt eine umfangreiche Sammlung von React-Komponenten bereit, die für die Entwicklung von Frontend Fragments verwendet werden.
+
+- **Dokumentation**: [mittwald.github.io/flow](https://mittwald.github.io/flow/)
+- **GitHub Repository**: [github.com/mittwald/flow](https://github.com/mittwald/flow)
+
+Das flow Design System besteht unter anderem aus folgenden Paketen:
+
+| Paket                                    | Verwendung                                                         |
+| ---------------------------------------- | ------------------------------------------------------------------ |
+| `@mittwald/flow-react-components`        | React-Komponenten für die Implementierung regulärer Frontends      |
+| `@mittwald/flow-remote-react-components` | React-Komponenten für die Nutzung innerhalb von Frontend Fragments |
+
+Unter [UI Patterns](https://mittwald.github.io/flow/03-patterns/anlegeprozess) und den folgenden Seiten sind gängige UX-Patterns beschrieben,
+die dir helfen, typische Anwendungsfälle umzusetzen.
+Wenn du dich an diesen Patterns orientierst, sieht deine Extension nicht nur aus wie ein Bestandteil des mStudio,
+sondern fühlt sich auch so an.
+
+### Verfügbare Komponenten
+
+Das mStudio selbst baut vollständig auf den flow-Komponenten auf.
+Alles, was im mStudio möglich ist, lässt sich auch mit den flow-Komponenten in deiner Extension umsetzen.
+
+Komponenten sind unter anderem in folgenden Kategorien verfügbar:
+
+- **Form Controls** – Eingabefelder, RadioGroups, Checkboxen, etc.
+- **Content** – Text, Überschriften, Bilder, etc.
+- **Struktur** – LayoutCards, Sections, Listen, ColumnLayouts, etc.
+- **Navigation** – Tabs, Links, Breadcrumbs, etc.
+- **Overlays** – Modals, Tooltips, LightBoxes, etc.
+- **Datenvisualisierung** – CartesianCharts, DonutCharts, etc.
+
+In der [flow-Dokumentation](https://mittwald.github.io/flow/) sind für alle Komponenten Dokumentation, Beispiele und Guidelines formuliert.
+Außerdem ist der Einsatz der Komponenten in der Reference Extension zu sehen und kann als Orientierung dienen.
+
+:::warning Keine nativen HTML-Elemente
+Für die Entwicklung von Frontend Fragments können, bis auf wenige [Ausnahmen](../../../how-to/develop-frontend-fragment#limited-components), keine nativen HTML-Elemente wie `<div>`, `<span>` oder `<button>` verwendet werden.
+Verwende stattdessen die entsprechenden flow-Komponenten.
+:::
+
+### Custom Styling
+
+Eigenes CSS-Styling ist in Frontend Fragments bewusst nicht möglich.
+Frontend Fragments sollen sich anfühlen, als wären sie ein Kernbestandteil des mStudio.
+Durch die Verwendung der flow-Komponenten wird ein konsistentes Look-and-Feel sichergestellt.
+
+Alles, was an Layout-Gestaltung benötigt wird, funktioniert über die flow-Komponenten.
+Falls etwas nicht wie gewünscht funktioniert oder eine Komponente fehlt, kannst du Feedback im [flow GitHub Repository](https://github.com/mittwald/flow) geben.
+
+Falls die flow Components nicht für deinen Anwendungsfall geeignet sind, besteht auch die Möglichkeit, ein [externes Frontend](./05-external-frontend.mdx) zu entwickeln.
+
+## Routing und Navigation
+
+Die Reference Extension verwendet [TanStack Start](https://tanstack.com/start/latest) als Full-Stack-Framework, das TanStack Router für das Routing mitbringt.
+
+Innerhalb deiner Extension kannst du beliebig viele Routen anlegen und zwischen ihnen navigieren.
+Die Routen werden im `src/routes/`-Verzeichnis definiert.
+
+### Kontextparameter
+
+Über die Ext Bridge kannst du auf Kontext-Informationen wie die `projectId` oder `customerId` zugreifen, je nachdem, in welchem Context deine Extension läuft.
+Diese Informationen können genutzt werden, um die Anzeige oder das Verhalten der Extension anzupassen.
+
+In unserem [Frontend Fragment Guide](../../../how-to/develop-frontend-fragment/#getconfig--useconfig-react) haben wir ausführlicher beschrieben,
+wie die Ext Bridge funktioniert und welche Informationen zur Verfügung stehen.
