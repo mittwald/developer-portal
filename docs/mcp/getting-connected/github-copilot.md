@@ -221,7 +221,7 @@ List open support conversations for my account
 
 ## Next Steps
 
-- **[Tutorials](../tutorials/)**: See real-world examples
+- **[Tutorials](../../tutorials/)**: See real-world examples
 - **[Other Tools](./)**: Set up Claude Code, Cursor, or Codex CLI
 
 ## Official Documentation

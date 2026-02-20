@@ -141,6 +141,6 @@ user@local $ codex mcp add mittwald --url https://mittwald-mcp-fly2.fly.dev/mcp 
 
 ## Next Steps
 
-- [Tutorials](../tutorials/) for human + agent workflows
-- [How-To Playbooks](../how-to/) for task-focused operations
-- [Auth & Token Lifecycle](../auth-token-lifecycle/) for consent/refresh/re-auth behavior
+- [Tutorials](../../tutorials/) for human + agent workflows
+- [How-To Playbooks](../../how-to/) for task-focused operations
+- [Auth & Token Lifecycle](../../auth-token-lifecycle/) for consent/refresh/re-auth behavior

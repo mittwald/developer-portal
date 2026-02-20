@@ -152,7 +152,7 @@ A: Yes, use `~/.cursor/mcp.json` for global configuration.
 
 ## Next Steps
 
-- [Tutorials](../tutorials/)
+- [Tutorials](../../tutorials/)
 - [Other Tools](./)
 
 ## Official Documentation

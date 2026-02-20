@@ -240,7 +240,7 @@ Create a backup for project [project-id]
 
 ## Next Steps
 
-- **[Tutorials](../tutorials/)**: See real-world examples
+- **[Tutorials](../../tutorials/)**: See real-world examples
 - **[Other Tools](./)**: Set up GitHub Copilot, Cursor, or Codex CLI
 
 ## Official Documentation
