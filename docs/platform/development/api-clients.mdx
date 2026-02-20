@@ -1,0 +1,302 @@
+---
+title: Creating API clients
+sidebar_label: Creating API clients
+---
+
+# Introduction
+
+Explain **why** some use cases might require custom API clients, e.g. different programming languages,
+company standards, ... .
+
+My own main reason is to create loosely coupled components within our SDKs, which do not force
+our customers to work with unfamiliar tools.
+
+
+# Introduction
+
+When working with the mittwald API, there are many reasons why you might want—or even need—to build a custom API client, rather than relying solely on official SDKs. While language preference and adherence to company standards are common motivations, there are several additional drivers worth considering:
+
+- **Programming Language and Technology Stack**  
+  Not all languages or platforms have a first-party SDK. If your project uses a language, framework, or environment not supported out of the box, a custom client ensures smooth integration.
+
+- **Advanced or Non-Standard Authentication Flows**  
+  Some projects require flexible ways to authenticate: using tokens from environment variables, securing extension interactions, handling session tokens in browser scenarios, or rotating secrets automatically. Official clients might not cover new or complex organizational authentication needs.
+
+- **Integration in Specialized Environments**  
+  From CLI tools to browser-based apps, serverless functions, or embedded systems, platform and runtime constraints sometimes demand tailored clients optimized for their specific environment.
+
+- **Adaptability to API Changes and Experimental Features**  
+  APIs evolve—sometimes rapidly. Building your own client can help you leverage beta features, work with endpoints not yet supported officially, or quickly adapt to breaking changes or vendor extensions.
+
+- **Architectural and Integration Flexibility**  
+  Teams with advanced architectural patterns (such as microservices, middleware layering, or plug-in systems) often need more control, such as inserting custom logging, tracing, or rate-limiting at the client level, or composing higher-level abstractions on top of the API transport.
+
+- **Security, Compliance, and Auditing**  
+  Certain industries and organizations require code to be fully auditable or self-hosted, integrate tightly with internal security tooling, or manage credentials in custom ways. Building your own client allows you to comply with these requirements.
+
+- **Testing, Mocking, and Local Development**  
+  Custom clients can include features useful for local development and CI, such as mock data modes, test doubles, or simplified authentication for early prototyping without leaking sensitive credentials.
+
+- **Documentation, Localization, and Onboarding**  
+  Sometimes, a custom client is a strategic asset: it can be written and documented in the team’s native language, or tailored with onboarding examples and guides for your organization’s developers.
+
+- **Dependency Management and Code Ownership**  
+  Rolling your own client lets you pin dependencies, shape the API surface to your needs, and avoid external drift—crucial for organizations with strict stability or security standards.
+
+**In summary:**  
+Custom API clients aren't just about personal or company preferences—they’re a key enabler for integration, compliance, security, and developer productivity. By designing a client tailored to your specific requirements, you ensure your applications remain robust, maintainable, and future-proof.
+
+# Preparations
+
+Thorough preparation sets the stage for a smooth and efficient custom API client development process. With the right groundwork, it’s often possible to generate most of your client automatically, with minimal manual intervention. Below are key preparation areas to consider before you start:
+
+---
+
+## 1. Understand Your Use Case and Target Environment
+
+- **Where will the client run?**  
+  Identify if your client will be used in server-side apps, browser-based scripts, command-line tools, serverless functions, or CI/CD pipelines.
+- **Who are the end users?**  
+  Consider internal teams, external customers, or automation tools, as this impacts features and user-friendliness.
+- **Any platform constraints?**  
+  Some environments (like browser or serverless) might have restrictions on authentication methods, storage, or dependencies.
+
+---
+
+## 2. Gather and Inspect the OpenAPI Specification
+
+Download the current OpenAPI specification for the API:
+
+```shell
+curl --location --fail --silent 'https://api.mittwald.de/v2/openapi.json' > openapi.json
+```
+
+- **Validate the specification:**  
+  Use OpenAPI validators (e.g., [Swagger Editor](https://editor.swagger.io/)) to check for errors or inconsistencies.
+- **Check for completeness:**  
+  Ensure all required endpoints, authentication flows, and schemas are documented.
+
+---
+
+## 3. Clarify Authentication and Security Requirements
+
+- **Authentication methods:**  
+  Will your client need to support API tokens, OAuth2, extension secrets, or additional mechanisms?
+- **Secret management:**  
+  Make sure required tokens or secrets are available and can be injected securely (e.g., via env vars, config files, secure vaults).
+- **Plan for secure storage:**  
+  Never hard-code sensitive information in the client.
+
+---
+
+## 4. Select and Set Up Your Code Generation Tooling
+
+- **Choose a code generator:**  
+  Tools like [OpenAPI Generator](https://openapi-generator.tech/), [Swagger Codegen](https://github.com/swagger-api/swagger-codegen), or [Autorest](https://aka.ms/autorest) can scaffold clients in many languages.
+- **Check compatibility:**  
+  Ensure your chosen tool supports your preferred language and the OpenAPI version provided.
+- **Install the generator:**  
+  Set up the codegen toolkit and familiarize yourself with its options and configuration files.
+
+---
+
+## 5. Prepare Generator and Project Configuration
+
+- **Adjust generator settings:**  
+  Configure type mappings, serialization options, HTTP client selection, package naming, and code style to match your project’s conventions.
+- **Supporting files:**  
+  Prepare configuration/templates for environment variables, CI scripts, documentation, and testing.
+- **Versioning setup:**  
+  Decide on how your client should reflect the API version—this aids consumers in knowing API compatibility.
+
+---
+
+## 6. Plan for API Evolution and Maintenance
+
+- **Automate updates:**  
+  Consider scripting the whole fetch-generate-test process, so your client stays up to date as the API evolves.
+- **Monitor API changes:**  
+  Subscribe to API changelogs, and be ready to re-generate and retest as the OpenAPI spec changes.
+- **Handle breaking changes:**  
+  Set up version control, and plan for how to manage client updates if/when the API structure is updated.
+
+---
+
+## 7. Identify Special API Features and Custom Logic
+
+- **Special endpoints:**  
+  Note if the API includes pagination, file uploads, webhooks, long-running operations, or other advanced patterns. Code generators may require extra configuration or manual adjustments for these.
+- **Error handling:**  
+  Check for consistent error response formats and plan how the generated client should surface them.
+- **Custom workflows:**  
+  If certain business flows require composite or multi-step API interactions, document these scenarios to extend the client after generation.
+
+---
+
+By thoroughly preparing along these lines, not only will you accelerate the initial client build, but you’ll also ensure your solution remains robust, secure, and maintainable as both your codebase and the mittwald API evolve.
+
+# Philosophy
+
+A smooth development workflow relies on working with reliable, standards-compliant tools and specifications. When building custom API clients from OpenAPI specifications, aim for simplicity and maintainability above all.
+
+**Let the generator do the work:**  
+Modern OpenAPI client generators are powerful and handle the majority of typical API complexities automatically. In most cases, minimal configuration or manual intervention should be necessary, provided the API specification is well-maintained.
+
+If you encounter limitations or quirks—such as subtle warnings, version differences, or deviations from the OpenAPI standard—prioritize resolving the root cause, ideally by improving or fixing the specification itself. Raising issues or contributing fixes to the API spec helps the community and improves outcomes for everyone.
+
+**Avoid unnecessary complexity:**  
+Try to refrain from introducing workarounds or custom patches for every edge case in generated clients. Focusing on generator configuration, rather than manual code changes or ad hoc “fixes” to the spec, keeps your workflow sustainable and future-proof.
+
+> 🌱 **Maintain your generation process, not the output.**  
+> Let your manual efforts go into improving automation, testing, and pipeline robustness—rather than into laborious edits of generated code.
+
+Popular OpenAPI generators include [OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator) and others. Test generated clients with simple API requests to quickly validate they operate as expected.
+
+**Takeaway:**  
+A little discipline in maintaining a clean, automated generation workflow not only reduces technical debt, but saves you and your team time with every new API release.
+
+# Example - Python API client
+
+Requirements:
+- Python Installation
+- Basic Bash, Python, `pip` and `virtualenv` knowledge
+
+A python API client can be generated using the [openapi-python-client module](https://github.com/openapi-generators/openapi-python-client).
+
+As the client itself is 100% generated, we create a **pipeline** for client generation instead
+of the actual client. This means that we automate the API client generation, releasing and updates.
+
+## Creating Python mittwald API client
+
+Before we automate the whole process, we start with client generation on the console. First steps are
+to create our project folder, create a Python virtualenv inside and install the client generator:
+
+```shellsession
+(user@local) $ mkdir python-api-client
+(user@local) $ cd python-api-client
+(user@local) $ virtualenv venv           # or "python -m venv venv"
+(user@local) $ source venv/bin/activate
+(venv)(user@local) $ pip install openapi-python-client
+```
+
+::note
+`(venv)` in prompt means our virtual environment is active. This alters your `PATH` environment variable
+so `python` points to local virtualenv interpreter. Guide shows activation for bash, other activation
+scripts for common shells ( Powershell, fish, zsh, ... ) can be found in the `venv/bin/` directory.
+Environments can be deactivated with `deactivate` command. In bash, use `which python` before and
+after activation to see the difference.
+::
+
+Now wen can download the OpenAPI specification file from mittwald docs:
+
+```shellsession
+(venv)(user@local) $ curl --location --fail --silent 'https://api.mittwald.de/v2/openapi.json' > openapi.json
+```
+
+This is all we need. Run code generator:
+
+```shellsession
+(venv)(user@local) $ openapi-python-client generate --path ./openapi.json
+```
+
+The client generator might throw warnings while running. As stated above, do not alter `openapi.json` to
+fix such issues. Better check generator config, or create an issue to get the root cause fixed.
+Prefer this way, only adjust manually if you really have to. Keep maintenance effort for clients as low as
+possible.
+
+After generation, you should see a `mittwald-api-client` folder in your project directory. This is the
+generated client as pythonn package. It can be installed for testing via:
+
+```shellsession
+(venv)(user@local) $ pip install -e ./mittwald-api-client
+```
+
+The generated `mittwald-api-client/README.md` offers some starter code to test the generated client.
+Call your generated client with some business cases in mind to validate its function. Here is a starter
+script:
+
+```python
+import os
+import sys
+
+from dotenv import load_dotenv
+
+from mittwald_api_client import AuthenticatedClient
+from mittwald_api_client.api.project import project_get_server
+
+
+def main():
+    """
+    Test fresh built API client, set up authenticated client
+    from environment and fetch server information
+    """
+
+    load_dotenv()
+
+    API_TOKEN = os.getenv("API_TOKEN")
+    SERVER_ID = os.getenv("SERVER_ID")
+
+    if API_TOKEN is None or SERVER_ID is None:
+        print("API_TOKEN or SERVER_ID missing. Check environment.")
+        sys.exit(1)
+
+    client = AuthenticatedClient(
+        base_url="https://api.mittwald.de",
+        token=API_TOKEN,
+        follow_redirects=True,  # API returns 308 aka permanent redirects, NOT expected by client by default
+    )
+
+    with client as myclient:
+        res = project_get_server.sync_detailed(
+            client=myclient,
+            server_id=SERVER_ID,
+        )
+
+    print("client call result:")
+    print(res)
+    print("---")
+
+if __name__ == '__main__':
+    main()
+```
+
+It is strongly recommended to wrap credentials and context in a standard way, most importantly avoid
+any credentials from direct usage in the code or as command line argument.
+This example uses `dotenv.load_dotenv` in order to fetch credentials from environment via `.env` file.
+
+## Publishing Python mittwald API client
+
+Publishing API clients strongly depends on the software ecosystem you are working with, releasing it
+at all depends on the actual use case. For bundled usage in a very specialized use case, publishing
+might not even be necessary at all.
+
+Our Python example has no specialized features at all and is as generic as it could be, offering
+a broad range of use cases. So publishing it for others is very useful.
+
+In the Python ecosystem, public PyPI is the place to release packages. Luckily, the generator used
+got us covered and explains how to publish in generated `mittwald-api-client/README.md`.
+
+After account creation on PyPI we can configure poetry, here an example for testing PyPI repository:
+
+```shellsession
+poetry config repositories.testpypi https://test.pypi.org/simple/
+poetry config pypi-token.testpypi <TOKEN-HERE>
+```
+
+After poetry base configuration, we can build and publish our client:
+
+```shellsession
+cd mittwald-api-client
+poetry publish --build -r testpypi
+```
+
+When publishing worked without errors, the client can now be installed into python environments using pip:
+
+```shellsession
+cd my-python-mittwald-project
+pip install -i https://test.pypi.org/simple/ mittwald-api-client
+```
+
+That's it. The same workflow applies to productive PyPI.
+
+## Maintaining Python mittwald API client
