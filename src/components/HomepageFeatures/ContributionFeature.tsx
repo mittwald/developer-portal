@@ -1,12 +1,11 @@
-import Intro, { IntroHeader } from "../Intro";
-import Translate from "@docusaurus/Translate";
-import React from "react";
-import FeatureRow from "../FeatureRow";
-import clsx from "clsx";
-import styles from "@site/src/components/HomepageFeatures/styles.module.css";
-import { Icon } from "@mittwald/flow-react-components";
-import { IconHeartHandshake } from "@tabler/icons-react";
 import Link from "@docusaurus/Link";
+import Translate from "@docusaurus/Translate";
+import { Icon } from "@mittwald/flow-react-components";
+import styles from "@site/src/components/HomepageFeatures/styles.module.css";
+import { IconHeartHandshake } from "@tabler/icons-react";
+import clsx from "clsx";
+import FeatureRow from "../FeatureRow";
+import Intro, { IntroHeader } from "../Intro";
 
 function ContributionIntro() {
   return (
@@ -111,7 +110,7 @@ function ToolsFeature() {
       </ul>
       <p>
         <strong>
-          <Translate id={"index.sdks.coming-soon"}>Coming soon</Translate>: 🪄
+          <Translate id={"index.sdks.coming-soon"}>Coming soon</Translate>:
         </strong>
       </p>
       <ul>
