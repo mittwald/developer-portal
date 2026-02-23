@@ -146,7 +146,7 @@ Check [this guide](https://distribution.github.io/distribution/about/deploying/)
     To create a new container registry via the CLI, use the `mw container run` command:
 
     ```shellsession
-    (user@local) $ mw container run \
+    user@local $ mw container run \
       --name example-registry \
       --volume registry-data:/var/lib/registry \
       --publish 5000:5000/tcp \
@@ -182,8 +182,8 @@ In order to add basic authentication to our registry we need to prepare credenti
 First step is to create the credentials file **locally**:
 
 ```shellsession
-(user@local) $ mkdir -p auth
-(user@local) $ docker run \
+user@local $ mkdir -p auth
+user@local $ docker run \
   --entrypoint htpasswd \
   httpd:2 -Bbn exampleuser examplepassword > auth/htpasswd
 ```
@@ -217,13 +217,13 @@ To persist the credentials file, we start with creating a new volume for our reg
     To create a new volume via the CLI, use the `mw volume create` command:
 
     ```shellsession
-    (user@local) $ mw volume create registry-auth
+    user@local $ mw volume create registry-auth
     ```
 
     After volume creation we can attach it to our container via `mw container update`:
 
     ```shellsession
-    (user@local) $ mw container update \
+    user@local $ mw container update \
       c-XXXXXX \
       -v registry-auth:/auth \
       -v registry-data:/var/lib/registry
@@ -262,7 +262,7 @@ After that, we reconfigure our registry to use new basic auth credentials.
     To add or update environment variables via the CLI, use the `mw container update` command:
 
     ```shellsession
-    (user@local) $ mw container update \
+    user@local $ mw container update \
       c-XXXXXX \
       -v registry-auth:/auth \
       -v registry-data:/var/lib/registry \
@@ -274,7 +274,7 @@ After that, we reconfigure our registry to use new basic auth credentials.
     Here is a full `container run` command if you start from scratch or skipped ahead:
 
     ```shellsession
-    (user@local) $ mw container run \
+    user@local $ mw container run \
       --name example-registry \
       --volume registry-data:/var/lib/registry \
       --volume registry-auth:/auth \
@@ -296,7 +296,7 @@ After that, we reconfigure our registry to use new basic auth credentials.
 Then we ship our credentials file, overriding default user credentials ( to be found in logs if needed ).
 
 ```shellsession
-(user@local) $ mw container cp -r auth/ example-registry:/
+user@local $ mw container cp -r auth/ example-registry:/
 ```
 
 As final step, create a subdomain in your project and point it to registry container.
@@ -314,7 +314,7 @@ As final step, create a subdomain in your project and point it to registry conta
   <TabItem value="cli" label="CLI">
 
     ```shellsession
-    (user@local) $ mw domain virtualhost create \
+    user@local $ mw domain virtualhost create \
       --hostname docker.p-XXXXXX.project.space \
       --path-to-container /:<Container-UUID>:5000/tcp
     ```
@@ -329,16 +329,16 @@ Now, after domain has been set up, we can start testing. As we have configured b
 registry to actually use it. Build and tag an arbitrary Docker image, then push to new registry:
 
 ```shellsession
-(user@local) $ cd path/to/your/project
-(user@local) $ docker build -t <Your Image> .
-(user@local) $ docker tag <Your Image>:latest docker.p-XXXXXX.project.space/<Your Image>
-(user@local) $ docker push docker.p-XXXXXX.project.space/<Your Image>:latest
+user@local $ cd path/to/your/project
+user@local $ docker build -t <Your Image> .
+user@local $ docker tag <Your Image>:latest docker.p-XXXXXX.project.space/<Your Image>
+user@local $ docker push docker.p-XXXXXX.project.space/<Your Image>:latest
 ```
 
 Your push **must** be rejected due to missing basic auth credentials:
 
 ```shellsession
-(user@local) $ docker push docker.p-XXXXXX.project.space/<Your Image>:latest
+user@local $ docker push docker.p-XXXXXX.project.space/<Your Image>:latest
 ...
 push access denied, repository does not exist or may require authorization: authorization failed: no basic auth credentials
 ```
@@ -347,7 +347,7 @@ If it worked without errors, your setup is incomplete and no authentication is a
 Now log in:
 
 ```shellsession
-(user@local) $ docker login docker.p-XXXXXX.project.space
+user@local $ docker login docker.p-XXXXXX.project.space
 ```
 
 :::note

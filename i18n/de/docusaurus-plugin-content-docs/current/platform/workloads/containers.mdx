@@ -146,7 +146,7 @@ Weitere detaillierte Anweisungen und Konfigurationsoptionen findest du in [diese
     Um eine neue Container-Registry über die CLI zu erstellen, verwende den Befehl `mw container run`:
 
     ```shellsession
-    (user@local) $ mw container run \
+    user@local $ mw container run \
       --name example-registry \
       --volume registry-data:/var/lib/registry \
       --publish 5000:5000/tcp \
@@ -179,8 +179,8 @@ Um eine Basis-Authentifizierung zu unserer Registry hinzuzufügen, müssen wir Z
 Der erste Schritt besteht darin, die Anmeldedatei **lokal** zu erstellen:
 
 ```shellsession
-(user@local) $ mkdir -p auth
-(user@local) $ docker run \
+user@local $ mkdir -p auth
+user@local $ docker run \
   --entrypoint htpasswd \
   httpd:2 -Bbn exampleuser examplepassword > auth/htpasswd
 ```
@@ -213,13 +213,13 @@ Um die Anmeldedatei persistent zu speichern, beginnen wir mit der Erstellung ein
     Um ein neues Volume über die CLI zu erstellen, verwende den Befehl `mw volume create`:
 
     ```shellsession
-    (user@local) $ mw volume create registry-auth
+    user@local $ mw volume create registry-auth
     ```
 
     Nach der Volume-Erstellung können wir es über `mw container update` an unseren Container anhängen:
 
     ```shellsession
-    (user@local) $ mw container update \
+    user@local $ mw container update \
       c-XXXXXX \
       -v registry-auth:/auth \
       -v registry-data:/var/lib/registry
@@ -258,7 +258,7 @@ Danach konfigurieren wir unsere Registry neu, um die neuen Basis-Authentifizieru
     Um Umgebungsvariablen über die CLI hinzuzufügen oder zu aktualisieren, verwende den Befehl `mw container update`:
 
     ```shellsession
-    (user@local) $ mw container update \
+    user@local $ mw container update \
       c-XXXXXX \
       -v registry-auth:/auth \
       -v registry-data:/var/lib/registry \
@@ -270,7 +270,7 @@ Danach konfigurieren wir unsere Registry neu, um die neuen Basis-Authentifizieru
     Hier ist ein vollständiger `container run`-Befehl, wenn du von Grund auf neu beginnst oder vorgesprungen bist:
 
     ```shellsession
-    (user@local) $ mw container run \
+    user@local $ mw container run \
       --name example-registry \
       --volume registry-data:/var/lib/registry \
       --volume registry-auth:/auth \
@@ -292,7 +292,7 @@ Erstelle den Container mit den festgelegten Volumes und Umgebungsvariablen.
 Dann übertragen wir unsere Anmeldedatei und überschreiben die Standard-Benutzerzugangsdaten (die bei Bedarf in den Logs zu finden sind).
 
 ```shellsession
-(user@local) $ mw container cp -r auth/ example-registry:/
+user@local $ mw container cp -r auth/ example-registry:/
 ```
 
 Als letzten Schritt erstelle eine Subdomain in deinem Projekt und verweise sie auf den Registry-Container.
@@ -310,7 +310,7 @@ Als letzten Schritt erstelle eine Subdomain in deinem Projekt und verweise sie a
   <TabItem value="cli" label="CLI">
 
     ```shellsession
-    (user@local) $ mw domain virtualhost create \
+    user@local $ mw domain virtualhost create \
       --hostname docker.p-XXXXXX.project.space \
       --path-to-container /:<Container-UUID>:5000/tcp
     ```
@@ -324,16 +324,16 @@ Als letzten Schritt erstelle eine Subdomain in deinem Projekt und verweise sie a
 Nachdem die Domain eingerichtet wurde, können wir mit dem Testen beginnen. Da wir die Basis-Authentifizierung konfiguriert haben, sollten wir überprüfen, ob unsere Registry diese tatsächlich verwendet. Erstelle und tagge ein beliebiges Docker-Image und pushe es dann zur neuen Registry:
 
 ```shellsession
-(user@local) $ cd path/to/your/project
-(user@local) $ docker build -t <Your Image> .
-(user@local) $ docker tag <Your Image>:latest docker.p-XXXXXX.project.space/<Your Image>
-(user@local) $ docker push docker.p-XXXXXX.project.space/<Your Image>:latest
+user@local $ cd path/to/your/project
+user@local $ docker build -t <Your Image> .
+user@local $ docker tag <Your Image>:latest docker.p-XXXXXX.project.space/<Your Image>
+user@local $ docker push docker.p-XXXXXX.project.space/<Your Image>:latest
 ```
 
 Dein Push **muss** aufgrund fehlender Basis-Authentifizierungs-Zugangsdaten abgelehnt werden:
 
 ```shellsession
-(user@local) $ docker push docker.p-XXXXXX.project.space/<Your Image>:latest
+user@local $ docker push docker.p-XXXXXX.project.space/<Your Image>:latest
 ...
 push access denied, repository does not exist or may require authorization: authorization failed: no basic auth credentials
 ```
@@ -342,7 +342,7 @@ Wenn es ohne Fehler funktioniert hat, ist deine Einrichtung unvollständig und k
 Melde dich jetzt an:
 
 ```shellsession
-(user@local) $ docker login docker.p-XXXXXX.project.space
+user@local $ docker login docker.p-XXXXXX.project.space
 ```
 
 :::note
