@@ -1,7 +1,7 @@
 ---
 title: Tutorials
 description: Outcome-driven human + agent walkthroughs for mittwald MCP
-sidebar_position: 2
+sidebar_position: 3
 ---
 
 # Tutorials

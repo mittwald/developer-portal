@@ -1,7 +1,7 @@
 ---
 title: Auth & Token Lifecycle
 description: OAuth consent, refresh, and re-authentication behavior
-sidebar_position: 0
+sidebar_position: 2
 ---
 
 # Auth & Token Lifecycle

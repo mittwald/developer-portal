@@ -1,7 +1,7 @@
 ---
 title: Runbooks
 description: Incident recovery procedures for mittwald MCP
-sidebar_position: 0
+sidebar_position: 5
 ---
 
 # Runbooks

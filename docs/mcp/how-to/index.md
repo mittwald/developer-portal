@@ -1,7 +1,7 @@
 ---
 title: How-To Playbooks
 description: Task-focused guides for common mittwald MCP operations
-sidebar_position: 0
+sidebar_position: 4
 ---
 
 # How-To Playbooks
