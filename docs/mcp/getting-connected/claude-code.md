@@ -7,25 +7,25 @@ description: Set up OAuth and mittwald MCP in Claude Code with step-by-step inst
 
 Claude Code is Anthropic's CLI for working with Claude in your terminal. This guide shows you how to connect mittwald MCP using OAuth (recommended) or an API key so you can access mittwald tools directly from Claude Code.
 
-## Prerequisites
+## Prerequisites {#prerequisites}
 
 - **Claude Code installed** (https://code.claude.com/docs/en/mcp)
 - **A mittwald account** (to authenticate)
 - **A web browser** (for OAuth login)
 - **10 minutes** to complete setup
 
-## Authentication Options
+## Authentication Options {#authentication-options}
 
 Claude Code supports two ways to authenticate with mittwald MCP:
 
 - **OAuth (recommended)**: Secure browser-based flow with automatic token refresh.
 - **API key**: Best for headless/CI environments where OAuth is not practical.
 
-## Option A: OAuth Authentication (Recommended)
+## Option A: OAuth Authentication (Recommended) {#option-a-oauth}
 
 Claude Code handles OAuth automatically using Dynamic Client Registration (DCR), so you do **not** need to register a client manually.
 
-### Step 1: Add mittwald MCP Server
+### Step 1: Add mittwald MCP Server {#step-1-add-mcp-server}
 
 Run this command in your terminal:
 
@@ -46,7 +46,7 @@ user@local $ claude mcp add --transport http --scope project mittwald https://mc
 user@local $ claude mcp add --transport http --scope user mittwald https://mcp.mittwald.de/mcp
 ```
 
-### Step 2: Authenticate with mittwald
+### Step 2: Authenticate with mittwald {#step-2-authenticate}
 
 In Claude Code, run the `/mcp` command:
 
@@ -56,7 +56,7 @@ In Claude Code, run the `/mcp` command:
 
 If the browser doesn't open, Claude Code will show a URL you can copy and paste manually.
 
-### Step 3: Complete Authorization
+### Step 3: Complete Authorization {#step-3-complete-authorization}
 
 **In your browser**:
 
@@ -70,7 +70,7 @@ If the browser doesn't open, Claude Code will show a URL you can copy and paste 
 - Tokens are stored securely
 - Tokens refresh automatically when they expire
 
-### Step 4: Verify Your Connection
+### Step 4: Verify Your Connection {#step-4-verify-connection}
 
 Ask Claude Code to run a simple mittwald tool:
 
@@ -91,26 +91,30 @@ You should see output similar to:
 
 ✅ **Success!** mittwald MCP is now connected to Claude Code.
 
-## Option B: API Key Authentication
+## Option B: API Key Authentication {#option-b-api-key}
 
 Use this option for headless servers or CI environments where OAuth is not practical.
 
-### Step 1: Get Your mittwald API Token
+### Step 1: Get Your mittwald API Token {#step-1-get-api-token}
 
 1. Go to **mStudio → User Settings → API Tokens**
 2. Create a new token with the permissions you need
 3. Copy and store the token securely
 
-### Step 2: Add mittwald MCP with API Key
+### Step 2: Add mittwald MCP with API Key {#step-2-add-mcp-with-api-key}
 
 ```shellsession
 user@local $ claude mcp add --transport http mittwald https://mcp.mittwald.de/mcp \
     --header "Authorization: Bearer YOUR_MITTWALD_API_TOKEN"
 ```
 
-**Important**: API tokens do **not** auto-refresh. Rotate them regularly and keep them secret.
+:::warning
 
-### Step 3: Verify Connection
+API tokens do **not** auto-refresh. Rotate them regularly and keep them secret.
+
+:::
+
+### Step 3: Verify Connection {#step-3-verify-connection}
 
 Use the same test as OAuth:
 
@@ -118,43 +122,43 @@ Use the same test as OAuth:
 Use mittwald MCP to get my user information
 ```
 
-## Common Tasks with mittwald MCP
+## Common Tasks with mittwald MCP {#common-tasks}
 
 Once authenticated, you can use natural language prompts in Claude Code:
 
-### List Your Projects
+### List Your Projects {#list-your-projects}
 
 ```
 Show me all my mittwald projects
 ```
 
-### Get App Information
+### Get App Information {#get-app-information}
 
 ```
 List all apps in project [project-id]
 ```
 
-### View Database Info
+### View Database Info {#view-database-info}
 
 ```
 Show database details for [db-id]
 ```
 
-### Check Server Status
+### Check Server Status {#check-server-status}
 
 ```
 Get server status for [server-id]
 ```
 
-### Create a Backup
+### Create a Backup {#create-a-backup}
 
 ```
 Create a backup for project [project-id]
 ```
 
-## Troubleshooting
+## Troubleshooting {#troubleshooting}
 
-### Error: "Browser Didn't Open"
+### Error: "Browser Didn't Open" {#error-browser-didnt-open}
 
 **Symptom**: Claude Code shows an authorization URL, but no browser window appears.
 
@@ -166,7 +170,7 @@ Create a backup for project [project-id]
 2. Paste it into your browser manually
 3. Complete authorization and return to Claude Code
 
-### Error: "OAuth Authorization Failed"
+### Error: "OAuth Authorization Failed" {#error-oauth-authorization-failed}
 
 **Symptom**: OAuth flow completes in the browser, but Claude Code reports authorization failed.
 
@@ -178,7 +182,7 @@ Create a backup for project [project-id]
 2. Ensure your network allows access to the OAuth server
 3. If it persists, contact mittwald support with the error message
 
-### Error: "Connection Refused"
+### Error: "Connection Refused" {#error-connection-refused}
 
 **Symptom**: Claude Code can't reach `https://mcp.mittwald.de/mcp`.
 
@@ -190,7 +194,7 @@ Create a backup for project [project-id]
 2. Retry the command from a different network
 3. Check proxy or firewall rules
 
-### Error: "Invalid Token"
+### Error: "Invalid Token" {#error-invalid-token}
 
 **Symptom**: Requests fail with 401 Unauthorized after previously working.
 
@@ -201,7 +205,7 @@ Create a backup for project [project-id]
 - **OAuth**: Run `/mcp` and re-authenticate
 - **API Key**: Generate a new API token and re-add the server
 
-### Error: "Permission Denied"
+### Error: "Permission Denied" {#error-permission-denied}
 
 **Symptom**: You receive 403 errors for specific operations.
 
@@ -212,7 +216,7 @@ Create a backup for project [project-id]
 1. Re-authenticate and approve the required scopes
 2. For API keys, create a new token with the correct permissions
 
-### Error: "Server Not Found"
+### Error: "Server Not Found" {#error-server-not-found}
 
 **Symptom**: Claude Code says the MCP server doesn't exist.
 
@@ -223,42 +227,42 @@ Create a backup for project [project-id]
 1. Run `claude mcp list` to check configured servers
 2. Re-add the server with the correct URL and scope
 
-## FAQ
+## FAQ {#faq}
 
-### Q: Is my password transmitted to Claude Code?
+### Q: Is my password transmitted to Claude Code? {#faq-password-transmitted}
 
 **A**: No. Your password is entered in your browser with mittwald. Claude Code only receives an OAuth token.
 
-### Q: Can I use multiple mittwald accounts?
+### Q: Can I use multiple mittwald accounts? {#faq-multiple-accounts}
 
 **A**: Yes, but you must authenticate each account separately and manage separate configurations (for example, different scopes or server names).
 
-### Q: How long do tokens last?
+### Q: How long do tokens last? {#faq-token-duration}
 
 **A**: OAuth access tokens typically last about 1 hour, but Claude Code refreshes them automatically. API keys remain valid until revoked.
 
-### Q: How do I revoke access?
+### Q: How do I revoke access? {#faq-revoke-access}
 
 **A**: In Claude Code, run `/mcp`, select the server, and choose **Clear authentication**. You can also revoke tokens from mStudio.
 
-### Q: Can I use this on a server (SSH)?
+### Q: Can I use this on a server (SSH)? {#faq-server-ssh}
 
 **A**: OAuth requires a browser, so API keys are usually better for headless servers. If needed, authenticate on a local machine and reuse the configuration.
 
-### Q: What scopes should I request?
+### Q: What scopes should I request? {#faq-scopes}
 
 **A**: Use the smallest set of scopes that fits your tasks. Most developers start with `user:read`, `customer:read`, `project:read`, and `app:read`.
 
-### Q: How does Claude Code differ from Claude Desktop?
+### Q: How does Claude Code differ from Claude Desktop? {#faq-claude-code-vs-desktop}
 
 **A**: Claude Code is a CLI with MCP support and terminal workflows. Claude Desktop is a GUI app with a different configuration model.
 
-## Next Steps
+## Next Steps {#next-steps}
 
 - **[Tutorials](../../tutorials/)**: See real-world examples
 - **[Other Tools](./)**: Set up GitHub Copilot, Cursor, or Codex CLI
 
-## Official Documentation
+## Official Documentation {#official-documentation}
 
 This guide is based on official Claude Code capabilities:
 
@@ -266,7 +270,7 @@ This guide is based on official Claude Code capabilities:
 - [Claude Code MCP Setup](https://code.claude.com/docs/en/mcp) - MCP server configuration
 - [OAuth for MCP Server Guide](https://www.buildwithmatija.com/blog/oauth-mcp-server-claude) - Community implementation guide
 
-## Still Need Help?
+## Still Need Help? {#still-need-help}
 
 - Check [Claude Code Documentation](https://code.claude.com/docs/en/mcp) for CLI-specific help
 - Contact [mittwald support](mailto:support@mittwald.de)

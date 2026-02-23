@@ -18,29 +18,29 @@ Every tutorial in this section follows the same structure:
 6. Rollback/cleanup prompt
 7. Resume-after-failure prompt
 
-## By Team Context
+## By Team Context {#by-team-context}
 
-### Freelancers
+### Freelancers {#freelancers}
 
 - [Client Onboarding Automation](./freelancer-client-onboarding)
 - [Automated Backup Monitoring](./automated-backup-monitoring)
 
-### Agencies
+### Agencies {#agencies}
 
 - [Agency Multi-Project Management](./agency-multi-project-management)
 - [Developer Onboarding](./developer-onboarding)
 
-### E-commerce
+### E-commerce {#e-commerce}
 
 - [E-commerce Launch Day Preparation](./ecommerce-launch-day)
 - [Database Performance Optimization](./database-performance)
 
-### Enterprise TYPO3
+### Enterprise TYPO3 {#enterprise-typo3}
 
 - [TYPO3 Multi-Site Deployment](./typo3-multisite-deployment)
 - [Security Audit Automation](./security-audit-automation)
 
-### Modern Stack / DevOps
+### Modern Stack / DevOps {#modern-stack-devops}
 
 - [Container Stack Deployment](./container-stack-deployment)
 - [CI/CD Pipeline Integration](./cicd-pipeline-integration)

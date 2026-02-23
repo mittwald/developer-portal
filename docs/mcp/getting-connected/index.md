@@ -10,11 +10,11 @@ Welcome! This guide helps you set up authentication for mittwald MCP with your p
 
 **Why authentication is required**: mittwald MCP requires authenticated access to your mittwald resources. OAuth 2.1 is the recommended method for interactive use, and API tokens are available for headless/CI workflows.
 
-## Choose Your Tool
+## Choose Your Tool {#choose-your-tool}
 
 mittwald MCP works with 4 popular agentic coding tools. Choose the one you use:
 
-### Claude Code
+### Claude Code {#claude-code}
 
 **Best for**: Developers using Anthropic's Claude Code CLI
 
@@ -25,7 +25,7 @@ mittwald MCP works with 4 popular agentic coding tools. Choose the one you use:
 
 → **[Set up Claude Code](./claude-code)**
 
-### GitHub Copilot
+### GitHub Copilot {#github-copilot}
 
 **Best for**: Developers using GitHub Copilot in VS Code, Visual Studio, JetBrains IDEs, or Xcode
 
@@ -36,7 +36,7 @@ mittwald MCP works with 4 popular agentic coding tools. Choose the one you use:
 
 → **[Set up GitHub Copilot](./github-copilot)**
 
-### Cursor
+### Cursor {#cursor}
 
 **Best for**: Developers using Cursor IDE (VS Code fork with AI features)
 
@@ -47,7 +47,7 @@ mittwald MCP works with 4 popular agentic coding tools. Choose the one you use:
 
 → **[Set up Cursor](./cursor)**
 
-### Codex CLI
+### Codex CLI {#codex-cli}
 
 **Best for**: Developers using OpenAI's Codex CLI for terminal-based AI workflows
 
@@ -58,7 +58,7 @@ mittwald MCP works with 4 popular agentic coding tools. Choose the one you use:
 
 → **[Set up Codex CLI](./codex-cli)**
 
-## Quick Comparison
+## Quick Comparison {#quick-comparison}
 
 | Feature               | Claude Code                           | GitHub Copilot                           | Cursor                                                  | Codex CLI                           |
 | --------------------- | ------------------------------------- | ---------------------------------------- | ------------------------------------------------------- | ----------------------------------- |
@@ -69,11 +69,11 @@ mittwald MCP works with 4 popular agentic coding tools. Choose the one you use:
 | **PKCE**              | Automatic                             | Automatic                                | Automatic                                               | Automatic                           |
 | **Redirect Handling** | Local callback managed by Claude Code | Managed by IDE                           | Managed by Cursor (or static redirect for static OAuth) | Local callback managed by Codex CLI |
 
-## Two Ways to Authenticate
+## Two Ways to Authenticate {#two-ways-to-authenticate}
 
 mittwald MCP supports two authentication methods. Choose based on your use case:
 
-### Option 1: OAuth 2.1 (Recommended)
+### Option 1: OAuth 2.1 (Recommended) {#option-1-oauth}
 
 **Best for**: Interactive development, local machines, security-conscious workflows
 
@@ -99,7 +99,7 @@ mittwald MCP supports two authentication methods. Choose based on your use case:
 
 **Supported by**: All 4 tools (Claude Code, GitHub Copilot, Cursor, Codex CLI)
 
-### Option 2: API Token (Direct Authentication)
+### Option 2: API Token (Direct Authentication) {#option-2-api-token}
 
 **Best for**: CI/CD pipelines, headless servers, automated scripts, simple testing
 
@@ -124,7 +124,7 @@ mittwald MCP supports two authentication methods. Choose based on your use case:
 
 **Supported by**: All 4 tools (different configuration methods per tool)
 
-### Which Should I Choose?
+### Which Should I Choose? {#which-should-i-choose}
 
 **Use OAuth if**:
 
@@ -141,11 +141,11 @@ mittwald MCP supports two authentication methods. Choose based on your use case:
 
 **You can use both**: Configure OAuth for local development and API tokens for CI/CD.
 
-## What is OAuth and Why Do I Need It?
+## What is OAuth and Why Do I Need It? {#what-is-oauth}
 
 **OAuth 2.1** is a secure authorization protocol that allows mittwald MCP to access your mittwald resources on your behalf **without sharing your password**.
 
-### How OAuth Works (Step-by-Step)
+### How OAuth Works (Step-by-Step) {#how-oauth-works}
 
 1. **You choose a tool** (Claude Code, Copilot, Cursor, or Codex CLI)
 2. **The tool requests access** to mittwald on your behalf
@@ -155,7 +155,7 @@ mittwald MCP supports two authentication methods. Choose based on your use case:
 6. **Your tool uses the token** to call MCP tools and access your mittwald resources
 7. **Your password is never shared** with the tool - only the access token
 
-### Security Features
+### Security Features {#security-features}
 
 **PKCE** (Proof Key for Code Exchange)
 
@@ -181,32 +181,32 @@ mittwald MCP supports two authentication methods. Choose based on your use case:
 - Tools receive only a temporary access token
 - If token is compromised, impact is limited and token can be revoked
 
-## Common OAuth Concepts Explained
+## Common OAuth Concepts Explained {#common-oauth-concepts}
 
-### Redirect URI
+### Redirect URI {#redirect-uri}
 
 The callback URL where mittwald OAuth sends you after authentication. Each tool uses a different pattern:
 
 - **CLI tools** (Claude Code, Codex CLI): `http://127.0.0.1/callback` (loopback)
 - **IDE tools** (Copilot, Cursor): IDE-specific callback (handled automatically)
 
-### Client ID
+### Client ID {#client-id}
 
 A unique identifier for your tool registration with mittwald OAuth. Some tools obtain this automatically (DCR), while others may require static client credentials.
 
-### Authorization Code
+### Authorization Code {#authorization-code}
 
 A temporary code (valid ~10 minutes) exchanged for an access token during OAuth flow. You don't handle this manually - your tool does automatically.
 
-### Access Token
+### Access Token {#access-token}
 
 Your credential for accessing mittwald MCP tools. Your tool includes this in every request. It expires (typically ~1 hour) and may be refreshed automatically depending on the client/provider flow.
 
-### Refresh Token
+### Refresh Token {#refresh-token}
 
 A long-lived credential used to obtain new access tokens. Stored securely by your tool; enables you to stay authenticated for days without re-logging in.
 
-### Scope
+### Scope {#scope}
 
 What your tool is allowed to do. mittwald scopes follow `resource:action` format:
 
@@ -215,7 +215,7 @@ What your tool is allowed to do. mittwald scopes follow `resource:action` format
 - `app:read` - Read apps and domains
 - `database:read` - Read databases
 
-## After OAuth Setup
+## After OAuth Setup {#after-oauth-setup}
 
 Once OAuth is configured for your chosen tool, you can:
 
@@ -224,9 +224,9 @@ Once OAuth is configured for your chosen tool, you can:
 - **Use outcome-focused playbooks** in [how-to](../how-to/) for day-to-day operations
 - **Prepare for incidents** with [runbooks](../runbooks/)
 
-## Troubleshooting
+## Troubleshooting {#troubleshooting}
 
-### "I'm not sure which tool to choose"
+### "I'm not sure which tool to choose" {#not-sure-which-tool}
 
 Each tool is best suited to different workflows:
 
@@ -237,7 +237,7 @@ Each tool is best suited to different workflows:
 
 All have equally simple OAuth setup (~10 min each). You can always set up multiple tools if you want.
 
-### "I got stuck during OAuth setup"
+### "I got stuck during OAuth setup" {#stuck-during-oauth-setup}
 
 Each guide has a detailed **troubleshooting section** with solutions for:
 
@@ -249,11 +249,11 @@ Each guide has a detailed **troubleshooting section** with solutions for:
 
 Visit your tool's guide (links above) and find your specific error.
 
-### "I need more technical detail"
+### "I need more technical detail" {#need-more-technical-detail}
 
 Check out the [Auth & Token Lifecycle](../auth-token-lifecycle/) section for details on consent, refresh, and re-authentication behavior.
 
-## OAuth Flow Diagram
+## OAuth Flow Diagram {#oauth-flow-diagram}
 
 Here's what happens behind the scenes when you authenticate:
 
@@ -282,7 +282,7 @@ sequenceDiagram
 
 **Key insight**: PKCE (code verifier/challenge) ensures only your original tool can exchange the authorization code for a token - even if the code is intercepted, it's worthless without the verifier.
 
-## Frequently Asked Questions
+## Frequently Asked Questions {#faq}
 
 **Q: Is my mittwald password sent to the tool?**
 
@@ -324,7 +324,7 @@ A: Yes! All 4 tools support API token authentication as an alternative to OAuth.
 
 A: Log in to [mStudio](https://studio.mittwald.de), go to **User Settings → API Tokens**, create a new token with the scopes you need, and copy it immediately (you won't see it again).
 
-## Terminology Glossary
+## Terminology Glossary {#terminology-glossary}
 
 To help avoid confusion, here's how we use authentication-related terms in this documentation:
 
@@ -338,18 +338,18 @@ To help avoid confusion, here's how we use authentication-related terms in this 
 
 **Learn more**: [mittwald API Authentication](/docs/v2/api/intro/) - Official documentation on API tokens and authentication methods.
 
-## Ready to Get Started?
+## Ready to Get Started? {#ready-to-get-started}
 
 Choose your tool from the list above and follow the step-by-step guide. OAuth setup takes about 10 minutes, and then you'll have access to all available mittwald MCP tools!
 
-### Quick Links
+### Quick Links {#quick-links}
 
 - **[Claude Code Setup](./claude-code)** - For Claude Code CLI users
 - **[GitHub Copilot Setup](./github-copilot)** - For Copilot IDE users
 - **[Cursor Setup](./cursor)** - For Cursor IDE users
 - **[Codex CLI Setup](./codex-cli)** - For Codex CLI users
 
-## Need Help?
+## Need Help? {#need-help}
 
 - **Specific error?** Check your tool's guide troubleshooting section
 - **Token issues?** See [Auth & Token Lifecycle](../auth-token-lifecycle/)

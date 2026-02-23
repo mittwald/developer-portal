@@ -7,18 +7,18 @@ description: Set up OAuth and mittwald MCP in GitHub Copilot with step-by-step i
 
 GitHub Copilot in VS Code can connect to mittwald MCP so you can run mittwald tools directly from Copilot Chat. This guide shows you how to set up OAuth (recommended) or an API key for headless environments.
 
-## Prerequisites
+## Prerequisites {#prerequisites}
 
 - **VS Code 1.99 or later** (required for OAuth support)
 - **GitHub Copilot extension installed**
 - **A mittwald account** (to authenticate)
 - **10 minutes** to complete setup
 
-## Step 1: Create MCP Configuration
+## Step 1: Create MCP Configuration {#step-1-create-mcp-configuration}
 
 Create a project-level configuration file at `.vscode/mcp.json`. Choose one of the authentication methods below.
 
-### 1.1 OAuth (Recommended)
+### 1.1 OAuth (Recommended) {#oauth-recommended}
 
 Use OAuth for the secure browser-based flow with automatic token refresh.
 
@@ -33,7 +33,7 @@ Use OAuth for the secure browser-based flow with automatic token refresh.
 }
 ```
 
-### 1.2 API Key (Alternative)
+### 1.2 API Key (Alternative) {#api-key-alternative}
 
 Use this option for headless servers or CI environments where OAuth is not practical. Input variables keep the token out of source control.
 
@@ -61,15 +61,15 @@ Use this option for headless servers or CI environments where OAuth is not pract
 
 To create a token, go to **mStudio → User Settings → API Tokens**, generate a token, and store it securely.
 
-## Step 2: Start the MCP Server
+## Step 2: Start the MCP Server {#step-2-start-the-mcp-server}
 
 Open `.vscode/mcp.json` in VS Code. You should see a **Start** CodeLens above the server definition. Click **Start** to activate the server.
 
 If you do not see CodeLens buttons, restart VS Code and confirm your version is 1.99+.
 
-## Step 3: Authenticate
+## Step 3: Authenticate {#step-3-authenticate}
 
-### 3.1 OAuth
+### 3.1 OAuth {#oauth}
 
 Click the **Auth** CodeLens above the server definition:
 
@@ -79,7 +79,7 @@ Click the **Auth** CodeLens above the server definition:
 
 Enterprise users may need their admin to enable the **MCP servers in Copilot** policy before Auth appears.
 
-### 3.2 API Key
+### 3.2 API Key {#api-key}
 
 If you chose the API key configuration, VS Code prompts for the token when the server starts. Paste the token when prompted.
 
@@ -88,7 +88,8 @@ If you chose the API key configuration, VS Code prompts for the token when the s
 Never hardcode tokens in the config file. Input variables keep secrets out of source control.
 
 :::
-## Step 4: Verify Your Connection
+
+## Step 4: Verify Your Connection {#step-4-verify-your-connection}
 
 Open Copilot Chat and run a simple test:
 
@@ -100,43 +101,43 @@ You should see a list of projects returned from mittwald MCP.
 
 ✅ **Success!** mittwald MCP is now connected to GitHub Copilot.
 
-## Common Tasks with mittwald MCP
+## Common Tasks with mittwald MCP {#common-tasks}
 
 Once authenticated, you can use Copilot Chat prompts like these:
 
-### List Your Projects
+### List Your Projects {#list-your-projects}
 
 ```
 Use mittwald MCP to show all my projects
 ```
 
-### Get App Information
+### Get App Information {#get-app-information}
 
 ```
 Show apps in my project [project-id]
 ```
 
-### Database Details
+### Database Details {#database-details}
 
 ```
 Get database connection info for [db-id]
 ```
 
-### Backup Status
+### Backup Status {#backup-status}
 
 ```
 Check backup schedules for project [project-id]
 ```
 
-### Support Tickets
+### Support Tickets {#support-tickets}
 
 ```
 List open support conversations for my account
 ```
 
-## Troubleshooting
+## Troubleshooting {#troubleshooting}
 
-### Error: "No CodeLens Buttons Appearing"
+### Error: "No CodeLens Buttons Appearing" {#error-no-codelens-buttons}
 
 **Symptom**: No **Start** or **Auth** buttons appear above the server configuration.
 
@@ -148,7 +149,7 @@ List open support conversations for my account
 2. Restart VS Code
 3. Ensure you are on VS Code 1.99+ (`code --version`)
 
-### Error: "Auth Button Not Working"
+### Error: "Auth Button Not Working" {#error-auth-button-not-working}
 
 **Symptom**: Clicking **Auth** does nothing or fails immediately.
 
@@ -159,7 +160,7 @@ List open support conversations for my account
 1. Update VS Code to 1.99 or later
 2. If you are on Copilot Enterprise, ask your admin to enable **MCP servers in Copilot**
 
-### Error: "Configuration Error"
+### Error: "Configuration Error" {#error-configuration-error}
 
 **Symptom**: VS Code shows JSON parse errors or MCP server fails to load.
 
@@ -171,7 +172,7 @@ List open support conversations for my account
 2. Remove trailing commas
 3. Compare with the example in this guide
 
-### Error: "Server Connection Failed"
+### Error: "Server Connection Failed" {#error-server-connection-failed}
 
 **Symptom**: MCP server fails to start or times out.
 
@@ -183,7 +184,7 @@ List open support conversations for my account
 2. Check outbound network access
 3. Try from another network
 
-### Error: "Token Not Accepted"
+### Error: "Token Not Accepted" {#error-token-not-accepted}
 
 **Symptom**: Requests fail with 401 Unauthorized.
 
@@ -194,7 +195,7 @@ List open support conversations for my account
 1. Create a new API token in mStudio
 2. Restart the MCP server and enter the new token
 
-### Error: "MCP Policy Disabled"
+### Error: "MCP Policy Disabled" {#error-mcp-policy-disabled}
 
 **Symptom**: MCP servers are blocked in Copilot Enterprise.
 
@@ -205,42 +206,42 @@ List open support conversations for my account
 1. Ask your admin to enable **MCP servers in Copilot**
 2. Restart VS Code after the policy change
 
-## FAQ
+## FAQ {#faq}
 
-### Q: What VS Code version do I need?
+### Q: What VS Code version do I need? {#faq-vscode-version}
 
 **A**: Use VS Code 1.99 or later for OAuth support.
 
-### Q: Does this work with VS Code Insiders?
+### Q: Does this work with VS Code Insiders? {#faq-vscode-insiders}
 
 **A**: Yes, as long as your Insiders build is 1.99+.
 
-### Q: Is my token stored securely?
+### Q: Is my token stored securely? {#faq-token-storage}
 
 **A**: OAuth tokens are stored by VS Code. API tokens are entered via input variables and are not saved in the config file.
 
-### Q: How do I update the MCP configuration?
+### Q: How do I update the MCP configuration? {#faq-update-config}
 
 **A**: Edit `.vscode/mcp.json` and restart the MCP server using the **Start** CodeLens.
 
-### Q: Can I use this with GitHub Copilot Enterprise?
+### Q: Can I use this with GitHub Copilot Enterprise? {#faq-copilot-enterprise}
 
 **A**: Yes, but your organization must enable the **MCP servers in Copilot** policy.
 
-### Q: How do I revoke MCP access?
+### Q: How do I revoke MCP access? {#faq-revoke-access}
 
 **A**: Remove the server from `.vscode/mcp.json` and revoke tokens in mStudio.
 
-### Q: Can I share my mcp.json with my team?
+### Q: Can I share my mcp.json with my team? {#faq-share-config}
 
 **A**: Yes, but do not store API tokens inside the file. Use OAuth or input variables.
 
-## Next Steps
+## Next Steps {#next-steps}
 
 - **[Tutorials](../../tutorials/)**: See real-world examples
 - **[Other Tools](./)**: Set up Claude Code, Cursor, or Codex CLI
 
-## Official Documentation
+## Official Documentation {#official-documentation}
 
 This guide is based on official GitHub Copilot capabilities:
 
@@ -248,7 +249,7 @@ This guide is based on official GitHub Copilot capabilities:
 - [Enhanced MCP OAuth Support](https://github.blog/changelog/2025-11-18-enhanced-mcp-oauth-support-for-github-copilot-in-jetbrains-eclipse-and-xcode/) - OAuth 2.1 with PKCE (GA Sept 2025)
 - [Extending Copilot Chat with MCP](https://docs.github.com/copilot/customizing-copilot/using-model-context-protocol/extending-copilot-chat-with-mcp) - MCP integration guide
 
-## Still Need Help?
+## Still Need Help? {#still-need-help}
 
 - Check [GitHub Copilot documentation](https://docs.github.com/en/copilot)
 - Review [VS Code MCP documentation](https://code.visualstudio.com/docs)
