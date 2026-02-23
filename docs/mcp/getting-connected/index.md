@@ -12,7 +12,29 @@ Welcome! This guide helps you set up authentication for mittwald MCP with your p
 
 ## Choose Your Tool {#choose-your-tool}
 
-mittwald MCP works with 4 popular agentic coding tools. Choose the one you use:
+mittwald MCP works with 6 popular AI tools. Choose the one you use:
+
+### Claude Desktop {#claude-desktop}
+
+**Best for**: Users of Claude Desktop app or Claude.ai web interface
+
+- **Type**: Desktop app / Web app
+- **OAuth Pattern**: Browser-based (connector settings UI)
+- **Setup Time**: ~5 minutes
+- **Complexity**: ⭐ (Very Simple - settings UI only)
+
+→ **[Set up Claude Desktop](./claude-desktop)**
+
+### ChatGPT {#chatgpt}
+
+**Best for**: Users of ChatGPT Plus, Team, Enterprise, or Education
+
+- **Type**: Web app / Mobile app
+- **OAuth Pattern**: Browser-based (connector settings UI)
+- **Setup Time**: ~5 minutes
+- **Complexity**: ⭐ (Very Simple - settings UI only)
+
+→ **[Set up ChatGPT](./chatgpt)**
 
 ### Claude Code {#claude-code}
 
@@ -60,14 +82,14 @@ mittwald MCP works with 4 popular agentic coding tools. Choose the one you use:
 
 ## Quick Comparison {#quick-comparison}
 
-| Feature               | Claude Code                           | GitHub Copilot                           | Cursor                                                  | Codex CLI                           |
-| --------------------- | ------------------------------------- | ---------------------------------------- | ------------------------------------------------------- | ----------------------------------- |
-| **Type**              | CLI                                   | IDE Extension                            | IDE                                                     | CLI                                 |
-| **Platform**          | macOS, Linux, Windows                 | VS Code, Visual Studio, JetBrains, Xcode | macOS, Linux, Windows                                   | macOS, Linux, Windows               |
-| **Configuration**     | CLI command                           | IDE settings                             | IDE settings or JSON file                               | CLI command                         |
-| **Browser Required**  | Yes (for auth)                        | Yes (for auth)                           | Yes (for auth)                                          | Yes (for auth)                      |
-| **PKCE**              | Automatic                             | Automatic                                | Automatic                                               | Automatic                           |
-| **Redirect Handling** | Local callback managed by Claude Code | Managed by IDE                           | Managed by Cursor (or static redirect for static OAuth) | Local callback managed by Codex CLI |
+| Feature               | Claude Desktop | ChatGPT           | Claude Code                           | GitHub Copilot                           | Cursor                                                  | Codex CLI                           |
+| --------------------- | -------------- | ----------------- | ------------------------------------- | ---------------------------------------- | ------------------------------------------------------- | ----------------------------------- |
+| **Type**              | Desktop/Web    | Web/Mobile        | CLI                                   | IDE Extension                            | IDE                                                     | CLI                                 |
+| **Platform**          | All            | All               | macOS, Linux, Windows                 | VS Code, Visual Studio, JetBrains, Xcode | macOS, Linux, Windows                                   | macOS, Linux, Windows               |
+| **Configuration**     | Settings UI    | Settings UI       | CLI command                           | IDE settings                             | IDE settings or JSON file                               | CLI command                         |
+| **Browser Required**  | Yes (for auth) | Yes (for auth)    | Yes (for auth)                        | Yes (for auth)                           | Yes (for auth)                                          | Yes (for auth)                      |
+| **PKCE**              | Automatic      | Automatic         | Automatic                             | Automatic                                | Automatic                                               | Automatic                           |
+| **Redirect Handling** | Managed by app | Managed by app    | Local callback managed by Claude Code | Managed by IDE                           | Managed by Cursor (or static redirect for static OAuth) | Local callback managed by Codex CLI |
 
 ## Two Ways to Authenticate {#two-ways-to-authenticate}
 
@@ -97,7 +119,7 @@ mittwald MCP supports two authentication methods. Choose based on your use case:
 - ❌ Requires browser (not suitable for headless servers)
 - ❌ More complex initial setup
 
-**Supported by**: All 4 tools (Claude Code, GitHub Copilot, Cursor, Codex CLI)
+**Supported by**: All 6 tools (Claude Desktop, ChatGPT, Claude Code, GitHub Copilot, Cursor, Codex CLI)
 
 ### Option 2: API Token (Direct Authentication) {#option-2-api-token}
 
@@ -122,7 +144,7 @@ mittwald MCP supports two authentication methods. Choose based on your use case:
 - ❌ Token is long-lived (security risk if leaked)
 - ❌ Must rotate manually
 
-**Supported by**: All 4 tools (different configuration methods per tool)
+**Supported by**: Claude Code, GitHub Copilot, Cursor, Codex CLI (different configuration methods per tool)
 
 ### Which Should I Choose? {#which-should-i-choose}
 
@@ -230,12 +252,14 @@ Once OAuth is configured for your chosen tool, you can:
 
 Each tool is best suited to different workflows:
 
+- **Claude Desktop**: Want the simplest setup with Claude's native app or web interface
+- **ChatGPT**: Prefer OpenAI's ChatGPT interface (web or mobile)
 - **Claude Code CLI**: Terminal lovers who want pure CLI workflows
 - **GitHub Copilot**: Already using Copilot in your IDE
 - **Cursor IDE**: Want an IDE specifically designed for AI-assisted coding
 - **Codex CLI**: Prefer OpenAI's tools and terminal-based development
 
-All have equally simple OAuth setup (~10 min each). You can always set up multiple tools if you want.
+All have simple OAuth setup (~5-10 min each). You can always set up multiple tools if you want.
 
 ### "I got stuck during OAuth setup" {#stuck-during-oauth-setup}
 
@@ -294,7 +318,7 @@ A: Yes. Simply remove the MCP server configuration from your tool, and access is
 
 **Q: Do I need to set up OAuth for each tool?**
 
-A: Only for the tool(s) you plan to use. You can set up multiple tools if you want (e.g., both Claude Code and Cursor).
+A: Only for the tool(s) you plan to use. You can set up multiple tools if you want (e.g., both Claude Desktop and Cursor).
 
 **Q: How long does an access token last?**
 
@@ -318,7 +342,7 @@ A: Register separate OAuth clients for each account (give them different names).
 
 **Q: Can I use an API token instead of OAuth?**
 
-A: Yes! All 4 tools support API token authentication as an alternative to OAuth. API tokens are best for headless environments (CI/CD, SSH servers) where browser-based OAuth isn't practical. See your tool's setup guide for instructions.
+A: Yes! The CLI and IDE tools (Claude Code, GitHub Copilot, Cursor, Codex CLI) support API token authentication as an alternative to OAuth. API tokens are best for headless environments (CI/CD, SSH servers) where browser-based OAuth isn't practical. See your tool's setup guide for instructions.
 
 **Q: Where do I get an API token?**
 
@@ -344,6 +368,8 @@ Choose your tool from the list above and follow the step-by-step guide. OAuth se
 
 ### Quick Links {#quick-links}
 
+- **[Claude Desktop Setup](./claude-desktop)** - For Claude Desktop and Claude.ai users
+- **[ChatGPT Setup](./chatgpt)** - For ChatGPT users
 - **[Claude Code Setup](./claude-code)** - For Claude Code CLI users
 - **[GitHub Copilot Setup](./github-copilot)** - For Copilot IDE users
 - **[Cursor Setup](./cursor)** - For Cursor IDE users
