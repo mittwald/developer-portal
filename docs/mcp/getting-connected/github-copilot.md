@@ -83,8 +83,11 @@ Enterprise users may need their admin to enable the **MCP servers in Copilot** p
 
 If you chose the API key configuration, VS Code prompts for the token when the server starts. Paste the token when prompted.
 
-**Important**: Never hardcode tokens in the config file. Input variables keep secrets out of source control.
+:::warning
 
+Never hardcode tokens in the config file. Input variables keep secrets out of source control.
+
+:::
 ## Step 4: Verify Your Connection
 
 Open Copilot Chat and run a simple test:
