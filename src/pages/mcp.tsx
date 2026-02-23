@@ -2,6 +2,7 @@ import React from "react";
 import clsx from "clsx";
 import Link from "@docusaurus/Link";
 import Layout from "@theme/Layout";
+import Translate, { translate } from "@docusaurus/Translate";
 import { CodeBlock, Icon } from "@mittwald/flow-react-components";
 import {
   IconBook,
@@ -26,11 +27,17 @@ function MCPPageHeader() {
       <div className="container">
         <h1 className="hero__title">mittwald MCP</h1>
         <p className={styles.heroDescription}>
-          Prompt your agent with intent. Let your AI agent interact with the
-          mittwald mStudio with safe, auditable tool calls.
+          <Translate id="mcp.description">
+            Prompt your agent with intent. Let your AI agent interact with the
+            mittwald mStudio with safe, auditable tool calls.
+          </Translate>
           <img
             src={demo}
-            alt="An example of using mittwald MCP with an AI assistant to manage infrastructure."
+            alt={translate({
+              id: "mcp.img.alt",
+              message:
+                "An example of using mittwald MCP with an AI assistant to manage infrastructure.",
+            })}
           />
         </p>
         <div className={styles.buttons}>
@@ -41,7 +48,7 @@ function MCPPageHeader() {
             <Icon>
               <IconRocket />
             </Icon>
-            Run First Workflow
+            <Translate id="mcp.cta.firstWorkflow">Run First Workflow</Translate>
           </Link>
           <Link
             className="button button--secondary button--lg"
@@ -50,7 +57,7 @@ function MCPPageHeader() {
             <Icon>
               <IconBook />
             </Icon>
-            Documentation
+            <Translate id="mcp.cta.documentation">Documentation</Translate>
           </Link>
           <Link
             className="button button--secondary button--lg"
@@ -77,8 +84,10 @@ function ServerURLSection() {
     >
       <div className={clsx("container", mcpStyles.urlContainer)}>
         <p>
-          <strong>Just want to get started quickly?</strong>&nbsp; Use this MCP
-          URL in the AI assistant of your choice:
+          <Translate id="mcp.url.intro">
+            <strong>Just want to get started quickly?</strong> Use this MCP URL
+            in the AI assistant of your choice:
+          </Translate>
         </p>
         <CodeBlock
           copyable
@@ -87,8 +96,20 @@ function ServerURLSection() {
           className={mcpStyles.urlField}
         />
         <p>
-          See our <Link to="/docs/v2/mcp/getting-connected">setup guides</Link>{" "}
-          for more detailed instructions.
+          <Translate
+            id="mcp.url.setupGuides"
+            values={{
+              link: (
+                <Link to="/docs/v2/mcp/getting-connected">
+                  <Translate id="mcp.url.setupGuides.link">
+                    setup guides
+                  </Translate>
+                </Link>
+              ),
+            }}
+          >
+            {"See our {link} for more detailed instructions."}
+          </Translate>
         </p>
       </div>
     </section>
@@ -106,47 +127,91 @@ function OverviewFeature() {
                 <Icon>
                   <IconRobot />
                 </Icon>
-                <h3>Agent-First Infrastructure</h3>
+                <h3>
+                  <Translate id="mcp.overview.agentFirst.title">
+                    Agent-First Infrastructure
+                  </Translate>
+                </h3>
               </IntroHeader>
               <p>
-                mittwald MCP connects your AI coding assistant to mittwald's
-                infrastructure. Describe what you want in natural language, and
-                let your agent handle the API calls.
+                <Translate id="mcp.overview.agentFirst.body">
+                  mittwald MCP connects your AI coding assistant to mittwald's
+                  infrastructure. Describe what you want in natural language,
+                  and let your agent handle the API calls.
+                </Translate>
               </p>
             </Intro>
           </div>
           <div className={clsx("col col--4")}>
             <div className={clsx("padding--md", featureStyles.feature)}>
-              <h3>Comprehensive Toolset</h3>
+              <h3>
+                <Translate id="mcp.overview.toolset.title">
+                  Comprehensive Toolset
+                </Translate>
+              </h3>
               <p>
-                Full coverage across projects, apps, databases, DNS, mail,
-                security, and automation. One MCP endpoint for all mittwald
-                operations.
+                <Translate id="mcp.overview.toolset.body">
+                  Full coverage across projects, apps, databases, DNS, mail,
+                  security, and automation. One MCP endpoint for all mittwald
+                  operations.
+                </Translate>
               </p>
               <ul>
-                <li>Project and app management</li>
-                <li>Database provisioning</li>
-                <li>Domain and SSL configuration</li>
-                <li>Backup and restore</li>
+                <li>
+                  <Translate id="mcp.overview.toolset.projects">
+                    Project and app management
+                  </Translate>
+                </li>
+                <li>
+                  <Translate id="mcp.overview.toolset.database">
+                    Database provisioning
+                  </Translate>
+                </li>
+                <li>
+                  <Translate id="mcp.overview.toolset.domain">
+                    Domain and SSL configuration
+                  </Translate>
+                </li>
+                <li>
+                  <Translate id="mcp.overview.toolset.backup">
+                    Backup and restore
+                  </Translate>
+                </li>
               </ul>
             </div>
           </div>
           <div className={clsx("col col--4")}>
             <div className={clsx("padding--md", featureStyles.feature)}>
-              <h3>Flexible Authentication</h3>
-              <p>Choose the auth method that fits your workflow:</p>
+              <h3>
+                <Translate id="mcp.overview.auth.title">
+                  Flexible Authentication
+                </Translate>
+              </h3>
+              <p>
+                <Translate id="mcp.overview.auth.body">
+                  Choose the auth method that fits your workflow:
+                </Translate>
+              </p>
               <ul>
                 <li>
-                  <strong>OAuth 2.1</strong> for interactive agents with
-                  automatic token refresh
+                  <Translate id="mcp.overview.auth.oauth">
+                    <strong>OAuth 2.1</strong> for interactive agents with
+                    automatic token refresh
+                  </Translate>
                 </li>
                 <li>
-                  <strong>API tokens</strong> for CI/CD pipelines and headless
-                  environments
+                  <Translate id="mcp.overview.auth.token">
+                    <strong>API tokens</strong> for CI/CD pipelines and headless
+                    environments
+                  </Translate>
                 </li>
               </ul>
               <p>
-                <Link to="/docs/v2/mcp/getting-connected">Setup guides →</Link>
+                <Link to="/docs/v2/mcp/getting-connected">
+                  <Translate id="mcp.overview.auth.link">
+                    Setup guides →
+                  </Translate>
+                </Link>
               </p>
             </div>
           </div>
@@ -167,18 +232,30 @@ function GettingStartedFeature() {
                 <Icon>
                   <IconPlugConnected />
                 </Icon>
-                <h3>Get Started</h3>
+                <h3>
+                  <Translate id="mcp.getStarted.title">Get Started</Translate>
+                </h3>
               </IntroHeader>
               <p>
-                Connect your preferred AI assistant to mittwald MCP and start
-                managing infrastructure with natural language prompts.
+                <Translate id="mcp.getStarted.body">
+                  Connect your preferred AI assistant to mittwald MCP and start
+                  managing infrastructure with natural language prompts.
+                </Translate>
               </p>
             </Intro>
           </div>
           <div className={clsx("col col--4")}>
             <div className={clsx("padding--md", featureStyles.feature)}>
-              <h3>Connect Your Assistant</h3>
-              <p>Step-by-step setup guides for popular AI coding tools:</p>
+              <h3>
+                <Translate id="mcp.getStarted.connect.title">
+                  Connect Your Assistant
+                </Translate>
+              </h3>
+              <p>
+                <Translate id="mcp.getStarted.connect.body">
+                  Step-by-step setup guides for popular AI coding tools:
+                </Translate>
+              </p>
               <ul>
                 <li>
                   <Link to="/docs/v2/mcp/getting-connected/claude-code">
@@ -203,23 +280,50 @@ function GettingStartedFeature() {
           </div>
           <div className={clsx("col col--4")}>
             <div className={clsx("padding--md", featureStyles.feature)}>
-              <h3>Learn the Pattern</h3>
+              <h3>
+                <Translate id="mcp.getStarted.learn.title">
+                  Learn the Pattern
+                </Translate>
+              </h3>
               <p>
-                Human intent in prompts, MCP tools for execution, explicit
-                approvals for risky actions.
+                <Translate id="mcp.getStarted.learn.body">
+                  Human intent in prompts, MCP tools for execution, explicit
+                  approvals for risky actions.
+                </Translate>
               </p>
               <ul>
                 <li>
-                  <Link to="/docs/v2/mcp/tutorials">Tutorials</Link> — guided
-                  walkthroughs
+                  <Link to="/docs/v2/mcp/tutorials">
+                    <Translate id="mcp.getStarted.learn.tutorials">
+                      Tutorials
+                    </Translate>
+                  </Link>{" "}
+                  —{" "}
+                  <Translate id="mcp.getStarted.learn.tutorials.desc">
+                    guided walkthroughs
+                  </Translate>
                 </li>
                 <li>
-                  <Link to="/docs/v2/mcp/how-to">How-To Playbooks</Link> — task
-                  recipes
+                  <Link to="/docs/v2/mcp/how-to">
+                    <Translate id="mcp.getStarted.learn.howto">
+                      How-To Playbooks
+                    </Translate>
+                  </Link>{" "}
+                  —{" "}
+                  <Translate id="mcp.getStarted.learn.howto.desc">
+                    task recipes
+                  </Translate>
                 </li>
                 <li>
-                  <Link to="/docs/v2/mcp/runbooks">Runbooks</Link> — incident
-                  recovery
+                  <Link to="/docs/v2/mcp/runbooks">
+                    <Translate id="mcp.getStarted.learn.runbooks">
+                      Runbooks
+                    </Translate>
+                  </Link>{" "}
+                  —{" "}
+                  <Translate id="mcp.getStarted.learn.runbooks.desc">
+                    incident recovery
+                  </Translate>
                 </li>
               </ul>
             </div>
@@ -241,44 +345,64 @@ function WorkflowFeature() {
                 <Icon>
                   <IconListCheck />
                 </Icon>
-                <h3>How It Works</h3>
+                <h3>
+                  <Translate id="mcp.workflow.title">How It Works</Translate>
+                </h3>
               </IntroHeader>
               <p>
-                Agent-driven workflows follow a consistent pattern: you provide
-                intent, the agent discovers and executes tools, you verify
-                results.
+                <Translate id="mcp.workflow.body">
+                  Agent-driven workflows follow a consistent pattern: you
+                  provide intent, the agent discovers and executes tools, you
+                  verify results.
+                </Translate>
               </p>
             </Intro>
           </div>
           <div className={clsx("col col--8")}>
             <div className={clsx("padding--md", featureStyles.feature)}>
-              <h3>The Agent Workflow</h3>
+              <h3>
+                <Translate id="mcp.workflow.steps.title">
+                  The Agent Workflow
+                </Translate>
+              </h3>
               <ol>
                 <li>
-                  <strong>Intent</strong> — You prompt the outcome you want on
-                  mittwald
+                  <Translate id="mcp.workflow.steps.intent">
+                    <strong>Intent</strong> — You prompt the outcome you want on
+                    mittwald
+                  </Translate>
                 </li>
                 <li>
-                  <strong>Discovery</strong> — Your agent discovers relevant MCP
-                  tools and required inputs
+                  <Translate id="mcp.workflow.steps.discovery">
+                    <strong>Discovery</strong> — Your agent discovers relevant
+                    MCP tools and required inputs
+                  </Translate>
                 </li>
                 <li>
-                  <strong>Auth</strong> — OAuth or token auth is used for each
-                  tool call
+                  <Translate id="mcp.workflow.steps.auth">
+                    <strong>Auth</strong> — OAuth or token auth is used for each
+                    tool call
+                  </Translate>
                 </li>
                 <li>
-                  <strong>Execution</strong> — The agent performs tool calls and
-                  reports results
+                  <Translate id="mcp.workflow.steps.execution">
+                    <strong>Execution</strong> — The agent performs tool calls
+                    and reports results
+                  </Translate>
                 </li>
                 <li>
-                  <strong>Verify</strong> — You run read checks and decide
-                  whether to proceed, retry, or roll back
+                  <Translate id="mcp.workflow.steps.verify">
+                    <strong>Verify</strong> — You run read checks and decide
+                    whether to proceed, retry, or roll back
+                  </Translate>
                 </li>
               </ol>
               <p>
-                <strong>Human responsibility:</strong> Destructive or
-                cost-impacting changes should be approved explicitly. Treat the
-                agent as an operator, not as an unattended process.
+                <Translate id="mcp.workflow.responsibility">
+                  <strong>Human responsibility:</strong> Destructive or
+                  cost-impacting changes should be approved explicitly. Treat
+                  the agent as an operator, not as an unattended process.
+                </Translate>
               </p>
             </div>
           </div>
@@ -299,36 +423,86 @@ function TutorialsFeature() {
                 <Icon>
                   <IconUsers />
                 </Icon>
-                <h3>Tutorials by Team</h3>
+                <h3>
+                  <Translate id="mcp.tutorials.title">
+                    Tutorials by Team
+                  </Translate>
+                </h3>
               </IntroHeader>
               <p>
-                Outcome-driven walkthroughs organized by team context and use
-                case.
+                <Translate id="mcp.tutorials.body">
+                  Outcome-driven walkthroughs organized by team context and use
+                  case.
+                </Translate>
               </p>
               <p>
-                <Link to="/docs/v2/mcp/tutorials">Browse all tutorials →</Link>
+                <Link to="/docs/v2/mcp/tutorials">
+                  <Translate id="mcp.tutorials.link">
+                    Browse all tutorials →
+                  </Translate>
+                </Link>
               </p>
             </Intro>
           </div>
           <div className={clsx("col col--4")}>
             <div className={clsx("padding--md", featureStyles.feature)}>
-              <h3>Freelancers & Agencies</h3>
+              <h3>
+                <Translate id="mcp.tutorials.freelancers.title">
+                  Freelancers & Agencies
+                </Translate>
+              </h3>
               <ul>
-                <li>Client onboarding automation</li>
-                <li>Cross-project visibility</li>
-                <li>Team access management</li>
-                <li>Backup monitoring</li>
+                <li>
+                  <Translate id="mcp.tutorials.freelancers.onboarding">
+                    Client onboarding automation
+                  </Translate>
+                </li>
+                <li>
+                  <Translate id="mcp.tutorials.freelancers.visibility">
+                    Cross-project visibility
+                  </Translate>
+                </li>
+                <li>
+                  <Translate id="mcp.tutorials.freelancers.access">
+                    Team access management
+                  </Translate>
+                </li>
+                <li>
+                  <Translate id="mcp.tutorials.freelancers.backup">
+                    Backup monitoring
+                  </Translate>
+                </li>
               </ul>
             </div>
           </div>
           <div className={clsx("col col--4")}>
             <div className={clsx("padding--md", featureStyles.feature)}>
-              <h3>E-Commerce & DevOps</h3>
+              <h3>
+                <Translate id="mcp.tutorials.devops.title">
+                  E-Commerce & DevOps
+                </Translate>
+              </h3>
               <ul>
-                <li>Launch day preparation</li>
-                <li>Database performance checks</li>
-                <li>Container stack deployment</li>
-                <li>CI/CD pipeline integration</li>
+                <li>
+                  <Translate id="mcp.tutorials.devops.launch">
+                    Launch day preparation
+                  </Translate>
+                </li>
+                <li>
+                  <Translate id="mcp.tutorials.devops.database">
+                    Database performance checks
+                  </Translate>
+                </li>
+                <li>
+                  <Translate id="mcp.tutorials.devops.container">
+                    Container stack deployment
+                  </Translate>
+                </li>
+                <li>
+                  <Translate id="mcp.tutorials.devops.cicd">
+                    CI/CD pipeline integration
+                  </Translate>
+                </li>
               </ul>
             </div>
           </div>
@@ -342,7 +516,11 @@ export default function MCPPage() {
   return (
     <Layout
       title="mittwald MCP"
-      description="Prompt your agent with intent. Let mittwald MCP execute the infrastructure work with safe, auditable tool calls."
+      description={translate({
+        id: "mcp.description",
+        message:
+          "Prompt your agent with intent. Let mittwald MCP execute the infrastructure work with safe, auditable tool calls.",
+      })}
     >
       <div>
         <MCPPageHeader />
