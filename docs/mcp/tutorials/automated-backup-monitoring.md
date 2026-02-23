@@ -10,7 +10,7 @@ destructive: true
 
 This tutorial creates a repeatable backup health workflow for multiple projects.
 
-## Copy-paste prompt
+## Copy-paste prompt {#copy-paste-prompt}
 
 ```text
 Run a backup health audit across my mittwald projects.
@@ -24,38 +24,38 @@ Workflow:
 Return a concise status table with project IDs and backup IDs.
 ```
 
-## What the agent will do automatically
+## What the agent will do automatically {#what-agent-will-do}
 
 - Enumerate projects, schedules, and recent backup state.
 - Highlight stale or missing backup protection.
 - Propose immediate mitigations (manual backup + schedule changes).
 
-## What you (human) must still do
+## What you (human) must still do {#what-you-must-do}
 
 - Approve any write actions.
 - Decide retention windows and backup timing.
 - Approve or reject any restore action.
 
-## Likely questions the agent will ask and good answers
+## Likely questions the agent will ask and good answers {#likely-questions}
 
 - What retention policy should I enforce? -> `14 days for production, 7 days for staging.`
 - Should I trigger manual backups now? -> `Yes for every project flagged as stale.`
 - Restore anything now? -> `No restore now, audit only.`
 
-## Verification prompt
+## Verification prompt {#verification-prompt}
 
 ```text
 Re-check backup schedules and latest backup timestamps for all audited projects.
 Return before/after status for any project where changes were made.
 ```
 
-## Rollback/cleanup prompt
+## Rollback/cleanup prompt {#rollback-cleanup-prompt}
 
 ```text
 List backup schedules or manual backups created in this session and remove only the temporary/test ones after I confirm IDs.
 ```
 
-## Resume after failure
+## Resume after failure {#resume-after-failure}
 
 ```text
 Resume from the first project that has not been audited yet. Do not repeat projects that already have a completed backup status result.

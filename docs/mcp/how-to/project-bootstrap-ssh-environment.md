@@ -8,7 +8,7 @@ useCases:
 destructive: true
 ---
 
-## Copy-paste prompt
+## Copy-paste prompt {#copy-paste-prompt}
 
 ```text
 Bootstrap a mittwald project for development and deployment.
@@ -22,25 +22,25 @@ Tasks:
 Ask before creating users or changing configuration.
 ```
 
-## What the agent will do automatically
+## What the agent will do automatically {#what-agent-will-do}
 
 - Discover project/server context.
 - Validate SSH and environment prerequisites.
 - Execute approved setup actions.
 
-## What you (human) must still do
+## What you (human) must still do {#what-you-must-do}
 
 - Provide project naming/business context.
 - Provide public keys or secret values.
 - Approve user/config writes.
 
-## Verification prompt
+## Verification prompt {#verification-prompt}
 
 ```text
 Re-check project bootstrap status: project metadata, SSH readiness, and environment checks. Return pass/fail per item.
 ```
 
-## Rollback/cleanup prompt
+## Rollback/cleanup prompt {#rollback-cleanup-prompt}
 
 ```text
 Remove bootstrap artifacts created in this session (users/config entries) if setup should be undone.

@@ -11,7 +11,7 @@ destructive: false
 
 This tutorial is a read-first performance review for commerce and high-traffic workloads.
 
-## Copy-paste prompt
+## Copy-paste prompt {#copy-paste-prompt}
 
 ```text
 Run a mittwald database performance readiness review for my production project.
@@ -25,38 +25,38 @@ Tasks:
 Read-only only. No writes.
 ```
 
-## What the agent will do automatically
+## What the agent will do automatically {#what-agent-will-do}
 
 - Gather current MySQL/Redis inventory and config.
 - Analyze capacity and cache readiness signals.
 - Prioritize likely risk areas.
 
-## What you (human) must still do
+## What you (human) must still do {#what-you-must-do}
 
 - Choose which recommendations to execute.
 - Schedule maintenance windows for changes.
 - Provide business-side performance thresholds.
 
-## Likely questions the agent will ask and good answers
+## Likely questions the agent will ask and good answers {#likely-questions}
 
 - Which project/database is critical? -> `Production project <project-id>.`
 - What is acceptable latency? -> `Keep checkout DB queries under 200ms p95.`
 - Can I apply changes now? -> `No, recommendations only.`
 
-## Verification prompt
+## Verification prompt {#verification-prompt}
 
 ```text
 Re-run the same readiness checks and confirm no data gaps in the audit.
 Return the list of inspected database IDs and the top 3 risks.
 ```
 
-## Rollback/cleanup prompt
+## Rollback/cleanup prompt {#rollback-cleanup-prompt}
 
 ```text
 No rollback needed for read-only audit. If any write action happened accidentally, list affected resource IDs and propose reversal steps.
 ```
 
-## Resume after failure
+## Resume after failure {#resume-after-failure}
 
 ```text
 Resume the readiness audit from the first database that does not yet have findings.

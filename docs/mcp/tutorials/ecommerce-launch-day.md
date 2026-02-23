@@ -12,7 +12,7 @@ destructive: true
 
 Use this launch checklist when a production storefront needs fast, evidence-based go/no-go validation.
 
-## Copy-paste prompt
+## Copy-paste prompt {#copy-paste-prompt}
 
 ```text
 Run a mittwald launch readiness audit for my production storefront.
@@ -27,38 +27,38 @@ Create a fresh pre-launch backup only after I approve.
 Return a launch status summary with blockers and resource IDs.
 ```
 
-## What the agent will do automatically
+## What the agent will do automatically {#what-agent-will-do}
 
 - Audit backups, DB, SSL, and app runtime state.
 - Identify blockers and missing safeguards.
 - Propose launch/no-launch recommendation.
 
-## What you (human) must still do
+## What you (human) must still do {#what-you-must-do}
 
 - Approve pre-launch backup creation.
 - Decide go/no-go based on blockers.
 - Coordinate external dependencies (marketing, DNS cutover windows).
 
-## Likely questions the agent will ask and good answers
+## Likely questions the agent will ask and good answers {#likely-questions}
 
 - Which project/domain is launch target? -> `Production project <project-id>, domain <domain>.`
 - Should I create a manual backup now? -> `Yes, create one now.`
 - If SSL issues exist, pause launch? -> `Yes, pause until SSL is green.`
 
-## Verification prompt
+## Verification prompt {#verification-prompt}
 
 ```text
 Re-check all launch criteria and confirm current status for backup freshness, DB readiness, SSL validity, and app runtime.
 Show any remaining blockers with IDs.
 ```
 
-## Rollback/cleanup prompt
+## Rollback/cleanup prompt {#rollback-cleanup-prompt}
 
 ```text
 If launch changes were applied and need reversal, restore the pre-launch state using the latest approved backup and list all affected resources.
 ```
 
-## Resume after failure
+## Resume after failure {#resume-after-failure}
 
 ```text
 Resume launch readiness from the first incomplete validation step and keep completed checks as final.

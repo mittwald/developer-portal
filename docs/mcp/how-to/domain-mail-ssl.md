@@ -9,7 +9,7 @@ useCases:
 destructive: true
 ---
 
-## Copy-paste prompt
+## Copy-paste prompt {#copy-paste-prompt}
 
 ```text
 Set up domain operations for my mittwald project.
@@ -23,25 +23,25 @@ I need:
 Ask before any write operation.
 ```
 
-## What the agent will do automatically
+## What the agent will do automatically {#what-agent-will-do}
 
 - Discover domain/mail/certificate state.
 - Execute approved DNS/mail/SSL changes.
 - Return a complete operational summary.
 
-## What you (human) must still do
+## What you (human) must still do {#what-you-must-do}
 
 - Confirm authoritative domain and addresses.
 - Approve each write.
 - Validate external DNS propagation expectations.
 
-## Verification prompt
+## Verification prompt {#verification-prompt}
 
 ```text
 Re-list DNS records, mail addresses/forwarding, and certificate status for the target domain. Confirm all requested changes are active.
 ```
 
-## Rollback/cleanup prompt
+## Rollback/cleanup prompt {#rollback-cleanup-prompt}
 
 ```text
 Revert DNS/mail changes created in this session and restore the prior known-good state using the recorded IDs.

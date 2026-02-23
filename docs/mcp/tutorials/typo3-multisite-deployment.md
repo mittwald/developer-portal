@@ -11,7 +11,7 @@ destructive: true
 
 This tutorial covers controlled rollout of TYPO3 variants across multiple domains.
 
-## Copy-paste prompt
+## Copy-paste prompt {#copy-paste-prompt}
 
 ```text
 Set up a TYPO3 multi-site rollout for my mittwald project.
@@ -26,38 +26,38 @@ Workflow:
 Do read-only validation first, then ask for approval before each write.
 ```
 
-## What the agent will do automatically
+## What the agent will do automatically {#what-agent-will-do}
 
 - Discover existing app and project context.
 - Plan resource creation for each site variant.
 - Execute approved setup operations.
 - Return domain/app/database/access mappings.
 
-## What you (human) must still do
+## What you (human) must still do {#what-you-must-do}
 
 - Confirm target domains and language/site mapping.
 - Approve each write step.
 - Validate TYPO3-level config after infra setup.
 
-## Likely questions the agent will ask and good answers
+## Likely questions the agent will ask and good answers {#likely-questions}
 
 - Which project is the base installation in? -> `Project <project-id>.`
 - Should each site have its own DB? -> `Yes, one DB per site.`
 - Include `www` + apex for SSL? -> `Yes, both.`
 
-## Verification prompt
+## Verification prompt {#verification-prompt}
 
 ```text
 Verify each configured site: app ID, database ID, domain/virtualhost ID, certificate status, and SSH access state.
 ```
 
-## Rollback/cleanup prompt
+## Rollback/cleanup prompt {#rollback-cleanup-prompt}
 
 ```text
 List resources created for this rollout and remove only those that belong to this session after I confirm IDs.
 ```
 
-## Resume after failure
+## Resume after failure {#resume-after-failure}
 
 ```text
 Resume multi-site rollout from the first incomplete site and skip sites already marked as complete.

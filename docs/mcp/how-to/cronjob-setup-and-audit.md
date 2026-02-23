@@ -7,7 +7,7 @@ useCases:
 destructive: true
 ---
 
-## Copy-paste prompt
+## Copy-paste prompt {#copy-paste-prompt}
 
 ```text
 Set up and audit cronjobs for my mittwald project.
@@ -21,25 +21,25 @@ Flow:
 Ask for approval before creating/updating/triggering jobs.
 ```
 
-## What the agent will do automatically
+## What the agent will do automatically {#what-agent-will-do}
 
 - Audit current schedule/execution data.
 - Propose corrective scheduling.
 - Execute approved changes and report outcomes.
 
-## What you (human) must still do
+## What you (human) must still do {#what-you-must-do}
 
 - Confirm schedule, command, and timeout policy.
 - Approve manual triggers in production windows.
 - Decide escalation path for failures.
 
-## Verification prompt
+## Verification prompt {#verification-prompt}
 
 ```text
 Re-list cronjobs and execution history for this project and confirm the approved schedule/trigger outcomes are visible.
 ```
 
-## Rollback/cleanup prompt
+## Rollback/cleanup prompt {#rollback-cleanup-prompt}
 
 ```text
 Restore previous cron configuration by reverting the jobs changed in this session.

@@ -6,11 +6,11 @@ useCases:
 destructive: true
 ---
 
-## Incident Trigger
+## Incident Trigger {#incident-trigger}
 
 Use this runbook when production is degraded and rollback via backup restore is required.
 
-## Copy-paste prompt
+## Copy-paste prompt {#copy-paste-prompt}
 
 ```text
 Run a mittwald backup-restore incident workflow for my production project.
@@ -23,32 +23,32 @@ Steps:
 5) return incident timeline with backup/restore IDs.
 ```
 
-## What the agent will do automatically
+## What the agent will do automatically {#what-agent-will-do}
 
 - Collect candidate backups and incident context.
 - Recommend safest restore point.
 - Execute approved restore.
 - Produce post-restore verification report.
 
-## What you (human) must still do
+## What you (human) must still do {#what-you-must-do}
 
 - Approve restore point selection.
 - Communicate downtime/status externally.
 - Decide follow-up corrective actions.
 
-## Verification prompt
+## Verification prompt {#verification-prompt}
 
 ```text
 Verify post-restore state: backup used, restore status, app availability indicators, and remaining errors.
 ```
 
-## Rollback/cleanup prompt
+## Rollback/cleanup prompt {#rollback-cleanup-prompt}
 
 ```text
 If restore target was wrong, list alternative restore candidates and execute a second restore only after explicit confirmation.
 ```
 
-## Resume after failure
+## Resume after failure {#resume-after-failure}
 
 ```text
 Resume incident recovery from the failed restore step using previously selected backup candidates.

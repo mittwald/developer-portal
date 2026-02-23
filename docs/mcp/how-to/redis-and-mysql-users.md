@@ -7,7 +7,7 @@ useCases:
 destructive: true
 ---
 
-## Copy-paste prompt
+## Copy-paste prompt {#copy-paste-prompt}
 
 ```text
 Set up Redis caching and a least-privilege MySQL user for my mittwald project.
@@ -21,25 +21,25 @@ Steps:
 Ask before creating users/resources.
 ```
 
-## What the agent will do automatically
+## What the agent will do automatically {#what-agent-will-do}
 
 - Audit existing Redis/MySQL setup.
 - Create approved resources.
 - Return relevant IDs and connection metadata.
 
-## What you (human) must still do
+## What you (human) must still do {#what-you-must-do}
 
 - Approve resource/user creation.
 - Place credentials into secret manager.
 - Validate app/plugin integration.
 
-## Verification prompt
+## Verification prompt {#verification-prompt}
 
 ```text
 Re-list Redis instances and MySQL users for this project and confirm the new resources exist with intended permissions.
 ```
 
-## Rollback/cleanup prompt
+## Rollback/cleanup prompt {#rollback-cleanup-prompt}
 
 ```text
 Delete only the Redis/MySQL user resources created in this session and confirm they are no longer active.

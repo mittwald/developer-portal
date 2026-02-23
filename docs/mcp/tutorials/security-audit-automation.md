@@ -11,7 +11,7 @@ destructive: false
 
 This tutorial runs a read-first security evidence pass for compliance and operational reviews.
 
-## Copy-paste prompt
+## Copy-paste prompt {#copy-paste-prompt}
 
 ```text
 Run a mittwald security audit snapshot for my account and organization.
@@ -26,37 +26,37 @@ Include:
 Read-only only. Return findings with severity and resource IDs.
 ```
 
-## What the agent will do automatically
+## What the agent will do automatically {#what-agent-will-do}
 
 - Collect token/key/session/membership/certificate data.
 - Highlight stale or risky items.
 - Produce a severity-ranked report.
 
-## What you (human) must still do
+## What you (human) must still do {#what-you-must-do}
 
 - Decide remediation priorities.
 - Approve any revocation/removal follow-up work.
 - Store evidence in your compliance system.
 
-## Likely questions the agent will ask and good answers
+## Likely questions the agent will ask and good answers {#likely-questions}
 
 - What time range for session review? -> `Last 30 days.`
 - Should unknown sessions be revoked now? -> `No, report-only for this pass.`
 - Which org is in scope? -> `Use organization <org-id>.`
 
-## Verification prompt
+## Verification prompt {#verification-prompt}
 
 ```text
 Re-run the same audit queries and confirm the final report includes all token, key, session, membership, and certificate IDs.
 ```
 
-## Rollback/cleanup prompt
+## Rollback/cleanup prompt {#rollback-cleanup-prompt}
 
 ```text
 No rollback is required for read-only auditing. If any write action occurred by mistake, list affected IDs and propose corrective steps.
 ```
 
-## Resume after failure
+## Resume after failure {#resume-after-failure}
 
 ```text
 Resume the audit from the first incomplete security category and preserve completed categories.

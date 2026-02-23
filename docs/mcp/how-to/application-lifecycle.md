@@ -9,7 +9,7 @@ useCases:
 destructive: true
 ---
 
-## Copy-paste prompt
+## Copy-paste prompt {#copy-paste-prompt}
 
 ```text
 Manage my mittwald application lifecycle end-to-end.
@@ -23,25 +23,25 @@ I need:
 Start read-only, then request approval before writes.
 ```
 
-## What the agent will do automatically
+## What the agent will do automatically {#what-agent-will-do}
 
 - Inventory project/app runtime state.
 - Select the right lifecycle action path.
 - Execute approved lifecycle steps and summarize outcomes.
 
-## What you (human) must still do
+## What you (human) must still do {#what-you-must-do}
 
 - Approve production-impacting changes.
 - Provide migration direction (source/destination).
 - Validate app-level smoke checks after rollout.
 
-## Verification prompt
+## Verification prompt {#verification-prompt}
 
 ```text
 Re-list affected apps and verify lifecycle outcomes (deploy/update/install/migrate) including status and IDs.
 ```
 
-## Rollback/cleanup prompt
+## Rollback/cleanup prompt {#rollback-cleanup-prompt}
 
 ```text
 Rollback the last lifecycle change for affected apps and report restored state and remaining risks.
