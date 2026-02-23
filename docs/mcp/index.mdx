@@ -8,7 +8,32 @@ sidebar_position: 0
 
 mittwald MCP lets you manage your hosting infrastructure through AI assistants like Claude, Copilot, or ChatGPT using natural language.
 
-## MCP: One Integration for All AI Tools {#mcp-one-integration}
+## Quick Start {#quick-start}
+
+Connect your AI tool to the mittwald MCP server:
+
+```
+https://mcp.mittwald.de/mcp
+```
+
+Choose your tool and follow the setup guide:
+
+| Tool | Type | Setup Time |
+|------|------|------------|
+| **[Claude Desktop](./getting-connected/claude-desktop)** | Desktop/Web App | ~5 min |
+| **[ChatGPT](./getting-connected/chatgpt)** | Web/Mobile App | ~5 min |
+| **[Claude Code](./getting-connected/claude-code)** | CLI | ~10 min |
+| **[GitHub Copilot](./getting-connected/github-copilot)** | IDE Extension | ~10 min |
+| **[Cursor](./getting-connected/cursor)** | IDE | ~10 min |
+| **[Codex CLI](./getting-connected/codex-cli)** | CLI | ~10 min |
+
+Once connected, try a simple command in your AI tool:
+
+```
+Use mittwald MCP to list my projects
+```
+
+## What is MCP? {#what-is-mcp}
 
 **MCP (Model Context Protocol)** is an open standard that connects AI assistants to external services. Instead of building separate integrations for each AI tool, mittwald provides one MCP server that works with all MCP-compatible clients.
 
@@ -26,7 +51,7 @@ The agent determines which tools to call, handles authentication, executes the s
 
 Agents have guardrails: destructive operations require confirmation, and you maintain oversight of what actions are taken.
 
-## OAuth 2.1: Secure Access Without Sharing Passwords {#oauth-secure-access}
+## Authentication {#authentication}
 
 mittwald MCP uses OAuth 2.1 with PKCE for authentication. When you connect a tool:
 
@@ -36,3 +61,12 @@ mittwald MCP uses OAuth 2.1 with PKCE for authentication. When you connect a too
 4. The tool uses this token—never your password
 
 Tokens are scoped to specific permissions, expire automatically, and can be revoked anytime. Your credentials stay with mittwald.
+
+For CI/CD pipelines or headless environments, you can also use [API tokens](./getting-connected/#option-2-api-token) instead of OAuth.
+
+## Next Steps {#next-steps}
+
+- **[Getting Connected](./getting-connected/)** — Detailed setup guides for all supported tools
+- **[Tutorials](./tutorials/)** — End-to-end walkthroughs for common scenarios
+- **[How-To Guides](./how-to/)** — Task-focused guides for day-to-day operations
+- **[Runbooks](./runbooks/)** — Incident recovery procedures
