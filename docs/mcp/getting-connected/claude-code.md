@@ -97,7 +97,7 @@ Use this option for headless servers or CI environments where OAuth is not pract
 
 ### Step 1: Get Your mittwald API Token
 
-1. Go to **MStudio → User Settings → API Tokens**
+1. Go to **mStudio → User Settings → API Tokens**
 2. Create a new token with the permissions you need
 3. Copy and store the token securely
 
@@ -239,7 +239,7 @@ Create a backup for project [project-id]
 
 ### Q: How do I revoke access?
 
-**A**: In Claude Code, run `/mcp`, select the server, and choose **Clear authentication**. You can also revoke tokens from MStudio.
+**A**: In Claude Code, run `/mcp`, select the server, and choose **Clear authentication**. You can also revoke tokens from mStudio.
 
 ### Q: Can I use this on a server (SSH)?
 

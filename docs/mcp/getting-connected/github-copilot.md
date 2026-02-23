@@ -59,7 +59,7 @@ Use this option for headless servers or CI environments where OAuth is not pract
 }
 ```
 
-To create a token, go to **MStudio → User Settings → API Tokens**, generate a token, and store it securely.
+To create a token, go to **mStudio → User Settings → API Tokens**, generate a token, and store it securely.
 
 ## Step 2: Start the MCP Server
 
@@ -188,7 +188,7 @@ List open support conversations for my account
 
 **Fix**:
 
-1. Create a new API token in MStudio
+1. Create a new API token in mStudio
 2. Restart the MCP server and enter the new token
 
 ### Error: "MCP Policy Disabled"
@@ -226,7 +226,7 @@ List open support conversations for my account
 
 ### Q: How do I revoke MCP access?
 
-**A**: Remove the server from `.vscode/mcp.json` and revoke tokens in MStudio.
+**A**: Remove the server from `.vscode/mcp.json` and revoke tokens in mStudio.
 
 ### Q: Can I share my mcp.json with my team?
 
