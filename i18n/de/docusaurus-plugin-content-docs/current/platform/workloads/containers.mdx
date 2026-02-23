@@ -193,6 +193,243 @@ Wenn dein Container-Image aus einer privaten Registry geladen werden soll, musst
   </TabItem>
 </Tabs>
 
+:::note
+Verwechsle nicht "private" Registry mit selbst-gehostet, was im nächsten Kapitel erklärt wird.
+:::
+
+## Eigene, selbst-gehostete Docker-Image-Registry {#self-hosted-registries}
+
+Wenn keine private Registry existiert oder aus irgendeinem Grund nicht verfügbar ist, kannst du deine eigene Docker-Image-Registry im mittwald Container-Hosting hosten.
+
+:::note
+Um dieser Anleitung zu folgen, müssen wir Dateien über den Befehl `mw container cp` übertragen.
+Stelle sicher, dass du den SSH-Zugriff auf deine Umgebung vorbereitet hast, siehe [diese Anleitung](../../../cli/usage/intro).
+:::
+
+Weitere detaillierte Anweisungen und Konfigurationsoptionen findest du in [dieser Anleitung](https://distribution.github.io/distribution/about/deploying/).
+
+<Tabs groupId="access-mode">
+  <TabItem value="gui" label="mStudio UI">
+    Um eine neue Container-Registry über das mStudio zu erstellen, folge diesen Schritten:
+
+    1. Navigiere zu dem Projekt, in dem du den Container erstellen möchtest.
+    2. Wähle den Menüpunkt "Container" in der Seitenleiste aus.
+    3. Klicke im geöffneten "Container"-Tab auf die Schaltfläche "Erstellen".
+    4. Konfiguriere den Container nach Bedarf und verwende das Image `library/registry:3`.
+    5. Richte Umgebungsvariablen nach deinen Wünschen ein, siehe die obige Anleitung für Details.
+
+  </TabItem>
+  <TabItem value="cli" label="CLI">
+    Um eine neue Container-Registry über die CLI zu erstellen, verwende den Befehl `mw container run`:
+
+    ```shellsession
+    user@local $ mw container run \
+      --name example-registry \
+      --volume registry-data:/var/lib/registry \
+      --publish 5000:5000/tcp \
+      --create-volumes \
+      library/registry:3
+    ```
+
+    Umgebungsvariablen für die Konfiguration können über die Option `--env` hinzugefügt werden, siehe die obige Anleitung für Konfigurationsoptionen.
+    Weitere Informationen findest du in der Dokumentation zum [`mw container run` Befehl](/docs/v2/cli/reference/container/#mw-container-run).
+
+  </TabItem>
+  <TabItem value="api" label="API">
+    Um zu erfahren, wie man eine Container-Registry über die API erstellt oder ändert, lies den Artikel ["Einen Container starten"](../../../api/howtos/create-container).
+  </TabItem>
+</Tabs>
+
+Die in diesem Kapitel eingerichtete Registry kann als private Registry verwendet werden. Stelle daher sicher, dass die Registry erreichbar ist, z.B. indem du eine Subdomain in deinem Projekt erstellst, die auf die eigene Registry verweist.
+
+Eine eigene Registry könnte beispielsweise eine Domain wie `docker.p-XXXXXX.project.space` haben, die als Registry für zukünftige Container-Deployments konfiguriert werden kann.
+
+:::warning
+Ohne zusätzliche Konfiguration ist diese Registry öffentlich und ohne Authentifizierung verfügbar.
+Wenn eine Anmeldung über Zugangsdaten gewünscht ist, folge den nächsten Schritten, um eine Basis-Authentifizierung einzurichten.
+:::
+
+### Basis-Authentifizierung für selbst-gehostete Docker-Registry {#docker-registry-basic-auth}
+
+Um eine Basis-Authentifizierung zu unserer Registry hinzuzufügen, müssen wir Zugangsdaten vorbereiten, die wir dann in unsere Registry deployen.
+
+Der erste Schritt besteht darin, die Anmeldedatei **lokal** zu erstellen:
+
+```shellsession
+user@local $ mkdir -p auth
+user@local $ docker run \
+  --entrypoint htpasswd \
+  httpd:2 -Bbn exampleuser examplepassword > auth/htpasswd
+```
+
+Dies erstellt die `htpasswd`-Anmeldedatei, die wir jetzt übertragen müssen.
+
+:::warning
+Denke daran, `exampleuser` und `examplepassword` durch geeignete Zugangsdaten zu ersetzen.
+:::
+
+:::note
+Diese Anleitung zeigt die Einrichtungsschritte getrennt, obwohl im `CLI`-Modus vieles mit einem Befehl erledigt werden kann.
+Wenn du bereits mit der `CLI` vertraut bist und nur die richtigen Befehle benötigst, springe gerne ans Ende der Anleitung, die die vollständigen Befehle ohne Zwischenschritte zur Erklärung bereitstellt.
+:::
+
+Um die Anmeldedatei persistent zu speichern, beginnen wir mit der Erstellung eines neuen Volumes für unseren Registry-Container:
+
+<Tabs groupId="access-mode">
+  <TabItem value="gui" label="mStudio UI">
+    Um ein neues Container-Volume über das mStudio zu erstellen, folge diesen Schritten:
+
+    1. Navigiere zu dem Projekt, in dem du die Registry erstellt hast.
+    2. Wähle den Menüpunkt "Container" in der Seitenleiste aus und wähle dann den Registry-Container aus.
+    3. Navigiere im geöffneten "Container"-Tab zum Tab "Volumes".
+    4. Klicke im Tab "Volumes" auf "Erstellen".
+    5. Konfiguriere den neuen Volume-Einhängepunkt auf `/auth` und klicke auf "Speichern".
+
+  </TabItem>
+  <TabItem value="cli" label="CLI">
+    Um ein neues Volume über die CLI zu erstellen, verwende den Befehl `mw volume create`:
+
+    ```shellsession
+    user@local $ mw volume create registry-auth
+    ```
+
+    Nach der Volume-Erstellung können wir es über `mw container update` an unseren Container anhängen:
+
+    ```shellsession
+    user@local $ mw container update \
+      c-XXXXXX \
+      -v registry-auth:/auth \
+      -v registry-data:/var/lib/registry
+    ```
+
+    :::note
+    Der obige Befehl enthält noch nicht die für die Basis-Authentifizierung benötigten Umgebungsvariablen. Diese folgen im nächsten Schritt.
+    Du kannst diesen Schritt überspringen und stattdessen einen vollständigen Update-Befehl im nächsten Abschnitt verwenden.
+    :::
+
+  </TabItem>
+  <TabItem value="api" label="API">
+    Um zu erfahren, wie man eine Container-Registry über die API erstellt oder ändert, lies den Artikel ["Einen Container starten"](../../../api/howtos/create-container).
+  </TabItem>
+</Tabs>
+
+Danach konfigurieren wir unsere Registry neu, um die neuen Basis-Authentifizierungs-Zugangsdaten zu verwenden.
+
+<Tabs groupId="access-mode">
+  <TabItem value="gui" label="mStudio UI">
+    Um die Konfiguration des selbst-gehosteten Registry-Containers abzuschließen, folge diesen Schritten:
+
+    1. Navigiere zu dem Projekt, in dem du die Registry erstellt hast.
+    2. Wähle den Menüpunkt "Container" in der Seitenleiste aus und wähle dann den Registry-Container aus.
+    3. Navigiere im geöffneten "Container"-Tab zum Tab "Umgebungsvariablen".
+    4. Verwende die Schaltfläche "Hinzufügen", um Umgebungsvariablen wie folgt zu erstellen:
+
+    ```env
+    REGISTRY_AUTH=htpasswd
+    REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm
+    REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
+    ```
+
+  </TabItem>
+  <TabItem value="cli" label="CLI">
+    Um Umgebungsvariablen über die CLI hinzuzufügen oder zu aktualisieren, verwende den Befehl `mw container update`:
+
+    ```shellsession
+    user@local $ mw container update \
+      c-XXXXXX \
+      -v registry-auth:/auth \
+      -v registry-data:/var/lib/registry \
+      -e "REGISTRY_AUTH=htpasswd" \
+      -e "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm" \
+      -e "REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd"
+    ```
+
+    Hier ist ein vollständiger `container run`-Befehl, wenn du von Grund auf neu beginnst oder vorgesprungen bist:
+
+    ```shellsession
+    user@local $ mw container run \
+      --name example-registry \
+      --volume registry-data:/var/lib/registry \
+      --volume registry-auth:/auth \
+      --publish 5000:5000/tcp \
+      --create-volumes \
+      -e "REGISTRY_AUTH=htpasswd" \
+      -e "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm" \
+      -e "REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd" \
+      library/registry:3
+    ```
+
+  </TabItem>
+  <TabItem value="api" label="API">
+    Um zu erfahren, wie man eine Container-Registry über die API erstellt oder ändert, lies den Artikel ["Einen Container starten"](../../../api/howtos/create-container).
+  </TabItem>
+</Tabs>
+
+Erstelle den Container mit den festgelegten Volumes und Umgebungsvariablen.
+Dann übertragen wir unsere Anmeldedatei und überschreiben die Standard-Benutzerzugangsdaten (die bei Bedarf in den Logs zu finden sind).
+
+```shellsession
+user@local $ mw container cp -r auth/ example-registry:/
+```
+
+Als letzten Schritt erstelle eine Subdomain in deinem Projekt und verweise sie auf den Registry-Container.
+
+<Tabs groupId="access-mode">
+  <TabItem value="gui" label="mStudio UI">
+    Um eine Subdomain in deinem Projekt hinzuzufügen und zu verlinken, folge diesen Schritten:
+
+    1. Navigiere zu dem Projekt, in dem du die Registry erstellt hast.
+    2. Wähle den Menüpunkt "Domains" in der Seitenleiste aus und klicke dann auf "Hinzufügen" -> "Subdomain".
+    3. Verwende als Subdomain zum Beispiel `docker.p-XXXXXX.project.space`.
+    4. Wähle den Registry-Container als Ziel aus und klicke auf "Erstellen".
+
+  </TabItem>
+  <TabItem value="cli" label="CLI">
+
+    ```shellsession
+    user@local $ mw domain virtualhost create \
+      --hostname docker.p-XXXXXX.project.space \
+      --path-to-container /:<Container-UUID>:5000/tcp
+    ```
+
+  </TabItem>
+  <TabItem value="api" label="API">
+    Um zu erfahren, wie man eine Container-Registry über die API erstellt oder ändert, lies den Artikel ["Einen Container starten"](../../../api/howtos/create-container).
+  </TabItem>
+</Tabs>
+
+Nachdem die Domain eingerichtet wurde, können wir mit dem Testen beginnen. Da wir die Basis-Authentifizierung konfiguriert haben, sollten wir überprüfen, ob unsere Registry diese tatsächlich verwendet. Erstelle und tagge ein beliebiges Docker-Image und pushe es dann zur neuen Registry:
+
+```shellsession
+user@local $ cd path/to/your/project
+user@local $ docker build -t <Your Image> .
+user@local $ docker tag <Your Image>:latest docker.p-XXXXXX.project.space/<Your Image>
+user@local $ docker push docker.p-XXXXXX.project.space/<Your Image>:latest
+```
+
+Dein Push **muss** aufgrund fehlender Basis-Authentifizierungs-Zugangsdaten abgelehnt werden:
+
+```shellsession
+user@local $ docker push docker.p-XXXXXX.project.space/<Your Image>:latest
+...
+push access denied, repository does not exist or may require authorization: authorization failed: no basic auth credentials
+```
+
+Wenn es ohne Fehler funktioniert hat, ist deine Einrichtung unvollständig und keine Authentifizierung ist aktiv!
+Melde dich jetzt an:
+
+```shellsession
+user@local $ docker login docker.p-XXXXXX.project.space
+```
+
+:::note
+Denke beim Testen daran, dich speziell von deiner Registry über `docker logout docker.p-XXXXXX.project.space` abzumelden.
+:::
+
+Wiederhole `docker push`, was jetzt nach erfolgreicher Anmeldung funktioniert!
+Herzlichen Glückwunsch, du hast erfolgreich deine eigene private, selbst-gehostete Docker-Registry erstellt.
+Abhängig von deiner Projektstruktur und deinem Anwendungsfall kann eine generische Docker-Registry in einem separaten Projekt **oder** eine Registry pro Projekt erstellt und verwendet werden.
+
 ## Deployment-Strategien {#deployment-strategies}
 
 Wenn du deine Anwendung mithilfe von Containern deployst, wirst du typischerweise neue Versionen deiner Anwendung bereitstellen, indem du ein neues Container-Image erstellst und es im selben Container-Stack bereitstellst. Dies ist eine gängige Praxis in containerisierten Umgebungen, da sie eine einfache Versionierung und Rückgängigmachung ermöglicht.
@@ -223,11 +460,13 @@ Nachdem das Image erstellt wurde, kannst du es in deinem Container-Stack bereits
 
 <Tabs groupId="access-mode">
   <TabItem value="cli" label="CLI">
-    Wenn du die CLI verwendest, um deine containerisierte Anwendung zu deployen, kannst du den Befehl `mw container update` verwenden, um das Image-Tag zu aktualisieren:
+    Um das Container-Image eines bestehenden Containers zu aktualisieren, verwende den Befehl `mw container update`:
 
-```shellsession
-$ mw container update my-container --image my-registry/my-container:v1.0.1
-```
+    ```shellsession
+    $ mw container update \
+      --image my-registry/my-container:v1.0.1 \
+      my-container
+    ```
 
   </TabItem>
   <TabItem value="terraform" label="Terraform">
@@ -335,7 +574,7 @@ Alle Volumes (sowohl Projekt-Volumes als auch Stack-Volumes) werden automatisch 
 
 _Aber_, ein einfaches Dateisystem-Backup ist möglicherweise nicht für alle Anwendungs-Workloads ausreichend. Wenn deine Anwendung beispielsweise eine Datenbank verwendet, solltest du sicherstellen, dass die Datenbank sich in einem konsistenten Zustand befindet, bevor du ein Backup machst. Dies kann durch die Verwendung der integrierten Backup-Funktionalität der Datenbank oder durch die Verwendung einer Drittanbieter-Backup-Lösung erfolgen.
 
-## Netzwerkverbindung zwischen Containern und Apps {#ingress-http}
+## Netzwerkverbindung zwischen Containern und Apps {#stack-network-connectivity}
 
 Managed Apps und Container sind mit demselben Netzwerk verbunden. Das bedeutet, dass du auf Apps von deinen Containern und umgekehrt zugreifen kannst. Der Hostname des Containers ist der Schlüssel des Containers in der Stack-Definition; wenn du den Container über die UI erstellt hast, wird der Hostname aus dem Namen des Containers abgeleitet. Wenn du beispielsweise einen Container mit dem Namen `Mein Container` erstellst, wird der interne DNS-Name `mein-container` sein. Du kannst den internen DNS-Namen in der UI einsehen, nachdem der Container erstellt wurde.
 
@@ -353,7 +592,7 @@ Um einen Containerport von innerhalb deines Projekts zugänglich zu machen, kann
   }}
 />
 
-## Container über HTTP aus dem Internet zugänglich machen
+## Container über HTTP aus dem Internet zugänglich machen {#ingress-http}
 
 Um einen Container-HTTP-Port aus dem Internet zugänglich zu machen, musst du eine Ingress-Ressource definieren, die auf den gegebenen Container verweist.
 
