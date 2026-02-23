@@ -31,6 +31,7 @@ user@local $ codex mcp add mittwald --url https://mittwald-mcp-fly2.fly.dev/mcp
 ```
 
 Current Codex CLI behavior:
+
 - detects OAuth support from the server
 - starts the OAuth flow automatically
 - prints an authorization URL and waits for callback

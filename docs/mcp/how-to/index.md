@@ -8,6 +8,6 @@ sidebar_position: 0
 
 Outcome-focused guides for day-to-day operations with mittwald MCP.
 
-import DocCardList from '@theme/DocCardList';
+import DocCardList from "@theme/DocCardList";
 
 <DocCardList />

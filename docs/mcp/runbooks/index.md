@@ -8,6 +8,6 @@ sidebar_position: 0
 
 Incident recovery procedures with verification and rollback prompts.
 
-import DocCardList from '@theme/DocCardList';
+import DocCardList from "@theme/DocCardList";
 
 <DocCardList />

@@ -8,6 +8,6 @@ sidebar_position: 0
 
 Details on consent, refresh, and re-authentication behavior across MCP clients.
 
-import DocCardList from '@theme/DocCardList';
+import DocCardList from "@theme/DocCardList";
 
 <DocCardList />

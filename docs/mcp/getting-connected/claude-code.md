@@ -59,11 +59,13 @@ If the browser doesn't open, Claude Code will show a URL you can copy and paste 
 ### Step 3: Complete Authorization
 
 **In your browser**:
+
 1. Log in to mittwald
 2. Review the requested scopes
 3. Click **Authorize**
 
 **Back in Claude Code**:
+
 - The authorization is captured automatically
 - Tokens are stored securely
 - Tokens refresh automatically when they expire
@@ -159,6 +161,7 @@ Create a backup for project [project-id]
 **Cause**: Default browser not detected or environment is headless.
 
 **Fix**:
+
 1. Copy the URL displayed in Claude Code
 2. Paste it into your browser manually
 3. Complete authorization and return to Claude Code
@@ -170,6 +173,7 @@ Create a backup for project [project-id]
 **Cause**: OAuth server rejected the client registration or callback.
 
 **Fix**:
+
 1. Run `/mcp` again and retry the flow
 2. Ensure your network allows access to the OAuth server
 3. If it persists, contact mittwald support with the error message
@@ -181,6 +185,7 @@ Create a backup for project [project-id]
 **Cause**: Network issue or firewall/proxy blocking outbound HTTPS.
 
 **Fix**:
+
 1. Verify internet access
 2. Retry the command from a different network
 3. Check proxy or firewall rules
@@ -192,6 +197,7 @@ Create a backup for project [project-id]
 **Cause**: Token expired or was revoked.
 
 **Fix**:
+
 - **OAuth**: Run `/mcp` and re-authenticate
 - **API Key**: Generate a new API token and re-add the server
 
@@ -202,6 +208,7 @@ Create a backup for project [project-id]
 **Cause**: The token lacks required scopes.
 
 **Fix**:
+
 1. Re-authenticate and approve the required scopes
 2. For API keys, create a new token with the correct permissions
 
@@ -212,30 +219,38 @@ Create a backup for project [project-id]
 **Cause**: Server name or URL is incorrect, or the configuration scope is different.
 
 **Fix**:
+
 1. Run `claude mcp list` to check configured servers
 2. Re-add the server with the correct URL and scope
 
 ## FAQ
 
 ### Q: Is my password transmitted to Claude Code?
+
 **A**: No. Your password is entered in your browser with mittwald. Claude Code only receives an OAuth token.
 
 ### Q: Can I use multiple mittwald accounts?
+
 **A**: Yes, but you must authenticate each account separately and manage separate configurations (for example, different scopes or server names).
 
 ### Q: How long do tokens last?
+
 **A**: OAuth access tokens typically last about 1 hour, but Claude Code refreshes them automatically. API keys remain valid until revoked.
 
 ### Q: How do I revoke access?
+
 **A**: In Claude Code, run `/mcp`, select the server, and choose **Clear authentication**. You can also revoke tokens from MStudio.
 
 ### Q: Can I use this on a server (SSH)?
+
 **A**: OAuth requires a browser, so API keys are usually better for headless servers. If needed, authenticate on a local machine and reuse the configuration.
 
 ### Q: What scopes should I request?
+
 **A**: Use the smallest set of scopes that fits your tasks. Most developers start with `user:read`, `customer:read`, `project:read`, and `app:read`.
 
 ### Q: How does Claude Code differ from Claude Desktop?
+
 **A**: Claude Code is a CLI with MCP support and terminal workflows. Claude Desktop is a GUI app with a different configuration model.
 
 ## Next Steps
@@ -246,6 +261,7 @@ Create a backup for project [project-id]
 ## Official Documentation
 
 This guide is based on official Claude Code capabilities:
+
 - [Claude Code IAM Documentation](https://code.claude.com/docs/en/iam) - OAuth 2.1 with DCR support
 - [Claude Code MCP Setup](https://code.claude.com/docs/en/mcp) - MCP server configuration
 - [OAuth for MCP Server Guide](https://www.buildwithmatija.com/blog/oauth-mcp-server-claude) - Community implementation guide

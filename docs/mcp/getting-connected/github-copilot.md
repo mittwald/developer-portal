@@ -140,6 +140,7 @@ List open support conversations for my account
 **Cause**: VS Code does not recognize MCP configuration or CodeLens is disabled.
 
 **Fix**:
+
 1. Confirm the file path is `.vscode/mcp.json`
 2. Restart VS Code
 3. Ensure you are on VS Code 1.99+ (`code --version`)
@@ -151,6 +152,7 @@ List open support conversations for my account
 **Cause**: VS Code is too old for MCP OAuth or policy is disabled.
 
 **Fix**:
+
 1. Update VS Code to 1.99 or later
 2. If you are on Copilot Enterprise, ask your admin to enable **MCP servers in Copilot**
 
@@ -161,6 +163,7 @@ List open support conversations for my account
 **Cause**: Invalid JSON in `.vscode/mcp.json`.
 
 **Fix**:
+
 1. Validate JSON syntax
 2. Remove trailing commas
 3. Compare with the example in this guide
@@ -172,6 +175,7 @@ List open support conversations for my account
 **Cause**: Network issues, firewall rules, or incorrect URL.
 
 **Fix**:
+
 1. Confirm the URL is `https://mittwald-mcp-fly2.fly.dev/mcp`
 2. Check outbound network access
 3. Try from another network
@@ -183,6 +187,7 @@ List open support conversations for my account
 **Cause**: Token is invalid, expired, or revoked.
 
 **Fix**:
+
 1. Create a new API token in MStudio
 2. Restart the MCP server and enter the new token
 
@@ -193,30 +198,38 @@ List open support conversations for my account
 **Cause**: Organization policy disables MCP servers.
 
 **Fix**:
+
 1. Ask your admin to enable **MCP servers in Copilot**
 2. Restart VS Code after the policy change
 
 ## FAQ
 
 ### Q: What VS Code version do I need?
+
 **A**: Use VS Code 1.99 or later for OAuth support.
 
 ### Q: Does this work with VS Code Insiders?
+
 **A**: Yes, as long as your Insiders build is 1.99+.
 
 ### Q: Is my token stored securely?
+
 **A**: OAuth tokens are stored by VS Code. API tokens are entered via input variables and are not saved in the config file.
 
 ### Q: How do I update the MCP configuration?
+
 **A**: Edit `.vscode/mcp.json` and restart the MCP server using the **Start** CodeLens.
 
 ### Q: Can I use this with GitHub Copilot Enterprise?
+
 **A**: Yes, but your organization must enable the **MCP servers in Copilot** policy.
 
 ### Q: How do I revoke MCP access?
+
 **A**: Remove the server from `.vscode/mcp.json` and revoke tokens in MStudio.
 
 ### Q: Can I share my mcp.json with my team?
+
 **A**: Yes, but do not store API tokens inside the file. Use OAuth or input variables.
 
 ## Next Steps
@@ -227,6 +240,7 @@ List open support conversations for my account
 ## Official Documentation
 
 This guide is based on official GitHub Copilot capabilities:
+
 - [Setting up GitHub MCP Server](https://docs.github.com/en/copilot/how-tos/provide-context/use-mcp/set-up-the-github-mcp-server) - MCP setup for GitHub Copilot
 - [Enhanced MCP OAuth Support](https://github.blog/changelog/2025-11-18-enhanced-mcp-oauth-support-for-github-copilot-in-jetbrains-eclipse-and-xcode/) - OAuth 2.1 with PKCE (GA Sept 2025)
 - [Extending Copilot Chat with MCP](https://docs.github.com/copilot/customizing-copilot/using-model-context-protocol/extending-copilot-chat-with-mcp) - MCP integration guide
