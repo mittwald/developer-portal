@@ -167,10 +167,10 @@ Die in diesem Kapitel eingerichtete Registry kann als private Registry verwendet
 
 Eine eigene Registry könnte beispielsweise eine Domain wie `docker.p-XXXXXX.project.space` haben, die als Registry für zukünftige Container-Deployments konfiguriert werden kann.
 
-::warning
+:::warning
 Ohne zusätzliche Konfiguration ist diese Registry öffentlich und ohne Authentifizierung verfügbar.
 Wenn eine Anmeldung über Zugangsdaten gewünscht ist, folge den nächsten Schritten, um eine Basis-Authentifizierung einzurichten.
-::
+:::
 
 ### Basis-Authentifizierung für selbst-gehostete Docker-Registry {#docker-registry-basic-auth}
 
@@ -185,12 +185,16 @@ Der erste Schritt besteht darin, die Anmeldedatei **lokal** zu erstellen:
   httpd:2 -Bbn exampleuser examplepassword > auth/htpasswd
 ```
 
-Dies erstellt die `htpasswd`-Anmeldedatei, die wir jetzt übertragen müssen. Denke daran, `exampleuser` und `examplepassword` durch geeignete Zugangsdaten zu ersetzen.
+Dies erstellt die `htpasswd`-Anmeldedatei, die wir jetzt übertragen müssen.
 
-::note
+:::warning
+Denke daran, `exampleuser` und `examplepassword` durch geeignete Zugangsdaten zu ersetzen.
+:::
+
+:::note
 Diese Anleitung zeigt die Einrichtungsschritte getrennt, obwohl im `CLI`-Modus vieles mit einem Befehl erledigt werden kann.
 Wenn du bereits mit der `CLI` vertraut bist und nur die richtigen Befehle benötigst, springe gerne ans Ende der Anleitung, die die vollständigen Befehle ohne Zwischenschritte zur Erklärung bereitstellt.
-::
+:::
 
 Um die Anmeldedatei persistent zu speichern, beginnen wir mit der Erstellung eines neuen Volumes für unseren Registry-Container:
 
