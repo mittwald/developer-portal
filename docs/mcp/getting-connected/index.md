@@ -336,7 +336,7 @@ To help avoid confusion, here's how we use authentication-related terms in this 
 | **OAuth refresh token** | Long-lived token used to obtain new access tokens without re-authentication.                                                                                              |
 | **OAuth flow**          | The browser-based authentication process where you log in and approve scopes.                                                                                             |
 
-**Learn more**: [mittwald API Authentication](https://developer.mittwald.de/docs/v2/api/intro/) - Official documentation on API tokens and authentication methods.
+**Learn more**: [mittwald API Authentication](/docs/v2/api/intro/) - Official documentation on API tokens and authentication methods.
 
 ## Ready to Get Started?
 
