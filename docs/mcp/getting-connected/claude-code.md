@@ -30,20 +30,20 @@ Claude Code handles OAuth automatically using Dynamic Client Registration (DCR),
 Run this command in your terminal:
 
 ```shellsession
-user@local $ claude mcp add --transport http mittwald https://mittwald-mcp-fly2.fly.dev/mcp
+user@local $ claude mcp add --transport http mittwald https://mcp.mittwald.de/mcp
 ```
 
 **Optional: choose a configuration scope** (default is `local`):
 
 ```shellsession
 # Local (default, private)
-user@local $ claude mcp add --transport http --scope local mittwald https://mittwald-mcp-fly2.fly.dev/mcp
+user@local $ claude mcp add --transport http --scope local mittwald https://mcp.mittwald.de/mcp
 
 # Project (shared via .mcp.json)
-user@local $ claude mcp add --transport http --scope project mittwald https://mittwald-mcp-fly2.fly.dev/mcp
+user@local $ claude mcp add --transport http --scope project mittwald https://mcp.mittwald.de/mcp
 
 # User (available across projects)
-user@local $ claude mcp add --transport http --scope user mittwald https://mittwald-mcp-fly2.fly.dev/mcp
+user@local $ claude mcp add --transport http --scope user mittwald https://mcp.mittwald.de/mcp
 ```
 
 ### Step 2: Authenticate with mittwald
@@ -104,7 +104,7 @@ Use this option for headless servers or CI environments where OAuth is not pract
 ### Step 2: Add mittwald MCP with API Key
 
 ```shellsession
-user@local $ claude mcp add --transport http mittwald https://mittwald-mcp-fly2.fly.dev/mcp \
+user@local $ claude mcp add --transport http mittwald https://mcp.mittwald.de/mcp \
     --header "Authorization: Bearer YOUR_MITTWALD_API_TOKEN"
 ```
 
@@ -180,7 +180,7 @@ Create a backup for project [project-id]
 
 ### Error: "Connection Refused"
 
-**Symptom**: Claude Code can't reach `https://mittwald-mcp-fly2.fly.dev/mcp`.
+**Symptom**: Claude Code can't reach `https://mcp.mittwald.de/mcp`.
 
 **Cause**: Network issue or firewall/proxy blocking outbound HTTPS.
 

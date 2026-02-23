@@ -27,7 +27,7 @@ You should see commands like `add`, `list`, `get`, `login`, `logout`, and `remov
 ### 1. Add mittwald MCP server
 
 ```shellsession
-user@local $ codex mcp add mittwald --url https://mittwald-mcp-fly2.fly.dev/mcp
+user@local $ codex mcp add mittwald --url https://mcp.mittwald.de/mcp
 ```
 
 Current Codex CLI behavior:
@@ -75,7 +75,7 @@ user@local $ export MITTWALD_API_TOKEN="<your_token>"
 
 ```shellsession
 user@local $ codex mcp add mittwald \
-    --url https://mittwald-mcp-fly2.fly.dev/mcp \
+    --url https://mcp.mittwald.de/mcp \
     --bearer-token-env-var MITTWALD_API_TOKEN
 ```
 
@@ -114,7 +114,7 @@ user@local $ codex mcp add <name> --url <mcp_endpoint>
 Example:
 
 ```shellsession
-user@local $ codex mcp add mittwald --url https://mittwald-mcp-fly2.fly.dev/mcp
+user@local $ codex mcp add mittwald --url https://mcp.mittwald.de/mcp
 ```
 
 ### OAuth browser step did not open
@@ -131,7 +131,7 @@ user@local $ codex mcp add mittwald --url https://mittwald-mcp-fly2.fly.dev/mcp
 
 ```shellsession
 user@local $ codex mcp remove mittwald
-user@local $ codex mcp add mittwald --url https://mittwald-mcp-fly2.fly.dev/mcp --bearer-token-env-var MITTWALD_API_TOKEN
+user@local $ codex mcp add mittwald --url https://mcp.mittwald.de/mcp --bearer-token-env-var MITTWALD_API_TOKEN
 ```
 
 ## Security Notes

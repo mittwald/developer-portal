@@ -9,7 +9,7 @@ Cursor can connect to mittwald MCP over HTTP and use OAuth for authentication.
 
 This guide uses the Fly deployment endpoint:
 
-`https://mittwald-mcp-fly2.fly.dev/mcp`
+`https://mcp.mittwald.de/mcp`
 
 ## Prerequisites
 
@@ -35,7 +35,7 @@ Add this to `.cursor/mcp.json`:
 {
   "mcpServers": {
     "mittwald": {
-      "url": "https://mittwald-mcp-fly2.fly.dev/mcp"
+      "url": "https://mcp.mittwald.de/mcp"
     }
   }
 }
@@ -77,7 +77,7 @@ Most setups should use the default flow above. Use static OAuth only when your O
 {
   "mcpServers": {
     "mittwald": {
-      "url": "https://mittwald-mcp-fly2.fly.dev/mcp",
+      "url": "https://mcp.mittwald.de/mcp",
       "auth": {
         "CLIENT_ID": "${env:MITTWALD_OAUTH_CLIENT_ID}",
         "CLIENT_SECRET": "${env:MITTWALD_OAUTH_CLIENT_SECRET}",
@@ -102,7 +102,7 @@ If you prefer token headers (for CI or deterministic non-interactive runs):
 {
   "mcpServers": {
     "mittwald": {
-      "url": "https://mittwald-mcp-fly2.fly.dev/mcp",
+      "url": "https://mcp.mittwald.de/mcp",
       "headers": {
         "Authorization": "Bearer ${env:MITTWALD_API_TOKEN}"
       }

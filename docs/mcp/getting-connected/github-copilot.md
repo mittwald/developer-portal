@@ -27,7 +27,7 @@ Use OAuth for the secure browser-based flow with automatic token refresh.
   "servers": {
     "mittwald": {
       "type": "http",
-      "url": "https://mittwald-mcp-fly2.fly.dev/mcp"
+      "url": "https://mcp.mittwald.de/mcp"
     }
   }
 }
@@ -50,7 +50,7 @@ Use this option for headless servers or CI environments where OAuth is not pract
   "servers": {
     "mittwald": {
       "type": "http",
-      "url": "https://mittwald-mcp-fly2.fly.dev/mcp",
+      "url": "https://mcp.mittwald.de/mcp",
       "headers": {
         "Authorization": "Bearer ${input:mittwald_token}"
       }
@@ -176,7 +176,7 @@ List open support conversations for my account
 
 **Fix**:
 
-1. Confirm the URL is `https://mittwald-mcp-fly2.fly.dev/mcp`
+1. Confirm the URL is `https://mcp.mittwald.de/mcp`
 2. Check outbound network access
 3. Try from another network
 
