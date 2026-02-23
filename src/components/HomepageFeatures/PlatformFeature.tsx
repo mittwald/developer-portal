@@ -165,6 +165,20 @@ function PlatformTools() {
             ]}
           />
         </li>
+        <li>
+          <LinkGroup
+            title={
+              <Translate id="index.deploy.tools.agentic">
+                Agentic AI integration
+              </Translate>
+            }
+            links={[
+              <Link to="/mcp">
+                MCP <NewBadge />
+              </Link>,
+            ]}
+          />
+        </li>
       </ul>
     </>
   );
