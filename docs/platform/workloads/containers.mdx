@@ -120,14 +120,14 @@ If your container image should be loaded from a private registry, you first need
 Do not confuse "private" registry with self-hosted, which is explained in the next chapter.
 :::
 
-## Custom, self-hosted docker image registry {#self-hosted-registries}
+## Custom, self-hosted Docker image registry {#self-hosted-registries}
 
-If no private registry exists or is unavailable for any reason, it is possible to host your own docker image registry in the mittwald container hosting.
+If no private registry exists or is unavailable for any reason, it is possible to host your own Docker image registry in the mittwald container hosting.
 
-::note
+:::note
 In order to work through this guide, we need to ship files via `mw container cp` command.
 Make sure to prepare SSH access to your environment, check [this guide](../../../cli/usage/intro).
-::
+:::
 
 Check [this guide](https://distribution.github.io/distribution/about/deploying/) for detailed instructions and configuration.
 
@@ -143,7 +143,7 @@ Check [this guide](https://distribution.github.io/distribution/about/deploying/)
 
   </TabItem>
   <TabItem value="cli" label="CLI">
-    To create a new container registry via the CLI, use the `mw registry create` command:
+    To create a new container registry via the CLI, use the `mw container run` command:
 
     ```shellsession
     (user@local) $ mw container run \
@@ -170,12 +170,12 @@ in your project pointing towards custom registry.
 A custom registry might end up with a domain like `docker.p-XXXXXX.project.space`,
 which can be configured as registry for future container deployments.
 
-::warning
-Without additional configuration this registry is publicly available without authentication.
+:::warning
+Without additional configuration this registry is publicly available without authentification.
 If login via credentials is desired, follow next steps to set up basic authentication.
-::
+:::
 
-### Basic auth for self-hosted docker registry {#docker-registry-basic-auth}
+### Basic auth for self-hosted Docker registry {#docker-registry-basic-auth}
 
 In order to add basic authentication to our registry we need to prepare credentials which we then deploy into our registry.
 
@@ -226,10 +226,10 @@ To persist the credentials file, we start with creating a new volume for our reg
       -v registry-data:/var/lib/registry
     ```
 
-    ::note
+    :::note
     Command above does not yet include environment variables needed for basic auth. This will follow in next step.
     Feel free to skip this step in favor of a full update command in the next section.
-    ::
+    :::
 
   </TabItem>
   <TabItem value="api" label="API">
@@ -256,7 +256,7 @@ After that, we reconfigure our registry to use new basic auth credentials.
 
   </TabItem>
   <TabItem value="cli" label="CLI">
-    To add or update environment variables via the CLI, use the `mw continaer update` command:
+    To add or update environment variables via the CLI, use the `mw container update` command:
 
     ```shellsession
     (user@local) $ mw container update \
@@ -347,13 +347,13 @@ Now log in:
 (user@local) $ docker login docker.p-XXXXXX.project.space
 ```
 
-::note
+:::note
 When testing, remember to log out specifically from your registry via `docker logout docker.p-XXXXXX.project.space`
-::
+:::
 
 Retry `docker push`, which now works after successful login!
-Congratulations, you have successfully created your own private, self-hosted docker registry.
-Depending on your project structure and use case, one generic docker registry in a separate project,
+Congratulations, you have successfully created your own private, self-hosted Docker registry.
+Depending on your project structure and use case, one generic Docker registry in a separate project,
 **or** one registry per project can be created and used.
 
 ## Deployment strategies

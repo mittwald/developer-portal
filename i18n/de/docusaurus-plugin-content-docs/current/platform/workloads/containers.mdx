@@ -124,10 +124,10 @@ Verwechsle nicht "private" Registry mit selbst-gehostet, was im nächsten Kapite
 
 Wenn keine private Registry existiert oder aus irgendeinem Grund nicht verfügbar ist, kannst du deine eigene Docker-Image-Registry im mittwald Container-Hosting hosten.
 
-::note
+:::note
 Um dieser Anleitung zu folgen, müssen wir Dateien über den Befehl `mw container cp` übertragen.
 Stelle sicher, dass du den SSH-Zugriff auf deine Umgebung vorbereitet hast, siehe [diese Anleitung](../../../cli/usage/intro).
-::
+:::
 
 Weitere detaillierte Anweisungen und Konfigurationsoptionen findest du in [dieser Anleitung](https://distribution.github.io/distribution/about/deploying/).
 
@@ -143,7 +143,7 @@ Weitere detaillierte Anweisungen und Konfigurationsoptionen findest du in [diese
 
   </TabItem>
   <TabItem value="cli" label="CLI">
-    Um eine neue Container-Registry über die CLI zu erstellen, verwende den Befehl `mw registry create`:
+    Um eine neue Container-Registry über die CLI zu erstellen, verwende den Befehl `mw container run`:
 
     ```shellsession
     (user@local) $ mw container run \
@@ -221,10 +221,10 @@ Um die Anmeldedatei persistent zu speichern, beginnen wir mit der Erstellung ein
       -v registry-data:/var/lib/registry
     ```
 
-    ::note
+    :::note
     Der obige Befehl enthält noch nicht die für die Basis-Authentifizierung benötigten Umgebungsvariablen. Diese folgen im nächsten Schritt.
     Du kannst diesen Schritt überspringen und stattdessen einen vollständigen Update-Befehl im nächsten Abschnitt verwenden.
-    ::
+    :::
 
   </TabItem>
   <TabItem value="api" label="API">
@@ -341,9 +341,9 @@ Melde dich jetzt an:
 (user@local) $ docker login docker.p-XXXXXX.project.space
 ```
 
-::note
+:::note
 Denke beim Testen daran, dich speziell von deiner Registry über `docker logout docker.p-XXXXXX.project.space` abzumelden.
-::
+:::
 
 Wiederhole `docker push`, was jetzt nach erfolgreicher Anmeldung funktioniert!
 Herzlichen Glückwunsch, du hast erfolgreich deine eigene private, selbst-gehostete Docker-Registry erstellt.
