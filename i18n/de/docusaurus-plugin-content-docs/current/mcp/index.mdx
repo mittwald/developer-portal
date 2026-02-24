@@ -1,0 +1,72 @@
+---
+title: Einführung
+description: Steuere deine mittwald-Infrastruktur über KI-Assistenten
+sidebar_position: 0
+---
+
+# Einführung in den mStudio MCP-Server
+
+Mit mittwald MCP kannst du deine Hosting-Infrastruktur über KI-Assistenten wie Claude, Copilot oder ChatGPT in natürlicher Sprache verwalten.
+
+## Schnellstart {#quick-start}
+
+Verbinde dein KI-Tool mit dem mittwald MCP-Server:
+
+```
+https://mcp.mittwald.de/mcp
+```
+
+Wähle dein Tool und folge der Setup-Anleitung:
+
+| Tool | Typ | Setup-Zeit |
+|------|------|------------|
+| **[Claude Desktop](./getting-connected/claude-desktop)** | Desktop/Web App | ~5 Min. |
+| **[ChatGPT](./getting-connected/chatgpt)** | Web/Mobile App | ~5 Min. |
+| **[Claude Code](./getting-connected/claude-code)** | CLI | ~10 Min. |
+| **[GitHub Copilot](./getting-connected/github-copilot)** | IDE Extension | ~10 Min. |
+| **[Cursor](./getting-connected/cursor)** | IDE | ~10 Min. |
+| **[Codex CLI](./getting-connected/codex-cli)** | CLI | ~10 Min. |
+
+Sobald die Verbindung steht, probiere einen einfachen Befehl in deinem KI-Tool aus:
+
+```
+Use mittwald MCP to list my projects
+```
+
+## Was ist MCP? {#what-is-mcp}
+
+**MCP (Model Context Protocol)** ist ein offener Standard, der KI-Assistenten mit externen Diensten verbindet. Anstatt separate Integrationen für jedes KI-Tool zu entwickeln, stellt mittwald einen MCP-Server bereit, der mit allen MCP-kompatiblen Clients funktioniert.
+
+Dein KI-Assistent sendet Anfragen an den mittwald MCP-Server, der diese in API-Aufrufe übersetzt und Ergebnisse zurückgibt. Du interagierst in natürlicher Sprache; das Protokoll kümmert sich um den Rest.
+
+## Agentic Coding: KI, die handelt {#agentic-coding}
+
+Traditionelle KI-Assistenten schlagen vor, was zu tun ist. Agentic AI **führt es aus**.
+
+Anstatt API-Dokumentation zum Copy-Paste zu erhalten, beschreibst du dein Ziel:
+
+> "Erstelle ein Projekt mit WordPress, MySQL-Datenbank und täglichen Backups"
+
+Der Agent bestimmt, welche Tools aufgerufen werden müssen, kümmert sich um die Authentifizierung, führt die Schritte nacheinander aus und meldet das Ergebnis. Mehrstufige Workflows, die zuvor manuelle Koordination erforderten, laufen automatisch ab.
+
+Agenten haben Schutzmaßnahmen: Destruktive Operationen erfordern eine Bestätigung, und du behältst die Übersicht über durchgeführte Aktionen.
+
+## Authentifizierung {#authentication}
+
+mittwald MCP verwendet OAuth 2.1 mit PKCE zur Authentifizierung. Wenn du ein Tool verbindest:
+
+1. Du authentifizierst dich direkt bei mittwald in deinem Browser
+2. Du genehmigst spezifische Berechtigungen für das Tool
+3. mittwald stellt dem Tool ein temporäres Token aus
+4. Das Tool verwendet dieses Token – niemals dein Passwort
+
+Tokens sind auf spezifische Berechtigungen beschränkt, laufen automatisch ab und können jederzeit widerrufen werden. Deine Zugangsdaten bleiben bei mittwald.
+
+Für CI/CD-Pipelines oder Headless-Umgebungen kannst du auch [API-Tokens](./getting-connected/#option-2-api-token) anstelle von OAuth verwenden.
+
+## Nächste Schritte {#next-steps}
+
+- **[Getting Connected](./getting-connected/)** — Detaillierte Setup-Anleitungen für alle unterstützten Tools
+- **[Tutorials](./tutorials/)** — End-to-End-Anleitungen für häufige Szenarien
+- **[How-To Guides](./how-to/)** — Aufgabenfokussierte Anleitungen für tägliche Abläufe
+- **[Runbooks](./runbooks/)** — Verfahren zur Wiederherstellung nach Vorfällen
