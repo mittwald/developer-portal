@@ -27,11 +27,11 @@ ChatGPT unterstützt MCP-Server über sein Connector-Feature. Diese Anleitung ze
 2. Klicke auf **Create**
 3. Fülle die Connector-Details aus:
 
-   | Feld               | Wert                                                                           |
-   | ------------------ | ------------------------------------------------------------------------------ |
-   | **Connector name** | mittwald                                                                       |
-   | **Description**    | Manage mittwald hosting: projects, apps, databases, domains, and more          |
-   | **Connector URL**  | `https://mcp.mittwald.de/mcp`                                                  |
+   | Feld               | Wert                                                                  |
+   | ------------------ | --------------------------------------------------------------------- |
+   | **Connector name** | mittwald                                                              |
+   | **Description**    | Manage mittwald hosting: projects, apps, databases, domains, and more |
+   | **Connector URL**  | `https://mcp.mittwald.de/mcp`                                         |
 
 4. Klicke auf **Create** zum Speichern
 

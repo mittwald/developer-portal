@@ -105,14 +105,14 @@ mittwald MCP funktioniert mit 6 beliebten KI-Tools. Wähle dasjenige, das du ver
 - Erfordert Browser-Zugriff (nicht für Headless-Umgebungen geeignet)
 - Benötigt interaktive Authentifizierung
 
-| Tool | OAuth-Implementierung |
-| --- | --- |
-| Claude Desktop | Settings UI (Beta-Feature) |
-| ChatGPT | Settings UI |
-| Claude Code | Standard Web Flow |
-| GitHub Copilot | Dynamic Client Registration (DCR) |
-| Cursor | Settings UI oder JSON-Konfiguration |
-| Codex CLI | RFC 8252 Loopback Flow |
+| Tool           | OAuth-Implementierung               |
+| -------------- | ----------------------------------- |
+| Claude Desktop | Settings UI (Beta-Feature)          |
+| ChatGPT        | Settings UI                         |
+| Claude Code    | Standard Web Flow                   |
+| GitHub Copilot | Dynamic Client Registration (DCR)   |
+| Cursor         | Settings UI oder JSON-Konfiguration |
+| Codex CLI      | RFC 8252 Loopback Flow              |
 
 ### Option 2: API Token {#option-2-api-token}
 
@@ -145,14 +145,14 @@ Speichere API-Tokens niemals in Konfigurationsdateien, die in die Versionskontro
 
 **Setup-Anleitung für jedes Tool**:
 
-| Tool | Unterstützt API Token |
-| --- | --- |
-| Claude Desktop | Nein (nur OAuth) |
-| ChatGPT | Nein (nur OAuth) |
-| Claude Code | Ja (über Umgebungsvariable) |
+| Tool           | Unterstützt API Token         |
+| -------------- | ----------------------------- |
+| Claude Desktop | Nein (nur OAuth)              |
+| ChatGPT        | Nein (nur OAuth)              |
+| Claude Code    | Ja (über Umgebungsvariable)   |
 | GitHub Copilot | Ja (über Terraform-Variablen) |
-| Cursor | Ja (über JSON-Konfiguration) |
-| Codex CLI | Ja (über Konfigurationsdatei) |
+| Cursor         | Ja (über JSON-Konfiguration)  |
+| Codex CLI      | Ja (über Konfigurationsdatei) |
 
 ## Schrittweise Setup-Anleitungen {#step-by-step-guides}
 
@@ -170,18 +170,18 @@ Jede Anleitung enthält:
 
 Wenn du mittwald MCP mit OAuth verbindest, wirst du aufgefordert, Berechtigungen zu genehmigen. Der MCP-Server fordert:
 
-| Bereich | Beschreibung | Zweck |
-| --- | --- | --- |
-| `read:projects` | Projekte anzeigen | Projekte auflisten, Details abrufen |
-| `write:projects` | Projekte erstellen/aktualisieren | Neue Projekte erstellen, Einstellungen ändern |
-| `read:apps` | Anwendungen anzeigen | Installierte Apps auflisten |
-| `write:apps` | Apps verwalten | Apps installieren/aktualisieren/entfernen |
-| `read:databases` | Datenbanken anzeigen | Datenbank-Verbindungsdetails abrufen |
-| `write:databases` | Datenbanken verwalten | Datenbanken erstellen/löschen |
-| `read:containers` | Container anzeigen | Container-Status abrufen |
-| `write:containers` | Container verwalten | Container starten/stoppen/erstellen |
-| `read:backups` | Backups anzeigen | Backup-Zeitpläne anzeigen |
-| `write:backups` | Backups verwalten | Backup-Richtlinien konfigurieren |
+| Bereich            | Beschreibung                     | Zweck                                         |
+| ------------------ | -------------------------------- | --------------------------------------------- |
+| `read:projects`    | Projekte anzeigen                | Projekte auflisten, Details abrufen           |
+| `write:projects`   | Projekte erstellen/aktualisieren | Neue Projekte erstellen, Einstellungen ändern |
+| `read:apps`        | Anwendungen anzeigen             | Installierte Apps auflisten                   |
+| `write:apps`       | Apps verwalten                   | Apps installieren/aktualisieren/entfernen     |
+| `read:databases`   | Datenbanken anzeigen             | Datenbank-Verbindungsdetails abrufen          |
+| `write:databases`  | Datenbanken verwalten            | Datenbanken erstellen/löschen                 |
+| `read:containers`  | Container anzeigen               | Container-Status abrufen                      |
+| `write:containers` | Container verwalten              | Container starten/stoppen/erstellen           |
+| `read:backups`     | Backups anzeigen                 | Backup-Zeitpläne anzeigen                     |
+| `write:backups`    | Backups verwalten                | Backup-Richtlinien konfigurieren              |
 
 :::note
 
