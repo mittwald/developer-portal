@@ -82,14 +82,14 @@ mittwald MCP works with 6 popular AI tools. Choose the one you use:
 
 ## Quick Comparison {#quick-comparison}
 
-| Feature               | Claude Desktop | ChatGPT           | Claude Code                           | GitHub Copilot                           | Cursor                                                  | Codex CLI                           |
-| --------------------- | -------------- | ----------------- | ------------------------------------- | ---------------------------------------- | ------------------------------------------------------- | ----------------------------------- |
-| **Type**              | Desktop/Web    | Web/Mobile        | CLI                                   | IDE Extension                            | IDE                                                     | CLI                                 |
-| **Platform**          | All            | All               | macOS, Linux, Windows                 | VS Code, Visual Studio, JetBrains, Xcode | macOS, Linux, Windows                                   | macOS, Linux, Windows               |
-| **Configuration**     | Settings UI    | Settings UI       | CLI command                           | IDE settings                             | IDE settings or JSON file                               | CLI command                         |
-| **Browser Required**  | Yes (for auth) | Yes (for auth)    | Yes (for auth)                        | Yes (for auth)                           | Yes (for auth)                                          | Yes (for auth)                      |
-| **PKCE**              | Automatic      | Automatic         | Automatic                             | Automatic                                | Automatic                                               | Automatic                           |
-| **Redirect Handling** | Managed by app | Managed by app    | Local callback managed by Claude Code | Managed by IDE                           | Managed by Cursor (or static redirect for static OAuth) | Local callback managed by Codex CLI |
+| Feature               | Claude Desktop | ChatGPT        | Claude Code                           | GitHub Copilot                           | Cursor                                                  | Codex CLI                           |
+| --------------------- | -------------- | -------------- | ------------------------------------- | ---------------------------------------- | ------------------------------------------------------- | ----------------------------------- |
+| **Type**              | Desktop/Web    | Web/Mobile     | CLI                                   | IDE Extension                            | IDE                                                     | CLI                                 |
+| **Platform**          | All            | All            | macOS, Linux, Windows                 | VS Code, Visual Studio, JetBrains, Xcode | macOS, Linux, Windows                                   | macOS, Linux, Windows               |
+| **Configuration**     | Settings UI    | Settings UI    | CLI command                           | IDE settings                             | IDE settings or JSON file                               | CLI command                         |
+| **Browser Required**  | Yes (for auth) | Yes (for auth) | Yes (for auth)                        | Yes (for auth)                           | Yes (for auth)                                          | Yes (for auth)                      |
+| **PKCE**              | Automatic      | Automatic      | Automatic                             | Automatic                                | Automatic                                               | Automatic                           |
+| **Redirect Handling** | Managed by app | Managed by app | Local callback managed by Claude Code | Managed by IDE                           | Managed by Cursor (or static redirect for static OAuth) | Local callback managed by Codex CLI |
 
 ## Two Ways to Authenticate {#two-ways-to-authenticate}
 
