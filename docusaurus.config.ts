@@ -49,7 +49,7 @@ const config: Config = {
   organizationName: "mittwald", // Usually your GitHub org/user name.
   projectName: "developer-portal", // Usually your repo name.
 
-  onBrokenLinks: "warn",
+  onBrokenLinks: "throw",
 
   // Broken anchors need to be ignored because of Redocusaurus
   // Reset to "throw" once https://github.com/rohit-gohri/redocusaurus/issues/321 is fixed
@@ -273,8 +273,8 @@ const config: Config = {
   markdown: {
     mermaid: true,
     hooks: {
-        onBrokenMarkdownLinks: "warn",
-    }
+      onBrokenMarkdownLinks: "warn",
+    },
   },
   themes: ["@docusaurus/theme-mermaid"],
 };
