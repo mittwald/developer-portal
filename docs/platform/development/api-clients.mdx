@@ -171,8 +171,10 @@ Try to refrain from introducing workarounds or custom patches for every edge cas
 Focusing on generator configuration, rather than manual code changes or ad hoc “fixes” to the spec,
 keeps your workflow sustainable and future-proof.
 
-> 🌱 **Maintain your generation process, not the output.**  
-> Let your manual efforts go into improving automation, testing, and pipeline robustness—rather than into laborious edits of generated code.
+:::tip
+**Maintain your generation process, not the output.**  
+Let your manual efforts go into improving automation, testing, and pipeline robustness—rather than into laborious edits of generated code.
+:::
 
 Popular OpenAPI generators include [OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator) and others. Test generated clients with simple API requests to quickly validate they operate as expected.
 
@@ -194,14 +196,14 @@ will be covered in the next section.
 
 ## Creating a Python mittwald API Client
 
-Before automating the workflow, start by manually generating a client on your console. First, create your project folder, set up a Python virtual environment, and install the client generator:
+Before automating the workflow, start by manually generating a client on your console. First, create your project folder, set up a Python virtual environment, and install the client generator and the dependency for loading environment variables:
 
 ```shellsession
 (user@local) $ mkdir python-api-client
 (user@local) $ cd python-api-client
 (user@local) $ python3 -m venv venv
 (user@local) $ source venv/bin/activate
-(venv)(user@local) $ pip install openapi-python-client
+(venv)(user@local) $ pip install openapi-python-client python-dotenv
 ```
 
 :::note
@@ -387,11 +389,14 @@ cd my-python-mittwald-project
 pip install -i https://test.pypi.org/simple/ mittwald-api-client
 ```
 
-> The same steps apply to productive PyPI. Use unique package names to avoid conflicts!
+:::note
 
+The same steps apply to productive PyPI. Use unique package names to avoid conflicts!
+
+:::
 For automation and maintenance, please continue to the [maintenance & pipeline section](#maintenance-pipeline).
 
-## Automating Python API Client Generation and Release with GitHub Actions
+## Automating Python API Client Generation and Release with GitHub Actions {#maintenance-pipeline}
 
 To ensure your Python mittwald API client always stays up-to-date with the latest API changes,
 you can establish a CI/CD pipeline using GitHub Actions. This workflow will automatically

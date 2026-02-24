@@ -197,9 +197,12 @@ in generierten Clients einzuführen. Die Konzentration auf Generator-Konfigurati
 anstatt auf manuelle Code-Änderungen oder Ad-hoc-"Fixes" an der Spezifikation,
 hält deinen Workflow nachhaltig und zukunftssicher.
 
-> 🌱 **Pflege deinen Generierungsprozess, nicht das Output.**  
-> Investiere deine manuellen Bemühungen in die Verbesserung von Automatisierung, Testing und Pipeline-Robustheit – statt in aufwändige Bearbeitungen von generiertem Code.
+:::tip
 
+🌱 **Pflege deinen Generierungsprozess, nicht das Output.**  
+Investiere deine manuellen Bemühungen in die Verbesserung von Automatisierung, Testing und Pipeline-Robustheit – statt in aufwändige Bearbeitungen von generiertem Code.
+
+:::
 Zu den beliebten OpenAPI-Generatoren gehören [OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator) und andere. Teste generierte Clients mit einfachen API-Requests, um schnell zu validieren, dass sie wie erwartet funktionieren.
 
 **Fazit:**  
@@ -231,7 +234,7 @@ Python-Umgebung ein und installiere den Client-Generator:
 (user@local) $ cd python-api-client
 (user@local) $ python3 -m venv venv
 (user@local) $ source venv/bin/activate
-(venv)(user@local) $ pip install openapi-python-client
+(venv)(user@local) $ pip install openapi-python-client python-dotenv
 ```
 
 :::note
@@ -413,11 +416,14 @@ cd my-python-mittwald-project
 pip install -i https://test.pypi.org/simple/ mittwald-api-client
 ```
 
-> Die gleichen Schritte gelten für das produktive PyPI. Verwende eindeutige Package-Namen, um Konflikte zu vermeiden!
+:::note
 
+Die gleichen Schritte gelten für das produktive PyPI. Verwende eindeutige Package-Namen, um Konflikte zu vermeiden!
+
+:::
 Für Automatisierung und Wartung fahre bitte mit dem [Wartungs- & Pipeline-Abschnitt](#maintenance-pipeline) fort.
 
-## Python API Client-Generierung und -Release mit GitHub Actions automatisieren
+## Python API Client-Generierung und -Release mit GitHub Actions automatisieren {#maintenance-pipeline}
 
 Um sicherzustellen, dass dein Python mittwald API Client immer auf dem neuesten Stand
 mit den neuesten API-Änderungen bleibt, kannst du eine CI/CD-Pipeline mit GitHub Actions
