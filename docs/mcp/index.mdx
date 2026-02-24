@@ -1,0 +1,72 @@
+---
+title: Introduction
+description: Control your mittwald infrastructure through AI assistants
+sidebar_position: 0
+---
+
+# Introduction to the mStudio MCP server
+
+mittwald MCP lets you manage your hosting infrastructure through AI assistants like Claude, Copilot, or ChatGPT using natural language.
+
+## Quick Start {#quick-start}
+
+Connect your AI tool to the mittwald MCP server:
+
+```
+https://mcp.mittwald.de/mcp
+```
+
+Choose your tool and follow the setup guide:
+
+| Tool                                                     | Type            | Setup Time |
+| -------------------------------------------------------- | --------------- | ---------- |
+| **[Claude Desktop](./getting-connected/claude-desktop)** | Desktop/Web App | ~5 min     |
+| **[ChatGPT](./getting-connected/chatgpt)**               | Web/Mobile App  | ~5 min     |
+| **[Claude Code](./getting-connected/claude-code)**       | CLI             | ~10 min    |
+| **[GitHub Copilot](./getting-connected/github-copilot)** | IDE Extension   | ~10 min    |
+| **[Cursor](./getting-connected/cursor)**                 | IDE             | ~10 min    |
+| **[Codex CLI](./getting-connected/codex-cli)**           | CLI             | ~10 min    |
+
+Once connected, try a simple command in your AI tool:
+
+```
+Use mittwald MCP to list my projects
+```
+
+## What is MCP? {#what-is-mcp}
+
+**MCP (Model Context Protocol)** is an open standard that connects AI assistants to external services. Instead of building separate integrations for each AI tool, mittwald provides one MCP server that works with all MCP-compatible clients.
+
+Your AI assistant sends requests to the mittwald MCP server, which translates them into API calls and returns results. You interact in natural language; the protocol handles the rest.
+
+## Agentic Coding: AI That Takes Action {#agentic-coding}
+
+Traditional AI assistants suggest what to do. Agentic AI **executes** it.
+
+Instead of receiving API documentation to copy-paste, you describe your goal:
+
+> "Create a project with WordPress, MySQL database, and daily backups"
+
+The agent determines which tools to call, handles authentication, executes the steps in sequence, and reports the result. Multi-step workflows that previously required manual coordination happen automatically.
+
+Agents have guardrails: destructive operations require confirmation, and you maintain oversight of what actions are taken.
+
+## Authentication {#authentication}
+
+mittwald MCP uses OAuth 2.1 with PKCE for authentication. When you connect a tool:
+
+1. You authenticate directly with mittwald in your browser
+2. You approve specific permissions for the tool
+3. mittwald issues a temporary token to the tool
+4. The tool uses this token—never your password
+
+Tokens are scoped to specific permissions, expire automatically, and can be revoked anytime. Your credentials stay with mittwald.
+
+For CI/CD pipelines or headless environments, you can also use [API tokens](./getting-connected/#option-2-api-token) instead of OAuth.
+
+## Next Steps {#next-steps}
+
+- **[Getting Connected](./getting-connected/)** — Detailed setup guides for all supported tools
+- **[Tutorials](./tutorials/)** — End-to-end walkthroughs for common scenarios
+- **[How-To Guides](./how-to/)** — Task-focused guides for day-to-day operations
+- **[Runbooks](./runbooks/)** — Incident recovery procedures
