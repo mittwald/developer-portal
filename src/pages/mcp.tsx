@@ -84,9 +84,13 @@ function ServerURLSection() {
     >
       <div className={clsx("container", mcpStyles.urlContainer)}>
         <p>
+          <strong>
+            <Translate id="mcp.url.intro.bold">
+              Just want to get started quickly?
+            </Translate>
+          </strong>{" "}
           <Translate id="mcp.url.intro">
-            <strong>Just want to get started quickly?</strong> Use this MCP URL
-            in the AI assistant of your choice:
+            Use this MCP URL in the AI assistant of your choice:
           </Translate>
         </p>
         <CodeBlock
@@ -194,15 +198,19 @@ function OverviewFeature() {
               </p>
               <ul>
                 <li>
-                  <Translate id="mcp.overview.auth.oauth">
-                    <strong>OAuth 2.1</strong> for interactive agents with
-                    automatic token refresh
+                  <Translate
+                    id="mcp.overview.auth.oauth"
+                    values={{ bold: <strong>OAuth 2.1</strong> }}
+                  >
+                    {"{bold} for interactive agents with automatic token refresh"}
                   </Translate>
                 </li>
                 <li>
-                  <Translate id="mcp.overview.auth.token">
-                    <strong>API tokens</strong> for CI/CD pipelines and headless
-                    environments
+                  <Translate
+                    id="mcp.overview.auth.token"
+                    values={{ bold: <strong>API tokens</strong> }}
+                  >
+                    {"{bold} for CI/CD pipelines and headless environments"}
                   </Translate>
                 </li>
               </ul>
@@ -367,41 +375,52 @@ function WorkflowFeature() {
               </h3>
               <ol>
                 <li>
-                  <Translate id="mcp.workflow.steps.intent">
-                    <strong>Intent</strong> — You prompt the outcome you want on
-                    mittwald
+                  <Translate
+                    id="mcp.workflow.steps.intent"
+                    values={{ bold: <strong>Intent</strong> }}
+                  >
+                    {"{bold} — You prompt the outcome you want on mittwald"}
                   </Translate>
                 </li>
                 <li>
-                  <Translate id="mcp.workflow.steps.discovery">
-                    <strong>Discovery</strong> — Your agent discovers relevant
-                    MCP tools and required inputs
+                  <Translate
+                    id="mcp.workflow.steps.discovery"
+                    values={{ bold: <strong>Discovery</strong> }}
+                  >
+                    {"{bold} — Your agent discovers relevant MCP tools and required inputs"}
                   </Translate>
                 </li>
                 <li>
-                  <Translate id="mcp.workflow.steps.auth">
-                    <strong>Auth</strong> — OAuth or token auth is used for each
-                    tool call
+                  <Translate
+                    id="mcp.workflow.steps.auth"
+                    values={{ bold: <strong>Auth</strong> }}
+                  >
+                    {"{bold} — OAuth or token auth is used for each tool call"}
                   </Translate>
                 </li>
                 <li>
-                  <Translate id="mcp.workflow.steps.execution">
-                    <strong>Execution</strong> — The agent performs tool calls
-                    and reports results
+                  <Translate
+                    id="mcp.workflow.steps.execution"
+                    values={{ bold: <strong>Execution</strong> }}
+                  >
+                    {"{bold} — The agent performs tool calls and reports results"}
                   </Translate>
                 </li>
                 <li>
-                  <Translate id="mcp.workflow.steps.verify">
-                    <strong>Verify</strong> — You run read checks and decide
-                    whether to proceed, retry, or roll back
+                  <Translate
+                    id="mcp.workflow.steps.verify"
+                    values={{ bold: <strong>Verify</strong> }}
+                  >
+                    {"{bold} — You run read checks and decide whether to proceed, retry, or roll back"}
                   </Translate>
                 </li>
               </ol>
               <p>
-                <Translate id="mcp.workflow.responsibility">
-                  <strong>Human responsibility:</strong> Destructive or
-                  cost-impacting changes should be approved explicitly. Treat
-                  the agent as an operator, not as an unattended process.
+                <Translate
+                  id="mcp.workflow.responsibility"
+                  values={{ bold: <strong>Human responsibility:</strong> }}
+                >
+                  {"{bold} Destructive or cost-impacting changes should be approved explicitly. Treat the agent as an operator, not as an unattended process."}
                 </Translate>
               </p>
             </div>
