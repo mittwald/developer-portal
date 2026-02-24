@@ -1,0 +1,26 @@
+---
+title: User-Unbound Authorization
+---
+
+In the previous chapters, you got to know user-bound authorization methods:
+session tokens, OAuth2, and the Access Token Retrieval Key (ATReK).
+All these methods have one thing in common:
+every interaction with the mStudio API happens in the name of an mStudio user.
+
+However, user-bound authorization does not fit every use case.
+Consider the following scenarios:
+
+- **Custom user management**: Your Extension implements its own user management independent of mStudio users, for example in white-label solutions.
+- **Background automation**: Your Extension should execute mStudio actions automatically in the background, for example automated workflows, scheduled jobs, or notifications.
+
+For these scenarios, mStudio provides an alternative authorization method: **Extension Instance Secrets**.
+
+## How Extension Instance Secrets Work
+
+mStudio sends the Extension Instance Secret through lifecycle webhooks for each Extension Instance.
+The Reference Extension stores these secrets encrypted in the database.
+
+With the Extension Instance ID and Extension Instance Secret, your Extension can request a short-lived access token.
+This token authorizes the Extension to access resources in the Extension Context without a logged-in user.
+
+Detailed information on obtaining an access token and its limitations is available under [Authenticating with the Extension Instance Secret](../../50-reference/5-api.mdx#authenticating-with-the-extension-instance-secret).

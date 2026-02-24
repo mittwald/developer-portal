@@ -1,0 +1,36 @@
+---
+title: Use a Different Extension Context
+---
+
+The Reference Extension is built as a **project Extension** and is installed in a project context.
+Depending on your use case, however, it may make more sense to develop an **organization Extension**.
+
+:::warning Changing the context deletes existing Extension Instances
+When changing the Extension Context, all existing Extension Instances are deleted.
+After the change, you must create a new Extension Instance to continue testing.
+:::
+
+:::info Extension Context cannot be changed after verification request
+The Extension Context can no longer be changed after requesting Extension verification.
+If you are unsure which context is right for your Extension, check the [Guide for choosing the Extension Context](../../../how-to/choose-a-context).
+The choice also determines which functionality your Extension can access.
+:::
+
+## Change the Extension Context
+
+The Extension Context is configured in mStudio.
+The process is identical to the one described in [Configure Extension](../../configure-extension#set-the-extension-context).
+Choose **"Organisation"** instead of **"Projekt"**.
+
+:::warning Webhook reachability
+To allow deletion of the Extension Instance, your Extension must also process the corresponding webhook.
+So if you change the context in your DEV setup, remember to start the tunnel first as described in the ["Expose Extension" guide](../../expose-extension).
+
+If you forgot to start the tunnel, that is fine.
+Webhooks are retried automatically.
+An exponential backoff is used.
+At most, you need to wait 10 minutes for the retry.
+:::
+
+Your Extension Instances will now be deleted, and then the Extension Context will be changed.
+As soon as you can see that the Extension Instances are gone, you can create a new one.

@@ -1,0 +1,329 @@
+---
+title: Deployment der Extension
+---
+
+Grundsätzlich gibt es **keine Vorschriften**, über welche Hosting-Strategie und bei welchem Hoster eine Extension bereitgestellt wird,
+da Extensions ausschließlich über Web-Technologien integriert werden.
+
+Im Folgenden wird ein **empfohlener Weg** präsentiert, wie die Extension einfach deployt werden kann.
+
+## Übersicht des Deployment-Wegs
+
+Der hier beschriebene Deployment-Weg nutzt folgende Bestandteile:
+
+| Bestandteil                          | Beschreibung                                                            |
+| ------------------------------------ | ----------------------------------------------------------------------- |
+| **GitHub**                           | Das Repository mit dem Quellcode der Extension                          |
+| **GitHub Actions**                   | CI/CD-Pipeline, die das Container-Image baut und das Deployment auslöst |
+| **GitHub Container Registry**        | Private Registry, in der das gebaute Container-Image gespeichert wird   |
+| **mStudio Container Hosting**        | Zielumgebung, in der die Extension als Container betrieben wird         |
+| **mittwald/deploy-container-action** | GitHub Action, die das Deployment ins mStudio durchführt                |
+
+Dieser Deployment-Weg eignet sich, wenn:
+
+- Der Quellcode der Extension in einem **GitHub Repository** liegen soll
+- Eine **automatisierte CI/CD-Pipeline** gewünscht ist
+- Das Container-Image **privat** bleiben soll
+- Das Deployment ins **mStudio Container Hosting** erfolgen soll
+
+:::info Alternative Wege
+Natürlich können auch andere Container-Registries (z. B. Docker Hub, GitLab Registry) oder andere CI/CD-Systeme verwendet werden.
+Die grundlegenden Schritte bleiben dabei ähnlich.
+:::
+
+## Anlegen einer zweiten Extension
+
+Damit nach Deployment und Umbau auch das lokale Entwicklungssystem weiterhin verwendet werden kann,
+empfiehlt es sich, für die **Prod Umgebung eine eigene Extension** anzulegen.
+Folge den Schritten aus der [Extension Konfiguration](../configure-extension) erneut mit einer zweiten Extension.
+Die **URLs** brauchst du zu diesem Zeitpunkt **noch nicht konfigurieren**, die werden sich für das produktive System unterscheiden.
+
+## Buchen eines Servers
+
+Für das Container-Hosting des mStudio wird ein **Server** benötigt.
+Im Projekthosting steht das Container-Hosting nicht zur Verfügung.
+
+![Einen Server buchen](/img/contribution/getting-started-guide/book-server.png)
+
+In diesem neuen Server kann nun mehrkostenfrei ein **Projekt erstellt** werden,
+in dem die Extension als Container gestartet werden kann.
+
+![Projekt im Server erstellen](/img/contribution/getting-started-guide/create-project-in-server.png)
+
+## GitHub Repository erstellen
+
+Da die Reference Extension von `github.com/mittwald/reference-extension` geklont wurde,
+zeigt das lokale Repository noch auf das Original-Repository.
+Für das Deployment wird jedoch ein **eigenes GitHub-Repository** benötigt.
+
+### Neues Repository auf GitHub anlegen
+
+1. Öffne [github.com/new](https://github.com/new)
+2. Vergib einen **Repository-Namen** (z.B. `my-extension`)
+3. Wähle die Sichtbarkeit **Private**
+4. Klicke auf **Create repository**
+
+### Lokales Repository umkonfigurieren
+
+Nach dem Erstellen des Repositories muss das lokale Repository auf den **neuen Remote** umgestellt und die **bestehende Pipeline entfernt** werden:
+
+```bash
+# Aktuelles Remote umbenennen (optional, falls du das Original behalten möchtest)
+git remote rename origin upstream
+
+# Neues Remote hinzufügen
+git remote add origin git@github.com:<dein-username>/<repository-name>.git
+
+# Die aktuelle Pipeline entfernen
+rm -rf ./.github
+
+# Die Änderungen committen
+git commit -a -m "remove pipeline"
+
+# Branch auf main umbenennen (die Reference Extension verwendet master)
+git branch -M main
+
+# Code in das neue Repository pushen
+git push -u origin main
+```
+
+:::info Upstream Aktualisierungen
+Falls du die Änderungen aus dem Original-Repository später übernehmen möchtest, kannst du das `upstream`-Remote behalten und mit `git fetch upstream` die Änderungen abrufen.
+:::
+
+## GitHub Container Registry
+
+Für das Deployment wird die **GitHub Container Registry (ghcr.io)** verwendet.
+Das Container-Image wird bei jedem Push automatisch gebaut und in der Registry veröffentlicht.
+
+Da das Container-Image **privat** bleiben soll, muss im mStudio eine entsprechende Registry-Konfiguration hinterlegt werden.
+
+### Personal Access Token erstellen
+
+Für den Zugriff auf die private GitHub Container Registry wird ein **Personal Access Token (classic)** benötigt:
+
+1. Öffne in GitHub **Settings** → **Developer settings** → **Personal access tokens** → **Tokens (classic)**
+2. Klicke auf **Generate new token (classic)**
+3. Vergib einen aussagekräftigen Namen (z.B. "mStudio Registry Access")
+4. Wähle den Scope **read:packages**
+5. Klicke auf **Generate token** und kopiere den Token
+
+:::warning
+Der Token wird nur einmal angezeigt. Speichere ihn sicher ab.
+:::
+
+### Private Registry im mStudio einrichten
+
+Damit das mStudio Container Hosting auf das private Image zugreifen kann, muss die Registry im Projekt authentifiziert werden:
+
+1. Navigiere im mStudio zu deinem **Projekt**
+2. Öffne den Bereich **Container** → **Registries**
+3. Klicke auf "GitHub"
+4. Klicke in der Sektion "Zugangsdaten" auf "Bearbeiten"
+5. Gib folgende Daten ein:
+   - **Benutzername**: Dein GitHub-Benutzername
+   - **Passwort/Access-Token**: Der zuvor erstellte Personal Access Token
+6. Klicke auf **Speichern**
+
+Weitere Details zur Einrichtung privater Registries findest du in der [Dokumentation zum Container Hosting](../../../platform/workloads/containers/#private-registries).
+
+## Stack-Definition erstellen
+
+Erstelle die Datei `deploy/stack.yaml` im Repository.
+Diese Datei definiert, welche Services im mStudio Container Hosting gestartet werden sollen:
+
+```yaml title="deploy/stack.yaml"
+services:
+  app:
+    image: "{{ .Env.IMAGE_TAG }}"
+    description: "Extension"
+    ports:
+      - "3000/tcp"
+    environment:
+      NODE_ENV: production
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: "{{ .Env.POSTGRES_USER }}"
+      POSTGRES_PASSWORD: "{{ .Env.POSTGRES_PASSWORD }}"
+      POSTGRES_DB: "{{ .Env.POSTGRES_DB }}"
+      ENCRYPTION_MASTER_PASSWORD: "{{ .Env.ENCRYPTION_MASTER_PASSWORD }}"
+      ENCRYPTION_SALT: "{{ .Env.ENCRYPTION_SALT }}"
+      EXTENSION_SECRET: "{{ .Env.EXTENSION_SECRET }}"
+      EXTENSION_ID: "{{ .Env.EXTENSION_ID }}"
+
+  db:
+    image: "postgres:16-alpine"
+    description: "Database"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: "{{ .Env.POSTGRES_USER }}"
+      POSTGRES_PASSWORD: "{{ .Env.POSTGRES_PASSWORD }}"
+      POSTGRES_DB: "{{ .Env.POSTGRES_DB }}"
+
+volumes:
+  postgres-data: {}
+```
+
+:::tip Platzhalter
+Die Platzhalter `{{ .Env.VARIABLE }}` werden durch die Umgebungsvariablen ersetzt, die im GitHub Actions Workflow definiert sind.
+:::
+
+## GitHub Actions Workflow
+
+Erstelle die Datei `.github/workflows/deploy.yml`:
+
+```yaml title=".github/workflows/deploy.yml"
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    outputs:
+      image_tag: ${{ steps.image_tag.outputs.value }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate image tag
+        id: image_tag
+        run: echo "value=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.image_tag.outputs.value }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to mStudio
+        uses: mittwald/deploy-container-action@v1
+        with:
+          api_token: ${{ secrets.MITTWALD_API_TOKEN }}
+          stack_id: ${{ vars.STACK_ID }}
+          stack_file: deploy/stack.yaml
+        env:
+          IMAGE_TAG: ${{ needs.build.outputs.image_tag }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          ENCRYPTION_MASTER_PASSWORD: ${{ secrets.ENCRYPTION_MASTER_PASSWORD }}
+          ENCRYPTION_SALT: ${{ secrets.ENCRYPTION_SALT }}
+          EXTENSION_SECRET: ${{ secrets.EXTENSION_SECRET }}
+          EXTENSION_ID: ${{ vars.EXTENSION_ID }}
+```
+
+Dieser Workflow **baut** das Docker-Image, **speichert** es in der Registry und **deployt** die Datenbank und Extension im mStudio.
+In den meisten Fällen bietet es sich an, zusätzliche Actions zur Sicherstellung der Code-Qualität zu ergänzen.
+
+## Secrets und Variablen konfigurieren
+
+Im GitHub Repository müssen folgende **Umgebungsvariablen** konfiguriert werden unter **Settings** → **Secrets and variables** → **Actions**.
+Die meisten Werte können vom **lokalen Setup abgeleitet** werden, also aus der `.env` entnommen werden.
+Falls du, wie empfohlen, eine **zweite Extension** angelegt hast, wähle für die `EXTENSION_ID` und `EXTENSION_SECRET` entsprechend die Werte der **Prod Extension**.
+
+### Repository secrets
+
+| Secret                       | Beschreibung                                                                                                                         |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `MITTWALD_API_TOKEN`         | API-Token mit Schreibzugriff aus dem [mStudio](https://studio.mittwald.de/app/profile/api-tokens)                                    |
+| `POSTGRES_USER`              | Benutzername für die PostgreSQL-Datenbank                                                                                            |
+| `POSTGRES_PASSWORD`          | Passwort für die PostgreSQL-Datenbank                                                                                                |
+| `POSTGRES_DB`                | Name der PostgreSQL-Datenbank                                                                                                        |
+| `ENCRYPTION_MASTER_PASSWORD` | Master-Passwort für die Ableitung des symmetrischen Schlüssels zur Verschlüsselung der Datenbank                                     |
+| `ENCRYPTION_SALT`            | Salt für die Ableitung des symmetrischen Schlüssels zur Verschlüsselung der Datenbank                                                |
+| `EXTENSION_SECRET`           | Extension Secret zur Authentifizierung von Frontend Fragmenten; wenn du eine zweite Extension angelegt hast, wähle das Secret dieser |
+
+### Repository variables
+
+| Variable       | Beschreibung                                                                                     |
+| -------------- | ------------------------------------------------------------------------------------------------ |
+| `STACK_ID`     | Die Stack-ID aus dem mStudio Container Hosting; **entspricht der Projekt-ID**                    |
+| `EXTENSION_ID` | ID der Extension im Marktplatz; wenn du eine zweite Extension angelegt hast, wähle die ID dieser |
+
+#### Stack-ID ermitteln
+
+Die **Stack-ID** findest du im mStudio:
+
+1. Navigiere zu deinem **Projekt** im Server
+2. Die **Stack-ID entspricht der Projekt-ID** und wird in der URL angezeigt: `https://studio.mittwald.de/app/projects/{projectId}/dashboard`
+
+## Deployment auslösen
+
+Das Deployment wird automatisch ausgelöst bei:
+
+- **Push auf `main`**: Deployt die aktuelle Version
+- **Git-Tag erstellen** (z.B. `v1.0.0`): Deployt eine Release-Version
+- **Manuell**: Über den "Run workflow"-Button in GitHub Actions
+
+Die Änderungen an der `deploy/stack.yaml` und der `.github/workflows/deploy.yml` müssen also nur noch in den `main`-Branch gepusht werden
+und die Extension sollte gebaut und deployt werden.
+
+```bash
+# Die Änderungen committen
+git commit -a -m "add pipeline"
+
+# Code in das neue Repository pushen
+git push
+```
+
+Die Extension sollte nach erfolgreichem Durchlaufen der Pipeline im mStudio laufen.
+
+![Die laufende Extension](/img/contribution/getting-started-guide/running-extension.png)
+
+## Domain auf die Extension zeigen lassen
+
+Um die Extension nun von außen erreichen zu können, muss das Ziel einer Domain auf die Extension konfiguriert werden.
+Das mStudio vergibt automatisch für jedes Projekt eine Projekt-Domain.
+
+Im "Domains"-Menü kann nun für diese Domain das Ziel auf den Extension-Container konfiguriert werden.
+
+![Eine Domain zuweisen](/img/contribution/getting-started-guide/assign-domain.png)
+
+## Extension Endpunkte konfigurieren
+
+Genau wie bei der [Extension Konfiguration](../configure-extension) müssen nun die Endpunkte für die Webhooks sowie des Frontend Fragments konfiguriert werden.
+Statt localhost- bzw. zrok-Adresse wird nun die Projekt-Domain verwendet.
+
+![Frontend Fragment Prod Extension](/img/contribution/getting-started-guide/prod-extension-frontend-fragment.png)
+![Webhook URL Prod Extension](/img/contribution/getting-started-guide/prod-extension-webhook-url.png)
+
+Damit ist die Extension fertig bereitgestellt.
+Wenn du testen willst, ob alles wie erwartet funktioniert, kannst du erneut eine Extension Instance erstellen und die Extension ausprobieren.
+
+Das Bereitstellen der Reference Extension wird in den wenigsten Fällen das Ziel eines Contributors sein.
+Wie du an diesem Punkt weiter machst, wenn du deine eigene Extension entwickeln willst, wird in den [nächsten Schritten](../next-steps/introduction) beschrieben.
+
+**Das Gute ist: Bei jedem `git push` in den `main`-Branch wird deine Extension automatisch aktualisiert!**

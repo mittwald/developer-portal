@@ -1,0 +1,117 @@
+---
+title: Configure Extension
+---
+
+## Register an Extension
+
+As soon as you are a Contributor, you can create an Extension in mStudio.
+In your organization, open tab **"Entwicklung"** and register a new Extension via the **"Anlegen"** button.
+At this point, you only enter a **name**. You can change it later at any time.
+
+Extension names must be **unique**.
+For development and production use, it is recommended to create separate Extensions.
+For example, development Extensions can include "(DEV)" in the name.
+
+:::info Extension lifecycle
+Extensions become **visible** in the marketplace only after they are **published**.
+This means you can safely create development or staging Extensions for your own development process.
+More information about the Extension lifecycle is described in the [Extension Concept](../../overview/extensions#lifecycle-of-an-extension).
+:::
+
+![Register Extension](/img/contribution/getting-started-guide/register-extension.png)
+
+## Set the Extension Context
+
+For every Extension, you must define in which **context** it should be **installable**.
+Available options are **"Organisation"** and **"Projekt"**.
+The Reference Extension is built as a project Extension.
+
+In tab **"Berechtigungen"**, click **"Bearbeiten"** in the **Extension Context** section.
+Then choose **"Projekt"** and save.
+
+:::info Choosing the Extension Context
+The Reference Extension is built as a project Extension.
+But this is not the right fit for every Extension idea.
+
+In the ["How do I choose the correct Extension Context?" guide](../../how-to/choose-a-context),
+we describe the impact of this choice and which factors matter most.
+:::
+
+![Extension context](/img/contribution/getting-started-guide/extension-context.png)
+
+## Configure Permissions
+
+The Reference Extension retrieves information about the user and the project where it is installed.
+It also allows changing the project name.
+To do that, Extension permissions must be configured as Scopes.
+This is always required when Extensions access the mStudio API.
+
+Like the Extension Context, configure permissions in tab **"Berechtigungen"**.
+Click **"Bearbeiten"** in the corresponding section.
+Then enable **"Projekt lesen"**, **"Projekt schreiben"**, and **"Benutzer lesen"**.
+
+:::info Available Scopes
+In the [Scopes guide](../../overview/concepts/scopes),
+we describe in detail which Scopes are available and how to identify the right one.
+If you have trouble finding the right Scope or a required Scope is missing, contact us.
+We are happy to help.
+:::
+
+![Set permissions](/img/contribution/getting-started-guide/scopes.png)
+
+## Generate Extension Secret
+
+A secret is required to authenticate Frontend Fragments.
+This secret can be generated in tab **"Berechtigungen"**, just like Extension Context and Scopes.
+After generation, the secret is shown **only once**.
+Store it in a safe place for configuring the Reference Extension.
+
+:::info Extension Secret vs. Extension Instance Secret
+An Extension Secret is not the same as an Extension Instance Secret.
+The Extension Secret applies to the Extension as a whole and exists once per Extension,
+while Extension Instance Secrets are issued per individual installation of an Extension.
+:::
+
+:::warning Generating a new secret
+You can issue a new secret for your Extension at any time.
+To keep your Extension working, the old secret is not invalidated immediately,
+but only after 24 hours.
+So the new secret must be stored in your Extension within those 24 hours,
+otherwise your Extension will lose access to the mStudio API.
+
+Once the new secret is configured,
+you can also manually invalidate the old one earlier.
+:::
+
+## Configure the Frontend URL
+
+The Reference Extension uses a **Frontend Fragment**.
+That means it implements a frontend that integrates seamlessly into mStudio.
+
+:::info Frontend Fragment vs. External Frontend
+Frontend Fragments are not the only way to provide a frontend for an Extension.
+If Frontend Fragments are too restrictive for your requirements or do not match your use case,
+you can also implement an External Frontend.
+
+The characteristics and differences between Frontend Fragments and External Frontends are explained in the [Frontend Development Concept](../../overview/concepts/frontend-development).
+:::
+
+To set the Frontend Fragment URL for the Reference Extension, open tab **"Frontend"** of the Extension,
+then click **"Hinzufügen"** in the **Frontend Fragments** section.
+
+![Add Frontend Fragment](/img/contribution/getting-started-guide/frontend-fragments.png)
+
+For a Frontend Fragment, you must choose an **anchor point**.
+It determines where the Extension frontend is embedded.
+The Reference Extension is built to be mounted at `/projects/project/menu/section/extensions/item`,
+which means as a menu entry within a project.
+
+You must also define a **display name** for the anchor point.
+For anchor points that behave like menu entries, this controls the menu label.
+For sections, this defines the section title.
+
+Finally, you must provide a **URL**.
+For an Extension currently in development, this can be a local address reachable from your machine.
+Since the Reference Extension runs on port 3000 by default, enter `http://localhost:3000`.
+
+![Configure Frontend Fragment](/img/contribution/getting-started-guide/frontend-fragment-configuration.png)

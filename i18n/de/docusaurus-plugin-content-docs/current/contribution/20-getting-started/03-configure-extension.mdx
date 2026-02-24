@@ -1,0 +1,114 @@
+---
+title: Konfiguration der Extension
+---
+
+## Extension registrieren
+
+Sobald du Contributor bist, kannst du im mStudio eine Extension anlegen.
+Rufe dafür in deiner Organisation den Tab **"Entwicklung"** auf und registriere über den Button **"Anlegen"** eine neue Extension.
+Zu diesem Zeitpunkt trägst du nur einen **Namen** ein. Diesen kannst du später jederzeit ändern.
+
+Extension-Namen müssen **eindeutig** sein.
+Für Entwicklungs- und Produktivzwecke empfiehlt es sich, getrennte Extensions anzulegen.
+Entwicklungs-Extensions können beispielsweise mit "(DEV)" im Namen gekennzeichnet werden.
+
+:::info Lebenszyklus von Extensions
+Extensions sind erst im Marktplatz **sichtbar**, wenn sie **veröffentlicht** wurden.
+Deswegen können problemlos für eigene Entwicklungsprozesse Entwicklungs- bzw. Staging-Extensions angelegt werden.
+Weitere Informationen zum Lebenszyklus von Extensions sind im [Extension Konzept](../../overview/extensions) erklärt.
+:::
+
+![Extension registrieren](/img/contribution/getting-started-guide/register-extension.png)
+
+## Setzen des Extension Context
+
+Für jede Extension muss festgelegt werden, in **welchem Kontext** sie **installierbar** sein soll.
+Zur Auswahl stehen **Organisation** und **Projekt**.
+Die Reference Extension ist als Projekt-Extension aufgebaut.
+
+Im **Tab "Berechtigungen"** klickst du in der Sektion **Extension Context** auf **Bearbeiten**.
+Wähle dann **Projekt** und speichere.
+
+:::info Wahl des Extension Context
+Die Reference Extension ist als Projekt-Extension aufgebaut.
+Das ist aber nicht für jede Extension-Idee sinnvoll.
+
+Welche Auswirkungen die Wahl hat und welche Faktoren für die Wahl entscheidend sind, haben wir im ["Wie wähle ich den richtigen Extension Context?"-Guide](../../how-to/choose-a-context) beschrieben.
+:::
+
+![Extension Context](/img/contribution/getting-started-guide/extension-context.png)
+
+## Berechtigungen konfigurieren
+
+Die Reference Extension ruft Informationen über den User und das Projekt, in dem sie installiert ist, ab.
+Außerdem bietet sie die Möglichkeit, den Namen des Projekts anzupassen.
+Um dazu in der Lage zu sein, müssen für die Extension Berechtigungen in Form von Scopes konfiguriert werden.
+Das muss immer gemacht werden, wenn Extensions auf die mStudio API zugreifen wollen.
+
+Genauso wie den Extension Context konfigurierst du auch die Berechtigungen im **Tab "Berechtigungen"**.
+Klicke dazu in der entsprechenden Sektion auf **"Bearbeiten"**.
+Stelle nun **Projekt lesen** und **Projekt schreiben** sowie **Benutzer lesen** ein.
+
+:::info Verfügbare Scopes
+Im [Guide zu Scopes](../../overview/concepts/scopes) haben wir ausführlicher beschrieben, welche Scopes verfügbar sind und wie der richtige Scope identifiziert werden kann.
+Wenn du Schwierigkeiten damit hast, den richtigen Scope zu finden oder dein Scope fehlt, komm gerne auf uns zu.
+Wir unterstützen dich gerne dabei.
+:::
+
+![Berechtigungen einstellen](/img/contribution/getting-started-guide/scopes.png)
+
+## Extension Secret generieren
+
+Für die Authentifizierung von Frontend Fragmenten wird ein Secret benötigt.
+Dieses Secret kann wie der Extension Context und die Scopes im **Tab "Berechtigungen"** generiert werden.
+Nach dem Generieren wird dir das Secret **einmalig** angezeigt.
+Merke es dir an einem sicheren Ort für die Konfiguration der Reference Extension.
+
+:::info Extension Secret und Extension Instance Secret
+Ein Extension Secret ist nicht das gleiche wie ein Extension Instance Secret.
+Während das Extension Secret für die gesamte Extension gilt und einmalig für eine Extension ist,
+werden Extension Instances für jede einzelne Instance, sprich Installation einer Extension, ausgestellt.
+:::
+
+:::warning Generieren eines neuen Secrets
+Du kannst dir jederzeit ein neues Secret für deine Extension ausstellen lassen.
+Damit deine Extension weiterhin funktioniert, wird das alte Secret nicht sofort,
+sondern erst nach 24 Stunden invalidiert.
+Das neue Secret muss also innerhalb von 24 Stunden in der Extension hinterlegt werden,
+damit die Extension nicht ihre Fähigkeit verliert, auf die mStudio API zuzugreifen.
+
+Wenn du das neue Secret in der Extension hinterlegt hast,
+kannst du das alte auch schon früher händisch invalidieren.
+:::
+
+## Konfigurieren der Frontend-URL
+
+Die Reference Extension verwendet ein **Frontend Fragment**.
+Das bedeutet, sie implementiert ein Frontend, das nahtlos in das mStudio integriert wird.
+
+:::info Frontend Fragment vs. External Frontend
+Frontend Fragmente sind nicht die einzige Möglichkeit, ein Frontend für eine Extension anzubieten.
+Wenn die Anforderungen an Frontend Fragmente für dich zu restriktiv sind oder nicht zu deinem Anwendungsfall passen,
+gibt es auch die Möglichkeit, ein externes Frontend zu implementieren.
+
+Die Eigenschaften und Unterschiede zwischen Frontend Fragmenten und externen Frontends sind im [Konzept zur Frontend Entwicklung](../../overview/concepts/frontend-development) erklärt.
+:::
+
+Um die URL für das Frontend Fragment der Reference Extension einzustellen, klicke im **Tab "Frontend"** der Extension in der Sektion **Frontend Fragments** auf **Hinzufügen**.
+
+![Frontend Fragment hinzufügen](/img/contribution/getting-started-guide/frontend-fragments.png)
+
+Für ein Frontend Fragment muss ein **Ankerpunkt** gewählt werden.
+Dieser bestimmt, an welcher Stelle das Frontend deiner Extension eingebunden werden soll.
+Die Reference Extension ist dafür gebaut, am Ankerpunkt `/projects/project/menu/section/extensions/item` eingehängt zu werden,
+also als Menüpunkt innerhalb eines Projekts.
+
+Für den Ankerpunkt muss außerdem ein **Anzeigename** definiert werden.
+Dieser bestimmt bspw. bei Ankerpunkten, die als Menüpunkte fungieren, wie der Menüpunkt heißt.
+Für Sektionen bestimmt der Anzeigename die Überschrift der Sektion.
+
+Schließlich muss eine **URL** angegeben werden.
+Für die in Entwicklung befindliche Extension kann hier auch eine auf dem **lokalen Client erreichbare Adresse** eingegeben werden.
+Da die Reference Extension standardmäßig auf Port 3000 läuft, trägst du hier `http://localhost:3000` ein.
+
+![Konfiguration des Frontend Fragments](/img/contribution/getting-started-guide/frontend-fragment-configuration.png)
