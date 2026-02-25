@@ -61,7 +61,7 @@ function MCPPageHeader() {
           </Link>
           <Link
             className="button button--secondary button--lg"
-            href="https://github.com/mittwald/mcp"
+            href="https://github.com/mittwald/mcp-server"
           >
             <Icon>
               <IconBrandGithub />
@@ -202,7 +202,9 @@ function OverviewFeature() {
                     id="mcp.overview.auth.oauth"
                     values={{ bold: <strong>OAuth 2.1</strong> }}
                   >
-                    {"{bold} for interactive agents with automatic token refresh"}
+                    {
+                      "{bold} for interactive agents with automatic token refresh"
+                    }
                   </Translate>
                 </li>
                 <li>
@@ -387,7 +389,9 @@ function WorkflowFeature() {
                     id="mcp.workflow.steps.discovery"
                     values={{ bold: <strong>Discovery</strong> }}
                   >
-                    {"{bold} — Your agent discovers relevant MCP tools and required inputs"}
+                    {
+                      "{bold} — Your agent discovers relevant MCP tools and required inputs"
+                    }
                   </Translate>
                 </li>
                 <li>
@@ -403,7 +407,9 @@ function WorkflowFeature() {
                     id="mcp.workflow.steps.execution"
                     values={{ bold: <strong>Execution</strong> }}
                   >
-                    {"{bold} — The agent performs tool calls and reports results"}
+                    {
+                      "{bold} — The agent performs tool calls and reports results"
+                    }
                   </Translate>
                 </li>
                 <li>
@@ -411,7 +417,9 @@ function WorkflowFeature() {
                     id="mcp.workflow.steps.verify"
                     values={{ bold: <strong>Verify</strong> }}
                   >
-                    {"{bold} — You run read checks and decide whether to proceed, retry, or roll back"}
+                    {
+                      "{bold} — You run read checks and decide whether to proceed, retry, or roll back"
+                    }
                   </Translate>
                 </li>
               </ol>
@@ -420,7 +428,9 @@ function WorkflowFeature() {
                   id="mcp.workflow.responsibility"
                   values={{ bold: <strong>Human responsibility:</strong> }}
                 >
-                  {"{bold} Destructive or cost-impacting changes should be approved explicitly. Treat the agent as an operator, not as an unattended process."}
+                  {
+                    "{bold} Destructive or cost-impacting changes should be approved explicitly. Treat the agent as an operator, not as an unattended process."
+                  }
                 </Translate>
               </p>
             </div>
