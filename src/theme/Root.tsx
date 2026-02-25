@@ -22,7 +22,7 @@ function PageViewTracker({ children }: PropsWithChildren<{}>) {
       customDimensions: [
         {
           id: 1, // language
-          value: location.pathname.startsWith("de") ? "de" : "en",
+          value: location.pathname.startsWith("/de") ? "de" : "en",
         },
       ],
     });
