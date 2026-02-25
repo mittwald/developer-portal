@@ -12,7 +12,20 @@ function PageViewTracker({ children }: PropsWithChildren<{}>) {
   const location = useLocation();
 
   useEffect(() => {
-    trackPageView({});
+    // Strip the language prefix from the URL; this allows us to track page
+    // views for both languages under the same URL in Matomo, while still
+    // distinguishing between them using a custom dimension.
+    trackPageView({
+      href:
+        "https://developer.mittwald.de" +
+        location.pathname.replace(/^\/de/, ""),
+      customDimensions: [
+        {
+          id: 1, // language
+          value: location.pathname.startsWith("de") ? "de" : "en",
+        },
+      ],
+    });
   }, [location]);
 
   return children;
