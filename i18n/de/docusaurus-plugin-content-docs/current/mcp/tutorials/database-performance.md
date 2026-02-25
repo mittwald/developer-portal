@@ -15,6 +15,8 @@ Dieses Tutorial ist eine Read-First-Performance-Review für Commerce- und High-T
 
 Der mittwald MCP-Server bietet Datenbank-Inventar-, Konfigurations- und Benutzerverwaltungsfunktionen. Für direkte Query-Inspektion, Performance-Metriken und Slow-Query-Analyse benötigst du zusätzliche MCP-Server, die sich direkt mit deinen MySQL- oder Redis-Instanzen verbinden können (zum Beispiel einen MySQL-MCP-Server mit Zugriff auf deine Datenbank-Credentials).
 
+Achte dabei immer darauf, möglichst nur Read-Only- bzw. Least-Privilege-Datenbankbenutzer zu verwenden, Credentials ausschließlich über sichere Secrets/Umgebungsvariablen bereitzustellen und sie niemals in Prompts, Chat-Verläufen, Logs oder Versionskontrolle einzufügen.
+
 :::
 
 ## Copy-Paste-Prompt {#copy-paste-prompt}
