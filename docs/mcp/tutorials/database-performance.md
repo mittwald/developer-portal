@@ -11,6 +11,13 @@ destructive: false
 
 This tutorial is a read-first performance review for commerce and high-traffic workloads.
 
+:::note[Additional MCP servers may be required]
+
+The mittwald MCP server provides database inventory, configuration, and user management capabilities. For direct query inspection, performance metrics, and slow query analysis, you will need additional MCP servers that can connect directly to your MySQL or Redis instances (for example, a MySQL MCP server with access to your database credentials).
+
+Always use a dedicated, least-privilege database user (read-only where possible) for these MCP servers and provide credentials via a secure secret mechanism (for example environment variables or your secret manager), never by pasting them into prompts, configuration files, or logs.
+:::
+
 ## Copy-paste prompt {#copy-paste-prompt}
 
 ```text

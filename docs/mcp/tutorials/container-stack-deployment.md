@@ -3,7 +3,6 @@ title: Container Stack Deployment
 description: Deploy and validate a Docker stack with clear verification and rollback prompts
 useCases:
   - containers-001-manage-resources
-  - containers-002-scale-app
   - containers-003-deploy-docker-stack
   - containers-004-manage-volumes
 destructive: true
@@ -22,7 +21,7 @@ Flow:
 3) Verify service health, ports, and persistent volumes.
 4) Report rollout status and any failing service IDs.
 
-Do not scale or delete resources unless I approve.
+Do not delete resources unless I approve.
 ```
 
 ## What the agent will do automatically {#what-agent-will-do}
@@ -34,14 +33,13 @@ Do not scale or delete resources unless I approve.
 
 ## What you (human) must still do {#what-you-must-do}
 
-- Approve scaling/deletion changes.
+- Approve deletion changes.
 - Provide missing env or secret values.
 - Decide rollback if health checks fail.
 
 ## Likely questions the agent will ask and good answers {#likely-questions}
 
 - Which stack should I deploy? -> `Use stack <stack-name> in project <project-id>.`
-- Can I scale services? -> `Scale only after initial health is green.`
 - Should I prune unused resources? -> `No, report only.`
 
 ## Verification prompt {#verification-prompt}
