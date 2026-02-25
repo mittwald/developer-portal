@@ -9,6 +9,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          token: '${{ secrets.RELEASE_USER_TOKEN }}'
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
@@ -25,7 +27,7 @@ jobs:
           mv oasdiff /usr/local/bin/oasdiff
       - name: Git Identity 🪪
         run: |
-          git config user.name "mittwald-machine"
+          git config user.name "mittwald-machine[bot]"
           git config user.email "mittwald-machine@users.noreply.github.com"
       - name: Generate API changelogs
         env:
@@ -35,7 +37,7 @@ jobs:
           
           if [ $(git status --porcelain changelog static/specs | wc -l) -gt 0 ] ; then
             git add changelog static/specs
-            git commit -m "Generate API changelog for $(date +%d-%m-%Y)";
+            git commit -m "chore(changelog): generate API changelog for $(date +%d-%m-%Y)";
           fi
       - name: Synchronize CLI docs
         run: |
@@ -43,12 +45,11 @@ jobs:
           
           if [ $(git status --porcelain docs/cli | wc -l) -gt 0 ] ; then
             git add docs/cli
-            git commit -m "Synchronize CLI documentation from mittwald/cli";
+            git commit -m "chore(cli): synchronize CLI documentation from mittwald/cli";
           fi
       - name: Run build
         run: |
           npm run build
       - name: Push changes
         run: |
-          git remote add publish "https://mittwald-machine:${{ secrets.RELEASE_USER_TOKEN }}@github.com/mittwald/developer-portal.git"
-          git push publish
+          git push
