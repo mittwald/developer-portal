@@ -7,7 +7,7 @@ description: Connect mittwald MCP to Cursor using OAuth (recommended) or API tok
 
 Cursor can connect to mittwald MCP over HTTP and use OAuth for authentication.
 
-This guide uses the Fly deployment endpoint:
+This guide uses the MCP endpoint:
 
 `https://mcp.mittwald.de/mcp`
 

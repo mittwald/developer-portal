@@ -42,7 +42,7 @@ Do read-only validation first, then ask for approval before each write.
 ## Wahrscheinliche Fragen, die der Agent stellen wird, und gute Antworten {#likely-questions}
 
 - Which project is the base installation in? → `Project <project-id>.`
-- Should each site have its own DB? → `Yes, one DB per site.`
+- Should each site have its own DB? → `No, TYPO3 multisite uses a single shared database.`
 - Include `www` + apex for SSL? → `Yes, both.`
 
 ## Verifizierungs-Prompt {#verification-prompt}
