@@ -189,8 +189,8 @@ API-Spezifikation ist gut gepflegt.
 Wenn du auf Einschränkungen oder Eigenheiten stößt – wie subtile Warnungen,
 Versionsunterschiede oder Abweichungen vom OpenAPI-Standard – priorisiere die
 Behebung der Grundursache, idealerweise durch Verbesserung oder Korrektur der
-Spezifikation selbst. Das Melden von Problemen oder das Einbringen von Fixes
-zur API-Spezifikation hilft der Community und verbessert die Ergebnisse für alle.
+Spezifikation selbst. Das [Melden von Problemen](https://github.com/mittwald/feature-requests/issues)
+oder das Einbringen von Fixes zur API-Spezifikation hilft der Community und verbessert die Ergebnisse für alle.
 
 **Vermeide unnötige Komplexität:**  
 Versuche, darauf zu verzichten, Workarounds oder eigene Patches für jeden Edge Case
@@ -249,6 +249,12 @@ mit `deactivate`. Unter Windows ist die Aktivierung `venv\Scripts\activate`.
 ```shellsession
 user@local $ curl --location --fail --silent 'https://api.mittwald.de/v2/openapi.json' > openapi.json
 ```
+
+:::note
+Um zu vermeiden, dass der generierte Client mit zu vielen Operationen überladen wird,
+kann es hilfreich sein, die OpenAPI-Spezifikation vor der Clientgenerierung zu filtern.
+Dies umfasst das Filtern veralteter Operationen, die andernfalls im Client als Platzhalter erscheinen könnten.
+:::
 
 ### Den Code-Generator ausführen {#run-generator}
 

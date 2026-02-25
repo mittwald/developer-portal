@@ -164,8 +164,8 @@ provided the API specification is well-maintained.
 
 If you encounter limitations or quirks—such as subtle warnings, version differences,
 or deviations from the OpenAPI standard—prioritize resolving the root cause,
-ideally by improving or fixing the specification itself. Raising issues or contributing fixes
-to the API spec helps the community and improves outcomes for everyone.
+ideally by improving or fixing the specification itself. Raising [issues](https://github.com/mittwald/feature-requests/issues)
+or contributing fixes to the API spec helps the community and improves outcomes for everyone.
 
 **Avoid unnecessary complexity:**  
 Try to refrain from introducing workarounds or custom patches for every edge case in generated clients.
@@ -219,6 +219,13 @@ On Windows, activation is `venv\Scripts\activate`.
 ```shellsession
 (venv) user@local $ curl --location --fail --silent 'https://api.mittwald.de/v2/openapi.json' > openapi.json
 ```
+
+:::note
+In order to avoid cluttering the generated client with too many operations,
+it might be helpful to filter the openapi specification before generating
+a client from it. This includes filtering deprecated operations, which otherwise
+might show up in client as stubs.
+:::
 
 ### Run the Code Generator {#run-generator}
 
