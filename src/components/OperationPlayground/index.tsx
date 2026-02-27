@@ -1,12 +1,16 @@
 import {
+  AccentBox,
   Action,
   ActionGroup,
   Button,
   Content,
+  Flex,
   Heading,
+  Icon,
   Modal,
   ModalTrigger,
   Section,
+  Text,
 } from "@mittwald/flow-react-components";
 import React, { useState } from "react";
 import { OpenAPIV3 } from "openapi-types";
@@ -15,7 +19,11 @@ import OperationPath from "./OperationPath";
 import QueryParametersSection from "./QueryParametersSection";
 import RequestBodySection from "./RequestBodySection";
 import ResponseSection from "./ResponseSection";
+import ApiKeyRequired from "./ApiKeyRequired";
+import ApiKeyForm from "./ApiKeyForm";
+import { useApiKey } from "./useApiKey";
 import styles from "./index.module.css";
+import { IconKey } from "@tabler/icons-react";
 import ParameterObject = OpenAPIV3.ParameterObject;
 import RequestBodyObject = OpenAPIV3.RequestBodyObject;
 
@@ -33,9 +41,18 @@ type RequestState = "idle" | "loading" | "success" | "error";
 /**
  * Interactive API playground that allows users to test API endpoints directly
  * from the documentation. Renders a modal with request configuration and
- * displays the response.
+ * displays the response. Requires an mStudio API key to be configured.
  */
 function OperationPlayground({ path, method, spec }: OperationPlaygroundProps) {
+  const {
+    apiKey,
+    userEmail,
+    isVerifying,
+    verificationError,
+    saveApiKey,
+    clearApiKey,
+  } = useApiKey();
+
   const [pathParams, setPathParams] = useState<Record<string, string>>({});
   const [queryParams, setQueryParams] = useState<Record<string, string>>({});
   const [requestBody, setRequestBody] = useState<string>(undefined);
@@ -69,6 +86,7 @@ function OperationPlayground({ path, method, spec }: OperationPlaygroundProps) {
       method: method.toUpperCase(),
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
       },
       body: requestBody,
     });
@@ -108,49 +126,96 @@ function OperationPlayground({ path, method, spec }: OperationPlaygroundProps) {
       <Modal size="m" offCanvas>
         <Heading>API Playground</Heading>
         <Content>
-          <Section>
-            <Heading>Request</Heading>
-            <div className={styles.operationPath}>
-              <HTTPMethod method={method} />
-              <OperationPath path={path} onChange={updatePathParam} />
-            </div>
-          </Section>
-
-          {showRequestInputs && hasQueryParams && (
-            <QueryParametersSection
-              parameters={specQueryParams}
-              queryParams={queryParams}
-              onQueryParamChange={updateQueryParam}
+          {!apiKey ? (
+            <ApiKeyRequired
+              isVerifying={isVerifying}
+              error={verificationError}
+              onSubmit={saveApiKey}
             />
-          )}
+          ) : (
+            <>
+              <Section>
+                <Heading>Request</Heading>
+                <div className={styles.operationPath}>
+                  <HTTPMethod method={method} />
+                  <OperationPath path={path} onChange={updatePathParam} />
+                </div>
+                <AccentBox>
+                  <Icon>
+                    <IconKey />
+                  </Icon>
+                  <Section>
+                    <Flex align="center">
+                      <Flex grow>
+                        <Text>
+                          Executing as <strong>{userEmail}</strong>
+                        </Text>
+                      </Flex>
+                      <Flex>
+                        <ApiKeyForm
+                          isVerifying={isVerifying}
+                          error={verificationError}
+                          onSubmit={saveApiKey}
+                        >
+                          <Button variant="plain">Change API key</Button>
+                        </ApiKeyForm>
+                        <Button
+                          variant="plain"
+                          color="danger"
+                          onClick={clearApiKey}
+                        >
+                          Forget API key
+                        </Button>
+                      </Flex>
+                    </Flex>
+                  </Section>
+                </AccentBox>
+              </Section>
 
-          {showRequestInputs && hasRequestBody && (
-            <RequestBodySection
-              requestBody={spec.requestBody as RequestBodyObject}
-              onRequestBodyChange={setRequestBody}
-            />
-          )}
+              {showRequestInputs && hasQueryParams && (
+                <QueryParametersSection
+                  parameters={specQueryParams}
+                  queryParams={queryParams}
+                  onQueryParamChange={updateQueryParam}
+                />
+              )}
 
-          {showResponse && (
-            <ResponseSection response={response} responseText={responseText} />
+              {showRequestInputs && hasRequestBody && (
+                <RequestBodySection
+                  requestBody={spec.requestBody as RequestBodyObject}
+                  onRequestBodyChange={setRequestBody}
+                />
+              )}
+
+              {showResponse && (
+                <ResponseSection
+                  response={response}
+                  responseText={responseText}
+                />
+              )}
+            </>
           )}
         </Content>
         <ActionGroup>
-          <Action onAction={executeRequest}>
-            <Button
-              isPending={requestState === "loading"}
-              isSucceeded={requestState === "success"}
-              isFailed={requestState === "error"}
-              color="accent"
-            >
-              Execute request
-            </Button>
-          </Action>
-          <Action onAction={reset}>
-            <Button variant="soft" color="secondary" slot="secondary">
-              Reset
-            </Button>
-          </Action>
+          {apiKey && (
+            <>
+              <Action onAction={executeRequest}>
+                <Button
+                  isPending={requestState === "loading"}
+                  isSucceeded={requestState === "success"}
+                  isFailed={requestState === "error"}
+                  color="accent"
+                >
+                  Execute request
+                </Button>
+              </Action>
+              <Action onAction={reset}>
+                <Button variant="soft" color="secondary" slot="secondary">
+                  Reset
+                </Button>
+              </Action>
+            </>
+          )}
           <Action closeModal>
             <Button variant="soft" color="secondary" slot="secondary">
               Cancel
