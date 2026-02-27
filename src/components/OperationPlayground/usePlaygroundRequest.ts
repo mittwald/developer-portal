@@ -67,29 +67,54 @@ export function usePlaygroundRequest({
   const executeRequest = useCallback(async () => {
     setRequestState("loading");
 
-    let url = "https://api.mittwald.de" + path;
-    for (const [param, value] of Object.entries(pathParams)) {
-      url = url.replace(`{${param}}`, value);
-    }
+    try {
+      let url = "https://api.mittwald.de" + path;
+      for (const [param, value] of Object.entries(pathParams)) {
+        url = url.replace(`{${param}}`, encodeURIComponent(value));
+      }
 
-    const queryString = new URLSearchParams(queryParams).toString();
-    if (queryString) {
-      url += `?${queryString}`;
-    }
+      const queryString = new URLSearchParams(queryParams).toString();
+      if (queryString) {
+        url += `?${queryString}`;
+      }
 
-    const res = await fetch(url, {
-      method: method.toUpperCase(),
-      headers: {
-        "Content-Type": "application/json",
+      const headers: HeadersInit = {
         Authorization: `Bearer ${apiKey}`,
-      },
-      body: requestBody,
-    });
+      };
 
-    const json = await res.json();
-    setResponseText(JSON.stringify(json, null, 2));
-    setRequestState(res.ok ? "success" : "error");
-    setResponse(res);
+      if (requestBody) {
+        headers["Content-Type"] = "application/json";
+      }
+
+      const res = await fetch(url, {
+        method: method.toUpperCase(),
+        headers,
+        body: requestBody || undefined,
+      });
+
+      const contentType = res.headers.get("content-type") || "";
+      const rawText = await res.text();
+
+      if (contentType.includes("application/json")) {
+        try {
+          const json = JSON.parse(rawText);
+          setResponseText(JSON.stringify(json, null, 2));
+        } catch {
+          setResponseText(rawText);
+        }
+      } else {
+        setResponseText(rawText);
+      }
+
+      setRequestState(res.ok ? "success" : "error");
+      setResponse(res);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Request failed";
+      setResponseText(message);
+      setRequestState("error");
+      setResponse(null);
+    }
   }, [path, method, apiKey, pathParams, queryParams, requestBody]);
 
   const updatePathParam = useCallback((name: string, value: string) => {
@@ -97,10 +122,15 @@ export function usePlaygroundRequest({
   }, []);
 
   const updateQueryParam = useCallback((name: string, value: string) => {
-    setQueryParams((prev) => ({
-      ...prev,
-      [name]: value === "" ? undefined : value,
-    }));
+    setQueryParams((prev) => {
+      const next = { ...prev };
+      if (value === "") {
+        delete next[name];
+      } else {
+        next[name] = value;
+      }
+      return next;
+    });
   }, []);
 
   return {
