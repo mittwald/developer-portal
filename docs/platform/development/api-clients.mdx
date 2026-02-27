@@ -244,6 +244,71 @@ a client from it. This includes filtering deprecated operations, which otherwise
 might show up in client as stubs.
 :::
 
+### (Optional) Adjust specification via overlays {#adjust-openapi-overlays}
+
+Although the raw OpenAPI specification can be used directly to create an API client,
+often it is very useful to adjust the base specification in order to generate customized
+clients.
+
+As such overlays are declarative be definition, some logic might be required in order to
+**generate** such overlays depending on your use case.
+
+:::note
+Overlays can be persisted for multiple usage and orchestration. Keep generated overlays
+**and** base specification as build artifacts in order to create reproducible builds.
+
+Maintain descriptive titles for your overlays as well as good descriptions. This
+will allow easier audits and bug tracking later down the line.
+:::
+
+Here is an example snippet from an overlay:
+
+```json
+{
+  "overlay": "1.1.0",
+  "info": {
+    "title": "Overlay: Remove deprecated and unwanted operations",
+    "version": "1.0.0",
+    "description": "Removes deprecated operations and, if tags given, non-matching ops; deletes empty paths. See overlay_generator.py for business rule logic."
+  },
+  "actions": [
+    {
+      "target": "$.paths['/v2/appinstallations/{appInstallationId}/actions/{action}'].post",
+      "remove": true,
+      "description": "Removed due to deprecation or filter"
+    }
+  ]
+}
+```
+
+The challenging part creating overlays is to find correct [JSONPath](https://www.rfc-editor.org/rfc/rfc9535.pdf)
+selectors in the `target` field of your `actions`.
+
+:::warning
+The range ( and power! ) of selectors available depends on the implementation of the patching
+tool used! In other words: When using wider selectors matching more than one element,
+there is a good chance the patching tool will only hit the first result!
+
+Prefer selectors matching exactly one element, be specific. Not only will this avoid subtle bugs
+in the patching tools available, its explicit nature also helps to avoid side-effects and track
+changes! That's why in most cases - especially when many operations need to be touched - such overlays
+should be **constructed** from a script rather than written by hand.
+:::
+
+Overlay application example using [oas-patcher](https://github.com/mcroissant/oas_patcher)
+
+```shellsession
+# overlay generator creating "openapi_filter_overlay.json"
+python tools/overlay_generator.py openapi.json openapi_filter_overlay.json
+
+# apply overlay create "openapi_from_overlay.json"
+oas-patch overlay openapi.json openapi_filter_overlay.json -o openapi_from_overlay.json
+```
+
+The resulting `openapi_from_overlay.json` is now filtered according to actions defined
+in `openapi_filter_overlay.json`. Keep those files bundled with base `openapi.json` in
+order to reproduce the exact same build later.
+
 ### Run the Code Generator {#run-generator}
 
 ```shellsession

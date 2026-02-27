@@ -273,6 +273,71 @@ kann es hilfreich sein, die OpenAPI-Spezifikation vor der Clientgenerierung zu f
 Dies umfasst das Filtern veralteter Operationen, die andernfalls im Client als Platzhalter erscheinen könnten.
 :::
 
+### (Optional) Spezifikation per Overlay anpassen {#adjust-openapi-overlays}
+
+Auch wenn du die rohe OpenAPI-Spezifikation direkt verwenden kannst um einen API-Client
+zu erstellen, ist es oft sinnvoll, die Basis-Spezifikation vorher anzupassen,
+um einen individuelleren Client zu erzeugen.
+
+Da Overlays deklarativ sind, kann es je nach Anwendungsfall notwendig sein,
+eigene Logik zu verwenden, um diese Overlays zu generieren.
+
+:::note
+Overlays kannst du speichern und mehrfach oder in Kombination anwenden.
+Bewahre sowohl die generierten Overlays **als auch** die Basis-Spezifikation als Build-Artefakte auf,
+damit du später reproduzierbare Builds erstellen kannst.
+
+Vergib verständliche Titel für deine Overlays und beschreibe sie präzise.
+Das erleichtert spätere Audits und die Fehlersuche.
+:::
+
+Hier ein Beispiel für ein Overlay:
+
+```json
+{
+  "overlay": "1.1.0",
+  "info": {
+    "title": "Overlay: Entferne veraltete und unerwünschte Operationen",
+    "version": "1.0.0",
+    "description": "Entfernt veraltete Operationen und – falls Tags angegeben sind – nicht passende Operationen; löscht leere Pfade. Siehe overlay_generator.py für die Business-Logik."
+  },
+  "actions": [
+    {
+      "target": "$.paths['/v2/appinstallations/{appInstallationId}/actions/{action}'].post",
+      "remove": true,
+      "description": "Wurde wegen Veralterung oder Filter entfernt"
+    }
+  ]
+}
+```
+
+Die Herausforderung beim Erstellen von Overlays ist es, die passenden [JSONPath](https://www.rfc-editor.org/rfc/rfc9535.pdf) 
+Selektoren für das `target`-Feld in den Aktionen zu bestimmen.
+
+:::warning
+Wie viele und welche Selektoren genutzt werden können, hängt vom verwendeten Patch-Tool ab.
+Wenn du einen breiten Selektor verwendest, der mehrere Elemente trifft, ist es möglich,
+dass das Tool nur das erste Element anpasst.
+
+Wähle Selektoren, die exakt ein Element treffen, und sei dabei so spezifisch wie möglich.
+Das hilft, Fehler und unerwünschte Nebenwirkungen bei Änderungen zu vermeiden.
+Besonders bei vielen Anpassungen sollten Overlays mit einem Skript generiert werden und nicht von Hand.
+:::
+
+Beispiel für das Anwenden eines Overlays mit [oas-patcher](https://github.com/mcroissant/oas_patcher):
+
+```shellsession
+# Overlay-Generator erstellt "openapi_filter_overlay.json"
+python tools/overlay_generator.py openapi.json openapi_filter_overlay.json
+
+# Overlay anwenden, erstellt "openapi_from_overlay.json"
+oas-patch overlay openapi.json openapi_filter_overlay.json -o openapi_from_overlay.json
+```
+
+Die resultierende `openapi_from_overlay.json` ist entsprechend den im `openapi_filter_overlay.json`
+definierten Aktionen gefiltert. Halte diese Dateien zusammen mit der Basis-`openapi.json` bereit,
+um Builds später exakt reproduzieren zu können.
+
 ### Den Code-Generator ausführen {#run-generator}
 
 ```shellsession
