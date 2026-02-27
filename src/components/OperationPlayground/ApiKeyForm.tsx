@@ -71,12 +71,12 @@ function ApiKeyForm({
           )}
         </Content>
         <ActionGroup>
+          <Action onAction={handleSubmit}>
+            <Button color="accent" isPending={isVerifying}>
+              Verify & Save
+            </Button>
+          </Action>
           <Action closeModal>
-            <Action onAction={handleSubmit}>
-              <Button color="accent" isPending={isVerifying}>
-                Verify & Save
-              </Button>
-            </Action>
             <Button variant="soft" color="secondary">
               Cancel
             </Button>
