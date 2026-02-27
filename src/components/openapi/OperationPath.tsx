@@ -1,5 +1,6 @@
 import { Fragment } from "react";
 import styles from "./OperationPath.module.css";
+import React from "react";
 
 function OperationPath({ path }: { path: string }) {
   const components = path.split("/");
