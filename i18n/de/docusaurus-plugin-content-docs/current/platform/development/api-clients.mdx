@@ -1,0 +1,661 @@
+---
+title: API-Clients erstellen
+sidebar_label: API-Clients erstellen
+description: Guide für die Erstellung eigner API-Clients aus der OpenAPI Spezifikation
+---
+
+# Einführung {#intro}
+
+Bei der Arbeit mit der mittwald-API gibt es viele Gründe, warum du
+einen eigenen API-Client erstellen möchtest – oder sogar musst –,
+anstatt ausschließlich auf offizielle SDKs zu setzen. Während
+Sprachpräferenzen und die Einhaltung von Unternehmensstandards häufige
+Beweggründe sind, gibt es mehrere zusätzliche Faktoren, die du
+berücksichtigen solltest:
+
+- **Programmiersprache und Technology Stack**  
+  Nicht alle Sprachen oder Plattformen verfügen über ein offizielles SDK.
+  Wenn dein Projekt eine Sprache, ein Framework oder eine Umgebung verwendet,
+  die nicht von Haus aus unterstützt wird, sorgt ein eigener Client für eine
+  reibungslose Integration.
+
+- **Erweiterte oder nicht standardmäßige Authentifizierungsabläufe**  
+  Einige Projekte erfordern flexible Authentifizierungsmethoden: die Verwendung
+  von Tokens aus Umgebungsvariablen, die Sicherung von Extension-Interaktionen,
+  die Handhabung von Session-Tokens in Browser-Szenarien oder die automatische
+  Rotation von Secrets. Offizielle Clients decken möglicherweise nicht alle neuen
+  oder komplexen organisationsspezifischen Authentifizierungsanforderungen ab.
+
+- **Integration in spezialisierte Umgebungen**  
+  Von CLI-Tools über browserbasierte Apps, Serverless-Funktionen bis hin zu
+  eingebetteten Systemen – Plattform- und Laufzeitbeschränkungen erfordern manchmal
+  maßgeschneiderte Clients, die für ihre spezifische Umgebung optimiert sind.
+
+- **Anpassungsfähigkeit an API-Änderungen und experimentelle Features**  
+  APIs entwickeln sich weiter – manchmal schnell. Das Erstellen eines eigenen Clients
+  kann dir helfen, Beta-Features zu nutzen, mit Endpunkten zu arbeiten, die noch nicht
+  offiziell unterstützt werden, oder dich schnell an Breaking Changes oder
+  herstellerspezifische Erweiterungen anzupassen.
+
+- **Architektonische und Integrationsflexibilität**  
+  Teams mit fortgeschrittenen Architekturmustern (wie Microservices, Middleware-Layering
+  oder Plugin-Systemen) benötigen oft mehr Kontrolle, wie z. B. das Einfügen von
+  benutzerdefiniertem Logging, Tracing oder Rate-Limiting auf Client-Ebene oder die
+  Zusammensetzung höherwertiger Abstraktionen über dem API-Transport.
+
+- **Sicherheit, Compliance und Auditing**  
+  Bestimmte Branchen und Organisationen verlangen, dass Code vollständig auditierbar
+  oder selbst gehostet ist, sich eng in interne Sicherheitstools integriert oder
+  Credentials auf benutzerdefinierte Weise verwaltet. Das Erstellen eines eigenen
+  Clients ermöglicht es dir, diese Anforderungen zu erfüllen.
+
+- **Testing, Mocking und lokale Entwicklung**  
+  Eigene Clients können Features enthalten, die für lokale Entwicklung und CI nützlich
+  sind, wie Mock-Datenmodi, Test-Doubles oder vereinfachte Authentifizierung für
+  frühes Prototyping, ohne sensible Credentials preiszugeben.
+
+- **Dokumentation, Lokalisierung und Onboarding**  
+  Manchmal ist ein eigener Client ein strategisches Asset: Er kann in der Muttersprache
+  des Teams geschrieben und dokumentiert werden oder mit Onboarding-Beispielen und
+  Anleitungen für die Entwickler deiner Organisation maßgeschneidert werden.
+
+- **Dependency Management und Code Ownership**  
+  Ein eigener Client ermöglicht es dir, Dependencies zu pinnen, die API-Oberfläche an
+  deine Bedürfnisse anzupassen und externe Drift zu vermeiden – entscheidend für
+  Organisationen mit strengen Stabilitäts- oder Sicherheitsstandards.
+
+**Zusammenfassend:**  
+Eigene API-Clients sind nicht nur eine Frage persönlicher oder Unternehmenspräferenzen –
+sie sind ein wichtiger Enabler für Integration, Compliance, Sicherheit und
+Entwicklerproduktivität.
+
+Indem du einen auf deine spezifischen Anforderungen zugeschnittenen Client entwickelst,
+stellst du sicher, dass deine Anwendungen robust, wartbar und zukunftssicher bleiben.
+
+# Vorbereitung {#preparation}
+
+Eine gründliche Vorbereitung ist die Grundlage für einen reibungslosen und effizienten
+Entwicklungsprozess für eigene API-Clients.
+
+Mit der richtigen Vorarbeit ist es oft möglich, den Großteil deines Clients automatisch
+zu generieren, mit minimaler manueller Intervention. Im Folgenden sind wichtige
+Vorbereitungsbereiche aufgeführt, die du vor dem Start berücksichtigen solltest:
+
+## Verstehe deinen Use Case und die Zielumgebung {#use-case-and-goal}
+
+- **Wo wird der Client ausgeführt?**  
+  Identifiziere, ob dein Client in serverseitigen Apps, browserbasierten Skripten,
+  Kommandozeilen-Tools, Serverless-Funktionen oder CI/CD-Pipelines verwendet wird.
+- **Wer sind die Endnutzer?**  
+  Berücksichtige interne Teams, externe Kunden oder Automatisierungstools, da dies
+  Features und Benutzerfreundlichkeit beeinflusst.
+- **Gibt es Plattformbeschränkungen?**  
+  Einige Umgebungen (wie Browser oder Serverless) können Einschränkungen bei
+  Authentifizierungsmethoden, Storage oder Dependencies haben.
+
+## Sammle und überprüfe die OpenAPI-Spezifikation {#get-openapi-specification}
+
+Lade die aktuelle OpenAPI-Spezifikation für die API herunter:
+
+```shellsession
+user@local $ curl --location --fail --silent 'https://api.mittwald.de/v2/openapi.json' > openapi.json
+```
+
+- **Validiere die Spezifikation:**  
+  Verwende OpenAPI-Validatoren (z. B. [Swagger Editor](https://editor.swagger.io/)),
+  um auf Fehler oder Inkonsistenzen zu prüfen.
+- **Prüfe auf Vollständigkeit:**  
+  Stelle sicher, dass alle erforderlichen Endpunkte, Authentifizierungsabläufe und
+  Schemas dokumentiert sind.
+
+## Kläre Authentifizierungs- und Sicherheitsanforderungen {#authentication-and-security}
+
+- **Authentifizierungsmethoden:**  
+  Muss dein Client API-Tokens, OAuth2, Extension-Secrets oder zusätzliche Mechanismen
+  unterstützen?
+- **Secret Management:**  
+  Stelle sicher, dass erforderliche Tokens oder Secrets verfügbar sind und sicher
+  eingebunden werden können (z. B. über Umgebungsvariablen, Config-Dateien, sichere Vaults).
+- **Plane für sichere Speicherung:**  
+  Hardcode niemals sensible Informationen im Client.
+
+## Wähle und richte deine Code-Generierungstools ein {#code-generator}
+
+- **Wähle einen Code-Generator:**  
+  Tools wie [OpenAPI Generator](https://openapi-generator.tech/),
+  [Swagger Codegen](https://github.com/swagger-api/swagger-codegen) oder
+  [Autorest](https://aka.ms/autorest) können Clients in vielen Sprachen erstellen.
+- **Prüfe die Kompatibilität:**  
+  Stelle sicher, dass dein gewähltes Tool deine bevorzugte Sprache und die
+  bereitgestellte OpenAPI-Version unterstützt.
+- **Installiere den Generator:**  
+  Richte das Codegen-Toolkit ein und mache dich mit seinen Optionen und
+  Konfigurationsdateien vertraut.
+
+## Bereite Generator- und Projektkonfiguration vor {#code-generator-config}
+
+- **Passe Generator-Einstellungen an:**  
+  Konfiguriere Type-Mappings, Serialisierungsoptionen, HTTP-Client-Auswahl,
+  Package-Naming und Code-Style entsprechend den Konventionen deines Projekts.
+- **Unterstützende Dateien:**  
+  Bereite Konfigurationen/Templates für Umgebungsvariablen, CI-Skripte,
+  Dokumentation und Testing vor.
+- **Versionierungs-Setup:**  
+  Entscheide, wie dein Client die API-Version widerspiegeln soll – dies hilft
+  Konsumenten, die API-Kompatibilität zu verstehen.
+
+## Plane für API-Evolution und Wartung {#api-evolution-and-maintenance}
+
+- **Automatisiere Updates:**  
+  Erwäge, den gesamten Fetch-Generate-Test-Prozess zu skripten, damit dein Client
+  mit der API-Evolution Schritt hält.
+- **Überwache API-Änderungen:**  
+  Abonniere API-Changelogs und sei bereit, bei Änderungen der OpenAPI-Spezifikation
+  neu zu generieren und zu testen.
+- **Handhabung von Breaking Changes:**  
+  Richte eine Versionskontrolle ein und plane, wie du Client-Updates verwaltest,
+  wenn die API-Struktur aktualisiert wird.
+
+## Identifiziere spezielle API-Features und Custom Logic {#custom-logic}
+
+- **Spezielle Endpunkte:**  
+  Beachte, ob die API Pagination, File-Uploads, Webhooks, lang laufende Operationen
+  oder andere fortgeschrittene Patterns enthält. Code-Generatoren erfordern
+  möglicherweise zusätzliche Konfiguration oder manuelle Anpassungen dafür.
+- **Fehlerbehandlung:**  
+  Prüfe auf konsistente Fehlerantwortformate und plane, wie der generierte Client
+  diese anzeigen soll.
+- **Eigene Workflows:**  
+  Wenn bestimmte Business-Flows zusammengesetzte oder mehrstufige API-Interaktionen
+  erfordern, dokumentiere diese Szenarien, um den Client nach der Generierung zu erweitern.
+
+Durch gründliche Vorbereitung entlang dieser Linien beschleunigst du nicht nur den
+initialen Client-Build, sondern stellst auch sicher, dass deine Lösung robust, sicher
+und wartbar bleibt, während sich sowohl deine Codebasis als auch die mittwald-API
+weiterentwickeln.
+
+## Arbeiten mit OpenAPI Overlays {#openapi-overlays}
+
+Um reproduzierbare Ergebnisse zu erzeugen und Anpassungsschritte sogar teilen zu können, sind [OpenAPI Overlays](https://learn.openapis.org/overlay/)
+eine gute Möglichkeit, die Basis-OpenAPI-Spezifikation auf eine wartbare Weise anzupassen.
+
+Anstatt generierte Clients oder die Mittwald OpenAPI-Spezifikation manuell zu verändern,
+erstellen wir ein Overlay mit Patch-Operationen, das dann auf die Original-
+Spezifikation angewendet werden kann, um Anpassungen vorzunehmen.
+
+Diese Overlays können gespeichert und wiederverwendet werden; in manchen Anwendungsfällen werden sogar mehrere Overlays
+hintereinander verwendet, zum Beispiel werden zuerst unerwünschte Operationen entfernt, anschließend das `description`-
+Feld für die benötigten Operationen übersetzt.
+
+Im folgenden Python-Beispiel wird diese Toolchain verwendet, um jegliches manuelles Filtern
+oder Anpassen der Spezifikation vollständig zu vermeiden und einen vollständig generierten Client aus reproduzierbaren
+Quellen zu erstellen.
+
+# Philosophie {#philosophy}
+
+Ein reibungsloser Entwicklungsworkflow basiert auf der Arbeit mit zuverlässigen,
+standardkonformen Tools und Spezifikationen. Beim Erstellen eigener API-Clients aus
+OpenAPI-Spezifikationen solltest du vor allem auf Einfachheit und Wartbarkeit achten.
+
+**Lass den Generator die Arbeit machen:**  
+Moderne OpenAPI-Client-Generatoren sind leistungsstark und bewältigen die meisten
+typischen API-Komplexitäten automatisch. In den meisten Fällen sollte minimale
+Konfiguration oder manuelle Intervention notwendig sein, vorausgesetzt, die
+API-Spezifikation ist gut gepflegt.
+
+Wenn du auf Einschränkungen oder Eigenheiten stößt – wie subtile Warnungen,
+Versionsunterschiede oder Abweichungen vom OpenAPI-Standard – priorisiere die
+Behebung der Grundursache, idealerweise durch Verbesserung oder Korrektur der
+Spezifikation selbst. Das [Melden von Problemen](https://github.com/mittwald/feature-requests/issues)
+oder das Einbringen von Fixes zur API-Spezifikation hilft der Community und verbessert die Ergebnisse für alle.
+
+**Vermeide unnötige Komplexität:**  
+Versuche, darauf zu verzichten, Workarounds oder eigene Patches für jeden Edge Case
+in generierten Clients einzuführen. Die Konzentration auf Generator-Konfiguration,
+anstatt auf manuelle Code-Änderungen oder Ad-hoc-"Fixes" an der Spezifikation,
+hält deinen Workflow nachhaltig und zukunftssicher.
+
+:::tip
+🌱 **Pflege deinen Generierungsprozess, nicht das Output.**  
+Investiere deine manuellen Bemühungen in die Verbesserung von Automatisierung, Testing und Pipeline-Robustheit – statt in aufwändige Bearbeitungen von generiertem Code.
+:::
+
+Zu den beliebten OpenAPI-Generatoren gehören [OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator) und andere. Teste generierte Clients mit einfachen API-Requests, um schnell zu validieren, dass sie wie erwartet funktionieren.
+
+**Fazit:**  
+Ein wenig Disziplin bei der Pflege eines sauberen, automatisierten Generierungs-Workflows
+reduziert nicht nur technische Schulden, sondern spart dir und deinem Team Zeit bei
+jedem neuen API-Release.
+
+# Beispiel – Python API Client {#example-python}
+
+**Anforderungen:**
+- Python-Installation (Version 3.10+ empfohlen)
+- Grundkenntnisse in Bash, Python, `pip` und virtuellen Umgebungen
+
+Ein Python-API-Client kann mit dem [openapi-python-client-Modul](https://github.com/openapi-generators/openapi-python-client) generiert werden.
+
+Da der Client selbst zu 100% generiert wird, konzentrieren wir uns auf die Erstellung
+einer **Pipeline** für automatisierte Client-Erstellung, Release und Updates. Im
+Folgenden beginnen wir mit dem manuellen Prozess zur Veranschaulichung – Automatisierung
+und Wartung werden im nächsten Abschnitt behandelt.
+
+## Einen Python mittwald API Client erstellen {#create-python-client}
+
+Bevor du den Workflow automatisierst, beginne damit, manuell einen Client in deiner
+Konsole zu generieren. Erstelle zunächst deinen Projektordner, richte eine virtuelle
+Python-Umgebung ein und installiere den Client-Generator:
+
+```shellsession
+user@local $ mkdir python-api-client
+user@local $ cd python-api-client
+user@local $ python3 -m venv venv
+user@local $ source venv/bin/activate
+(venv) user@local $ pip install openapi-python-client python-dotenv
+```
+
+:::note
+`(venv)` zeigt an, dass deine virtuelle Umgebung aktiv ist. Dies ändert deinen `PATH`,
+sodass `python` auf den lokalen Interpreter zeigt. Die Aktivierung für bash/zsh wird
+gezeigt; für andere Shells (PowerShell, fish, etc.) siehe `venv/bin/`. Deaktivierung
+mit `deactivate`. Unter Windows ist die Aktivierung `venv\Scripts\activate`.
+:::
+
+### Die OpenAPI-Spezifikation herunterladen {#fetch-openapi-specs}
+
+```shellsession
+user@local $ curl --location --fail --silent 'https://api.mittwald.de/v2/openapi.json' > openapi.json
+```
+
+:::note
+Um zu vermeiden, dass der generierte Client mit zu vielen Operationen überladen wird,
+kann es hilfreich sein, die OpenAPI-Spezifikation vor der Clientgenerierung zu filtern.
+Dies umfasst das Filtern veralteter Operationen, die andernfalls im Client als Platzhalter erscheinen könnten.
+:::
+
+### (Optional) Spezifikation per Overlay anpassen {#adjust-openapi-overlays}
+
+Auch wenn du die rohe OpenAPI-Spezifikation direkt verwenden kannst um einen API-Client
+zu erstellen, ist es oft sinnvoll, die Basis-Spezifikation vorher anzupassen,
+um einen individuelleren Client zu erzeugen.
+
+Da Overlays deklarativ sind, kann es je nach Anwendungsfall notwendig sein,
+eigene Logik zu verwenden, um diese Overlays zu generieren.
+
+:::note
+Overlays kannst du speichern und mehrfach oder in Kombination anwenden.
+Bewahre sowohl die generierten Overlays **als auch** die Basis-Spezifikation als Build-Artefakte auf,
+damit du später reproduzierbare Builds erstellen kannst.
+
+Vergib verständliche Titel für deine Overlays und beschreibe sie präzise.
+Das erleichtert spätere Audits und die Fehlersuche.
+:::
+
+Hier ein Beispiel für ein Overlay:
+
+```json
+{
+  "overlay": "1.1.0",
+  "info": {
+    "title": "Overlay: Entferne veraltete und unerwünschte Operationen",
+    "version": "1.0.0",
+    "description": "Entfernt veraltete Operationen und – falls Tags angegeben sind – nicht passende Operationen; löscht leere Pfade. Siehe overlay_generator.py für die Business-Logik."
+  },
+  "actions": [
+    {
+      "target": "$.paths['/v2/appinstallations/{appInstallationId}/actions/{action}'].post",
+      "remove": true,
+      "description": "Wurde wegen Veralterung oder Filter entfernt"
+    }
+  ]
+}
+```
+
+Die Herausforderung beim Erstellen von Overlays ist es, die passenden [JSONPath](https://www.rfc-editor.org/rfc/rfc9535.pdf) 
+Selektoren für das `target`-Feld in den Aktionen zu bestimmen.
+
+:::warning
+Wie viele und welche Selektoren genutzt werden können, hängt vom verwendeten Patch-Tool ab.
+Wenn du einen breiten Selektor verwendest, der mehrere Elemente trifft, ist es möglich,
+dass das Tool nur das erste Element anpasst.
+
+Wähle Selektoren, die exakt ein Element treffen, und sei dabei so spezifisch wie möglich.
+Das hilft, Fehler und unerwünschte Nebenwirkungen bei Änderungen zu vermeiden.
+Besonders bei vielen Anpassungen sollten Overlays mit einem Skript generiert werden und nicht von Hand.
+:::
+
+Beispiel für das Anwenden eines Overlays mit [oas-patcher](https://github.com/mcroissant/oas_patcher):
+
+```shellsession
+# Overlay-Generator erstellt "openapi_filter_overlay.json"
+python tools/overlay_generator.py openapi.json openapi_filter_overlay.json
+
+# Overlay anwenden, erstellt "openapi_from_overlay.json"
+oas-patch overlay openapi.json openapi_filter_overlay.json -o openapi_from_overlay.json
+```
+
+Die resultierende `openapi_from_overlay.json` ist entsprechend den im `openapi_filter_overlay.json`
+definierten Aktionen gefiltert. Halte diese Dateien zusammen mit der Basis-`openapi.json` bereit,
+um Builds später exakt reproduzieren zu können.
+
+### Den Code-Generator ausführen {#run-generator}
+
+```shellsession
+(venv) user@local $ openapi-python-client generate --path ./openapi.json
+```
+
+Der Generator kann Warnungen ausgeben.  
+**Wie mit Warnungen umgehen:**  
+- Wenn dein Projekt die API-Teile benötigt, die eine Warnung auslösen, musst du das zugrunde liegende Problem beheben.  
+- Wenn du diese Endpunkte oder Features nicht benötigst, kannst du die Warnungen sicher ignorieren.
+- Für blockierende Probleme in der OpenAPI-Spezifikation melde diese bitte über den [mittwald Feature Requests Tracker](https://github.com/mittwald/feature-requests).
+
+Halte den Wartungsaufwand gering; vermeide es, die OpenAPI-Spezifikation zu patchen, es sei denn, es ist unbedingt notwendig. Bevorzuge Generator-Konfigurationsanpassungen.
+
+### Den generierten Client installieren und testen {#install-client}
+
+Nach der Generierung erscheint ein `mittwald-api-client`-Ordner in deinem Projektverzeichnis. Installiere ihn zum Testen:
+
+```shellsession
+(venv) user@local $ pip install -e ./mittwald-api-client
+```
+
+Schaue dir die generierte `mittwald-api-client/README.md` an, um loszulegen. Teste deinen Client mit echten Business Cases; hier ist ein Starter-Skript für eine einfache GET-Operation:
+
+```python name=examples/python-client-get.py
+import os
+import sys
+from dotenv import load_dotenv
+from mittwald_api_client import AuthenticatedClient
+from mittwald_api_client.api.project import project_get_server
+
+def main():
+    """Test freshly built API client: set up an authenticated client from environment and fetch server info."""
+    load_dotenv()
+    API_TOKEN = os.getenv("API_TOKEN")
+    SERVER_ID = os.getenv("SERVER_ID")
+    if API_TOKEN is None or SERVER_ID is None:
+        print("API_TOKEN or SERVER_ID missing. Check environment.")
+        sys.exit(1)
+    client = AuthenticatedClient(
+        base_url="https://api.mittwald.de",
+        token=API_TOKEN,
+        follow_redirects=True,  # API returns 308 redirects, not expected by client by default
+    )
+    with client as myclient:
+        res = project_get_server.sync_detailed(
+            client=myclient,
+            server_id=SERVER_ID,
+        )
+    print("client call result:")
+    print(res)
+    print("---")
+
+if __name__ == '__main__':
+    main()
+```
+
+:::note
+Es wird dringend empfohlen, Credentials und Kontext über Umgebungsvariablen oder `.env`-Dateien zu verwalten, anstatt über Kommandozeilen-Argumente oder Hardcoding. Dieses Beispiel verwendet `dotenv.load_dotenv`, um Credentials aus `.env` zu laden.
+:::
+
+```text
+# Example .env file for local development
+API_TOKEN=your-api-token-here
+SERVER_ID=your-server-id-here
+```
+
+:::warning
+Committe niemals `.env` oder andere Secret-Dateien in die Versionskontrolle. Verwende `.gitignore`-Dateien, um solche Dateien von der Versionskontrolle auszuschließen.
+:::
+
+:::note
+Für fortgeschrittene oder leistungsintensive Anwendungsfälle erwäge die Verwendung der Async-API, die in modernen Clients verfügbar ist. Beginne synchron für Einfachheit; wechsle zu async, wenn nötig.
+:::
+
+### Nicht-GET-Operationen testen – Beispiel POST {#post-example}
+
+Um andere HTTP-Methoden (POST, PATCH, DELETE) zu verwenden, musst du Request-Body-Objekte konstruieren. Hier ist ein Beispiel für eine POST-Operation:
+
+```python name=examples/python-client-post.py
+import os
+import sys
+import time
+
+from dotenv import load_dotenv
+
+from mittwald_api_client import AuthenticatedClient
+from mittwald_api_client.api.project import project_create_project
+from mittwald_api_client.models import ProjectCreateProjectBody
+
+
+def main():
+    """
+    Test fresh built API client, set up authenticated client
+    from environment and fetch server information
+    """
+
+    load_dotenv()
+
+    API_TOKEN = os.getenv("API_TOKEN")
+    SERVER_ID = os.getenv("SERVER_ID")
+
+    if API_TOKEN is None or SERVER_ID is None:
+        print("API_TOKEN or SERVER_ID missing. Check environment.")
+        sys.exit(1)
+
+    client = AuthenticatedClient(
+        base_url="https://api.mittwald.de",
+        token=API_TOKEN,
+        follow_redirects=True,  # API returns 308 aka permanent redirects, NOT expected by client by default
+    )
+
+    with client as myclient:
+        res = project_create_project.sync(
+            client=myclient,
+            server_id=SERVER_ID,
+            body=ProjectCreateProjectBody.from_dict({
+                "description": f"python_post_test_project_{time.time()}"
+            })
+        )
+
+    print("client call result:")
+    print(res)
+    print("---")
+
+if __name__ == '__main__':
+    main()
+```
+
+Prüfe die generierten Client-Modelle auf erforderliche Felder und Strukturen.
+
+:::note
+Stelle auch sicher, dass du ein Token mit Schreibberechtigungen verwendest, wenn du CRUD-Operationen über die API ausführst.
+:::
+
+## Nach der Generierung – Aufräumen {#clean-up}
+
+- Überprüfe generierte Tests, README und Beispiel-Skripte, bevor du publizierst oder mit deiner Haupt-App integrierst.
+- Räume nicht benötigte Dateien auf, damit klar und fokussiert ist, was du auslieferst.
+
+## Package Naming – Hinweis zu Konflikten {#naming-conflicts}
+
+:::note
+Generierte Package-Namen (wie `mittwald-api-client`) können mit bestehenden Packages in PyPI kollidieren. Bei Bedarf passe die Generator-Config oder den Package-Namen vor der Veröffentlichung an, um Konflikte zu vermeiden.
+:::
+
+## Python mittwald API Client veröffentlichen {#publish-client}
+
+Die Veröffentlichung von API-Clients hängt von deinem Use Case ab; für hochspezialisierte Projekte ist eine Veröffentlichung möglicherweise nicht erforderlich. Für allgemeine oder wiederverwendbare Clients ist das öffentliche PyPI der Standard.
+
+Folge den Anweisungen in der generierten README für die Veröffentlichung. Beispiel für **test PyPI**:
+
+```shellsession
+(venv) user@local $ poetry config repositories.testpypi https://test.pypi.org/simple/
+(venv) user@local $ poetry config pypi-token.testpypi <TOKEN-HERE>
+(venv) user@local $ cd mittwald-api-client
+(venv) user@local $ poetry publish --build -r testpypi
+```
+
+Nach erfolgreicher Veröffentlichung:
+
+```shellsession
+(venv) user@local $ cd my-python-mittwald-project
+(venv) user@local $ pip install -i https://test.pypi.org/simple/ mittwald-api-client
+```
+
+:::note
+Die gleichen Schritte gelten für das produktive PyPI. Verwende eindeutige Package-Namen, um Konflikte zu vermeiden!
+:::
+
+Für Automatisierung und Wartung fahre bitte mit dem [Wartungs- & Pipeline-Abschnitt](#maintenance-pipeline) fort.
+
+## Python API Client-Generierung und -Release mit GitHub Actions automatisieren {#maintenance-pipeline}
+
+Um sicherzustellen, dass dein Python mittwald API Client immer auf dem neuesten Stand
+mit den neuesten API-Änderungen bleibt, kannst du eine CI/CD-Pipeline mit GitHub Actions
+einrichten. Dieser Workflow wird automatisch den Client aus der OpenAPI-Spezifikation
+regenerieren, testen und – optional – neue Versionen nach einem regelmäßigen Zeitplan
+(z. B. wöchentlich) veröffentlichen.
+
+### Voraussetzungen {#pipeline-requirements}
+
+- Dein Projekt-Repository auf GitHub.
+- Python 3.10+ in deinem Workflow spezifiziert.
+- Zugang zur mittwald OpenAPI-Spezifikations-URL.
+- Publishing-Credentials (z. B. PyPI-Token) als GitHub-Repository-Secrets gespeichert.
+
+### Erforderliche Dateien zum Repo hinzufügen {#pipeline-config}
+
+- Platziere deine Generator-Config-Datei (z. B. `.openapi-python-client-config.yml`) im Projekt-Root, falls erforderlich.
+- Behalte deine Test-Skripte und Beispiel-`.env.example`-Dateien eingecheckt, aber committe **niemals** echte Credentials.
+
+### Beispiel GitHub Actions Workflow {#example-workflow}
+
+Erstelle eine Datei unter `.github/workflows/client-release.yml`:
+
+```yaml name=.github/workflows/client-release.yml
+name: API Client Regeneration and Release
+
+permissions:
+  contents: write
+  id-token: write       # Required for OIDC with PyPI trusted publisher
+
+on:
+  schedule:
+    - cron: '0 4 * * 1'       # Runs every Monday at 04:00 UTC
+  workflow_dispatch:           # Allows manual trigger
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4   # v4 is latest stable at time of writing
+        with:
+          fetch-depth: 0   # Fetch all history and tags
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Upgrade pip, install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements_build.txt
+
+      - name: Download OpenAPI specification
+        run: curl --location --fail --silent 'https://api.mittwald.de/v2/openapi.json' > openapi.json
+
+      - name: Filter deprecated endpoints from OpenAPI spec
+        run: |
+          echo "Filtering specs ..."
+          python tools/filter_openapi_deprecated.py openapi.json openapi.json
+
+      - name: Set dynamic version in OpenAPI spec
+        run: |
+          LAST_TAG=$(git tag --sort=-creatordate | head -n 1)
+          python tools/adjust_openapi_version.py openapi.json $LAST_TAG
+
+      - name: Regenerate Client
+        run: openapi-python-client generate --overwrite --path ./openapi.json
+
+      - name: Install Generated Client for Testing
+        run: pip install -e ./mittwald-api-client
+
+      - name: Run Tests
+        run: |
+          python smoke_test.py
+
+      - name: Extract version from openapi.json
+        id: get_version
+        run: |
+          VERSION=$(jq -r '.info.version' openapi.json)
+          echo "RELEASE_VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Commit regenerated client
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add mittwald-api-client openapi.json
+          git commit -m "chore: update generated API client ${RELEASE_VERSION}" || echo "No changes to commit"
+          git push origin HEAD:${{ github.ref }}
+
+      - name: Build Package
+        run: |
+          cd mittwald-api-client
+          poetry build
+
+      - name: List build output
+        run: |
+          cd mittwald-api-client
+          ls -la dist
+
+      - name: Publish to TestPyPI using OIDC
+        if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
+        uses: pypa/gh-action-pypi-publish@v1.13.0
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          packages-dir: mittwald-api-client/dist
+          verbose: true
+
+      - name: Create and push git tag
+        if: success()
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag "v$RELEASE_VERSION"
+          git push origin "v$RELEASE_VERSION"
+        env:
+          RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
+
+      - name: Upload built packages for inspection
+        uses: actions/upload-artifact@v4
+        with:
+          name: built-dist
+          path: mittwald-api-client/dist/
+```
+
+### Best Practices und Tipps {#best-practices}
+
+- **Zeitplan weise wählen:**  
+  Verwende die `cron`-Scheduling-Syntax, um zu steuern, wie häufig Releases stattfinden (z. B. wöchentlich, täglich).
+- **Secrets sichern:**  
+  Konfiguriere deinen Workflow als Trusted Publisher auf PyPI und verwende die moderne `gh-action-pypi-publish`-Action. Dies ist die aktuelle Methode, um sichere und tokenlose Release-Pipelines zu erstellen.
+- **Testing:**  
+  Teste den regenerierten Client immer vor der Veröffentlichung. Füge aussagekräftige Business-Case-Tests hinzu, um zu verhindern, dass defekte Packages veröffentlicht werden.
+- **Manuelle Trigger:**  
+  Das `workflow_dispatch`-Event ermöglicht es Maintainern, Releases bei Bedarf auszulösen.
+- **Versionskontrolle:**  
+  Erwäge, Releases zu taggen oder Versionsnummern basierend auf API-/Spec-Änderungen zu aktualisieren.
+- **Artifact-Upload:**
+  Füge einen `upload-artifact`-Schritt hinzu, um Build-Output für Debugging und Inspektion zu bewahren.
+
+### Den Workflow erweitern {#extend-workflow}
+
+- Du kannst Schritte hinzufügen, um automatisch Release Notes, Tags oder Changelogs zu erstellen.
+- Unterstütze mehrere Python-Versionen durch Matrix-Builds, falls erforderlich.
+- Integriere Benachrichtigungen oder Fehlschlag-Alarme über Slack, E-Mail, etc.
+
+Mit diesem Setup bleibt dein API-Client aktuell, getestet und einfach verteilbar – ohne manuelle Intervention.
