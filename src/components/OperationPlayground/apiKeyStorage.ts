@@ -7,9 +7,19 @@ export interface StoredApiKeyData {
 }
 
 /**
+ * Check if localStorage is available (not during SSR).
+ */
+function isLocalStorageAvailable(): boolean {
+  return typeof window !== "undefined" && typeof localStorage !== "undefined";
+}
+
+/**
  * Load API key and user email from localStorage.
  */
 export function loadApiKeyData(): StoredApiKeyData {
+  if (!isLocalStorageAvailable()) {
+    return { apiKey: null, userEmail: null };
+  }
   return {
     apiKey: localStorage.getItem(API_KEY_STORAGE_KEY),
     userEmail: localStorage.getItem(USER_EMAIL_STORAGE_KEY),
@@ -20,6 +30,9 @@ export function loadApiKeyData(): StoredApiKeyData {
  * Save API key and user email to localStorage.
  */
 export function saveApiKeyData(apiKey: string, userEmail: string): void {
+  if (!isLocalStorageAvailable()) {
+    return;
+  }
   localStorage.setItem(API_KEY_STORAGE_KEY, apiKey);
   localStorage.setItem(USER_EMAIL_STORAGE_KEY, userEmail);
 }
@@ -28,6 +41,9 @@ export function saveApiKeyData(apiKey: string, userEmail: string): void {
  * Remove API key and user email from localStorage.
  */
 export function clearApiKeyData(): void {
+  if (!isLocalStorageAvailable()) {
+    return;
+  }
   localStorage.removeItem(API_KEY_STORAGE_KEY);
   localStorage.removeItem(USER_EMAIL_STORAGE_KEY);
 }
