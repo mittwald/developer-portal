@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
-
-const API_KEY_STORAGE_KEY = "mstudio-api-key";
-const USER_EMAIL_STORAGE_KEY = "mstudio-user-email";
+import {
+  clearApiKeyData,
+  loadApiKeyData,
+  saveApiKeyData,
+  verifyApiKey,
+} from "./apiKeyStorage";
 
 export interface ApiKeyState {
   /** The stored API key, or undefined if not set */
@@ -21,15 +24,6 @@ export interface UseApiKeyResult extends ApiKeyState {
   clearApiKey: () => void;
 }
 
-interface UserResponse {
-  userId: string;
-  email?: string;
-  person?: {
-    firstName?: string;
-    lastName?: string;
-  };
-}
-
 /**
  * Hook for managing mStudio API key storage and verification.
  * Persists the API key and user email in localStorage.
@@ -43,8 +37,7 @@ export function useApiKey(): UseApiKeyResult {
   >(undefined);
 
   useEffect(() => {
-    const storedKey = localStorage.getItem(API_KEY_STORAGE_KEY);
-    const storedEmail = localStorage.getItem(USER_EMAIL_STORAGE_KEY);
+    const { apiKey: storedKey, userEmail: storedEmail } = loadApiKeyData();
     if (storedKey) {
       setApiKey(storedKey);
     }
@@ -53,48 +46,30 @@ export function useApiKey(): UseApiKeyResult {
     }
   }, []);
 
-  const saveApiKey = useCallback(async (key: string): Promise<boolean> => {
-    setIsVerifying(true);
-    setVerificationError(undefined);
+  const handleSaveApiKey = useCallback(
+    async (key: string): Promise<boolean> => {
+      setIsVerifying(true);
+      setVerificationError(undefined);
 
-    try {
-      const response = await fetch("https://api.mittwald.de/v2/users/self", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${key}`,
-        },
-      });
+      const result = await verifyApiKey(key);
 
-      if (!response.ok) {
-        if (response.status === 401 || response.status === 403) {
-          setVerificationError("Invalid API key");
-        } else {
-          setVerificationError(`Verification failed: ${response.status}`);
-        }
+      if (!result.success) {
+        setVerificationError(result.error);
         setIsVerifying(false);
         return false;
       }
 
-      const user: UserResponse = await response.json();
-      const email = user.email ?? "Unknown";
-
-      localStorage.setItem(API_KEY_STORAGE_KEY, key);
-      localStorage.setItem(USER_EMAIL_STORAGE_KEY, email);
-
+      saveApiKeyData(key, result.email);
       setApiKey(key);
-      setUserEmail(email);
+      setUserEmail(result.email);
       setIsVerifying(false);
       return true;
-    } catch (error) {
-      setVerificationError("Network error during verification");
-      setIsVerifying(false);
-      return false;
-    }
-  }, []);
+    },
+    [],
+  );
 
-  const clearApiKey = useCallback(() => {
-    localStorage.removeItem(API_KEY_STORAGE_KEY);
-    localStorage.removeItem(USER_EMAIL_STORAGE_KEY);
+  const handleClearApiKey = useCallback(() => {
+    clearApiKeyData();
     setApiKey(undefined);
     setUserEmail(undefined);
     setVerificationError(undefined);
@@ -105,7 +80,7 @@ export function useApiKey(): UseApiKeyResult {
     userEmail,
     isVerifying,
     verificationError,
-    saveApiKey,
-    clearApiKey,
+    saveApiKey: handleSaveApiKey,
+    clearApiKey: handleClearApiKey,
   };
 }
