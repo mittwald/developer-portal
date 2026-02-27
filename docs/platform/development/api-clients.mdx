@@ -152,6 +152,23 @@ By thoroughly preparing along these lines, not only will you accelerate the init
 but you’ll also ensure your solution remains robust, secure, and maintainable as both your
 codebase and the mittwald API evolve.
 
+## Working with OpenAPI overlays {#openapi-overlays}
+
+In order to create reproducible output and even share customizing steps, [OpenAPI overlays](https://learn.openapis.org/overlay/)
+are a good way to adjust the base OpenAPI specification in a maintainable way.
+
+Instead of adjusting generated clients or the Mittwald OpenAPI specification manually,
+we create an overlay with patch operations, which then can be applied to the original
+specification for customization purposes.
+
+These overlays can be persisted and reused, for some use cases even stacks of overlays
+are used seuqentially, e.g. removing unwanted operations first, then translate `description`
+field for operations needed.
+
+In the following Python example this toolchain is used to avoid any manual filtering in
+the specification or adjustments entirely, creating fully generated client from reproducible
+sources.
+
 # Philosophy {#philosophy}
 
 A smooth development workflow relies on working with reliable, standards-compliant tools and specifications.
