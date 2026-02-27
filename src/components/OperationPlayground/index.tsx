@@ -1,32 +1,23 @@
 import {
-  Accordion,
   Action,
   ActionGroup,
   Button,
-  CodeBlock,
   Content,
-  FieldDescription,
   Heading,
-  Label,
   Modal,
   ModalTrigger,
   Section,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  TextArea,
-  TextField,
 } from "@mittwald/flow-react-components";
-import React, { Fragment, useState } from "react";
-import HTTPMethod from "@site/src/components/openapi/HTTPMethod";
-import styles from "./index.module.css";
+import React, { useState } from "react";
 import { OpenAPIV3 } from "openapi-types";
-import { generateSchemaExample } from "@site/src/openapi/generateSchemaExample";
-import ResponseStatus from "@site/src/components/OperationPlayground/ResponseStatus";
+import HTTPMethod from "@site/src/components/openapi/HTTPMethod";
+import OperationPath from "./OperationPath";
+import QueryParametersSection from "./QueryParametersSection";
+import RequestBodySection from "./RequestBodySection";
+import ResponseSection from "./ResponseSection";
+import styles from "./index.module.css";
 import ParameterObject = OpenAPIV3.ParameterObject;
+import RequestBodyObject = OpenAPIV3.RequestBodyObject;
 
 export interface OperationPlaygroundProps {
   path: string;
@@ -34,47 +25,13 @@ export interface OperationPlaygroundProps {
   spec: OpenAPIV3.OperationObject;
 }
 
-function OperationPath({
-  path,
-  onChange,
-}: {
-  path: string;
-  onChange: (param: string, value: string) => void;
-}) {
-  const components = path.split("/");
-  const parts = components.map((part, idx) => {
-    if (part.startsWith("{")) {
-      const paramName = part.slice(1, -1);
-      return (
-        <Fragment key={idx}>
-          <TextField
-            placeholder={paramName}
-            onChange={(e) => onChange(paramName, e)}
-          />
-          <span className={styles.operationPathItem}>/</span>
-        </Fragment>
-      );
-    }
-
-    return (
-      <Fragment key={idx}>
-        <span className={styles.operationPathItem}>{part}</span>
-        <span className={styles.operationPathItem}>/</span>
-      </Fragment>
-    );
-  });
-
-  return parts;
-}
+type RequestState = "idle" | "loading" | "success" | "error";
 
 function OperationPlayground({ path, method, spec }: OperationPlaygroundProps) {
   const [pathParams, setPathParams] = useState<Record<string, string>>({});
   const [queryParams, setQueryParams] = useState<Record<string, string>>({});
   const [requestBody, setRequestBody] = useState<string>(undefined);
-  const [requestState, setRequestState] = useState<
-    "idle" | "loading" | "success" | "error"
-  >("idle");
-
+  const [requestState, setRequestState] = useState<RequestState>("idle");
   const [response, setResponse] = useState<Response>(null);
   const [responseText, setResponseText] = useState<string>("");
 
@@ -87,10 +44,9 @@ function OperationPlayground({ path, method, spec }: OperationPlaygroundProps) {
     setResponseText("");
   };
 
-  const executeRequest = () => {
+  const executeRequest = async () => {
     setRequestState("loading");
 
-    // Construct the URL with path and query parameters
     let url = "https://api.mittwald.de" + path;
     for (const [param, value] of Object.entries(pathParams)) {
       url = url.replace(`{${param}}`, value);
@@ -101,21 +57,18 @@ function OperationPlayground({ path, method, spec }: OperationPlaygroundProps) {
       url += `?${queryString}`;
     }
 
-    (async () => {
-      const response = await fetch(url, {
-        method: method.toUpperCase(),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: requestBody,
-      });
+    const response = await fetch(url, {
+      method: method.toUpperCase(),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: requestBody,
+    });
 
-      response.json().then((j) => {
-        setResponseText(JSON.stringify(j, null, 2));
-        setRequestState(response.ok ? "success" : "error");
-        setResponse(response);
-      });
-    })();
+    const json = await response.json();
+    setResponseText(JSON.stringify(json, null, 2));
+    setRequestState(response.ok ? "success" : "error");
+    setResponse(response);
   };
 
   const updatePathParam = (name: string, value: string) => {
@@ -123,119 +76,57 @@ function OperationPlayground({ path, method, spec }: OperationPlaygroundProps) {
   };
 
   const updateQueryParam = (name: string, value: string) => {
-    if (value === "") {
-      value = undefined;
-    }
-    setQueryParams((prev) => ({ ...prev, [name]: value }));
+    setQueryParams((prev) => ({
+      ...prev,
+      [name]: value === "" ? undefined : value,
+    }));
   };
-
-  const sections = [
-    <Section key="request">
-      <Heading>Request</Heading>
-      <div className={styles.operationPath}>
-        <HTTPMethod method={method} />
-        <OperationPath path={path} onChange={updatePathParam} />
-      </div>
-    </Section>,
-  ];
 
   const specQueryParams =
     (spec.parameters?.filter(
       (param) => (param as ParameterObject).in === "query",
     ) as ParameterObject[]) || [];
 
-  if (specQueryParams.length > 0 && requestState === "idle") {
-    sections.push(
-      <Section key="query">
-        <Heading>Query Parameters</Heading>
-        {specQueryParams.map((param) => (
-          <TextField
-            onChange={(v) => updateQueryParam(param.name, v)}
-            value={queryParams[param.name] ?? ""}
-            placeholder={param.example}
-          >
-            <Label>{param.name}</Label>
-            {param.description ? (
-              <FieldDescription>{param.description}</FieldDescription>
-            ) : undefined}
-          </TextField>
-        ))}
-      </Section>,
-    );
-  }
+  const showRequestInputs = requestState === "idle";
+  const showResponse =
+    response && (requestState === "success" || requestState === "error");
 
-  if (spec.requestBody && requestState === "idle") {
-    if (
-      "content" in spec.requestBody &&
-      spec.requestBody.content["application/json"]?.schema
-    ) {
-      const schema = spec.requestBody.content["application/json"]
-        .schema as OpenAPIV3.SchemaObject;
-
-      const initialBody = JSON.stringify(
-        generateSchemaExample(schema),
-        null,
-        2,
-      );
-      sections.push(
-        <Section key="body">
-          <Heading>Request Body</Heading>
-          <TextArea
-            onChange={setRequestBody}
-            placeholder="Request body"
-            autoResizeMaxRows={10}
-            defaultValue={initialBody}
-          />
-        </Section>,
-      );
-    }
-  }
-
-  if ((response && requestState === "success") || requestState === "error") {
-    const headersAsArray: [string, string][] = [];
-    response.headers.forEach((v, k) => {
-      headersAsArray.push([k, v]);
-    });
-
-    sections.push(
-      <Section key="response">
-        <Heading>Response</Heading>
-        <ResponseStatus response={response} />
-        <Accordion defaultExpanded={false} variant="outline">
-          <Heading>Headers</Heading>
-          <Content>
-            <Table aria-label="Response headers">
-              <TableHeader>
-                <TableColumn>Header</TableColumn>
-                <TableColumn>Value</TableColumn>
-              </TableHeader>
-              <TableBody>
-                {headersAsArray.map(([key, value], idx) => (
-                  <TableRow key={idx}>
-                    <TableCell>{key}</TableCell>
-                    <TableCell>{value}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Content>
-        </Accordion>
-        <Accordion defaultExpanded={true} variant="outline">
-          <Heading>Response body</Heading>
-          <Content>
-            <CodeBlock code={responseText} copyable={true} />
-          </Content>
-        </Accordion>
-      </Section>,
-    );
-  }
+  const hasQueryParams = specQueryParams.length > 0;
+  const hasRequestBody = spec.requestBody && "content" in spec.requestBody;
 
   return (
     <ModalTrigger>
       <Button>Try it out</Button>
       <Modal size="m" offCanvas>
         <Heading>API Playground</Heading>
-        <Content>{sections}</Content>
+        <Content>
+          <Section>
+            <Heading>Request</Heading>
+            <div className={styles.operationPath}>
+              <HTTPMethod method={method} />
+              <OperationPath path={path} onChange={updatePathParam} />
+            </div>
+          </Section>
+
+          {showRequestInputs && hasQueryParams && (
+            <QueryParametersSection
+              parameters={specQueryParams}
+              queryParams={queryParams}
+              onQueryParamChange={updateQueryParam}
+            />
+          )}
+
+          {showRequestInputs && hasRequestBody && (
+            <RequestBodySection
+              requestBody={spec.requestBody as RequestBodyObject}
+              onRequestBodyChange={setRequestBody}
+            />
+          )}
+
+          {showResponse && (
+            <ResponseSection response={response} responseText={responseText} />
+          )}
+        </Content>
         <ActionGroup>
           <Action onAction={executeRequest}>
             <Button
