@@ -74,21 +74,19 @@ function OperationPathHeader({
   }
 
   return (
-    <>
-      <pre className={styles.meta}>
-        <HTTPMethod method={method} />
-        <span>
-          <OperationPath path={path} />
-        </span>
-        <CopyButton
-          text={baseURL + pathWithoutBase}
-          size="m"
-          variant="plain"
-          style={{ marginTop: -8, marginBottom: -8 }}
-        />
-        <OperationPlayground path={path} method={method} spec={spec} />
-      </pre>
-    </>
+    <pre className={styles.meta}>
+      <HTTPMethod method={method} />
+      <span>
+        <OperationPath path={path} />
+      </span>
+      <CopyButton
+        text={baseURL + pathWithoutBase}
+        size="m"
+        variant="plain"
+        style={{ marginTop: -8, marginBottom: -8 }}
+      />
+      <OperationPlayground path={path} method={method} spec={spec} />
+    </pre>
   );
 }
 
