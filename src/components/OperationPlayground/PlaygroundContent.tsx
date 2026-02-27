@@ -53,6 +53,7 @@ function PlaygroundContent({
   ...modalProps
 }: PlaygroundContentProps & ModalProps) {
   const {
+    pathParams,
     queryParams,
     requestState,
     response,
@@ -83,6 +84,7 @@ function PlaygroundContent({
         <RequestSection
           path={path}
           method={method}
+          pathParams={pathParams}
           onPathParamChange={updatePathParam}
           userEmail={userEmail}
           isVerifying={isVerifying}

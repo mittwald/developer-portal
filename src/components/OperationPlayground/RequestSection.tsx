@@ -10,6 +10,8 @@ export interface RequestSectionProps {
   path: string;
   /** The HTTP method */
   method: string;
+  /** Current path parameter values */
+  pathParams: Record<string, string>;
   /** Callback when a path parameter changes */
   onPathParamChange: (name: string, value: string) => void;
   /** The user's email address */
@@ -31,6 +33,7 @@ export interface RequestSectionProps {
 function RequestSection({
   path,
   method,
+  pathParams,
   onPathParamChange,
   userEmail,
   isVerifying,
@@ -43,7 +46,7 @@ function RequestSection({
       <Heading>Request</Heading>
       <div className={styles.operationPath}>
         <HTTPMethod method={method} />
-        <OperationPath path={path} onChange={onPathParamChange} />
+        <OperationPath path={path} values={pathParams} onChange={onPathParamChange} />
       </div>
       <ApiKeyInfo
         userEmail={userEmail}

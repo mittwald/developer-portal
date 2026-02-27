@@ -5,6 +5,8 @@ import styles from "./index.module.css";
 export interface OperationPathProps {
   /** The API path template, e.g. "/v2/projects/{projectId}/users/{userId}" */
   path: string;
+  /** Current path parameter values */
+  values: Record<string, string>;
   /** Callback fired when a path parameter value changes */
   onChange: (param: string, value: string) => void;
 }
@@ -14,7 +16,7 @@ export interface OperationPathProps {
  * Static path segments are displayed as text, while parameters (enclosed in
  * curly braces) become editable text fields.
  */
-function OperationPath({ path, onChange }: OperationPathProps) {
+function OperationPath({ path, values, onChange }: OperationPathProps) {
   const components = path.split("/");
   const parts = components.map((part, idx) => {
     if (part.startsWith("{")) {
@@ -23,7 +25,9 @@ function OperationPath({ path, onChange }: OperationPathProps) {
         <Fragment key={idx}>
           <TextField
             placeholder={paramName}
+            value={values[paramName] ?? ""}
             onChange={(e) => onChange(paramName, e)}
+            aria-label={`URL path parameter ${paramName}`}
           />
           <span className={styles.operationPathItem}>/</span>
         </Fragment>
