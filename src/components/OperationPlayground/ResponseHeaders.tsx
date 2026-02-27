@@ -12,9 +12,14 @@ import {
 import React from "react";
 
 export interface ResponseHeadersProps {
+  /** The Headers object from the fetch Response */
   headers: Headers;
 }
 
+/**
+ * Renders response headers in a collapsible accordion with a two-column table.
+ * Collapsed by default to reduce visual clutter.
+ */
 function ResponseHeaders({ headers }: ResponseHeadersProps) {
   const headersAsArray: [string, string][] = [];
   headers.forEach((v, k) => {

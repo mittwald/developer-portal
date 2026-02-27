@@ -4,10 +4,16 @@ import { OpenAPIV3 } from "openapi-types";
 import { generateSchemaExample } from "@site/src/openapi/generateSchemaExample";
 
 export interface RequestBodySectionProps {
+  /** OpenAPI request body definition */
   requestBody: OpenAPIV3.RequestBodyObject;
+  /** Callback fired when the request body content changes */
   onRequestBodyChange: (value: string) => void;
 }
 
+/**
+ * Renders a text area for editing the JSON request body. Automatically
+ * generates an example body from the OpenAPI schema as the initial value.
+ */
 function RequestBodySection({
   requestBody,
   onRequestBodyChange,

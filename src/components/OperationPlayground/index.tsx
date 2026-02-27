@@ -20,13 +20,21 @@ import ParameterObject = OpenAPIV3.ParameterObject;
 import RequestBodyObject = OpenAPIV3.RequestBodyObject;
 
 export interface OperationPlaygroundProps {
+  /** The API endpoint path, may contain path parameters like {id} */
   path: string;
+  /** The HTTP method (GET, POST, PUT, DELETE, etc.) */
   method: string;
+  /** The OpenAPI operation specification */
   spec: OpenAPIV3.OperationObject;
 }
 
 type RequestState = "idle" | "loading" | "success" | "error";
 
+/**
+ * Interactive API playground that allows users to test API endpoints directly
+ * from the documentation. Renders a modal with request configuration and
+ * displays the response.
+ */
 function OperationPlayground({ path, method, spec }: OperationPlaygroundProps) {
   const [pathParams, setPathParams] = useState<Record<string, string>>({});
   const [queryParams, setQueryParams] = useState<Record<string, string>>({});
