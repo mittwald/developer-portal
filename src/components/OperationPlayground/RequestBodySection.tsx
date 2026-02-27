@@ -1,4 +1,5 @@
 import { Heading, Section, TextArea } from "@mittwald/flow-react-components";
+import Translate, { translate } from "@docusaurus/Translate";
 import React from "react";
 import { OpenAPIV3 } from "openapi-types";
 import { generateSchemaExample } from "@site/src/openapi/generateSchemaExample";
@@ -28,10 +29,15 @@ function RequestBodySection({
 
   return (
     <Section>
-      <Heading>Request Body</Heading>
+      <Heading>
+        <Translate id="playground.request-body.title">Request Body</Translate>
+      </Heading>
       <TextArea
         onChange={onRequestBodyChange}
-        placeholder="Request body"
+        placeholder={translate({
+          id: "playground.request-body.placeholder",
+          message: "Request body",
+        })}
         autoResizeMaxRows={10}
         defaultValue={initialBody}
       />

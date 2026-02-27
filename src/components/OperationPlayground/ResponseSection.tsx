@@ -5,6 +5,7 @@ import {
   Heading,
   Section,
 } from "@mittwald/flow-react-components";
+import Translate from "@docusaurus/Translate";
 import React from "react";
 import ResponseStatus from "./ResponseStatus";
 import ResponseHeaders from "./ResponseHeaders";
@@ -24,11 +25,15 @@ export interface ResponseSectionProps {
 function ResponseSection({ response, responseText }: ResponseSectionProps) {
   return (
     <Section>
-      <Heading>Response</Heading>
+      <Heading>
+        <Translate id="playground.response.title">Response</Translate>
+      </Heading>
       <ResponseStatus response={response} />
       <ResponseHeaders headers={response.headers} />
       <Accordion defaultExpanded={true} variant="outline">
-        <Heading>Response body</Heading>
+        <Heading>
+          <Translate id="playground.response.body">Response body</Translate>
+        </Heading>
         <Content>
           <CodeBlock code={responseText} copyable={true} />
         </Content>

@@ -1,4 +1,5 @@
 import { Button, ModalTrigger } from "@mittwald/flow-react-components";
+import Translate from "@docusaurus/Translate";
 import React from "react";
 import { OpenAPIV3 } from "openapi-types";
 import ApiKeyRequired from "./ApiKeyRequired";
@@ -31,7 +32,9 @@ function OperationPlayground({ path, method, spec }: OperationPlaygroundProps) {
 
   return (
     <ModalTrigger>
-      <Button>Try it out</Button>
+      <Button>
+        <Translate id="playground.trigger">Try it out</Translate>
+      </Button>
       {!apiKey ? (
         <ApiKeyRequired
           isVerifying={isVerifying}

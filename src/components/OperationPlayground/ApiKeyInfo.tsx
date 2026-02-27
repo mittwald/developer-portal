@@ -6,6 +6,7 @@ import {
   Section,
   Text,
 } from "@mittwald/flow-react-components";
+import Translate from "@docusaurus/Translate";
 import { IconKey } from "@tabler/icons-react";
 import React from "react";
 import ApiKeyForm from "./ApiKeyForm";
@@ -43,7 +44,12 @@ function ApiKeyInfo({
         <Flex align="center">
           <Flex grow>
             <Text>
-              Executing as <strong>{userEmail}</strong>
+              <Translate
+                id="playground.apikey.executing-as"
+                values={{ email: <strong>{userEmail}</strong> }}
+              >
+                {"Executing as {email}"}
+              </Translate>
             </Text>
           </Flex>
           <Flex>
@@ -52,10 +58,16 @@ function ApiKeyInfo({
               error={verificationError}
               onSubmit={onSaveApiKey}
             >
-              <Button variant="plain">Change API key</Button>
+              <Button variant="plain">
+                <Translate id="playground.apikey.change">
+                  Change API key
+                </Translate>
+              </Button>
             </ApiKeyForm>
             <Button variant="plain" color="danger" onClick={onClearApiKey}>
-              Forget API key
+              <Translate id="playground.apikey.forget">
+                Forget API key
+              </Translate>
             </Button>
           </Flex>
         </Flex>

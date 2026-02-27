@@ -1,4 +1,5 @@
 import { Heading, Section } from "@mittwald/flow-react-components";
+import Translate from "@docusaurus/Translate";
 import React from "react";
 import HTTPMethod from "@site/src/components/openapi/HTTPMethod";
 import OperationPath from "./OperationPath";
@@ -43,10 +44,16 @@ function RequestSection({
 }: RequestSectionProps) {
   return (
     <Section>
-      <Heading>Request</Heading>
+      <Heading>
+        <Translate id="playground.request.title">Request</Translate>
+      </Heading>
       <div className={styles.operationPath}>
         <HTTPMethod method={method} />
-        <OperationPath path={path} values={pathParams} onChange={onPathParamChange} />
+        <OperationPath
+          path={path}
+          values={pathParams}
+          onChange={onPathParamChange}
+        />
       </div>
       <ApiKeyInfo
         userEmail={userEmail}

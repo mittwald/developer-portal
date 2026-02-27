@@ -6,6 +6,7 @@ import RequestBodySection from "./RequestBodySection";
 import ResponseSection from "./ResponseSection";
 import PlaygroundActions from "./PlaygroundActions";
 import { usePlaygroundRequest } from "./usePlaygroundRequest";
+import Translate from "@docusaurus/Translate";
 import ParameterObject = OpenAPIV3.ParameterObject;
 import RequestBodyObject = OpenAPIV3.RequestBodyObject;
 import {
@@ -79,7 +80,9 @@ function PlaygroundContent({
 
   return (
     <Modal {...modalProps}>
-      <Heading>API Playground</Heading>
+      <Heading>
+        <Translate id="playground.title">API Playground</Translate>
+      </Heading>
       <Content>
         <RequestSection
           path={path}

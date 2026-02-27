@@ -3,6 +3,7 @@ import {
   ActionGroup,
   Button,
 } from "@mittwald/flow-react-components";
+import Translate from "@docusaurus/Translate";
 import React from "react";
 import { RequestState } from "./usePlaygroundRequest";
 
@@ -32,17 +33,17 @@ function PlaygroundActions({
           isFailed={requestState === "error"}
           color="accent"
         >
-          Execute request
+          <Translate id="playground.actions.execute">Execute request</Translate>
         </Button>
       </Action>
       <Action onAction={onReset}>
         <Button variant="soft" color="secondary" slot="secondary">
-          Reset
+          <Translate id="playground.actions.reset">Reset</Translate>
         </Button>
       </Action>
       <Action closeModal>
         <Button variant="soft" color="secondary" slot="secondary">
-          Cancel
+          <Translate id="playground.actions.cancel">Cancel</Translate>
         </Button>
       </Action>
     </ActionGroup>

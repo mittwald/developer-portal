@@ -12,6 +12,7 @@ import {
   TextField,
   Alert,
 } from "@mittwald/flow-react-components";
+import Translate from "@docusaurus/Translate";
 import React, { useState } from "react";
 
 export interface ApiKeyFormProps {
@@ -48,7 +49,11 @@ function ApiKeyForm({
     <ModalTrigger>
       {children}
       <Modal size="s">
-        <Heading>Configure API Key</Heading>
+        <Heading>
+          <Translate id="playground.apikey.form.title">
+            Configure API Key
+          </Translate>
+        </Heading>
         <Content>
           <Section>
             <TextField
@@ -57,10 +62,16 @@ function ApiKeyForm({
               type="password"
               isRequired
             >
-              <Label>mStudio API Token</Label>
+              <Label>
+                <Translate id="playground.apikey.form.label">
+                  mStudio API Token
+                </Translate>
+              </Label>
               <FieldDescription>
-                Enter your mStudio API token. You can create one in the mStudio
-                dashboard under Account Settings → API Tokens.
+                <Translate id="playground.apikey.form.description">
+                  Enter your mStudio API token. You can create one in the
+                  mStudio dashboard under Account Settings → API Tokens.
+                </Translate>
               </FieldDescription>
             </TextField>
           </Section>
@@ -73,12 +84,14 @@ function ApiKeyForm({
         <ActionGroup>
           <Action onAction={handleSubmit}>
             <Button color="accent" isPending={isVerifying}>
-              Verify & Save
+              <Translate id="playground.apikey.form.submit">
+                Verify & Save
+              </Translate>
             </Button>
           </Action>
           <Action closeModal>
             <Button variant="soft" color="secondary">
-              Cancel
+              <Translate id="playground.actions.cancel">Cancel</Translate>
             </Button>
           </Action>
         </ActionGroup>

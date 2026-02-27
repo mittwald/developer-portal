@@ -1,4 +1,5 @@
 import { TextField } from "@mittwald/flow-react-components";
+import { translate } from "@docusaurus/Translate";
 import React, { Fragment } from "react";
 import styles from "./index.module.css";
 
@@ -27,7 +28,13 @@ function OperationPath({ path, values, onChange }: OperationPathProps) {
             placeholder={paramName}
             value={values[paramName] ?? ""}
             onChange={(e) => onChange(paramName, e)}
-            aria-label={`URL path parameter ${paramName}`}
+            aria-label={translate(
+              {
+                id: "playground.path-param.aria-label",
+                message: "URL path parameter {paramName}",
+              },
+              { paramName },
+            )}
           />
           <span className={styles.operationPathItem}>/</span>
         </Fragment>

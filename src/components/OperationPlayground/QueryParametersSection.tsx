@@ -5,6 +5,7 @@ import {
   Section,
   TextField,
 } from "@mittwald/flow-react-components";
+import Translate from "@docusaurus/Translate";
 import React from "react";
 import { OpenAPIV3 } from "openapi-types";
 import ParameterObject = OpenAPIV3.ParameterObject;
@@ -34,7 +35,11 @@ function QueryParametersSection({
 
   return (
     <Section>
-      <Heading>Query Parameters</Heading>
+      <Heading>
+        <Translate id="playground.query-params.title">
+          Query Parameters
+        </Translate>
+      </Heading>
       {parameters.map((param) => (
         <TextField
           key={param.name}

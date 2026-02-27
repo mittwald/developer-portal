@@ -9,6 +9,7 @@ import {
   ModalProps,
   Text,
 } from "@mittwald/flow-react-components";
+import Translate from "@docusaurus/Translate";
 import { IconKey } from "@tabler/icons-react";
 import React from "react";
 import ApiKeyForm from "./ApiKeyForm";
@@ -34,22 +35,32 @@ function ApiKeyRequired({
 }: ApiKeyRequiredProps & ModalProps) {
   return (
     <Modal {...modalProps}>
-      <Heading>API Playground</Heading>
+      <Heading>
+        <Translate id="playground.title">API Playground</Translate>
+      </Heading>
       <Content>
         <IllustratedMessage>
           <IconKey />
-          <Heading>API Key Required</Heading>
+          <Heading>
+            <Translate id="playground.apikey.required.title">
+              API Key Required
+            </Translate>
+          </Heading>
           <Text>
-            To use the API Playground, you need to configure your mStudio API
-            key first. Your API key will be stored in your browser's local
-            storage.
+            <Translate id="playground.apikey.required.description">
+              To use the API Playground, you need to configure your mStudio API
+              key first. Your API key will be stored in your browser's local
+              storage.
+            </Translate>
           </Text>
           <ApiKeyForm
             isVerifying={isVerifying}
             error={error}
             onSubmit={onSubmit}
           >
-            <Button color="accent">Add API Key</Button>
+            <Button color="accent">
+              <Translate id="playground.apikey.add">Add API Key</Translate>
+            </Button>
           </ApiKeyForm>
         </IllustratedMessage>
       </Content>
@@ -57,7 +68,7 @@ function ApiKeyRequired({
       <ActionGroup>
         <Action closeModal>
           <Button variant="soft" color="secondary">
-            Cancel
+            <Translate id="playground.actions.cancel">Cancel</Translate>
           </Button>
         </Action>
       </ActionGroup>
