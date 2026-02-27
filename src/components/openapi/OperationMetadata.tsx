@@ -18,6 +18,9 @@ import Translate from "@docusaurus/Translate";
 import Admonition from "@theme/Admonition";
 import isDeprecated from "@site/src/openapi/isDeprecated";
 import HTTPMethod from "@site/src/components/openapi/HTTPMethod";
+import React from "react";
+import OperationPlayground from "@site/src/components/OperationPlayground";
+import OperationObject = OpenAPIV3.OperationObject;
 
 function OperationIdHelp() {
   return (
@@ -57,14 +60,17 @@ function OperationPathHeader({
   method,
   path,
   baseURL,
+  spec,
 }: {
   method: string;
   path: string;
   baseURL: string;
+  spec: OperationObject;
 }) {
   const parsedBaseURL = new URL(baseURL);
+  let pathWithoutBase = path;
   if (path.startsWith(parsedBaseURL.pathname)) {
-    path = path.substring(parsedBaseURL.pathname.length);
+    pathWithoutBase = path.substring(parsedBaseURL.pathname.length);
   }
 
   return (
@@ -74,11 +80,12 @@ function OperationPathHeader({
         <OperationPath path={path} />
       </span>
       <CopyButton
-        text={baseURL + path}
+        text={baseURL + pathWithoutBase}
         size="m"
         variant="plain"
         style={{ marginTop: -8, marginBottom: -8 }}
       />
+      <OperationPlayground path={path} method={method} spec={spec} />
     </pre>
   );
 }
@@ -98,7 +105,12 @@ export function OperationMetadata({
 }) {
   return (
     <>
-      <OperationPathHeader method={method} path={path} baseURL={baseURL} />
+      <OperationPathHeader
+        method={method}
+        path={path}
+        baseURL={baseURL}
+        spec={spec}
+      />
 
       {isDeprecated(spec) && <DeprecationNotice />}
 
