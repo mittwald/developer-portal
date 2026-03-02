@@ -193,39 +193,38 @@ Quellen zu erstellen.
 
 # Philosophie {#philosophy}
 
-Ein reibungsloser Entwicklungsworkflow basiert auf der Arbeit mit zuverlässigen,
-standardkonformen Tools und Spezifikationen. Beim Erstellen eigener API-Clients aus
-OpenAPI-Spezifikationen solltest du vor allem auf Einfachheit und Wartbarkeit achten.
+Ein reibungsloser Entwicklungs-Workflow basiert auf zuverlässigen, standardkonformen Tools und Spezifikationen. Beim Erstellen von individuellen API-Clients auf Basis von OpenAPI-Spezifikationen sollten Einfachheit und Wartbarkeit immer oberste Priorität haben.
 
 **Lass den Generator die Arbeit machen:**  
-Moderne OpenAPI-Client-Generatoren sind leistungsstark und bewältigen die meisten
-typischen API-Komplexitäten automatisch. In den meisten Fällen sollte minimale
-Konfiguration oder manuelle Intervention notwendig sein, vorausgesetzt, die
-API-Spezifikation ist gut gepflegt.
+Moderne OpenAPI-Client-Generatoren sind leistungsfähig und bewältigen automatisch die meisten typischen API-Komplexitäten. In den allermeisten Fällen sind minimale Konfiguration und kaum manuelle Eingriffe notwendig, sofern die API-Spezifikation gepflegt und aktuell ist.
 
-Wenn du auf Einschränkungen oder Eigenheiten stößt – wie subtile Warnungen,
-Versionsunterschiede oder Abweichungen vom OpenAPI-Standard – priorisiere die
-Behebung der Grundursache, idealerweise durch Verbesserung oder Korrektur der
-Spezifikation selbst. Das [Melden von Problemen](https://github.com/mittwald/feature-requests/issues)
-oder das Einbringen von Fixes zur API-Spezifikation hilft der Community und verbessert die Ergebnisse für alle.
+Solltest du auf Einschränkungen oder Eigenheiten stoßen – wie etwa Warnungen, Versionsdifferenzen oder Abweichungen vom OpenAPI-Standard – behebe am besten die Ursache. Idealerweise verbesserst oder korrigierst du die Spezifikation selbst. Ein Issue im [mittwald/feature-requests](https://github.com/mittwald/feature-requests/issues) zu erstellen oder direkt Verbesserungsvorschläge einzureichen, hilft nicht nur dir selbst, sondern der gesamten Community.
 
-**Vermeide unnötige Komplexität:**  
-Versuche, darauf zu verzichten, Workarounds oder eigene Patches für jeden Edge Case
-in generierten Clients einzuführen. Die Konzentration auf Generator-Konfiguration,
-anstatt auf manuelle Code-Änderungen oder Ad-hoc-"Fixes" an der Spezifikation,
-hält deinen Workflow nachhaltig und zukunftssicher.
+## OpenAPI-Overlays für flexible Entwicklung nutzen
+
+Ein großer Vorteil dieses Workflows ist die Anpassungsfähigkeit durch **OpenAPI-Overlays** – Filter oder Patches, die auf die Basisspezifikation angewendet werden, um spezialisierte oder eingeschränkte API-Sichten zu erzeugen. Die Overlay-Verarbeitung ermöglicht es dir:
+
+- Schnell Client-Bibliotheken für bestimmte Teams, Produkte oder Anwendungsfälle zu erstellen, indem gezielt Endpunkte ein- oder ausgeschlossen werden.
+- API-Änderungen oder Individualisierungen ohne manuelles Editieren des Codes zu prototypisieren und abzusichern.
+- Robustheit zu garantieren: Jeder Overlay-basierte Client steht garantiert im Einklang mit seiner spezifizierten Schnittstelle, weil er denselben Vertrags-Testprozess wie die "normale" Version durchläuft.
+
+Mit diesem Ansatz wird dein Client-Generierungsprozess **dynamisch und widerstandsfähig**: Ändere einfach die Basis- oder Overlay-Spezifikation, regeneriere Client und Mock-Server, und der Test-Workflow prüft automatisch, ob die neue Client-/Server-Kombo mit dem gewünschten API-Vertrag übereinstimmt.
+
+**Mit Vollständigkeitstests den Vertragsanspruch einlösen:**  
+Systematische Tests, die sicherstellen, dass jede `operationId` aus der OpenAPI-Spezifikation tatsächlich als aufrufbare Methode im Client auftaucht, gewährleisten vollständige, vertragsbasierte Abdeckung. Dieser Mapping-Test fungiert als schneller, strenger „Türsteher“ und zeigt zuverlässig Diskrepanzen auf – sei es durch Overlays, Generator-Updates oder API-Weiterentwicklungen. Gefilterte Spezifikationen sind so nicht nur praktisch, sondern werden zu verifizierbaren Bausteinen im gesamten API-Lifecycle.
+
+**Komplexität vermeiden:**  
+Vermeide möglichst Workarounds oder individuelle Patches für jeden Spezialfall im generierten Client. Setze stattdessen auf Generator-Konfiguration und Verbesserungen an der Spezifikation, nicht auf manuelle Nachbearbeitung. So bleibt dein Workflow zukunftsfähig und wartungsarm.
 
 :::tip
-🌱 **Pflege deinen Generierungsprozess, nicht das Output.**  
-Investiere deine manuellen Bemühungen in die Verbesserung von Automatisierung, Testing und Pipeline-Robustheit – statt in aufwändige Bearbeitungen von generiertem Code.
+🌱 **Pflege deinen Generierungsprozess, nicht das Ergebnis.**  
+Stecke dein Know-how in Automatisierung, Overlays und robuste Pipelines – und nicht in aufwendige, händische Nachbesserungen am generierten Code.
 :::
 
-Zu den beliebten OpenAPI-Generatoren gehören [OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator) und andere. Teste generierte Clients mit einfachen API-Requests, um schnell zu validieren, dass sie wie erwartet funktionieren.
+Bekannte OpenAPI-Generatoren sind z.B. der [OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator). Teste generierte Clients zunächst mit einfachen API-Requests auf Funktionsfähigkeit und führe zusätzlich Vertragsvollständigkeitstests durch, um jede API-Änderung sicher im Client abzubilden.
 
 **Fazit:**  
-Ein wenig Disziplin bei der Pflege eines sauberen, automatisierten Generierungs-Workflows
-reduziert nicht nur technische Schulden, sondern spart dir und deinem Team Zeit bei
-jedem neuen API-Release.
+Etwas Disziplin beim Aufbau eines sauberen, automatisierten und Overlay-fähigen Client-Workflows reduziert technische Schulden, ermöglicht schnelles Prototyping und spart dir und deinem Team mit jedem neuen API-Release Zeit und Mühe.
 
 # Beispiel – Python API Client {#example-python}
 

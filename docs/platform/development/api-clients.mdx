@@ -171,34 +171,38 @@ sources.
 
 # Philosophy {#philosophy}
 
-A smooth development workflow relies on working with reliable, standards-compliant tools and specifications.
-When building custom API clients from OpenAPI specifications, aim for simplicity and maintainability above all.
+A smooth development workflow relies on working with reliable, standards-compliant tools and specifications. When building custom API clients from OpenAPI specifications, aim for simplicity and maintainability above all.
 
 **Let the generator do the work:**  
-Modern OpenAPI client generators are powerful and handle the majority of typical API complexities automatically.
-In most cases, minimal configuration or manual intervention should be necessary,
-provided the API specification is well-maintained.
+Modern OpenAPI client generators are powerful and handle the majority of typical API complexities automatically. In most cases, minimal configuration or manual intervention should be necessary, provided the API specification is well-maintained.
 
-If you encounter limitations or quirks—such as subtle warnings, version differences,
-or deviations from the OpenAPI standard—prioritize resolving the root cause,
-ideally by improving or fixing the specification itself. Raising [issues](https://github.com/mittwald/feature-requests/issues)
-or contributing fixes to the API spec helps the community and improves outcomes for everyone.
+If you encounter limitations or quirks—such as subtle warnings, version differences, or deviations from the OpenAPI standard—prioritize resolving the root cause, ideally by improving or fixing the specification itself. Raising [issues](https://github.com/mittwald/feature-requests/issues) or contributing fixes to the API spec helps the community and improves outcomes for everyone.
+
+## Leverage OpenAPI Overlays for Agile Development
+
+One major strength of this workflow is its adaptability through **OpenAPI overlays**—patches or filters applied to the base API specification to generate custom or restricted views of the API. By processing overlays, you can:
+
+- Rapidly create client libraries for specific teams, products, or use cases by selectively including or excluding endpoints.
+- Prototype and validate API changes or customizations without manual code edits.
+- Ensure robustness: every overlay-generated client is guaranteed to be in sync with its filtered specification by running the same contract-verification tests.
+
+This approach makes your client generation pipeline **dynamic and robust**—simply adjust the base or overlay specification, regenerate, and the testing workflow will immediately verify that the new client and server mock both match the intended contract.
+
+**Test completeness to fulfill your contract:**  
+Systematically testing that every `operationId` in your OpenAPI spec is reflected as a callable method in your generated client ensures full, contract-based coverage. This mapping test acts as a fast, strict “gatekeeper,” surfacing any discrepancies introduced by overlays, generator upgrades, or API evolutions. Filtered specs are thus not only a convenience, but become rigorously verifiable building blocks in your API lifecycle.
 
 **Avoid unnecessary complexity:**  
-Try to refrain from introducing workarounds or custom patches for every edge case in generated clients.
-Focusing on generator configuration, rather than manual code changes or ad hoc “fixes” to the spec,
-keeps your workflow sustainable and future-proof.
+Try to refrain from introducing workarounds or custom patches for every edge case in generated clients. Focusing on generator configuration, rather than manual code changes or ad hoc “fixes” to the spec, keeps your workflow sustainable and future-proof.
 
 :::tip
 🌱 **Maintain your generation process, not the output.**  
-Let your manual efforts go into improving automation, testing, and pipeline robustness—rather than into laborious edits of generated code.
+Let your manual efforts go into improving automation, overlays, and pipeline robustness—rather than into laborious edits of generated code.
 :::
 
-Popular OpenAPI generators include [OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator) and others. Test generated clients with simple API requests to quickly validate they operate as expected.
+Popular OpenAPI generators include [OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator) and others. Test generated clients with simple API requests to quickly validate they operate as expected, and run contract-completeness tests to ensure every API change is reflected in your client.
 
 **Takeaway:**  
-A little discipline in maintaining a clean, automated generation workflow not only reduces technical debt,
-but saves you and your team time with every new API release.
+A little discipline in maintaining a clean, automated and overlay-friendly generation workflow reduces technical debt, supports rapid prototyping, and saves you and your team time with every new API release.
 
 # Example – Python API Client {#example-python}
 
