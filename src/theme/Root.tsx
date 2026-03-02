@@ -12,7 +12,7 @@ function PageViewTracker({ children }: PropsWithChildren<{}>) {
   const location = useLocation();
 
   useEffect(() => {
-    if (window?.location?.host !== "developer.mittwald.de") {
+    if (window?.location?.hostname !== "developer.mittwald.de") {
       // Don't track page views on non-production hosts, to avoid polluting analytics
       return;
     }
