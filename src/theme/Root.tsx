@@ -12,6 +12,11 @@ function PageViewTracker({ children }: PropsWithChildren<{}>) {
   const location = useLocation();
 
   useEffect(() => {
+    if (window?.location?.hostname !== "developer.mittwald.de") {
+      // Don't track page views on non-production hosts, to avoid polluting analytics
+      return;
+    }
+
     // Strip the language prefix from the URL; this allows us to track page
     // views for both languages under the same URL in Matomo, while still
     // distinguishing between them using a custom dimension.
