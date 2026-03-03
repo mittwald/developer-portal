@@ -47,7 +47,10 @@ function QueryParametersSection({
           value={queryParams[param.name] ?? ""}
           placeholder={param.example}
         >
-          <Label>{param.name}</Label>
+          <Label>
+            {param.name}
+            {param.deprecated ? " (deprecated)" : ""}
+          </Label>
           {param.description ? (
             <FieldDescription>{param.description}</FieldDescription>
           ) : undefined}
