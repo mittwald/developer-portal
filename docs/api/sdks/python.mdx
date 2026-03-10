@@ -31,7 +31,9 @@ SERVER_ID=your-server-id
 - Obtain the API token in the mittwald management UI.
 - Set `SERVER_ID` to the UUID of a project or server you have access to.
 
-> **Note:** Do not commit your `.env` file to source control; add it to `.gitignore`.
+:::warning
+Do not commit your `.env` file to source control; add it to `.gitignore`.
+:::
 
 ## 3. Usage Example {#usage-example}
 
@@ -151,8 +153,8 @@ Although the raw OpenAPI specification can be used directly to create an API cli
 often it is very useful to adjust the base specification in order to generate customized
 clients.
 
-As such overlays are declarative be definition, some logic might be required in order to
-**generate** such overlays depending on your use case.
+Overlays are declarative by definition, some logic might be required in order to
+**generate** them depending on your use case.
 
 :::note
 Overlays can be persisted for multiple usage and orchestration. Keep generated overlays
@@ -182,11 +184,11 @@ Here is an example snippet from an overlay:
 }
 ```
 
-The challenging part creating overlays is to find correct [JSONPath](https://www.rfc-editor.org/rfc/rfc9535.pdf)
+The challenging part of creating overlays is finding correct [JSONPath](https://www.rfc-editor.org/rfc/rfc9535.pdf)
 selectors in the `target` field of your `actions`.
 
 :::warning
-The range ( and power! ) of selectors available depends on the implementation of the patching
+The range (and power!) of selectors available depends on the implementation of the patching
 tool used! In other words: When using wider selectors matching more than one element,
 there is a good chance the patching tool will only hit the first result!
 
