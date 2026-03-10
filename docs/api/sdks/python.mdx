@@ -12,8 +12,8 @@ This guide shows how to get started with the mittwald API Python SDK. The exampl
 
 Ensure Python 3.10+ is available, then install the required packages:
 
-```sh
-pip install mittwald-api-client python-dotenv
+```shellsession
+user@local $ pip install mittwald-api-client python-dotenv
 ```
 
 - `mittwald-api-client` is the (generated) SDK.
@@ -86,8 +86,8 @@ if __name__ == '__main__':
 
 Execute the script to perform an API call:
 
-```sh
-python api_client_test.py
+```shellsession
+(venv) user@local $ python api_client_test.py
 ```
 
 - If the environment variables and token are valid, the script shows the result of the server info API call.
@@ -135,7 +135,7 @@ On Windows, activation is `venv\Scripts\activate`.
 ### Download the OpenAPI Specification {#fetch-openapi-specs}
 
 ```shellsession
-(venv) user@local $ curl --location --fail --silent 'https://api.mittwald.de/v2/openapi.json' > openapi.json
+user@local $ curl --location --fail --silent 'https://api.mittwald.de/v2/openapi.json' > openapi.json
 ```
 
 :::note
@@ -200,10 +200,10 @@ Overlay application example using [oas-patcher](https://github.com/mcroissant/oa
 
 ```shellsession
 # overlay generator creating "openapi_filter_overlay.json"
-user@local $ python tools/overlay_generator.py openapi.json openapi_filter_overlay.json
+(venv) user@local $ python tools/overlay_generator.py openapi.json openapi_filter_overlay.json
 
 # apply overlay create "openapi_from_overlay.json"
-user@local $ oas-patch overlay openapi.json openapi_filter_overlay.json -o openapi_from_overlay.json
+(venv) user@local $ oas-patch overlay openapi.json openapi_filter_overlay.json -o openapi_from_overlay.json
 ```
 
 The resulting `openapi_from_overlay.json` is now filtered according to actions defined
