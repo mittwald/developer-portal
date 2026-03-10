@@ -276,6 +276,16 @@ Als letzten Schritt erstelle eine Subdomain in deinem Projekt und verweise sie a
   </TabItem>
 </Tabs>
 
+Wenn du die Authentifizierung über `REGISTRY_USER` und `REGISTRY_PASSWORD` konfiguriert hast, musst du dich anmelden, bevor du Images pushen kannst:
+
+```shellsession
+user@local $ docker login docker.p-XXXXXX.project.space
+```
+
+:::note
+Denke beim Testen daran, dich speziell von deiner Registry über `docker logout docker.p-XXXXXX.project.space` abzumelden.
+:::
+
 ## Deployment-Strategien {#deployment-strategies}
 
 Wenn du deine Anwendung mithilfe von Containern deployst, wirst du typischerweise neue Versionen deiner Anwendung bereitstellen, indem du ein neues Container-Image erstellst und es im selben Container-Stack bereitstellst. Dies ist eine gängige Praxis in containerisierten Umgebungen, da sie eine einfache Versionierung und Rückgängigmachung ermöglicht.

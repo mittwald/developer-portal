@@ -279,39 +279,15 @@ As final step, create a subdomain in your project and point it to registry conta
   </TabItem>
 </Tabs>
 
-Now, after domain has been set up, we can start testing. As we have configured basic auth, we should check our
-registry to actually use it. Build and tag an arbitrary Docker image, then push to new registry:
-
-```shellsession
-user@local $ cd path/to/your/project
-user@local $ docker build -t <Your Image> .
-user@local $ docker tag <Your Image>:latest docker.p-XXXXXX.project.space/<Your Image>
-user@local $ docker push docker.p-XXXXXX.project.space/<Your Image>:latest
-```
-
-Your push **must** be rejected due to missing basic auth credentials:
-
-```shellsession
-user@local $ docker push docker.p-XXXXXX.project.space/<Your Image>:latest
-...
-push access denied, repository does not exist or may require authorization: authorization failed: no basic auth credentials
-```
-
-If it worked without errors, your setup is incomplete and no authentication is active!
-Now log in:
+If you have configured authentication via `REGISTRY_USER` and `REGISTRY_PASSWORD`, you need to log in before pushing images:
 
 ```shellsession
 user@local $ docker login docker.p-XXXXXX.project.space
 ```
 
 :::note
-When testing, remember to log out specifically from your registry via `docker logout docker.p-XXXXXX.project.space`
+When testing, remember to log out specifically from your registry via `docker logout docker.p-XXXXXX.project.space`.
 :::
-
-Retry `docker push`, which now works after successful login!
-Congratulations, you have successfully created your own private, self-hosted Docker registry.
-Depending on your project structure and use case, one generic Docker registry in a separate project,
-**or** one registry per project can be created and used.
 
 ## Deployment strategies
 
