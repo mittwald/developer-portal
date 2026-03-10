@@ -224,11 +224,13 @@ Check [this guide](https://distribution.github.io/distribution/about/deploying/)
       --name example-registry \
       --volume registry-data:/var/lib/registry \
       --publish 5000:5000/tcp \
-      --env "REGISTRY_USER=exampleuser" \
-      --env "REGISTRY_PASSWORD=examplepassword" \
+      --env "REGISTRY_USER=<your-username>" \
+      --env "REGISTRY_PASSWORD=<your-secure-password>" \
       --create-volumes \
       mittwald/registry:3
     ```
+
+    Replace `<your-username>` and `<your-secure-password>` with secure credentials of your choice. Note that passwords passed via command line may be stored in shell history.
 
     Environment variables for configuration can be added via `--env` option, check guide above for configuration options.
     See the documentation on the [`mw container run` command](/docs/v2/cli/reference/container/#mw-container-run) for more information.

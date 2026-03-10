@@ -224,11 +224,13 @@ Weitere detaillierte Anweisungen und Konfigurationsoptionen findest du in [diese
       --name example-registry \
       --volume registry-data:/var/lib/registry \
       --publish 5000:5000/tcp \
-      --env "REGISTRY_USER=exampleuser" \
-      --env "REGISTRY_PASSWORD=examplepassword" \
+      --env "REGISTRY_USER=<dein-benutzername>" \
+      --env "REGISTRY_PASSWORD=<dein-sicheres-passwort>" \
       --create-volumes \
       mittwald/registry:3
     ```
+
+    Ersetze `<dein-benutzername>` und `<dein-sicheres-passwort>` durch sichere Zugangsdaten deiner Wahl. Beachte, dass über die Kommandozeile übergebene Passwörter in der Shell-History gespeichert werden können.
 
     Umgebungsvariablen für die Konfiguration können über die Option `--env` hinzugefügt werden, siehe die obige Anleitung für Konfigurationsoptionen.
     Weitere Informationen findest du in der Dokumentation zum [`mw container run` Befehl](/docs/v2/cli/reference/container/#mw-container-run).
