@@ -4,11 +4,11 @@ sidebar_label: Python SDK
 description: Guide how to use and install the Python SDK for the mittwald API, including client generation and maintenance.
 ---
 
-# Quickstart {#quickstart}
+## Quickstart {#quickstart}
 
 This guide shows how to get started with the mittwald API Python SDK. The example script demonstrates authentication and fetching server information.
 
-## 1. Installation {#installation}
+### 1. Installation {#installation}
 
 Ensure Python 3.10+ is available, then install the required packages:
 
@@ -19,7 +19,7 @@ user@local $ pip install mittwald-api-client python-dotenv
 - `mittwald-api-client` is the (generated) SDK.
 - `python-dotenv` loads environment variables from a `.env` file.
 
-## 2. Prepare Credentials {#prepare-credentials}
+### 2. Prepare Credentials {#prepare-credentials}
 
 Create a file named `.env` in your project directory with the following content:
 
@@ -35,7 +35,7 @@ SERVER_ID=your-server-id
 Do not commit your `.env` file to source control; add it to `.gitignore`.
 :::
 
-## 3. Usage Example {#usage-example}
+### 3. Usage Example {#usage-example}
 
 Save the following script as `api_client_test.py`:
 
@@ -84,7 +84,7 @@ if __name__ == '__main__':
     main()
 ```
 
-## 4. Run the Example {#run-example}
+### 4. Run the Example {#run-example}
 
 Execute the script to perform an API call:
 
@@ -97,13 +97,13 @@ Execute the script to perform an API call:
 
 ---
 
-## Next Steps {#next-steps}
+### Next Steps {#next-steps}
 
 - Explore the SDK in more depth by reviewing the modules under `mittwald_api_client.api` and `mittwald_api_client.models`.
 - For automation, overlays, and CI/CD, see the advanced guide.
 - For complete API reference, consult the [mittwald OpenAPI specification](https://api.mittwald.de/v2/openapi.json).
 
-# Code generation – Python API Client {#example-python}
+## Code generation – Python API Client {#example-python}
 
 **Requirements:**
 - Python Installation (version 3.10+ recommended)
@@ -115,7 +115,7 @@ As the client itself is 100% generated, we focus on creating a **pipeline** for 
 release, and updates. Below, we start with the manual process for illustration—automation and maintenance
 will be covered in the next section.
 
-## Creating a Python mittwald API Client {#create-python-client}
+### Creating a Python mittwald API Client {#create-python-client}
 
 Before automating the workflow, start by manually generating a client on your console. First, create your project folder, set up a Python virtual environment, and install the client generator and the dependency for loading environment variables:
 
@@ -134,7 +134,7 @@ for other shells (PowerShell, fish, etc.), see `venv/bin/`. Deactivate with `dea
 On Windows, activation is `venv\Scripts\activate`.
 :::
 
-### Download the OpenAPI Specification {#fetch-openapi-specs}
+#### Download the OpenAPI Specification {#fetch-openapi-specs}
 
 ```shellsession
 user@local $ curl --location --fail --silent 'https://api.mittwald.de/v2/openapi.json' > openapi.json
@@ -147,7 +147,7 @@ a client from it. This includes filtering deprecated operations, which otherwise
 might show up in client as stubs.
 :::
 
-### (Optional) Adjust specification via overlays {#adjust-openapi-overlays}
+#### (Optional) Adjust specification via overlays {#adjust-openapi-overlays}
 
 Although the raw OpenAPI specification can be used directly to create an API client,
 often it is very useful to adjust the base specification in order to generate customized
@@ -212,7 +212,7 @@ The resulting `openapi_from_overlay.json` is now filtered according to actions d
 in `openapi_filter_overlay.json`. Keep those files bundled with base `openapi.json` in
 order to reproduce the exact same build later.
 
-### Run the Code Generator {#run-generator}
+#### Run the Code Generator {#run-generator}
 
 ```shellsession
 (venv) user@local $ openapi-python-client generate --path ./openapi.json
@@ -226,7 +226,7 @@ The generator may emit warnings.
 
 Keep maintenance effort low; avoid patching the OpenAPI spec unless strictly necessary. Prefer generator configuration tweaks.
 
-### Install and test the Generated Client {#install-client}
+#### Install and test the Generated Client {#install-client}
 
 After generation, a `mittwald-api-client` folder will appear in your project directory. Install it for testing:
 
@@ -288,7 +288,7 @@ For advanced or high-performance use cases, consider using the async API availab
 Start synchronous for simplicity; move to async as needed.
 :::
 
-### Testing Non-GET Operations – Example POST {#post-example}
+#### Testing Non-GET Operations – Example POST {#post-example}
 
 To use other HTTP methods (POST, PATCH, DELETE), you’ll need to construct request body objects.
 Here’s an example of a POST operation:
@@ -349,19 +349,19 @@ Check the generated client models for required fields and structures.
 Also make sure to use a token with write permissions when you apply CRUD operations via API.
 :::
 
-## After Generation – Clean Up {#clean-up}
+### After Generation – Clean Up {#clean-up}
 
 - Review generated tests, README, and example scripts before publishing or integrating with your main app.
 - Tidy up unneeded files so what you ship is clear and focused.
 
-## Package Naming – Note on Conflicts {#naming-conflicts}
+### Package Naming – Note on Conflicts {#naming-conflicts}
 
 :::note
 Generated package names (like `mittwald-api-client`) may collide with existing packages in PyPI.
 If needed, adjust the generator config or package name before publishing to avoid conflicts.
 :::
 
-## Publishing Python mittwald API Client {#publish-client}
+### Publishing Python mittwald API Client {#publish-client}
 
 Publishing API clients depends on your use case; for highly specialized projects, publishing may not be needed.
 For general or reusable clients, public PyPI is the standard.
@@ -388,26 +388,26 @@ The same steps apply to productive PyPI. Use unique package names to avoid confl
 
 For automation and maintenance, please continue to the [maintenance & pipeline section](#maintenance-pipeline).
 
-## Automating Python API Client Generation and Release with GitHub Actions {#maintenance-pipeline}
+### Automating Python API Client Generation and Release with GitHub Actions {#maintenance-pipeline}
 
 To ensure your Python mittwald API client always stays up-to-date with the latest API changes,
 you can establish a CI/CD pipeline using GitHub Actions. This workflow will automatically
 regenerate the client from the OpenAPI specification, test it, and—optionally—release new
 versions on a regular schedule (e.g., weekly).
 
-### Prerequisites {#pipeline-requirements}
+#### Prerequisites {#pipeline-requirements}
 
 - Your project repository on GitHub.
 - Python 3.10+ specified in your workflow.
 - Access to the mittwald OpenAPI spec URL.
 - Publishing credentials (e.g., PyPI token stored as GitHub repository secrets).
 
-### Add Required Files to the Repo {#pipeline-config}
+#### Add Required Files to the Repo {#pipeline-config}
 
 - Place your generator config file (e.g., `.openapi-python-client-config.yml`) in the project root if needed.
 - Keep your test scripts and sample `.env.example` files checked in, but **never** commit real credentials.
 
-### Example GitHub Actions Workflow {#example-workflow}
+#### Example GitHub Actions Workflow {#example-workflow}
 
 Create a file at `.github/workflows/client-release.yml`:
 
@@ -514,7 +514,7 @@ jobs:
           path: mittwald-api-client/dist/
 ```
 
-### Best Practices and Tips {#best-practices}
+#### Best Practices and Tips {#best-practices}
 
 - **Schedule wisely:**  
   Use the `cron` scheduling syntax to control how frequently releases occur (e.g., weekly, daily).
@@ -530,7 +530,7 @@ jobs:
 - **Artifact upload:**
   Add `upload-artifact` step to conserve build output for debugging and introspection.
 
-### Extending the Workflow {#extend-workflow}
+#### Extending the Workflow {#extend-workflow}
 
 - You can add steps to create release notes, tag versions, or manage changelogs automatically.
 - Support multiple Python versions by matrix builds if needed.

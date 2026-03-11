@@ -4,7 +4,7 @@ sidebar_label: Creating API clients
 description: A guide on how to create API clients from OpenAPI specification
 ---
 
-# Introduction {#intro}
+## Introduction {#intro}
 
 When working with the mittwald API, there are many reasons why you
 might want—or even need—to build a custom API client, rather than
@@ -65,14 +65,14 @@ for integration, compliance, security, and developer productivity.
 By designing a client tailored to your specific requirements, you ensure your applications
 remain robust, maintainable, and future-proof.
 
-# Preparations {#preparation}
+## Preparations {#preparation}
 
 Thorough preparation sets the stage for a smooth and efficient custom API client development process.
 
 With the right groundwork, it’s often possible to generate most of your client automatically,
 with minimal manual intervention. Below are key preparation areas to consider before you start:
 
-## Understand Your Use Case and Target Environment {#use-case-and-goal}
+### Understand Your Use Case and Target Environment {#use-case-and-goal}
 
 - **Where will the client run?**  
   Identify if your client will be used in server-side apps, browser-based scripts,
@@ -84,7 +84,7 @@ with minimal manual intervention. Below are key preparation areas to consider be
   Some environments (like browser or serverless) might have restrictions on authentication methods,
   storage, or dependencies.
 
-## Gather and Inspect the OpenAPI Specification {#get-openapi-specification}
+### Gather and Inspect the OpenAPI Specification {#get-openapi-specification}
 
 Download the current OpenAPI specification for the API:
 
@@ -97,7 +97,7 @@ user@local $ curl --location --fail --silent 'https://api.mittwald.de/v2/openapi
 - **Check for completeness:**  
   Ensure all required endpoints, authentication flows, and schemas are documented.
 
-## Clarify Authentication and Security Requirements {#authentication-and-security}
+### Clarify Authentication and Security Requirements {#authentication-and-security}
 
 - **Authentication methods:**  
   Will your client need to support API tokens, OAuth2, extension secrets, or additional mechanisms?
@@ -106,7 +106,7 @@ user@local $ curl --location --fail --silent 'https://api.mittwald.de/v2/openapi
 - **Plan for secure storage:**  
   Never hard-code sensitive information in the client.
 
-## Select and Set Up Your Code Generation Tooling {#code-generator}
+### Select and Set Up Your Code Generation Tooling {#code-generator}
 
 - **Choose a code generator:**  
   Tools like [OpenAPI Generator](https://openapi-generator.tech/),
@@ -117,7 +117,7 @@ user@local $ curl --location --fail --silent 'https://api.mittwald.de/v2/openapi
 - **Install the generator:**  
   Set up the codegen toolkit and familiarize yourself with its options and configuration files.
 
-## Prepare Generator and Project Configuration {#code-generator-config}
+### Prepare Generator and Project Configuration {#code-generator-config}
 
 - **Adjust generator settings:**  
   Configure type mappings, serialization options, HTTP client selection, package naming,
@@ -127,7 +127,7 @@ user@local $ curl --location --fail --silent 'https://api.mittwald.de/v2/openapi
 - **Versioning setup:**  
   Decide on how your client should reflect the API version—this aids consumers in knowing API compatibility.
 
-## Plan for API Evolution and Maintenance {#api-evolution-and-maintenance}
+### Plan for API Evolution and Maintenance {#api-evolution-and-maintenance}
 
 - **Automate updates:**  
   Consider scripting the whole fetch-generate-test process, so your client stays up to date as the API evolves.
@@ -136,7 +136,7 @@ user@local $ curl --location --fail --silent 'https://api.mittwald.de/v2/openapi
 - **Handle breaking changes:**  
   Set up version control, and plan for how to manage client updates if/when the API structure is updated.
 
-## Identify Special API Features and Custom Logic {#custom-logic}
+### Identify Special API Features and Custom Logic {#custom-logic}
 
 - **Special endpoints:**  
   Note if the API includes pagination, file uploads, webhooks, long-running operations,
@@ -154,7 +154,7 @@ codebase and the mittwald API evolve.
 
 ---
 
-## Customizing the OpenAPI Specification with Overlays {#openapi-overlays}
+### Customizing the OpenAPI Specification with Overlays {#openapi-overlays}
 
 [OpenAPI overlays](https://learn.openapis.org/overlay/) provide a powerful and maintainable way to customize API specifications before client code generation.
 
@@ -185,7 +185,7 @@ Try to avoid patching generated client code directly. Prefer controlling output 
 
 ---
 
-## Next Steps {#next-steps}
+### Next Steps {#next-steps}
 
 - See the language-specific guides for concrete, end-to-end examples (e.g., [Python SDK generation](/docs/v2/api/sdks/python)).
 - Integrate overlays and automation in your CI/CD to keep all clients current.

@@ -4,7 +4,7 @@ sidebar_label: API-Clients erstellen
 description: Guide für die Erstellung eigener API-Clients aus der OpenAPI-Spezifikation
 ---
 
-# Einführung {#intro}
+## Einführung {#intro}
 
 Beim Arbeiten mit der mittwald API gibt es viele Gründe, warum du
 einen eigenen API-Client entwickeln möchtest oder sogar musst – und nicht
@@ -44,13 +44,13 @@ Eigene API-Clients bringen mehr als nur individuelle Präferenzen – sie sind o
 
 Mit einem maßgeschneiderten Client sorgst du dafür, dass deine Anwendungen robust, wartbar und zukunftssicher bleiben.
 
-# Vorbereitung {#preparation}
+## Vorbereitung {#preparation}
 
 Eine gründliche Vorbereitung ist der wichtigste Schritt für eine effiziente und nachhaltige Entwicklung deines API-Clients.
 
 Mit den richtigen Voraussetzungen kannst du einen Großteil des Codes automatisch generieren – und sparst viel manuelle Arbeit. Folgende Punkte solltest du vor dem Start klären:
 
-## Anwendungsfall & Zielumgebung definieren {#use-case-and-goal}
+### Anwendungsfall & Zielumgebung definieren {#use-case-and-goal}
 
 - **Wo läuft der Client?**  
   Wird der Client im Server, als Browser-Skript, in einer CLI, als Serverless Function oder im CI/CD genutzt?
@@ -59,7 +59,7 @@ Mit den richtigen Voraussetzungen kannst du einen Großteil des Codes automatisc
 - **Welche technischen Einschränkungen gibt es?**  
   Manche Plattformen (z.B. Browser, Lambda) lassen nicht jede Authentifizierung oder Speicherart zu.
 
-## OpenAPI-Spezifikation prüfen {#get-openapi-specification}
+### OpenAPI-Spezifikation prüfen {#get-openapi-specification}
 
 Lade die aktuelle OpenAPI-Spezifikation der API herunter:
 
@@ -72,7 +72,7 @@ user@local $ curl --location --fail --silent 'https://api.mittwald.de/v2/openapi
 - **Auf Vollständigkeit achten:**  
   Sind alle relevanten Endpunkte, Authentifizierungen und Schemas dokumentiert?
 
-## Authentifizierung und Sicherheit klären {#authentication-and-security}
+### Authentifizierung und Sicherheit klären {#authentication-and-security}
 
 - **Welche Authentifizierung braucht es?**  
   API-Tokens, OAuth2, spezielle Erweiterungen?
@@ -81,7 +81,7 @@ user@local $ curl --location --fail --silent 'https://api.mittwald.de/v2/openapi
 - **Wie werden die Daten sicher gespeichert?**  
   Niemals Geheimnisse im Code oder Repository ablegen.
 
-## Code-Generierungstool auswählen und einrichten {#code-generator}
+### Code-Generierungstool auswählen und einrichten {#code-generator}
 
 - **Welcher Generator?**  
   Tools wie [OpenAPI Generator](https://openapi-generator.tech/),
@@ -92,7 +92,7 @@ user@local $ curl --location --fail --silent 'https://api.mittwald.de/v2/openapi
 - **Tool installieren und konfigurieren:**  
   Ggf. Generator-Optionen, Vorlagen oder Konfigs anpassen.
 
-## Generator- & Projektkonfiguration {#code-generator-config}
+### Generator- & Projektkonfiguration {#code-generator-config}
 
 - **Generator-Einstellungen prüfen/anpassen:**  
   Typen, Serialisierung, HTTP-Client, Paketnamen und Code-Style an dein Projekt anpassen.
@@ -101,7 +101,7 @@ user@local $ curl --location --fail --silent 'https://api.mittwald.de/v2/openapi
 - **Versionierung bedenken:**  
   Wie wird die API-Version im Client reflektiert (wichtig für Downstream-Kompatibilität)?
 
-## Umgang mit API-Änderungen & Wartung {#api-evolution-and-maintenance}
+### Umgang mit API-Änderungen & Wartung {#api-evolution-and-maintenance}
 
 - **Automatische Updates:**  
   Skripte können Spezifikation holen, Client bauen und Tests laufen lassen.
@@ -110,7 +110,7 @@ user@local $ curl --location --fail --silent 'https://api.mittwald.de/v2/openapi
 - **Breaking Changes verwalten:**  
   Versionierung & Update-Strategien planen.
 
-## Besondere API-Eigenschaften & Custom Logic {#custom-logic}
+### Besondere API-Eigenschaften & Custom Logic {#custom-logic}
 
 - **Gibt es spezielle Endpunkte?**  
   Pagination, File-Uploads, Webhooks? Generatoren benötigen dafür oft besondere Einstellungen.
@@ -123,7 +123,7 @@ Mit solider Vorbereitung sparst du später viel Zeit – und sorgst für einen z
 
 ---
 
-## OpenAPI-Spezifikation mit Overlays anpassen {#openapi-overlays}
+### OpenAPI-Spezifikation mit Overlays anpassen {#openapi-overlays}
 
 [OpenAPI Overlays](https://learn.openapis.org/overlay/) sind ein wirkungsvolles und nachhaltiges Mittel, um API-Spezifikationen vor der Codegenerierung gezielt anzupassen.
 
@@ -154,7 +154,7 @@ Patching am generierten Client ist fehleranfällig und wartungsintensiv. Bevorzu
 
 ---
 
-## Nächste Schritte {#next-steps}
+### Nächste Schritte {#next-steps}
 
 - Sieh dir die sprachspezifischen Anleitungen für konkrete End-to-End-Beispiele an (z.B. [Python SDK Generierung](/docs/v2/api/sdks/python)).
 - Integriere Overlays und Automatisierung in deine CI/CD-Pipeline, um Clients immer aktuell zu halten.
