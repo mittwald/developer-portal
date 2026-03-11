@@ -246,24 +246,24 @@ from mittwald_api_client import AuthenticatedClient
 from mittwald_api_client.api.project import project_get_server
 
 def main():
-    """Test freshly built API client: set up an authenticated client from environment and fetch server info."""
+    """Frisch generierten API-Client testen: Authentifizierten Client aus Umgebung einrichten und Server-Info abrufen."""
     load_dotenv()
     API_TOKEN = os.getenv("API_TOKEN")
     SERVER_ID = os.getenv("SERVER_ID")
     if API_TOKEN is None or SERVER_ID is None:
-        print("API_TOKEN or SERVER_ID missing. Check environment.")
+        print("API_TOKEN oder SERVER_ID fehlt. Bitte prüfe deine Umgebung.")
         sys.exit(1)
     client = AuthenticatedClient(
         base_url="https://api.mittwald.de",
         token=API_TOKEN,
-        follow_redirects=True,  # API returns 308 redirects, not expected by client by default
+        follow_redirects=True,  # Die mittwald API kann HTTP 308 Redirects zurückgeben, die der Client standardmäßig nicht erwartet
     )
     with client as myclient:
         res = project_get_server.sync_detailed(
             client=myclient,
             server_id=SERVER_ID,
         )
-    print("client call result:")
+    print("Ergebnis des Client-Calls:")
     print(res)
     print("---")
 
@@ -307,8 +307,8 @@ from mittwald_api_client.models import ProjectCreateProjectBody
 
 def main():
     """
-    Test fresh built API client, set up authenticated client
-    from environment and fetch server information
+    Frisch generierten API-Client testen: Authentifizierten Client aus Umgebung
+    einrichten und Server-Informationen abrufen
     """
 
     load_dotenv()
@@ -317,13 +317,13 @@ def main():
     SERVER_ID = os.getenv("SERVER_ID")
 
     if API_TOKEN is None or SERVER_ID is None:
-        print("API_TOKEN or SERVER_ID missing. Check environment.")
+        print("API_TOKEN oder SERVER_ID fehlt. Bitte prüfe deine Umgebung.")
         sys.exit(1)
 
     client = AuthenticatedClient(
         base_url="https://api.mittwald.de",
         token=API_TOKEN,
-        follow_redirects=True,  # API returns 308 aka permanent redirects, NOT expected by client by default
+        follow_redirects=True,  # API kann 308 aka permanente Redirects zurückgeben, die der Client standardmäßig NICHT erwartet
     )
 
     with client as myclient:
@@ -335,7 +335,7 @@ def main():
             })
         )
 
-    print("client call result:")
+    print("Ergebnis des Client-Calls:")
     print(res)
     print("---")
 
