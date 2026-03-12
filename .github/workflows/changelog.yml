@@ -43,19 +43,17 @@ jobs:
       - name: Generate API changelogs
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: |
-          npm run generate:changelog
+        run: npm run generate:changelog
 
       - name: Synchronize CLI docs
-        run: |
-          npm run generate:cli
+        run: npm run generate:cli
 
       - name: Run build
-        run: |
-          npm run build
+        run: npm run build
 
       - name: Create Pull Request for API Changelog
         id: cpr
+        if: always()
         uses: peter-evans/create-pull-request@v6
         with:
           token: '${{ secrets.RELEASE_USER_TOKEN }}'
@@ -65,15 +63,16 @@ jobs:
           body: |
             This automated PR adds the latest API changelog and synchronized CLI docs.
 
-            If CI checks fail (e.g., invalid MDX), fix directly or let a maintainer repair and merge!
+            ⚠️ If CI checks fail (e.g., invalid MDX), please fix the changelog in this PR so it can be merged!
           labels: automated pr, changelog
           add-paths: |
+            changelog
             static/specs
             docs/cli
           delete-branch: true
 
       - name: Enable auto-merge
-        if: steps.cpr.outputs.pull-request-number != ''
+        if: always()  # Still use always() here, but the PR will only merge if checks pass
         uses: peter-evans/enable-pull-request-automerge@v3
         with:
           token: '${{ secrets.RELEASE_USER_TOKEN }}'
