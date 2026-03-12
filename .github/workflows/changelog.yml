@@ -51,15 +51,18 @@ jobs:
       - name: Run build
         run: npm run build
 
+      - name: Set DATE variable
+        run: echo "TODAY=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+
       - name: Create Pull Request for API Changelog
         id: cpr
         if: always()
         uses: peter-evans/create-pull-request@v6
         with:
           token: '${{ secrets.RELEASE_USER_TOKEN }}'
-          commit-message: "chore: generate API changelog and synchronize CLI docs ($(date +'%Y-%m-%d'))"
+          commit-message: "chore: generate API changelog and synchronize CLI docs (${{ env.TODAY }})"
           branch: "bot/api-changelog-${{ github.run_id }}"
-          title: "chore: API changelog & CLI doc update ($(date +'%Y-%m-%d'))"
+          title: "chore: API changelog & CLI doc update (${{ env.TODAY }})"
           body: |
             This automated PR adds the latest API changelog and synchronized CLI docs.
 
@@ -70,11 +73,3 @@ jobs:
             static/specs
             docs/cli
           delete-branch: true
-
-      - name: Enable auto-merge
-        if: always()  # Still use always() here, but the PR will only merge if checks pass
-        uses: peter-evans/enable-pull-request-automerge@v3
-        with:
-          token: '${{ secrets.RELEASE_USER_TOKEN }}'
-          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
-          merge-method: squash
