@@ -1,10 +1,10 @@
-import React from "react";
-import clsx from "clsx";
-import styles from "./styles.module.css";
-import Translate from "@docusaurus/Translate";
 import Link from "@docusaurus/Link";
-import { NewBadge } from "../NewBadge";
+import Translate from "@docusaurus/Translate";
 import FeatureRow from "@site/src/components/FeatureRow";
+import clsx from "clsx";
+import React from "react";
+import { NewBadge } from "../NewBadge";
+import styles from "./styles.module.css";
 
 const issueTrackerURL =
   "https://github.com/mittwald/developer-portal/issues/new?assignees=&labels=suggestion&projects=&template=suggestion.md";
@@ -150,7 +150,7 @@ const FeatureList = [
         </ul>
         <p>
           <strong>
-            <Translate id={"index.sdks.coming-soon"}>Coming soon</Translate>: 🪄
+            <Translate id={"index.sdks.coming-soon"}>Coming soon</Translate>:
           </strong>
         </p>
         <ul>
