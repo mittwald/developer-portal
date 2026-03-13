@@ -13,12 +13,12 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           token: '${{ secrets.RELEASE_USER_TOKEN }}'
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "20"
           cache: npm
@@ -48,21 +48,19 @@ jobs:
       - name: Synchronize CLI docs
         run: npm run generate:cli
 
-      - name: Run build
-        run: npm run build
-
       - name: Set DATE variable
-        run: echo "TODAY=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
       - name: Create Pull Request for API Changelog
         id: cpr
         if: always()
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v8
         with:
           token: '${{ secrets.RELEASE_USER_TOKEN }}'
-          commit-message: "chore: generate API changelog and synchronize CLI docs (${{ env.TODAY }})"
+          commit-message: "chore: generate API changelog and synchronize CLI docs (${{ steps.date.outputs.date }})"
           branch: "bot/api-changelog-${{ github.run_id }}"
-          title: "chore: API changelog & CLI doc update (${{ env.TODAY }})"
+          title: "chore: API changelog & CLI doc update (${{ steps.date.outputs.date }})"
           body: |
             This automated PR adds the latest API changelog and synchronized CLI docs.
 
@@ -73,3 +71,11 @@ jobs:
             static/specs
             docs/cli
           delete-branch: true
+
+      - name: Enable auto-merge for API changelog PR
+        if: steps.cpr.outputs.pull-request-number != ''
+        uses: peter-evans/enable-pull-request-automerge@v3
+        with:
+          token: '${{ secrets.RELEASE_USER_TOKEN }}'
+          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
+          merge-method: squash
