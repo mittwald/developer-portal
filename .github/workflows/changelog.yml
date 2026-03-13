@@ -1,55 +1,81 @@
 name: Generate API changelogs
+
 on:
   workflow_dispatch:
   schedule:
-      - cron: '0 20 * * 5'  # Friday, 20:00
+    - cron: '0 20 * * 5'  # Friday, 20:00
+
 jobs:
   generate-changelog:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v6
         with:
           token: '${{ secrets.RELEASE_USER_TOKEN }}'
+
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
           node-version: "20"
           cache: npm
+
       - name: Install dependencies
         run: npm ci
+
       - name: Generate code
         run: npm run generate
+
       - name: Install oasdiff
         run: |
           wget https://github.com/Tufin/oasdiff/releases/download/v1.10.23/oasdiff_1.10.23_linux_amd64.tar.gz
           tar xzf oasdiff_1.10.23_linux_amd64.tar.gz
           mv oasdiff /usr/local/bin/oasdiff
+
       - name: Git Identity 🪪
         run: |
           git config user.name "mittwald-machine[bot]"
           git config user.email "mittwald-machine@users.noreply.github.com"
+
       - name: Generate API changelogs
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: |
-          npm run generate:changelog
-          
-          if [ $(git status --porcelain changelog static/specs | wc -l) -gt 0 ] ; then
-            git add changelog static/specs
-            git commit -m "chore(changelog): generate API changelog for $(date +%d-%m-%Y)";
-          fi
+        run: npm run generate:changelog
+
       - name: Synchronize CLI docs
-        run: |
-          npm run generate:cli
-          
-          if [ $(git status --porcelain docs/cli | wc -l) -gt 0 ] ; then
-            git add docs/cli
-            git commit -m "chore(cli): synchronize CLI documentation from mittwald/cli";
-          fi
-      - name: Run build
-        run: |
-          npm run build
-      - name: Push changes
-        run: |
-          git push
+        run: npm run generate:cli
+
+      - name: Set DATE variable
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+
+      - name: Create Pull Request for API Changelog
+        id: cpr
+        if: always()
+        uses: peter-evans/create-pull-request@v8
+        with:
+          token: '${{ secrets.RELEASE_USER_TOKEN }}'
+          commit-message: "chore: generate API changelog and synchronize CLI docs (${{ steps.date.outputs.date }})"
+          branch: "bot/api-changelog-${{ github.run_id }}"
+          title: "chore: API changelog & CLI doc update (${{ steps.date.outputs.date }})"
+          body: |
+            This automated PR adds the latest API changelog and synchronized CLI docs.
+
+            ⚠️ If CI checks fail (e.g., invalid MDX), please fix the changelog in this PR so it can be merged!
+          labels: automated pr, changelog
+          add-paths: |
+            changelog
+            static/specs
+            docs/cli
+          delete-branch: true
+
+      - name: Enable auto-merge for API changelog PR
+        if: steps.cpr.outputs.pull-request-number != ''
+        uses: peter-evans/enable-pull-request-automerge@v3
+        with:
+          token: '${{ secrets.RELEASE_USER_TOKEN }}'
+          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
+          merge-method: squash
