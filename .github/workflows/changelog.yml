@@ -52,30 +52,54 @@ jobs:
         id: date
         run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
-      - name: Create Pull Request for API Changelog
-        id: cpr
+      - name: Create Pull Request for CLI docs
+        id: cpr-cli
         if: always()
         uses: peter-evans/create-pull-request@v8
         with:
           token: '${{ secrets.RELEASE_USER_TOKEN }}'
-          commit-message: "chore: generate API changelog and synchronize CLI docs (${{ steps.date.outputs.date }})"
-          branch: "bot/api-changelog-${{ github.run_id }}"
-          title: "chore: API changelog & CLI doc update (${{ steps.date.outputs.date }})"
+          commit-message: "chore: synchronize CLI docs (${{ steps.date.outputs.date }})"
+          branch: "bot/cli-docs-${{ github.run_id }}"
+          title: "chore: CLI doc update (${{ steps.date.outputs.date }})"
           body: |
-            This automated PR adds the latest API changelog and synchronized CLI docs.
+            This automated PR synchronizes CLI documentation.
+
+          labels: automated pr, documentation
+          add-paths: |
+            docs/cli
+          delete-branch: true
+
+      - name: Create Pull Request for API Changelog
+        id: cpr-changelog
+        if: always()
+        uses: peter-evans/create-pull-request@v8
+        with:
+          token: '${{ secrets.RELEASE_USER_TOKEN }}'
+          commit-message: "chore: generate API changelog (${{ steps.date.outputs.date }})"
+          branch: "bot/api-changelog-${{ github.run_id }}"
+          title: "chore: API changelog update (${{ steps.date.outputs.date }})"
+          body: |
+            This automated PR adds the latest API changelog.
 
             ⚠️ If CI checks fail (e.g., invalid MDX), please fix the changelog in this PR so it can be merged!
           labels: automated pr, changelog
           add-paths: |
             changelog
             static/specs
-            docs/cli
           delete-branch: true
 
-      - name: Enable auto-merge for API changelog PR
-        if: steps.cpr.outputs.pull-request-number != ''
+      - name: Enable auto-merge for CLI docs PR
+        if: steps.cpr-cli.outputs.pull-request-number != ''
         uses: peter-evans/enable-pull-request-automerge@v3
         with:
           token: '${{ secrets.RELEASE_USER_TOKEN }}'
-          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
+          pull-request-number: ${{ steps.cpr-cli.outputs.pull-request-number }}
+          merge-method: squash
+
+      - name: Enable auto-merge for API changelog PR
+        if: steps.cpr-changelog.outputs.pull-request-number != ''
+        uses: peter-evans/enable-pull-request-automerge@v3
+        with:
+          token: '${{ secrets.RELEASE_USER_TOKEN }}'
+          pull-request-number: ${{ steps.cpr-changelog.outputs.pull-request-number }}
           merge-method: squash
