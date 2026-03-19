@@ -1,0 +1,192 @@
+---
+title: Creating API clients
+sidebar_label: Creating API clients
+description: A guide on how to create API clients from OpenAPI specification
+---
+
+## Introduction {#intro}
+
+When working with the mittwald API, there are many reasons why you
+might want—or even need—to build a custom API client, rather than
+relying solely on official SDKs. While language preference and adherence
+to company standards are common motivations, there are several additional
+drivers worth considering:
+
+- **Programming Language and Technology Stack**  
+  Not all languages or platforms have a first-party SDK.
+  If your project uses a language, framework, or environment not supported
+  out of the box, a custom client ensures smooth integration.
+
+- **Advanced or Non-Standard Authentication Flows**  
+  Some projects require flexible ways to authenticate: using tokens from
+  environment variables, securing extension interactions, handling session
+  tokens in browser scenarios, or rotating secrets automatically. Official
+  clients might not cover new or complex organizational authentication needs.
+
+- **Integration in Specialized Environments**  
+  From CLI tools to browser-based apps, serverless functions, or embedded systems,
+  platform and runtime constraints sometimes demand tailored clients optimized
+  for their specific environment.
+
+- **Adaptability to API Changes and Experimental Features**  
+  APIs evolve—sometimes rapidly. Building your own client can help you leverage
+  beta features, work with endpoints not yet supported officially, or quickly
+  adapt to breaking changes or vendor extensions.
+
+- **Architectural and Integration Flexibility**  
+  Teams with advanced architectural patterns (such as microservices, middleware layering,
+  or plug-in systems) often need more control, such as inserting custom logging,
+  tracing, or rate-limiting at the client level, or composing higher-level abstractions
+  on top of the API transport.
+
+- **Security, Compliance, and Auditing**  
+  Certain industries and organizations require code to be fully auditable or self-hosted,
+  integrate tightly with internal security tooling, or manage credentials in custom ways.
+  Building your own client allows you to comply with these requirements.
+
+- **Testing, Mocking, and Local Development**  
+  Custom clients can include features useful for local development and CI, such as mock
+  data modes, test doubles, or simplified authentication for early prototyping without
+  leaking sensitive credentials.
+
+- **Documentation, Localization, and Onboarding**  
+  Sometimes, a custom client is a strategic asset: it can be written and documented in
+  the team’s native language, or tailored with onboarding examples and guides for your
+  organization’s developers.
+
+- **Dependency Management and Code Ownership**  
+  Rolling your own client lets you pin dependencies, shape the API surface to your needs,
+  and avoid external drift—crucial for organizations with strict stability or security standards.
+
+**In summary:**  
+Custom API clients aren't just about personal or company preferences—they’re a key enabler
+for integration, compliance, security, and developer productivity.
+
+By designing a client tailored to your specific requirements, you ensure your applications
+remain robust, maintainable, and future-proof.
+
+## Preparations {#preparation}
+
+Thorough preparation sets the stage for a smooth and efficient custom API client development process.
+
+With the right groundwork, it’s often possible to generate most of your client automatically,
+with minimal manual intervention. Below are key preparation areas to consider before you start:
+
+### Understand Your Use Case and Target Environment {#use-case-and-goal}
+
+- **Where will the client run?**  
+  Identify if your client will be used in server-side apps, browser-based scripts,
+  command-line tools, serverless functions, or CI/CD pipelines.
+- **Who are the end users?**  
+  Consider internal teams, external customers, or automation tools, as this impacts features and
+  user-friendliness.
+- **Any platform constraints?**  
+  Some environments (like browser or serverless) might have restrictions on authentication methods,
+  storage, or dependencies.
+
+### Gather and Inspect the OpenAPI Specification {#get-openapi-specification}
+
+Download the current OpenAPI specification for the API:
+
+```shellsession
+user@local $ curl --location --fail --silent 'https://api.mittwald.de/v2/openapi.json' > openapi.json
+```
+
+- **Validate the specification:**  
+  Use OpenAPI validators (e.g., [Swagger Editor](https://editor.swagger.io/)) to check for errors or inconsistencies.
+- **Check for completeness:**  
+  Ensure all required endpoints, authentication flows, and schemas are documented.
+
+### Clarify Authentication and Security Requirements {#authentication-and-security}
+
+- **Authentication methods:**  
+  Will your client need to support API tokens, OAuth2, extension secrets, or additional mechanisms?
+- **Secret management:**  
+  Make sure required tokens or secrets are available and can be injected securely (e.g., via env vars, config files, secure vaults).
+- **Plan for secure storage:**  
+  Never hard-code sensitive information in the client.
+
+### Select and Set Up Your Code Generation Tooling {#code-generator}
+
+- **Choose a code generator:**  
+  Tools like [OpenAPI Generator](https://openapi-generator.tech/),
+  [Swagger Codegen](https://github.com/swagger-api/swagger-codegen), or
+  [Autorest](https://aka.ms/autorest) can scaffold clients in many languages.
+- **Check compatibility:**  
+  Ensure your chosen tool supports your preferred language and the OpenAPI version provided.
+- **Install the generator:**  
+  Set up the codegen toolkit and familiarize yourself with its options and configuration files.
+
+### Prepare Generator and Project Configuration {#code-generator-config}
+
+- **Adjust generator settings:**  
+  Configure type mappings, serialization options, HTTP client selection, package naming,
+  and code style to match your project’s conventions.
+- **Supporting files:**  
+  Prepare configuration/templates for environment variables, CI scripts, documentation, and testing.
+- **Versioning setup:**  
+  Decide on how your client should reflect the API version—this aids consumers in knowing API compatibility.
+
+### Plan for API Evolution and Maintenance {#api-evolution-and-maintenance}
+
+- **Automate updates:**  
+  Consider scripting the whole fetch-generate-test process, so your client stays up to date as the API evolves.
+- **Monitor API changes:**  
+  Subscribe to API changelogs, and be ready to re-generate and retest as the OpenAPI spec changes.
+- **Handle breaking changes:**  
+  Set up version control, and plan for how to manage client updates if/when the API structure is updated.
+
+### Identify Special API Features and Custom Logic {#custom-logic}
+
+- **Special endpoints:**  
+  Note if the API includes pagination, file uploads, webhooks, long-running operations,
+  or other advanced patterns. Code generators may require extra configuration or manual
+  adjustments for these.
+- **Error handling:**  
+  Check for consistent error response formats and plan how the generated client should surface them.
+- **Custom workflows:**  
+  If certain business flows require composite or multi-step API interactions,
+  document these scenarios to extend the client after generation.
+
+By thoroughly preparing along these lines, not only will you accelerate the initial client build,
+but you’ll also ensure your solution remains robust, secure, and maintainable as both your
+codebase and the mittwald API evolve.
+
+---
+
+### Customizing the OpenAPI Specification with Overlays {#openapi-overlays}
+
+[OpenAPI overlays](https://learn.openapis.org/overlay/) provide a powerful and maintainable way to customize API specifications before client code generation.
+
+Instead of manually changing the base OpenAPI specification (or patching generated clients), overlays allow you to define patch operations—such as removing unwanted endpoints or adjusting documentation—without modifying the original source.
+
+Key benefits include:
+
+- **Reproducible builds**: Maintain overlays as code to ensure everyone on the team generates clients against the same, reviewed set of spec changes.
+- **Separation of concerns**: Keep base specification updates and your own customizations clearly separated and trackable.
+- **Automation friendly**: Overlays can be applied in CI/CD pipelines to always generate up-to-date clients as the API evolves.
+- **Maintainability**: Layer multiple overlays for different use cases (e.g. filter endpoints, add documentation, translate field descriptions).
+
+Actionable steps to use overlays:
+
+1. **Create an overlay**: Define your patch operations in a dedicated overlay file.
+2. **Apply the overlay with a tool**: Use tools like [oas-patcher](https://github.com/mcroissant/oas_patcher) to combine the base spec and your overlay file into a generated, customized spec.
+3. **Generate your client**: Run your preferred OpenAPI generator against this customized spec.
+
+:::tip
+🌱 **Best practice:** Maintain your generation process and overlays, not the generated output. This discipline reduces technical debt and supports rapid, error-free prototyping.
+:::
+
+**Contract completeness:**  
+As a safeguard, test that every `operationId` in your (possibly filtered) OpenAPI spec maps to a callable method in your generated client. This ensures your customization process doesn’t accidentally omit needed endpoints or break integration reliability.
+
+**Common pitfall:**  
+Try to avoid patching generated client code directly. Prefer controlling output by configuration or overlays, which are easier to maintain as the API evolves.
+
+---
+
+### Next Steps {#next-steps}
+
+- See the language-specific guides for concrete, end-to-end examples (e.g., [Python SDK generation](/docs/v2/api/sdks/python)).
+- Integrate overlays and automation in your CI/CD to keep all clients current.
+- For advanced usage—such as multi-language support or deeply customized workflows—extend your overlays and codegen process as your requirements grow.
