@@ -1,0 +1,287 @@
+---
+title: Breaking (!) API changes for v2 API, March 13 to March 20
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Conversation
+  - Mail
+  - Misc
+  - Domain
+  - Contract
+  - Backup
+  - Container
+  - User
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week's changelog for the mittwald API includes significant updates such as changes to response property types, the removal of required properties, the addition of new optional parameters, and the introduction of new endpoints.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The response property type for the `GET /v2/conversations/{conversationId}/messages` operation has changed from 'object' to '' for status '200'. Additionally, several required properties (`conversationId`, `createdAt`, `messageContent`, and `type`) have been removed from the response. **This is a breaking change.**
+  
+- The response property type for the `GET /v2/projects/{projectId}/mail-settings` operation has changed for both `blacklist/items/` and `whitelist/items/` from 'string' with format 'idn-email' to 'string' for status '200'.
+
+- The request body for the `PATCH /v2/projects/{projectId}/mail-settings/{mailSetting}` and `PUT /v2/projects/{projectId}/mail-settings/{mailSetting}` operations has had 'subschema #1, subschema #2' removed from the 'oneOf' list.
+
+- The request property type for the `PUT /v2/projects/{projectId}/mailsettings/blacklist` and `PUT /v2/projects/{projectId}/mailsettings/whitelist` operations has changed from 'string' with format 'idn-email' to 'string'.
+
+- The optional property `internal` and `meta` have been removed from the response of the `GET /v2/conversations/{conversationId}/messages` operation.
+
+- A new pattern has been added to the request property `blacklist/items/` and `whitelist/items/` for the `PUT /v2/projects/{projectId}/mailsettings/blacklist` and `PUT /v2/projects/{projectId}/mailsettings/whitelist` operations.
+
+- The schema `de.mittwald.v1.verification.VerifyAddressConfidence` and `de.mittwald.v1.verification.VerifyAddressResponse` have been removed from the API schema.
+
+- The non-success response with status '400' has been removed from the `POST /v2/actions/verify-address` operation.
+
+- The response property `oneOf` list for the `GET /v2/conversations/{conversationId}/messages` operation has been updated to include `#/components/schemas/de.mittwald.v1.conversation.ResubmissionStatusUpdate` and `#/components/schemas/de.mittwald.v1.conversation.GenericStatusUpdate`.
+
+- A new non-success response with status '412' has been added to the `POST /v2/domain-transferable` operation.
+
+- A new optional request parameter `types` has been added to the `GET /v2/orders` operation.
+
+- The endpoint `PUT /v2/project-backups/{projectBackupId}/expiration-time` has been added to update a Backup's expiration time.
+
+- The response property pattern for `blacklist/items/` and `whitelist/items/` has been added for the `GET /v2/projects/{projectId}/mail-settings` operation.
+
+- The request body `oneOf` list has been updated to include 'subschema #1, subschema #2' for the `PATCH /v2/projects/{projectId}/mail-settings/{mailSetting}` and `PUT /v2/projects/{projectId}/mail-settings/{mailSetting}` operations.
+
+- The endpoint `GET /v2/stacks` has been added to list Stacks belonging to the executing user.
+
+- The required property `refreshToken` has been added to the response of the `PUT /v2/users/self/credentials/password` operation.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Get all message of the conversation"
+
+
+- ⚠️ **Breaking:** the '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.StatusUpdate]/' response's property type/format changed from 'object'/'' to ''/'' for status '200'
+
+- ⚠️ **Breaking:** removed the required property '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.StatusUpdate]/conversationId' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.StatusUpdate]/createdAt' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.StatusUpdate]/messageContent' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.StatusUpdate]/type' from the response with the '200' status
+
+- removed the optional property '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.StatusUpdate]/internal' from the response with the '200' status
+
+- removed the optional property '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.StatusUpdate]/meta' from the response with the '200' status
+
+- added '#/components/schemas/de.mittwald.v1.conversation.ResubmissionStatusUpdate, #/components/schemas/de.mittwald.v1.conversation.GenericStatusUpdate' to the '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.StatusUpdate]/' response property 'oneOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="conversation-list-messages-by-conversation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List mail settings of a Project"
+
+
+- ⚠️ **Breaking:** the 'blacklist/items/' response's property type/format changed from 'string'/'idn-email' to 'string'/'' for status '200'
+
+- ⚠️ **Breaking:** the 'whitelist/items/' response's property type/format changed from 'string'/'idn-email' to 'string'/'' for status '200'
+
+- the 'blacklist/items/' response's property pattern '^([a-zA-Z0-9.!#$%&'*\/=?^_{|}~-]+@[a-zA-Z0-9-*]+(?:\.([a-zA-Z0-9-]+|\*))+)$' was added for the status '200'
+
+- the 'whitelist/items/' response's property pattern '^([a-zA-Z0-9.!#$%&'*\/=?^_{|}~-]+@[a-zA-Z0-9-*]+(?:\.([a-zA-Z0-9-]+|\*))+)$' was added for the status '200'
+
+
+For details, refer to the <OperationLink operation="mail-list-project-mail-settings" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a mail setting of a Project"
+
+
+- ⚠️ **Breaking:** removed 'subschema #1, subschema #2' from the request body 'oneOf' list
+
+- added 'subschema #1, subschema #2' to the request body 'oneOf' list
+
+
+For details, refer to the <OperationLink operation="mail-update-project-mail-setting" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a mail setting of a Project"
+
+
+- ⚠️ **Breaking:** removed 'subschema #1, subschema #2' from the request body 'oneOf' list
+
+- added 'subschema #1, subschema #2' to the request body 'oneOf' list
+
+
+For details, refer to the <OperationLink operation="deprecated-mail-update-project-mail-setting" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update blacklist for a given project ID"
+
+
+- ⚠️ **Breaking:** the 'blacklist/items/' request property type/format changed from 'string'/'idn-email' to 'string'/''
+
+- added the pattern '^([a-zA-Z0-9.!#$%&'*\/=?^_{|}~-]+@[a-zA-Z0-9-*]+(?:\.([a-zA-Z0-9-]+|\*))+)$' to the request property 'blacklist/items/'
+
+
+For details, refer to the <OperationLink operation="deprecated-mail-projectsetting-update-blacklist" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update whitelist for a given project ID"
+
+
+- ⚠️ **Breaking:** the 'whitelist/items/' request property type/format changed from 'string'/'idn-email' to 'string'/''
+
+- added the pattern '^([a-zA-Z0-9.!#$%&'*\/=?^_{|}~-]+@[a-zA-Z0-9-*]+(?:\.([a-zA-Z0-9-]+|\*))+)$' to the request property 'whitelist/items/'
+
+
+For details, refer to the <OperationLink operation="deprecated-mail-projectsetting-update-whitelist" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in ""
+
+
+- removed the schema 'de.mittwald.v1.verification.VerifyAddressConfidence'
+
+- removed the schema 'de.mittwald.v1.verification.VerifyAddressResponse'
+
+
+For details, refer to the <OperationLink operation="" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Check if an address exists"
+
+
+- removed the non-success response with the status '400'
+
+
+For details, refer to the <OperationLink operation="verification-verify-address" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Check if a Domain is available to transfer"
+
+
+- added the non-success response with the status '412'
+
+
+For details, refer to the <OperationLink operation="domain-check-domain-transferability" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get list of Orders"
+
+
+- added the new optional 'query' request parameter 'types'
+
+
+For details, refer to the <OperationLink operation="order-list-orders" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a Backup's expiration time"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="backup-replace-project-backup-expiration-time" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Stacks belonging to the executing user"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-list-self-stacks" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Change your password"
+
+
+- added the required property 'refreshToken' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="user-change-password" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK Release v2.1.197
+
+The latest release of the mittwald PHP SDK, version 2.1.197, introduces some significant changes and enhancements. 
+
+#### Breaking Changes
+- The `VerificationVerifyAddressBadRequestResponse` class has been removed from the codebase.
+
+#### Enhancements
+- Documentation for the `country` field in `VerificationVerifyAddressRequest` and `VerificationVerifyAddressRequestBody` has been updated. It now specifies that the input can be the full English or German name in addition to the ISO 3166-2 country codes.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.197).
+
+### mittwald JavaScript SDK Release 4.332.0
+
+The mittwald JavaScript SDK has been updated to version 4.332.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.332.0](https://github.com/mittwald/api-client-js/releases/tag/4.332.0).
+
+### mittwald JavaScript SDK Release 4.331.0
+
+The mittwald JavaScript SDK has been updated to version 4.331.0. This release includes the following feature:
+
+- Updated the generated client to improve functionality and performance. For more details, refer to the commit [f295949](https://github.com/mittwald/api-client-js/commit/f295949bc60bb0c0be016524b9aa16c1dc9f787b).
+
+For the full release notes and to download the latest version, visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.331.0).
+
+### mittwald JavaScript SDK Release 4.330.0
+
+The mittwald JavaScript SDK has been updated to version 4.330.0, released on March 19, 2026. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.330.0).
+
+### mittwald JavaScript SDK Release 4.329.0
+
+The mittwald JavaScript SDK has been updated to version 4.329.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.329.0).
+
+### mittwald JavaScript SDK Release 4.328.0
+
+The mittwald JavaScript SDK has been updated to version 4.328.0. This release includes a feature update where the generated client has been updated. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.328.0).
+
+### mittwald JavaScript SDK Release 4.327.0
+
+The mittwald JavaScript SDK has been updated to version 4.327.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.327.0).
+
+### mittwald JavaScript SDK Release 4.326.0
+
+The mittwald JavaScript SDK has been updated to version 4.326.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.326.0](https://github.com/mittwald/api-client-js/releases/tag/4.326.0).
+
