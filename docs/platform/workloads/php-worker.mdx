@@ -84,16 +84,16 @@ The following code snippets show a minimal example of a [ReactPHP](https://react
 
 Start by creating a PHP worker app, for example using the CLI:
 
-```shellsession title="Local shell session"
-$ mw app create php-worker --wait --entrypoint "php server.php"
+```shellsession
+user@local $ mw app create php-worker --wait --entrypoint "php server.php"
 ```
 
 After the app has been installed, initialize a new Composer project in the app's root directory and install ReactPHP as dependency.
 
 Alternatively, start with a local project and the [deploy][deployment] it into the application directory.
 
-```shellsession title="SSH shell session"
-$ composer init --require=react/http --require=react/socket
+```shellsession
+user@ssh $ composer init --require=react/http --require=react/socket
 ```
 
 After that, create a `server.php` with the following contents:
@@ -126,16 +126,16 @@ As soon as you connect a domain to your application, the ReactPHP server will be
 
 To start a [Laravel Reverb](https://reverb.laravel.com) application, create a PHP worker with the following arguments:
 
-```shellsession title="Local shell session"
-$ mw app create php-worker --wait --entrypoint "bash -c 'php artisan serve --port $PORT'"
+```shellsession
+user@local $ mw app create php-worker --wait --entrypoint "bash -c 'php artisan serve --port $PORT'"
 ```
 
 ### Symfony Messenger
 
 To start a [Symfony Messenger](https://symfony.com/doc/current/messenger.html) worker, create a PHP worker with the following arguments:
 
-```shellsession title="Local shell session"
-$ mw app create php-worker --wait --entrypoint "php bin/console messenger:consume async"
+```shellsession
+user@local $ mw app create php-worker --wait --entrypoint "php bin/console messenger:consume async"
 ```
 
 ## Other tutorials
@@ -158,14 +158,14 @@ Sometimes, you may want to run multiple worker instances of the same application
 
 To do this, add Node.js as a dependency to your PHP worker app:
 
-```shellsession title="Local shell session"
-$ mw app dependency update <app-id> --set node=~22.0
+```shellsession
+user@local $ mw app dependency update <app-id> --set node=~22.0
 ```
 
 Then, install PM2 via NPM:
 
-```shellsession title="SSH shell session"
-$ npm install -g pm2
+```shellsession
+user@ssh $ npm install -g pm2
 ```
 
 In your application directory, create an ecosystem configuration file `ecosystem.config.js`:
@@ -188,8 +188,8 @@ module.exports = {
 
 Finally, assert that the `pm2` command is used as the entrypoint for your PHP worker app:
 
-```shellsession title="Local shell session"
-$ mw app update <app-id> --entrypoint "pm2 start ecosystem.config.js --no-daemon"
+```shellsession
+user@local $ mw app update <app-id> --entrypoint "pm2 start ecosystem.config.js --no-daemon"
 ```
 
 ### Running multiple worker instances (with Supervisord) {#running-multiple-worker-instances-supervisord}
@@ -198,14 +198,14 @@ $ mw app update <app-id> --entrypoint "pm2 start ecosystem.config.js --no-daemon
 
 To use Supervisord, add Python as a dependency to your PHP worker app:
 
-```shellsession title="Local shell session"
-$ mw app dependency update <app-id> --set python=~3.13
+```shellsession
+user@local $ mw app dependency update <app-id> --set python=~3.13
 ```
 
 Then, install Supervisord via pip:
 
-```shellsession title="SSH shell session"
-$ pip install supervisor
+```shellsession
+user@ssh $ pip install supervisor
 ```
 
 In your application directory, create configuration file `supervisord.conf`:
@@ -235,8 +235,8 @@ directory=/html/actual-installation-directory
 
 Finally, assert that the `supervisord` command is used as the entrypoint for your PHP worker app:
 
-```shellsession title="Local shell session"
-$ mw app update <app-id> --entrypoint "supervisord"
+```shellsession
+user@local $ mw app update <app-id> --entrypoint "supervisord"
 ```
 
 After this, you can also use the `supervisorctl` command to manage your worker processes:
