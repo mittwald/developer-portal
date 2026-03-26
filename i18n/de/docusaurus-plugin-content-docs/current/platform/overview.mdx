@@ -1,0 +1,155 @@
+---
+sidebar_label: Plattform-Übersicht
+sidebar_position: 10
+description: Eine visuelle Übersicht der mittwald-Plattform-Entitätshierarchie, Workload-Typen und ihrer technischen Entsprechungen.
+tags:
+  - Containers
+  - Docker
+---
+
+# Plattform-Übersicht: Entitätshierarchie
+
+Diese Seite gibt dir einen Überblick über die mittwald-Hosting-Plattform auf einen Blick. Sie zeigt die wichtigsten Entitäten – wie Server, Projekte, Workloads und Datenbanken – und ordnet ihnen ihre technischen Entsprechungen zu.
+
+## Entitätshierarchie {#entity-hierarchy}
+
+Das folgende Diagramm zeigt alle wichtigen Plattformentitäten, wie sie ineinander verschachtelt sind und welche Technologie jeweils dahintersteckt:
+
+```mermaid
+graph TD
+    ORG["🏢 Organisation\n────────────\nKundenkonto / Mandant"]
+
+    SERVER["🖥️ Server\n────────────\nSpace Server-Tarif\nGemeinsamer Ressource-Pool"]
+    PROJECT["📁 Projekt\n────────────\nproSpace · Standalone\nAbrechnungs- & Isolationseinheit\n≈ Kubernetes-Namespace"]
+
+    APP["📦 App-Installation\n────────────\nVerwaltete Anwendung\nPHP · Node.js · Python"]
+    STACK["🐳 Container-Stack\n────────────\nDocker-Compose-Äquivalent\nOCI-Container-Orchestrierung"]
+
+    SERVICE["⚙️ Service\n────────────\nEinzelner Container\n≈ Docker Container / OCI-Instanz"]
+    VOLUME["💾 Volume\n────────────\nPersistenter Speicher\n≈ PersistentVolumeClaim"]
+
+    MYSQL["🗄️ MySQL / MariaDB\n────────────\nVerwaltete relationale Datenbank"]
+    PGSQL["🗄️ PostgreSQL\n────────────\nVerwaltete relationale Datenbank"]
+    REDIS["⚡ Redis\n────────────\nIn-Memory-Datenspeicher / Cache"]
+    OPENSEARCH["🔍 OpenSearch / Solr\n────────────\nVerwaltete Suchmaschine"]
+
+    INGRESS["🌐 Ingress\n────────────\nHTTP/S Reverse Proxy + TLS\nLeitet öffentlichen Traffic weiter"]
+    DOMAIN["🔗 Domain / DNS\n────────────\nDNS-Zonenverwaltung"]
+
+    SSH["🔑 SSH / SFTP-Nutzer\n────────────\nDateisystemzugriff"]
+    CRON["⏰ Cronjob\n────────────\nPlanung von Aufgaben"]
+
+    ORG -->|"kann besitzen"| SERVER
+    ORG -->|"kann besitzen"| PROJECT
+    SERVER -->|"hostet"| PROJECT
+
+    PROJECT -->|"Workload"| APP
+    PROJECT -->|"Workload"| STACK
+
+    PROJECT -->|"Datenspeicher"| MYSQL
+    PROJECT -->|"Datenspeicher"| PGSQL
+    PROJECT -->|"Datenspeicher"| REDIS
+    PROJECT -->|"Datenspeicher"| OPENSEARCH
+
+    PROJECT -->|"Netzwerk"| INGRESS
+    PROJECT -->|"Netzwerk"| DOMAIN
+
+    PROJECT -->|"Zugriff"| SSH
+    PROJECT -->|"Automatisierung"| CRON
+
+    STACK -->|"orchestriert"| SERVICE
+    STACK -->|"persistiert Daten via"| VOLUME
+    SERVICE -->|"bindet ein"| VOLUME
+
+    INGRESS -->|"leitet weiter zu"| APP
+    INGRESS -->|"leitet weiter zu"| SERVICE
+
+    APP -->|"verknüpfte DB"| MYSQL
+    APP -->|"verknüpfte DB"| REDIS
+
+    CRON -->|"läuft innerhalb von"| APP
+
+    classDef org fill:#4a5568,stroke:#2d3748,color:#fff
+    classDef hosting fill:#2b6cb0,stroke:#2c5282,color:#fff
+    classDef workload fill:#276749,stroke:#22543d,color:#fff
+    classDef container fill:#285e61,stroke:#234e52,color:#fff
+    classDef database fill:#744210,stroke:#5c3707,color:#fff
+    classDef network fill:#553c9a,stroke:#44337a,color:#fff
+    classDef access fill:#702459,stroke:#521b41,color:#fff
+
+    class ORG org
+    class SERVER,PROJECT hosting
+    class APP,STACK workload
+    class SERVICE,VOLUME container
+    class MYSQL,PGSQL,REDIS,OPENSEARCH database
+    class INGRESS,DOMAIN network
+    class SSH,CRON access
+```
+
+## Beschreibung der Entitäten {#entity-descriptions}
+
+### Organisation {#organization}
+
+Die **Organisation** (auch _Kundenkonto_ oder _Mandant_) ist die übergeordnete Entität. Sie besitzt Server und Projekte und ist das Subjekt der Abrechnung für alle Ressourcen.
+
+### Server {#server}
+
+Ein **Server** (Space Server-Tarif) ist ein gemeinsamer Ressource-Pool, der mehrere Projekte hosten kann. Er stellt eine feste Menge an CPU, Arbeitsspeicher und Speicherplatz bereit, die von allen Projekten auf diesem Server gemeinsam genutzt wird. Dieser Tarif eignet sich, wenn du mehrere kleinere Projekte kosteneffizient betreiben möchtest.
+
+### Projekt {#project}
+
+Ein **Projekt** ist die primäre Einheit für Isolation und Abrechnung. Jeder Workload, jede Datenbank, jede Domain und jeder Nutzer gehört zu einem Projekt. Projekte im Standalone-Tarif (proSpace) haben dedizierte, garantierte Ressourcen; Projekte auf einem Server teilen den Ressource-Pool des Servers.
+
+Technisch entspricht ein Projekt ungefähr einem **Kubernetes-Namespace** – es bietet Netzwerkisolation und separate Ressourcenquoten.
+
+### App-Installation {#app-installation}
+
+Eine **App-Installation** (auch _verwaltete Anwendung_) ist eine vorkonfigurierte Laufzeitumgebung für einen bestimmten Technologie-Stack wie PHP, Node.js oder Python. mittwald verwaltet das zugrundeliegende Framework und die Systemsoftware; du lieferst nur deinen Anwendungscode.
+
+App-Installationen können mit MySQL/MariaDB- oder Redis-Datenbanken verknüpft werden und können eigene Cronjobs und SSH/SFTP-Nutzer für das Deployment haben.
+
+### Container-Stack {#container-stack}
+
+Ein **Container-Stack** ist eine Docker-Compose-kompatible Deployment-Einheit. Er fasst einen oder mehrere _Services_ (Container) zusammen, stellt gemeinsam genutzte _Volumes_ für persistente Daten bereit und macht Ports intern innerhalb des Projekts verfügbar.
+
+### Service {#service}
+
+Ein **Service** ist ein einzelner Container, der innerhalb eines Container-Stacks läuft. Er entspricht direkt einem Docker-Container / OCI-Runtime-Instanz und kann mit CPU- und Speicherlimits konfiguriert werden.
+
+### Volume {#volume}
+
+Ein **Volume** ist persistenter Speicher, der an einen Container-Stack angehängt ist. Volumes überleben Container-Neustarts und können in einen oder mehrere Services eingebunden werden. Sie sind analog zu Kubernetes-`PersistentVolumeClaim`-Objekten.
+
+### Verwaltete Datenbanken {#managed-databases}
+
+| Entität           | Technologie        | Typischer Einsatz                          |
+| ----------------- | ------------------ | ------------------------------------------ |
+| MySQL / MariaDB   | Relational (SQL)   | Webanwendungen, CMS                        |
+| PostgreSQL        | Relational (SQL)   | Anwendungen mit erweiterten SQL-Funktionen |
+| Redis             | In-Memory-Speicher | Caching, Sessions, Queues                  |
+| OpenSearch / Solr | Suchmaschine       | Volltextsuche, Log-Analyse                 |
+
+Datenbanken sind projektweit verwaltete Dienste. Ihre Verbindungsdaten können direkt mit App-Installationen verknüpft werden.
+
+### Ingress {#ingress}
+
+Ein **Ingress** ordnet einen öffentlichen Hostnamen (Domain + Pfad) einem Workload zu, der innerhalb eines Projekts läuft. Er fungiert als HTTP/S Reverse Proxy, übernimmt die TLS-Terminierung (via Let's Encrypt oder ein benutzerdefiniertes Zertifikat) und leitet Traffic entweder zu einer App-Installation oder einem Container-Service weiter.
+
+### Domain / DNS {#domain}
+
+Mit **Domains** kannst du DNS-Zonen und -Records direkt innerhalb eines Projekts verwalten. Ein Domain-Eintrag repräsentiert den Besitz und die DNS-Verwaltung eines registrierten Domainnamens.
+
+### SSH / SFTP-Nutzer {#ssh-sftp-user}
+
+**SSH/SFTP-Nutzer** gewähren Dateisystemzugriff auf den Dateispeicher eines Projekts. Sie werden hauptsächlich für den Datei-Deployment oder ältere FTP-ähnliche Workflows verwendet.
+
+### Cronjob {#cronjob}
+
+Ein **Cronjob** ist eine geplante Aufgabe, die einen Befehl innerhalb einer App-Installation nach einem konfigurierbaren Zeitplan (Cron-Syntax) ausführt. Cronjobs sind projektbezogen und an eine bestimmte App-Installation gebunden.
+
+## Workload-Typen auf einen Blick {#workload-types}
+
+| Workload         | Geeignet für                                       | Technische Basis              |
+| ---------------- | -------------------------------------------------- | ----------------------------- |
+| App-Installation | Vorkonfigurierte Laufzeiten (PHP, Node.js, Python) | Verwaltetes Runtime-Framework |
+| Container-Stack  | Eigene Container, Microservices                    | OCI / Docker Compose          |
