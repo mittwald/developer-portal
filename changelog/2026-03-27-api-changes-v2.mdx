@@ -1,0 +1,155 @@
+---
+title: API changes for v2 API, March 20 to March 27
+authors:
+  - machine
+tags:
+  - apiv2
+  - App
+  - AI hosting
+  - Container
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API introduces several significant updates, including the removal of the 'app-execute-action' operation, the addition of new endpoints for AI hosting and container services, and enhancements to response properties for improved data handling.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- The API operation `app-execute-action` has been removed and replaced with `deprecated-app-installation-execute-action`.
+- A new optional request parameter `onlyRecommended` has been added to the `GET` operation for listing update candidates at the endpoint `/v2/apps/{appId}/versions/{baseAppVersionId}/update-candidates`.
+- The required property `modelTermsApprovalRequired` has been added to the response with a `200` status for the `GET` operation at the endpoint `/v2/customers/{customerId}/ai-hosting`.
+- A new endpoint has been added for the `GET` operation to retrieve a list of currently active models at `/v2/customers/{customerId}/ai-hosting-models`.
+- A new endpoint has been added for the `POST` operation to accept model terms for a customer at `/v2/customers/{customerId}/ai-hosting-models/actions/accept-terms`.
+- The required property `modelTermsApprovalRequired` has also been added to the response with a `200` status for the `GET` operation at the endpoint `/v2/projects/{projectId}/ai-hosting`.
+- A new endpoint has been added for the `GET` operation to retrieve a list of currently active models at `/v2/projects/{projectId}/ai-hosting-models`.
+- A new endpoint has been added for the `POST` operation to create or rotate a pull-image webhook token at `/v2/stacks/{stackId}/services/{serviceId}/webhook-token`.
+- A new endpoint has been added for the `GET` operation to call a pull-image webhook at `/v2/stacks/{stackId}/webhooks/pull-image`.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "app-execute-action"
+
+
+- api operation id 'app-execute-action' removed and replaced with 'deprecated-app-installation-execute-action'
+
+
+For details, refer to the <OperationLink operation="app-execute-action" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List update candidates belonging to an app version"
+
+
+- added the new optional 'query' request parameter 'onlyRecommended'
+
+
+For details, refer to the <OperationLink operation="app-list-update-candidates-for-appversion" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get ai hosting plan and usages of a customer"
+
+
+- added the required property 'modelTermsApprovalRequired' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ai-hosting-customer-get-usage" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a list of currently active models"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ai-hosting-customer-get-detailed-models" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Accepts the model terms for a customer"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ai-hosting-customer-accept-model-terms" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get ai hosting plan and usages of a project. Same as the customer route, but less details"
+
+
+- added the required property 'modelTermsApprovalRequired' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ai-hosting-project-get-usage" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a list of currently active models"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ai-hosting-project-get-detailed-models" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create or rotate pull-image webhook token"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-rotate-pull-image-webhook-for-service" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Call pull-image webhook"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-call-pull-image-webhook-for-service" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald JavaScript SDK Release 4.336.0
+
+The mittwald JavaScript SDK has been updated to version 4.336.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.336.0).
+
+### mittwald JavaScript SDK Release 4.335.0
+
+The mittwald JavaScript SDK has been updated to version 4.335.0. This release includes the following feature:
+
+- Updated the generated client to enhance functionality ([commit fac3120](https://github.com/mittwald/api-client-js/commit/fac31203561e54200c26d65ce3bebe3b92007fcf)).
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.335.0).
+
+### mittwald JavaScript SDK Release 4.334.0
+
+The mittwald JavaScript SDK has been updated to version 4.334.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.334.0](https://github.com/mittwald/api-client-js/releases/tag/4.334.0).
+
+### mittwald JavaScript SDK Release 4.333.0
+
+The mittwald JavaScript SDK has been updated to version 4.333.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.333.0).
+
