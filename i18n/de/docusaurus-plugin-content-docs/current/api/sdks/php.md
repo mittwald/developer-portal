@@ -1,6 +1,7 @@
 ---
 title: Zugriff auf die API mit PHP
 sidebar_label: PHP
+sidebar_position: 20
 description: Ein Überblick über verfügbare PHP-Bibliotheken zur Nutzung mit der mittwald-API.
 ---
 

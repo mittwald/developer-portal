@@ -1,6 +1,7 @@
 ---
 title: Accessing the API from PHP
 sidebar_label: PHP
+sidebar_position: 20
 description: An overview of available PHP libraries for interacting with the mittwald API.
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: Accessing the API from Javascript (Node.js or a browser)
 sidebar_label: JavaScript (Node.js/Browser)
+sidebar_position: 10
 description: An overview of available JavaScript libraries for interacting with the mittwald API.
 ---
 

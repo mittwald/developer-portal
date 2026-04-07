@@ -1,6 +1,7 @@
 ---
-title: Python SDK
-sidebar_label: Python SDK
+title: Python
+sidebar_label: Python
+sidebar_position: 30
 description: Guide how to use and install the Python SDK for the mittwald API, including client generation and maintenance.
 ---
 
@@ -106,6 +107,7 @@ Execute the script to perform an API call:
 ## Code generation – Python API Client {#example-python}
 
 **Requirements:**
+
 - Python Installation (version 3.10+ recommended)
 - Basic Bash, Python, `pip`, and virtual environment experience
 
@@ -219,8 +221,9 @@ order to reproduce the exact same build later.
 ```
 
 The generator may emit warnings.  
-**How to handle warnings:**  
-- If your project needs the API parts triggering a warning, you must resolve the underlying issue.  
+**How to handle warnings:**
+
+- If your project needs the API parts triggering a warning, you must resolve the underlying issue.
 - If you don’t need those endpoints or features, you can safely ignore the warnings.
 - For blocking issues in the OpenAPI spec, please report them via the [mittwald feature requests tracker](https://github.com/mittwald/feature-requests).
 
@@ -416,26 +419,26 @@ name: API Client Regeneration and Release
 
 permissions:
   contents: write
-  id-token: write       # Required for OIDC with PyPI trusted publisher
+  id-token: write # Required for OIDC with PyPI trusted publisher
 
 on:
   schedule:
-    - cron: '0 4 * * 1'       # Runs every Monday at 04:00 UTC
-  workflow_dispatch:           # Allows manual trigger
+    - cron: "0 4 * * 1" # Runs every Monday at 04:00 UTC
+  workflow_dispatch: # Allows manual trigger
 
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4   # v4 is latest stable at time of writing
+        uses: actions/checkout@v4 # v4 is latest stable at time of writing
         with:
-          fetch-depth: 0   # Fetch all history and tags
+          fetch-depth: 0 # Fetch all history and tags
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: "3.10"
 
       - name: Upgrade pip, install dependencies
         run: |
