@@ -1,6 +1,7 @@
 ---
 title: Zugriff auf die API mit JavaScript (Node.js/Browser)
 sidebar_label: JavaScript (Node.js/Browser)
+sidebar_position: 10
 description: Ein Überblick über verfügbare JavaScript-Bibliotheken zur Nutzung mit der mittwald-API.
 ---
 

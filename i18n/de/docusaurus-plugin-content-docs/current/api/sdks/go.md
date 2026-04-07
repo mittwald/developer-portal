@@ -1,6 +1,7 @@
 ---
 title: Zugriff auf die API mit Go
 sidebar_label: Go
+sidebar_position: 40
 description: Ein Überblick über verfügbare Go-Bibliotheken zur Interaktion mit der mittwald API.
 ---
 

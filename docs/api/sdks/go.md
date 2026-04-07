@@ -1,6 +1,7 @@
 ---
 title: Accessing the API from Go
 sidebar_label: Go
+sidebar_position: 40
 description: An overview of available Go libraries for interacting with the mittwald API.
 ---
 

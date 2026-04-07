@@ -150,7 +150,11 @@ function APILibraries() {
           (Node.js + browser)
         </li>
         <li>
-          <Link to="/docs/v2/api/sdks/go">mittwald Go SDK</Link> <NewBadge />
+          <Link to="/docs/v2/api/sdks/python">mittwald Python SDK</Link>{" "}
+          <NewBadge />
+        </li>
+        <li>
+          <Link to="/docs/v2/api/sdks/go">mittwald Go SDK</Link>
         </li>
       </ul>
       <p>
