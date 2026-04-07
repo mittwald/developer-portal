@@ -166,11 +166,11 @@ function APILibraries() {
       </p>
       <ul>
         <li>
-          <a href="https://github.com/nuonic-digital/mittwald-flow-mcp">
+          <Link href="https://github.com/nuonic-digital/mittwald-flow-mcp">
             <Translate id="index.sdks.community-mcp-flow">
               mittwald Flow MCP
             </Translate>
-          </a>{" "}
+          </Link>{" "}
           <NewBadge />
           <br />
           <Translate id="index.sdks.community-mcp-flow-desc">
