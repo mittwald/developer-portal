@@ -73,7 +73,7 @@ Das automatische Update von PHP-Versionen ist ein [offener Feature-Request](http
 Du kannst jedoch eine eigene Lösung zum automatischen Update von PHP bauen, indem du den `mw app dependency update` [CLI](/cli) Befehl verwendest. Dieser Befehl ermöglicht es dir, eine Versionsbeschränkung für die PHP-Abhängigkeit deiner App festzulegen, und aktualisiert die Abhängigkeiten der App entsprechend. Zum Beispiel kannst du den folgenden Befehl ausführen, um deine App auf die neueste 8.4-Version von PHP zu aktualisieren (entweder auf Abruf oder regelmäßig über einen Cron-Job):
 
 ```shell-session
-$ mw app dependency update <app-id> --set php=~8.4
+user@local $ mw app dependency update <app-id> --set php=~8.4
 ```
 
 ## Beispielanwendungen
@@ -84,16 +84,16 @@ Die folgenden Code-Snippets zeigen ein minimales Beispiel einer [ReactPHP](https
 
 Beginne mit der Erstellung einer PHP-Worker-App, zum Beispiel über die CLI:
 
-```shellsession title="Lokale Shell-Sitzung"
-$ mw app create php-worker --wait --entrypoint "php server.php"
+```shellsession
+user@local $ mw app create php-worker --wait --entrypoint "php server.php"
 ```
 
 Nach der Installation initialisiere ein neues Composer-Projekt im Wurzelverzeichnis der Anwendung und installiere ReactPHP als Abhängigkeit.
 
 Alternativ kannst du mit einem lokalen Projekt starten und es dann in das Anwendungsverzeichnis [deployen][deployment].
 
-```shellsession title="SSH-Shell-Sitzung"
-$ composer init --require=react/http --require=react/socket
+```shellsession
+user@ssh $ composer init --require=react/http --require=react/socket
 ```
 
 Erstelle anschließend eine `server.php` mit folgendem Inhalt:
@@ -126,16 +126,16 @@ Sobald du eine Domain mit deiner Anwendung verbindest, sollte der ReactPHP-Serve
 
 Um eine [Laravel Reverb](https://reverb.laravel.com)-Anwendung zu starten, erstelle einen PHP-Worker mit den folgenden Argumenten:
 
-```shellsession title="Lokale Shell-Sitzung"
-$ mw app create php-worker --wait --entrypoint "bash -c 'php artisan serve --port $PORT'"
+```shellsession
+user@local $ mw app create php-worker --wait --entrypoint "bash -c 'php artisan serve --port $PORT'"
 ```
 
 ### Symfony Messenger
 
 Um einen [Symfony Messenger](https://symfony.com/doc/current/messenger.html)-Worker zu starten, erstelle einen PHP-Worker mit den folgenden Argumenten:
 
-```shellsession title="Lokale Shell-Sitzung"
-$ mw app create php-worker --wait --entrypoint "php bin/console messenger:consume async"
+```shellsession
+user@local $ mw app create php-worker --wait --entrypoint "php bin/console messenger:consume async"
 ```
 
 ## Weitere Tutorials
@@ -152,20 +152,20 @@ cd /html/actual-installation-directory
 exec php artisan serve --port $PORT
 ```
 
-### Mehrere Worker-Instanzen ausführen
+### Mehrere Worker-Instanzen ausführen (mit PM2) {#running-multiple-worker-instances}
 
 Manchmal möchtest du mehrere Worker-Instanzen derselben Anwendung ausführen. Während dies durch das Erstellen mehrerer PHP-Worker-Apps möglich ist, kannst du auch mehrere Worker-Instanzen innerhalb derselben PHP-Worker-App mit einem Prozessmanager wie [pm2](https://pm2.keymetrics.io) betreiben.
 
 Dazu füge Node.js als Abhängigkeit zu deiner PHP-Worker-App hinzu:
 
-```shellsession title="Lokale Shell-Sitzung"
-$ mw app dependency update <app-id> --set node=~22.0
+```shellsession
+user@local $ mw app dependency update <app-id> --set node=~22.0
 ```
 
 Dann installiere PM2 über NPM:
 
-```shellsession title="SSH-Shell-Sitzung"
-$ npm install -g pm2
+```shellsession
+user@ssh $ npm install -g pm2
 ```
 
 Erstelle im Anwendungsverzeichnis eine `ecosystem.config.js`-Datei:
@@ -188,8 +188,64 @@ module.exports = {
 
 Stelle sicher, dass `pm2` als Entrypoint für deine PHP-Worker-App verwendet wird:
 
-```shellsession title="Lokale Shell-Sitzung"
-$ mw app update <app-id> --entrypoint "pm2 start ecosystem.config.js --no-daemon"
+```shellsession
+user@local $ mw app update <app-id> --entrypoint "pm2 start ecosystem.config.js --no-daemon"
+```
+
+### Mehrere Worker-Instanzen ausführen (mit Supervisord) {#running-multiple-worker-instances-supervisord}
+
+[Supervisord](https://supervisord.org/index.html) ist ein weiterer beliebter Prozessmanager, der verwendet werden kann, um mehrere Worker-Instanzen innerhalb derselben Worker-App auszuführen.
+
+Um Supervisord zu verwenden, füge Python als Abhängigkeit zu deiner PHP-Worker-App hinzu:
+
+```shellsession
+user@local $ mw app dependency update <app-id> --set python=~3.13
+```
+
+Dann installiere Supervisord über pip:
+
+```shellsession
+user@ssh $ pip install supervisor
+```
+
+Erstelle im Anwendungsverzeichnis eine Konfigurationsdatei `supervisord.conf`:
+
+```ini title="supervisord.conf"
+[unix_http_server]
+file = /tmp/supervisor.sock
+
+[supervisord]
+nodaemon = true
+
+[supervisorctl]
+serverurl = unix:///tmp/supervisor.sock
+
+[rpcinterface:supervisor]
+supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+
+[program:symfony-messenger]
+process_name=%(program_name)s_%(process_num)02d
+command=php bin/console messenger:consume async
+autostart=true
+autorestart=true
+numprocs=2
+redirect_stderr=true
+directory=/html/actual-installation-directory
+```
+
+Stelle sicher, dass `supervisord` als Entrypoint für deine PHP-Worker-App verwendet wird:
+
+```shellsession
+user@local $ mw app update <app-id> --entrypoint "supervisord"
+```
+
+Danach kannst du auch den Befehl `supervisorctl` verwenden, um deine Worker-Prozesse zu verwalten:
+
+```shellsession
+user@ssh $ supervisorctl status
+
+# alternativ von deinem lokalen Rechner:
+user@local $ mw ssh <app-id> "supervisorctl status"
 ```
 
 [deployment]: /docs/v2/category/guides/deployment/

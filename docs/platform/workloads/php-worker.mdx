@@ -73,7 +73,7 @@ Automatically updating PHP patch-level versions is a [currently open feature req
 You can build your own solution to automatically update PHP by using the `mw app dependency update` [CLI](/cli) command. This command allows you to specify a version constraint for the PHP dependency of your app, and it will update the app's dependencies accordingly. For example, to keep your app on the latest PHP 8.4 release, you can run the following command (either on-demand, or periodically via a cron job):
 
 ```shell-session
-$ mw app dependency update <app-id> --set php=~8.4
+user@local $ mw app dependency update <app-id> --set php=~8.4
 ```
 
 ## Example applications
@@ -84,16 +84,16 @@ The following code snippets show a minimal example of a [ReactPHP](https://react
 
 Start by creating a PHP worker app, for example using the CLI:
 
-```shellsession title="Local shell session"
-$ mw app create php-worker --wait --entrypoint "php server.php"
+```shellsession
+user@local $ mw app create php-worker --wait --entrypoint "php server.php"
 ```
 
 After the app has been installed, initialize a new Composer project in the app's root directory and install ReactPHP as dependency.
 
-Alternatively, start with a local project and the [deploy][deployment] it into the application directory.
+Alternatively, start with a local project and then [deploy][deployment] it into the application directory.
 
-```shellsession title="SSH shell session"
-$ composer init --require=react/http --require=react/socket
+```shellsession
+user@ssh $ composer init --require=react/http --require=react/socket
 ```
 
 After that, create a `server.php` with the following contents:
@@ -126,16 +126,16 @@ As soon as you connect a domain to your application, the ReactPHP server will be
 
 To start a [Laravel Reverb](https://reverb.laravel.com) application, create a PHP worker with the following arguments:
 
-```shellsession title="Local shell session"
-$ mw app create php-worker --wait --entrypoint "bash -c 'php artisan serve --port $PORT'"
+```shellsession
+user@local $ mw app create php-worker --wait --entrypoint "bash -c 'php artisan serve --port $PORT'"
 ```
 
 ### Symfony Messenger
 
 To start a [Symfony Messenger](https://symfony.com/doc/current/messenger.html) worker, create a PHP worker with the following arguments:
 
-```shellsession title="Local shell session"
-$ mw app create php-worker --wait --entrypoint "php bin/console messenger:consume async"
+```shellsession
+user@local $ mw app create php-worker --wait --entrypoint "php bin/console messenger:consume async"
 ```
 
 ## Other tutorials
@@ -152,20 +152,20 @@ cd /html/actual-installation-directory
 exec php artisan serve --port $PORT
 ```
 
-### Running multiple worker instances
+### Running multiple worker instances (with PM2) {#running-multiple-worker-instances}
 
 Sometimes, you may want to run multiple worker instances of the same application. While this can be achieved by creating multiple PHP worker apps, you can also run multiple worker instances within the same PHP worker app using a process manager like [pm2](https://pm2.keymetrics.io).
 
 To do this, add Node.js as a dependency to your PHP worker app:
 
-```shellsession title="Local shell session"
-$ mw app dependency update <app-id> --set node=~22.0
+```shellsession
+user@local $ mw app dependency update <app-id> --set node=~22.0
 ```
 
 Then, install PM2 via NPM:
 
-```shellsession title="SSH shell session"
-$ npm install -g pm2
+```shellsession
+user@ssh $ npm install -g pm2
 ```
 
 In your application directory, create an ecosystem configuration file `ecosystem.config.js`:
@@ -188,8 +188,64 @@ module.exports = {
 
 Finally, assert that the `pm2` command is used as the entrypoint for your PHP worker app:
 
-```shellsession title="Local shell session"
-$ mw app update <app-id> --entrypoint "pm2 start ecosystem.config.js --no-daemon"
+```shellsession
+user@local $ mw app update <app-id> --entrypoint "pm2 start ecosystem.config.js --no-daemon"
+```
+
+### Running multiple worker instances (with Supervisord) {#running-multiple-worker-instances-supervisord}
+
+[Supervisord](https://supervisord.org/index.html) is another popular process manager that can be used to run multiple worker instances within the same worker app.
+
+To use Supervisord, add Python as a dependency to your PHP worker app:
+
+```shellsession
+user@local $ mw app dependency update <app-id> --set python=~3.13
+```
+
+Then, install Supervisord via pip:
+
+```shellsession
+user@ssh $ pip install supervisor
+```
+
+In your application directory, create a configuration file `supervisord.conf`:
+
+```ini title="supervisord.conf"
+[unix_http_server]
+file = /tmp/supervisor.sock
+
+[supervisord]
+nodaemon = true
+
+[supervisorctl]
+serverurl = unix:///tmp/supervisor.sock
+
+[rpcinterface:supervisor]
+supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+
+[program:symfony-messenger]
+process_name=%(program_name)s_%(process_num)02d
+command=php bin/console messenger:consume async
+autostart=true
+autorestart=true
+numprocs=2
+redirect_stderr=true
+directory=/html/actual-installation-directory
+```
+
+Finally, assert that the `supervisord` command is used as the entrypoint for your PHP worker app:
+
+```shellsession
+user@local $ mw app update <app-id> --entrypoint "supervisord"
+```
+
+After this, you can also use the `supervisorctl` command to manage your worker processes:
+
+```shellsession
+user@ssh $ supervisorctl status
+
+# alternatively, from your local machine:
+user@local $ mw ssh <app-id> "supervisorctl status"
 ```
 
 [deployment]: /docs/v2/category/guides/deployment/
