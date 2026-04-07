@@ -1,0 +1,176 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.inlineView {
+  width: 100%;
+}
+
+/* Diagram wrapper with proper sizing */
+.diagramWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background-color: var(--mw-main-feature-background-color);
+  border: 1px solid var(--ifm-color-gray-300);
+  border-radius: var(--ifm-global-radius);
+  padding: 1rem;
+  overflow: hidden;
+  min-height: 550px;
+  max-width: 100%;
+}
+
+/* Control bar for zoom buttons */
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.02);
+  border-radius: var(--ifm-global-radius);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.zoomControls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  pointer-events: auto;
+}
+
+.zoomLevel {
+  min-width: 3rem;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ifm-color-content);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* The diagram container - where mermaid SVG renders */
+.diagram {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 480px;
+  max-height: 800px;
+  overflow: visible;
+  cursor: grab;
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  flex: 1;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  will-change: transform;
+}
+
+.diagram:active {
+  cursor: grabbing;
+}
+
+/* Diagram content wrapper */
+.diagramContent {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: auto;
+  pointer-events: auto;
+}
+
+/* SVG styling within the diagram */
+.diagram :global(svg) {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Hint text below diagram */
+.hint {
+  font-size: 0.75rem;
+  color: var(--ifm-color-content);
+  opacity: 0.7;
+  text-align: center;
+  padding: 0.25rem 0;
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: none;
+}
+
+/* Responsive adjustments for tablets */
+@media screen and (max-width: 1024px) {
+  .diagramWrapper {
+    min-height: 480px;
+  }
+
+  .diagram {
+    min-height: 420px;
+    max-height: 700px;
+  }
+}
+
+/* Responsive adjustments for small tablets and large phones */
+@media screen and (max-width: 768px) {
+  .diagramWrapper {
+    padding: 0.75rem;
+    min-height: 400px;
+  }
+
+  .diagram {
+    min-height: 350px;
+    max-height: 500px;
+  }
+
+  .controls {
+    flex-direction: row;
+    padding: 0.5rem;
+  }
+
+  .zoomControls {
+    width: 100%;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+}
+
+/* Responsive adjustments for phones */
+@media screen and (max-width: 480px) {
+  .diagramWrapper {
+    min-height: 300px;
+    padding: 0.5rem;
+  }
+
+  .diagram {
+    min-height: 280px;
+    max-height: 400px;
+  }
+
+  .controls {
+    padding: 0.5rem;
+  }
+
+  .zoomControls {
+    gap: 0.25rem;
+  }
+
+  .zoomLevel {
+    min-width: 2.5rem;
+    font-size: 0.75rem;
+  }
+
+  .hint {
+    display: none;
+  }
+}

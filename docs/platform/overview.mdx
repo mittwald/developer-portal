@@ -7,6 +7,8 @@ tags:
   - Docker
 ---
 
+import InteractiveMermaidDiagram from "@site/src/components/InteractiveMermaidDiagram";
+
 # Platform Overview: Entity Hierarchy
 
 This page gives you a bird's-eye view of the mittwald hosting platform. It maps the main entities – such as servers, projects, workloads, and databases – to their technical counterparts and shows how they relate to each other.
@@ -15,76 +17,122 @@ This page gives you a bird's-eye view of the mittwald hosting platform. It maps 
 
 The following diagram shows all major platform entities, how they are nested inside each other, and what technology underpins each of them:
 
+<InteractiveMermaidDiagram id="platform-entity-hierarchy"
+                           title="Platform Entity Hierarchy"
+                           defaultZoom={300}
+                           minZoom={100}
+                           maxZoom={2000}
+                           zoomStep={50}>
 ```mermaid
 graph TD
-    ORG["🏢 Organization\n────────────\nCustomer account / tenant"]
+    ORG[["🏢 Organization"]]
+    SERVER[["🖥️ Server"]]
+    
+    PROJECT["📁 Project"]
+    
+    APP["📦 Managed App Installation"]
+    CONTAINERS(("🐳 Containers"))
+    NETWORKING(("🌐 Networking"))
+    BACKUPS(("💾 Backups"))
+    MAIL(("📧 Mail"))
+    ACCESS(("🔑 Access"))
+    AIHOST(("🤖 AI Hosting"))
+    EXTENSIONS(["🔌 Extensions"])
+    
+    DATASTORES(("📊 Managed Data Stores"))
+    MYSQL[("🗄️ MySQL")]
+    REDIS[("⚡ Redis")]
+    
+    STACK{{"Container Stack *(auto)*"}}
+    SERVICE["⚙️ Service"]
+    VOLUME["💾 Volume"]
+    REGISTRY["📦 Registry"]
+    
+    DOMAIN["🔗 Domain"]
+    DNSZONE{{"DNS Zone *(auto)*"}}
+    INGRESS["Ingress"]
+    CERT(["🔐 Certificate *(auto)*"])
+    
+    CRONJOB["⏰ Cronjob"]
+    BACKUP["Backup"]
+    BACKUPSCHED["📅 Schedule"]
+    BACKUPEXPORT["📥 Export"]
+    
+    MAILADDR["Mail Address"]
+    DELIVERYBOX{{"Delivery *(auto)*"}}
+    MAILSETTINGS["⚙️ Settings *(auto)*"]
+    
+    SSHSFTP["🔑 SSH/SFTP"]
+    APITOKEN["🔐 API Token"]
+    
+    AIHOSTKEY["AI Hosting API Key"]
+    AIHOST_URL["AI Hosting Base URL"]
 
-    SERVER["🖥️ Server\n────────────\nSpace Server plan\nShared resource pool"]
-    PROJECT["📁 Project\n────────────\nproSpace · standalone\nBilling & isolation unit\n≈ Kubernetes namespace"]
+    ORG -->|owns| SERVER
+    SERVER -->|hosts| PROJECT
 
-    APP["📦 App Installation\n────────────\nManaged application\nPHP · Node.js · Python"]
-    STACK["🐳 Container Stack\n────────────\nDocker Compose equivalent\nOCI container orchestration"]
+    PROJECT --> APP
+    PROJECT --> CONTAINERS
+    PROJECT --> NETWORKING
+    PROJECT --> BACKUPS
+    PROJECT --> MAIL
+    PROJECT -.-> ACCESS
+    PROJECT -.-> AIHOST
+    PROJECT -.-> EXTENSIONS
 
-    SERVICE["⚙️ Service\n────────────\nIndividual container\n≈ Docker container / OCI instance"]
-    VOLUME["💾 Volume\n────────────\nPersistent storage\n≈ PersistentVolumeClaim"]
+    APP --> DATASTORES
+    DATASTORES --> MYSQL
+    DATASTORES --> REDIS
 
-    MYSQL["🗄️ MySQL / MariaDB\n────────────\nManaged relational database"]
-    PGSQL["🗄️ PostgreSQL\n────────────\nManaged relational database"]
-    REDIS["⚡ Redis\n────────────\nIn-memory data store / cache"]
-    OPENSEARCH["🔍 OpenSearch / Solr\n────────────\nManaged search engine"]
+    CONTAINERS --> STACK
+    CONTAINERS --> REGISTRY
+    STACK --> SERVICE
+    STACK --> VOLUME
+    SERVICE -.-> VOLUME
 
-    INGRESS["🌐 Ingress\n────────────\nHTTP/S reverse proxy + TLS\nRoutes public traffic"]
-    DOMAIN["🔗 Domain / DNS\n────────────\nDNS zone management"]
+    NETWORKING --> DOMAIN
+    NETWORKING --> INGRESS
+    DOMAIN --> DNSZONE
+    INGRESS --> CERT
 
-    SSH["🔑 SSH / SFTP User\n────────────\nFilesystem access"]
-    CRON["⏰ Cronjob\n────────────\nScheduled task runner"]
+    BACKUPS --> CRONJOB
+    BACKUPS --> BACKUP
+    BACKUP --> BACKUPSCHED
+    BACKUP --> BACKUPEXPORT
 
-    ORG -->|"can own"| SERVER
-    ORG -->|"can own"| PROJECT
-    SERVER -->|"hosts"| PROJECT
+    MAIL --> MAILADDR
+    MAILADDR --> DELIVERYBOX
+    MAIL --> MAILSETTINGS
 
-    PROJECT -->|"workload"| APP
-    PROJECT -->|"workload"| STACK
+    ACCESS --> SSHSFTP
+    ACCESS --> APITOKEN
 
-    PROJECT -->|"data store"| MYSQL
-    PROJECT -->|"data store"| PGSQL
-    PROJECT -->|"data store"| REDIS
-    PROJECT -->|"data store"| OPENSEARCH
+    AIHOST --> AIHOSTKEY
+    AIHOST --> AIHOST_URL
 
-    PROJECT -->|"networking"| INGRESS
-    PROJECT -->|"networking"| DOMAIN
+    classDef brandOrg fill:#147af3,stroke:#0050d8,color:#fff,stroke-width:3px
+    classDef managed fill:#72e06a,stroke:#5cd54f,color:#fff,stroke-width:2px
+    classDef containers fill:#0fb5ae,stroke:#0a94a1,color:#fff,stroke-width:2px
+    classDef networking fill:#4046ca,stroke:#3035a7,color:#fff,stroke-width:2px
+    classDef backups fill:#f68511,stroke:#d96b00,color:#fff,stroke-width:2px
+    classDef mail fill:#de3d82,stroke:#c1326f,color:#fff,stroke-width:2px
+    classDef access fill:#7e84fa,stroke:#6572e5,color:#fff,stroke-width:2px
+    classDef aiHosting fill:#7326d3,stroke:#6217bb,color:#fff,stroke-width:2px
+    classDef extensions fill:#e8c600,stroke:#c9a400,color:#000,stroke-width:2px
+    classDef autocreated fill:#8a9ba8,stroke:#6b7c8a,color:#fff
 
-    PROJECT -->|"access"| SSH
-    PROJECT -->|"automation"| CRON
-
-    STACK -->|"orchestrates"| SERVICE
-    STACK -->|"persists data via"| VOLUME
-    SERVICE -->|"mounts"| VOLUME
-
-    INGRESS -->|"routes to"| APP
-    INGRESS -->|"routes to"| SERVICE
-
-    APP -->|"linked DB"| MYSQL
-    APP -->|"linked DB"| REDIS
-
-    CRON -->|"runs within"| APP
-
-    classDef org fill:#4a5568,stroke:#2d3748,color:#fff
-    classDef hosting fill:#2b6cb0,stroke:#2c5282,color:#fff
-    classDef workload fill:#276749,stroke:#22543d,color:#fff
-    classDef container fill:#285e61,stroke:#234e52,color:#fff
-    classDef database fill:#744210,stroke:#5c3707,color:#fff
-    classDef network fill:#553c9a,stroke:#44337a,color:#fff
-    classDef access fill:#702459,stroke:#521b41,color:#fff
-
-    class ORG org
-    class SERVER,PROJECT hosting
-    class APP,STACK workload
-    class SERVICE,VOLUME container
-    class MYSQL,PGSQL,REDIS,OPENSEARCH database
-    class INGRESS,DOMAIN network
-    class SSH,CRON access
+    class ORG,SERVER,PROJECT brandOrg
+    class APP,DATASTORES,MYSQL,REDIS managed
+    class CONTAINERS,STACK,SERVICE,VOLUME,REGISTRY containers
+    class NETWORKING,DOMAIN,DNSZONE,INGRESS,CERT networking
+    class BACKUPS,CRONJOB,BACKUP,BACKUPSCHED,BACKUPEXPORT backups
+    class MAIL,MAILADDR,DELIVERYBOX,MAILSETTINGS mail
+    class ACCESS,SSHSFTP,APITOKEN access
+    class AIHOST,AIHOSTKEY,AIHOST_URL aiHosting
+    class EXTENSIONS extensions
+    class STACK,DNSZONE,CERT,DELIVERYBOX,MAILSETTINGS autocreated
 ```
+</InteractiveMermaidDiagram>
 
 ## Entity descriptions {#entity-descriptions}
 
@@ -102,15 +150,19 @@ A **project** is the primary unit of isolation and billing. Every workload, data
 
 Technically, a project corresponds roughly to a **Kubernetes namespace** – it provides network isolation and separate resource quotas.
 
+When created, a project automatically generates a default Container Stack, DNS zones for managed domains, and Mail Settings for email management.
+
 ### App installation {#app-installation}
 
-An **app installation** (also called _managed application_) is a pre-configured runtime environment for a specific technology stack such as PHP, Node.js, or Python. mittwald manages the underlying framework and system software; you only provide your application code.
+An **app installation** (also called _managed application_) is a pre-configured runtime environment for a specific technology stack such as PHP, Node.js, Python, or PHP Worker. mittwald manages the underlying framework and system software; you only provide your application code.
 
-App installations can be linked to MySQL / MariaDB or Redis databases, and may have their own cronjobs and SSH/SFTP users for deployment.
+App installations can be linked to MySQL or Redis databases, and may have their own cronjobs and SSH/SFTP users for deployment.
 
 ### Container stack {#container-stack}
 
 A **container stack** is a Docker Compose-compatible deployment unit. It groups one or more _services_ (containers) together, provides shared _volumes_ for persistent data, and exposes ports internally within the project.
+
+Each project includes one default container stack created automatically. You can declare additional stacks and services via the API or stack configuration files.
 
 ### Service {#service}
 
@@ -122,34 +174,184 @@ A **volume** is persistent storage attached to a container stack. Volumes surviv
 
 ### Managed databases {#managed-databases}
 
-| Entity            | Technology       | Typical use                                  |
-| ----------------- | ---------------- | -------------------------------------------- |
-| MySQL / MariaDB   | Relational (SQL) | Web applications, CMS                        |
-| PostgreSQL        | Relational (SQL) | Applications requiring advanced SQL features |
-| Redis             | In-memory store  | Caching, sessions, queues                    |
-| OpenSearch / Solr | Search engine    | Full-text search, log analysis               |
+mittwald provides both managed services and container-based database options.
 
-Databases are project-scoped managed services. Their connection credentials can be linked directly to app installations.
+**Managed services** are fully managed by mittwald with automatic backups and simplified connection management:
+
+| Entity | Technology       | Typical use                                  |
+| ------ | ---------------- | -------------------------------------------- |
+| MySQL  | Relational (SQL) | Web applications, CMS                        |
+| Redis  | In-memory store  | Caching, sessions, queues                    |
+
+Each MySQL database can have multiple **MySQL Users** – separate user accounts with configurable access privileges and hostnames. This allows you to grant granular permissions to different applications or services accessing the same database.
+
+**Container-based databases** are deployed as containers within your project, offering more flexibility and advanced features:
+
+| Entity      | Technology       | Typical use                                  |
+| ----------- | ---------------- | -------------------------------------------- |
+| MariaDB     | Relational (SQL) | Web applications, CMS (open-source option)  |
+| PostgreSQL  | Relational (SQL) | Applications requiring advanced SQL features |
+| OpenSearch  | Search engine    | Full-text search, log analysis               |
+| Solr        | Search engine    | Full-text search, indexed content retrieval  |
+
+Managed services can be linked directly to app installations. Container-based databases are configured as separate services within your project's container stack.
 
 ### Ingress {#ingress}
 
-An **ingress** maps a public hostname (domain + path) to a workload running inside a project. It acts as an HTTP/S reverse proxy, handles TLS termination (via Let's Encrypt or a custom certificate), and routes traffic to either an app installation or a container service.
+An **ingress** maps a public hostname (domain + path) to a workload running inside a project. It acts as an HTTP/S reverse proxy, handles TLS termination via an SSL/TLS certificate (either Let's Encrypt or custom), and routes traffic to either an app installation or a container service.
+
+Each ingress requires one SSL/TLS certificate. If you don't provide one, mittwald automatically creates a free Let's Encrypt certificate for you.
 
 ### Domain / DNS {#domain}
 
-**Domains** allow you to manage DNS zones and records directly inside a project. A domain entry represents ownership and DNS management of a registered domain name.
+A **domain** represents a registered domain name and its ownership state within a project. mittwald can manage your domain registration and DNS, or you can point your existing domain to mittwald by updating your nameservers.
+
+When you add a domain to a project, mittwald automatically creates a **DNS Zone** – a container for managing individual DNS records (A, AAAA, CNAME, MX, TXT, SRV, etc.). This separates domain ownership data from the actual DNS record management.
 
 ### SSH / SFTP user {#ssh-sftp-user}
 
-**SSH / SFTP users** grant filesystem access to a project's file storage. They are primarily used for file deployment or legacy FTP-style workflows.
+**SSH / SFTP users** grant filesystem access to a project's file storage. SSH users have full access to the project's filesystem, while SFTP users can be restricted to specific directories and access levels (read-only or full). They are primarily used for file deployment or legacy FTP-style workflows.
 
 ### Cronjob {#cronjob}
 
-A **cronjob** is a scheduled task that runs a command within an app installation on a configurable schedule (cron syntax). Cronjobs are project-scoped and tied to a specific app installation.
+A **cronjob** is a scheduled task that runs on a configurable schedule (cron syntax). Cronjobs can execute bash commands, PHP scripts, or HTTP requests, and are tied to a specific app installation. Cronjobs are project-scoped.
+
+### SSL/TLS Certificate {#ssl-certificate}
+
+An **SSL/TLS certificate** enables secure HTTPS connections to your workloads via ingresses. mittwald supports two types:
+
+- **Let's Encrypt certificates** (free, auto-renewing): Automatically created and managed when you set up an ingress without specifying a custom certificate.
+- **Custom certificates**: Uploaded manually for organizations with existing certificates or special requirements.
+
+Each ingress uses exactly one certificate. The certificate is automatically renewed before expiration.
+
+### DNS Zone {#dns-zone}
+
+A **DNS zone** is a container for DNS records (A, AAAA, CNAME, MX, TXT, SRV, etc.) for a specific domain. It is automatically created when you add a domain to your project.
+
+The DNS zone is distinct from the Domain entity – the domain represents ownership and registration, while the DNS zone manages the actual DNS records. You can manage DNS records for your zone directly through the mittwald API or mStudio.
+
+### Registry {#registry}
+
+A **registry** stores private docker image credentials. If you use custom container images in your container stack that are hosted on private registries (e.g., private Docker Hub, GitHub Container Registry, or self-hosted registries), you can create registry credentials in your project.
+
+Services within your container stack can reference these registry credentials to pull private images securely.
+
+### MySQL User {#mysql-user}
+
+A **MySQL user** is a separate database user account for accessing a MySQL database. Each MySQL database can have multiple users, each with:
+
+- A unique username and password
+- Configurable privileges (SELECT, INSERT, UPDATE, DELETE, etc.)
+- Host restrictions (which servers/IPs can connect)
+
+This allows you to grant different permission levels to different applications or services accessing the same database. For example, you might create a read-only user for a reporting service and a full-access user for your main application.
+
+### Mail Address {#mail-address}
+
+A **mail address** is an email address (e.g., `info@example.com`) with integrated IMAP/SMTP/POP3 mail services. When you create a mail address, mittwald automatically creates a **Delivery Box** (IMAP mailbox backend) to store incoming messages.
+
+Mail addresses can be configured with:
+- Storage quota (disk space limit)
+- Catch-all forwarding (redirect unmatched mail)
+- Autoresponder (automatic reply messages)
+- Archive settings (separate storage for older messages)
+
+### Delivery Box {#delivery-box}
+
+A **delivery box** is the IMAP mailbox backend automatically created for each mail address. It stores inbound messages and dialogue history. While mail addresses represent the public-facing email identity, delivery boxes handle the actual message storage and retrieval.
+
+You typically interact with delivery boxes indirectly through mail clients (Outlook, Apple Mail, Thunderbird) connecting via IMAP or POP3 protocols.
+
+### Mail Settings {#mail-settings}
+
+**Mail Settings** is a project-wide configuration for email behavior. It is automatically created for each project and allows you to:
+
+- Whitelist or blacklist specific email addresses or domains
+- Configure spam protection settings
+- Enable/disable message archiving
+- Set default storage limits for new mail addresses
+
+Mail Settings apply globally to all mail addresses within a project.
+
+### Backup Schedule {#backup-schedule}
+
+A **backup schedule** automatically creates snapshots of your project at regular intervals. You can configure:
+
+- Backup frequency (daily, weekly, monthly, etc.)
+- Retention time (how long backups are kept)
+- Backup window (when backups should run, if applicable)
+
+Backup schedules are optional – you can also create manual backups as needed. Automated backups appear as regular Backup entities in your project.
+
+### Backup Export {#backup-export}
+
+A **backup export** is a downloadable copy of a backup snapshot. You can export any backup to receive a compressed archive (e.g., .tar.gz) that you can download and store locally or on external storage.
+
+Backup exports are independent records that track when and where backup data has been exported, separate from the backups themselves.
+
+### API Token {#api-token}
+
+An **API token** is an authentication credential for programmatic API access. You can create and manage API tokens in your user account settings (not per-project).
+
+API tokens allow you to authenticate to mittwald's REST API without using your password. Each token can be individually revoked and has full access to all your projects and customer account.
+
+### AI Hosting {#ai-hosting}
+
+**AI Hosting** enables your applications to interact with Large Language Models (LLMs) via mittwald's hosting infrastructure. It provides a centralized way to configure and use AI capabilities across your project – either using mittwald's hosted LLM service or integrating with external AI providers.
+
+AI Hosting is designed for agencies building AI-powered client solutions, SaaS products with AI components, and organizations requiring EU-based, privacy-conscious AI infrastructure.
+
+Each AI Hosting integration requires two configuration values:
+- **AI Hosting API Key**: Your authentication credential for accessing the AI service
+- **AI Hosting Base URL**: The endpoint URL for the AI service (mittwald's hosted service or external provider)
+
+Once configured at the project level, any app installation or container service within your project can use these credentials to make API calls for tasks like text generation, chatbots, image processing, and AI agents.
+
+### AI Hosting API Key {#ai-hosting-key}
+
+An **AI Hosting API Key** is an authentication credential that grants access to the AI Hosting service. It authenticates requests from your applications to the LLM endpoint.
+
+The API key is stored securely at the project level and can be referenced by any workload within the project. You should treat it like a password – keep it confidential and rotate it periodically according to security best practices.
+
+### AI Hosting Base URL {#ai-hosting-base-url}
+
+An **AI Hosting Base URL** is the endpoint address for mittwald's AI Hosting service. It is provided as a constant value in mStudio that you copy into your application for API requests.
+
+This endpoint is configured at the project level and is used by your applications and container services to communicate with the LLM infrastructure.
 
 ## Workload types at a glance {#workload-types}
 
-| Workload         | Best for                                  | Technical basis           |
-| ---------------- | ----------------------------------------- | ------------------------- |
-| App installation | Pre-built runtimes (PHP, Node.js, Python) | Managed runtime framework |
-| Container stack  | Custom containers, microservices          | OCI / Docker Compose      |
+| Workload         | Best for                                          | Technical basis           |
+| ---------------- | ------------------------------------------------- | ------------------------- |
+| App installation | Pre-built runtimes (PHP, Node.js, Python, PHP Worker) | Managed runtime framework |
+| Container stack  | Custom containers, microservices                  | OCI / Docker Compose      |
+
+## Entity creation reference {#entity-creation-reference}
+
+The following table summarizes how platform entities are created and managed:
+
+| Entity | Creation Method | Auto-created | Typical use |
+| ------ | --------------- | ------------ | ----------- |
+| Project | UI/API | — | Primary organization unit |
+| Container Stack | Auto + API | ✅ Yes (one per project) | Docker Compose unit for services |
+| App Installation | UI/API | — | Managed runtime (PHP, Node.js, etc.) |
+| MySQL Database | UI/API | — | Managed relational database |
+| MySQL User | UI/API | — | Database access control |
+| Redis Database | UI/API | — | Managed in-memory cache |
+| Domain | UI/API | — | Domain registration/ownership |
+| DNS Zone | Auto + API | ✅ Yes (from domain) | DNS record container |
+| Ingress | UI/API | — | HTTP/S routing to workloads |
+| SSL/TLS Certificate | Auto + UI/API | ✅ Partial (Let's Encrypt auto) | HTTPS certificate |
+| Mail Address | UI/API | — | Email address with IMAP/SMTP |
+| Delivery Box | Auto | ✅ Yes (from mail address) | IMAP mailbox backend |
+| Mail Settings | Auto | ✅ Yes (per project) | Project-wide mail config |
+| Backup | UI/API | — | Project snapshot/restore point |
+| Backup Schedule | API | — | Automated backup configuration |
+| Cronjob | UI/API | — | Scheduled task runner |
+| SSH / SFTP User | UI/API | — | Filesystem access |
+| API Token | UI/API | — | API authentication |
+| Registry | UI/API | — | Private image registry credentials |
+| AI Hosting API Key | UI/API | — | LLM API credentials |
+| AI Hosting Base URL | UI/API | — | LLM API endpoint |
+| Extensions | UI/API | — | Marketplace extensions |
