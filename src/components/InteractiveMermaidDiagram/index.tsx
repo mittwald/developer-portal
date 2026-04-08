@@ -10,21 +10,20 @@ export interface InteractiveMermaidDiagramProps {
   title?: string;
   /** The mermaid diagram content (children will be the rendered mermaid block) */
   children: ReactNode;
-  /** Default zoom level (default: 250) */
+  /** Default zoom level (default: 100) */
   defaultZoom?: number;
-  /** Minimum zoom level in percent (default: 50) */
+  /** Minimum zoom level in percent (default: 10) */
   minZoom?: number;
-  /** Maximum zoom level in percent (default: 800) */
+  /** Maximum zoom level in percent (default: 1000) */
   maxZoom?: number;
   /** Zoom increment/decrement in percent (default: 20) */
   zoomStep?: number;
 }
 
 /**
- * Interactive wrapper for mermaid diagrams with zoom, pan, and fullscreen capabilities.
+ * Interactive wrapper for mermaid diagrams with zoom and pan capabilities.
  * Provides:
- * - Larger inline diagram with zoom/pan controls
- * - Fullscreen modal expansion via mittwald flow components
+ * - Inline diagram with zoom/pan controls
  * - Smooth CSS transform-based zoom and pan
  */
 function InteractiveMermaidDiagram({
@@ -73,7 +72,7 @@ function InteractiveMermaidDiagram({
     return () => {
       window.removeEventListener("wheel", handleWindowWheel);
     };
-  }, [minZoom, maxZoom]);
+  }, [minZoom, maxZoom, zoomStep]);
 
   const handleZoomIn = useCallback(() => {
     setZoom((prev) => Math.min(maxZoom, prev + zoomStep));
@@ -198,7 +197,7 @@ function InteractiveMermaidDiagram({
       </div>
       
       <div className={styles.hint}>
-        <small>💡 Ctrl+Scroll to zoom • Drag to pan • Buttons to control</small>
+        <small>💡 Ctrl/Cmd + Scroll to zoom • Drag to pan • Buttons to control</small>
       </div>
     </div>
   );
