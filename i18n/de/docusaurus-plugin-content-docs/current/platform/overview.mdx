@@ -11,14 +11,13 @@ import InteractiveMermaidDiagram from "@site/src/components/InteractiveMermaidDi
 
 # Plattform-Übersicht: Entitätshierarchie
 
-Diese Seite gibt dir einen Überblick über die mittwald-Hosting-Plattform auf einen Blick. Sie zeigt die wichtigsten Entitäten – wie Server, Projekte, Workloads und Datenbanken – und ordnet ihnen ihre technischen Entsprechungen zu.
+Diese Seite bietet dir einen Überblick über die mittwald-Hosting-Plattform und zeigt, wie zentrale Konzepte technisch umgesetzt werden. Ein **Projekt** ist beispielsweise ein Kubernetes Namespace; ein **Service** läuft als Docker-Container; und ein **Postfach** ist das IMAP-Mailbox-Backend für die E-Mail-Verwaltung. Das Verständnis dieser technischen Grundlagen hilft dir, deine Infrastruktur besser zu gestalten und zu optimieren.
 
 ## Entitätshierarchie {#entity-hierarchy}
 
 Das folgende Diagramm zeigt alle wichtigen Plattformentitäten, wie sie ineinander verschachtelt sind und welche Technologie jeweils dahintersteckt:
 
-<InteractiveMermaidDiagram id="platform-entity-hierarchy"
-                           title="Plattform-Entitätshierarchie"
+<InteractiveMermaidDiagram title="Plattform-Entitätshierarchie"
                            defaultZoom={300}
                            minZoom={100}
                            maxZoom={2000}
@@ -59,7 +58,7 @@ graph TD
     BACKUPEXPORT["📥 Sicherungs-Export"]
     
     MAILADDR["Mail-Adresse"]
-    DELIVERYBOX{{"Lieferkiste *(auto)*"}}
+    DELIVERYBOX{{"Postfach *(auto)*"}}
     MAILSETTINGS["⚙️ Mail-Einstellungen *(auto)*"]
     
     SSHSFTP["🔑 SSH/SFTP"]
@@ -71,44 +70,44 @@ graph TD
     ORG -->|besitzt| SERVER
     SERVER -->|hostet| PROJECT
 
-    PROJECT --> APP
-    PROJECT --> CONTAINERS
-    PROJECT --> NETWORKING
-    PROJECT --> BACKUPS
-    PROJECT --> MAIL
-    PROJECT -.-> ACCESS
-    PROJECT -.-> AIHOST
-    PROJECT -.-> EXTENSIONS
+    PROJECT -->|erstellt| APP
+    PROJECT -->|gruppiert| CONTAINERS
+    PROJECT -->|konfiguriert| NETWORKING
+    PROJECT -->|verwaltet| BACKUPS
+    PROJECT -->|verwaltet| MAIL
+    PROJECT -.->|kontrolliert| ACCESS
+    PROJECT -.->|konfiguriert| AIHOST
+    PROJECT -.->|installiert| EXTENSIONS
 
-    APP --> DATASTORES
-    DATASTORES --> MYSQL
-    DATASTORES --> REDIS
+    APP -->|verbindet| DATASTORES
+    DATASTORES -->|stellt bereit| MYSQL
+    DATASTORES -->|stellt bereit| REDIS
 
-    CONTAINERS --> STACK
-    CONTAINERS --> REGISTRY
-    STACK --> SERVICE
-    STACK --> VOLUME
-    SERVICE -.-> VOLUME
+    CONTAINERS -->|erzeugt| STACK
+    CONTAINERS -->|speichert| REGISTRY
+    STACK -->|deployed| SERVICE
+    STACK -->|stellt bereit| VOLUME
+    SERVICE -.->|bindet ein| VOLUME
 
-    NETWORKING --> DOMAIN
-    NETWORKING --> INGRESS
-    DOMAIN --> DNSZONE
-    INGRESS --> CERT
+    NETWORKING -->|verwaltet| DOMAIN
+    NETWORKING -->|routet| INGRESS
+    DOMAIN -->|auto-erstellt| DNSZONE
+    INGRESS -->|sichert| CERT
 
-    BACKUPS --> CRONJOB
-    BACKUPS --> BACKUP
-    BACKUP --> BACKUPSCHED
-    BACKUP --> BACKUPEXPORT
+    BACKUPS -->|plant| CRONJOB
+    BACKUPS -->|erstellt| BACKUP
+    BACKUP -->|definiert| BACKUPSCHED
+    BACKUP -->|ermöglicht| BACKUPEXPORT
 
-    MAIL --> MAILADDR
-    MAILADDR --> DELIVERYBOX
-    MAIL --> MAILSETTINGS
+    MAIL -->|stellt bereit| MAILADDR
+    MAILADDR -->|auto-erstellt| DELIVERYBOX
+    MAIL -->|auto-erstellt| MAILSETTINGS
 
-    ACCESS --> SSHSFTP
-    ACCESS --> APITOKEN
+    ACCESS -->|gewährt| SSHSFTP
+    ACCESS -->|gewährt| APITOKEN
 
-    AIHOST --> AIHOSTKEY
-    AIHOST --> AIHOST_URL
+    AIHOST -->|speichert| AIHOSTKEY
+    AIHOST -->|speichert| AIHOST_URL
 
     classDef brandOrg fill:#147af3,stroke:#0050d8,color:#fff,stroke-width:3px
     classDef managed fill:#72e06a,stroke:#5cd54f,color:#fff,stroke-width:2px

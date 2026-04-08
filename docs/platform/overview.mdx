@@ -11,14 +11,13 @@ import InteractiveMermaidDiagram from "@site/src/components/InteractiveMermaidDi
 
 # Platform Overview: Entity Hierarchy
 
-This page gives you a bird's-eye view of the mittwald hosting platform. It maps the main entities – such as servers, projects, workloads, and databases – to their technical counterparts and shows how they relate to each other.
+This page gives you a bird's-eye view of the mittwald hosting platform, mapping core concepts to their underlying technologies. For example, a **project** is technically a Kubernetes namespace; a **service** runs as a Docker container; and a **delivery box** is the IMAP mailbox backend for email. Understanding these technical foundations helps you design and troubleshoot your infrastructure more effectively.
 
 ## Entity hierarchy {#entity-hierarchy}
 
 The following diagram shows all major platform entities, how they are nested inside each other, and what technology underpins each of them:
 
-<InteractiveMermaidDiagram id="platform-entity-hierarchy"
-                           title="Platform Entity Hierarchy"
+<InteractiveMermaidDiagram title="Platform Entity Hierarchy"
                            defaultZoom={300}
                            minZoom={100}
                            maxZoom={2000}
@@ -71,44 +70,44 @@ graph TD
     ORG -->|owns| SERVER
     SERVER -->|hosts| PROJECT
 
-    PROJECT --> APP
-    PROJECT --> CONTAINERS
-    PROJECT --> NETWORKING
-    PROJECT --> BACKUPS
-    PROJECT --> MAIL
-    PROJECT -.-> ACCESS
-    PROJECT -.-> AIHOST
-    PROJECT -.-> EXTENSIONS
+    PROJECT -->|provisions| APP
+    PROJECT -->|groups| CONTAINERS
+    PROJECT -->|configures| NETWORKING
+    PROJECT -->|manages| BACKUPS
+    PROJECT -->|manages| MAIL
+    PROJECT -.->|controls| ACCESS
+    PROJECT -.->|configures| AIHOST
+    PROJECT -.->|installs| EXTENSIONS
 
-    APP --> DATASTORES
-    DATASTORES --> MYSQL
-    DATASTORES --> REDIS
+    APP -->|links| DATASTORES
+    DATASTORES -->|provides| MYSQL
+    DATASTORES -->|provides| REDIS
 
-    CONTAINERS --> STACK
-    CONTAINERS --> REGISTRY
-    STACK --> SERVICE
-    STACK --> VOLUME
-    SERVICE -.-> VOLUME
+    CONTAINERS -->|generates| STACK
+    CONTAINERS -->|stores| REGISTRY
+    STACK -->|deploys| SERVICE
+    STACK -->|provides| VOLUME
+    SERVICE -.->|mounts| VOLUME
 
-    NETWORKING --> DOMAIN
-    NETWORKING --> INGRESS
-    DOMAIN --> DNSZONE
-    INGRESS --> CERT
+    NETWORKING -->|manages| DOMAIN
+    NETWORKING -->|routes| INGRESS
+    DOMAIN -->|auto-creates| DNSZONE
+    INGRESS -->|secures| CERT
 
-    BACKUPS --> CRONJOB
-    BACKUPS --> BACKUP
-    BACKUP --> BACKUPSCHED
-    BACKUP --> BACKUPEXPORT
+    BACKUPS -->|schedules| CRONJOB
+    BACKUPS -->|creates| BACKUP
+    BACKUP -->|defines| BACKUPSCHED
+    BACKUP -->|enables| BACKUPEXPORT
 
-    MAIL --> MAILADDR
-    MAILADDR --> DELIVERYBOX
-    MAIL --> MAILSETTINGS
+    MAIL -->|provides| MAILADDR
+    MAILADDR -->|auto-creates| DELIVERYBOX
+    MAIL -->|auto-creates| MAILSETTINGS
 
-    ACCESS --> SSHSFTP
-    ACCESS --> APITOKEN
+    ACCESS -->|grants| SSHSFTP
+    ACCESS -->|grants| APITOKEN
 
-    AIHOST --> AIHOSTKEY
-    AIHOST --> AIHOST_URL
+    AIHOST -->|stores| AIHOSTKEY
+    AIHOST -->|stores| AIHOST_URL
 
     classDef brandOrg fill:#147af3,stroke:#0050d8,color:#fff,stroke-width:3px
     classDef managed fill:#72e06a,stroke:#5cd54f,color:#fff,stroke-width:2px

@@ -4,8 +4,6 @@ import { IconZoomIn, IconZoomOut, IconRefresh } from "@tabler/icons-react";
 import styles from "./index.module.css";
 
 export interface InteractiveMermaidDiagramProps {
-  /** Unique identifier for the diagram */
-  id: string;
   /** Optional title for the diagram */
   title?: string;
   /** The mermaid diagram content (children will be the rendered mermaid block) */
@@ -27,7 +25,6 @@ export interface InteractiveMermaidDiagramProps {
  * - Smooth CSS transform-based zoom and pan
  */
 function InteractiveMermaidDiagram({
-  id,
   title,
   children,
   defaultZoom = 100,
