@@ -18,3 +18,25 @@ Manche Befehle, die eine dieser Ressourcen erstellen, haben auch ein `--update-c
 ```bash
 $ mw project create --description="..." --update-context
 ```
+
+## Verzeichnisbezogener Kontext mit `.mw-context.json` {#dotfile-context}
+
+Wenn du an mehreren mittwald-Projekten parallel arbeitest, kann das Wechseln des Kontexts mit `mw context set` umständlich sein, da der Kontext global in `~/.config/mw/context.json` gespeichert wird. Um dies zu vermeiden, kannst du eine `.mw-context.json`-Datei in deinem Projektverzeichnis (oder einem übergeordneten Verzeichnis) erstellen, um Kontextwerte festzulegen, die nur beim Arbeiten in diesem Verzeichnis gelten.
+
+Erstelle eine `.mw-context.json`-Datei mit den benötigten Kontextschlüsseln:
+
+```json
+{
+  "project-id": "p-xxxxx",
+  "server-id": "s-xxxxx",
+  "org-id": "o-xxxxx"
+}
+```
+
+Die CLI sucht automatisch aufwärts von deinem aktuellen Arbeitsverzeichnis nach dieser Datei. Wenn sie gefunden wird, haben die Werte in `.mw-context.json` Vorrang vor dem globalen Kontext.
+
+Dieser Ansatz ist nützlich für:
+
+- **Multi-Projekt-Workflows**: Jedes Projektverzeichnis kann seinen eigenen Kontext haben, ohne manuell wechseln zu müssen.
+- **Team-Zusammenarbeit**: Committe die `.mw-context.json`-Datei in dein Repository, damit Teammitglieder automatisch den richtigen Kontext verwenden.
+- **Vermeidung von Race Conditions**: Mehrere Terminals in verschiedenen Verzeichnissen beeinflussen sich nicht gegenseitig.
