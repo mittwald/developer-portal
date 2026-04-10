@@ -6,6 +6,7 @@ import { IconHeartHandshake } from "@tabler/icons-react";
 import clsx from "clsx";
 import FeatureRow from "../FeatureRow";
 import Intro, { IntroHeader } from "../Intro";
+import { NewBadge } from "@site/src/components/NewBadge";
 
 function ContributionIntro() {
   return (
@@ -121,7 +122,8 @@ function ToolsFeature() {
             <Translate id="index.contribution.tools.community-mcp-flow">
               mittwald Flow MCP
             </Translate>
-          </Link>
+          </Link>{" "}
+          <NewBadge />
           <br />
           <Translate id="index.contribution.tools.community-mcp-flow-desc">
             MCP server to work with mittwald flow frontend
