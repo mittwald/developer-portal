@@ -13,6 +13,46 @@ import InteractiveMermaidDiagram from "@site/src/components/InteractiveMermaidDi
 
 Diese Seite bietet dir einen Überblick über die mittwald-Hosting-Plattform und zeigt, wie zentrale Konzepte technisch umgesetzt werden. Ein **Projekt** ist beispielsweise ein Kubernetes Namespace; ein **Service** läuft als Docker-Container; und ein **Postfach** ist das IMAP-Mailbox-Backend für die E-Mail-Verwaltung. Das Verständnis dieser technischen Grundlagen hilft dir, deine Infrastruktur besser zu gestalten und zu optimieren.
 
+## Vereinfachte Übersicht: Was läuft wo? {#what-runs-where}
+
+Bevor du dich in alle Details vertiefst, hier die Antwort auf die Frage: **Was läuft wo auf der mittwald-Plattform?** Dieses vereinfachte Diagramm zeigt dir die Kernsstruktur – wie die Plattform von der obersten Ebene bis zu den Workloads organisiert ist, die deine Anwendungen ausführen. Alles andere in der Plattform (Datenbanken, Domains, E-Mail, Sicherungen usw.) baut auf dieser fundamentalen Hierarchie auf.
+
+<InteractiveMermaidDiagram title="Was läuft wo: Vereinfachte Übersicht"
+                           defaultZoom={200}
+                           minZoom={100}
+                           maxZoom={500}
+                           zoomStep={50}>
+```mermaid
+graph TD
+    ORG[["🏢 Organisation"]]
+    SERVER[["🖥️ Server"]]
+    PROJECT["📁 Projekt"]
+    APP["📦 App-Installationen"]
+    STACK["🐳 Container-Stacks"]
+
+    ORG -->|besitzt einen oder mehrere| SERVER
+    SERVER -->|hostet ein oder mehrere| PROJECT
+    PROJECT -->|führt aus| APP
+    PROJECT -->|führt aus| STACK
+
+    classDef orgStyle fill:#147af3,stroke:#0050d8,color:#fff,stroke-width:3px
+    classDef serverStyle fill:#4046ca,stroke:#3035a7,color:#fff,stroke-width:2px
+    classDef projectStyle fill:#72e06a,stroke:#5cd54f,color:#fff,stroke-width:2px
+    classDef workloadStyle fill:#0fb5ae,stroke:#0a94a1,color:#fff,stroke-width:2px
+
+    class ORG orgStyle
+    class SERVER serverStyle
+    class PROJECT projectStyle
+    class APP,STACK workloadStyle
+```
+</InteractiveMermaidDiagram>
+
+**Wichtigste Beziehungen:**
+- Eine **Organisation** besitzt einen oder mehrere Server und Projekte
+- Ein **Server** ist ein gemeinsamer Ressourcen-Pool, der mehrere Projekte hostet
+- Ein **Projekt** ist die Haupteinheit, in der du Workloads deployst – es können App-Installationen, Container-Stacks oder beides laufen
+- **App-Installationen** und **Container-Stacks** sind die Workload-Typen, die die eigentliche Arbeit machen: deine Anwendungscode ausführen
+
 ## Entitätshierarchie {#entity-hierarchy}
 
 Das folgende Diagramm zeigt alle wichtigen Plattformentitäten, wie sie ineinander verschachtelt sind und welche Technologie jeweils dahintersteckt:

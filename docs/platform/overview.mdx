@@ -13,6 +13,46 @@ import InteractiveMermaidDiagram from "@site/src/components/InteractiveMermaidDi
 
 This page gives you a bird's-eye view of the mittwald hosting platform, mapping core concepts to their underlying technologies. For example, a **project** is technically a Kubernetes namespace; a **service** runs as a Docker container; and a **delivery box** is the IMAP mailbox backend for email. Understanding these technical foundations helps you design and troubleshoot your infrastructure more effectively.
 
+## Simplified Overview: What Runs Where? {#what-runs-where}
+
+Before diving into all the details, here's the answer to the question: **What runs where on the mittwald platform?** This simplified diagram shows the core containment structure – how the platform is organized from the top level down to the actual workloads that serve your customers. Everything else in the platform (databases, domains, email, backups, etc.) builds on top of this foundational hierarchy.
+
+<InteractiveMermaidDiagram title="What Runs Where: Simplified Overview"
+                           defaultZoom={200}
+                           minZoom={100}
+                           maxZoom={500}
+                           zoomStep={50}>
+```mermaid
+graph TD
+    ORG[["🏢 Organization"]]
+    SERVER[["🖥️ Server"]]
+    PROJECT["📁 Project"]
+    APP["📦 App Installations"]
+    STACK["🐳 Container Stacks"]
+
+    ORG -->|owns one or more| SERVER
+    SERVER -->|hosts one or more| PROJECT
+    PROJECT -->|runs| APP
+    PROJECT -->|runs| STACK
+
+    classDef orgStyle fill:#147af3,stroke:#0050d8,color:#fff,stroke-width:3px
+    classDef serverStyle fill:#4046ca,stroke:#3035a7,color:#fff,stroke-width:2px
+    classDef projectStyle fill:#72e06a,stroke:#5cd54f,color:#fff,stroke-width:2px
+    classDef workloadStyle fill:#0fb5ae,stroke:#0a94a1,color:#fff,stroke-width:2px
+
+    class ORG orgStyle
+    class SERVER serverStyle
+    class PROJECT projectStyle
+    class APP,STACK workloadStyle
+```
+</InteractiveMermaidDiagram>
+
+**Key relationships:**
+- An **organization** owns one or more servers and projects
+- A **server** is a shared resource pool that hosts multiple projects
+- A **project** is the main unit where you deploy workloads – it can run app installations, container stacks, or both
+- **App installations** and **container stacks** are the workload types that do the actual work: running your application code
+
 ## Entity hierarchy {#entity-hierarchy}
 
 The following diagram shows all major platform entities, how they are nested inside each other, and what technology underpins each of them:
