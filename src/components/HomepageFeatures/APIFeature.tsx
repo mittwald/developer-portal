@@ -159,27 +159,6 @@ function APILibraries() {
       </ul>
       <p>
         <strong>
-          <Translate id="index.sdks.community-title">
-            Community Contributions
-          </Translate>
-        </strong>
-      </p>
-      <ul>
-        <li>
-          <Link href="https://github.com/nuonic-digital/mittwald-flow-mcp">
-            <Translate id="index.sdks.community-mcp-flow">
-              mittwald Flow MCP
-            </Translate>
-          </Link>{" "}
-          <NewBadge />
-          <br />
-          <Translate id="index.sdks.community-mcp-flow-desc">
-            MCP server to work with mittwald flow frontend
-          </Translate>
-        </li>
-      </ul>
-      <p>
-        <strong>
           <Translate id={"index.sdks.own-sdks"}>
             Have you built your own library that uses our API?
           </Translate>{" "}

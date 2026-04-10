@@ -110,15 +110,21 @@ function ToolsFeature() {
       </ul>
       <p>
         <strong>
-          <Translate id={"index.sdks.coming-soon"}>Coming soon</Translate>:
+          <Translate id="index.contribution.tools.community-title">
+            Community Contributions
+          </Translate>
         </strong>
       </p>
       <ul>
         <li>
-          <strong>Extension Deployment Manager</strong>:{" "}
-          <Translate id="index.contribution.tools.edm">
-            A utility application to help you implement the required extension
-            webhooks and manage the lifecycle of your extension installations.
+          <Link href="https://github.com/nuonic-digital/mittwald-flow-mcp">
+            <Translate id="index.contribution.tools.community-mcp-flow">
+              mittwald Flow MCP
+            </Translate>
+          </Link>
+          <br />
+          <Translate id="index.contribution.tools.community-mcp-flow-desc">
+            MCP server to work with mittwald flow frontend
           </Translate>
         </li>
       </ul>
