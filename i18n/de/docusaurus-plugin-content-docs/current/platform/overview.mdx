@@ -33,6 +33,8 @@ graph TD
     STACK["🐳 Container-Stacks"]
 
     ORG -->|besitzt einen oder mehrere| SERVER
+    ORG -->|besitzt einen oder mehrere| PROJECT
+
     SERVER -->|hostet ein oder mehrere| PROJECT
     PROJECT -->|führt aus| APP
     PROJECT -->|führt aus| STACK
@@ -213,12 +215,21 @@ Du kannst über die API oder Stack-Konfigurationsdateien zusätzliche Stacks und
 
 Ein **Service** ist ein einzelner Container, der innerhalb eines Container-Stacks läuft.
 Er entspricht direkt einem Docker-Container / OCI-Runtime-Instanz und kann mit CPU- und Speicherlimits konfiguriert werden.
+Im mStudio werden Services als "Container" bezeichnet – die Begriffe sind austauschbar.
 
 ### Volume {#volume}
 
 Ein **Volume** ist persistenter Speicher, der an einen Container-Stack angehängt ist.
 Volumes überleben Container-Neustarts und können in einen oder mehrere Services eingebunden werden.
 Sie sind analog zu Kubernetes-`PersistentVolumeClaim`-Objekten.
+
+### Registry {#registry}
+
+Eine **Registry** speichert private Docker-Image-Anmeldedaten. Wenn du benutzerdefinierte Container-Images in deinem Container-Stack
+verwendest, die auf privaten Registries gehostet werden (z. B. privates Docker Hub, GitHub Container Registry oder selbst gehostete Registries),
+kannst du Registry-Anmeldedaten in deinem Projekt erstellen.
+
+Services innerhalb deines Container-Stacks k\u00f6nnen diese Registry-Anmeldedaten referenzieren, um private Images sicher zu pullen.
 
 ### Verwaltete Datenbanken {#managed-databases}
 
@@ -246,61 +257,6 @@ Dies ermöglicht dir, granulare Berechtigungen für verschiedene Anwendungen ode
 Verwaltete Dienste können direkt mit App-Installationen verknüpft werden.
 Container-basierte Datenbanken werden als separate Services innerhalb des Container-Stacks deines Projekts konfiguriert.
 
-### Ingress {#ingress}
-
-Ein **Ingress** ordnet einen öffentlichen Hostnamen (Domain + Pfad) einem Workload zu, der innerhalb eines Projekts läuft.
-Er fungiert als HTTP/S Reverse Proxy, übernimmt die TLS-Terminierung durch ein SSL/TLS-Zertifikat (entweder Let's Encrypt oder benutzerdefiniert),
-und leitet Traffic entweder zu einer App-Installation oder einem Container-Service weiter.
-
-Jeder Ingress benötigt ein SSL/TLS-Zertifikat. Wenn du kein benutzerdefiniertes Zertifikat angibst, erstellt mittwald automatisch ein kostenloses Let's Encrypt-Zertifikat für dich.
-
-### Domain / DNS {#domain}
-
-Eine **Domain** repräsentiert einen registrierten Domainnamen und seinen Besitzzustand innerhalb eines Projekts.
-mittwald kann ihre Domain-Registrierung und DNS verwalten, oder du kannst deine bestehende Domain auf mittwald verweisen, indem du deine Nameserver aktualisierst.
-
-Wenn du eine Domain zu einem Projekt hinzufügst, erstellt mittwald automatisch eine **DNS-Zone** – einen Container für die Verwaltung
-einzelner DNS-Records (A, AAAA, CNAME, MX, TXT, SRV usw.). Dies trennt Domain-Besitzdaten von der eigentlichen DNS-Record-Verwaltung.
-
-### SSH / SFTP-Nutzer {#ssh-sftp-user}
-
-**SSH/SFTP-Nutzer** gewähren Dateisystemzugriff auf den Dateispeicher eines Projekts.
-SSH-Nutzer haben vollständigen Zugriff auf das Dateisystem des Projekts, während SFTP-Nutzer auf bestimmte Verzeichnisse
-und Zugriffsstufen (Nur-Lesen oder Vollzugriff) beschränkt werden können. Sie werden hauptsächlich für Datei-Deployment oder ältere FTP-Workflows verwendet.
-
-### Cronjob {#cronjob}
-
-Ein **Cronjob** ist eine geplante Aufgabe, die nach einem konfigurierbaren Zeitplan (Cron-Syntax) ausgeführt wird.
-Cronjobs können Bash-Befehle, PHP-Skripte oder HTTP-Anfragen ausführen und sind an eine bestimmte App-Installation gebunden.
-Cronjobs sind projektbezogen.
-
-### SSL/TLS-Zertifikat {#ssl-certificate}
-
-Ein **SSL/TLS-Zertifikat** ermöglicht sichere HTTPS-Verbindungen zu deinen Workloads über Ingresses. mittwald unterstützt zwei Typen:
-
-- **Let's Encrypt-Zertifikate** (kostenlos, automatisch erneuert): Werden automatisch erstellt und verwaltet, wenn du einen Ingress ohne benutzerdefiniertes Zertifikat einrichtest.
-- **Benutzerdefinierte Zertifikate**: Werden manuell hochgeladen für Organisationen mit bestehenden Zertifikaten oder speziellen Anforderungen.
-
-Jeder Ingress nutzt genau ein Zertifikat.
-
-### DNS-Zone {#dns-zone}
-
-Eine **DNS-Zone** ist ein Container für DNS-Records (A, AAAA, CNAME, MX, TXT, SRV usw.) für eine bestimmte Domain.
-Sie wird automatisch erstellt, wenn du eine Domain zu deinem Projekt hinzufügst.
-
-Die DNS-Zone ist verschieden von der Domain-Entität – die Domain repräsentiert Besitz und Registrierung,
-während die DNS-Zone die eigentlichen DNS-Records verwaltet.
-
-Du kannst DNS-Records für deine Zone direkt über die mittwald-API oder mStudio verwalten.
-
-### Registry {#registry}
-
-Eine **Registry** speichert private Docker-Image-Anmeldedaten. Wenn du benutzerdefinierte Container-Images in deinem Container-Stack
-verwendest, die auf privaten Registries gehostet werden (z. B. privates Docker Hub, GitHub Container Registry oder selbst gehostete Registries),
-kannst du Registry-Anmeldedaten in deinem Projekt erstellen.
-
-Services innerhalb deines Container-Stacks k\u00f6nnen diese Registry-Anmeldedaten referenzieren, um private Images sicher zu pullen.
-
 ### MySQL-Nutzer {#mysql-user}
 
 Ein **MySQL-Nutzer** ist ein separates Datenbanknutzer-Konto für den Zugriff auf eine MySQL-Datenbank.
@@ -313,6 +269,48 @@ Jede MySQL-Datenbank kann mehrere Nutzer haben, jeweils mit:
 Dies ermöglicht dir, verschiedene Berechtigungsstufen für verschiedene Anwendungen oder
 Services zu gewähren, die auf diese Datenbank zugreifen. Du könntest beispielsweise einen schreibgeschützten Nutzer
 für einen Reporting-Service und einen vollständig berechtigten Nutzer für deine Hauptanwendung erstellen.
+
+### Cronjob {#cronjob}
+
+Ein **Cronjob** ist eine geplante Aufgabe, die nach einem konfigurierbaren Zeitplan (Cron-Syntax) ausgeführt wird.
+Cronjobs können Bash-Befehle, PHP-Skripte oder HTTP-Anfragen ausführen und sind an eine bestimmte App-Installation
+oder einen Container gebunden, somit also projektbezogen.
+
+### Ingress {#ingress}
+
+Ein **Ingress** ordnet einen öffentlichen Hostnamen (Domain + Pfad) einem Workload zu, der innerhalb eines Projekts läuft.
+Er fungiert als HTTP/S Reverse Proxy, übernimmt die TLS-Terminierung durch ein SSL/TLS-Zertifikat (entweder Let's Encrypt oder benutzerdefiniert),
+und leitet Traffic entweder zu einer App-Installation oder einem Container-Service weiter.
+
+Jeder Ingress benötigt ein SSL/TLS-Zertifikat. Wenn du kein benutzerdefiniertes Zertifikat angibst, erstellt mittwald automatisch ein kostenloses Let's Encrypt-Zertifikat für dich.
+Automatische Zertifikatsanfragen können über die API gelöscht werden, ebenso wie Zertifikate selbst gelöscht oder durch benutzerdefinierte ersetzt werden können.
+
+### SSL/TLS-Zertifikat {#ssl-certificate}
+
+Ein **SSL/TLS-Zertifikat** ermöglicht sichere HTTPS-Verbindungen zu deinen Workloads über Ingresses. mittwald unterstützt zwei Typen:
+
+- **Let's Encrypt-Zertifikate** (kostenlos, automatisch erneuert): Werden automatisch erstellt und verwaltet, wenn du einen Ingress ohne benutzerdefiniertes Zertifikat einrichtest.
+- **Benutzerdefinierte Zertifikate**: Werden manuell hochgeladen für Organisationen mit bestehenden Zertifikaten oder speziellen Anforderungen.
+
+Jeder Ingress nutzt genau ein Zertifikat.
+
+### Domain / DNS {#domain}
+
+Eine **Domain** repräsentiert einen registrierten Domainnamen und seinen Besitzzustand innerhalb eines Projekts.
+mittwald kann ihre Domain-Registrierung und DNS verwalten, oder du kannst deine bestehende Domain auf mittwald verweisen, indem du deine Nameserver aktualisierst.
+
+Wenn du eine Domain zu einem Projekt hinzufügst, erstellt mittwald automatisch eine **DNS-Zone** – einen Container für die Verwaltung
+einzelner DNS-Records (A, AAAA, CNAME, MX, TXT, SRV usw.). Dies trennt Domain-Besitzdaten von der eigentlichen DNS-Record-Verwaltung.
+
+### DNS-Zone {#dns-zone}
+
+Eine **DNS-Zone** ist ein Container für DNS-Records (A, AAAA, CNAME, MX, TXT, SRV usw.) für eine bestimmte Domain.
+Sie wird automatisch erstellt, wenn du eine Domain zu deinem Projekt hinzufügst.
+
+Die DNS-Zone ist verschieden von der Domain-Entität – die Domain repräsentiert Besitz und Registrierung,
+während die DNS-Zone die eigentlichen DNS-Records verwaltet.
+
+Du kannst DNS-Records für deine Zone direkt über die mittwald-API oder mStudio verwalten.
 
 ### Mail-Adresse {#mail-address}
 
@@ -355,6 +353,12 @@ das du lokal oder auf externem Speicher herunterladen und speichern kannst.
 
 Sicherungs-Exporte sind unabhängige Records, die verfolgen, wann und wo Sicherungsdaten exportiert wurden,
 getrennt von den Sicherungen selbst.
+
+### SSH / SFTP-Nutzer {#ssh-sftp-user}
+
+**SSH/SFTP-Nutzer** gewähren Dateisystemzugriff auf den Dateispeicher eines Projekts.
+SSH-Nutzer haben vollständigen Zugriff auf das Dateisystem des Projekts, während SFTP-Nutzer auf bestimmte Verzeichnisse
+und Zugriffsstufen (Nur-Lesen oder Vollzugriff) beschränkt werden können. Sie werden hauptsächlich für Datei-Deployment oder ältere FTP-Workflows verwendet.
 
 ### API-Token {#api-token}
 

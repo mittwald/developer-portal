@@ -33,6 +33,8 @@ graph TD
     STACK["🐳 Container Stacks"]
 
     ORG -->|owns one or more| SERVER
+    ORG -->|owns one or more| PROJECT
+
     SERVER -->|hosts one or more| PROJECT
     PROJECT -->|runs| APP
     PROJECT -->|runs| STACK
@@ -213,12 +215,21 @@ You can declare additional stacks and services via the API or stack configuratio
 
 A **service** is an individual container running inside a container stack.
 It maps directly to a Docker container / OCI runtime instance and can be given CPU and memory limits.
+In mStudio, services are called "containers" – the terms are interchangeable.
 
 ### Volume {#volume}
 
 A **volume** is persistent storage attached to a container stack.
 Volumes survive container restarts and can be mounted into one or more services.
 They are analogous to Kubernetes `PersistentVolumeClaim` objects.
+
+### Registry {#registry}
+
+A **registry** stores private Docker image credentials. If you use custom container images in your container stack
+that are hosted on private registries (e.g., private Docker Hub, GitHub Container Registry, or self-hosted registries),
+you can create registry credentials in your project.
+
+Services within your container stack can reference these registry credentials to pull private images securely.
 
 ### Managed databases {#managed-databases}
 
@@ -246,61 +257,6 @@ This allows you to grant granular permissions to different applications or servi
 Managed services can be linked directly to app installations.
 Container-based databases are configured as separate services within your project's container stack.
 
-### Ingress {#ingress}
-
-An **ingress** maps a public hostname (domain + path) to a workload running inside a project.
-It acts as an HTTP/S reverse proxy, handles TLS termination via an SSL/TLS certificate (either Let's Encrypt or custom),
-and routes traffic to either an app installation or a container service.
-
-Each ingress requires one SSL/TLS certificate. If you don't provide one, mittwald automatically creates a free Let's Encrypt certificate for you.
-
-### Domain / DNS {#domain}
-
-A **domain** represents a registered domain name and its ownership state within a project.
-mittwald can manage your domain registration and DNS, or you can point your existing domain to mittwald by updating your nameservers.
-
-When you add a domain to a project, mittwald automatically creates a **DNS Zone** – a container for managing
-individual DNS records (A, AAAA, CNAME, MX, TXT, SRV, etc.). This separates domain ownership data from the actual DNS record management.
-
-### SSH / SFTP user {#ssh-sftp-user}
-
-**SSH / SFTP users** grant filesystem access to a project's file storage.
-SSH users have full access to the project's filesystem, while SFTP users can be restricted to specific directories
-and access levels (read-only or full). They are primarily used for file deployment or legacy FTP workflows.
-
-### Cronjob {#cronjob}
-
-A **cronjob** is a scheduled task that runs on a configurable schedule (cron syntax).
-Cronjobs can execute bash commands, PHP scripts, or HTTP requests, and are tied to a specific app installation.
-Cronjobs are project-scoped.
-
-### SSL/TLS Certificate {#ssl-certificate}
-
-An **SSL/TLS certificate** enables secure HTTPS connections to your workloads via ingresses. mittwald supports two types:
-
-- **Let's Encrypt certificates** (free, auto-renewing): Automatically created and managed when you set up an ingress without specifying a custom certificate.
-- **Custom certificates**: Uploaded manually for organizations with existing certificates or special requirements.
-
-Each ingress uses exactly one certificate.
-
-### DNS Zone {#dns-zone}
-
-A **DNS zone** is a container for DNS records (A, AAAA, CNAME, MX, TXT, SRV, etc.) for a specific domain.
-It is automatically created when you add a domain to your project.
-
-The DNS zone is distinct from the Domain entity – the domain represents ownership and registration,
-while the DNS zone manages the actual DNS records.
-
-You can manage DNS records for your zone directly through the mittwald API or mStudio.
-
-### Registry {#registry}
-
-A **registry** stores private Docker image credentials. If you use custom container images in your container stack
-that are hosted on private registries (e.g., private Docker Hub, GitHub Container Registry, or self-hosted registries),
-you can create registry credentials in your project.
-
-Services within your container stack can reference these registry credentials to pull private images securely.
-
 ### MySQL User {#mysql-user}
 
 A **MySQL user** is a separate database user account for accessing a MySQL database.
@@ -313,6 +269,48 @@ Each MySQL database can have multiple users, each with:
 This allows you to grant different permission levels to different applications or
 services accessing the same database. For example, you might create a read-only user
 for a reporting service and a full-access user for your main application.
+
+### Cronjob {#cronjob}
+
+A **cronjob** is a scheduled task that runs on a configurable schedule (cron syntax).
+Cronjobs can execute bash commands, PHP scripts, or HTTP requests, and are tied to a specific app installation
+or a container, making them project-scoped.
+
+### Ingress {#ingress}
+
+An **ingress** maps a public hostname (domain + path) to a workload running inside a project.
+It acts as an HTTP/S reverse proxy, handles TLS termination via an SSL/TLS certificate (either Let's Encrypt or custom),
+and routes traffic to either an app installation or a container service.
+
+Each ingress requires one SSL/TLS certificate. If you don't provide one, mittwald automatically creates a free Let's Encrypt certificate for you.
+Automatic certificate requests can be deleted via API, just as certificates themselves can be deleted or replaced with custom ones.
+
+### SSL/TLS Certificate {#ssl-certificate}
+
+An **SSL/TLS certificate** enables secure HTTPS connections to your workloads via ingresses. mittwald supports two types:
+
+- **Let's Encrypt certificates** (free, auto-renewing): Automatically created and managed when you set up an ingress without specifying a custom certificate.
+- **Custom certificates**: Uploaded manually for organizations with existing certificates or special requirements.
+
+Each ingress uses exactly one certificate.
+
+### Domain / DNS {#domain}
+
+A **domain** represents a registered domain name and its ownership state within a project.
+mittwald can manage your domain registration and DNS, or you can point your existing domain to mittwald by updating your nameservers.
+
+When you add a domain to a project, mittwald automatically creates a **DNS Zone** – a container for managing
+individual DNS records (A, AAAA, CNAME, MX, TXT, SRV, etc.). This separates domain ownership data from the actual DNS record management.
+
+### DNS Zone {#dns-zone}
+
+A **DNS zone** is a container for DNS records (A, AAAA, CNAME, MX, TXT, SRV, etc.) for a specific domain.
+It is automatically created when you add a domain to your project.
+
+The DNS zone is distinct from the Domain entity – the domain represents ownership and registration,
+while the DNS zone manages the actual DNS records.
+
+You can manage DNS records for your zone directly through the mittwald API or mStudio.
 
 ### Mail Address {#mail-address}
 
@@ -356,6 +354,12 @@ that you can download and store locally or on external storage.
 
 Backup exports are independent records that track when and where backup data has been exported,
 separate from the backups themselves.
+
+### SSH / SFTP user {#ssh-sftp-user}
+
+**SSH / SFTP users** grant filesystem access to a project's file storage.
+SSH users have full access to the project's filesystem, while SFTP users can be restricted to specific directories
+and access levels (read-only or full). They are primarily used for file deployment or legacy FTP workflows.
 
 ### API Token {#api-token}
 
