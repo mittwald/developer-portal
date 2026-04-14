@@ -40,6 +40,18 @@ function InteractiveMermaidDiagram({
   const [isPanning, setIsPanning] = useState(false);
   const panStartRef = useRef({ mouseX: 0, mouseY: 0, panX: 0, panY: 0 });
   const currentPanRef = useRef({ x: 0, y: 0 });
+  
+  // Touch tracking refs
+  const touchStartRef = useRef({ touchX: 0, touchY: 0, panX: 0, panY: 0 });
+  const currentPinchDistanceRef = useRef<number | null>(null);
+  const pinchStartZoomRef = useRef<number>(defaultZoom);
+
+  // Helper: Calculate distance between two touch points
+  const getTouchDistance = useCallback((touch1: React.Touch, touch2: React.Touch): number => {
+    const dx = touch1.clientX - touch2.clientX;
+    const dy = touch1.clientY - touch2.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }, []);
 
   // Handle window wheel zoom - listen on window level to capture wheel before diagram
   useEffect(() => {
@@ -140,6 +152,106 @@ function InteractiveMermaidDiagram({
     setPanY(currentPanRef.current.y);
   };
 
+  // Touch event handlers for mobile support
+  const handleDiagramTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    // Prevent default touch behaviors (pinch-to-zoom, double-tap zoom)
+    
+    if (e.touches.length === 1) {
+      // Single finger - treat as pan start
+      const touch = e.touches[0];
+      touchStartRef.current = {
+        touchX: touch.clientX,
+        touchY: touch.clientY,
+        panX: currentPanRef.current.x,
+        panY: currentPanRef.current.y,
+      };
+      setIsPanning(true);
+    } else if (e.touches.length === 2) {
+      // Two fingers - prepare for pinch zoom
+      setIsPanning(false);
+      pinchStartZoomRef.current = zoom;
+      currentPinchDistanceRef.current = getTouchDistance(
+        e.touches[0],
+        e.touches[1]
+      );
+    }
+  };
+
+  const handleDiagramTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    
+    if (e.touches.length === 1 && isPanning) {
+      // Single finger pan
+      const touch = e.touches[0];
+      const zoomFactor = zoom / 100;
+      const touchDeltaX = touch.clientX - touchStartRef.current.touchX;
+      const touchDeltaY = touch.clientY - touchStartRef.current.touchY;
+      
+      const panDeltaX = touchDeltaX / zoomFactor;
+      const panDeltaY = touchDeltaY / zoomFactor;
+      
+      const newPanX = touchStartRef.current.panX + panDeltaX;
+      const newPanY = touchStartRef.current.panY + panDeltaY;
+      
+      currentPanRef.current = { x: newPanX, y: newPanY };
+      
+      if (diagramRef.current) {
+        const newTransform = `scale(${zoomFactor}) translate(${newPanX}px, ${newPanY}px)`;
+        diagramRef.current.style.transform = newTransform;
+      }
+    } else if (e.touches.length === 2) {
+      // Two finger pinch zoom
+      setIsPanning(false);
+      
+      const currentDistance = getTouchDistance(e.touches[0], e.touches[1]);
+      const previousDistance = currentPinchDistanceRef.current || currentDistance;
+      
+      if (previousDistance > 0) {
+        const distanceRatio = currentDistance / previousDistance;
+        const zoomDelta = (distanceRatio - 1) * 100; // Scale sensitivity
+        const newZoom = Math.max(
+          minZoom,
+          Math.min(maxZoom, pinchStartZoomRef.current + zoomDelta)
+        );
+        
+        setZoom(newZoom);
+      }
+      
+      currentPinchDistanceRef.current = currentDistance;
+    }
+  };
+
+  const handleDiagramTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (isPanning && e.touches.length === 0) {
+      // Single finger pan ended
+      setIsPanning(false);
+      setPanX(currentPanRef.current.x);
+      setPanY(currentPanRef.current.y);
+    } else if (e.touches.length < 2) {
+      // Pinch ended or transitioned to single/no touch
+      currentPinchDistanceRef.current = null;
+      
+      if (e.touches.length === 1) {
+        // Transitioned from two fingers to one - restart pan
+        const touch = e.touches[0];
+        touchStartRef.current = {
+          touchX: touch.clientX,
+          touchY: touch.clientY,
+          panX: currentPanRef.current.x,
+          panY: currentPanRef.current.y,
+        };
+        setIsPanning(true);
+      }
+    }
+  };
+
+  const handleDiagramTouchCancel = () => {
+    // Handle interrupted touch (e.g., system gesture)
+    setIsPanning(false);
+    currentPinchDistanceRef.current = null;
+    setPanX(currentPanRef.current.x);
+    setPanY(currentPanRef.current.y);
+  };
+
   const transformStyle = {
     transform: `scale(${zoom / 100}) translate(${panX}px, ${panY}px)`,
     transformOrigin: "center center",
@@ -185,6 +297,10 @@ function InteractiveMermaidDiagram({
         onMouseMove={handleDiagramMouseMove}
         onMouseUp={handleDiagramMouseUp}
         onMouseLeave={handleDiagramMouseUp}
+        onTouchStart={handleDiagramTouchStart}
+        onTouchMove={handleDiagramTouchMove}
+        onTouchEnd={handleDiagramTouchEnd}
+        onTouchCancel={handleDiagramTouchCancel}
         role="img"
         aria-label={title || "Interactive diagram"}
       >
@@ -194,7 +310,7 @@ function InteractiveMermaidDiagram({
       </div>
       
       <div className={styles.hint}>
-        <small>💡 Ctrl/Cmd + Scroll to zoom • Drag to pan • Buttons to control</small>
+        <small>💡 Desktop: Ctrl/Cmd + Scroll to zoom • Drag to pan • Mobile: Pinch to zoom • Drag to pan</small>
       </div>
     </div>
   );
