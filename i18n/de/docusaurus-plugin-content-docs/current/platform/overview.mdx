@@ -1,0 +1,409 @@
+---
+sidebar_label: Plattform-Übersicht
+sidebar_position: 10
+description: Eine visuelle Übersicht der mittwald-Plattform-Entitätshierarchie, Workload-Typen und ihrer technischen Entsprechungen.
+---
+
+import InteractiveMermaidDiagram from "@site/src/components/InteractiveMermaidDiagram";
+
+# Plattform-Übersicht: Entitätshierarchie
+
+Diese Seite bietet dir einen Überblick über die mittwald-Hosting-Plattform und zeigt, wie zentrale Konzepte technisch umgesetzt werden. Ein **Projekt** ist beispielsweise ein Kubernetes Namespace; ein **Service** läuft als Docker-Container; und ein **Postfach** ist das IMAP-Mailbox-Backend für die E-Mail-Verwaltung. Das Verständnis dieser technischen Grundlagen hilft dir, deine Infrastruktur besser zu gestalten und zu optimieren.
+
+## Vereinfachte Übersicht {#simple-entity-hierarchy}
+
+Dieses vereinfachte Diagramm zeigt dir die Kernstruktur – wie die Plattform von der obersten Ebene bis zu
+den Workloads organisiert ist, die deine Anwendungen ausführen.
+Alles andere in der Plattform (Datenbanken, Domains, E-Mail, Sicherungen usw.) baut auf dieser fundamentalen Hierarchie auf.
+
+<InteractiveMermaidDiagram title="Was läuft wo: Vereinfachte Übersicht"
+                           defaultZoom={200}
+                           minZoom={100}
+                           maxZoom={500}
+                           zoomStep={50}>
+```mermaid
+graph TD
+    ORG[["🏢 Organisation"]]
+    SERVER[["🖥️ Server"]]
+    PROJECT["📁 Projekt"]
+    APP["📦 App-Installationen"]
+    STACK["🐳 Container-Stacks"]
+
+    ORG -->|besitzt einen oder mehrere| SERVER
+    ORG -->|besitzt einen oder mehrere| PROJECT
+
+    SERVER -->|hostet ein oder mehrere| PROJECT
+    PROJECT -->|führt aus| APP
+    PROJECT -->|führt aus| STACK
+
+    classDef brandOrg fill:#147af3,stroke:#0050d8,color:#fff,stroke-width:3px
+    classDef managed fill:#72e06a,stroke:#5cd54f,color:#fff,stroke-width:2px
+    classDef containers fill:#0fb5ae,stroke:#0a94a1,color:#fff,stroke-width:2px
+
+    class ORG,SERVER,PROJECT brandOrg
+    class APP managed
+    class STACK containers
+```
+</InteractiveMermaidDiagram>
+
+**Wichtigste Beziehungen:**
+- Eine **Organisation** besitzt _einen oder mehrere_ Server und Projekte
+- Ein **Server** ist ein gemeinsamer Ressourcen-Pool, der _mehrere_ Projekte hostet
+- Ein **Projekt** ist die Haupteinheit, in der du Workloads deployst – es können App-Installationen, Container-Stacks oder beides laufen
+- **App-Installationen** und **Container-Stacks** sind die Workload-Typen, die die eigentliche Arbeit machen: deine Anwendungscode ausführen
+
+## Entitätshierarchie {#entity-hierarchy}
+
+Das folgende Diagramm zeigt alle wichtigen Plattformentitäten und wie sie miteinander verbunden sind:
+
+<InteractiveMermaidDiagram title="Plattform-Entitätshierarchie"
+                           defaultZoom={300}
+                           minZoom={100}
+                           maxZoom={2000}
+                           zoomStep={50}>
+```mermaid
+graph TD
+    ORG[["🏢 Organisation"]]
+    SERVER[["🖥️ Server"]]
+    
+    PROJECT["📁 Projekt"]
+    
+    APP["📦 Verwaltete App-Installation"]
+    CONTAINERS(("🐳 Container"))
+    NETWORKING(("🌐 Netzwerk"))
+    BACKUPS(("💾 Sicherungen"))
+    MAIL(("📧 E-Mail"))
+    ACCESS(("🔑 Zugriff"))
+    AIHOST(("🤖 AI-Hosting"))
+    EXTENSIONS(["🔌 Erweiterungen"])
+    
+    DATASTORES(("📊 Verwaltete Datenspeicher"))
+    MYSQL[("🗄️ MySQL")]
+    REDIS[("⚡ Redis")]
+    
+    STACK{{"Container-Stack *(auto)*"}}
+    SERVICE["⚙️ Service"]
+    VOLUME["💾 Volume"]
+    REGISTRY["📦 Registry"]
+    
+    DOMAIN["🔗 Domain"]
+    DNSZONE{{"DNS-Zone *(auto)*"}}
+    INGRESS["Ingress"]
+    CERT(["🔐 Zertifikat *(auto)*"])
+    
+    CRONJOB["⏰ Cronjob"]
+    BACKUP["Sicherung"]
+    BACKUPSCHED["📅 Sicherungsplan"]
+    BACKUPEXPORT["📥 Sicherungs-Export"]
+    
+    MAILADDR["Mail-Adresse"]
+    DELIVERYBOX{{"Postfach *(auto)*"}}
+    MAILSETTINGS["⚙️ Mail-Einstellungen *(auto)*"]
+    
+    SSHSFTP["🔑 SSH/SFTP"]
+    APITOKEN["🔐 API-Token"]
+    
+    AIHOSTKEY["AI-Hosting-API-Schlüssel"]
+    AIHOST_URL["AI-Hosting-Basis-URL"]
+
+    ORG -->|besitzt| SERVER
+    SERVER -->|hostet| PROJECT
+
+    PROJECT -->|erstellt| APP
+    PROJECT -->|gruppiert| CONTAINERS
+    PROJECT -->|konfiguriert| NETWORKING
+    PROJECT -->|verwaltet| BACKUPS
+    PROJECT -->|verwaltet| MAIL
+    PROJECT -.->|kontrolliert| ACCESS
+    PROJECT -.->|konfiguriert| AIHOST
+    PROJECT -.->|installiert| EXTENSIONS
+
+    APP -->|verbindet| DATASTORES
+    DATASTORES -->|stellt bereit| MYSQL
+    DATASTORES -->|stellt bereit| REDIS
+
+    CONTAINERS -->|erzeugt| STACK
+    CONTAINERS -->|speichert| REGISTRY
+    STACK -->|stellt bereit| SERVICE
+    STACK -->|stellt bereit| VOLUME
+    SERVICE -.->|bindet ein| VOLUME
+
+    NETWORKING -->|verwaltet| DOMAIN
+    NETWORKING -->|routet| INGRESS
+    DOMAIN -->|auto-erstellt| DNSZONE
+    INGRESS -->|sichert| CERT
+
+    BACKUPS -->|plant| CRONJOB
+    BACKUPS -->|erstellt| BACKUP
+    BACKUP -->|definiert| BACKUPSCHED
+    BACKUP -->|ermöglicht| BACKUPEXPORT
+
+    MAIL -->|stellt bereit| MAILADDR
+    MAILADDR -->|auto-erstellt| DELIVERYBOX
+    MAIL -->|auto-erstellt| MAILSETTINGS
+
+    ACCESS -->|gewährt| SSHSFTP
+    ACCESS -->|gewährt| APITOKEN
+
+    AIHOST -->|speichert| AIHOSTKEY
+    AIHOST -->|speichert| AIHOST_URL
+
+    classDef brandOrg fill:#147af3,stroke:#0050d8,color:#fff,stroke-width:3px
+    classDef managed fill:#72e06a,stroke:#5cd54f,color:#fff,stroke-width:2px
+    classDef containers fill:#0fb5ae,stroke:#0a94a1,color:#fff,stroke-width:2px
+    classDef networking fill:#4046ca,stroke:#3035a7,color:#fff,stroke-width:2px
+    classDef backups fill:#f68511,stroke:#d96b00,color:#fff,stroke-width:2px
+    classDef mail fill:#de3d82,stroke:#c1326f,color:#fff,stroke-width:2px
+    classDef access fill:#7e84fa,stroke:#6572e5,color:#fff,stroke-width:2px
+    classDef aiHosting fill:#7326d3,stroke:#6217bb,color:#fff,stroke-width:2px
+    classDef extensions fill:#e8c600,stroke:#c9a400,color:#000,stroke-width:2px
+    classDef autocreated fill:#8a9ba8,stroke:#6b7c8a,color:#fff
+
+    class ORG,SERVER,PROJECT brandOrg
+    class APP,DATASTORES,MYSQL,REDIS managed
+    class CONTAINERS,STACK,SERVICE,VOLUME,REGISTRY containers
+    class NETWORKING,DOMAIN,DNSZONE,INGRESS,CERT networking
+    class BACKUPS,CRONJOB,BACKUP,BACKUPSCHED,BACKUPEXPORT backups
+    class MAIL,MAILADDR,DELIVERYBOX,MAILSETTINGS mail
+    class ACCESS,SSHSFTP,APITOKEN access
+    class AIHOST,AIHOSTKEY,AIHOST_URL aiHosting
+    class EXTENSIONS extensions
+    class STACK,DNSZONE,CERT,DELIVERYBOX,MAILSETTINGS autocreated
+```
+</InteractiveMermaidDiagram>
+
+## Beschreibung der Entitäten {#entity-descriptions}
+
+### Organisation {#organization}
+
+Die **Organisation** (auch _Kundenkonto_ oder _Mandant_) ist die übergeordnete Entität.
+Sie besitzt Server und Projekte und ist das Subjekt der Abrechnung für alle Ressourcen.
+
+### Server {#server}
+
+Ein **Server** ist ein gemeinsamer Ressource-Pool, der mehrere Projekte hosten kann. Er stellt eine feste Menge an CPU,
+Arbeitsspeicher und Speicherplatz bereit, die von allen Projekten auf diesem Server gemeinsam genutzt wird.
+
+### Projekt {#project}
+
+Ein **Projekt** ist die primäre Einheit für Isolation und Abrechnung. Jeder Workload, jede Datenbank, jede Domain und jeder Nutzer gehört zu einem Projekt.
+Technisch entspricht ein Projekt ungefähr einem **Kubernetes-Namespace** – es bietet Netzwerkisolation und separate Ressourcenquoten.
+
+Bei der Erstellung eines Projekts wird automatisch eine Projekt-Domain generiert, um den Hauptworkload des Projekts zugänglich zu machen.
+
+### App-Installation {#app-installation}
+
+Eine **App-Installation** (auch _verwaltete Anwendung_) ist eine vorkonfigurierte Laufzeitumgebung für einen bestimmten Technologie-Stack
+wie PHP, Node.js, Python oder PHP Worker. mittwald verwaltet das zugrundeliegende Framework und die Systemsoftware;
+du lieferst nur deinen Anwendungscode.
+
+App-Installationen können mit MySQL- oder Redis-Datenbanken verknüpft werden und können eigene Cronjobs und SSH/SFTP-Nutzer für Deployment
+und Verwaltung haben.
+
+### Container-Stack {#container-stack}
+
+Ein **Container-Stack** ist eine Docker-Compose-kompatible Deployment-Einheit. Er fasst einen oder mehrere _Services_ (Container) zusammen,
+stellt gemeinsam genutzte _Volumes_ für persistente Daten bereit und macht Ports intern innerhalb des Projekts verfügbar.
+
+Jedes Projekt enthält einen automatisch erstellten leeren Standard-Container-Stack.
+Du kannst über die API oder Stack-Konfigurationsdateien zusätzliche Stacks und Services deklarieren.
+
+### Service {#service}
+
+Ein **Service** ist ein einzelner Container, der innerhalb eines Container-Stacks läuft.
+Er entspricht direkt einem Docker-Container / OCI-Runtime-Instanz und kann mit CPU- und Speicherlimits konfiguriert werden.
+Im mStudio werden Services als "Container" bezeichnet – die Begriffe sind austauschbar.
+
+### Volume {#volume}
+
+Ein **Volume** ist persistenter Speicher, der an einen Container-Stack angehängt ist.
+Volumes überleben Container-Neustarts und können in einen oder mehrere Services eingebunden werden.
+Sie sind analog zu Kubernetes-`PersistentVolumeClaim`-Objekten.
+
+### Registry {#registry}
+
+Eine **Registry** speichert private Docker-Image-Anmeldedaten. Wenn du benutzerdefinierte Container-Images in deinem Container-Stack
+verwendest, die auf privaten Registries gehostet werden (z. B. privates Docker Hub, GitHub Container Registry oder selbst gehostete Registries),
+kannst du Registry-Anmeldedaten in deinem Projekt erstellen.
+
+Services innerhalb deines Container-Stacks k\u00f6nnen diese Registry-Anmeldedaten referenzieren, um private Images sicher zu pullen.
+
+### Verwaltete Datenbanken {#managed-databases}
+
+mittwald bietet sowohl verwaltete Dienste als auch Container-basierte Datenbankoptionen.
+
+**Verwaltete Dienste** werden vollständig von mittwald verwaltet und bieten automatische Sicherungen und vereinfachte Verbindungsverwaltung:
+
+| Entität | Technologie        | Typischer Einsatz                          |
+| ------- | ------------------ | ------------------------------------------ |
+| MySQL   | Relational (SQL)   | Webanwendungen, CMS                        |
+| Redis   | In-Memory-Speicher | Caching, Sessions, Queues                  |
+
+Jede MySQL-Datenbank kann mehrere **MySQL-Nutzer** haben – separate Nutzer-Konten mit konfigurierbaren Zugriffsprivilegien und Hostnamen.
+Dies ermöglicht dir, granulare Berechtigungen für verschiedene Anwendungen oder Services zu vergeben, die diese Datenbank nutzen.
+
+**Container-basierte Datenbanken** werden als Container innerhalb deines Projekts bereitgestellt und bieten mehr Flexibilität und erweiterte Funktionen:
+
+| Entität | Technologie        | Typischer Einsatz                          |
+| ------- | ------------------ | ------------------------------------------ |
+| MariaDB | Relational (SQL)   | Webanwendungen, CMS (Open-Source-Option)   |
+| PostgreSQL | Relational (SQL) | Anwendungen mit erweiterten SQL-Funktionen |
+| OpenSearch | Suchmaschine     | Volltextsuche, Log-Analyse                 |
+| Solr    | Suchmaschine       | Volltextsuche, Indexabfrage von Inhalten   |
+
+Verwaltete Dienste können direkt mit App-Installationen verknüpft werden.
+Container-basierte Datenbanken werden als separate Services innerhalb des Container-Stacks deines Projekts konfiguriert.
+
+### MySQL-Nutzer {#mysql-user}
+
+Ein **MySQL-Nutzer** ist ein separates Datenbanknutzer-Konto für den Zugriff auf eine MySQL-Datenbank.
+Jede MySQL-Datenbank kann mehrere Nutzer haben, jeweils mit:
+
+- Einem eindeutigen Benutzernamen und Passwort
+- Konfigurierbaren Privilegien (schreibgeschützt, Lese- und Schreibzugriff, usw.)
+- Host-Beschränkungen (externer Zugriff zulässig oder beschränkt)
+
+Dies ermöglicht dir, verschiedene Berechtigungsstufen für verschiedene Anwendungen oder
+Services zu gewähren, die auf diese Datenbank zugreifen. Du könntest beispielsweise einen schreibgeschützten Nutzer
+für einen Reporting-Service und einen vollständig berechtigten Nutzer für deine Hauptanwendung erstellen.
+
+### Cronjob {#cronjob}
+
+Ein **Cronjob** ist eine geplante Aufgabe, die nach einem konfigurierbaren Zeitplan (Cron-Syntax) ausgeführt wird.
+Cronjobs können Bash-Befehle, PHP-Skripte oder HTTP-Anfragen ausführen und sind an eine bestimmte App-Installation
+oder einen Container gebunden, somit also projektbezogen.
+
+### Ingress {#ingress}
+
+Ein **Ingress** ordnet einen öffentlichen Hostnamen (Domain + Pfad) einem Workload zu, der innerhalb eines Projekts läuft.
+Er fungiert als HTTP/S Reverse Proxy, übernimmt die TLS-Terminierung durch ein SSL/TLS-Zertifikat (entweder Let's Encrypt oder benutzerdefiniert),
+und leitet Traffic entweder zu einer App-Installation oder einem Container-Service weiter.
+
+Jeder Ingress benötigt ein SSL/TLS-Zertifikat. Wenn du kein benutzerdefiniertes Zertifikat angibst, erstellt mittwald automatisch ein kostenloses Let's Encrypt-Zertifikat für dich.
+Automatische Zertifikatsanfragen können über die API gelöscht werden, ebenso wie Zertifikate selbst gelöscht oder durch benutzerdefinierte ersetzt werden können.
+
+### SSL/TLS-Zertifikat {#ssl-certificate}
+
+Ein **SSL/TLS-Zertifikat** ermöglicht sichere HTTPS-Verbindungen zu deinen Workloads über Ingresses. mittwald unterstützt zwei Typen:
+
+- **Let's Encrypt-Zertifikate** (kostenlos, automatisch erneuert): Werden automatisch erstellt und verwaltet, wenn du einen Ingress ohne benutzerdefiniertes Zertifikat einrichtest.
+- **Benutzerdefinierte Zertifikate**: Werden manuell hochgeladen für Organisationen mit bestehenden Zertifikaten oder speziellen Anforderungen.
+
+Jeder Ingress nutzt genau ein Zertifikat.
+
+### Domain / DNS {#domain}
+
+Eine **Domain** repräsentiert einen registrierten Domainnamen und seinen Besitzzustand innerhalb eines Projekts.
+mittwald kann ihre Domain-Registrierung und DNS verwalten, oder du kannst deine bestehende Domain auf mittwald verweisen, indem du deine Nameserver aktualisierst.
+
+Wenn du eine Domain zu einem Projekt hinzufügst, erstellt mittwald automatisch eine **DNS-Zone** – einen Container für die Verwaltung
+einzelner DNS-Records (A, AAAA, CNAME, MX, TXT, SRV usw.). Dies trennt Domain-Besitzdaten von der eigentlichen DNS-Record-Verwaltung.
+
+### DNS-Zone {#dns-zone}
+
+Eine **DNS-Zone** ist ein Container für DNS-Records (A, AAAA, CNAME, MX, TXT, SRV usw.) für eine bestimmte Domain.
+Sie wird automatisch erstellt, wenn du eine Domain zu deinem Projekt hinzufügst.
+
+Die DNS-Zone ist verschieden von der Domain-Entität – die Domain repräsentiert Besitz und Registrierung,
+während die DNS-Zone die eigentlichen DNS-Records verwaltet.
+
+Du kannst DNS-Records für deine Zone direkt über die mittwald-API oder mStudio verwalten.
+
+### Mail-Adresse {#mail-address}
+
+Eine **Mail-Adresse** ist eine E-Mail-Adresse (z. B. `info@example.com`) mit integrierten IMAP/SMTP/POP3-Diensten.
+Wenn du eine Mail-Adresse erstellst, kann mittwald automatisch ein **Postfach** für dich anlegen, um eingehende Nachrichten zu speichern.
+
+### Postfach {#mail-box}
+
+Ein **Postfach** ist der Speicherort für Nachrichten, der automatisch für jede Mail-Adresse erstellt wird.
+Es speichert alle eingehenden E-Mails und Konversationen. Während die Mail-Adresse deine öffentliche E-Mail-Identität darstellt,
+verwaltet das Postfach die tatsächliche Speicherung und den Abruf deiner Nachrichten.
+
+Du greifst auf dein Postfach typischerweise über Mail-Clients (Outlook, Apple Mail, Thunderbird) zu, die sich per IMAP oder POP3 verbinden.
+
+### Postausgang {#delivery-box}
+
+Ein **Postausgang** ist ein SMTP-Mail-Backend, das innerhalb eines Projekts erstellt wird, um den Versand von E-Mails von deinen Mail-Adressen zu verwalten.
+Er verwaltet ausgehende Nachrichten und deren Zustellung. Während das Postfach eingehende E-Mails speichert und abruft,
+verwaltet der Postausgang den Versand und die Lieferung deiner ausgehenden E-Mails.
+
+Du greifst auf deinen Postausgang typischerweise über Mail-Clients (Outlook, Apple Mail, Thunderbird) zu, die Nachrichten per SMTP versenden, oder über mittwalds Mail-Dienste.
+
+### Mail-Einstellungen {#mail-settings}
+
+**Mail-Einstellungen** ist eine projektweite Konfiguration f\u00fcr Mail-Verhalten. Sie werden automatisch f\u00fcr jedes Projekt erstellt und erm\u00f6glichen dir:
+
+- Spezifische E-Mail-Adressen oder Domains auf die Whitelist oder Blacklist zu setzen
+- Spam-Schutz-Einstellungen zu konfigurieren
+- Nachrichtenarchivierung zu aktivieren/deaktivieren
+- Standard-Speicherlimits f\u00fcr neue Mail-Adressen festzulegen
+
+Mail-Einstellungen gelten global f\u00fcr alle Mail-Adressen innerhalb eines Projekts.
+
+### Sicherungsplan {#backup-schedule}
+
+Ein **Sicherungsplan** erstellt automatisch Snapshots deines Projekts in regelm\u00e4\u00dfigen Abst\u00e4nden. Du kannst konfigurieren:
+
+- Sicherungsh\u00e4ufigkeit (t\u00e4glich, w\u00f6chentlich, monatlich usw.)
+- Aufbewahrungszeit (wie lange Sicherungen behalten werden)
+- Sicherungsfenster (wann Sicherungen laufen sollen, falls zutreffend)
+
+Sicherungspl\u00e4ne sind optional \u2013 du kannst auch manuelle Sicherungen nach Bedarf erstellen. Automatisierte Sicherungen erscheinen als regul\u00e4re Sicherungs-Entit\u00e4ten in deinem Projekt.
+
+### Sicherungs-Export {#backup-export}
+
+Ein **Sicherungs-Export** ist eine herunterladbare Kopie eines Sicherungs-Snapshots. Du kannst jede Sicherung exportieren, um ein komprimiertes Archiv (z. B. .tar.gz) zu erhalten,
+das du lokal oder auf externem Speicher herunterladen und speichern kannst.
+
+Sicherungs-Exporte sind unabhängige Records, die verfolgen, wann und wo Sicherungsdaten exportiert wurden,
+getrennt von den Sicherungen selbst.
+
+### SSH / SFTP-Nutzer {#ssh-sftp-user}
+
+**SSH/SFTP-Nutzer** gewähren Dateisystemzugriff auf den Dateispeicher eines Projekts.
+SSH-Nutzer haben vollständigen Zugriff auf das Dateisystem des Projekts, während SFTP-Nutzer auf bestimmte Verzeichnisse
+und Zugriffsstufen (Nur-Lesen oder Vollzugriff) beschränkt werden können. Sie werden hauptsächlich für Datei-Deployment oder ältere FTP-Workflows verwendet.
+
+### API-Token {#api-token}
+
+Ein **API-Token** ist ein Authentifizierungsmerkmal für programmgesteuerten API-Zugriff. Du kannst API-Token in deinen
+Nutzerkontoeinstellungen erstellen und verwalten (nicht pro Projekt).
+
+API-Token ermöglichen dir, dich bei der mittwald-REST-API zu authentifizieren, ohne dein Passwort zu verwenden.
+Jeder Token kann einzeln widerrufen werden und hat vollständigen Zugriff auf alle deine Projekte und dein Nutzer-Konto.
+
+### AI-Hosting {#ai-hosting}
+
+**AI-Hosting** ermöglicht deinen Anwendungen, mit Large Language Models (LLMs) über die Hosting-Infrastruktur von mittwald zu interagieren.
+Es bietet eine zentrale Möglichkeit, AI-Funktionen in deinem Projekt zu konfigurieren und zu nutzen mit mittwalds gehosteten LLM-Service.
+
+AI-Hosting ist für Agenturen konzipiert, die AI-gestützte Client-Lösungen bauen, für SaaS-Produkte mit AI-Komponenten,
+und für Organisationen, die eine EU-basierte, datenschutzfreundliche AI-Infrastruktur benötigen.
+
+Jede AI-Hosting-Integration benötigt zwei Konfigurationswerte:
+- **AI-Hosting-API-Schlüssel**: Dein Authentifizierungsmerkmal für den Zugriff auf den AI-Service
+- **AI-Hosting-Basis-URL**: Die Endpunkt-URL für den AI-Service (`https://llm.aihosting.mittwald.de/v1`)
+
+Nach der Konfiguration auf Projektebene können alle App-Installationen oder Container-Services in deinem Projekt
+diese Anmeldedaten verwenden, um API-Aufrufe für Aufgaben wie Textgenerierung, Chatbots, Bildverarbeitung und AI-Agenten zu senden.
+
+### AI-Hosting-API-Schlüssel {#ai-hosting-key}
+
+Ein **AI-Hosting-API-Schlüssel** ist ein Authentifizierungsmerkmal, das Zugriff auf den AI-Hosting-Service gewährt.
+Es authentifiziert Anfragen von deinen Anwendungen an den LLM-Endpunkt.
+
+Der API-Schlüssel wird sicher auf Projektebene gespeichert und kann von jedem Workload innerhalb des Projekts referenziert werden.
+Du solltest ihn wie ein Passwort behandeln – halte ihn vertraulich und aktualisiere ihn regelmäßig nach Best Practices der Sicherheit.
+
+### AI-Hosting-Basis-URL {#ai-hosting-base-url}
+
+Eine **AI-Hosting-Basis-URL** ist die Endpunkt-Adresse für mittwalds AI-Hosting-Service.
+Sie wird als konstanter Wert in mStudio bereitgestellt, den du in deine Anwendung zur Verwendung bei API-Anfragen kopierst.
+
+## Workload-Typen auf einen Blick {#workload-types}
+
+| Workload         | Geeignet für                                              | Technische Basis              |
+| ---------------- | --------------------------------------------------------- | ----------------------------- |
+| App-Installation | Vorkonfigurierte Laufzeiten (PHP, Node.js, Python, PHP Worker) | Verwaltetes Runtime-Framework |
+| Container-Stack  | Eigene Container, Microservices                           | OCI / Docker Compose          |

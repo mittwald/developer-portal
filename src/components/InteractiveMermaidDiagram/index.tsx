@@ -1,0 +1,327 @@
+import React, { ReactNode, useRef, useState, useEffect, useCallback } from "react";
+import { Button } from "@mittwald/flow-react-components";
+import { IconZoomIn, IconZoomOut, IconRefresh } from "@tabler/icons-react";
+import styles from "./index.module.css";
+
+export interface InteractiveMermaidDiagramProps {
+  /** Optional title for the diagram */
+  title?: string;
+  /** The mermaid diagram content (children will be the rendered mermaid block) */
+  children: ReactNode;
+  /** Default zoom level (default: 100) */
+  defaultZoom?: number;
+  /** Minimum zoom level in percent (default: 10) */
+  minZoom?: number;
+  /** Maximum zoom level in percent (default: 1000) */
+  maxZoom?: number;
+  /** Zoom increment/decrement in percent (default: 20) */
+  zoomStep?: number;
+}
+
+/**
+ * Interactive wrapper for mermaid diagrams with zoom and pan capabilities.
+ * Provides:
+ * - Inline diagram with zoom/pan controls
+ * - Smooth CSS transform-based zoom and pan
+ */
+function InteractiveMermaidDiagram({
+  title,
+  children,
+  defaultZoom = 100,
+  minZoom = 10,
+  maxZoom = 1000,
+  zoomStep = 20,
+}: InteractiveMermaidDiagramProps) {
+  const diagramRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [zoom, setZoom] = useState(defaultZoom);
+  const [panX, setPanX] = useState(0);
+  const [panY, setPanY] = useState(0);
+  const [isPanning, setIsPanning] = useState(false);
+  const panStartRef = useRef({ mouseX: 0, mouseY: 0, panX: 0, panY: 0 });
+  const currentPanRef = useRef({ x: 0, y: 0 });
+  
+  // Touch tracking refs
+  const touchStartRef = useRef({ touchX: 0, touchY: 0, panX: 0, panY: 0 });
+  const currentPinchDistanceRef = useRef<number | null>(null);
+  const pinchStartZoomRef = useRef<number>(defaultZoom);
+
+  // Helper: Calculate distance between two touch points
+  const getTouchDistance = useCallback((touch1: React.Touch, touch2: React.Touch): number => {
+    const dx = touch1.clientX - touch2.clientX;
+    const dy = touch1.clientY - touch2.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }, []);
+
+  // Handle window wheel zoom - listen on window level to capture wheel before diagram
+  useEffect(() => {
+    const handleWindowWheel = (e: WheelEvent) => {
+      // Check if we're hovering over the diagram area
+      if (!diagramRef.current) return;
+      const rect = diagramRef.current.getBoundingClientRect();
+      const isOverDiagram =
+        e.clientX >= rect.left &&
+        e.clientX <= rect.right &&
+        e.clientY >= rect.top &&
+        e.clientY <= rect.bottom;
+      
+      if (!isOverDiagram) return;
+      
+      // Only handle zoom if ctrl/cmd is held
+      if (!e.ctrlKey && !e.metaKey) return;
+      
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const delta = e.deltaY > 0 ? -zoomStep : zoomStep;
+      setZoom((currentZoom) => Math.max(minZoom, Math.min(maxZoom, currentZoom + delta)));
+    };
+
+    window.addEventListener("wheel", handleWindowWheel, { passive: false });
+    return () => {
+      window.removeEventListener("wheel", handleWindowWheel);
+    };
+  }, [minZoom, maxZoom, zoomStep]);
+
+  const handleZoomIn = useCallback(() => {
+    setZoom((prev) => Math.min(maxZoom, prev + zoomStep));
+  }, [maxZoom, zoomStep]);
+
+  const handleZoomOut = useCallback(() => {
+    setZoom((prev) => Math.max(minZoom, prev - zoomStep));
+  }, [minZoom, zoomStep]);
+
+  const handleReset = useCallback(() => {
+    setZoom(defaultZoom);
+    setPanX(0);
+    setPanY(0);
+    currentPanRef.current = { x: 0, y: 0 };
+  }, [defaultZoom]);
+
+  // Pan with mouse drag - only on SVG, not on buttons
+  const handleDiagramMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    // Check if click is on a button or control
+    if (target.tagName === "BUTTON" || target.closest("button")) return;
+    
+    setIsPanning(true);
+    // Store starting mouse position AND current actual pan values (from ref, not stale state)
+    panStartRef.current = {
+      mouseX: e.clientX,
+      mouseY: e.clientY,
+      panX: currentPanRef.current.x,
+      panY: currentPanRef.current.y,
+    };
+  };
+
+  const handleDiagramMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isPanning) return;
+    
+    e.preventDefault();
+    
+    // Calculate mouse movement in viewport space
+    const zoomFactor = zoom / 100;
+    const mouseDeltaX = e.clientX - panStartRef.current.mouseX;
+    const mouseDeltaY = e.clientY - panStartRef.current.mouseY;
+    
+    // Convert mouse movement to pan space by dividing by zoom
+    const panDeltaX = mouseDeltaX / zoomFactor;
+    const panDeltaY = mouseDeltaY / zoomFactor;
+    
+    // Calculate new pan: starting pan + movement delta (in pan space)
+    const newPanX = panStartRef.current.panX + panDeltaX;
+    const newPanY = panStartRef.current.panY + panDeltaY;
+    
+    // Track latest pan values
+    currentPanRef.current = { x: newPanX, y: newPanY };
+    
+    // Update inline style directly without setState - no re-render, no flicker
+    if (diagramRef.current) {
+      const newTransform = `scale(${zoomFactor}) translate(${newPanX}px, ${newPanY}px)`;
+      diagramRef.current.style.transform = newTransform;
+    }
+  };
+
+  const handleDiagramMouseUp = () => {
+    if (!isPanning) return;
+    
+    setIsPanning(false);
+    
+    // Sync final pan values back to state for persistence
+    setPanX(currentPanRef.current.x);
+    setPanY(currentPanRef.current.y);
+  };
+
+  // Touch event handlers for mobile support
+  const handleDiagramTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    // Prevent default touch behaviors (pinch-to-zoom, double-tap zoom)
+    
+    if (e.touches.length === 1) {
+      // Single finger - treat as pan start
+      const touch = e.touches[0];
+      touchStartRef.current = {
+        touchX: touch.clientX,
+        touchY: touch.clientY,
+        panX: currentPanRef.current.x,
+        panY: currentPanRef.current.y,
+      };
+      setIsPanning(true);
+    } else if (e.touches.length === 2) {
+      // Two fingers - prepare for pinch zoom
+      setIsPanning(false);
+      pinchStartZoomRef.current = zoom;
+      currentPinchDistanceRef.current = getTouchDistance(
+        e.touches[0],
+        e.touches[1]
+      );
+    }
+  };
+
+  const handleDiagramTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    
+    if (e.touches.length === 1 && isPanning) {
+      // Single finger pan
+      const touch = e.touches[0];
+      const zoomFactor = zoom / 100;
+      const touchDeltaX = touch.clientX - touchStartRef.current.touchX;
+      const touchDeltaY = touch.clientY - touchStartRef.current.touchY;
+      
+      const panDeltaX = touchDeltaX / zoomFactor;
+      const panDeltaY = touchDeltaY / zoomFactor;
+      
+      const newPanX = touchStartRef.current.panX + panDeltaX;
+      const newPanY = touchStartRef.current.panY + panDeltaY;
+      
+      currentPanRef.current = { x: newPanX, y: newPanY };
+      
+      if (diagramRef.current) {
+        const newTransform = `scale(${zoomFactor}) translate(${newPanX}px, ${newPanY}px)`;
+        diagramRef.current.style.transform = newTransform;
+      }
+    } else if (e.touches.length === 2) {
+      // Two finger pinch zoom
+      setIsPanning(false);
+      
+      const currentDistance = getTouchDistance(e.touches[0], e.touches[1]);
+      const previousDistance = currentPinchDistanceRef.current || currentDistance;
+      
+      if (previousDistance > 0) {
+        const distanceRatio = currentDistance / previousDistance;
+        const zoomDelta = (distanceRatio - 1) * 100; // Scale sensitivity
+        const newZoom = Math.max(
+          minZoom,
+          Math.min(maxZoom, pinchStartZoomRef.current + zoomDelta)
+        );
+        
+        setZoom(newZoom);
+      }
+      
+      currentPinchDistanceRef.current = currentDistance;
+    }
+  };
+
+  const handleDiagramTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (isPanning && e.touches.length === 0) {
+      // Single finger pan ended
+      setIsPanning(false);
+      setPanX(currentPanRef.current.x);
+      setPanY(currentPanRef.current.y);
+    } else if (e.touches.length < 2) {
+      // Pinch ended or transitioned to single/no touch
+      currentPinchDistanceRef.current = null;
+      
+      if (e.touches.length === 1) {
+        // Transitioned from two fingers to one - restart pan
+        const touch = e.touches[0];
+        touchStartRef.current = {
+          touchX: touch.clientX,
+          touchY: touch.clientY,
+          panX: currentPanRef.current.x,
+          panY: currentPanRef.current.y,
+        };
+        setIsPanning(true);
+      }
+    }
+  };
+
+  const handleDiagramTouchCancel = () => {
+    // Handle interrupted touch (e.g., system gesture)
+    setIsPanning(false);
+    currentPinchDistanceRef.current = null;
+    setPanX(currentPanRef.current.x);
+    setPanY(currentPanRef.current.y);
+  };
+
+  const transformStyle = {
+    transform: `scale(${zoom / 100}) translate(${panX}px, ${panY}px)`,
+    transformOrigin: "center center",
+  };
+
+  const DiagramView = () => (
+    <div className={styles.diagramWrapper}>
+      <div className={styles.controls}>
+        <div className={styles.zoomControls}>
+          <Button
+            variant="soft"
+            size="s"
+            onClick={handleZoomOut}
+            aria-label="Zoom out"
+          >
+            <IconZoomOut size={16} />
+          </Button>
+          <span className={styles.zoomLevel}>{zoom}%</span>
+          <Button
+            variant="soft"
+            size="s"
+            onClick={handleZoomIn}
+            aria-label="Zoom in"
+          >
+            <IconZoomIn size={16} />
+          </Button>
+          <Button
+            variant="soft"
+            size="s"
+            onClick={handleReset}
+            aria-label="Reset zoom"
+          >
+            <IconRefresh size={16} />
+          </Button>
+        </div>
+      </div>
+      
+      <div
+        ref={diagramRef}
+        className={styles.diagram}
+        style={transformStyle as React.CSSProperties}
+        onMouseDown={handleDiagramMouseDown}
+        onMouseMove={handleDiagramMouseMove}
+        onMouseUp={handleDiagramMouseUp}
+        onMouseLeave={handleDiagramMouseUp}
+        onTouchStart={handleDiagramTouchStart}
+        onTouchMove={handleDiagramTouchMove}
+        onTouchEnd={handleDiagramTouchEnd}
+        onTouchCancel={handleDiagramTouchCancel}
+        role="img"
+        aria-label={title || "Interactive diagram"}
+      >
+        <div className={styles.diagramContent} ref={contentRef}>
+          {children}
+        </div>
+      </div>
+      
+      <div className={styles.hint}>
+        <small>💡 Desktop: Ctrl/Cmd + Scroll to zoom • Drag to pan • Mobile: Pinch to zoom • Drag to pan</small>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.inlineView}>
+        <DiagramView />
+      </div>
+    </div>
+  );
+}
+
+export default InteractiveMermaidDiagram;

@@ -1,0 +1,410 @@
+---
+sidebar_label: Platform Overview
+sidebar_position: 10
+description: A visual overview of the mittwald platform's entity hierarchy, workload types, and their technical counterparts.
+---
+
+import InteractiveMermaidDiagram from "@site/src/components/InteractiveMermaidDiagram";
+
+# Platform Overview: Entity Hierarchy
+
+This page gives you a bird's-eye view of the mittwald hosting platform, mapping core concepts to their underlying technologies. For example, a **project** is technically a Kubernetes namespace; a **service** runs as a Docker container; and a **delivery box** is the IMAP mailbox backend for email. Understanding these technical foundations helps you design and troubleshoot your infrastructure more effectively.
+
+## Simplified Overview {#simple-entity-hierarchy}
+
+This simplified diagram shows the core containment structure – how the platform is organized from the top level down to
+the actual workloads that serve your customers.
+Everything else in the platform (databases, domains, email, backups, etc.) builds on top of this foundational hierarchy.
+
+<InteractiveMermaidDiagram title="What Runs Where: Simplified Overview"
+                           defaultZoom={200}
+                           minZoom={100}
+                           maxZoom={500}
+                           zoomStep={50}>
+```mermaid
+graph TD
+    ORG[["🏢 Organization"]]
+    SERVER[["🖥️ Server"]]
+    PROJECT["📁 Project"]
+    APP["📦 App Installations"]
+    STACK["🐳 Container Stacks"]
+
+    ORG -->|owns one or more| SERVER
+    ORG -->|owns one or more| PROJECT
+
+    SERVER -->|hosts one or more| PROJECT
+    PROJECT -->|runs| APP
+    PROJECT -->|runs| STACK
+
+    classDef brandOrg fill:#147af3,stroke:#0050d8,color:#fff,stroke-width:3px
+    classDef managed fill:#72e06a,stroke:#5cd54f,color:#fff,stroke-width:2px
+    classDef containers fill:#0fb5ae,stroke:#0a94a1,color:#fff,stroke-width:2px
+
+    class ORG,SERVER,PROJECT brandOrg
+    class APP managed
+    class STACK containers
+```
+</InteractiveMermaidDiagram>
+
+**Key relationships:**
+- An **organization** owns _one or more_ servers and projects
+- A **server** is a shared resource pool that hosts _multiple_ projects
+- A **project** is the main unit where you deploy workloads – it can run app installations, container stacks, or both
+- **App installations** and **container stacks** are the workload types that do the actual work: running your application code
+
+## Entity hierarchy {#entity-hierarchy}
+
+The following diagram shows all major platform entities and how they relate to each other.
+
+<InteractiveMermaidDiagram title="Platform Entity Hierarchy"
+                           defaultZoom={300}
+                           minZoom={100}
+                           maxZoom={2000}
+                           zoomStep={50}>
+```mermaid
+graph TD
+    ORG[["🏢 Organization"]]
+    SERVER[["🖥️ Server"]]
+    
+    PROJECT["📁 Project"]
+    
+    APP["📦 Managed App Installation"]
+    CONTAINERS(("🐳 Containers"))
+    NETWORKING(("🌐 Networking"))
+    BACKUPS(("💾 Backups"))
+    MAIL(("📧 Mail"))
+    ACCESS(("🔑 Access"))
+    AIHOST(("🤖 AI Hosting"))
+    EXTENSIONS(["🔌 Extensions"])
+    
+    DATASTORES(("📊 Managed Data Stores"))
+    MYSQL[("🗄️ MySQL")]
+    REDIS[("⚡ Redis")]
+    
+    STACK{{"Container Stack *(auto)*"}}
+    SERVICE["⚙️ Service"]
+    VOLUME["💾 Volume"]
+    REGISTRY["📦 Registry"]
+    
+    DOMAIN["🔗 Domain"]
+    DNSZONE{{"DNS Zone *(auto)*"}}
+    INGRESS["Ingress"]
+    CERT(["🔐 Certificate *(auto)*"])
+    
+    CRONJOB["⏰ Cronjob"]
+    BACKUP["Backup"]
+    BACKUPSCHED["📅 Schedule"]
+    BACKUPEXPORT["📥 Export"]
+    
+    MAILADDR["Mail Address"]
+    DELIVERYBOX{{"Delivery Box *(auto)*"}}
+    MAILSETTINGS["⚙️ Mail Settings *(auto)*"]
+    
+    SSHSFTP["🔑 SSH/SFTP"]
+    APITOKEN["🔐 API Token"]
+    
+    AIHOSTKEY["AI Hosting API Key"]
+    AIHOST_URL["AI Hosting Base URL"]
+
+    ORG -->|owns| SERVER
+    SERVER -->|hosts| PROJECT
+
+    PROJECT -->|provisions| APP
+    PROJECT -->|groups| CONTAINERS
+    PROJECT -->|configures| NETWORKING
+    PROJECT -->|manages| BACKUPS
+    PROJECT -->|manages| MAIL
+    PROJECT -.->|controls| ACCESS
+    PROJECT -.->|configures| AIHOST
+    PROJECT -.->|installs| EXTENSIONS
+
+    APP -->|links| DATASTORES
+    DATASTORES -->|provides| MYSQL
+    DATASTORES -->|provides| REDIS
+
+    CONTAINERS -->|generates| STACK
+    CONTAINERS -->|stores| REGISTRY
+    STACK -->|deploys| SERVICE
+    STACK -->|provides| VOLUME
+    SERVICE -.->|mounts| VOLUME
+
+    NETWORKING -->|manages| DOMAIN
+    NETWORKING -->|routes| INGRESS
+    DOMAIN -->|auto-creates| DNSZONE
+    INGRESS -->|secures| CERT
+
+    BACKUPS -->|schedules| CRONJOB
+    BACKUPS -->|creates| BACKUP
+    BACKUP -->|defines| BACKUPSCHED
+    BACKUP -->|enables| BACKUPEXPORT
+
+    MAIL -->|provides| MAILADDR
+    MAILADDR -->|auto-creates| DELIVERYBOX
+    MAIL -->|auto-creates| MAILSETTINGS
+
+    ACCESS -->|grants| SSHSFTP
+    ACCESS -->|grants| APITOKEN
+
+    AIHOST -->|stores| AIHOSTKEY
+    AIHOST -->|stores| AIHOST_URL
+
+    classDef brandOrg fill:#147af3,stroke:#0050d8,color:#fff,stroke-width:3px
+    classDef managed fill:#72e06a,stroke:#5cd54f,color:#fff,stroke-width:2px
+    classDef containers fill:#0fb5ae,stroke:#0a94a1,color:#fff,stroke-width:2px
+    classDef networking fill:#4046ca,stroke:#3035a7,color:#fff,stroke-width:2px
+    classDef backups fill:#f68511,stroke:#d96b00,color:#fff,stroke-width:2px
+    classDef mail fill:#de3d82,stroke:#c1326f,color:#fff,stroke-width:2px
+    classDef access fill:#7e84fa,stroke:#6572e5,color:#fff,stroke-width:2px
+    classDef aiHosting fill:#7326d3,stroke:#6217bb,color:#fff,stroke-width:2px
+    classDef extensions fill:#e8c600,stroke:#c9a400,color:#000,stroke-width:2px
+    classDef autocreated fill:#8a9ba8,stroke:#6b7c8a,color:#fff
+
+    class ORG,SERVER,PROJECT brandOrg
+    class APP,DATASTORES,MYSQL,REDIS managed
+    class CONTAINERS,STACK,SERVICE,VOLUME,REGISTRY containers
+    class NETWORKING,DOMAIN,DNSZONE,INGRESS,CERT networking
+    class BACKUPS,CRONJOB,BACKUP,BACKUPSCHED,BACKUPEXPORT backups
+    class MAIL,MAILADDR,DELIVERYBOX,MAILSETTINGS mail
+    class ACCESS,SSHSFTP,APITOKEN access
+    class AIHOST,AIHOSTKEY,AIHOST_URL aiHosting
+    class EXTENSIONS extensions
+    class STACK,DNSZONE,CERT,DELIVERYBOX,MAILSETTINGS autocreated
+```
+</InteractiveMermaidDiagram>
+
+## Entity descriptions {#entity-descriptions}
+
+### Organization {#organization}
+
+The **organization** (also called _customer account_ or _tenant_) is the top-level entity.
+It owns servers and projects and is the billing subject for all resources.
+
+### Server {#server}
+
+A **server** is a shared resource pool that can host multiple projects. It provides a fixed amount of CPU,
+memory, and storage that is shared across all projects on it.
+
+### Project {#project}
+
+A **project** is the primary unit of isolation and billing. Every workload, database, domain, and user belongs to a project.
+Technically, a project corresponds roughly to a **Kubernetes namespace** – it provides network isolation and separate resource quotas.
+
+When created, a project automatically generates a project domain to expose the project's main workload.
+
+### App installation {#app-installation}
+
+An **app installation** (also called _managed application_) is a pre-configured runtime environment for a specific technology
+stack such as PHP, Node.js, Python, or PHP Worker. mittwald manages the underlying framework and system software;
+you only provide your application code.
+
+App installations can be linked to MySQL or Redis databases, and may have their own cronjobs and SSH/SFTP users for deployment
+and management.
+
+### Container stack {#container-stack}
+
+A **container stack** is a Docker Compose-compatible deployment unit. It groups one or more _services_ (containers) together,
+provides shared _volumes_ for persistent data, and exposes ports internally within the project.
+
+Each project includes one default empty container stack created automatically.
+You can declare additional stacks and services via the API or stack configuration files.
+
+### Service {#service}
+
+A **service** is an individual container running inside a container stack.
+It maps directly to a Docker container / OCI runtime instance and can be given CPU and memory limits.
+In mStudio, services are called "containers" – the terms are interchangeable.
+
+### Volume {#volume}
+
+A **volume** is persistent storage attached to a container stack.
+Volumes survive container restarts and can be mounted into one or more services.
+They are analogous to Kubernetes `PersistentVolumeClaim` objects.
+
+### Registry {#registry}
+
+A **registry** stores private Docker image credentials. If you use custom container images in your container stack
+that are hosted on private registries (e.g., private Docker Hub, GitHub Container Registry, or self-hosted registries),
+you can create registry credentials in your project.
+
+Services within your container stack can reference these registry credentials to pull private images securely.
+
+### Managed databases {#managed-databases}
+
+mittwald provides both managed services and container-based database options.
+
+**Managed services** are fully managed by mittwald with automatic backups and simplified connection management:
+
+| Entity | Technology       | Typical use                                  |
+| ------ | ---------------- | -------------------------------------------- |
+| MySQL  | Relational (SQL) | Web applications, CMS                        |
+| Redis  | In-memory store  | Caching, sessions, queues                    |
+
+Each MySQL database can have multiple **MySQL Users** – separate user accounts with configurable access privileges and hostnames.
+This allows you to grant granular permissions to different applications or services accessing the same database.
+
+**Container-based databases** are deployed as containers within your project, offering more flexibility and advanced features:
+
+| Entity      | Technology       | Typical use                                  |
+| ----------- | ---------------- | -------------------------------------------- |
+| MariaDB     | Relational (SQL) | Web applications, CMS (open-source option)  |
+| PostgreSQL  | Relational (SQL) | Applications requiring advanced SQL features |
+| OpenSearch  | Search engine    | Full-text search, log analysis               |
+| Solr        | Search engine    | Full-text search, indexed content retrieval  |
+
+Managed services can be linked directly to app installations.
+Container-based databases are configured as separate services within your project's container stack.
+
+### MySQL User {#mysql-user}
+
+A **MySQL user** is a separate database user account for accessing a MySQL database.
+Each MySQL database can have multiple users, each with:
+
+- A unique username and password
+- Configurable privileges (read-only, read-write, etc.)
+- Host restrictions (external access allowed or restricted)
+
+This allows you to grant different permission levels to different applications or
+services accessing the same database. For example, you might create a read-only user
+for a reporting service and a full-access user for your main application.
+
+### Cronjob {#cronjob}
+
+A **cronjob** is a scheduled task that runs on a configurable schedule (cron syntax).
+Cronjobs can execute bash commands, PHP scripts, or HTTP requests, and are tied to a specific app installation
+or a container, making them project-scoped.
+
+### Ingress {#ingress}
+
+An **ingress** maps a public hostname (domain + path) to a workload running inside a project.
+It acts as an HTTP/S reverse proxy, handles TLS termination via an SSL/TLS certificate (either Let's Encrypt or custom),
+and routes traffic to either an app installation or a container service.
+
+Each ingress requires one SSL/TLS certificate. If you don't provide one, mittwald automatically creates a free Let's Encrypt certificate for you.
+Automatic certificate requests can be deleted via API, just as certificates themselves can be deleted or replaced with custom ones.
+
+### SSL/TLS Certificate {#ssl-certificate}
+
+An **SSL/TLS certificate** enables secure HTTPS connections to your workloads via ingresses. mittwald supports two types:
+
+- **Let's Encrypt certificates** (free, auto-renewing): Automatically created and managed when you set up an ingress without specifying a custom certificate.
+- **Custom certificates**: Uploaded manually for organizations with existing certificates or special requirements.
+
+Each ingress uses exactly one certificate.
+
+### Domain / DNS {#domain}
+
+A **domain** represents a registered domain name and its ownership state within a project.
+mittwald can manage your domain registration and DNS, or you can point your existing domain to mittwald by updating your nameservers.
+
+When you add a domain to a project, mittwald automatically creates a **DNS Zone** – a container for managing
+individual DNS records (A, AAAA, CNAME, MX, TXT, SRV, etc.). This separates domain ownership data from the actual DNS record management.
+
+### DNS Zone {#dns-zone}
+
+A **DNS zone** is a container for DNS records (A, AAAA, CNAME, MX, TXT, SRV, etc.) for a specific domain.
+It is automatically created when you add a domain to your project.
+
+The DNS zone is distinct from the Domain entity – the domain represents ownership and registration,
+while the DNS zone manages the actual DNS records.
+
+You can manage DNS records for your zone directly through the mittwald API or mStudio.
+
+### Mail Address {#mail-address}
+
+A **mail address** is an email address (e.g., `info@example.com`) with integrated IMAP/SMTP/POP3 mail services.
+When you create a mail address, mittwald can automatically create a **Mail Box** (IMAP mailbox backend) to store incoming messages.
+
+### Mail Box {#mail-box}
+
+A **mail box** is the IMAP mailbox backend automatically created for each mail address.
+It stores inbound messages and dialogue history. While mail addresses represent the public-facing email identity,
+mail boxes handle the actual message storage and retrieval.
+
+You typically interact with mail boxes indirectly through mail clients (Outlook, Apple Mail, Thunderbird) connecting via IMAP or POP3 protocols.
+
+### Delivery Box {#delivery-box}
+
+A **delivery box** is the SMTP mail backend, which can be created within a project to manage the sending of emails from your mail addresses.
+It handles outgoing messages and mail delivery. While mail boxes store and retrieve incoming messages,
+delivery boxes manage the sending and delivery of your outgoing mail.
+
+You typically interact with delivery boxes indirectly through mail clients (Outlook, Apple Mail, Thunderbird) sending messages via SMTP, or through mittwald's mail services.
+
+### Mail Settings {#mail-settings}
+
+**Mail Settings** is a project-wide configuration for email behavior. It is automatically created for each project and allows you to:
+
+- Whitelist or blacklist specific email addresses or domains
+- Configure spam protection settings
+- Enable/disable message archiving
+- Set default storage limits for new mail addresses
+
+Mail Settings apply globally to all mail addresses within a project.
+
+### Backup Schedule {#backup-schedule}
+
+A **backup schedule** automatically creates snapshots of your project at regular intervals. You can configure:
+
+- Backup frequency (daily, weekly, monthly, etc.)
+- Retention time (how long backups are kept)
+- Backup window (when backups should run, if applicable)
+
+Backup schedules are optional – you can also create manual backups as needed.
+Automated backups appear as regular Backup entities in your project.
+
+### Backup Export {#backup-export}
+
+A **backup export** is a downloadable copy of a backup snapshot. You can export any backup to receive a compressed archive (e.g., .tar.gz)
+that you can download and store locally or on external storage.
+
+Backup exports are independent records that track when and where backup data has been exported,
+separate from the backups themselves.
+
+### SSH / SFTP user {#ssh-sftp-user}
+
+**SSH / SFTP users** grant filesystem access to a project's file storage.
+SSH users have full access to the project's filesystem, while SFTP users can be restricted to specific directories
+and access levels (read-only or full). They are primarily used for file deployment or legacy FTP workflows.
+
+### API Token {#api-token}
+
+An **API token** is an authentication credential for programmatic API access. You can create and manage API tokens
+in your user account settings (not per-project).
+
+API tokens allow you to authenticate to mittwald's REST API without using your password.
+Each token can be individually revoked and has full access to all your projects and customer account.
+
+### AI Hosting {#ai-hosting}
+
+**AI Hosting** enables your applications to interact with Large Language Models (LLMs) via mittwald's hosting infrastructure.
+It provides a centralized way to configure and use AI capabilities across your project using mittwald's hosted LLM service.
+
+AI Hosting is designed for agencies building AI-powered client solutions, SaaS products with AI components,
+and organizations requiring EU-based, privacy-conscious AI infrastructure.
+
+Each AI Hosting integration requires two configuration values:
+- **AI Hosting API Key**: Your authentication credential for accessing the AI service
+- **AI Hosting Base URL**: The endpoint URL for the AI service (`https://llm.aihosting.mittwald.de/v1`)
+
+Once configured at the project level, any app installation or container service within your project
+can use these credentials to make API calls for tasks like text generation, chatbots, image processing, and AI agents.
+
+### AI Hosting API Key {#ai-hosting-key}
+
+An **AI Hosting API Key** is an authentication credential that grants access to the AI Hosting service.
+It authenticates requests from your applications to the LLM endpoint.
+
+The API key is stored securely at the project level and can be referenced by any workload within the project.
+You should treat it like a password – keep it confidential and rotate it periodically according to security best practices.
+
+### AI Hosting Base URL {#ai-hosting-base-url}
+
+An **AI Hosting Base URL** is the endpoint address for mittwald's AI Hosting service.
+It is provided as a constant value in mStudio that you copy into your application for API requests.
+
+## Workload types at a glance {#workload-types}
+
+| Workload         | Best for                                          | Technical basis           |
+| ---------------- | ------------------------------------------------- | ------------------------- |
+| App installation | Pre-built runtimes (PHP, Node.js, Python, PHP Worker) | Managed runtime framework |
+| Container stack  | Custom containers, microservices                  | OCI / Docker Compose      |
