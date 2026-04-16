@@ -66,7 +66,7 @@ Alternativ kannst du einen OpenSearch-Container manuell einrichten:
    discovery.seed_hosts=opensearch-test  # gibt an, welcher Knoten im Cluster verwendet werden soll
    node.name=opensearch-test  # Name für den OS-Knoten
    plugins.security.ssl.http.enabled=false  # ermöglicht die Verbindung über HTTP, da Container kein HTTPS verarbeiten können
-   discovery.site=single-node
+   discovery.type=single-node
    OPENSEARCH_INITIAL_ADMIN_PASSWORD=SuperSecurePassword123  # setzt das Admin-Passwort. Seit Version 2.12 ist dies obligatorisch
    ```
 
@@ -114,7 +114,7 @@ Wenn du Docker Compose bevorzugst, kannst du eine `docker-compose.yml`-Datei ers
          - discovery.seed_hosts=opensearch
          - node.name=opensearch
          - plugins.security.ssl.http.enabled=false
-         - discovery.site=single-node
+         - discovery.type=single-node
          - OPENSEARCH_INITIAL_ADMIN_PASSWORD=SuperSecurePassword123
        volumes:
          - opensearch-data:/usr/share/opensearch/data
