@@ -1,0 +1,273 @@
+---
+title: Breaking (!) API changes for v2 API, April 10 to April 17
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Conversation
+  - Container
+  - Domain
+  - App
+  - Marketplace
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week's update to the mittwald API includes significant changes such as the removal of several required properties from the response of the conversation messages endpoint, the addition of new enum values, and the introduction of optional request parameters for listing extensions.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The response property type for the `GET /v2/conversations/{conversationId}/messages` operation has changed from 'object' to an unspecified type for the status '200'. This is a breaking change.
+- The required properties `conversationId`, `createdAt`, `messageContent`, `messageId`, `meta`, and `type` have been removed from the response of the `GET /v2/conversations/{conversationId}/messages` operation for the status '200'. This is a breaking change.
+- The optional property `files` has been removed from the response of the `GET /v2/conversations/{conversationId}/messages` operation for the status '200'.
+- The enum value 'restarting' has been removed from the 'query' request parameter `status` in the `GET /v2/projects/{projectId}/services` operation. This is a breaking change.
+- The new required property `projectDescription` has been added to the response of the `GET /v2/app-installations` and `GET /v2/app-installations/{appInstallationId}` operations for the status '200'.
+- The new optional request parameters `includeChargeable` and `includeFree` have been added to the `GET /v2/extensions` operation.
+- The new enum value 'pricing.priceInCents' has been added to the 'query' request parameter `sort` in the `GET /v2/extensions` operation.
+- The enum value 'CONTACT_VERIFICATION' has been added to the response property `processType` for the `GET /v2/domains` and `GET /v2/domains/{domainId}` operations for the status '200'.
+- The API operation ID `container-validate-container-registry-uri` has been removed and replaced with `deprecated-container-validate-container-registry-uri`.
+- The enum value 'restarting' has been removed from the response properties `status`, `items/status`, and `services/items/status` for the `GET /v2/projects/{projectId}/services`, `GET /v2/projects/{projectId}/stacks`, `GET /v2/stacks`, `GET /v2/stacks/{stackId}`, `PATCH /v2/stacks/{stackId}`, and `PUT /v2/stacks/{stackId}` operations for the status '200'.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Get all message of the conversation"
+
+
+- ⚠️ **Breaking:** the '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.ServiceRequest]/' response's property type/format changed from 'object'/'' to ''/'' for status '200'
+
+- ⚠️ **Breaking:** removed the required property '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.ServiceRequest]/conversationId' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.ServiceRequest]/createdAt' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.ServiceRequest]/messageContent' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.ServiceRequest]/messageId' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.ServiceRequest]/meta' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.ServiceRequest]/type' from the response with the '200' status
+
+- removed the optional property '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.ServiceRequest]/files' from the response with the '200' status
+
+- added '#/components/schemas/de.mittwald.v1.conversation.GenericServiceRequest, subschema #2' to the '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.ServiceRequest]/' response property 'allOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="conversation-list-messages-by-conversation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Services belonging to a Project"
+
+
+- ⚠️ **Breaking:** removed the enum value 'restarting' from the 'query' request parameter 'status'
+
+- removed the 'restarting' enum value from the '/items/status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="container-list-services" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Domains"
+
+
+- added the new 'CONTACT_VERIFICATION' enum value to the '/items/processes/items/processType' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="domain-list-domains" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Domain"
+
+
+- added the new 'CONTACT_VERIFICATION' enum value to the 'processes/items/processType' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="domain-get-domain" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Domains belonging to a Project"
+
+
+- added the new 'CONTACT_VERIFICATION' enum value to the '/items/processes/items/processType' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="deprecated-domain-list-domains" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "container-validate-container-registry-uri"
+
+
+- api operation id 'container-validate-container-registry-uri' removed and replaced with 'deprecated-container-validate-container-registry-uri'
+
+
+For details, refer to the <OperationLink operation="container-validate-container-registry-uri" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app installations that a user has access to"
+
+
+- added the required property '/items/projectDescription' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations-for-user" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an app installation"
+
+
+- added the required property 'projectDescription' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-get-appinstallation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Extensions"
+
+
+- added the new optional 'query' request parameter 'includeChargeable'
+
+- added the new optional 'query' request parameter 'includeFree'
+
+- added the new enum value 'pricing.priceInCents' to the 'query' request parameter 'sort'
+
+
+For details, refer to the <OperationLink operation="extension-list-extensions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app installations belonging to a Project"
+
+
+- added the required property '/items/projectDescription' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Stacks belonging to a Project"
+
+
+- removed the 'restarting' enum value from the '/items/services/items/status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="container-list-stacks" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Stacks belonging to the executing user"
+
+
+- removed the 'restarting' enum value from the '/items/services/items/status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="container-list-self-stacks" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Stack"
+
+
+- removed the 'restarting' enum value from the 'services/items/status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="container-get-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create, update or delete Services or Volumes belonging to a Stack"
+
+
+- removed the 'restarting' enum value from the 'services/items/status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="container-update-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Declaratively create, update or delete Services or Volumes belonging to a Stack"
+
+
+- removed the 'restarting' enum value from the 'services/items/status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="container-declare-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Service belonging to a Stack"
+
+
+- removed the 'restarting' enum value from the 'status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="container-get-service" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald JavaScript SDK Release 4.349.0
+
+The mittwald JavaScript SDK has been updated to version 4.349.0. This release includes the following feature:
+
+- Updated the generated client to enhance functionality and performance. For more details, refer to the commit [bd0b828](https://github.com/mittwald/api-client-js/commit/bd0b8287be6dcdcd3949689a346f0df7a9e543b9).
+
+For further information, please visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.349.0).
+
+### mittwald JavaScript SDK Release 4.348.0
+
+The mittwald JavaScript SDK has been updated to version 4.348.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.348.0](https://github.com/mittwald/api-client-js/releases/tag/4.348.0).
+
+### mittwald JavaScript SDK Release 4.347.0
+
+The mittwald JavaScript SDK has been updated to version 4.347.0. This release includes a feature update with an updated generated client. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.347.0](https://github.com/mittwald/api-client-js/releases/tag/4.347.0).
+
+### mittwald JavaScript SDK Release 4.346.0
+
+The mittwald JavaScript SDK has been updated to version 4.346.0. This release includes the following feature:
+
+- Updated the generated client to improve functionality ([commit 10c7767](https://github.com/mittwald/api-client-js/commit/10c7767ac1361c6cca7b1ab751de2c9fb8954742)).
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.346.0).
+
+### mittwald JavaScript SDK Release 4.345.0
+
+The mittwald JavaScript SDK has been updated to version 4.345.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.345.0](https://github.com/mittwald/api-client-js/releases/tag/4.345.0).
+
+### mittwald JavaScript SDK Release 4.344.0
+
+The mittwald JavaScript SDK has been updated to version 4.344.0. This release includes an update to the generated client, enhancing its functionality. For more details, you can view the release on GitHub: [mittwald/api-client-js 4.344.0](https://github.com/mittwald/api-client-js/releases/tag/4.344.0).
+
