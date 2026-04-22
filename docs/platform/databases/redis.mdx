@@ -184,19 +184,19 @@ wp plugin install redis-cache --activate
 and set the required configuration constants:
 
 ```shell
-wp config set --type=constant WP_REDIS_PATH HOST
+wp config set --type=constant WP_REDIS_HOST HOST
 wp config set --type=constant WP_REDIS_PORT PORT
 wp config set --type=constant WP_REDIS_DATABASE 0
 wp config set --type=constant WP_REDIS_SCHEME tcp
 ```
 
-- use the `hostname` and `port` specified for the database as values for `WP_REDIS_PATH` and `WP_REDIS_PORT` (see [`GET https://api.mittwald.de/v2/redis-databases/{id}`](https://developer.mittwald.de/reference/v2#tag/Database/operation/database-get-redis-database))
+- use the `hostname` and `port` specified for the database as values for `WP_REDIS_HOST` and `WP_REDIS_PORT` (see [`GET https://api.mittwald.de/v2/redis-databases/{id}`](https://developer.mittwald.de/reference/v2#tag/Database/operation/database-get-redis-database))
 - Choose a free database number between 0 and 15 for the `WP_REDIS_DATABASE` value.
 
 If you don’t like to use the WP-CLI, you can also install the plugin via the WordPress backend. After installation and activation, add the following entries to `wp-config.php`:
 
 ```php
-define('WP_REDIS_PATH', 'HOST');
+define('WP_REDIS_HOST', 'HOST');
 define('WP_REDIS_PORT', 'PORT');
 define('WP_REDIS_DATABASE', '0');
 define('WP_REDIS_SCHEME', 'tcp');
