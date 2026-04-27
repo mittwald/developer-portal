@@ -1,0 +1,99 @@
+---
+sidebar_label: Qwen3.5-122B-A10B-FP8
+description: Detailled information on Qwen3.5-122B-A10B-FP8
+title: Qwen3.5-122B-A10B-FP8
+slug: /platform/aihosting/models/qwen3-5-122b-a10b-fp8
+---
+
+## Description
+
+"Qwen3.5-122B-A10B-FP8" is a Mixture-of-Experts (MoE) language model by Alibaba with 122 billion total parameters, of which approximately 10 billion are active per forward pass. It is designed for high-quality chat, agentic workflows, and reasoning tasks while remaining computationally efficient thanks to the MoE architecture.
+
+It supports and is suitable for:
+
+- Text generation within a chat completion (text to text)
+- Tool-calling for agentic workflows
+- Image understanding (vision)
+- Thinking / reasoning for step-by-step problem solving
+
+The following limitations apply:
+
+- Maximum context length: 245,760 tokens
+- Thinking mode requires at least 128,000 tokens of remaining context to function properly
+
+**Thinking mode is enabled by default.** To disable it, pass `"enable_thinking": false` in your API request's extra body parameters.
+
+## Recommended inference parameters
+
+The model has different recommended settings depending on the use case. Do not use greedy decoding (temperature 0) — it can cause performance degradation and repetitions.
+
+### Thinking mode (default)
+
+**General tasks:**
+
+| Parameter          | Value |
+| ------------------ | ----- |
+| `temperature`      | 1.0   |
+| `top_p`            | 0.95  |
+| `top_k`            | 20    |
+| `presence_penalty` | 1.5   |
+
+**Precise coding / web development:**
+
+| Parameter          | Value |
+| ------------------ | ----- |
+| `temperature`      | 0.6   |
+| `top_p`            | 0.95  |
+| `top_k`            | 20    |
+| `presence_penalty` | 0.0   |
+
+### Non-thinking mode (`enable_thinking: false`)
+
+**General tasks:**
+
+| Parameter          | Value |
+| ------------------ | ----- |
+| `temperature`      | 0.7   |
+| `top_p`            | 0.8   |
+| `top_k`            | 20    |
+| `presence_penalty` | 1.5   |
+
+**Reasoning / math / complex problem solving:**
+
+| Parameter          | Value |
+| ------------------ | ----- |
+| `temperature`      | 1.0   |
+| `top_p`            | 1.0   |
+| `top_k`            | 40    |
+| `presence_penalty` | 2.0   |
+
+### Output length
+
+Set `max_tokens` according to task complexity to control cost and latency:
+
+| Task type                                      | Recommended `max_tokens` |
+| ---------------------------------------------- | ------------------------ |
+| Standard queries                               | 32,768                   |
+| Complex problems (math, programming contests)  | 81,920                   |
+
+## Tips for specific tasks
+
+### Math problems
+
+For best results on mathematical tasks, append the following instruction to your prompt:
+
+```
+Please reason step by step, and put your final answer within \boxed{}.
+```
+
+### Multiple-choice questions
+
+To get consistent, parseable output on multiple-choice tasks, add this to your prompt:
+
+```
+Please show your choice in the 'answer' field with only the choice letter, e.g., 'answer': 'C'.
+```
+
+## Terms of use and licensing {#terms-of-use-and-licensing}
+
+The [general terms of use](../../access-and-usage/terms-of-use/) apply. The model is provided by Alibaba under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0.html), and reuse of the generated content is not subject to any additional restrictions.
