@@ -1,0 +1,153 @@
+---
+title: API changes for v2 API, April 24 to May 1
+authors:
+  - machine
+tags:
+  - apiv2
+  - AI hosting
+  - Conversation
+  - Container
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API introduces several enhancements, including the addition of required and optional properties to various response objects, as well as a new optional request parameter for improved stack management and conversation message retrieval.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- The required property `/items/tokenFactor` has been added to the response with the '200' status for the following operations:
+  - `GET /v2/ai-hosting-models` (Get a list of currently active models)
+  - `GET /v2/customers/{customerId}/ai-hosting-models` (Get a list of currently active models)
+  - `GET /v2/projects/{projectId}/ai-hosting-models` (Get a list of currently active models)
+
+- The optional property `/items/templateId` has been added to the response with the '200' status for the following operations:
+  - `GET /v2/projects/{projectId}/stacks` (List Stacks belonging to a Project)
+  - `GET /v2/stacks` (List Stacks belonging to the executing user)
+  - `GET /v2/stacks/{stackId}` (Get a Stack)
+  - `PATCH /v2/stacks/{stackId}` (Create, update or delete Services or Volumes belonging to a Stack)
+  - `PUT /v2/stacks/{stackId}` (Declaratively create, update or delete Services or Volumes belonging to a Stack)
+
+- A new optional request parameter `searchTerm` has been added to the `GET /v2/stacks` operation (List Stacks belonging to the executing user).
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Get a list of currently active models"
+
+
+- added the required property '/items/tokenFactor' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ai-hosting-get-models" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all message of the conversation"
+
+
+- added the optional property '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.ServiceRequest]/allOf[subschema #2]/meta/oneOf[#/components/schemas/de.mittwald.v1.conversation.ServiceRequestRelocationPayload]/email' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="conversation-list-messages-by-conversation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a list of currently active models"
+
+
+- added the required property '/items/tokenFactor' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ai-hosting-customer-get-detailed-models" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a list of currently active models"
+
+
+- added the required property '/items/tokenFactor' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ai-hosting-project-get-detailed-models" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Stacks belonging to a Project"
+
+
+- added the optional property '/items/templateId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-list-stacks" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Stacks belonging to the executing user"
+
+
+- added the new optional 'query' request parameter 'searchTerm'
+
+- added the optional property '/items/templateId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-list-self-stacks" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Stack"
+
+
+- added the optional property 'templateId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-get-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create, update or delete Services or Volumes belonging to a Stack"
+
+
+- added the optional property 'templateId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-update-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Declaratively create, update or delete Services or Volumes belonging to a Stack"
+
+
+- added the optional property 'templateId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-declare-stack" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald JavaScript SDK Release 4.355.0
+
+The mittwald JavaScript SDK has been updated to version 4.355.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.355.0](https://github.com/mittwald/api-client-js/releases/tag/4.355.0).
+
+### mittwald JavaScript SDK Release 4.354.0
+
+The mittwald JavaScript SDK has been updated to version 4.354.0. This release includes an update to the generated client, enhancing the functionality and performance of the SDK. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.354.0).
+
+### mittwald JavaScript SDK Release 4.353.0
+
+The mittwald JavaScript SDK has been updated to version 4.353.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.353.0).
+
