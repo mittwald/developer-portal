@@ -17,3 +17,4 @@ Also, please note that neither the issue tracker nor the discussion board are a 
 ## Contributing
 
 We are happy to accept external contributions to our documentation. See the [Contribution guide](./CONTRIBUTING.md) for more information.
+
