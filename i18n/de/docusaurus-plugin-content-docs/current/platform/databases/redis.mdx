@@ -7,6 +7,7 @@ description: |
 import PlanCompatibility from "@site/src/components/PlanCompatibility";
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
+import OperationLink from "@site/src/components/OperationLink";
 
 <PlanCompatibility features={["redis"]} />
 
@@ -39,8 +40,8 @@ Redis einzurichten ist einfach. Je nach CMS oder Shopsystem musst du jedoch eini
   <TabItem value="cli" label="CLI">
     Um eine Redis-Datenbank über die CLI zu erstellen, führe den folgenden Befehl aus:
 
-    ```bash
-    $ mw database redis create --description "My Redis database" --version 7.2
+    ```shellsession
+    user@local $ mw database redis create --description "My Redis database" --version 7.2
     ```
 
     Nachdem die Installation abgeschlossen ist, nutze den Befehl `mw database redis get`, um die Verbindungsinformationen zu sehen.
@@ -174,26 +175,26 @@ Bei Redis-Datenbank gewünschte freie Datenbank zwischen 0 und 15 wählen, und d
 
 Wir empfehlen das Plugin **[Redis Object Cache](https://wordpress.org/plugins/redis-cache/)**. Installiere dieses Plugin zunächst über die WP-CLI
 
-```shell
-wp plugin install redis-cache --activate
+```shellsession
+user@ssh $ wp plugin install redis-cache --activate
 ```
 
 und setze die benötigten Konfigurations-Einträge:
 
-```shell
-wp config set --type=constant WP_REDIS_PATH HOST
-wp config set --type=constant WP_REDIS_PORT PORT
-wp config set --type=constant WP_REDIS_DATABASE 0
-wp config set --type=constant WP_REDIS_SCHEME tcp
+```shellsession
+user@ssh $ wp config set --type=constant WP_REDIS_HOST HOST
+user@ssh $ wp config set --type=constant WP_REDIS_PORT PORT
+user@ssh $ wp config set --type=constant WP_REDIS_DATABASE 0
+user@ssh $ wp config set --type=constant WP_REDIS_SCHEME tcp
 ```
 
-- Nutze den `hostname` und `port` der Datenbank als Werte für `WP_REDIS_PATH` und `WP_REDIS_PORT` (siehe [`GET https://api.mittwald.de/v2/redis-databases/{id}`](https://developer.mittwald.de/reference/v2#tag/Database/operation/database-get-redis-database))
+- Nutze den `hostname` und `port` der Datenbank als Werte für `WP_REDIS_HOST` und `WP_REDIS_PORT` (siehe <OperationLink operation="database-get-redis-database" />)
 - Wähle eine freie Datenbank zwischen 0 und 15 als Wert für `WP_REDIS_DATABASE`.
 
 Wenn du die WP-CLI nicht benutzen möchtest, kannst du das Plugin auch über das WordPress-Dashboard installieren. Nach der Installation und Aktivierung fügst du der wp-config.php folgende Einträge hinzu:
 
 ```php
-define('WP_REDIS_PATH', 'HOST');
+define('WP_REDIS_HOST', 'HOST');
 define('WP_REDIS_PORT', 'PORT');
 define('WP_REDIS_DATABASE', '0');
 define('WP_REDIS_SCHEME', 'tcp');
