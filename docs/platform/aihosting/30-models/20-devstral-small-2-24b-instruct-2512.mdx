@@ -19,6 +19,7 @@ The following limitations apply:
 
 - Maximum context length: 262,144 tokens
 - Maximum images per context: 4
+- Images must be submitted as Base64-encoded data URLs (no remote URLs)
 - This model does not support thinking / reasoning
 
 It is recommended to operate the model with the following parameters:
@@ -27,6 +28,8 @@ It is recommended to operate the model with the following parameters:
 - `top_p=0.8`
 - `top_k=20`
 - `repetition_penalty=1.05`
+
+For vision tasks, lower temperature (`temperature=0.1`) is recommended when accurate image description or text extraction is required. Always resize images to a maximum of 1024 px on the longest edge before encoding - large images significantly increase time to first token (TTFT). See the [Python examples](../../examples/python/#vision-encoding) or [JavaScript examples](../../examples/javascript/#vision-encoding) for a ready-to-use helper.
 
 ## Terms of use and licensing
 

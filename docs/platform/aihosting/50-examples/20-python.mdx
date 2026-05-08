@@ -66,8 +66,45 @@ print(response.content)
 
 ## Vision (image + text)
 
+Vision models on mittwald AI Hosting accept images as **Base64-encoded data URLs only**. Sending image URLs is not supported and results in a server error.
+
+:::note[Note]
+If you use a tool such as Open WebUI or LibreChat, image uploads are handled automatically - these tools encode and resize images transparently before sending them to the API. The Base64 encoding below is only required when calling the API directly from code.
+:::
+
+### Encoding and resizing images {#vision-encoding}
+
+Install [Pillow](https://pillow.readthedocs.io/) for image processing:
+
+```sh
+pip install Pillow
+```
+
+**Always resize before encoding.** Sending large images significantly increases time to first token (TTFT). Keeping the longest edge at 1024 px or below is a safe default that preserves quality for most tasks:
+
+```python
+import base64
+import io
+from PIL import Image
+
+def encode_image(path: str, max_px: int = 1024) -> str:
+    """Resize to max_px on the longest edge and return a Base64 data URL."""
+    with Image.open(path) as img:
+        w, h = img.size
+        scale = min(1.0, max_px / max(w, h))
+        if scale < 1.0:
+            img = img.resize((int(w * scale), int(h * scale)), Image.LANCZOS)
+        buf = io.BytesIO()
+        img.save(buf, format="JPEG", quality=85)
+        b64 = base64.b64encode(buf.getvalue()).decode()
+    return f"data:image/jpeg;base64,{b64}"
+```
+
+### Making a vision request {#vision-request}
+
 ```python
 from openai import OpenAI
+
 client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
 
 resp = client.chat.completions.create(
@@ -75,16 +112,43 @@ resp = client.chat.completions.create(
     messages=[{
         "role": "user",
         "content": [
-            {"type": "text", "text": "Describe this image succinctly."},
-            {"type": "image_url", "image_url": {"url": "https://example.com/sample.jpg"}}
+            {"type": "text", "text": "Describe this image in detail."},
+            {"type": "image_url", "image_url": {"url": encode_image("photo.jpg")}},
         ]
     }],
-    temperature=0.1
+    temperature=0.1,
+    max_tokens=512,
 )
 print(resp.choices[0].message.content)
 ```
 
-Notes: up to 4 images per request recommended; prefer square-ish aspect ratios.
+### Choosing a vision model {#vision-model-selection}
+
+| Model | Max images | Strengths |
+| ----- | ---------- | --------- |
+| `Qwen3.5-122B-A10B-FP8` | 20+ | Best accuracy, OCR, complex scenes |
+| `Ministral-3-14B-Instruct-2512` | 4 | Balanced speed and quality |
+| `Qwen3.6-35B-A3B-FP8` | 5+ | Fast on warm requests |
+| `Devstral-Small-2-24B-Instruct-2512` | 4 | Code-heavy workflows with images |
+
+For Qwen models, **disable thinking mode** in vision requests to avoid unnecessary overhead:
+
+```python
+resp = client.chat.completions.create(
+    model="Qwen3.5-122B-A10B-FP8",
+    messages=[{
+        "role": "user",
+        "content": [
+            {"type": "text", "text": "Extract all text from this document."},
+            {"type": "image_url", "image_url": {"url": encode_image("document.jpg")}},
+        ]
+    }],
+    temperature=0.7,
+    max_tokens=1024,
+    extra_body={"chat_template_kwargs": {"enable_thinking": False}},
+)
+print(resp.choices[0].message.content)
+```
 
 ## Tool-calling (function calling)
 

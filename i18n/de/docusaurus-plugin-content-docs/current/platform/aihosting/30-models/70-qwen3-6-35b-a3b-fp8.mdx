@@ -20,6 +20,7 @@ Folgende Limitierungen gelten:
 
 - Maximale Context-Länge: 262.144 Token
 - Der Thinking-Modus benötigt mindestens 128.000 Token verbleibenden Context, um korrekt zu funktionieren
+- Bilder müssen als Base64-kodierte Data-URLs übermittelt werden (keine externen URLs)
 
 **Thinking-Modus ist standardmäßig aktiviert.** Um ihn zu deaktivieren, übergib `"enable_thinking": false` in den Extra-Body-Parametern deiner API-Anfrage.
 
@@ -77,6 +78,27 @@ Setze `max_tokens` entsprechend der Aufgabenkomplexität, um Kosten und Latenz z
 | Komplexe Aufgaben (Mathematik, Programmierwettbewerbe) | 81.920                   |
 
 ## Tipps für spezifische Aufgaben
+
+### Vision (Bild zu Text) {#vision}
+
+Für Vision-Aufgaben sollte der Thinking-Modus immer deaktiviert werden – er erhöht die Latenz, ohne das Bildverständnis zu verbessern:
+
+```python
+extra_body={"chat_template_kwargs": {"enable_thinking": False}}
+```
+
+Empfohlene Parameter für Vision:
+
+| Parameter     | Wert |
+| ------------- | ---- |
+| `temperature` | 0.7  |
+| `top_p`       | 0.8  |
+| `top_k`       | 20   |
+| `max_tokens`  | 512–2048 je nach Aufgabe |
+
+Für präzise Texterkennung (OCR) oder das Auslesen von Daten empfiehlt sich stattdessen `temperature=0.1`.
+
+Bilder sollten vor der Base64-Kodierung auf maximal 1024 px an der längsten Seite skaliert werden – große Bilder erhöhen die Wartezeit bis zum ersten Token (TTFT) erheblich. Die erste Anfrage für ein neues Bild hat eine längere TTFT, während der Bild-Encoder aufwärmt; nachfolgende Anfragen mit demselben Bild profitieren vom Caching. Fertige Hilfsfunktionen sind in den [Python-Beispielen](../../examples/python/#vision-encoding) und [JavaScript-Beispielen](../../examples/javascript/#vision-encoding) verfügbar.
 
 ### Mathematikaufgaben
 
