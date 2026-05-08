@@ -21,6 +21,40 @@ console.log(resp.choices[0].message.content);
 
 ## Vision (Bild + Text)
 
+Die Vision-Modelle auf mittwald AI Hosting akzeptieren Bilder ausschließlich als **Base64-kodierte Data-URLs**. Das Senden von Bild-URLs wird nicht unterstützt und führt zu einem Serverfehler.
+
+:::note
+Bei der Nutzung von Tools wie Open WebUI oder LibreChat werden Bild-Uploads automatisch verarbeitet – diese Tools kodieren und skalieren Bilder transparent, bevor sie an die API gesendet werden. Die Base64-Kodierung unten ist nur beim direkten API-Aufruf aus eigenem Code notwendig.
+:::
+
+### Bilder kodieren und verkleinern {#vision-encoding}
+
+Installiere [sharp](https://sharp.pixelplumbing.com/) für die Bildverarbeitung:
+
+```sh
+npm install sharp
+```
+
+**Immer vor dem Senden verkleinern.** Große Bilder erhöhen die Wartezeit bis zum ersten Token (TTFT) erheblich. Eine maximale Kantenlänge von 1024 px ist ein sicherer Standardwert:
+
+```ts
+import sharp from "sharp";
+
+async function encodeImage(path: string, maxPx = 1024): Promise<string> {
+  const img = sharp(path);
+  const { width = 0, height = 0 } = await img.metadata();
+  const longest = Math.max(width, height);
+  const resized =
+    longest > maxPx
+      ? img.resize(width >= height ? maxPx : undefined, height > width ? maxPx : undefined)
+      : img;
+  const buf = await resized.jpeg({ quality: 85 }).toBuffer();
+  return `data:image/jpeg;base64,${buf.toString("base64")}`;
+}
+```
+
+### Eine Vision-Anfrage stellen {#vision-request}
+
 ```ts
 import OpenAI from "openai";
 
@@ -32,15 +66,45 @@ const resp = await client.chat.completions.create({
     {
       role: "user",
       content: [
-        { type: "text", text: "Was siehst du?" },
-        {
-          type: "image_url",
-          image_url: { url: "https://example.com/photo.jpg" },
-        },
+        { type: "text", text: "Beschreibe dieses Bild detailliert." },
+        { type: "image_url", image_url: { url: await encodeImage("foto.jpg") } },
       ],
     },
   ],
   temperature: 0.1,
+  max_tokens: 512,
+});
+
+console.log(resp.choices[0].message.content);
+```
+
+### Modell auswählen {#vision-model-selection}
+
+| Modell | Max. Bilder | Stärken |
+| ------ | ----------- | ------- |
+| `Qwen3.5-122B-A10B-FP8` | 20+ | Beste Genauigkeit, OCR, komplexe Szenen |
+| `Ministral-3-14B-Instruct-2512` | 4 | Ausgewogenes Verhältnis von Geschwindigkeit und Qualität |
+| `Qwen3.6-35B-A3B-FP8` | 5+ | Schnell bei wiederholten Anfragen |
+| `Devstral-Small-2-24B-Instruct-2512` | 4 | Code-Workflows mit Bildern |
+
+Bei Qwen-Modellen sollte der **Thinking-Modus deaktiviert** werden, um unnötigen Overhead zu vermeiden:
+
+```ts
+const resp = await client.chat.completions.create({
+  model: "Qwen3.5-122B-A10B-FP8",
+  messages: [
+    {
+      role: "user",
+      content: [
+        { type: "text", text: "Extrahiere den gesamten Text aus diesem Dokument." },
+        { type: "image_url", image_url: { url: await encodeImage("dokument.jpg") } },
+      ],
+    },
+  ],
+  temperature: 0.7,
+  max_tokens: 1024,
+  // @ts-expect-error vLLM-spezifischer Parameter, nicht in OpenAI-Typen enthalten
+  extra_body: { chat_template_kwargs: { enable_thinking: false } },
 });
 
 console.log(resp.choices[0].message.content);

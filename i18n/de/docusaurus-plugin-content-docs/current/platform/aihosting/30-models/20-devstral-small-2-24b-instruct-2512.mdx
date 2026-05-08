@@ -18,6 +18,7 @@ Folgende Limitierungen gelten:
 
 - Maximale Context-Länge: 262.144 Token
 - Maximale Bilder je Context: 4
+- Bilder müssen als Base64-kodierte Data-URLs übermittelt werden (keine externen URLs)
 - Dieses Modell unterstützt kein Thinking / Reasoning
 
 Es wird empfohlen das Modell mit folgenden Parametern zu betreiben:
@@ -26,6 +27,8 @@ Es wird empfohlen das Modell mit folgenden Parametern zu betreiben:
 - `top_p=0.8`
 - `top_k=20`
 - `repetition_penalty=1.05`
+
+Für Vision-Aufgaben empfiehlt sich eine niedrigere Temperatur (`temperature=0.1`), wenn präzise Bildbeschreibungen oder Texterkennung erforderlich sind. Bilder sollten vor der Kodierung auf maximal 1024 px an der längsten Seite skaliert werden – große Bilder erhöhen die Wartezeit bis zum ersten Token (TTFT) erheblich. Fertige Hilfsfunktionen sind in den [Python-Beispielen](../../examples/python/#vision-encoding) und [JavaScript-Beispielen](../../examples/javascript/#vision-encoding) verfügbar.
 
 ## Nutzungsbedingungen und Lizenzhinweise
 

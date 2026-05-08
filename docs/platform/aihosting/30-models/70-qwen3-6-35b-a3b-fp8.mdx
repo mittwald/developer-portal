@@ -21,12 +21,13 @@ The following limitations apply:
 
 - Maximum context length: 262,144 tokens
 - Thinking mode requires at least 128,000 tokens of remaining context to function properly
+- Images must be submitted as Base64-encoded data URLs (no remote URLs)
 
 **Thinking mode is enabled by default.** To disable it, pass `"enable_thinking": false` in your API request's extra body parameters.
 
 ## Recommended inference parameters
 
-The model has different recommended settings depending on the use case. Do not use greedy decoding (temperature 0) — it can cause performance degradation and repetitions.
+The model has different recommended settings depending on the use case. Do not use greedy decoding (temperature 0) - it can cause performance degradation and repetitions.
 
 ### Thinking mode (default)
 
@@ -78,6 +79,27 @@ Set `max_tokens` according to task complexity to control cost and latency:
 | Complex problems (math, programming contests)  | 81,920                   |
 
 ## Tips for specific tasks
+
+### Vision (image to text) {#vision}
+
+Always disable thinking mode for vision tasks - thinking adds latency without improving image understanding:
+
+```python
+extra_body={"chat_template_kwargs": {"enable_thinking": False}}
+```
+
+Recommended parameters for vision:
+
+| Parameter     | Value |
+| ------------- | ----- |
+| `temperature` | 0.7   |
+| `top_p`       | 0.8   |
+| `top_k`       | 20    |
+| `max_tokens`  | 512–2048 depending on task |
+
+For accurate text extraction (OCR) or data reading, use `temperature=0.1` instead.
+
+Always resize images to a maximum of 1024 px on the longest edge before encoding as Base64 - large images significantly increase time to first token (TTFT). The first request for a new image will have a longer TTFT while the image encoder warms up; subsequent requests with the same image benefit from caching. See the [Python examples](../../examples/python/#vision-encoding) or [JavaScript examples](../../examples/javascript/#vision-encoding) for a ready-to-use helper.
 
 ### Math problems
 

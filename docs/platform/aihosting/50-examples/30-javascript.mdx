@@ -21,6 +21,40 @@ console.log(resp.choices[0].message.content);
 
 ## Vision (image + text)
 
+Vision models on mittwald AI Hosting accept images as **Base64-encoded data URLs only**. Sending image URLs is not supported and results in a server error.
+
+:::note[Note]
+If you use a tool such as Open WebUI or LibreChat, image uploads are handled automatically - these tools encode and resize images transparently before sending them to the API. The Base64 encoding below is only required when calling the API directly from code.
+:::
+
+### Encoding and resizing images {#vision-encoding}
+
+Install [sharp](https://sharp.pixelplumbing.com/) for image processing:
+
+```sh
+npm install sharp
+```
+
+**Always resize before encoding.** Sending large images significantly increases time to first token (TTFT). Keeping the longest edge at 1024 px or below is a safe default that preserves quality for most tasks:
+
+```ts
+import sharp from "sharp";
+
+async function encodeImage(path: string, maxPx = 1024): Promise<string> {
+  const img = sharp(path);
+  const { width = 0, height = 0 } = await img.metadata();
+  const longest = Math.max(width, height);
+  const resized =
+    longest > maxPx
+      ? img.resize(width >= height ? maxPx : undefined, height > width ? maxPx : undefined)
+      : img;
+  const buf = await resized.jpeg({ quality: 85 }).toBuffer();
+  return `data:image/jpeg;base64,${buf.toString("base64")}`;
+}
+```
+
+### Making a vision request {#vision-request}
+
 ```ts
 import OpenAI from "openai";
 
@@ -32,15 +66,45 @@ const resp = await client.chat.completions.create({
     {
       role: "user",
       content: [
-        { type: "text", text: "What do you see?" },
-        {
-          type: "image_url",
-          image_url: { url: "https://example.com/photo.jpg" },
-        },
+        { type: "text", text: "Describe this image in detail." },
+        { type: "image_url", image_url: { url: await encodeImage("photo.jpg") } },
       ],
     },
   ],
   temperature: 0.1,
+  max_tokens: 512,
+});
+
+console.log(resp.choices[0].message.content);
+```
+
+### Choosing a vision model {#vision-model-selection}
+
+| Model | Max images | Strengths |
+| ----- | ---------- | --------- |
+| `Qwen3.5-122B-A10B-FP8` | 20+ | Best accuracy, OCR, complex scenes |
+| `Ministral-3-14B-Instruct-2512` | 4 | Balanced speed and quality |
+| `Qwen3.6-35B-A3B-FP8` | 5+ | Fast on warm requests |
+| `Devstral-Small-2-24B-Instruct-2512` | 4 | Code-heavy workflows with images |
+
+For Qwen models, **disable thinking mode** in vision requests to avoid unnecessary overhead:
+
+```ts
+const resp = await client.chat.completions.create({
+  model: "Qwen3.5-122B-A10B-FP8",
+  messages: [
+    {
+      role: "user",
+      content: [
+        { type: "text", text: "Extract all text from this document." },
+        { type: "image_url", image_url: { url: await encodeImage("document.jpg") } },
+      ],
+    },
+  ],
+  temperature: 0.7,
+  max_tokens: 1024,
+  // @ts-expect-error vLLM-specific parameter not in OpenAI types
+  extra_body: { chat_template_kwargs: { enable_thinking: false } },
 });
 
 console.log(resp.choices[0].message.content);
