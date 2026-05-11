@@ -48,6 +48,29 @@ curl -i -X POST https://llm.aihosting.mittwald.de/v1/chat/completions \
 
 Der Parameter `model` erfordert eine gültige Modellbezeichnung, welcher über die `/v1/models`-Route ermittelt werden kann. Es können weitere Modellparameter wie `temperature`, `top_p` oder `top_k` übermittelt werden. Empfohlene Einstellungen hierfür finden sich in der Beschreibung der Modelle, sofern diese vom Standard abweichen. Welche erweiterten Parameter Einfluss auf die Antwort nehmen ist modellabhängig.
 
+### System-Prompt {#system-prompt}
+
+Alle Chat-Modelle unterstützen einen System-Prompt über den Nachrichtentyp `role: "system"`. Dieser wird als erster Eintrag im `messages`-Array übergeben:
+
+```sh
+curl -i -X POST https://llm.aihosting.mittwald.de/v1/chat/completions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $APIKEY" \
+    -d '{
+        "model": "Ministral-3-14B-Instruct-2512",
+        "messages": [
+            {
+                "role": "system",
+                "content": "Du bist ein hilfreicher Assistent. Antworte immer auf Deutsch."
+            },
+            {
+                "role": "user",
+                "content": "Explain what an API is."
+            }
+        ]
+    }'
+```
+
 Für eine Stream-Response muss die Option `stream: true` gesetzt werden.
 
 ```sh
@@ -71,7 +94,12 @@ curl -i -N -X POST https://llm.aihosting.mittwald.de/v1/chat/completions \
 
 ### Vision (Bild + Text)
 
+Bilder müssen als Base64-kodierte Data-URLs übermittelt werden. Die Bilddatei wird zunächst enkodiert und dann in der Anfrage übergeben:
+
 ```sh
+# Bild als Base64-Data-URL enkodieren
+IMAGE_B64=$(base64 -i photo.jpg | tr -d '\n')
+
 curl -i -X POST https://llm.aihosting.mittwald.de/v1/chat/completions \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $APIKEY" \
@@ -81,12 +109,14 @@ curl -i -X POST https://llm.aihosting.mittwald.de/v1/chat/completions \
           "role": "user",
           "content": [
             {"type": "text", "text": "Was ist auf diesem Bild?"},
-            {"type": "image_url", "image_url": {"url": "https://example.com/photo.jpg"}}
+            {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64,'"$IMAGE_B64"'"}}
           ]
         }],
         "temperature": 0.1
     }'
 ```
+
+Fertige Hilfsfunktionen zum Skalieren und Enkodieren von Bildern sind in den [Python-Beispielen](../../examples/python/#vision-encoding) und [JavaScript-Beispielen](../../examples/javascript/#vision-encoding) zu finden.
 
 ### Function Calling (Tools)
 
@@ -180,7 +210,7 @@ Dieser Endpunkt ermöglicht es, Audiodateien mit Whisper-Modellen in Text zu tra
 curl -X POST https://llm.aihosting.mittwald.de/v1/audio/transcriptions \
     -H "Authorization: Bearer $APIKEY" \
     -F "file=@/path/to/audio.mp3" \
-    -F "model=Whisper-Large-V3-Turbo"
+    -F "model=whisper-large-v3-turbo"
 ```
 
 Der `file`-Parameter sollte die zu transkribierende Audiodatei enthalten. Unterstützte Formate sind MP3, OGG, WAV und FLAC. Die maximale Dateigröße beträgt 25 MB. Der `model`-Parameter gibt an, welches Whisper-Modell für die Transkription verwendet werden soll.
