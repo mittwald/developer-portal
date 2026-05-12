@@ -6,10 +6,10 @@ title: Errors and error messages
 
 If the API returns a status code outside the 200 to 399 range, there is an error in the request. The following errors are expected:
 
+- `400 Bad Request`: The request cannot be processed. An error message should be included explaining the reasons:
+  - `At most n image(s) may be provided in one request.`: The total number of images in the provided context exceeds the model's capacity. Either remove images from the context or start a new context.
+  - `max_tokens must be at least…`: The maximum context length of the model was exceeded for text generation. The error message also shows the number of excess tokens (as a negative value). The context must be shortened.
 - `401 Unauthorized`: No API key was provided in the `Authorization` header, or the API key is invalid.
 - `408 Request Timeout`: The request exceeded the maximum allowed duration of 1,800 seconds (30 minutes) and was terminated. Consider splitting large workloads into smaller, independent requests.
 - `429 Too Many Requests`: The rate limit has been reached. No further requests can be made within the current time window. The limit resets after the window has passed. Rate-limit responses do **not** include a `Retry-After` header — implement a fixed delay or exponential back-off in your client.
 - `502 Bad Gateway` / `503 Service Unavailable`: The model is temporarily unavailable, for example due to a restart or overload. Retry the request after a short delay.
-- `400 Bad Request`: The request cannot be processed. An error message should be included explaining the reasons:
-  - `At most n image(s) may be provided in one request.`: The total number of images in the provided context exceeds the model's capacity. Either remove images from the context or start a new context.
-  - `max_tokens must be at least…`: The maximum context length of the model was exceeded for text generation. The error message also shows the number of excess tokens (as a negative value). The context must be shortened.
