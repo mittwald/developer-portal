@@ -11,11 +11,24 @@ Although our API is compatible with the OpenAI API, there are some limitations:
 - Only selected endpoints are implemented (see [list](../supported-endpoints/))
 - Some parameters like `n`, `logprobs`, `functions` (depending on the model) are not available
 - Vision input is currently only supported via Base64, not via URLs
+- The `response_format` parameter only accepts `"text"` as the value. The OpenAI-style `{"type": "json_object"}` variant is not supported and is silently ignored. To reliably obtain JSON output, instruct the model via the system prompt or user message (e.g. "Respond with a valid JSON object only.").
 
 ## Limitations
 
 All requests are subject to a rate limit to ensure fair and consistent usage and availability of the models for all users. Requests are limited according to the respective tariff the user has booked. Please check the according price information regarding the limitations applied in your case.
 
 All models are also subject to model-specific limitations. These always include the allowed context length measured in the number of transmitted tokens. For vision-capable models that process images, only a limited number of images can be transmitted per request, meaning _across the entire submitted context_. This affects all images sent in the full chat history of a request.
+
+### Request timeout {#request-timeout}
+
+Each request may run for a maximum of **1,800 seconds (30 minutes)**. Requests that exceed this duration are terminated and return a `408 Request Timeout` error. For long-running workloads such as FAQ generation with large inputs, consider splitting the work into smaller, independent requests.
+
+### Output token limit {#output-token-limit}
+
+There is no artificial per-request cap on output tokens beyond the model's context window. The `max_tokens` parameter can be set to any value up to the model's full context length minus the number of input tokens sent. The maximum context length for each model is listed on the respective [model page](../../models/).
+
+### System prompt support {#system-prompt-support}
+
+All chat models support the `role: "system"` message type. You can pass a system prompt as the first message in the `messages` array with `"role": "system"`.
 
 Currently, it is **not possible to generate images**. A corresponding API route does not exist.

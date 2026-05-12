@@ -11,11 +11,24 @@ Obwohl unsere API kompatibel zur OpenAI-API ist, gibt es einige Einschränkungen
 - Nur ausgewählte Endpunkte sind implementiert (siehe [Liste](../supported-endpoints/))
 - Einige Parameter wie `n`, `logprobs`, `functions` (je nach Modell) sind nicht verfügbar
 - Vision-Input erfolgt derzeit nur über Base64, nicht über URLs
+- Der Parameter `response_format` akzeptiert ausschließlich den Wert `"text"`. Die OpenAI-Variante `{"type": "json_object"}` wird nicht unterstützt und stillschweigend ignoriert. Um zuverlässig JSON-Ausgaben zu erhalten, formuliere die Anforderung direkt im System-Prompt oder in der Nutzernachricht (z. B. „Antworte ausschließlich mit einem validen JSON-Objekt.").
 
 ## Limitierungen
 
-Alle Anfragen unterliegen einem RateLimit, um eine faire und gleichmäßige Nutzung und Verfügbarkeit der Modelle für alle Nutzer zu gewährleisten. Im Rahmen der Beta-Phase sind dies für einen API-Key 300 Anfragen pro Minute unabhängig vom genutzten Modell. Wird das Limit erreicht, erhält der Nutzer einen HTTP-Status-Code `429 Too Many Requests`. Nach Ablauf einer Minute wird das Limit für den verwendeten API-Key zurückgesetzt.
+Alle Anfragen unterliegen einem RateLimit, um eine faire und gleichmäßige Nutzung und Verfügbarkeit der Modelle für alle Nutzer zu gewährleisten. Die geltenden Limits richten sich nach dem gebuchten Tarif. Die jeweiligen Werte sind den Preisinformationen zu entnehmen.
 
-Alle Modelle unterliegen zudem modellspezifischen Limitierungen. Diese umfassen immer die erlaubte Context-Länge gemessen an der Anzahl an übermitteln Tokens. Bei Vision-fähigen-Modellen zur Verarbeitung von Bildern können je Anfrage und somit im _gesamten übermittelten Context_ nur eine limitierte Anzahl an Bildern übertragen werden. Dies betrifft somit alle in der gesamten Chat-Historie einer Anfrage übermittelten Bilder.
+Alle Modelle unterliegen zudem modellspezifischen Limitierungen. Diese umfassen immer die erlaubte Context-Länge gemessen an der Anzahl an übermittelten Tokens. Bei Vision-fähigen Modellen zur Verarbeitung von Bildern können je Anfrage und somit im _gesamten übermittelten Context_ nur eine limitierte Anzahl an Bildern übertragen werden. Dies betrifft somit alle in der gesamten Chat-Historie einer Anfrage übermittelten Bilder.
+
+### Anfrage-Timeout {#request-timeout}
+
+Jede Anfrage darf maximal **1.800 Sekunden (30 Minuten)** dauern. Anfragen, die diesen Zeitraum überschreiten, werden abgebrochen und liefern einen `408 Request Timeout`-Fehler zurück. Bei umfangreichen Aufgaben wie der FAQ-Generierung mit großen Eingaben empfiehlt es sich, die Arbeit in kleinere, unabhängige Anfragen aufzuteilen.
+
+### Ausgabe-Token-Limit {#output-token-limit}
+
+Es gibt kein künstliches Limit für Output-Tokens unterhalb des Kontextfensters des jeweiligen Modells. Der Parameter `max_tokens` kann auf jeden Wert bis zur vollen Kontextlänge des Modells abzüglich der gesendeten Eingabe-Tokens gesetzt werden. Die maximale Kontextlänge jedes Modells ist auf der jeweiligen [Modellseite](../../models/) aufgeführt.
+
+### System-Prompt-Unterstützung {#system-prompt-support}
+
+Alle Chat-Modelle unterstützen den Nachrichtentyp `role: "system"`. Ein System-Prompt kann als erstes Element im `messages`-Array mit `"role": "system"` übergeben werden.
 
 Gegenwärtig besteht **keine Möglichkeit, Bilder zu generieren**. Eine entsprechende API-Route existiert dementsprechend nicht.
