@@ -45,6 +45,49 @@ These types of routes do not work with user-unbound access tokens, as they do no
 but only authorize access to resources of the Extension Context.
 :::
 
+### Workaround: Using Deprecated Project-Scoped Operations {#workaround-deprecated-operations}
+
+If you need to list resources within a specific project scope using an Extension Instance token,
+there's a workaround for the problem described above. The older API versions often included project-scoped list
+operations that are now deprecated in favor of the modern global list operations. While deprecated
+endpoints aren't exactly recommended reading, they actually work with Extension Instance tokens
+because they're already bound to a specific project context.
+
+Here's how you can work around this limitation:
+
+**Example: Fetching ingresses for a project**
+
+```typescript
+// Using the deprecated project-scoped endpoint via the underlying axios client
+const listResp = await apiClient.axios.get(
+  `/v2/projects/${projectId}/ingresses`
+);
+
+if (listResp.status !== 200) {
+  throw new Error(
+    `Failed to fetch ingresses for project ${projectId}. Status: ${listResp.status}`
+  );
+}
+
+const ingresses = listResp.data as DomainData[];
+const existingIngress = ingresses.find((ing: any) => ing.hostname === hostname);
+```
+
+**Pattern for using this workaround:**
+
+1. **Identify the limitation**: If a global list operation doesn't work with your Extension Instance
+   token, you've hit this issue.
+2. **Check the OpenAPI specification**: Look for an older, project-scoped variant of the operation.
+   Don't forget to check the deprecated operations—they're marked for a reason, and this is one of them.
+3. **Use the axios client directly**: Instead of the typed API client methods, access the underlying
+   `apiClient.axios` to call the deprecated endpoint directly. This bypasses the client's type safety,
+   so you'll need to adjust accordingly (e.g., using `any` types where the client would normally
+   provide strict type guards).
+4. **Handle errors manually**: Since you're bypassing the client's abstraction, remember to check
+   the response status yourself.
+
+Your linter might have opinions about this approach, but it works.
+
 ## OAuth2
 
 The mStudio implements OAuth2 as an authentication mechanism for the public API according to [RFC 6749](https://tools.ietf.org/html/rfc6749).
