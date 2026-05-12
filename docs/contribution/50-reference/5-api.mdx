@@ -69,8 +69,8 @@ if (listResp.status !== 200) {
   );
 }
 
-const ingresses = listResp.data as DomainData[];
-const existingIngress = ingresses.find((ing: any) => ing.hostname === hostname);
+const ingresses = listResp.data as Array<{ hostname?: string }>;
+const existingIngress = ingresses.find((ing) => ing.hostname === hostname);
 ```
 
 **Pattern for using this workaround:**

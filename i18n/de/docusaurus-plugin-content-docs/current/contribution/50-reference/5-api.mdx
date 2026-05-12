@@ -72,8 +72,8 @@ if (listResp.status !== 200) {
   );
 }
 
-const ingresses = listResp.data as DomainData[];
-const existingIngress = ingresses.find((ing: any) => ing.hostname === hostname);
+const ingresses = listResp.data as Array<{ hostname?: string }>;
+const existingIngress = ingresses.find((ing) => ing.hostname === hostname);
 ```
 
 **Muster für die Verwendung dieses Workarounds:**
@@ -83,9 +83,9 @@ const existingIngress = ingresses.find((ing: any) => ing.hostname === hostname);
 2. **Überprüfe die OpenAPI-Spezifikation**: Suche nach einer älteren, projektgebundenen Variante der Operation.
    Vergiss nicht, die veralteten Operationen zu überprüfen – sie sind aus einem Grund gekennzeichnet, und dies ist einer davon.
 3. **Verwende den axios-Client direkt**: Anstelle der typisierten API-Client-Methoden greifst du auf den zugrunde liegenden
-   `apiClient.axios` zu, um den veralteten Endpunkt direkt aufzurufen. Dies umgeht die Typ-Sicherheit des Client,
+   `apiClient.axios` zu, um den veralteten Endpunkt direkt aufzurufen. Dies umgeht die Typ-Sicherheit des Clients,
    daher musst du entsprechend vorgehen (z. B. mit `any`-Typen, wo der Client normalerweise
-   strenge Type Guards bereitgestellt würde).
+   strenge Type Guards bereitstellen würde).
 4. **Fehlerbehandlung manuell durchführen**: Da du die Abstraktion des Client umgehst, denk daran, den
    Antwortstatus selbst zu überprüfen.
 
