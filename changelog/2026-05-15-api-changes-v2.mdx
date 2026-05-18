@@ -1,15 +1,13 @@
 ---
-title: Breaking (!) API changes for v2 API, May 8 to May 15
+title: API changes for v2 API, May 8 to May 15
 authors:
   - machine
 tags:
   - apiv2
-  - breaking
   - User
   - App
   - Domain
   - Marketplace
-
 ---
 
 import OperationHint from "@site/src/components/OperationHint";
@@ -19,24 +17,8 @@ This week's update to the mittwald API includes significant changes such as modi
 
 {/* truncate */}
 
-
-
-:::caution Breaking changes
-
-This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
-
-While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
-
-:::
-
-
-
 ## Summary
 
-
-- The response body type for the `POST` operation at the path `/v2/authenticate` has changed from 'object' to an empty format for the status '401'. This is a breaking change.
-- The required properties 'type' and 'validationErrors' have been removed from the response for the `POST` operation at the path `/v2/authenticate` with the status '401'. This is a breaking change.
-- The optional property 'message' has been removed from the response for the `POST` operation at the path `/v2/authenticate` with the status '401'.
 - The optional property '/items/appVersion/lastChangeBy' has been added to the response for the `GET` operation at the path `/v2/app-installations` with the status '200'.
 - The optional property '/items/appVersion/previous' has been added to the response for the `GET` operation at the path `/v2/app-installations` with the status '200'.
 - The optional property '/items/systemSoftware/items/systemSoftwareVersion/lastChangeBy' has been added to the response for the `GET` operation at the path `/v2/app-installations` with the status '200'.
@@ -65,19 +47,9 @@ While we generally strive to avoid breaking changes in accordance with our [API 
 
 _Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
 
-
 ## Detailed changes
 
-
-
 ### Changes in "Authenticate yourself to get an access token"
-
-
-- ⚠️ **Breaking:** the response's body type/format changed from 'object'/'' to ''/'' for status '401'
-
-- ⚠️ **Breaking:** removed the required property 'type' from the response with the '401' status
-
-- ⚠️ **Breaking:** removed the required property 'validationErrors' from the response with the '401' status
 
 - removed the optional property 'message' from the response with the '401' status
 
@@ -87,13 +59,9 @@ _Disclaimer: This summary is AI-generated. If you find any discrepancies, please
 
 - added the success response with the status '204'
 
-
 For details, refer to the <OperationLink operation="user-authenticate" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "List app installations that a user has access to"
-
 
 - added the optional property '/items/appVersion/lastChangeBy' to the response with the '200' status
 
@@ -103,13 +71,9 @@ For details, refer to the <OperationLink operation="user-authenticate" apiVersio
 
 - added the optional property '/items/systemSoftware/items/systemSoftwareVersion/previous' to the response with the '200' status
 
-
 For details, refer to the <OperationLink operation="app-list-appinstallations-for-user" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get an app installation"
-
 
 - added the optional property 'appVersion/lastChangeBy' to the response with the '200' status
 
@@ -119,143 +83,91 @@ For details, refer to the <OperationLink operation="app-list-appinstallations-fo
 
 - added the optional property 'systemSoftware/items/systemSoftwareVersion/previous' to the response with the '200' status
 
-
 For details, refer to the <OperationLink operation="app-get-appinstallation" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Validate your second factor"
-
 
 - added the new optional 'query' request parameter 'cookieOnly'
 
 - added the success response with the status '204'
 
-
 For details, refer to the <OperationLink operation="user-authenticate-mfa" apiVersion="v2" /> endpoint.
-
-
 
 ### Changes in "List Contact-Verifications belonging to the executing user"
 
-
 - endpoint added
-
 
 For details, refer to the <OperationLink operation="domain-list-contact-verifications" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get a Contact-Verification"
 
-
 - endpoint added
-
 
 For details, refer to the <OperationLink operation="domain-get-contact-verification" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Resends a Contact-Verification email"
-
 
 - endpoint added
 
-
 For details, refer to the <OperationLink operation="domain-resend-contact-verification-email" apiVersion="v2" /> endpoint.
-
-
 
 ### Changes in "Delete a contributor"
 
-
 - added the media type 'application/json' for the response with the status '412'
-
 
 For details, refer to the <OperationLink operation="contributor-delete-contributor" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "List Extensions of own contributor"
-
 
 - added the optional property '/items/deletionDeadline' to the response with the '200' status
 
 - added the optional property '/items/isDeletionScheduled' to the response with the '200' status
-
 
 For details, refer to the <OperationLink operation="extension-list-own-extensions" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get Extension of own contributor"
-
 
 - added the optional property 'deletionDeadline' to the response with the '200' status
 
 - added the optional property 'isDeletionScheduled' to the response with the '200' status
-
 
 For details, refer to the <OperationLink operation="extension-get-own-extension" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Patch Extension"
-
 
 - added the optional property 'deletionDeadline' to the response with the '200' status
 
 - added the optional property 'isDeletionScheduled' to the response with the '200' status
 
-
 For details, refer to the <OperationLink operation="extension-patch-extension" apiVersion="v2" /> endpoint.
-
-
 
 ### Changes in "Get the extension instance of a specific customer and extension, if existing"
 
-
 - added the optional property 'extensionDeletionDeadline' to the response with the '200' status
-
 
 For details, refer to the <OperationLink operation="extension-get-extension-instance-for-customer" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "List extension instances"
-
 
 - added the optional property '/items/extensionDeletionDeadline' to the response with the '200' status
 
-
 For details, refer to the <OperationLink operation="extension-list-extension-instances" apiVersion="v2" /> endpoint.
-
-
 
 ### Changes in "Get an extension instance"
 
-
 - added the optional property 'extensionDeletionDeadline' to the response with the '200' status
-
 
 For details, refer to the <OperationLink operation="extension-get-extension-instance" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "List Extensions"
-
 
 - added the optional property '/items/deletionDeadline' to the response with the '200' status
 
 - added the optional property '/items/isDeletionScheduled' to the response with the '200' status
 
-
 For details, refer to the <OperationLink operation="extension-list-extensions" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "Get an Extension"
-
 
 - added the optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.Extension]/deletionDeadline' to the response with the '200' status
 
@@ -265,13 +177,9 @@ For details, refer to the <OperationLink operation="extension-list-extensions" a
 
 - added the optional property '/anyOf[#/components/schemas/de.mittwald.v1.marketplace.UnpublishedExtension]/isDeletionScheduled' to the response with the '200' status
 
-
 For details, refer to the <OperationLink operation="extension-get-extension" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "List app installations belonging to a Project"
-
 
 - added the optional property '/items/appVersion/lastChangeBy' to the response with the '200' status
 
@@ -281,44 +189,27 @@ For details, refer to the <OperationLink operation="extension-get-extension" api
 
 - added the optional property '/items/systemSoftware/items/systemSoftwareVersion/previous' to the response with the '200' status
 
-
 For details, refer to the <OperationLink operation="app-list-appinstallations" apiVersion="v2" /> endpoint.
-
-
 
 ### Changes in "Get the extension instance of a specific project and extension, if existing"
 
-
 - added the optional property 'extensionDeletionDeadline' to the response with the '200' status
-
 
 For details, refer to the <OperationLink operation="extension-get-extension-instance-for-project" apiVersion="v2" /> endpoint.
 
-
-
 ### Changes in "user-check-token"
-
 
 - api operation id 'user-check-token' removed and replaced with 'deprecated-user-check-token'
 
-
 For details, refer to the <OperationLink operation="user-check-token" apiVersion="v2" /> endpoint.
-
-
 
 ### Changes in "Check status of the current session"
 
-
 - endpoint added
-
 
 For details, refer to the <OperationLink operation="user-get-current-session-status" apiVersion="v2" /> endpoint.
 
-
-
-
 ## Client package releases
-
 
 ### mittwald JavaScript SDK Release 4.366.0
 
@@ -351,4 +242,3 @@ The mittwald JavaScript SDK has been updated to version 4.362.0. This release in
 - Updated the generated client, enhancing the SDK's functionality and performance.
 
 For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.362.0](https://github.com/mittwald/api-client-js/releases/tag/4.362.0).
-
