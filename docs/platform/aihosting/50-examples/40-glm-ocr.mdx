@@ -4,12 +4,12 @@ description: Practical guide for extracting text from documents, invoices, and f
 title: Extracting text from documents with GLM-OCR
 ---
 
-GLM-OCR is a purpose-built document understanding model. Unlike general vision models, it is optimised exclusively for reading text — making it the right choice whenever you need to digitise PDFs, parse scanned invoices, or extract fields from forms at high accuracy and low cost.
+GLM-OCR is a document OCR model — built only for reading text, not for chat or image understanding. Use it when you need to digitise PDFs, parse scanned invoices, or pull fields from forms.
 
 :::tip When to use GLM-OCR
-Pick GLM-OCR when your goal is **text extraction** from any document format (PDF, DOCX, PPTX, XLSX, HTML, images). For tasks that combine understanding and conversation (e.g. "summarise and explain this contract"), a general vision model such as [Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8) may be a better fit. Of course, you can pre-process your documents with GLM-OCR and then forward the text to another LLM.
+Use GLM-OCR for **text extraction** from documents (PDF, DOCX, PPTX, XLSX, HTML, images). For tasks that involve reasoning or conversation on top of a document — e.g. "summarise and explain this contract" — a general vision model like [Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8) is a better fit. You can combine both: OCR first, then pass the text to another model.
 
-See the [GLM-OCR model reference](/docs/v2/platform/aihosting/models/glm-ocr) for supported formats, request limits, and all inference parameters.
+Supported formats, limits, and inference parameters are in the [GLM-OCR model reference](/docs/v2/platform/aihosting/models/glm-ocr).
 :::
 
 ## Setup
@@ -31,7 +31,7 @@ client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
 
 ## Output modes {#output-modes}
 
-GLM-OCR supports three output modes, controlled entirely through your prompt:
+GLM-OCR has three output modes, all controlled through the prompt:
 
 | Mode | When to use | Example prompt |
 | ---- | ----------- | -------------- |
@@ -51,8 +51,8 @@ GLM-OCR supports three output modes, controlled entirely through your prompt:
 
 The most common use case: reading a scanned or digital PDF. The integrated proxy converts each page to an image automatically — you just send the file as a base64 data URI.
 
-:::note[Data handling and privacy]
-**No document data is written to disk.** The proxy renders your document to PNG images entirely in RAM and forwards them directly to the model — it retains no data after each response. External URLs embedded in HTML, CSS, and SVG are explicitly blocked to prevent SSRF attacks. Document content is processed entirely within the mittwald infrastructure and is not sent to any third party.
+:::note[Data handling]
+**No document data is written to disk.** The proxy converts documents to PNG images in memory and passes them straight to the model — nothing is cached or stored between requests. External URLs inside HTML, CSS, or SVG files are blocked to prevent SSRF. All processing stays on mittwald servers.
 :::
 
 ```python
