@@ -1,0 +1,740 @@
+---
+sidebar_label: GLM-OCR guide
+description: Practical guide for extracting text from documents, invoices, and forms with GLM-OCR — including a full RAG pipeline
+title: Extracting text from documents with GLM-OCR
+---
+
+GLM-OCR is a purpose-built document understanding model. Unlike general vision models, it is optimised exclusively for reading text — making it the right choice whenever you need to digitise PDFs, parse scanned invoices, or extract fields from forms at high accuracy and low cost.
+
+:::tip When to use GLM-OCR
+Pick GLM-OCR when your goal is **text extraction** from any document format (PDF, DOCX, PPTX, XLSX, HTML, images). For tasks that combine understanding and conversation (e.g. "summarise and explain this contract"), a general vision model such as [Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8) may be a better fit. Of course, you can pre-process your documents with GLM-OCR and then forward the text to another LLM.
+
+See the [GLM-OCR model reference](/docs/v2/platform/aihosting/models/glm-ocr) for supported formats, request limits, and all inference parameters.
+:::
+
+## Setup
+
+Install the OpenAI library and store your API key from mStudio:
+
+```sh
+pip install openai
+export OPENAI_API_KEY="sk-…"
+```
+
+All examples below use a shared client:
+
+```python
+from openai import OpenAI
+
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+```
+
+## Output modes {#output-modes}
+
+GLM-OCR supports three output modes, controlled entirely through your prompt:
+
+| Mode | When to use | Example prompt |
+| ---- | ----------- | -------------- |
+| **Plain text** | Full-text search, logging, simple digitisation | `"Extract all text from this document."` |
+| **Markdown** | Preserving document structure (headings, lists, tables) for display or RAG | `"Extract the text and format it as Markdown. Use # for headings and - for lists."` |
+| **JSON** | Extracting specific named fields from forms, invoices, certificates | `"Extract these fields and return them as JSON: …"` |
+
+:::note[Output behaviour]
+**JSON mode always wraps output in markdown code fences** (` ```json … ``` `) — you must strip them before calling `json.loads()`. See the [KIE example](#extracting-structured-data-from-invoices) below for the stripping pattern.
+
+**Markdown mode needs explicit formatting instructions.** A generic "convert to Markdown" prompt may not produce heading syntax. Always specify `# for main headings, ## for subheadings, - for lists`.
+
+**HTML source → HTML tables.** When the input is an HTML file containing a `<table>`, the model tends to reproduce it as HTML even if you ask for markdown tables. Use a PDF or image source when you need clean markdown table output.
+:::
+
+## Extracting text from a PDF
+
+The most common use case: reading a scanned or digital PDF. The integrated proxy converts each page to an image automatically — you just send the file as a base64 data URI.
+
+:::note[Data handling and privacy]
+**No document data is written to disk.** The proxy renders your document to PNG images entirely in RAM and forwards them directly to the model — it retains no data after each response. External URLs embedded in HTML, CSS, and SVG are explicitly blocked to prevent SSRF attacks. Document content is processed entirely within the mittwald infrastructure and is not sent to any third party.
+:::
+
+```python
+import base64
+from openai import OpenAI
+
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+
+with open("invoice.pdf", "rb") as f:
+    pdf_b64 = base64.b64encode(f.read()).decode()
+
+response = client.chat.completions.create(
+    model="GLM-OCR",
+    messages=[{
+        "role": "user",
+        "content": [
+            {
+                "type": "image_url",
+                "image_url": {"url": f"data:application/pdf;base64,{pdf_b64}"},
+            },
+            {"type": "text", "text": "Extract all text from this document."},
+        ],
+    }],
+    temperature=0.1,
+)
+
+print(response.choices[0].message.content)
+```
+
+:::note[Page limit]
+Up to **30 pages** are processed per request. The API returns HTTP 413 for larger documents — see [Batch-processing large PDFs](#batch-processing-large-pdfs) below.
+:::
+
+## Extracting text from images
+
+Scanned pages sent as JPEG, PNG, WebP, or SVG are processed directly by the model. Change the MIME type in the data URI to match your file:
+
+```python
+import base64
+from openai import OpenAI
+
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+
+# Works with: image/jpeg  image/png  image/webp  image/svg+xml
+MIME = {"jpg": "image/jpeg", "jpeg": "image/jpeg", "png": "image/png",
+        "webp": "image/webp", "svg": "image/svg+xml"}
+
+def ocr_image(path: str) -> str:
+    ext = path.rsplit(".", 1)[-1].lower()
+    with open(path, "rb") as f:
+        b64 = base64.b64encode(f.read()).decode()
+    response = client.chat.completions.create(
+        model="GLM-OCR",
+        messages=[{
+            "role": "user",
+            "content": [
+                {"type": "image_url", "image_url": {"url": f"data:{MIME[ext]};base64,{b64}"}},
+                {"type": "text", "text": "Extract all text from this image."},
+            ],
+        }],
+        temperature=0.1,
+    )
+    return response.choices[0].message.content
+
+print(ocr_image("scan.jpg"))
+print(ocr_image("diagram.png"))
+print(ocr_image("chart.webp"))
+print(ocr_image("drawing.svg"))
+```
+
+## Reading Office documents (DOCX, PPTX, XLSX)
+
+GLM-OCR accepts Word, PowerPoint, and Excel files directly — no conversion on your side. Only the MIME type in the data URI changes:
+
+```python
+import base64
+from openai import OpenAI
+
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+
+MIME = {
+    "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+}
+
+def read_office_doc(path: str) -> str:
+    ext = path.rsplit(".", 1)[-1].lower()
+    with open(path, "rb") as f:
+        b64 = base64.b64encode(f.read()).decode()
+    response = client.chat.completions.create(
+        model="GLM-OCR",
+        messages=[{
+            "role": "user",
+            "content": [
+                {
+                    "type": "image_url",
+                    "image_url": {"url": f"data:{MIME[ext]};base64,{b64}"},
+                },
+                {"type": "text", "text": "Extract all text from this document."},
+            ],
+        }],
+        temperature=0.1,
+    )
+    return response.choices[0].message.content
+
+print(read_office_doc("contract.docx"))
+print(read_office_doc("slides.pptx"))
+print(read_office_doc("report.xlsx"))
+```
+
+:::note[XLSX output]
+For Excel files, the model includes the **worksheet name** as the first line of output, followed by the cell content. Strip or handle that first line if you are post-processing the result programmatically.
+
+Office files must be valid Open XML documents. Corrupted or hand-crafted ZIP structures return HTTP 400.
+:::
+
+## Markdown document output
+
+Ask GLM-OCR to preserve document structure (headings, bullet lists, emphasis) when the output will be displayed or stored for RAG. Being explicit about the formatting scheme is required — the model needs concrete instructions to produce heading syntax reliably:
+
+```python
+import base64
+from openai import OpenAI
+
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+
+with open("report.pdf", "rb") as f:
+    pdf_b64 = base64.b64encode(f.read()).decode()
+
+response = client.chat.completions.create(
+    model="GLM-OCR",
+    messages=[{
+        "role": "user",
+        "content": [
+            {
+                "type": "image_url",
+                "image_url": {"url": f"data:application/pdf;base64,{pdf_b64}"},
+            },
+            {
+                "type": "text",
+                "text": (
+                    "Extract the text from this document and format it as Markdown. "
+                    "Use # for main headings, ## for subheadings, and - for bullet lists."
+                ),
+            },
+        ],
+    }],
+    temperature=0.1,
+)
+
+markdown = response.choices[0].message.content
+print(markdown)
+# Example output:
+# # Annual Report 2024
+#
+# Revenue: 50,000 EUR
+#
+# - Q1: 12,000 EUR
+# - Q2: 13,000 EUR
+```
+
+## Extracting structured data from invoices (KIE) {#extracting-structured-data-from-invoices}
+
+Key Information Extraction (KIE) lets you pull specific fields out of a document as a JSON object. Describe the schema you want in plain language — the model fills in the values it finds.
+
+The model **always wraps its JSON output in markdown code fences** regardless of how the prompt is worded — strip them before parsing:
+
+```python
+import base64
+import json
+import re
+from openai import OpenAI
+
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+
+with open("invoice.pdf", "rb") as f:
+    pdf_b64 = base64.b64encode(f.read()).decode()
+
+response = client.chat.completions.create(
+    model="GLM-OCR",
+    messages=[{
+        "role": "user",
+        "content": [
+            {
+                "type": "image_url",
+                "image_url": {"url": f"data:application/pdf;base64,{pdf_b64}"},
+            },
+            {
+                "type": "text",
+                "text": (
+                    "Extract the following fields from this invoice and return them as a JSON object:\n"
+                    '{ "invoice_number": "", "date": "", "vendor": "", '
+                    '"total_amount": "", "line_items": [] }'
+                ),
+            },
+        ],
+    }],
+    temperature=0.1,
+)
+
+# Strip the markdown code fences the model always adds around JSON
+raw = response.choices[0].message.content
+clean = re.sub(r"^```[a-z]*\n?", "", raw.strip())
+clean = re.sub(r"\n?```$", "", clean)
+data = json.loads(clean)
+print(data)
+```
+
+The same approach works for any document type — just adapt the schema to the fields you need:
+
+```python
+# German Lohnsteuerbescheinigung
+"text": (
+    "Extrahiere die folgenden Felder und gib sie als JSON zurück:\n"
+    '{ "steuernummer": "", "veranlagungszeitraum": "", "bruttoarbeitslohn": "", '
+    '"lohnsteuer": "", "solidaritaetszuschlag": "" }'
+)
+```
+
+## Batch-processing large PDFs {#batch-processing-large-pdfs}
+
+The 30-page limit applies per request. Split large documents with [pypdf](https://pypdf.readthedocs.io/) and concatenate the results:
+
+```python
+import base64
+from io import BytesIO
+from pypdf import PdfReader, PdfWriter
+from openai import OpenAI
+
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+
+def _ocr_batch(pdf_bytes: bytes) -> str:
+    b64 = base64.b64encode(pdf_bytes).decode()
+    resp = client.chat.completions.create(
+        model="GLM-OCR",
+        messages=[{
+            "role": "user",
+            "content": [
+                {"type": "image_url", "image_url": {"url": f"data:application/pdf;base64,{b64}"}},
+                {"type": "text", "text": "Extract all text from this document."},
+            ],
+        }],
+        temperature=0.1,
+    )
+    return resp.choices[0].message.content
+
+def ocr_large_pdf(path: str, batch_size: int = 30) -> str:
+    reader = PdfReader(path)
+    parts = []
+    for start in range(0, len(reader.pages), batch_size):
+        writer = PdfWriter()
+        for page in reader.pages[start : start + batch_size]:
+            writer.add_page(page)
+        buf = BytesIO()
+        writer.write(buf)
+        parts.append(_ocr_batch(buf.getvalue()))
+    return "\n\n".join(parts)
+
+text = ocr_large_pdf("annual_report.pdf")
+```
+
+## Full pipeline: OCR → embedding → search → answer {#full-pipeline}
+
+Combine three mittwald AI Hosting models into a complete document question-answering pipeline:
+
+1. **GLM-OCR** digitises your documents — using **Markdown output mode** so headings and structure are preserved, which produces cleaner chunks and better retrieval quality than flat text
+2. **[Qwen3-Embedding-8B](/docs/v2/platform/aihosting/models/qwen3-embedding-8b)** turns text chunks into vectors
+3. **[Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8)** answers questions in natural language based on the retrieved context
+
+```sh
+pip install openai pypdf
+```
+
+```python
+import base64
+import math
+import re
+from io import BytesIO
+from pypdf import PdfReader, PdfWriter
+from openai import OpenAI
+
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+
+
+# ── Step 1: OCR (Markdown mode for clean structure) ───────────────────────────
+# Using Markdown output mode instead of plain text produces structured chunks
+# that respect document headings — significantly improving retrieval precision.
+
+MIME = {
+    "pdf":  "application/pdf",
+    "jpg":  "image/jpeg",
+    "jpeg": "image/jpeg",
+    "png":  "image/png",
+    "webp": "image/webp",
+    "svg":  "image/svg+xml",
+    "html": "text/html",
+    "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+}
+
+def ocr_document(path: str) -> str:
+    ext = path.rsplit(".", 1)[-1].lower()
+    with open(path, "rb") as f:
+        b64 = base64.b64encode(f.read()).decode()
+    resp = client.chat.completions.create(
+        model="GLM-OCR",
+        messages=[{"role": "user", "content": [
+            {"type": "image_url", "image_url": {"url": f"data:{MIME.get(ext, 'application/pdf')};base64,{b64}"}},
+            {
+                "type": "text",
+                "text": (
+                    "Extract the text from this document and format it as Markdown. "
+                    "Use # for main headings, ## for subheadings, and - for bullet lists."
+                ),
+            },
+        ]}],
+        temperature=0.1,
+    )
+    return resp.choices[0].message.content
+
+
+# ── Step 2: Chunk (split at markdown headings, then by word count) ────────────
+
+def chunk_text(text: str, size: int = 400, overlap: int = 50) -> list[str]:
+    # Split at top-level headings first to keep sections together
+    sections = re.split(r"(?m)^(?=# )", text)
+    chunks: list[str] = []
+    for section in sections:
+        words = section.split()
+        i = 0
+        while i < len(words):
+            chunks.append(" ".join(words[i : i + size]))
+            i += size - overlap
+    return [c for c in chunks if c.strip()]
+
+
+# ── Step 3: Embed with Qwen3-Embedding-8B ────────────────────────────────────
+
+def embed(texts: list[str]) -> list[list[float]]:
+    resp = client.embeddings.create(model="Qwen3-Embedding-8B", input=texts)
+    return [item.embedding for item in resp.data]
+
+
+# ── Step 4: Retrieve via cosine similarity ────────────────────────────────────
+
+def cosine(a: list[float], b: list[float]) -> float:
+    dot = sum(x * y for x, y in zip(a, b))
+    norm = math.sqrt(sum(x * x for x in a)) * math.sqrt(sum(x * x for x in b))
+    return dot / (norm + 1e-9)
+
+def retrieve(query_vec: list[float], index: list, top_k: int = 3) -> list[str]:
+    scored = [(cosine(query_vec, vec), chunk) for vec, chunk in index]
+    return [chunk for _, chunk in sorted(scored, reverse=True)[:top_k]]
+
+
+# ── Step 5: Answer with Qwen3.5-122B-A10B-FP8 ────────────────────────────────
+# Qwen3.5 has thinking mode enabled by default — disable it for Q&A tasks so
+# the answer is returned in message.content rather than reasoning_content.
+# See: /docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8
+
+def answer(question: str, chunks: list[str]) -> str:
+    context = "\n\n---\n\n".join(chunks)
+    resp = client.chat.completions.create(
+        model="Qwen3.5-122B-A10B-FP8",
+        messages=[
+            {
+                "role": "system",
+                "content": "Answer questions based only on the provided document context. Be concise and precise.",
+            },
+            {
+                "role": "user",
+                "content": f"Context:\n{context}\n\nQuestion: {question}",
+            },
+        ],
+        temperature=0.7,
+        top_p=0.8,
+        max_tokens=1024,
+        extra_body={"chat_template_kwargs": {"enable_thinking": False}},
+    )
+    return resp.choices[0].message.content
+
+
+# ── Build index ───────────────────────────────────────────────────────────────
+
+# Accepts PDFs, images (jpg/png/webp/svg), DOCX, PPTX, XLSX, HTML — mix freely
+documents = ["invoice.pdf", "contract.docx"]
+
+index: list[tuple[list[float], str]] = []
+for path in documents:
+    text = ocr_document(path)
+    chunks = chunk_text(text)
+    vectors = embed(chunks)
+    index.extend(zip(vectors, chunks))
+
+print(f"Indexed {len(index)} chunks from {len(documents)} documents.")
+
+
+# ── Ask questions ─────────────────────────────────────────────────────────────
+
+questions = [
+    "What is the total invoice amount?",
+    "How long is the contract term?",
+]
+
+for q in questions:
+    [q_vec] = embed([q])
+    context_chunks = retrieve(q_vec, index)
+    print(f"\nQ: {q}")
+    print(f"A: {answer(q, context_chunks)}")
+```
+
+:::tip Scaling up
+For production use, replace the in-memory cosine search with **pgvector** — a PostgreSQL extension for vector similarity search that runs on mittwald Container Hosting alongside n8n. See the [full RAG with n8n section](#n8n) below, or the [mittwald n8n guide](/docs/v2/guides/apps/n8n/) for a ready-to-deploy Docker Compose stack.
+:::
+
+## Full pipeline with n8n and pgvector {#n8n}
+
+[n8n](https://n8n.io) is a workflow automation platform that lets you build the same OCR → embed → search → answer pipeline visually — without writing application code. mittwald provides a dedicated [n8n hosting guide](/docs/v2/guides/apps/n8n/) that covers running n8n together with a **pgvector** database on mittwald Container Hosting. This is the recommended production setup.
+
+:::info Hosting your vector database on mittwald
+**[mittwald Container Hosting](/docs/v2/platform/workloads/containers/)** lets you run any Docker image as a container in your mStudio project — including vector databases. You deploy them via `mw stack deploy` (Docker Compose) or the mStudio UI, with persistent storage via named volumes. No external database service needed.
+
+Three vector databases are available as mittwald container templates:
+
+| Database | Docker image | Best for |
+|----------|-------------|---------|
+| **pgvector** | `ankane/pgvector:latest` | PostgreSQL-based; built-in n8n support |
+| **Qdrant** | `qdrant/qdrant:latest` | High-performance dedicated vector search; REST + gRPC API |
+| **ChromaDB** | `chromadb/chroma:latest` | Simple HTTP API; easy to get started |
+:::
+
+Because mittwald AI Hosting exposes an OpenAI-compatible API, n8n's built-in OpenAI nodes work out of the box with a custom base URL.
+
+### Deploy n8n + pgvector on mittwald
+
+The mittwald n8n guide describes deploying a complete stack via `mw stack deploy`. The essential Docker Compose configuration:
+
+```yaml
+services:
+  n8n:
+    image: n8nio/n8n:stable
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+    environment:
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=pgvector
+      - DB_POSTGRESDB_DATABASE=n8n
+      - DB_POSTGRESDB_USER=n8n
+      - DB_POSTGRESDB_PASSWORD=<password>
+
+  pgvector:
+    image: ankane/pgvector:latest
+    environment:
+      - POSTGRES_DB=n8n
+      - POSTGRES_USER=n8n
+      - POSTGRES_PASSWORD=<password>
+    volumes:
+      - pgvector_data:/var/lib/postgresql/data
+
+volumes:
+  n8n_data:
+  pgvector_data:
+```
+
+See the [mittwald n8n guide](/docs/v2/guides/apps/n8n/) for the complete setup instructions including custom domain, SSL, and mStudio configuration.
+
+### Alternative: Qdrant
+
+Qdrant is a dedicated vector search engine with a REST and gRPC API. Run it as a container alongside your application:
+
+```yaml
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    ports:
+      - "6333:6333"   # REST API
+      - "6334:6334"   # gRPC
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+volumes:
+  qdrant_data:
+```
+
+Deploy with `mw stack deploy` and connect from Python using the official client:
+
+```python
+# pip install qdrant-client openai
+from qdrant_client import QdrantClient
+from qdrant_client.models import Distance, VectorParams, PointStruct
+from openai import OpenAI
+import uuid
+
+ai = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+qdrant = QdrantClient(host="localhost", port=6333)
+
+# Create collection (run once)
+qdrant.create_collection(
+    collection_name="documents",
+    vectors_config=VectorParams(size=4096, distance=Distance.COSINE),
+)
+
+def embed(texts: list[str]) -> list[list[float]]:
+    resp = ai.embeddings.create(model="Qwen3-Embedding-8B", input=texts)
+    return [item.embedding for item in resp.data]
+
+def index_chunks(chunks: list[str]) -> None:
+    vectors = embed(chunks)
+    qdrant.upsert(
+        collection_name="documents",
+        points=[
+            PointStruct(id=str(uuid.uuid4()), vector=vec, payload={"text": chunk})
+            for vec, chunk in zip(vectors, chunks)
+        ],
+    )
+
+def search(question: str, top_k: int = 3) -> list[str]:
+    [q_vec] = embed([question])
+    result = qdrant.query_points(collection_name="documents", query=q_vec, limit=top_k)
+    return [hit.payload["text"] for hit in result.points]
+```
+
+### Alternative: ChromaDB
+
+ChromaDB offers a simple HTTP API that works well for prototyping and smaller document collections:
+
+```yaml
+services:
+  chromadb:
+    image: chromadb/chroma:latest
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+
+volumes:
+  chroma_data:
+```
+
+Connect from Python:
+
+```python
+# pip install chromadb openai
+import chromadb
+from openai import OpenAI
+
+ai = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+chroma = chromadb.HttpClient(host="localhost", port=8000)
+collection = chroma.get_or_create_collection("documents")
+
+def embed(texts: list[str]) -> list[list[float]]:
+    resp = ai.embeddings.create(model="Qwen3-Embedding-8B", input=texts)
+    return [item.embedding for item in resp.data]
+
+def index_chunks(chunks: list[str]) -> None:
+    vectors = embed(chunks)
+    collection.add(
+        ids=[str(i) for i in range(len(chunks))],
+        embeddings=vectors,
+        documents=chunks,
+    )
+
+def search(question: str, top_k: int = 3) -> list[str]:
+    [q_vec] = embed([question])
+    results = collection.query(query_embeddings=[q_vec], n_results=top_k)
+    return results["documents"][0]
+```
+
+### Credential setup in n8n
+
+Create a new **OpenAI API** credential in n8n and override the base URL:
+
+| Field | Value |
+|-------|-------|
+| API Key | your mStudio AI Hosting key (`sk-…`) |
+| Base URL | `https://llm.aihosting.mittwald.de/v1` |
+
+GLM-OCR, [Qwen3-Embedding-8B](/docs/v2/platform/aihosting/models/qwen3-embedding-8b), and [Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8) all share this single credential.
+
+### Document ingestion workflow
+
+Build this n8n workflow to automatically digitise and index new documents:
+
+```
+[Trigger: new file / webhook / schedule]
+       ↓
+[Read Binary File]
+       ↓
+[Code node]  base64-encode file → data URI
+       ↓
+[HTTP Request]  POST https://llm.aihosting.mittwald.de/v1/chat/completions
+  model: GLM-OCR
+  prompt: "Extract the text and format it as Markdown. Use # for headings and - for lists."
+       ↓
+[Code node]  split Markdown into 400-word chunks with 50-word overlap
+       ↓
+[Embeddings OpenAI node]  model: Qwen3-Embedding-8B
+       ↓
+[Postgres (pgvector) node]  INSERT chunks + embeddings into the vector table
+```
+
+The GLM-OCR call uses an **HTTP Request** node because the file must be base64-encoded first:
+
+```javascript
+// n8n Code node — encode binary to base64 data URI
+const binaryData = $input.first().binary.data;
+const b64 = binaryData.data;       // n8n already base64-encodes binary items
+const mime = binaryData.mimeType;  // e.g. "application/pdf"
+return [{ json: { dataUri: `data:${mime};base64,${b64}` } }];
+```
+
+### Question-answering workflow
+
+A second workflow answers user questions on demand:
+
+```
+[Trigger: webhook  ?question=How+long+is+the+contract%3F]
+       ↓
+[Embeddings OpenAI node]  embed the question  (Qwen3-Embedding-8B)
+       ↓
+[Postgres (pgvector) node]  SELECT top-3 chunks by vector similarity
+       ↓
+[OpenAI Chat node]  model: Qwen3.5-122B-A10B-FP8
+  system: "Answer only from the provided context."
+  user:   "Context: {{chunks}}\n\nQuestion: {{question}}"
+       ↓
+[Respond to Webhook]  return the answer as JSON
+```
+
+:::tip n8n AI Agent node
+n8n's **AI Agent** node (with a custom OpenAI credential pointing to mittwald AI Hosting) can orchestrate multi-step tool use automatically — useful when you want the model to decide whether to search the vector store or answer from its own knowledge.
+:::
+
+## Prompting tips
+
+### Tables — preserve structure as Markdown
+
+Without guidance, the model may flatten table rows into plain text. Ask for markdown tables explicitly:
+
+```
+Extract all text from this document.
+Preserve table structures as markdown tables where applicable.
+```
+
+:::note
+When the **input is an HTML file**, the model tends to reproduce tables as HTML `<table>` elements even if you ask for markdown. This is expected behaviour — use a PDF or image source when you specifically need `|` markdown table syntax.
+:::
+
+### Tables — output as HTML
+
+For spreadsheet data that needs to be inserted into a database or further processed, request HTML:
+
+```
+Extract the table from this document and return it as an HTML <table> element with <tr> and <td> tags.
+```
+
+### Formulas — output LaTeX
+
+For documents with mathematical content, request LaTeX so the result can be re-rendered downstream:
+
+```
+Extract all text from this document.
+Render mathematical formulas in LaTeX: $...$ for inline math, $$...$$ for display math.
+```
+
+### Low-quality scans — flag uncertain words
+
+When working with faded or degraded originals, instruct the model to mark unclear words rather than silently guess:
+
+```
+Extract all legible text from this document.
+If a word is unclear, write your best guess followed by [?].
+```
+
+### Multilingual documents
+
+GLM-OCR natively supports Chinese, English, German, French, Spanish, Russian, Japanese, and Korean in a single request — no language parameter needed. For mixed-language documents, instruct the model to preserve the original language of each section:
+
+```
+Extract all text from this document. Keep each text passage in its original language — do not translate.
+```
