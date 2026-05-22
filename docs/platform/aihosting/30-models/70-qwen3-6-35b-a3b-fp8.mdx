@@ -26,9 +26,7 @@ The following limitations apply:
 - Thinking mode requires at least 128,000 tokens of remaining context to function properly
 - Images must be submitted as Base64-encoded data URLs (no remote URLs)
 
-**Thinking mode is enabled by default.** See [API usage](#api-usage) below for the correct way to disable it — the parameter must be nested inside `chat_template_kwargs`.
-
-## API usage {#api-usage}
+**Thinking mode is enabled by default.** See [Disabling thinking mode](#disable-thinking) below for the correct way — the parameter must be nested inside `chat_template_kwargs`.
 
 :::warning[Thinking mode is on by default and can cause long response times]
 Before every response the model generates an internal reasoning chain. For complex prompts this can be thousands of tokens long, adding several seconds to the time-to-first-token (TTFT).
@@ -36,7 +34,7 @@ Before every response the model generates an internal reasoning chain. For compl
 **Common mistake:** passing `enable_thinking: false` as a top-level field in the request body — the API silently ignores it and thinking stays on. It must be nested inside `chat_template_kwargs` as shown below.
 :::
 
-### Disabling thinking mode
+### Disabling thinking mode {#disable-thinking}
 
 <Tabs groupId="language">
   <TabItem value="python" label="Python">

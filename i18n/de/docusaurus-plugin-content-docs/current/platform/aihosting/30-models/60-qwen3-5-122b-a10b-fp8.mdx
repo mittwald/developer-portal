@@ -24,9 +24,7 @@ Folgende Limitierungen gelten:
 - Der Thinking-Modus benötigt mindestens 128.000 Token verbleibenden Context, um korrekt zu funktionieren
 - Bilder müssen als Base64-kodierte Data-URLs übermittelt werden (keine externen URLs)
 
-**Thinking-Modus ist standardmäßig aktiviert.** Wie du ihn korrekt deaktivierst, zeigt der Abschnitt [API-Nutzung](#api-nutzung) — der Parameter muss in `chat_template_kwargs` verschachtelt werden.
-
-## API-Nutzung {#api-nutzung}
+**Thinking-Modus ist standardmäßig aktiviert.** Wie du ihn korrekt deaktivierst, zeigt der Abschnitt [Thinking-Modus deaktivieren](#thinking-modus-deaktivieren) — der Parameter muss in `chat_template_kwargs` verschachtelt werden.
 
 :::warning[Thinking-Modus ist standardmäßig aktiviert und kann zu langen Antwortzeiten führen]
 Das Modell generiert vor jeder Antwort eine interne Gedankenkette. Bei komplexen Prompts kann diese Tausende von Tokens umfassen und die Zeit bis zum ersten Token (TTFT) um mehrere Sekunden erhöhen.
@@ -34,7 +32,7 @@ Das Modell generiert vor jeder Antwort eine interne Gedankenkette. Bei komplexen
 **Häufiger Fehler:** `enable_thinking: false` als Top-Level-Feld im Request-Body übergeben — die API ignoriert es stillschweigend und der Thinking-Modus bleibt aktiv. Es muss wie unten gezeigt in `chat_template_kwargs` verschachtelt werden.
 :::
 
-### Thinking-Modus deaktivieren
+### Thinking-Modus deaktivieren {#thinking-modus-deaktivieren}
 
 <Tabs groupId="language">
   <TabItem value="python" label="Python">
