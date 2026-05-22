@@ -5,6 +5,9 @@ title: Qwen3.5-122B-A10B-FP8
 slug: /platform/aihosting/models/qwen3-5-122b-a10b-fp8
 ---
 
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
 ## Description
 
 "Qwen3.5-122B-A10B-FP8" is a Mixture-of-Experts (MoE) language model by Alibaba with 122 billion total parameters, of which approximately 10 billion are active per forward pass. It is designed for high-quality chat, agentic workflows, and reasoning tasks while remaining computationally efficient thanks to the MoE architecture.
@@ -22,7 +25,116 @@ The following limitations apply:
 - Thinking mode requires at least 128,000 tokens of remaining context to function properly
 - Images must be submitted as Base64-encoded data URLs (no remote URLs)
 
-**Thinking mode is enabled by default.** To disable it, pass `"enable_thinking": false` in your API request's extra body parameters.
+**Thinking mode is enabled by default.** See [API usage](#api-usage) below for the correct way to disable it — the parameter must be nested inside `chat_template_kwargs`.
+
+## API usage {#api-usage}
+
+:::warning[Thinking mode is on by default and can cause long response times]
+Before every response the model generates an internal reasoning chain. For complex prompts this can be thousands of tokens long, adding several seconds to the time-to-first-token (TTFT).
+
+**Common mistake:** passing `enable_thinking: false` as a top-level field in the request body — the API silently ignores it and thinking stays on. It must be nested inside `chat_template_kwargs` as shown below.
+:::
+
+### Disabling thinking mode
+
+<Tabs groupId="language">
+  <TabItem value="python" label="Python">
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1",
+    api_key="sk-your-api-key-here",
+)
+
+response = client.chat.completions.create(
+    model="Qwen3.5-122B-A10B-FP8",
+    messages=[{"role": "user", "content": "What is 2 + 2?"}],
+    temperature=0.7,
+    top_p=0.8,
+    max_tokens=32768,
+    extra_body={
+        "chat_template_kwargs": {"enable_thinking": False},
+        #                        ^^^^^^^^^^^^^^^^^^^^^^^^
+        # Must be nested here — passing enable_thinking at the top level
+        # is silently ignored by the API.
+    },
+)
+
+print(response.choices[0].message.content)
+```
+
+  </TabItem>
+  <TabItem value="javascript" label="JavaScript">
+
+```ts
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  baseURL: "https://llm.aihosting.mittwald.de/v1",
+  apiKey: "sk-your-api-key-here",
+});
+
+const response = await client.chat.completions.create({
+  model: "Qwen3.5-122B-A10B-FP8",
+  messages: [{ role: "user", content: "What is 2 + 2?" }],
+  temperature: 0.7,
+  top_p: 0.8,
+  max_tokens: 32768,
+  // @ts-ignore – vLLM extension; must be nested here, not enable_thinking at top level
+  chat_template_kwargs: { enable_thinking: false },
+} as any);
+
+console.log(response.choices[0].message.content);
+```
+
+  </TabItem>
+  <TabItem value="php" label="PHP">
+
+```php
+<?php
+// composer require openai-php/client guzzlehttp/guzzle
+
+$client = OpenAI::factory()
+    ->withBaseUri('https://llm.aihosting.mittwald.de/v1')
+    ->withApiKey('sk-your-api-key-here')
+    ->make();
+
+$response = $client->chat()->create([
+    'model' => 'Qwen3.5-122B-A10B-FP8',
+    'messages' => [
+        ['role' => 'user', 'content' => 'What is 2 + 2?'],
+    ],
+    'temperature' => 0.7,
+    'top_p' => 0.8,
+    'max_tokens' => 32768,
+    'chat_template_kwargs' => ['enable_thinking' => false],
+    // Must be nested here — passing 'enable_thinking' => false at the top
+    // level of the request is silently ignored by the API.
+]);
+
+echo $response->choices[0]->message->content;
+```
+
+  </TabItem>
+</Tabs>
+
+### Reading the response
+
+When thinking mode is **enabled** (default), the model returns two separate fields:
+
+| Field | Contents |
+| ----- | -------- |
+| `choices[0].message.reasoning_content` | Internal chain-of-thought (may be very long) |
+| `choices[0].message.content` | Final answer |
+
+If `content` is empty, the model placed its answer inside the reasoning block — disable thinking mode to ensure `content` is always populated.
+
+```python
+print(response.choices[0].message.reasoning_content)  # internal chain-of-thought
+print(response.choices[0].message.content)             # final answer
+```
 
 ## Recommended inference parameters
 

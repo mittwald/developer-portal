@@ -4,6 +4,9 @@ description: Detaillierte Informationen zu Qwen3.5-122B-A10B-FP8
 title: Qwen3.5-122B-A10B-FP8
 ---
 
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
 ## Beschreibung
 
 „Qwen3.5-122B-A10B-FP8" ist ein Mixture-of-Experts-Sprachmodell (MoE) von Alibaba mit 122 Milliarden Gesamtparametern, von denen jeweils ca. 10 Milliarden pro Forward-Pass aktiv sind. Es ist für qualitativ hochwertige Chat-, agentische und Reasoning-Workflows ausgelegt und bleibt dank der MoE-Architektur rechnerisch effizient.
@@ -21,7 +24,116 @@ Folgende Limitierungen gelten:
 - Der Thinking-Modus benötigt mindestens 128.000 Token verbleibenden Context, um korrekt zu funktionieren
 - Bilder müssen als Base64-kodierte Data-URLs übermittelt werden (keine externen URLs)
 
-**Thinking-Modus ist standardmäßig aktiviert.** Um ihn zu deaktivieren, übergib `"enable_thinking": false` in den Extra-Body-Parametern deiner API-Anfrage.
+**Thinking-Modus ist standardmäßig aktiviert.** Wie du ihn korrekt deaktivierst, zeigt der Abschnitt [API-Nutzung](#api-nutzung) — der Parameter muss in `chat_template_kwargs` verschachtelt werden.
+
+## API-Nutzung {#api-nutzung}
+
+:::warning[Thinking-Modus ist standardmäßig aktiviert und kann zu langen Antwortzeiten führen]
+Das Modell generiert vor jeder Antwort eine interne Gedankenkette. Bei komplexen Prompts kann diese Tausende von Tokens umfassen und die Zeit bis zum ersten Token (TTFT) um mehrere Sekunden erhöhen.
+
+**Häufiger Fehler:** `enable_thinking: false` als Top-Level-Feld im Request-Body übergeben — die API ignoriert es stillschweigend und der Thinking-Modus bleibt aktiv. Es muss wie unten gezeigt in `chat_template_kwargs` verschachtelt werden.
+:::
+
+### Thinking-Modus deaktivieren
+
+<Tabs groupId="language">
+  <TabItem value="python" label="Python">
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1",
+    api_key="sk-your-api-key-here",
+)
+
+response = client.chat.completions.create(
+    model="Qwen3.5-122B-A10B-FP8",
+    messages=[{"role": "user", "content": "Was ist 2 + 2?"}],
+    temperature=0.7,
+    top_p=0.8,
+    max_tokens=32768,
+    extra_body={
+        "chat_template_kwargs": {"enable_thinking": False},
+        #                        ^^^^^^^^^^^^^^^^^^^^^^^^
+        # Muss hier verschachtelt sein — enable_thinking auf Top-Level-Ebene
+        # wird von der API stillschweigend ignoriert.
+    },
+)
+
+print(response.choices[0].message.content)
+```
+
+  </TabItem>
+  <TabItem value="javascript" label="JavaScript">
+
+```ts
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  baseURL: "https://llm.aihosting.mittwald.de/v1",
+  apiKey: "sk-your-api-key-here",
+});
+
+const response = await client.chat.completions.create({
+  model: "Qwen3.5-122B-A10B-FP8",
+  messages: [{ role: "user", content: "Was ist 2 + 2?" }],
+  temperature: 0.7,
+  top_p: 0.8,
+  max_tokens: 32768,
+  // @ts-ignore – vLLM-Erweiterung; muss hier verschachtelt sein, nicht enable_thinking auf Top-Level
+  chat_template_kwargs: { enable_thinking: false },
+} as any);
+
+console.log(response.choices[0].message.content);
+```
+
+  </TabItem>
+  <TabItem value="php" label="PHP">
+
+```php
+<?php
+// composer require openai-php/client guzzlehttp/guzzle
+
+$client = OpenAI::factory()
+    ->withBaseUri('https://llm.aihosting.mittwald.de/v1')
+    ->withApiKey('sk-your-api-key-here')
+    ->make();
+
+$response = $client->chat()->create([
+    'model' => 'Qwen3.5-122B-A10B-FP8',
+    'messages' => [
+        ['role' => 'user', 'content' => 'Was ist 2 + 2?'],
+    ],
+    'temperature' => 0.7,
+    'top_p' => 0.8,
+    'max_tokens' => 32768,
+    'chat_template_kwargs' => ['enable_thinking' => false],
+    // Muss hier verschachtelt sein — 'enable_thinking' => false auf Top-Level-Ebene
+    // wird von der API stillschweigend ignoriert.
+]);
+
+echo $response->choices[0]->message->content;
+```
+
+  </TabItem>
+</Tabs>
+
+### Antwort auslesen
+
+Wenn der Thinking-Modus **aktiviert** ist (Standard), liefert das Modell zwei separate Felder:
+
+| Feld | Inhalt |
+| ---- | ------ |
+| `choices[0].message.reasoning_content` | Interne Gedankenkette (kann sehr lang sein) |
+| `choices[0].message.content` | Endgültige Antwort |
+
+Wenn `content` leer ist, hat das Modell seine Antwort in den Reasoning-Block geschrieben — deaktiviere den Thinking-Modus, damit `content` immer befüllt wird.
+
+```python
+print(response.choices[0].message.reasoning_content)  # interne Gedankenkette
+print(response.choices[0].message.content)             # endgültige Antwort
+```
 
 ## Empfohlene Inferenzparameter
 
