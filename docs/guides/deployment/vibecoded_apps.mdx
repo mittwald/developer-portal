@@ -10,60 +10,160 @@ description: Structure and quickstart for shipping vibe coded apps with a zero-c
 
 ## Introduction / Motivation {#introduction-motivation}
 
-Why do we want to ship vibe coded apps in the first place?
+With upcoming and rapidly growing agentic coding capabilities, we want to make
+it as easy as possible to ship "vibe coded" apps to the world.
 
-- TODO: define the product and business motivation
-- TODO: describe expected speed and learning benefits
-- TODO: clarify when vibecoding is a good fit and when it is not
+Besides rapid prototyping and development, we want to enable users to easily share their
+vibe coded apps with others and deploy them to production environments without
+needing to worry about complex deployment processes or configurations.
+
+Even small business apps can be built with vibe coding, this guide will help you to get
+your vibe coded app from your local machine ( or cloud ai-driven IDE ) to the world with minimal friction.
+
+Deploying an app is exciting—and worth doing thoughtfully. Compliance, privacy, security and operational
+responsibility matter, and we recommend connecting with our community if you have questions.
 
 ## Vibecoding app landscape overview {#vibecoding-app-landscape-overview}
 
-Apps are easy to create, but most vendors try to lock you in using proprietary deployments.
+Apps are easy to create, and deployment options vary widely.
 
-- TODO: map common platform types and lock-in mechanisms
-- TODO: outline migration friction and long-term costs
-- TODO: contrast hosted convenience with portability
+Different platforms offer different trade-offs. Vendors like Replit and Lovable prioritize developer speed
+and ease of use with their specific project templates, build systems, and deployment pipelines. This convenience
+comes with a trade-off: moving your app to another platform later may require rework.
+On the other hand, you get a fast path to production with integrated tools and support.
+
+On the other hand, platforms like GitHub and mittwald offer more standard and flexible
+deployment options that can be easily adapted to different environments.
+
+By using GitHub as a central repository for your vibe coded app, you can maintain
+a clear history of changes, collaborate with others, and deploy to various platforms
+without being tied to a specific vendor's ecosystem.
+
+This approach allows for greater freedom and control over your app's deployment
+while still benefiting from the ease of use that vibe coding provides.
 
 ## GitHub is our anchor {#github-is-our-anchor}
 
 If we can export to GitHub, we have good chances to deploy anywhere.
 
-- TODO: explain why Git history and repository ownership matter
-- TODO: define minimum export requirements (code, config, build files)
-- TODO: list pitfalls of partial or one-way exports
+Most platforms support GitHub as a source for deployment, and having a well-structured
+GitHub repository allows for better collaboration, version control, and integration
+with various deployment tools and services. If GitHub is not the Git platform of choice,
+the same principles apply to any other Git hosting service that supports similar features.
+
+The moment we can export our vibe coded app to GitHub, we can leverage a wide range of
+deployment options, including continuous integration and continuous deployment (CI/CD)
+pipelines and containerization.
+
+Many tools offer two-way synchronization with GitHub, which means that changes made in
+the GitHub repository can be automatically reflected in the deployment environment,
+and vice versa. This allows for a more seamless development and deployment process,
+as developers can work on their code in GitHub while still having the benefits
+of a live deployment environment.
+
+Export quality varies, so test locally first. A well-structured export that includes all necessary code,
+configuration, and build files makes deployment and maintenance much easier.
+A partial or incomplete export may require rework during deployment or maintenance, and can create
+issues with version control and collaboration.
 
 ## Principles and limits of zero conf deployments {#principles-and-limits-of-zero-conf-deployments}
 
-- TODO: define what zero conf means in this guide
-- TODO: explain technical boundaries and trade-offs
-- TODO: set expectations for cases that still need manual setup
+As most platforms deploy with custom pipelines and configurations,
+we need to define a common denominator for zero conf deployment.
+In this context, zero conf deployment means that we can take the exported code from GitHub
+and deploy it to a platform without needing to make any manual changes or configurations.
+
+In other words: End users should be able to deploy their vibe coded app with minimal setup,
+ideally just by connecting their GitHub repository to a deployment platform that supports
+zero conf deployment.
+
+Unfortunately, not all platforms support zero conf deployment, and even those that do may have
+limitations or trade-offs to consider. For example, some platforms may require specific file
+structures, configuration files, or build processes that may not be compatible with
+the way vibe coded apps are exported.
+
+In other words: while zero conf deployment is an ideal goal, it may not always be achievable in practice,
+and users may need to be prepared to make some manual adjustments or configurations in certain cases.
+
+A good practice to check exported code for zero conf compatibility is to try deploying it locally
+using a tool like Docker or a local development server before attempting to deploy it to a cloud platform.
+This can help identify any issues or missing components that may need to be addressed before deployment.
 
 ## Tips and tricks to work towards zero conf deployment {#tips-and-tricks-zero-conf-deployment}
 
-- TODO: coding patterns that improve deployability
-- TODO: repository and environment variable hygiene
-- TODO: practical checklist before first deployment
+During development, we can follow certain practices to improve the chances of achieving zero conf deployment.
+
+Keep the stack small: the more dependencies and services your app relies on, the more complex the deployment process becomes.
+
+Use standard tools and configurations: sticking to widely used tools and configurations can increase compatibility
+with various deployment platforms.
+
+Document your app's requirements and dependencies clearly: this can help others understand what is needed to
+deploy the app successfully and can also assist in troubleshooting any issues that arise during deployment.
+
+Audit security and privacy best practices: ensuring that your app follows security and privacy best practices
+can help prevent issues during deployment and operation. Avoid hardcoding secrets, use environment variables,
+and regularly review your dependencies for vulnerabilities.
+
+Deployment checklist:
+- [ ] App runs locally without errors
+- [ ] All secrets/keys are out of your code!
+- [ ] README explains setup & usage
+- [ ] Build/export scripts work
+- [ ] Tested app in a browser/incognito window
+- [ ] Backups: Save a copy of your project!
+- [ ] Choose a reliable host that meets your needs
+- [ ] Shared the link with a friend — get feedback
+- [ ] Celebrate your first deploy! 🎉
 
 ## Zero conf deployment at mittwald {#zero-conf-deployment-at-mittwald}
 
-mw CLI, GitHub Action, extension.
+mittwald offers a zero conf deployment option for vibe coded apps,
+allowing users to deploy their apps directly from GitHub with minimal setup.
 
-- TODO: brief overview of each path
-- TODO: recommend decision criteria by team maturity
-- TODO: reference follow-up guides and docs
+In the present, two main paths for zero conf deployment of vibe coded apps are present:
+- Manually via mittald CLI
+- Automated via GitHub Action
+
+The recommended approach is to start with the manual CLI deployment to understand the
+process and then move towards automation with GitHub Actions for a more streamlined
+and efficient deployment workflow.
+
+A separate extension for mStudio is also in the works, which will further simplify
+the deployment process by providing an integrated experience within the development environment.
 
 ## Quickstart guide for zero conf deployment of vibe coded apps {#quickstart-zero-conf-deployment-vibe-coded-apps}
 
-- TODO: prerequisites
-- TODO: local project preparation
-- TODO: GitHub setup
-- TODO: first deployment with mittwald
-- TODO: verification and rollback basics
+Prerequisites:
+- A vibe coded app with a GitHub repository
+- A mittwald hosting account
+- Basic understanding of Git and GitHub
+- mittwald CLI installed and configured
 
-## Final words and warnings {#final-words-and-warnings}
+Manual quickstart steps:
+1. Prepare your vibe coded app for deployment by ensuring it runs locally and all dependencies are properly configured.
+2. Make sure you are in sync with your GitHub repository and that all changes are committed and pushed.
+3. Use the mittwald CLI to create a new project and call the deployment command in the folder context of your vibe coded app.
 
-Privacy, security, and operational responsibility.
+Initial deployment takes a few minutes as the app is built the hosting environment is set up.
+Once the deployment is complete, you can access your app via the provided URL.
 
-- TODO: privacy checklist for source and telemetry
-- TODO: security baseline (secrets, dependency hygiene, least privilege)
-- TODO: operational warnings and escalation guidance
+Test your app in a browser, and if you encounter any issues, check the logs and configuration to troubleshoot.
+
+After successful deployment, you can set up a GitHub Action to automate future deployments whenever you push
+changes to your repository. Leverage git tags to manage releases and rollbacks effectively.
+
+## Moving forward: Best practices for success {#moving-forward-best-practices}
+
+As you prepare to deploy, consider these practices that help apps succeed:
+
+- **Security and privacy matter.** Remove hardcoded secrets, use environment variables, and keep dependencies
+up to date. These practices are straightforward and make your app more reliable.
+- **Test early.** Deploy locally first, share with friends, and gather feedback before going live.
+- **Community is here.** Our mittwald Discord server is a great place to ask questions, share what you're building,
+and learn from other developers.
+- **One size doesn't fit all.** Zero conf deployment works great for many apps. If your app has specific needs—complex
+databases, custom infrastructure, or compliance requirements—that's fine too. Plan accordingly and don't hesitate to
+reach out for guidance.
+
+You've built something cool. Ship it, learn from it, and iterate. That's the vibe.
