@@ -142,8 +142,25 @@ Prerequisites:
 
 Manual quickstart steps:
 1. Prepare your vibe coded app for deployment by ensuring it runs locally and all dependencies are properly configured.
+
+```shellsession
+user@local $ git clone https://github.com/<your-org>/<your-repo>.git
+user@local $ cd <your-repo>
+```
+
 2. Make sure you are in sync with your GitHub repository and that all changes are committed and pushed.
+
+```shellsession
+user@local $ git pull
+user@local $ git status
+```
+
 3. Use the mittwald CLI to create a new project and call the deployment command in the folder context of your vibe coded app.
+
+```shellsession
+user@local $ mw project create --description=<project-name> --update-context
+user@local $ mw experimental deploy
+```
 
 Initial deployment takes a few minutes as the app is built the hosting environment is set up.
 Once the deployment is complete, you can access your app via the provided URL.
