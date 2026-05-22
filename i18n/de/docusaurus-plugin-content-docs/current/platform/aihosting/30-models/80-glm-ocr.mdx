@@ -10,13 +10,13 @@ import TabItem from "@theme/TabItem";
 
 Der [GLM-OCR-Guide](../../examples/glm-ocr/) enthält lauffähige Beispiele für alle gängigen Anwendungsfälle, darunter eine vollständige Pipeline mit [Qwen3-Embedding-8B](/docs/v2/platform/aihosting/models/qwen3-embedding-8b), [Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8), n8n und Vektordatenbank-Optionen (pgvector, Qdrant, ChromaDB).
 
+## Beschreibung
+
+„GLM-OCR" ist ein auf optische Zeichenerkennung (OCR) spezialisiertes Modell von Z.ai (ZhipuAI), das für die präzise Textextraktion aus Dokumenten und Bildern entwickelt wurde. Ein auf unserer Plattform integrierter Dokumenten-Proxy wandelt PDF-, DOCX-, PPTX-, XLSX-, HTML-, SVG- und Rasterbild-Formate automatisch in PNG-Seiten um, bevor das Modell sie verarbeitet.
+
 :::note[Datenverarbeitung]
 **Es werden keine Dokumentdaten auf Datenträgern gespeichert.** Der Proxy wandelt Dokumente im Arbeitsspeicher in PNG-Bilder um und übergibt sie direkt an das Modell — zwischen Anfragen wird nichts gespeichert. Externe URLs in HTML-, CSS- oder SVG-Dateien werden geblockt, um SSRF zu verhindern. Die gesamte Verarbeitung findet auf mittwald-Servern statt.
 :::
-
-## Beschreibung
-
-„GLM-OCR" ist ein auf optische Zeichenerkennung (OCR) spezialisiertes Modell von Z.ai (ZhipuAI), das für die präzise Textextraktion aus Dokumenten und Bildern entwickelt wurde. Das Modell basiert auf der GLM-V-Encoder-Decoder-Architektur – bestehend aus einem 0,4B CogViT-Visual-Encoder und einem 0,5B GLM-Sprachdecoder – und erzielt trotz nur 0,9B Parametern State-of-the-Art-Ergebnisse (94,62 Punkte auf OmniDocBench V1.5, Platz 1 weltweit). Ein auf unserer Plattform integrierter Dokumenten-Proxy wandelt PDF-, DOCX-, PPTX-, XLSX-, HTML-, SVG- und Rasterbild-Formate automatisch in PNG-Seiten um, bevor das Modell sie verarbeitet.
 
 Geeignet für und unterstützt:
 
