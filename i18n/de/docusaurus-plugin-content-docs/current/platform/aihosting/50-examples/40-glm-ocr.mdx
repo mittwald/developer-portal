@@ -9,7 +9,7 @@ GLM-OCR ist ein OCR-Modell, das ausschließlich für das Lesen von Text entwicke
 :::tip Wann GLM-OCR einsetzen?
 Nutze GLM-OCR für **Textextraktion** aus Dokumenten (PDF, DOCX, PPTX, XLSX, HTML, Bilder). Wenn du auf Basis eines Dokuments auch Reasoning oder Konversation brauchst – z. B. „Fasse diesen Vertrag zusammen und erkläre ihn" – ist ein allgemeines Vision-Modell wie [Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8) besser geeignet. Beides lässt sich kombinieren: erst OCR, dann den extrahierten Text an ein anderes Modell übergeben.
 
-Unterstützte Formate, Limits und Inferenzparameter stehen in der [GLM-OCR Modellreferenz](/docs/v2/platform/aihosting/models/glm-ocr).
+Unterstützte Formate, Limits, Ausgabemodi und Inferenzparameter stehen in der [GLM-OCR Modellreferenz](/docs/v2/platform/aihosting/models/glm-ocr).
 :::
 
 ## Einrichtung
@@ -29,31 +29,9 @@ from openai import OpenAI
 client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
 ```
 
-## Ausgabemodi {#ausgabemodi}
-
-GLM-OCR hat drei Ausgabemodi, alle über den Prompt gesteuert:
-
-| Modus | Wann sinnvoll | Beispiel-Prompt |
-| ----- | ------------- | --------------- |
-| **Klartext** | Volltextsuche, Logging, einfache Digitalisierung | `"Extrahiere den gesamten Text aus diesem Dokument."` |
-| **Markdown** | Dokumentstruktur erhalten (Überschriften, Listen, Tabellen) für Anzeige oder RAG | `"Extrahiere den Text und formatiere ihn als Markdown. Verwende # für Überschriften und - für Listen."` |
-| **JSON** | Bestimmte benannte Felder aus Formularen, Rechnungen, Zertifikaten extrahieren | `"Extrahiere diese Felder und gib sie als JSON zurück: …"` |
-
-:::note[Ausgabeverhalten]
-**JSON-Modus umschließt die Ausgabe immer mit Markdown-Code-Blöcken** (` ```json … ``` `) – diese müssen vor dem Aufruf von `json.loads()` entfernt werden. Das Stripping-Muster zeigt das [KIE-Beispiel](#strukturierte-daten-aus-rechnungen-extrahieren) weiter unten.
-
-**Markdown-Modus benötigt konkrete Formatierungsanweisungen.** Ein allgemeines „Wandle in Markdown um" reicht möglicherweise nicht aus, um Überschriften-Syntax zuverlässig zu erzeugen. Immer `# für Hauptüberschriften, ## für Unterüberschriften, - für Listen` angeben.
-
-**HTML-Quelle → HTML-Tabellen.** Enthält die Eingabe eine HTML-Datei mit einer `<table>`, gibt das Modell diese tendenziell als HTML aus – auch wenn nach Markdown-Tabellen gefragt wird. Für saubere Markdown-Tabellenausgabe eine PDF- oder Bildquelle verwenden.
-:::
-
 ## Text aus einem PDF extrahieren
 
 Der häufigste Anwendungsfall: das Lesen eines gescannten oder digitalen PDFs. Der integrierte Proxy wandelt jede Seite automatisch in ein Bild um – du schickst die Datei einfach als Base64-Data-URI.
-
-:::note[Datenverarbeitung]
-**Es werden keine Dokumentdaten auf Datenträgern gespeichert.** Der Proxy wandelt Dokumente im Arbeitsspeicher in PNG-Bilder um und übergibt sie direkt an das Modell – zwischen Anfragen wird nichts zwischengespeichert. Externe URLs in HTML-, CSS- oder SVG-Dateien werden geblockt, um SSRF zu verhindern. Die gesamte Verarbeitung findet auf mittwald-Servern statt.
-:::
 
 ```python
 import base64
@@ -82,9 +60,7 @@ response = client.chat.completions.create(
 print(response.choices[0].message.content)
 ```
 
-:::note[Seitenlimit]
-Pro Anfrage werden bis zu **30 Seiten** verarbeitet. Bei größeren Dokumenten gibt die API HTTP 413 zurück – siehe [Große PDFs in Batches verarbeiten](#grosse-pdfs-in-batches-verarbeiten) weiter unten.
-:::
+Pro Anfrage werden bis zu **30 Seiten** verarbeitet – siehe [Große PDFs in Batches verarbeiten](#grosse-pdfs-in-batches-verarbeiten) bei größeren Dokumenten.
 
 ## Text aus Bildern extrahieren
 
@@ -163,12 +139,6 @@ print(dokument_lesen("vertrag.docx"))
 print(dokument_lesen("praesentation.pptx"))
 print(dokument_lesen("auswertung.xlsx"))
 ```
-
-:::note[XLSX-Ausgabe]
-Bei Excel-Dateien gibt das Modell den **Tabellenblatt-Namen als erste Zeile** aus, gefolgt vom Zelleninhalt. Beim programmatischen Weiterverarbeiten diese erste Zeile herausfiltern oder berücksichtigen.
-
-Office-Dateien müssen gültige Open-XML-Dokumente sein. Beschädigte oder selbst erstellte ZIP-Strukturen führen zu HTTP 400.
-:::
 
 ## Markdown-Ausgabe
 

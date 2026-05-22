@@ -9,7 +9,7 @@ GLM-OCR is a document OCR model — built only for reading text, not for chat or
 :::tip When to use GLM-OCR
 Use GLM-OCR for **text extraction** from documents (PDF, DOCX, PPTX, XLSX, HTML, images). For tasks that involve reasoning or conversation on top of a document — e.g. "summarise and explain this contract" — a general vision model like [Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8) is a better fit. You can combine both: OCR first, then pass the text to another model.
 
-Supported formats, limits, and inference parameters are in the [GLM-OCR model reference](/docs/v2/platform/aihosting/models/glm-ocr).
+Supported formats, limits, output modes, and inference parameters are in the [GLM-OCR model reference](/docs/v2/platform/aihosting/models/glm-ocr).
 :::
 
 ## Setup
@@ -29,31 +29,9 @@ from openai import OpenAI
 client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
 ```
 
-## Output modes {#output-modes}
-
-GLM-OCR has three output modes, all controlled through the prompt:
-
-| Mode | When to use | Example prompt |
-| ---- | ----------- | -------------- |
-| **Plain text** | Full-text search, logging, simple digitisation | `"Extract all text from this document."` |
-| **Markdown** | Preserving document structure (headings, lists, tables) for display or RAG | `"Extract the text and format it as Markdown. Use # for headings and - for lists."` |
-| **JSON** | Extracting specific named fields from forms, invoices, certificates | `"Extract these fields and return them as JSON: …"` |
-
-:::note[Output behaviour]
-**JSON mode always wraps output in markdown code fences** (` ```json … ``` `) — you must strip them before calling `json.loads()`. See the [KIE example](#extracting-structured-data-from-invoices) below for the stripping pattern.
-
-**Markdown mode needs explicit formatting instructions.** A generic "convert to Markdown" prompt may not produce heading syntax. Always specify `# for main headings, ## for subheadings, - for lists`.
-
-**HTML source → HTML tables.** When the input is an HTML file containing a `<table>`, the model tends to reproduce it as HTML even if you ask for markdown tables. Use a PDF or image source when you need clean markdown table output.
-:::
-
 ## Extracting text from a PDF
 
 The most common use case: reading a scanned or digital PDF. The integrated proxy converts each page to an image automatically — you just send the file as a base64 data URI.
-
-:::note[Data handling]
-**No document data is written to disk.** The proxy converts documents to PNG images in memory and passes them straight to the model — nothing is cached or stored between requests. External URLs inside HTML, CSS, or SVG files are blocked to prevent SSRF. All processing stays on mittwald servers.
-:::
 
 ```python
 import base64
@@ -82,9 +60,7 @@ response = client.chat.completions.create(
 print(response.choices[0].message.content)
 ```
 
-:::note[Page limit]
-Up to **30 pages** are processed per request. The API returns HTTP 413 for larger documents — see [Batch-processing large PDFs](#batch-processing-large-pdfs) below.
-:::
+Up to **30 pages** are processed per request — see [Batch-processing large PDFs](#batch-processing-large-pdfs) for larger documents.
 
 ## Extracting text from images
 
@@ -163,12 +139,6 @@ print(read_office_doc("contract.docx"))
 print(read_office_doc("slides.pptx"))
 print(read_office_doc("report.xlsx"))
 ```
-
-:::note[XLSX output]
-For Excel files, the model includes the **worksheet name** as the first line of output, followed by the cell content. Strip or handle that first line if you are post-processing the result programmatically.
-
-Office files must be valid Open XML documents. Corrupted or hand-crafted ZIP structures return HTTP 400.
-:::
 
 ## Markdown document output
 
