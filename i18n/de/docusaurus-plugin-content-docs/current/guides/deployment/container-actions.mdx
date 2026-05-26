@@ -125,19 +125,19 @@ Du hast jetzt zwei unterschiedliche Deployment-Ansätze:
 
 | Use Case | Empfohlene Action | Warum |
 | --- | --- | --- |
-| Du hast bereits ein Dockerfile und/oder eine explizite Stack-Definition (`stack.yaml`) und willst volle Kontrolle ueber Services, Ports und Rollout-Verhalten | **`mittwald/deploy-container-action`** | Ideal fuer einen expliziten, infrastrukturfokussierten Deployment-Ansatz. |
+| Du hast bereits ein Dockerfile und/oder eine explizite Stack-Definition (`stack.yaml`) und willst volle Kontrolle über Services, Ports und Rollout-Verhalten | **`mittwald/deploy-container-action`** | Ideal für einen expliziten, infrastrukturfokussierten Deployment-Ansatz. |
 | Du willst schnell direkt aus dem Quellcode deployen, ohne zuerst Dockerfiles oder Stack-Dateien anzulegen | **`mittwald/zerodeploy-action`** | Nutzt Railpack, erkennt Build-Schritte automatisch und deployt mit nahezu null Konfiguration in mittwald Container Hosting. |
 
-Wenn dein Team bereits Build- und Runtime-Definitionen fuer Container pflegt, bleib bei `deploy-container-action`. Wenn du den kuerzesten Weg vom Repository zum laufenden Service willst, nutze `zerodeploy-action`.
+Wenn dein Team bereits Build- und Runtime-Definitionen für Container pflegt, bleib bei `deploy-container-action`. Wenn du den kürzesten Weg vom Repository zum laufenden Service willst, nutze `zerodeploy-action`.
 
 ## Deploy mit `mittwald/zerodeploy-action` (Railpack) {#deploy-mit-zerodeploy-action-railpack}
 
-[`mittwald/zerodeploy-action`](https://github.com/mittwald/zerodeploy-action) ist fuer Repositories gedacht, die noch kein Docker-Setup haben. Die Action installiert die mittwald CLI, installiert Railpack, baut aus deinem Repository und deployt in dein Zielprojekt.
+[`mittwald/zerodeploy-action`](https://github.com/mittwald/zerodeploy-action) ist für Repositories gedacht, die noch kein Docker-Setup haben. Die Action installiert die mittwald CLI, installiert Railpack, baut aus deinem Repository und deployt in dein Zielprojekt.
 
-### Benoetigte Inputs {#benoetigte-inputs-zerodeploy}
+### Benötigte Inputs {#benötigte-inputs-zerodeploy}
 
 - **`MITTWALD_API_TOKEN`** Secret; API-Token aus mStudio
-- **Projekt-ID** (zum Beispiel `p-kpbj8e`)
+- **Projekt-ID** (zum Beispiel `p-XXXXXX`)
 
 ### Beispiel-Workflow {#beispiel-workflow-zerodeploy}
 
@@ -173,17 +173,17 @@ jobs:
           mittwald-project-id: "p-XXXXXX"
 ```
 
-Die Action prueft automatisch, ob `.env` unter `$GITHUB_WORKSPACE/.env` existiert, und bindet die Datei beim Deployment ein, wenn sie vorhanden ist.
+Die Action prüft automatisch, ob `.env` unter `$GITHUB_WORKSPACE/.env` existiert, und bindet die Datei beim Deployment ein, wenn sie vorhanden ist.
 
-### Nuetzliche optionale Inputs {#nuetzliche-optionale-inputs-zerodeploy}
+### Nützliche optionale Inputs {#nützliche-optionale-inputs-zerodeploy}
 
 - **`repo-subpath`**; deployt nur ein Unterverzeichnis (z.B. in Monorepos)
 - **`node-version`**; Node.js-Version innerhalb der Action (Standard: `24`)
 - **`mittwald-cli-version`**; Versionsbereich der CLI (Standard: `^1.17.0`)
 
-## Fortgeschrittene Muster fuer `mittwald/deploy-container-action` {#fortgeschrittene-muster}
+## Fortgeschrittene Muster für `mittwald/deploy-container-action` {#fortgeschrittene-muster}
 
-Die folgenden Optionen gelten fuer `mittwald/deploy-container-action` (den stack-basierten Workflow), nicht fuer `mittwald/zerodeploy-action`.
+Die folgenden Optionen gelten für `mittwald/deploy-container-action` (den stack-basierten Workflow), nicht für `mittwald/zerodeploy-action`.
 
 ### Selektive Neustarts {#selektive-neustarts}
 
@@ -196,7 +196,7 @@ with:
 
 Nicht aufgelistete Dienste werden nur neu gestartet, wenn die API meldet, dass ein Neustart tatsächlich erforderlich ist.
 
-### Naechste Schritte {#naechste-schritte}
+### Nächste Schritte {#nächste-schritte}
 
 - Füge ein [Ingress](/docs/v2/platform/workloads/containers/#ingress-http) hinzu, um HTTP-Ports für das öffentliche Internet freizugeben.
 - Verwende [Terraform](/docs/v2/guides/deployment/terraform/) für vollständig deklarative Infrastruktur und lasse GitHub Actions `terraform apply` aufrufen.
