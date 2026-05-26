@@ -13,18 +13,18 @@ import OperationLink from "@site/src/components/OperationLink";
 
 Using GitHub Actions you can build and publish your container image right from your source code repository, and then immediately deploy your application on the mittwald cloud platform. The official **`mittwald/deploy-container-action`** takes care of the API calls, applies your stack definition, and (if necessary) re-creates the affected services.
 
-## Prerequisites
+## Prerequisites {#prerequisites}
 
 - **mStudio API token**; see the docs on [obtaining an API token](/docs/v2/api/intro#obtaining-an-api-token)
 - **Stack ID**; see the docs on [identifying the default stack](/docs/v2/api/howtos/create-container/#identify-default-stack)
 - **(Optional) Private registry**; see [_Using private registries_](/docs/v2/platform/workloads/containers/#private-registries)
 - **GitHub Actions runner**; any runner with Docker support, e.g. `ubuntu-latest`
 
-## Identify your stack
+## Identify your stack {#identify-your-stack}
 
 Follow the documentation on [identifying the default stack](/docs/v2/api/howtos/create-container/#identify-default-stack) of your project. For convenience, we recommend storing the stack ID in a GitHub [variable](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables) or (when you're deploying into multiple environments) using a GitHub [environment secret](https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments), e.g. **`STACK_ID`**.
 
-## Write your `stack.yaml`
+## Write your `stack.yaml` {#write-your-stack-yaml}
 
 Next, create a file containing your stack definition somewhere in your repository (for this example, we'll assume `deploy/stack.yaml`). This file should follow the same format as the <OperationLink operation="container-declare-stack" apiVersion="v2" /> operation.
 
@@ -42,12 +42,12 @@ volumes: {}
 
 The placeholders inside `{{ … }}` are resolved from environment variables you pass in the workflow, so your secrets stay in GitHub and never touch the repo.
 
-## Add secrets and variable to the repo
+## Add secrets and variable to the repo {#add-secrets-and-variable-to-the-repo}
 
 - **`MITTWALD_API_TOKEN`**; API token from mStudio
 - **`STACK_ID`**; the ID copied in step 1. You could set this as a simple configuration variable, but might also attach this variable [to your target environment](https://docs.github.com/actions/learn-github-actions/contexts#vars-context), if you want to deploy into multiple stacks, depending on your environment.
 
-## Create the GitHub Action workflow
+## Create the GitHub Action workflow {#create-the-github-action-workflow}
 
 Create `.github/workflows/deploy.yml`:
 
@@ -119,9 +119,73 @@ jobs:
 
 Using this workflow, on every push of a new Git tag (or on any push to the `main` branch, depending on which configuration you choose), GitHub will build a new image, push it to GitHub Container Registry and instruct mStudio to run it.
 
-## Advanced patterns
+## Which action should you use? {#which-action-should-you-use}
 
-### Selective restarts
+You now have two different deployment styles:
+
+| Use case | Recommended action | Why |
+| --- | --- | --- |
+| You already have a Dockerfile and/or explicit stack definition (`stack.yaml`) and want full control over services, ports, and rollout behavior | **`mittwald/deploy-container-action`** | Best when you want an explicit, infrastructure-focused deployment model. |
+| You want to deploy quickly from source code without creating Dockerfiles or stack files first | **`mittwald/zerodeploy-action`** | Uses Railpack to infer build steps and deploys directly to mittwald container hosting with near-zero config. |
+
+If your team already maintains container build and runtime definitions, stay with `deploy-container-action`. If you want the fastest path from repository to running service, use `zerodeploy-action`.
+
+## Deploy with `mittwald/zerodeploy-action` (Railpack) {#deploy-with-zerodeploy-action-railpack}
+
+The [`mittwald/zerodeploy-action`](https://github.com/mittwald/zerodeploy-action) is designed for repositories that do not have a Docker setup yet. It installs the mittwald CLI, installs Railpack, builds from your repository, and deploys to your target project.
+
+### Required inputs {#required-inputs-zerodeploy}
+
+- **`MITTWALD_API_TOKEN`** secret; API token from mStudio
+- **Project ID** (for example `p-kpbj8e`)
+
+### Example workflow {#example-workflow-zerodeploy}
+
+Create `.github/workflows/zerodeploy.yml`:
+
+```yaml
+name: Deploy to Mittwald Container Hosting
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create .env for deployment
+        env:
+          APP_SECRET: ${{ secrets.APP_SECRET }}
+        run: |
+          {
+            echo "APP_ENV=production"
+            echo "APP_SECRET=$APP_SECRET"
+          } > .env
+
+      - name: Deploy with zerodeploy
+        uses: mittwald/zerodeploy-action@v1
+        with:
+          mittwald-api-token: ${{ secrets.MITTWALD_API_TOKEN }}
+          mittwald-project-id: "p-kpbj8e"
+```
+
+The action automatically checks for `.env` in `$GITHUB_WORKSPACE/.env` and includes it for deployment when present.
+
+### Useful optional inputs {#useful-optional-inputs-zerodeploy}
+
+- **`repo-subpath`**; deploy only a subdirectory (for monorepos)
+- **`node-version`**; Node.js runtime used inside the action (default: `24`)
+- **`mittwald-cli-version`**; CLI version constraint (default: `^1.17.0`)
+
+## Advanced patterns for `mittwald/deploy-container-action` {#advanced-patterns}
+
+The following options apply to `mittwald/deploy-container-action` (the stack-based workflow), not to `mittwald/zerodeploy-action`.
+
+### Selective restarts {#selective-restarts}
 
 If you need to avoid downtime for stateful services (e.g. databases) you can tell the Action to **skip** recreation after the update:
 
@@ -132,7 +196,7 @@ with:
 
 Services not listed are only restarted when the API reports that a restart is actually required.
 
-### Next steps
+### Next steps {#next-steps}
 
 - Add an [Ingress](/docs/v2/platform/workloads/containers/#ingress-http) to expose HTTP ports to the public internet.
 - Use [Terraform](/docs/v2/guides/deployment/terraform/) for fully-declarative infra, then let GitHub Actions call `terraform apply`.
