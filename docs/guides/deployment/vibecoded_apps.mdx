@@ -141,34 +141,41 @@ Prerequisites:
 - mittwald CLI installed and configured
 
 Manual quickstart steps:
-1. Prepare your vibe coded app for deployment by ensuring it runs locally and all dependencies are properly configured.
+1. Prepare your vibe coded app for deployment: verify that it runs locally and that all dependencies are installed.
 
 ```shellsession
 user@local $ git clone https://github.com/<your-org>/<your-repo>.git
 user@local $ cd <your-repo>
 ```
 
-2. Make sure you are in sync with your GitHub repository and that all changes are committed and pushed.
+2. Make sure your local repository is in sync with GitHub and that your changes are committed and pushed.
 
 ```shellsession
 user@local $ git pull
 user@local $ git status
 ```
 
-3. Use the mittwald CLI to create a new project and call the deployment command in the folder context of your vibe coded app.
+3. In your app folder, use the mittwald CLI to create a project and run the deployment command.
 
 ```shellsession
 user@local $ mw project create --description=<project-name> --update-context
 user@local $ mw experimental deploy
 ```
 
-Initial deployment takes a few minutes as the app is built the hosting environment is set up.
+Initial deployment takes a few minutes while the app is built and the hosting environment is set up.
 Once the deployment is complete, you can access your app via the provided URL.
 
 Test your app in a browser, and if you encounter any issues, check the logs and configuration to troubleshoot.
 
 After successful deployment, you can set up a GitHub Action to automate future deployments whenever you push
 changes to your repository. Leverage git tags to manage releases and rollbacks effectively.
+
+Related guides for deeper setup:
+
+- For container-based CI/CD with GitHub Actions, see [Deploying containerized applications with GitHub Actions](/docs/v2/guides/deployment/container-actions/).
+- For advanced deployment workflows and CI examples, see [Application deployment with deployer](/docs/v2/guides/deployment/deployer/).
+- For container concepts, stack files, and registry setup, see [Containers](/docs/v2/platform/workloads/containers/).
+- For declarative stack deployment commands, see [mw stack command reference](/docs/v2/cli/reference/stack/).
 
 ## Moving forward: Best practices for success {#moving-forward-best-practices}
 
