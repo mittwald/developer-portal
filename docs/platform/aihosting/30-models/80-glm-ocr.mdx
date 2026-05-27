@@ -10,7 +10,7 @@ import TabItem from "@theme/TabItem";
 
 The [GLM-OCR guide](../../examples/glm-ocr/) has runnable examples for all common use cases, including a full pipeline with [Qwen3-Embedding-8B](/docs/v2/platform/aihosting/models/qwen3-embedding-8b), [Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8), n8n, and vector database options (pgvector, Qdrant, ChromaDB).
 
-## Description
+## Description {#description}
 
 "GLM-OCR" is a document optical character recognition (OCR) model by Z.ai (ZhipuAI), specialized for accurate text extraction from documents and images. An integrated document proxy on our platform automatically converts PDF, DOCX, PPTX, XLSX, HTML, SVG, and raster image formats to PNG pages before the model processes them.
 
@@ -36,7 +36,7 @@ The following limitations apply:
 - No tool-calling or function calling support
 - No memory between requests — the model does not remember previous extractions. Each API call is independent; send the document again if you need to ask something new about it.
 
-## Supported input formats
+## Supported input formats {#supported-input-formats}
 
 All content is delivered as a base64-encoded data URI in the `image_url` field. The proxy automatically detects the format and converts it to per-page PNG images before passing them to the model.
 
@@ -56,11 +56,11 @@ All content is delivered as a base64-encoded data URI in the `image_url` field. 
 | XLSX | `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet` | One page per sheet, max 2,000 rows |
 | XLS | `application/vnd.ms-excel` | Legacy Excel format |
 
-## API usage
+## API usage {#api-usage}
 
 GLM-OCR is accessed via the standard **chat completions endpoint** (`/v1/chat/completions`) with the model name `GLM-OCR`. The document proxy intercepts the request, converts the document to PNG pages, and forwards them to the model — no page splitting required on your side.
 
-### PDF document extraction
+### PDF document extraction {#pdf-document-extraction}
 
 <Tabs groupId="language">
   <TabItem value="python" label="Python">
@@ -171,7 +171,7 @@ echo $response->choices[0]->message->content;
   </TabItem>
 </Tabs>
 
-### Single image extraction
+### Single image extraction {#single-image-extraction}
 
 For individual document images (JPEG, PNG):
 
@@ -284,7 +284,7 @@ echo $response->choices[0]->message->content;
   </TabItem>
 </Tabs>
 
-### Office documents (DOCX, PPTX, XLSX)
+### Office documents (DOCX, PPTX, XLSX) {#office-documents}
 
 Office documents use the same request shape — only the MIME type in the data URI changes:
 
@@ -329,7 +329,7 @@ print(extract_document("slides.pptx"))
 print(extract_document("report.xlsx"))
 ```
 
-## Recommended inference parameters
+## Recommended inference parameters {#recommended-inference-parameters}
 
 GLM-OCR is a deterministic extraction model. Use low temperature for accurate, faithful text extraction:
 
@@ -339,7 +339,7 @@ GLM-OCR is a deterministic extraction model. Use low temperature for accurate, f
 | `top_p`       | 1.0   |
 | `max_tokens`  | 4096 per page (scale with page count) |
 
-## Output modes
+## Output modes {#output-modes}
 
 The model's output format is controlled entirely through your prompt — there is no separate API parameter for it.
 
@@ -358,9 +358,9 @@ The model's output format is controlled entirely through your prompt — there i
 - **PPTX and XLSX require valid Open XML.** Corrupted or programmatically generated invalid Office ZIP structures return HTTP 400.
 :::
 
-## Tips for specific tasks
+## Tips for specific tasks {#tips-for-specific-tasks}
 
-### Large documents (> 30 pages)
+### Large documents (> 30 pages) {#large-documents}
 
 Split the PDF into batches and concatenate the results:
 
@@ -403,7 +403,7 @@ def extract_large_pdf(path: str, batch_size: int = 30) -> str:
     return "\n\n".join(results)
 ```
 
-### Tables and structured data
+### Tables and structured data {#tables-and-structured-data}
 
 For documents containing tables, prompt the model to preserve the structure:
 
@@ -411,7 +411,7 @@ For documents containing tables, prompt the model to preserve the structure:
 Extract all text from this document. Preserve table structures using plain-text alignment or markdown tables where applicable.
 ```
 
-### Key information extraction (KIE)
+### Key information extraction (KIE) {#key-information-extraction}
 
 To extract structured fields from invoices, forms, or receipts as JSON, describe the expected schema in your prompt. The model wraps its JSON output in markdown code fences — strip them before parsing:
 
@@ -444,7 +444,7 @@ clean = re.sub(r"\n?```$", "", clean)
 data = json.loads(clean)
 ```
 
-### Formula and mathematical expression recognition
+### Formula and mathematical expression recognition {#formula-and-mathematical-expression-recognition}
 
 For documents containing formulas, request LaTeX output for downstream processing:
 
@@ -452,7 +452,7 @@ For documents containing formulas, request LaTeX output for downstream processin
 Extract all text from this document. Render mathematical formulas and expressions in LaTeX notation enclosed in $...$ for inline math and $$...$$ for display math.
 ```
 
-### Improving accuracy on low-quality scans
+### Improving accuracy on low-quality scans {#improving-accuracy-on-low-quality-scans}
 
 For low-resolution or degraded documents, explicitly instruct the model:
 
@@ -460,6 +460,6 @@ For low-resolution or degraded documents, explicitly instruct the model:
 Extract all legible text from this document. If a word is unclear, transcribe your best interpretation and mark it with [?].
 ```
 
-## Terms of Use and Licensing {#nutzungsbedingungen-und-lizenzierung}
+## Terms of Use and Licensing {#terms-of-use-and-licensing}
 
 The [general terms of use](../../access-and-usage/terms-of-use/) apply. The model is provided by Z.ai under the [MIT License](https://opensource.org/licenses/MIT), and reuse of the extracted content is not subject to any additional restrictions imposed by the model license.
