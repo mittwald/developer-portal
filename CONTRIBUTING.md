@@ -54,6 +54,20 @@ You can use the following commands to build this project locally:
 - `npm run build` to build a production release (this may be necessary to work with multi-lingual content).
 - `npm run serve` to serve a production release locally.
 
+If you run into unwanted changes of `package-lock.json` in local installations, there is a
+high chance that your `node` / `npm` versions are not within the specified boundaries.
+
+Use `nvm` in order to run correct versions, avoiding surprises:
+
+```bash
+nvm install 20
+nvm use 20
+
+# check versions
+node --version
+npm --version
+```
+
 ## How-Tos
 
 ### Working with the changelog
