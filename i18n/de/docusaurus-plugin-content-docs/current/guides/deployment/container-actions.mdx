@@ -13,18 +13,18 @@ import OperationLink from "@site/src/components/OperationLink";
 
 Mit GitHub Actions kannst du dein Container-Image direkt aus deinem Quellcode-Repository erstellen und veröffentlichen und dann sofort deine Anwendung auf der mittwald Cloud-Plattform deployen. Die offizielle **`mittwald/deploy-container-action`** kümmert sich um die API-Aufrufe, wendet deine Stack-Definition an und erstellt (falls erforderlich) die betroffenen Dienste neu.
 
-## Voraussetzungen {#voraussetzungen}
+## Voraussetzungen {#prerequisites}
 
 - **mStudio API-Token**; siehe die Dokumentation zu [API-Token erhalten](/docs/v2/api/intro#obtaining-an-api-token)
 - **Stack-ID**; siehe die Dokumentation zu [Standard-Stack identifizieren](/docs/v2/api/howtos/create-container/#identify-default-stack)
 - **(Optional) Private Registry**; siehe [_Verwendung privater Registries_](/docs/v2/platform/workloads/containers/#private-registries)
 - **GitHub Actions Runner**; jeder Runner mit Docker-Unterstützung, z.B. `ubuntu-latest`
 
-## Identifiziere deinen Stack {#identifiziere-deinen-stack}
+## Identifiziere deinen Stack {#identify-your-stack}
 
 Folge der Dokumentation zu [Standard-Stack identifizieren](/docs/v2/api/howtos/create-container/#identify-default-stack) deines Projekts. Zur Vereinfachung empfehlen wir, die Stack-ID in einer [GitHub-Variablen](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables) zu speichern oder (wenn du in mehrere Umgebungen deployst) ein GitHub [Environment Secret](https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments) zu verwenden, z.B. **`STACK_ID`**.
 
-## Schreibe deine `stack.yaml` {#schreibe-deine-stack-yaml}
+## Schreibe deine `stack.yaml` {#write-your-stack-yaml}
 
 Erstelle als nächstes eine Datei, die deine Stack-Definition irgendwo in deinem Repository enthält (für dieses Beispiel nehmen wir an, `deploy/stack.yaml`). Diese Datei sollte das gleiche Format wie die <OperationLink operation="container-declare-stack" apiVersion="v2" />-Operation haben.
 
@@ -42,12 +42,12 @@ volumes: {}
 
 Die Platzhalter innerhalb von `{{ … }}` werden aus Umgebungsvariablen aufgelöst, die du im Workflow übergibst, sodass deine Secrets in GitHub bleiben und niemals im Repository eingecheckt werden müssen.
 
-## Füge Geheimnisse und Variablen zum Repository hinzu {#fuege-geheimnisse-und-variablen-zum-repository-hinzu}
+## Füge Geheimnisse und Variablen zum Repository hinzu {#add-secrets-and-variable-to-the-repo}
 
 - **`MITTWALD_API_TOKEN`**; API-Token für die mStudio-API
 - **`STACK_ID`**; die in Schritt 1 kopierte ID. Du könntest dies als einfache Konfigurationsvariable festlegen, könntest diese Variable aber auch [deiner Ziel-Environment](https://docs.github.com/actions/learn-github-actions/contexts#vars-context) zuordnen, wenn du environment-abhängig in verschiedene Stacks deployen möchtest.
 
-## Erstelle den GitHub Action Workflow {#erstelle-den-github-action-workflow}
+## Erstelle den GitHub Action Workflow {#create-the-github-action-workflow}
 
 Erstelle `.github/workflows/deploy.yml`:
 
@@ -57,7 +57,7 @@ name: Build & Deploy to mittwald
 on:
   push:
     tags: [v*]
-  # alternativ:
+  # alternatively:
   # push:
   #   branches: [main]
   workflow_dispatch:
@@ -119,11 +119,11 @@ jobs:
 
 Mit diesem Workflow wird bei jedem Push eines neuen Git-Tags (oder je nach Konfiguration, bei jedem Push zu `main`) GitHub ein neues Image erstellen, es in die GitHub Container Registry hochladen und die neuen Images ins mStudio deployen.
 
-## Welche Action solltest du verwenden? {#welche-action-solltest-du-verwenden}
+## Welche Action solltest du verwenden? {#which-action-should-you-use}
 
 Du hast jetzt zwei unterschiedliche Deployment-Ansätze:
 
-| Use Case | Empfohlene Action | Warum |
+| Anwendungsfall | Empfohlene Action | Warum |
 | --- | --- | --- |
 | Du hast bereits ein Dockerfile und/oder eine explizite Stack-Definition (`stack.yaml`) und willst volle Kontrolle über Services, Ports und Rollout-Verhalten | **`mittwald/deploy-container-action`** | Ideal für einen expliziten, infrastrukturfokussierten Deployment-Ansatz. |
 | Du willst schnell direkt aus dem Quellcode deployen, ohne zuerst Dockerfiles oder Stack-Dateien anzulegen | **`mittwald/zerodeploy-action`** | Nutzt Railpack, erkennt Build-Schritte automatisch und deployt mit nahezu null Konfiguration in mittwald Container Hosting. |
@@ -134,17 +134,17 @@ Wenn dein Team bereits Build- und Runtime-Definitionen für Container pflegt, bl
 
 [`mittwald/zerodeploy-action`](https://github.com/mittwald/zerodeploy-action) ist für Repositories gedacht, die noch kein Docker-Setup haben. Die Action installiert die mittwald CLI, installiert Railpack, baut aus deinem Repository und deployt in dein Zielprojekt.
 
-### Benötigte Inputs {#benötigte-inputs-zerodeploy}
+### Benötigte Inputs {#required-inputs-zerodeploy}
 
 - **`MITTWALD_API_TOKEN`** Secret; API-Token aus mStudio
 - **Projekt-ID** (zum Beispiel `p-XXXXXX`)
 
-### Beispiel-Workflow {#beispiel-workflow-zerodeploy}
+### Beispiel-Workflow {#example-workflow-zerodeploy}
 
 Erstelle `.github/workflows/zerodeploy.yml`:
 
 ```yaml
-name: Deploy to Mittwald Container Hosting
+name: Deploy to mittwald Container Hosting
 
 on:
   workflow_dispatch:
@@ -175,17 +175,17 @@ jobs:
 
 Die Action prüft automatisch, ob `.env` unter `$GITHUB_WORKSPACE/.env` existiert, und bindet die Datei beim Deployment ein, wenn sie vorhanden ist.
 
-### Nützliche optionale Inputs {#nützliche-optionale-inputs-zerodeploy}
+### Nützliche optionale Inputs {#useful-optional-inputs-zerodeploy}
 
 - **`repo-subpath`**; deployt nur ein Unterverzeichnis (z.B. in Monorepos)
 - **`node-version`**; Node.js-Version innerhalb der Action (Standard: `24`)
 - **`mittwald-cli-version`**; Versionsbereich der CLI (Standard: `^1.17.0`)
 
-## Fortgeschrittene Muster für `mittwald/deploy-container-action` {#fortgeschrittene-muster}
+## Fortgeschrittene Muster für `mittwald/deploy-container-action` {#advanced-patterns}
 
 Die folgenden Optionen gelten für `mittwald/deploy-container-action` (den stack-basierten Workflow), nicht für `mittwald/zerodeploy-action`.
 
-### Selektive Neustarts {#selektive-neustarts}
+### Selektive Neustarts {#selective-restarts}
 
 Wenn du Ausfallzeiten für zustandsbehaftete Dienste (z.B. Datenbanken) vermeiden möchtest, kannst du der Action sagen, dass sie die **Neuerstellung** nach dem Update **überspringen** soll:
 
@@ -196,7 +196,7 @@ with:
 
 Nicht aufgelistete Dienste werden nur neu gestartet, wenn die API meldet, dass ein Neustart tatsächlich erforderlich ist.
 
-### Nächste Schritte {#nächste-schritte}
+### Nächste Schritte {#next-steps}
 
 - Füge ein [Ingress](/docs/v2/platform/workloads/containers/#ingress-http) hinzu, um HTTP-Ports für das öffentliche Internet freizugeben.
 - Verwende [Terraform](/docs/v2/guides/deployment/terraform/) für vollständig deklarative Infrastruktur und lasse GitHub Actions `terraform apply` aufrufen.
