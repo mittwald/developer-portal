@@ -57,7 +57,7 @@ You can use the following commands to build this project locally:
 If you run into unwanted changes of `package-lock.json` in local installations, there is a
 high chance that your `node` / `npm` versions are not within the specified boundaries.
 
-Use `nvm` in order to run correct versions, avoiding suprises:
+Use `nvm` in order to run correct versions, avoiding surprises:
 
 ```bash
 nvm install 20
