@@ -15,6 +15,7 @@ Pay special attention to these guidelines when authoring and reviewing documenta
 
 - Markdown sub-headings within a document must have explicit anchor IDs for stable linking (this does not apply to the markdown front matter); suggest changes during code review if missing
 - Use the `<OperationLink />` component for linking to API operations, and `<OperationExample />` for including example requests. Do not link to API operations by hardcoding URLs or markdown links to the reference docs, as these are brittle and will break if the operation name or URL changes.
+- **Dash usage:** Use hyphens (`-`) for compound words and ranges (e.g., "open-source", "2024-2025"). Use em dashes (`—`) for parenthetical asides and sentence breaks (e.g., "Deploy your app — with integrated tools — in minutes"). Use en dashes (`–`) sparingly, only for numeric ranges when em dash or hyphen is inappropriate.
 
 ## Security
 
