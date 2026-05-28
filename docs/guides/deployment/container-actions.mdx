@@ -29,9 +29,9 @@ You now have two different deployment styles:
 
 If you want the fastest path from repository to running service, use `zerodeploy-action`. If your team already maintains container build and runtime definitions, stay with `deploy-container-action`.
 
-## Deploy with `mittwald/zerodeploy-action` (Railpack) {#deploy-with-zerodeploy-action-railpack}
+## Deploy with `mittwald/zerodeploy-action` {#deploy-with-zerodeploy-action}
 
-The [`mittwald/zerodeploy-action`](https://github.com/mittwald/zerodeploy-action) is designed for repositories that do not have a Docker setup yet. It installs the mittwald CLI, installs Railpack, builds from your repository, and deploys to your target project.
+The [`mittwald/zerodeploy-action`](https://github.com/mittwald/zerodeploy-action) is designed for repositories that do not have a Docker setup yet. It automatically determines the best way to build a Docker image from your code, and deploys that to your target project, using a dynamically provisioned container registry.
 
 ### Required inputs {#required-inputs-zerodeploy}
 
@@ -57,12 +57,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Create .env for deployment
-        env:
-          APP_SECRET: ${{ secrets.APP_SECRET }}
         run: |
           {
             echo "APP_ENV=production"
-            echo "APP_SECRET=$APP_SECRET"
+            echo "APP_SECRET=${{ secrets.APP_SECRET }}"
           } > .env
 
       - name: Deploy with zerodeploy
