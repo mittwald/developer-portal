@@ -11,7 +11,7 @@ import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import OperationLink from "@site/src/components/OperationLink";
 
-Mit GitHub Actions kannst du dein Container-Image direkt aus deinem Quellcode-Repository erstellen und veröffentlichen und dann sofort deine Anwendung auf der mittwald Cloud-Plattform deployen. Die offizielle **`mittwald/deploy-container-action`** kümmert sich um die API-Aufrufe, wendet deine Stack-Definition an und erstellt (falls erforderlich) die betroffenen Dienste neu.
+Mit GitHub Actions kannst du dein Container-Image direkt aus deinem Quellcode-Repository erstellen und veröffentlichen und dann sofort deine Anwendung auf der mittwald Cloud-Plattform deployen. Öffentliche mittwald GitHub Actions kümmern sich um die API-Aufrufe, wenden deine Stack-Definition an und erstellen (falls erforderlich) die betroffenen Dienste neu.
 
 ## Voraussetzungen {#prerequisites}
 
@@ -29,9 +29,9 @@ Du hast jetzt zwei unterschiedliche Deployment-Ansätze:
 
 Wenn du den kürzesten Weg vom Repository zum laufenden Service willst, nutze `zerodeploy-action`. Wenn dein Team bereits Build- und Runtime-Definitionen für Container pflegt, bleib bei `deploy-container-action`.
 
-## Deploy mit `mittwald/zerodeploy-action` (Railpack) {#deploy-mit-zerodeploy-action-railpack}
+## Deploy mit `mittwald/zerodeploy-action` {#deploy-mit-zerodeploy-action}
 
-[`mittwald/zerodeploy-action`](https://github.com/mittwald/zerodeploy-action) ist für Repositories gedacht, die noch kein Docker-Setup haben. Die Action installiert die mittwald CLI, installiert Railpack, baut aus deinem Repository und deployt in dein Zielprojekt.
+[`mittwald/zerodeploy-action`](https://github.com/mittwald/zerodeploy-action) ist für Repositories gedacht, die noch kein Docker-Setup haben. Sie bestimmt automatisch die beste Methode, um ein Docker-Image aus deinem Code zu erstellen, und deployt dieses in dein Zielprojekt, indem eine dynamisch bereitgestellte Container-Registry verwendet wird.
 
 ### Benötigte Inputs {#required-inputs-zerodeploy}
 
@@ -57,12 +57,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Create .env for deployment
-        env:
-          APP_SECRET: ${{ secrets.APP_SECRET }}
         run: |
           {
             echo "APP_ENV=production"
-            echo "APP_SECRET=$APP_SECRET"
+            echo "APP_SECRET=${{ secrets.APP_SECRET }}"
           } > .env
 
       - name: Deploy with zerodeploy
@@ -197,7 +195,7 @@ with:
 
 Nicht aufgelistete Dienste werden nur neu gestartet, wenn die API meldet, dass ein Neustart tatsächlich erforderlich ist.
 
-### Nächste Schritte {#next-steps}
+## Nächste Schritte {#next-steps}
 
 - Füge ein [Ingress](/docs/v2/platform/workloads/containers/#ingress-http) hinzu, um HTTP-Ports für das öffentliche Internet freizugeben.
 - Verwende [Terraform](/docs/v2/guides/deployment/terraform/) für vollständig deklarative Infrastruktur und lasse GitHub Actions `terraform apply` aufrufen.
