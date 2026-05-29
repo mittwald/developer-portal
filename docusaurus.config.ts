@@ -269,6 +269,9 @@ const config: Config = {
       darkTheme: darkCodeTheme,
       additionalLanguages: ["php", "shell-session", "hcl"],
     },
+    colorMode: {
+      respectPrefersColorScheme: true,
+    },
   } satisfies ThemeConfig,
   markdown: {
     mermaid: true,

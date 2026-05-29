@@ -3,12 +3,18 @@ import styles from "@site/src/components/HomepageFeatures/styles.module.css";
 import FeatureRow from "../FeatureRow";
 import Intro, { IntroHeader } from "../Intro";
 import Translate from "@docusaurus/Translate";
-import Link from "@docusaurus/Link";
 import React from "react";
 import LinkGroup from "@site/src/components/LinkGroup";
 import { NewBadge } from "@site/src/components/NewBadge";
-import { Icon } from "@mittwald/flow-react-components";
+import {
+  Heading,
+  Icon,
+  LayoutCard,
+  Section,
+  Text,
+} from "@mittwald/flow-react-components";
 import { IconCloudNetwork } from "@tabler/icons-react";
+import Link from "@site/src/components/Link";
 
 function PlatformIntro() {
   return (
@@ -36,87 +42,93 @@ function PlatformIntro() {
 function PlatformCoreFeatures() {
   return (
     <>
-      <h3>
-        <Translate id="index.deploy.platform.title">
-          Platform features
-        </Translate>
-      </h3>
-      <p>
-        <Translate id={"index.deploy.platform.body"}>
-          Our platform provides a variety of features to help you deploy your
-          applications and services:
-        </Translate>
-      </p>
-      <ul>
-        <li>
-          <LinkGroup
-            title={
-              <Translate id="index.deploy.platform.language">
-                Runtime environments
-              </Translate>
-            }
-            links={[
-              <Link to="/docs/v2/platform/workloads/php">PHP</Link>,
-              <Link to="/docs/v2/platform/workloads/nodejs">Node.js</Link>,
-              <Link to="/docs/v2/platform/workloads/python">Python</Link>,
-              <Link to="/docs/v2/platform/workloads/containers">
-                Container <NewBadge />
-              </Link>,
-            ]}
-          />
-        </li>
-        <li>
-          <LinkGroup
-            title={
-              <Translate id="index.deploy.platform.databases">
-                Databases
-              </Translate>
-            }
-            links={[
-              <Link to="/docs/v2/platform/databases/mysql">MySQL</Link>,
-              <Link to="/docs/v2/platform/databases/redis">Redis</Link>,
-              <Link to="/docs/v2/platform/databases/opensearch">
-                OpenSearch
-              </Link>,
-              <Link to="/docs/v2/platform/databases/solr">Solr</Link>,
-            ]}
-          />
-        </li>
-        <li>
-          <LinkGroup
-            title={
-              <>
-                <Translate id="index.deploy.platform.aihosting">
-                  AI-Hosting
-                </Translate>{" "}
-                <NewBadge />
-              </>
-            }
-            links={[
-              <Link to="/docs/v2/platform/aihosting/introduction">
-                <Translate id="index.deploy.platform.aihosting.intro">
-                  Introduction
-                </Translate>
-              </Link>,
-              <Link to="/docs/v2/platform/aihosting/cms">
-                <Translate id="index.deploy.platform.aihosting.cms">
-                  CMS integrations
-                </Translate>
-              </Link>,
-            ]}
-          />
-        </li>
-      </ul>
-      <p>
-        <Translate id="index.deploy.platform.features">
-          Missing features?
-        </Translate>{" "}
-        <Link href="https://github.com/mittwald/feature-requests/issues">
-          <Translate id="index.deploy.platform.features-link">
-            Request them here!
+      <Section>
+        <Heading>
+          <Translate id="index.deploy.platform.title">
+            Platform features
           </Translate>
-        </Link>
-      </p>
+        </Heading>
+        <Text elementType="p">
+          <Translate id={"index.deploy.platform.body"}>
+            Our platform provides a variety of features to help you deploy your
+            applications and services:
+          </Translate>
+        </Text>
+        <Text>
+          <ul>
+            <li>
+              <LinkGroup
+                title={
+                  <Translate id="index.deploy.platform.language">
+                    Runtime environments
+                  </Translate>
+                }
+                links={[
+                  <Link href="/docs/v2/platform/workloads/php">PHP</Link>,
+                  <Link to="/docs/v2/platform/workloads/nodejs">Node.js</Link>,
+                  <Link to="/docs/v2/platform/workloads/python">Python</Link>,
+                  <Link to="/docs/v2/platform/workloads/containers">
+                    Container <NewBadge />
+                  </Link>,
+                ]}
+              />
+            </li>
+            <li>
+              <LinkGroup
+                title={
+                  <Translate id="index.deploy.platform.databases">
+                    Databases
+                  </Translate>
+                }
+                links={[
+                  <Link to="/docs/v2/platform/databases/mysql">MySQL</Link>,
+                  <Link to="/docs/v2/platform/databases/redis">Redis</Link>,
+                  <Link to="/docs/v2/platform/databases/opensearch">
+                    OpenSearch
+                  </Link>,
+                  <Link to="/docs/v2/platform/databases/solr">Solr</Link>,
+                ]}
+              />
+            </li>
+            <li>
+              <LinkGroup
+                title={
+                  <>
+                    <Translate id="index.deploy.platform.aihosting">
+                      AI-Hosting
+                    </Translate>{" "}
+                    <NewBadge />
+                  </>
+                }
+                links={[
+                  <Link to="/docs/v2/platform/aihosting/introduction">
+                    <Translate id="index.deploy.platform.aihosting.intro">
+                      Introduction
+                    </Translate>
+                  </Link>,
+                  <Link to="/docs/v2/platform/aihosting/cms">
+                    <Translate id="index.deploy.platform.aihosting.cms">
+                      CMS integrations
+                    </Translate>
+                  </Link>,
+                ]}
+              />
+            </li>
+          </ul>
+        </Text>
+      </Section>
+      <Section>
+        <Text elementType="p">
+          <Translate id="index.deploy.platform.features">
+            Missing features?
+          </Translate>{" "}
+          <Link href="https://github.com/mittwald/feature-requests/issues">
+            <Translate id="index.deploy.platform.features-link">
+              Request them here!
+            </Translate>
+          </Link>
+        </Text>
+      </Section>
     </>
   );
 }
@@ -193,9 +205,9 @@ export default function PlatformFeature() {
             <PlatformIntro />
           </div>
           <div className={clsx("col col--4")}>
-            <div className={clsx("padding--md", styles.feature)}>
+            <LayoutCard>
               <PlatformCoreFeatures />
-            </div>
+            </LayoutCard>
           </div>
           <div className={clsx("col col--4")}>
             <div className={clsx("padding--md", styles.feature)}>

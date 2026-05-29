@@ -7,6 +7,7 @@ import {
 import { useLocation } from "@docusaurus/router";
 import { setTheme } from "@mittwald/flow-react-components";
 import "@mittwald/flow-react-components/all.css";
+import { ThemeProvider } from "next-themes";
 
 function PageViewTracker({ children }: PropsWithChildren<{}>) {
   const { trackPageView } = useMatomo();
@@ -72,8 +73,10 @@ export default function Root({ children }: PropsWithChildren<{}>) {
   });
 
   return (
-    <MatomoProvider value={matomoInstance}>
-      <PageViewTracker>{children}</PageViewTracker>
-    </MatomoProvider>
+    <ThemeProvider attribute="data-theme">
+      <MatomoProvider value={matomoInstance}>
+        <PageViewTracker>{children}</PageViewTracker>
+      </MatomoProvider>
+    </ThemeProvider>
   );
 }
