@@ -1,0 +1,186 @@
+---
+sidebar_label: OpenAI compatibility
+description: Which OpenAI API endpoints and parameters are supported on the dedicated AI Hosting endpoint
+title: OpenAI API compatibility
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+The dedicated AI Hosting endpoint is OpenAI-compatible. You can point any OpenAI SDK or library at it by changing two values — the base URL and the API key. This page documents exactly what is supported, what is not, and where the behavior differs from OpenAI's hosted service.
+
+## Switching from OpenAI {#migration}
+
+```python
+# Before
+client = OpenAI(api_key="sk-...")
+
+# After
+client = OpenAI(
+    api_key="YOUR_DEDICATED_API_KEY",
+    base_url="https://your-company.llm.aihosting.mittwald.de/v1",
+)
+```
+
+The model name also changes. Use the ID returned by `/v1/models` instead of an OpenAI model name like `gpt-4o`.
+
+## Supported endpoints {#endpoints}
+
+| Endpoint | Supported |
+|----------|-----------|
+| `GET /v1/models` | ✅ |
+| `POST /v1/chat/completions` | ✅ |
+| `POST /v1/completions` | ✅ (legacy text completions) |
+| `POST /v1/responses` | ✅ |
+| `POST /v1/embeddings` | ❌ — this endpoint serves a generative model, not an embedding model |
+| Assistants API (`/v1/assistants`, `/v1/threads`, …) | ❌ |
+| Batch API (`/v1/batches`) | ❌ |
+| Fine-tuning API (`/v1/fine_tuning`) | ❌ |
+| Files API (`/v1/files`) | ❌ |
+| Moderations API (`/v1/moderations`) | ❌ |
+| Audio / image endpoints | ❌ |
+
+## /v1/chat/completions parameter support {#parameters}
+
+| Parameter | Support | Notes |
+|-----------|---------|-------|
+| `model` | ✅ | Use the model ID from `/v1/models` |
+| `messages` | ✅ | |
+| `stream` | ✅ | See [Streaming](./getting-started#streaming) |
+| `temperature`, `top_p` | ✅ | |
+| `max_tokens` / `max_completion_tokens` | ✅ | |
+| `stop` | ✅ | |
+| `n` | ✅ | Multiple completions per request |
+| `presence_penalty`, `frequency_penalty` | ✅ | |
+| `logprobs`, `top_logprobs` | ✅ | |
+| `tools`, `tool_choice` | ✅ | See [Tool calling](#tool-calling) |
+| `parallel_tool_calls` | ✅ | `false` limits to one tool call; `true` (default) allows multiple |
+| `response_format` | ✅ | See [Structured outputs](#structured-outputs) |
+| `seed` | ⚠️ | Accepted and passed through — reproducibility is best-effort due to GPU non-determinism |
+| `user` | ⚠️ | Accepted but ignored |
+| `logit_bias` | ✅ | Supported; token IDs outside the model vocabulary return a validation error |
+| `stream_options` | ✅ | Supported when `stream: true`; passing it without streaming returns a validation error. `include_usage: true` appends a usage chunk at the end of the stream |
+
+## Structured outputs {#structured-outputs}
+
+Both JSON mode and JSON schema mode are supported.
+
+**JSON object mode** — constrains output to valid JSON:
+
+```json
+{
+  "model": "YOUR_MODEL_ID",
+  "messages": [{"role": "user", "content": "Return a JSON object with keys name and age."}],
+  "response_format": {"type": "json_object"}
+}
+```
+
+**JSON schema mode** — constrains output to a specific schema:
+
+```json
+{
+  "model": "YOUR_MODEL_ID",
+  "messages": [{"role": "user", "content": "Extract the person's name and age."}],
+  "response_format": {
+    "type": "json_schema",
+    "json_schema": {
+      "name": "person",
+      "strict": true,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string"},
+          "age": {"type": "integer"}
+        },
+        "required": ["name", "age"],
+        "additionalProperties": false
+      }
+    }
+  }
+}
+```
+
+:::note
+JSON schema mode uses guided decoding. Complex recursive schemas or very large schemas may increase latency.
+:::
+
+## Tool calling {#tool-calling}
+
+Tool calling (function calling) follows the OpenAI format. Pass your tools in the `tools` array and set `tool_choice` to control behavior.
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="YOUR_API_KEY",
+    base_url="https://your-company.llm.aihosting.mittwald.de/v1",
+)
+
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_weather",
+            "description": "Get the current weather for a location.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "location": {"type": "string", "description": "City and country"},
+                },
+                "required": ["location"],
+            },
+        },
+    }
+]
+
+response = client.chat.completions.create(
+    model="YOUR_MODEL_ID",
+    messages=[{"role": "user", "content": "What is the weather in Berlin?"}],
+    tools=tools,
+    tool_choice="auto",
+)
+
+tool_calls = response.choices[0].message.tool_calls
+```
+
+`parallel_tool_calls=False` restricts the model to at most one tool call per turn, which simplifies handling in multi-step agent loops.
+
+## Configuring client timeouts {#timeouts}
+
+LLM requests with long inputs or outputs can take 60 seconds or more. Many HTTP clients and frameworks default to much shorter timeouts. Set your client timeout explicitly to avoid spurious failures.
+
+<Tabs>
+<TabItem value="python" label="Python">
+
+```python
+import httpx
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="YOUR_API_KEY",
+    base_url="https://your-company.llm.aihosting.mittwald.de/v1",
+    timeout=httpx.Timeout(300.0, connect=10.0),
+)
+```
+
+A 300-second (5-minute) read timeout covers most inference workloads. Increase for very long contexts or high-concurrency conditions.
+
+</TabItem>
+<TabItem value="javascript" label="JavaScript / TypeScript">
+
+```typescript
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: "YOUR_API_KEY",
+  baseURL: "https://your-company.llm.aihosting.mittwald.de/v1",
+  timeout: 300 * 1000, // 300 seconds in milliseconds
+});
+```
+
+</TabItem>
+</Tabs>
+
+:::note
+The server-side connection timeout is 30 minutes. Client timeouts shorter than your longest expected request will cause client-side failures before the server terminates the connection.
+:::

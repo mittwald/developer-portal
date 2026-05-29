@@ -1,0 +1,187 @@
+---
+sidebar_label: Getting started
+description: How to make your first request to your dedicated AI hosting endpoint
+title: Getting started with Dedicated AI Hosting
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+After we set up your dedicated instance, you will receive:
+
+- **API base URL** - your dedicated HTTPS endpoint, e.g. `https://your-company.llm.aihosting.mittwald.de`
+- **API key** - a bearer token that authenticates your requests
+
+Keep your API key confidential. Store it in an environment variable or secrets manager — never hardcode it in source files or commit it to version control. If a key is exposed, contact us to rotate it.
+
+## Checking available models {#list-models}
+
+```shellsession
+user@local $ curl https://your-company.llm.aihosting.mittwald.de/v1/models \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+Use one of the returned model IDs as `YOUR_MODEL_ID` in requests.
+
+:::note
+If no model has been installed for your endpoint yet, this list can be empty. In that case, contact us to complete model provisioning before sending inference requests.
+:::
+
+## Sending your first request {#first-request}
+
+<Tabs>
+<TabItem value="curl" label="curl">
+
+```shellsession
+user@local $ curl https://your-company.llm.aihosting.mittwald.de/v1/chat/completions \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "YOUR_MODEL_ID",
+    "messages": [
+    {"role": "user", "content": "Explain retrieval-augmented generation in two sentences."}
+    ]
+  }'
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+```shellsession
+user@local $ pip install openai python-dotenv
+```
+
+```env
+OPENAI_API_KEY=YOUR_API_KEY
+OPENAI_BASE_URL=https://your-company.llm.aihosting.mittwald.de/v1
+```
+
+```python
+from openai import OpenAI
+from dotenv import load_dotenv
+
+load_dotenv()
+
+client = OpenAI()
+
+response = client.chat.completions.create(
+    model="YOUR_MODEL_ID",
+    messages=[
+        {"role": "user", "content": "Explain retrieval-augmented generation in two sentences."}
+    ]
+)
+
+print(response.choices[0].message.content)
+```
+
+</TabItem>
+<TabItem value="javascript" label="JavaScript / TypeScript">
+
+```shellsession
+user@local $ npm install openai dotenv
+```
+
+```env
+OPENAI_API_KEY=YOUR_API_KEY
+OPENAI_BASE_URL=https://your-company.llm.aihosting.mittwald.de/v1
+```
+
+```typescript
+import OpenAI from "openai";
+import "dotenv/config";
+
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+  baseURL: process.env.OPENAI_BASE_URL,
+});
+
+const response = await client.chat.completions.create({
+  model: "YOUR_MODEL_ID",
+  messages: [
+    { role: "user", content: "Explain retrieval-augmented generation in two sentences." }
+  ],
+});
+
+console.log(response.choices[0].message.content);
+```
+
+</TabItem>
+</Tabs>
+
+## Streaming responses {#streaming}
+
+Add `"stream": true` to receive tokens as they are generated instead of waiting for the full response.
+
+<Tabs>
+<TabItem value="curl" label="curl">
+
+```shellsession
+user@local $ curl https://your-company.llm.aihosting.mittwald.de/v1/chat/completions \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "YOUR_MODEL_ID",
+    "stream": true,
+    "messages": [
+      {"role": "user", "content": "Explain retrieval-augmented generation in two sentences."}
+    ]
+  }'
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+```python
+from openai import OpenAI
+
+client = OpenAI(api_key="YOUR_API_KEY", base_url="https://your-company.llm.aihosting.mittwald.de/v1")
+
+with client.chat.completions.stream(
+    model="YOUR_MODEL_ID",
+    messages=[{"role": "user", "content": "Explain retrieval-augmented generation in two sentences."}],
+) as stream:
+    for chunk in stream:
+        if chunk.choices[0].delta.content:
+            print(chunk.choices[0].delta.content, end="", flush=True)
+```
+
+</TabItem>
+<TabItem value="javascript" label="JavaScript / TypeScript">
+
+```typescript
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: "YOUR_API_KEY",
+  baseURL: "https://your-company.llm.aihosting.mittwald.de/v1",
+});
+
+const stream = await client.chat.completions.create({
+  model: "YOUR_MODEL_ID",
+  stream: true,
+  messages: [{ role: "user", content: "Explain retrieval-augmented generation in two sentences." }],
+});
+
+for await (const chunk of stream) {
+  process.stdout.write(chunk.choices[0]?.delta?.content ?? "");
+}
+```
+
+</TabItem>
+</Tabs>
+
+:::note
+If a streaming request is interrupted mid-response (for example, a network timeout or a server restart), the connection closes rather than returning an HTTP error code. The HTTP 200 is written when the stream starts, so a mid-stream failure looks like a connection reset on the client side. Handle this by detecting an incomplete stream and retrying the request.
+:::
+
+## Request parameters {#parameters}
+
+Parameter recommendations can be model-specific. Use the defaults from your chosen SDK first, then tune based on your model behavior and use case.
+
+## Drop-in replacement {#drop-in}
+
+Because the endpoint is OpenAI-compatible, you can use it as a drop-in replacement in frameworks that accept a custom base URL. See [OpenAI API compatibility](./openai-compatibility) for the full list of supported endpoints and parameters, including tool calling and structured outputs.
+
+## Managing multiple API keys {#key-management}
+
+If you want separate keys per app/team, usage tracking, or per-key rate limits, run [LiteLLM](../litellm) as a self-hosted proxy.

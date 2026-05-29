@@ -1,0 +1,226 @@
+---
+sidebar_label: Übersicht
+description: Dedicated AI Hosting - exklusive GPU-Kapazität für anspruchsvolle KI-Workloads
+title: Dedicated AI Hosting
+---
+
+import DocCardList from "@theme/DocCardList";
+
+Dedicated AI Hosting bietet dir exklusiven Zugriff auf reservierte GPU-Kapazität innerhalb der mittwald AI-Infrastruktur. Im Unterschied zum Shared Hosting laufen deine Workloads auf Hardware, die nur für dich bereitsteht.
+
+## Was du bekommst {#what-you-get}
+
+| Feature | Beschreibung |
+|---------|--------------|
+| **Exklusive GPU-Kapazität** | Deine Modelle laufen auf GPUs, die nur für dich reserviert sind. |
+| **Eigener API-Endpunkt** | Du erhältst einen dedizierten HTTPS-Endpunkt auf einer Kundensubdomain unter `llm.aihosting.mittwald.de`, z. B. `https://dein-unternehmen.llm.aihosting.mittwald.de/v1`. |
+| **Dedizierter API-Key** | Der Zugriff wird über einen dedizierten API-Key abgesichert. |
+| **OpenAI-kompatible API** | Anwendungen und Libraries mit OpenAI-Unterstützung funktionieren ohne Anpassung. |
+| **EU-Hosting, DSGVO-konform** | Compute und Daten bleiben in EU-Rechenzentren von mittwald. |
+| **Planbare Performance** | Deine Kapazität ist von anderen Kunden isoliert. |
+
+## Aktueller Produktumfang {#current-scope}
+
+Dedicated AI Hosting befindet sich aktuell im ersten Release-Umfang.
+
+### Modellumfang {#model-scope}
+
+Welche Modelle bei dir verfügbar sind, ist kundenspezifisch und hängt vom Rollout-Stand ab. Modellfindung und First-Request-Ablauf sind im [Getting-started-Guide](./getting-started) beschrieben.
+
+### Kapazitätsumfang {#capacity-scope}
+
+Deine dedizierte Kapazität (z. B. Anzahl und Sizing der Instanzen) wird gemäß vereinbartem Leistungsumfang bereitgestellt.
+
+### Hardware-Profil (aktuelles Angebot) {#hardware-profile}
+
+Dedicated AI Hosting nutzt aktuell **NVIDIA RTX PRO 6000 Blackwell Server Edition** GPUs.
+
+Relevante Eckdaten für die Modellplanung:
+
+- **96 GB GDDR7 VRAM pro GPU**
+- **1597 GB/s Speicherbandbreite**
+- **Bis zu 600 W konfigurierbare Leistungsaufnahme**
+- **Native Blackwell Tensor-Core-Unterstützung für Low-Precision-Inferenz (inklusive FP4/NVFP4-naher Deployments)**
+
+Diese Werte sind von NVIDIA veröffentlicht und helfen bei der Einschätzung, ob ein Modell auf einer GPU läuft oder über mehrere GPUs verteilt werden sollte.
+
+### Modell-Sizing (Beispiele) {#model-sizing}
+
+Ob ein Modell passt, hängt u. a. von Präzision/Quantisierung, Kontextlänge, KV-Cache-Einstellungen und Parallelität ab. Als praxisnahe Orientierung:
+
+- **Typisch auf 1 GPU (96 GB):** viele Modelle im Bereich 7B-32B, teils auch größere quantisierte Varianten
+- **Häufig auf 2 GPUs:** viele Deployments im Bereich 70B-120B, besonders bei größeren Kontextfenstern
+- **Auf mehrere GPUs streckbar:** sehr große Modelle oder Konfigurationen mit hohen Kontext- und Durchsatzanforderungen
+
+Beispielmuster (kundenspezifisch, keine festen Defaults):
+
+- Single-Card-Deployment: `Qwen3.6 8B` Klasse, `Llama 3.3 8B` Klasse
+- Two-Card-Deployment: `Qwen3.6 32B/35B` Klasse, `Llama 3.3 70B` Klasse
+
+Die finale Auslegung wird im Onboarding auf deine Ziel-Latenz und deinen Ziel-Durchsatz abgestimmt.
+
+### Grober VRAM-Rechner (vor dem Gespräch mit uns) {#vram-estimator}
+
+Für eine erste Einschätzung kannst du diese einfache Rechnung nutzen:
+
+1. **Gewichtsspeicher**
+: `weights bytes ~= params count * bytes per weight`
+
+2. **KV-Cache pro Token**
+: `kv per token bytes ~= 2 * layer count * kv width * bytes per kv value`
+
+`kv width` liegt für grobe Planung oft nahe an der hidden size.
+
+3. **Gesamter KV-Cache**
+: `total kv bytes ~= concurrent sequences * total tokens * kv per token bytes`
+
+`total tokens = input tokens + output tokens`
+
+4. **Zielwert für GPU-Speicher**
+: `total gpu bytes ~= weights bytes + total kv bytes + runtime overhead`
+
+Plane eine Sicherheitsreserve für Runtime-Overhead ein (Allocator-Fragmentierung, CUDA-Buffer, Runtime-Metadaten). Praxisnah sind **+15% bis +30%**.
+
+#### Rechenbeispiel von Hugging Face: Qwen3.6-35B-A3B {#vram-example}
+
+Modellseite: [Qwen/Qwen3.6-35B-A3B](https://huggingface.co/Qwen/Qwen3.6-35B-A3B)
+
+So liest du die Werte auf der Modellseite:
+
+- Aus **Model size / Parameters**: ca. `36B params`
+- Aus **Model Overview**: `40 layers`, hidden dimension `2048`
+- Aus **Tensor type**: `BF16` (2 Bytes pro Gewichts-Wert)
+- Aus **Context**: bis `262.144` Tokens (langer Kontext vergrößert KV-Cache stark)
+
+Beispielrechnung auf **1x RTX PRO 6000 Blackwell (96 GB VRAM)**:
+
+1. Gewichtsspeicher (BF16)
+: `36.000.000.000 * 2 ~= 72.000.000.000 bytes` (~72 GB dezimal)
+
+2. KV-Cache pro Token (grob, hidden size als kv width)
+: `2 * 40 * 2048 * 2 = 327.680 bytes pro Token` (~0,3125 MiB pro Token)
+
+3. Sicherheitsreserve
+: bei 20% Overhead liegt das nutzbare Planungsbudget bei etwa `96 GB / 1,2 ~= 80 GB`
+
+4. Verbleibend für KV-Cache
+: `80 GB - 72 GB ~= 8 GB` für KV-Cache
+
+5. Grobe Tokenkapazität auf einer GPU bei Concurrency 1
+: `8 GB / 327.680 bytes ~= 24k-26k Gesamt-Tokens`
+
+Diese `Gesamt-Tokens` sind Input + Output zusammen.  
+Beispiel: `16k Input + 8k Output = 24k Gesamt`.
+
+Bei niedrigerer KV-Präzision (bei kompatiblem Modell/Checkpoint-Stack) steigt die Tokenkapazität deutlich.
+
+#### Quantisierungsoptionen aus dem Hugging-Face-Model-Tree (ohne GGUF) {#quantization-options}
+
+Quelle Model-Tree: [Qwen3.6-35B-A3B Quantizations](https://huggingface.co/models?other=base_model:quantized:Qwen/Qwen3.6-35B-A3B)
+
+Für dedizierte Server-Deployments sind praktisch vor allem diese Non-GGUF-Familien relevant:
+
+- **FP8-Checkpoints** (Beispiel: [Qwen/Qwen3.6-35B-A3B-FP8](https://huggingface.co/Qwen/Qwen3.6-35B-A3B-FP8))
+- **NVFP4-Checkpoints** (Beispiel: [RedHatAI/Qwen3.6-35B-A3B-NVFP4](https://huggingface.co/RedHatAI/Qwen3.6-35B-A3B-NVFP4))
+- **AWQ-INT4-Checkpoints** (Beispielfamilien `...-AWQ` im gleichen Model-Tree)
+
+GGUF-Varianten sind hier bewusst ausgeschlossen, weil dieser Guide auf dediziertes API-Serving abzielt und nicht auf lokale Desktop-Runtimes. Zwar ist theoretisch das Hosting von GGUF-Modellen möglich. Jedoch ist dieses Backend immer noch im Beta Status und nicht für den Produktionsbetrieb empfohlen. 
+
+#### Wie Quantisierung dieselbe 1-GPU-Rechnung verändert {#quantization-estimate}
+
+Gleiche Annahmen wie oben:
+
+- 1x RTX PRO 6000 Blackwell (`96 GB`)
+- 20% Sicherheitsreserve -> Planungsbudget ~`80 GB`
+- KV-Cache pro Token (BF16-KV) ~`327.680 bytes`
+- KV-Cache pro Token (FP8-KV) ~`163.840 bytes` (ungefähr halb so groß wie BF16-KV)
+
+Gewichtsspeicher grob nach Format:
+
+- **BF16**: `~72 GB` (36B * 2 Bytes)
+- **FP8**: `~36 GB` (36B * 1 Byte)
+- **4-Bit-Familie (NVFP4/AWQ)**: theoretisch `~18 GB` (+Metadata-/Scale-Overhead, in der Praxis oft höher)
+
+Daraus grober Gesamt-Token-Bereich bei Concurrency 1 (Input + Output):
+
+- **BF16-Gewichte + BF16-KV**: ~`24k-26k` Tokens
+- **BF16-Gewichte + FP8-KV**: ~`49k-52k` Tokens (grob 2x gegenüber BF16-KV)
+- **FP8-Gewichte + BF16-KV**: ~`130k+` Tokens
+- **FP8-Gewichte + FP8-KV**: ~`260k+` Tokens (oft nah an Kontext-Limits des Modells)
+- **4-Bit-Gewichte + BF16-KV**: ~`170k+` Tokens (in der Praxis oft niedriger durch Overhead/Runtime-Limits)
+- **4-Bit-Gewichte + FP8-KV**: potenziell deutlich mehr Tokens, aber meist durch Kontext-Limits und Runtime-Verhalten begrenzt, bevor VRAM voll ausgeschöpft wird
+
+Das ist nur eine Erstplanung. Die final nutzbaren Limits hängen von Checkpoint-Paketierung, KV-Cache-Format-Support, multimodalem Speicherbedarf und Runtime-Verhalten unter Parallelität ab.
+
+#### Schnelle Faustregeln {#quick-rules}
+
+- Längerer Kontext und mehr Parallelität vergrößern den KV-Cache linear.
+- Quantisierung reduziert den Gewichtsspeicher stark, aber bei langem Kontext dominiert häufig der KV-Cache.
+- Liegt die Schätzung nahe am VRAM-Limit, sollte Multi-GPU oder reduzierter Kontext/Concurrency eingeplant werden.
+
+### Quantisierung und Präzisionsformate {#precision-options}
+
+Je nach Modell und Runtime können verschiedene Zahlenformate eingeplant werden, zum Beispiel:
+
+- `BF16` / `FP16` (qualitätsorientiert, höherer Speicherbedarf)
+- `FP8` (häufig guter Tradeoff aus Performance und Kapazität)
+- `NVFP4` / andere Low-Bit-Varianten (maximale Fit-/Durchsatzoptimierung bei sehr großen Modellen)
+
+Welches Format passt, hängt von deinen Qualitätszielen, Latenzvorgaben und der Kontextlänge ab.
+Nicht jedes Modell ist in jedem Quantisierungsformat verfügbar; die Kompatibilität wird pro Modell validiert.
+
+Praxis-Hinweise zur KV-Cache-Quantisierung:
+
+- **FP8-KV-Cache kann in vielen Setups die nutzbare Kontextkapazität gegenüber BF16-KV-Cache grob verdoppeln**.
+- Das funktioniert nur zuverlässig, wenn der verwendete Checkpoint kompatible KV-Scale-Metadaten/Kalibrierung enthält.
+- Fehlen diese Scales, fällt die Runtime ggf. auf BF16-KV-Cache zurück (höherer VRAM-Bedarf) oder zeigt Qualitäts-/Performanceprobleme.
+- Manche Modell-Stacks benötigen BF16-KV-Cache für stabile Ausgabequalität; wir validieren das pro Modell vor dem Produktivbetrieb.
+
+### Modellklassen aus aktuellen Markttrends {#model-classes}
+
+In aktuellen Hugging-Face-Trends sieht man sehr unterschiedliche Klassen, unter anderem:
+
+- kompakte Modelle um `7B-9B`
+- mittlere Modelle um `27B-36B` (inkl. MoE-/A3B-Varianten)
+- große Modelle in `70B+` Klassen
+
+Deshalb ist Dedicated-Sizing immer use-case-spezifisch.
+
+:::note[Sizing immer gemeinsam abstimmen]
+Bitte plane Modell, Präzisionsformat und Kapazität immer im persönlichen Austausch mit uns. Wir validieren Fit, Durchsatz und erstellen ein passgenaues Konzept vor dem Go-Live.
+:::
+
+### Enthaltene Plattformfunktionen {#platform-features}
+
+- Dedizierter Endpunkt und API-Key
+- Router-gesteuerte Lastverteilung über die bereitgestellte Kapazität
+- Automatisches Failover innerhalb deines Dedicated-Setups
+
+### LiteLLM vs Bifrost (wann wofür) {#litellm-vs-bifrost}
+
+Viele Kunden nutzen nicht nur einen einzigen Endpunkt. Wenn du über mehrere Provider oder zusätzliche Self-Hosted-Endpunkte routest, hilft diese Aufteilung:
+
+| Ziel | Empfohlene Komponente |
+|------|------------------------|
+| Keys pro Kunde ausstellen, Keys sperren/löschen, Budgets und Nutzung pro Key | **LiteLLM** |
+| Multi-Provider-Routing, Fallback-Ketten, gewichtete Lastverteilung | **Bifrost** |
+| Governance + Routing über mehrere Endpunkte | **LiteLLM + Bifrost zusammen** |
+
+Typische Muster:
+
+- **Nur dein mittwald Dedicated-Endpunkt + Kunden-Key-Lifecycle**: LiteLLM allein reicht meist aus.
+- **mittwald Dedicated-Endpunkt + weitere externe/self-hosted Modell-Endpunkte**: Bifrost ist für Routing-Richtlinien empfehlenswert.
+- **Dedicated + Shared + Anthropic/Claude (oder weitere Provider)**: Bifrost ist die Routing-Schicht für modell-/provider-spezifische Traffic-Entscheidungen.
+- **Kunden-Keys + Multi-Endpunkt-Routing**: LiteLLM vor Bifrost betreiben.
+: Request-Flow: `client -> LiteLLM -> Bifrost -> ausgewählter Provider-Endpunkt`
+
+### Nicht im initialen Umfang enthalten {#not-included}
+
+- Grafana-/Metrik-Dashboards
+- Self-Service-Provisionierung via mStudio
+
+:::info Einstieg
+Für den Einstieg siehe [Getting started](./getting-started). Für Multi-Key-Management und Nutzungsstatistiken nutze den [LiteLLM-Guide](./litellm).
+:::
+
+<DocCardList />

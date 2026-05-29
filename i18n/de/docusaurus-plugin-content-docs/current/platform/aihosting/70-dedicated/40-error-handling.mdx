@@ -1,0 +1,108 @@
+---
+sidebar_label: Fehlerbehandlung und Retries
+description: HTTP-Fehlercodes, Retry-Empfehlungen und Kapazitätsverhalten für den Dedicated-AI-Hosting-Endpunkt
+title: Fehlerbehandlung und Retries
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+Diese Seite beschreibt die HTTP-Fehlercodes, die deine Anwendung erhalten kann, das Kapazitätsverhalten des Endpunkts und wie du Retries korrekt konfigurierst.
+
+## HTTP-Fehlercodes {#error-codes}
+
+| Code | Bedeutung | Was tun |
+|------|-----------|---------|
+| `400` | Fehlerhafte Anfrage — Eingabe zu lang oder falsches Format | Eingabelänge reduzieren oder Anfrage korrigieren (siehe Kontextlimit unten) |
+| `401` | Ungültiger oder fehlender API-Key | `Authorization: Bearer YOUR_API_KEY` Header prüfen |
+| `503` | Service vorübergehend nicht verfügbar — Endpunkt überlastet oder neugestartet | Mit exponentiellem Backoff wiederholen |
+| `500` | Interner Serverfehler | Mit Backoff wiederholen; bei dauerhaftem Auftreten Support kontaktieren |
+| `502` | Bad Gateway | Mit Backoff wiederholen |
+| `504` | Gateway-Timeout — Anfrage hat zu lange gedauert | Eingabe verkleinern, Concurrency reduzieren oder wiederholen |
+
+:::note 401-Response-Format
+Der `401`-Response-Body lautet `{"error": "Unauthorized"}`. Das ist einfacher als das Standard-OpenAI-Fehlerformat und enthält keine Felder `type`, `param` oder `code`. Entsprechend in der Fehlerbehandlung berücksichtigen.
+:::
+
+## Kontextlimit {#context-limit}
+
+Anfragen, deren Gesamtanzahl an Tokens (Prompt + Completion) das konfigurierte Kontextfenster des Modells überschreitet, werden mit `400` abgewiesen. Die Antwort verwendet das OpenAI-Fehlerformat:
+
+```json
+{
+  "object": "error",
+  "message": "This model's maximum context length is X tokens. However, you requested Y tokens ...",
+  "type": "invalid_request_error",
+  "param": "messages",
+  "code": 400
+}
+```
+
+Das Kontextfenster des bereitgestellten Modells lässt sich im [Getting-started-Guide](./getting-started) über den `/v1/models`-Endpunkt abrufen. Plane Input + erwarteten Output so, dass sie innerhalb dieses Limits bleiben.
+
+## Maximale Request-Body-Größe {#body-size}
+
+Die maximale Request-Body-Größe beträgt **25 MB**. Anfragen darüber werden abgewiesen, bevor sie das Modell erreichen. Dieses Limit ist nur bei multimodalen Eingaben relevant (z. B. base64-kodierte Bilder). Standard-Text-Chat-Anfragen liegen weit darunter.
+
+## Verhalten unter hoher Last {#capacity}
+
+Der Endpunkt stellt Anfragen intern in eine Warteschlange, wenn alle Compute-Slots belegt sind. Das bedeutet:
+
+- Anfragen schlagen nicht sofort fehl, wenn das Modell beschäftigt ist — sie warten in der Queue.
+- Bei sehr hoher anhaltender Last können einige Anfragen schließlich ablaufen. Die Verbindung schließt sich dann als Connection-Reset, nicht als HTTP-Fehlercode. Das fällt besonders bei Streaming-Antworten auf (siehe [Streaming-Fehler](#streaming-failures) unten).
+- Der Endpunkt gibt `503` zurück, wenn er gar keine neuen Anfragen annehmen kann — zum Beispiel beim Neustart oder bei einem echten Serverfehler.
+
+Falls du unter deiner erwarteten Last regelmäßig hohe Latenz oder Timeouts erlebst, melde dich bei uns zur Überprüfung der bereitgestellten Kapazität.
+
+## Retry-Empfehlungen {#retries}
+
+Wiederhole Anfragen bei `503`, `502`, `500`. Bei `400` oder `401` nicht wiederholen.
+
+Empfohlenes Retry-Muster:
+
+1. Bei `5xx`: warten, dann erneut senden
+2. Starte mit **1 Sekunde Wartezeit**
+3. Verdopple die Wartezeit bei jedem weiteren Versuch (exponentieller Backoff)
+4. Begrenze die Wartezeit auf **60 Sekunden**
+5. Stoppe nach **5 Versuchen**
+
+Die meisten OpenAI-kompatiblen Client-Libraries haben eingebaute Retry-Logik, die direkt konfiguriert werden kann:
+
+<Tabs>
+<TabItem value="python" label="Python">
+
+```python
+import openai
+
+client = openai.OpenAI(
+    api_key="YOUR_API_KEY",
+    base_url="https://dein-unternehmen.llm.aihosting.mittwald.de/v1",
+    max_retries=5,
+)
+```
+
+</TabItem>
+<TabItem value="javascript" label="JavaScript / TypeScript">
+
+```typescript
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: "YOUR_API_KEY",
+  baseURL: "https://dein-unternehmen.llm.aihosting.mittwald.de/v1",
+  maxRetries: 5,
+});
+```
+
+</TabItem>
+</Tabs>
+
+## Streaming-Fehler {#streaming-failures}
+
+Bei Streaming-Anfragen (`"stream": true`) wird der HTTP-`200`-Response-Header geschrieben, sobald das erste Token bereit ist. Tritt danach ein Fehler auf (z. B. Timeout oder Server-Neustart), schließt sich die Verbindung als Connection-Reset — ohne HTTP-Fehlercode.
+
+Erkenne das, indem du prüfst, ob der Stream mit dem erwarteten Stop-Reason beendet wurde. Im Fehlerfall die Anfrage vollständig neu senden.
+
+## Unterstützte Protokolle {#protocol}
+
+Der Endpunkt unterstützt ausschließlich **HTTPS**. gRPC ist nicht verfügbar.

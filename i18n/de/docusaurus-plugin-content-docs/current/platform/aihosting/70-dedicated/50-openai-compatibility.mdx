@@ -1,0 +1,186 @@
+---
+sidebar_label: OpenAI-Kompatibilität
+description: Welche OpenAI-API-Endpunkte und Parameter auf dem Dedicated-AI-Hosting-Endpunkt unterstützt werden
+title: OpenAI-API-Kompatibilität
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+Der Dedicated-AI-Hosting-Endpunkt ist OpenAI-kompatibel. Jedes OpenAI-SDK oder jede Library lässt sich durch Änderung von zwei Werten umzeigen — die Base URL und der API-Key. Diese Seite dokumentiert genau, was unterstützt wird, was nicht, und wo das Verhalten vom gehosteten OpenAI-Dienst abweicht.
+
+## Wechsel von OpenAI {#migration}
+
+```python
+# Vorher
+client = OpenAI(api_key="sk-...")
+
+# Nachher
+client = OpenAI(
+    api_key="YOUR_DEDICATED_API_KEY",
+    base_url="https://dein-unternehmen.llm.aihosting.mittwald.de/v1",
+)
+```
+
+Der Modellname ändert sich ebenfalls. Verwende die ID aus `/v1/models` statt eines OpenAI-Modellnamens wie `gpt-4o`.
+
+## Unterstützte Endpunkte {#endpoints}
+
+| Endpunkt | Unterstützt |
+|----------|-------------|
+| `GET /v1/models` | ✅ |
+| `POST /v1/chat/completions` | ✅ |
+| `POST /v1/completions` | ✅ (Legacy-Text-Completions) |
+| `POST /v1/responses` | ✅ |
+| `POST /v1/embeddings` | ❌ — dieser Endpunkt betreibt ein generatives Modell, kein Embedding-Modell |
+| Assistants API (`/v1/assistants`, `/v1/threads`, …) | ❌ |
+| Batch API (`/v1/batches`) | ❌ |
+| Fine-tuning API (`/v1/fine_tuning`) | ❌ |
+| Files API (`/v1/files`) | ❌ |
+| Moderations API (`/v1/moderations`) | ❌ |
+| Audio-/Bild-Endpunkte | ❌ |
+
+## Parameter-Unterstützung für /v1/chat/completions {#parameters}
+
+| Parameter | Support | Hinweise |
+|-----------|---------|----------|
+| `model` | ✅ | Modell-ID aus `/v1/models` verwenden |
+| `messages` | ✅ | |
+| `stream` | ✅ | Siehe [Streaming](./getting-started#streaming) |
+| `temperature`, `top_p` | ✅ | |
+| `max_tokens` / `max_completion_tokens` | ✅ | |
+| `stop` | ✅ | |
+| `n` | ✅ | Mehrere Completions pro Anfrage |
+| `presence_penalty`, `frequency_penalty` | ✅ | |
+| `logprobs`, `top_logprobs` | ✅ | |
+| `tools`, `tool_choice` | ✅ | Siehe [Tool Calling](#tool-calling) |
+| `parallel_tool_calls` | ✅ | `false` begrenzt auf einen Tool-Call; `true` (Standard) erlaubt mehrere |
+| `response_format` | ✅ | Siehe [Strukturierte Ausgaben](#structured-outputs) |
+| `seed` | ⚠️ | Wird akzeptiert und weitergeleitet — Reproduzierbarkeit ist Best-Effort aufgrund von GPU-Nicht-Determinismus |
+| `user` | ⚠️ | Wird akzeptiert, aber ignoriert |
+| `logit_bias` | ✅ | Unterstützt; Token-IDs außerhalb des Modell-Vokabulars geben einen Validierungsfehler zurück |
+| `stream_options` | ✅ | Unterstützt bei `stream: true`; ohne Streaming gibt es einen Validierungsfehler. `include_usage: true` hängt am Ende des Streams einen Usage-Chunk an |
+
+## Strukturierte Ausgaben {#structured-outputs}
+
+Sowohl JSON-Object-Modus als auch JSON-Schema-Modus werden unterstützt.
+
+**JSON-Object-Modus** — beschränkt die Ausgabe auf valides JSON:
+
+```json
+{
+  "model": "YOUR_MODEL_ID",
+  "messages": [{"role": "user", "content": "Gib ein JSON-Objekt mit den Feldern name und age zurück."}],
+  "response_format": {"type": "json_object"}
+}
+```
+
+**JSON-Schema-Modus** — beschränkt die Ausgabe auf ein bestimmtes Schema:
+
+```json
+{
+  "model": "YOUR_MODEL_ID",
+  "messages": [{"role": "user", "content": "Extrahiere Name und Alter der Person."}],
+  "response_format": {
+    "type": "json_schema",
+    "json_schema": {
+      "name": "person",
+      "strict": true,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string"},
+          "age": {"type": "integer"}
+        },
+        "required": ["name", "age"],
+        "additionalProperties": false
+      }
+    }
+  }
+}
+```
+
+:::note
+Der JSON-Schema-Modus verwendet Guided Decoding. Komplexe rekursive Schemata oder sehr große Schemata können die Latenz erhöhen.
+:::
+
+## Tool Calling {#tool-calling}
+
+Tool Calling (Function Calling) folgt dem OpenAI-Format. Übergib deine Tools im `tools`-Array und steuere das Verhalten über `tool_choice`.
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="YOUR_API_KEY",
+    base_url="https://dein-unternehmen.llm.aihosting.mittwald.de/v1",
+)
+
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_weather",
+            "description": "Gibt das aktuelle Wetter für einen Ort zurück.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "location": {"type": "string", "description": "Stadt und Land"},
+                },
+                "required": ["location"],
+            },
+        },
+    }
+]
+
+response = client.chat.completions.create(
+    model="YOUR_MODEL_ID",
+    messages=[{"role": "user", "content": "Wie ist das Wetter in Berlin?"}],
+    tools=tools,
+    tool_choice="auto",
+)
+
+tool_calls = response.choices[0].message.tool_calls
+```
+
+`parallel_tool_calls=False` begrenzt das Modell auf maximal einen Tool-Call pro Turn, was die Verarbeitung in mehrstufigen Agent-Loops vereinfacht.
+
+## Client-Timeouts konfigurieren {#timeouts}
+
+LLM-Anfragen mit langen Eingaben oder Ausgaben können 60 Sekunden oder mehr dauern. Viele HTTP-Clients und Frameworks haben deutlich kürzere Standard-Timeouts. Setze deinen Client-Timeout explizit, um fehlerhafte Abbrüche zu vermeiden.
+
+<Tabs>
+<TabItem value="python" label="Python">
+
+```python
+import httpx
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="YOUR_API_KEY",
+    base_url="https://dein-unternehmen.llm.aihosting.mittwald.de/v1",
+    timeout=httpx.Timeout(300.0, connect=10.0),
+)
+```
+
+Ein Read-Timeout von 300 Sekunden (5 Minuten) deckt die meisten Inference-Workloads ab. Bei sehr langen Kontexten oder hoher Parallelität ggf. erhöhen.
+
+</TabItem>
+<TabItem value="javascript" label="JavaScript / TypeScript">
+
+```typescript
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: "YOUR_API_KEY",
+  baseURL: "https://dein-unternehmen.llm.aihosting.mittwald.de/v1",
+  timeout: 300 * 1000, // 300 Sekunden in Millisekunden
+});
+```
+
+</TabItem>
+</Tabs>
+
+:::note
+Der serverseitige Connection-Timeout beträgt 30 Minuten. Ein Client-Timeout, der kürzer ist als deine längste erwartete Anfrage, führt zu einem Client-seitigen Fehler, bevor der Server die Verbindung trennt.
+:::
