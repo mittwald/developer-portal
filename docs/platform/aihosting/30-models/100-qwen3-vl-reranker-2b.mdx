@@ -42,17 +42,19 @@ Qwen3-VL-Reranker-2B is served via the **`/v1/rerank`** endpoint, which follows 
 import os
 import requests
 
+documents = [
+    "Payment is due within 30 days of invoice.",
+    "The vendor must deliver goods within 14 business days.",
+    "Late payments incur a 2% monthly surcharge.",
+]
+
 response = requests.post(
     "https://llm.aihosting.mittwald.de/v1/rerank",
     headers={"Authorization": f"Bearer {os.environ['OPENAI_API_KEY']}"},
     json={
         "model": "Qwen3-VL-Reranker-2B",
         "query": "What are the payment terms?",
-        "documents": [
-            "Payment is due within 30 days of invoice.",
-            "The vendor must deliver goods within 14 business days.",
-            "Late payments incur a 2% monthly surcharge.",
-        ],
+        "documents": documents,
     },
     timeout=30,
 )
