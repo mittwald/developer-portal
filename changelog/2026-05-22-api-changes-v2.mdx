@@ -1,0 +1,324 @@
+---
+title: API changes for v2 API, May 15 to May 22
+authors:
+  - machine
+tags:
+  - apiv2
+  - App
+  - Contract
+  - Customer
+  - Database
+  - Project
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API introduces several enhancements, including the addition of optional properties to various responses, new optional request parameters for improved query capabilities, and the introduction of new endpoints for updating MySQL and Redis databases.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- The optional property `/items/appVersion/lastChangedAt` has been added to the response with a `200` status for the `GET` operation on the path `/v2/app-installations` and `/v2/projects/{projectId}/app-installations`.
+- The optional property `/items/systemSoftware/items/systemSoftwareVersion/lastChangedAt` has been added to the response with a `200` status for the `GET` operation on the path `/v2/app-installations` and `/v2/projects/{projectId}/app-installations`.
+- The optional property `appVersion/lastChangedAt` has been added to the response with a `200` status for the `GET` operation on the path `/v2/app-installations/{appInstallationId}`.
+- The optional property `systemSoftware/items/systemSoftwareVersion/lastChangedAt` has been added to the response with a `200` status for the `GET` operation on the path `/v2/app-installations/{appInstallationId}`.
+- A new optional request property `domain` has been added for the `POST` operation on the path `/v2/app-installations/{appInstallationId}/actions/copy`.
+- The optional property `additionalItems/items/tariffChange/isForced` has been added to the response with a `200` status for the `GET` operation on the paths `/v2/certificates/{certificateId}/contract`, `/v2/contracts/{contractId}`, `/v2/customers/{customerId}/ai-hosting/contract`, `/v2/customers/{customerId}/lead-fyndr-profile/contract`, `/v2/customers/{customerId}/contracts`, `/v2/domains/{domainId}/contract`, `/v2/licenses/{licenseId}/contract`, `/v2/mail-addresses/{mailAddressId}/contract`, `/v2/projects/{projectId}/contract`, and `/v2/servers/{serverId}/contract`.
+- The optional property `baseItem/tariffChange/isForced` has been added to the response with a `200` status for the `GET` operation on the paths `/v2/certificates/{certificateId}/contract`, `/v2/contracts/{contractId}`, `/v2/customers/{customerId}/ai-hosting/contract`, `/v2/customers/{customerId}/lead-fyndr-profile/contract`, `/v2/customers/{customerId}/contracts`, `/v2/domains/{domainId}/contract`, `/v2/licenses/{licenseId}/contract`, `/v2/mail-addresses/{mailAddressId}/contract`, and `/v2/projects/{projectId}/contract`.
+- The optional property `tariffChange/isForced` has been added to the response with a `200` status for the `GET` operation on the paths `/v2/contracts/{contractId}/base-items` and `/v2/contracts/{contractId}/items/{contractItemId}`.
+- New optional request parameters `searchTerm` have been added for the `GET` operations on the paths `/v2/customers/{customerId}/invites`, `/v2/customers/{customerId}/memberships`, `/v2/projects/{projectId}/invites`, and `/v2/projects/{projectId}/memberships`.
+- Two new endpoints have been added for the `PATCH` operations on the paths `/v2/mysql-databases/{mysqlDatabaseId}` and `/v2/redis-databases/{redisDatabaseId}`.
+  
+Note: No breaking changes have been indicated in this update.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "List app installations that a user has access to"
+
+
+- added the optional property '/items/appVersion/lastChangedAt' to the response with the '200' status
+
+- added the optional property '/items/systemSoftware/items/systemSoftwareVersion/lastChangedAt' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations-for-user" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an app installation"
+
+
+- added the optional property 'appVersion/lastChangedAt' to the response with the '200' status
+
+- added the optional property 'systemSoftware/items/systemSoftwareVersion/lastChangedAt' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-get-appinstallation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Request a copy of an app installation"
+
+
+- added the new optional request property 'domain'
+
+
+For details, refer to the <OperationLink operation="app-request-appinstallation-copy" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the Contract for the given Certificate"
+
+
+- added the optional property 'additionalItems/items/tariffChange/isForced' to the response with the '200' status
+
+- added the optional property 'baseItem/tariffChange/isForced' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-certificate" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Returns the Contract with the given ID"
+
+
+- added the optional property 'additionalItems/items/tariffChange/isForced' to the response with the '200' status
+
+- added the optional property 'baseItem/tariffChange/isForced' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the BaseItem of the Contract with the given ID"
+
+
+- added the optional property 'tariffChange/isForced' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="contract-get-base-item-of-contract" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the ContractItem with the given ID"
+
+
+- added the optional property 'tariffChange/isForced' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-item" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the AI Hosting Contract for the given Customer"
+
+
+- added the optional property 'additionalItems/items/tariffChange/isForced' to the response with the '200' status
+
+- added the optional property 'baseItem/tariffChange/isForced' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-ai-hosting" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return a list of Contracts for the given Customer"
+
+
+- added the optional property '/items/additionalItems/items/tariffChange/isForced' to the response with the '200' status
+
+- added the optional property '/items/baseItem/tariffChange/isForced' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="contract-list-contracts" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Invites belonging to a Customer"
+
+
+- added the new optional 'query' request parameter 'searchTerm'
+
+
+For details, refer to the <OperationLink operation="customer-list-invites-for-customer" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the Contract for the given LeadFyndrProfile"
+
+
+- added the optional property 'additionalItems/items/tariffChange/isForced' to the response with the '200' status
+
+- added the optional property 'baseItem/tariffChange/isForced' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-lead-fyndr" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Memberships belonging to a Customer"
+
+
+- added the new optional 'query' request parameter 'searchTerm'
+
+
+For details, refer to the <OperationLink operation="customer-list-memberships-for-customer" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the Contract for the given Domain"
+
+
+- added the optional property 'additionalItems/items/tariffChange/isForced' to the response with the '200' status
+
+- added the optional property 'baseItem/tariffChange/isForced' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-domain" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the Contract for the given License"
+
+
+- added the optional property 'additionalItems/items/tariffChange/isForced' to the response with the '200' status
+
+- added the optional property 'baseItem/tariffChange/isForced' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-license" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the Contract for the given Mail Address"
+
+
+- added the optional property 'additionalItems/items/tariffChange/isForced' to the response with the '200' status
+
+- added the optional property 'baseItem/tariffChange/isForced' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-mail-address" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a MySQL database"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="database-patch-mysql-database" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app installations belonging to a Project"
+
+
+- added the optional property '/items/appVersion/lastChangedAt' to the response with the '200' status
+
+- added the optional property '/items/systemSoftware/items/systemSoftwareVersion/lastChangedAt' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the Contract for the given Project"
+
+
+- added the optional property 'additionalItems/items/tariffChange/isForced' to the response with the '200' status
+
+- added the optional property 'baseItem/tariffChange/isForced' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-project" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Invites belonging to a Project"
+
+
+- added the new optional 'query' request parameter 'searchTerm'
+
+
+For details, refer to the <OperationLink operation="project-list-invites-for-project" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Memberships belonging to a Project"
+
+
+- added the new optional 'query' request parameter 'searchTerm'
+
+
+For details, refer to the <OperationLink operation="project-list-memberships-for-project" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a Redis database"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="database-patch-redis-database" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the Contract for the given Server"
+
+
+- added the optional property 'additionalItems/items/tariffChange/isForced' to the response with the '200' status
+
+- added the optional property 'baseItem/tariffChange/isForced' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-server" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald JavaScript SDK Release 4.373.0
+
+The mittwald JavaScript SDK has been updated to version 4.373.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.373.0).
+
+### mittwald JavaScript SDK Release 4.372.0
+
+The mittwald JavaScript SDK has been updated to version 4.372.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.372.0).
+
+### mittwald JavaScript SDK Release 4.371.0
+
+The mittwald JavaScript SDK has been updated to version 4.371.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.371.0](https://github.com/mittwald/api-client-js/releases/tag/4.371.0).
+
+### mittwald JavaScript SDK Release 4.370.0
+
+The mittwald JavaScript SDK has been updated to version 4.370.0. This release includes an update to the generated client, enhancing the functionality and performance of the SDK. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.370.0).
+
+### mittwald JavaScript SDK Release 4.369.0
+
+The mittwald JavaScript SDK has been updated to version 4.369.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.369.0).
+
+### mittwald JavaScript SDK Release 4.368.0
+
+The mittwald JavaScript SDK has been updated to version 4.368.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.368.0).
+
+### mittwald JavaScript SDK Release 4.367.0
+
+The mittwald JavaScript SDK has been updated to version 4.367.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.367.0](https://github.com/mittwald/api-client-js/releases/tag/4.367.0).
+
