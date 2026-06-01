@@ -169,6 +169,8 @@ Manual quickstart steps:
 :::note
 Note that the command used here is implemented in the `experimental` namespace,
 which means that it is still in development and may be subject to change.
+While the underyling code is stable, the command interface and behavior may evolve
+as we gather feedback and iterate on the feature.
 We recommend checking the latest documentation for any updates or changes to
 the deployment process.
 :::
@@ -176,10 +178,18 @@ the deployment process.
 Initial deployment takes a few minutes while the app is built and the hosting environment is set up.
 Once the deployment is complete, you can access your app via the provided URL.
 
-Test your app in a browser, and if you encounter any issues, check the logs and configuration to troubleshoot.
+Test your app in a browser, deployment command will create a subdomain and link to container target.
+If you encounter any issues, check the logs and configuration to troubleshoot.
+Logs can be found in the container section in mStudio or via the CLI with container ID:
+
+```shellsession
+user@local $ mw container logs c-XXXXXX
+```
 
 After successful deployment, you can set up a GitHub Action to automate future deployments whenever you push
 changes to your repository. Leverage Git tags to manage releases and rollbacks effectively.
+Updating the app can be fully automated with GitHub Actions, so you can focus on building and
+improving your app while the deployment process runs in the background.
 
 Related guides for deeper setup:
 
@@ -196,12 +206,15 @@ with some adjustments, most importantly picking the right workspace to build and
 
 In order to override Replit's default build and start commands, you can add
 following variables during build time, e.g. to pick the `hello-world` workspace
-in the example monorepo:
+in the example monorepo. From GitHub action workflow file:
 
-```
-RAILPACK_BUILD_CMD: 'pnpm --filter @workspace/hello-world run build'
-RAILPACK_INSTALL_CMD: 'pnpm --filter @workspace/hello-world install'
-RAILPACK_START_CMD: 'pnpm --filter @workspace/hello-world run serve'
+```yaml
+      - name: Deploy to Mittwald Container Hosting
+        uses: mittwald/rp-container-deploy-action@master
+        env:
+          RAILPACK_BUILD_CMD: 'pnpm --filter @workspace/hello-world run build'
+          RAILPACK_INSTALL_CMD: 'pnpm --filter @workspace/hello-world install'
+          RAILPACK_START_CMD: 'pnpm --filter @workspace/hello-world run serve'
 ```
 
 [Replit Git interface documentation](https://docs.replit.com/references/workspace-tools/git-interface)
@@ -231,7 +244,8 @@ options can be found in the [railpack documentation](https://railpack.com/langua
 As you prepare to deploy, consider these practices that help apps succeed:
 
 - **Security and privacy matter.** Remove hardcoded secrets, use environment variables, and keep dependencies
-up to date. These practices are straightforward and make your app more reliable.
+up to date. These practices are straightforward and make your app more reliable. Both CLI command and
+GitHub action support environment variables, so you can keep secrets out of your code and manage them securely.
 - **Test early.** Deploy locally first, share with friends, and gather feedback before going live.
 - **Community is here.** Our mittwald Discord server is a great place to ask questions, share what you're building,
 and learn from other developers.
