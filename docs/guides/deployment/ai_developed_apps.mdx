@@ -147,24 +147,31 @@ Prerequisites:
 Manual quickstart steps:
 1. Prepare your AI-developed app for deployment: verify that it runs locally and that all dependencies are installed.
 
-```shellsession
-user@local $ git clone https://github.com/<your-org>/<your-repo>.git
-user@local $ cd <your-repo>
-```
+    ```shellsession
+    user@local $ git clone https://github.com/<your-org>/<your-repo>.git
+    user@local $ cd <your-repo>
+    ```
 
 2. Make sure your local repository is in sync with GitHub and that your changes are committed and pushed.
 
-```shellsession
-user@local $ git pull
-user@local $ git status
-```
+    ```shellsession
+    user@local $ git pull
+    user@local $ git status
+    ```
 
 3. In your app folder, use the mittwald CLI to create a project and run the deployment command.
 
-```shellsession
-user@local $ mw project create --description=<project-name> --update-context
-user@local $ mw experimental deploy
-```
+    ```shellsession
+    user@local $ mw project create --description=<project-name> --update-context
+    user@local $ mw experimental deploy
+    ```
+
+:::note
+Note that the command used here is implemented in the `experimental` namespace,
+which means that it is still in development and may be subject to change.
+We recommend checking the latest documentation for any updates or changes to
+the deployment process.
+:::
 
 Initial deployment takes a few minutes while the app is built and the hosting environment is set up.
 Once the deployment is complete, you can access your app via the provided URL.
@@ -172,7 +179,7 @@ Once the deployment is complete, you can access your app via the provided URL.
 Test your app in a browser, and if you encounter any issues, check the logs and configuration to troubleshoot.
 
 After successful deployment, you can set up a GitHub Action to automate future deployments whenever you push
-changes to your repository. Leverage git tags to manage releases and rollbacks effectively.
+changes to your repository. Leverage Git tags to manage releases and rollbacks effectively.
 
 Related guides for deeper setup:
 
@@ -180,6 +187,44 @@ Related guides for deeper setup:
 - For advanced deployment workflows and CI examples, see [Application deployment with deployer](/docs/v2/guides/deployment/deployer/).
 - For container concepts, stack files, and registry setup, see [Containers](/docs/v2/platform/workloads/containers/).
 - For declarative stack deployment commands, see [mw stack command reference](/docs/v2/cli/reference/stack/).
+
+### Migrating vom Replit to mittwald {#migrating-replit-to-mittwald}
+
+Replit ships exported apps in nodejs workspaces as monorepo Git repository.
+This means that if you export your app to GitHub, you can deploy it to mittwald
+with some adjustments, most importantly picking the right workspace to build and serve.
+
+In order to override Replit's default build and start commands, you can add
+following variables during build time, e.g. to pick the `hello-world` workspace
+in the example monorepo:
+
+```
+RAILPACK_BUILD_CMD: 'pnpm --filter @workspace/hello-world run build'
+RAILPACK_INSTALL_CMD: 'pnpm --filter @workspace/hello-world install'
+RAILPACK_START_CMD: 'pnpm --filter @workspace/hello-world run serve'
+```
+
+[Replit Git interface documentation](https://docs.replit.com/references/workspace-tools/git-interface)
+
+### Migrating from Lovable to mittwald {#migrating-lovable-to-mittwald}
+
+Apps created with Lovable can be exported to GitHub as a standard Node.js project.
+In order to deploy such app to mittwald hosting, we must ensure that the exported app
+has a valid `package.json` file with the necessary build and start scripts defined.
+
+In addition, Lovable apps might fail in deployment due to unresolved dependencies or
+missing configuration files. To resolve these issues, it might be helpful to even
+remove additional package managers like `bun` and stick to `npm` or `pnpm` for better
+compatibility:
+
+```shellsession
+user@local $ rm bun.lock
+```
+
+Further reading on underlying package manager detection heuristics and configuration
+options can be found in the [railpack documentation](https://railpack.com/languages/node).
+
+[Lovable Git integration docs](https://docs.lovable.dev/integrations/github)
 
 ## Moving forward: Best practices for success {#moving-forward-best-practices}
 
