@@ -51,16 +51,16 @@ Start by installing the Plugin for your IDE:
 - [Jetbrains IDEs](https://plugins.jetbrains.com/plugin/22707-continue)
 - [Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=Continue.continue)
 
-Models are usually configured in the `config.yaml` file (usually found in the `~/.continue/` directory in your home directory). You can configure the mittwald models (`Devstral-Small-2-24B-Instruct-2512` works well for code generation) using the following configuration:
+Models are usually configured in the `config.yaml` file (usually found in the `~/.continue/` directory in your home directory). You can configure the mittwald models (`Ministral-3-14B-Instruct-2512` works well for code generation) using the following configuration:
 
 ```yaml
 name: mittwald
 version: 1.0.0
 schema: v1
 models:
-  - name: Devstral-Small-2-24B-Instruct-2512
+  - name: Ministral-3-14B-Instruct-2512
     provider: openai
-    model: Devstral-Small-2-24B-Instruct-2512
+    model: Ministral-3-14B-Instruct-2512
     apiBase: https://llm.aihosting.mittwald.de/v1
     apiKey: <INSERT-API-KEY>
     roles:
@@ -88,7 +88,7 @@ When configuring Cline via its UI, select the following options:
 - **API Provider**: Select "OpenAI Compatible"
 - **Base URL**: Enter `https://llm.aihosting.mittwald.de/v1`
 - **OpenAI Compatible API Key**: Enter your LLM API key from the mStudio
-- **Model ID**: Enter `Devstral-Small-2-24B-Instruct-2512`
+- **Model ID**: Enter `Ministral-3-14B-Instruct-2512`
 
 ### Zed {#zed}
 
@@ -98,7 +98,7 @@ When configuring Cline via its UI, select the following options:
 - Under "LLM Providers", click "Add Provider" and choose "OpenAI API Compatible".
 - Use `mittwald` as the provider name, set the API URL to
   `https://llm.aihosting.mittwald.de/v1`, and select
-  `Devstral-Small-2-24B-Instruct-2512`.
+  `Ministral-3-14B-Instruct-2512`.
 
 You can also configure this in `settings.json`:
 
@@ -110,8 +110,8 @@ You can also configure this in `settings.json`:
         "api_url": "https://llm.aihosting.mittwald.de/v1",
         "available_models": [
           {
-            "name": "Devstral-Small-2-24B-Instruct-2512",
-            "display_name": "Devstral-Small-2-24B-Instruct-2512",
+            "name": "Ministral-3-14B-Instruct-2512",
+            "display_name": "Ministral-3-14B-Instruct-2512",
             "max_tokens": 262144
           }
         ]
@@ -127,7 +127,7 @@ environment.
 ### Kilo Code {#kilo-code}
 
 Kilo Code is available as a Visual Studio Code extension and supports
-OpenAI-compatible providers. Configure Devstral as follows:
+OpenAI-compatible providers. Configure as follows:
 
 - Install the extension from the
   [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=kilocode.Kilo-Code).
@@ -135,7 +135,7 @@ OpenAI-compatible providers. Configure Devstral as follows:
 - Provider: OpenAI Compatible
 - Base URL: `https://llm.aihosting.mittwald.de/v1`
 - API Key: your mStudio LLM API key
-- Model: `Devstral-Small-2-24B-Instruct-2512`
+- Model: `Ministral-3-14B-Instruct-2512`
 
 Example environment:
 
@@ -144,7 +144,7 @@ export OPENAI_API_KEY=sk-...
 export OPENAI_BASE_URL=https://llm.aihosting.mittwald.de/v1
 ```
 
-Then select Devstral in Kilo Code's model picker for agent tasks.
+Then select the model in Kilo Code's model picker for agent tasks.
 
 ## CLI coding agents
 
@@ -168,8 +168,8 @@ Regardless of the location, the respective provider configuration could look lik
         "apiKey": "sk-..."
       },
       "models": {
-        "Devstral-Small-2-24B-Instruct-2512": {
-          "name": "Devstral-Small-2-24B-Instruct-2512"
+        "Ministral-3-14B-Instruct-2512": {
+          "name": "Ministral-3-14B-Instruct-2512"
         }
       }
     }
@@ -548,8 +548,8 @@ claude-code "fetch https://docs.python.org/3/library/asyncio.html and help me re
 
 ## Model selection
 
-- Ministral-3-14B-Instruct-2512: chat + vision, general assistants, multimodal UX.
-- Devstral-Small-2-24B-Instruct-2512: agentic coding, tool use, multi-file edits; supports vision.
+- Ministral-3-14B-Instruct-2512: chat + vision, general assistants, multimodal UX, agentic coding, tool use.
+- gpt-oss-120b: complex text-centric workloads and advanced automations requiring precision.
 
 ## Long-context tips (256k)
 
