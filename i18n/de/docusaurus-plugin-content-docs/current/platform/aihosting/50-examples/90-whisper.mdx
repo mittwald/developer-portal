@@ -175,6 +175,27 @@ client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
 
 Der gesamte übrige Code – Dateiverarbeitung, `response_format`, `language`, `temperature` – bleibt identisch.
 
+## Zeitstempel und Spracherkennung mit verbose_json {#verbose-json}
+
+`response_format="verbose_json"` gibt segmentgenaue Zeitstempel, die erkannte Sprache und die Gesamtdauer zurück:
+
+```python
+with open("aufnahme.mp3", "rb") as f:
+    result = client.audio.transcriptions.create(
+        model="whisper-large-v3-turbo",
+        file=f,
+        language="de",
+        response_format="verbose_json",
+        temperature=1.0,
+    )
+
+print(result.text)
+print(f"Sprache: {result.language}")
+print(f"Dauer: {result.duration}s")
+for seg in (result.segments or []):
+    print(f"  [{seg['start']:.1f}s–{seg['end']:.1f}s] {seg['text']}")
+```
+
 :::note Nicht unterstützte Formate
-Die `response_format`-Werte `srt`, `vtt` und `verbose_json` werden derzeit nicht unterstützt. `json` (Standard) oder `text` verwenden.
+`srt` und `vtt` werden nicht unterstützt (HTTP 400). `response_format="text"` wird akzeptiert, gibt aber immer einen JSON-Body zurück – stattdessen `"json"` oder `"verbose_json"` verwenden.
 :::

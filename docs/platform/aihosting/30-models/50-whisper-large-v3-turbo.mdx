@@ -14,8 +14,9 @@ The following limitations apply to this model on our platform:
 - Maximum file size: 25 MB per upload
 - No explicit context length limit – depends on audio duration and file size
 - Translation is currently not supported (`to_language`)
-- Supported output formats: **`text`**, **`json`**
-  - Other formats (`srt`, `vtt`, `verbose_json`) are currently not supported
+- Supported output formats: **`json`**, **`verbose_json`**
+  - `response_format="text"` is accepted but returns a JSON body regardless — use `"json"` instead
+  - `srt` and `vtt` are not supported (HTTP 400)
 
 ### Supported Input Formats
 
@@ -33,7 +34,7 @@ The following limitations apply to this model on our platform:
 - **`language` like `language="de"`should always be set explicitly** to maximize accuracy.
   If no value is provided, **German (`"de"`)** will be assumed by default, which may result in poorer outcomes for inputs in other languages.
 
-### Example Output (`response_format=json`)
+### Example output — `response_format="json"` {#output-json}
 
 ```json
 {
@@ -45,11 +46,33 @@ The following limitations apply to this model on our platform:
 }
 ```
 
+### Example output — `response_format="verbose_json"` {#output-verbose}
+
+Returns additional metadata including detected language, duration, and per-segment timestamps:
+
+```json
+{
+  "text": "This is the transcribed text.",
+  "language": "en",
+  "duration": "8.0",
+  "words": null,
+  "segments": [
+    {
+      "id": 0,
+      "avg_logprob": -0.45,
+      "text": " This is the transcribed text.",
+      "start": 0.0,
+      "end": 2.4
+    }
+  ]
+}
+```
+
 ### Best Practices
 
 - **Always set the `language` parameter explicitly**, e.g. `language="de"` for German audio files.
 - Segment long audio files into chunks of < 25 MB.
-- For real-time or near-real-time applications, use `response_format="text"`.
+- Use `response_format="verbose_json"` when you need language detection, duration, or segment-level timestamps.
 - For multilingual recordings: transcribe each language separately for better accuracy.
 
 ## Terms of Use and Licensing

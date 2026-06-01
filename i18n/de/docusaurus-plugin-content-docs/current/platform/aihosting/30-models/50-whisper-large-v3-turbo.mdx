@@ -13,8 +13,9 @@ Die folgenden Einschränkungen gelten für dieses Modell bei unserer Plattform:
 - Maximale Dateigröße: 25 MB pro Upload
 - Keine explizite Kontextlängenbegrenzung – abhängig von Audiodauer und Dateigröße
 - Es ist derzeit keine Übersetzung möglich (`to_language`)
-- Unterstützte Ausgabeformate: **`text`**, **`json`**
-  - Andere Formate (`srt`, `vtt`, `verbose_json`) werden aktuell nicht unterstützt
+- Unterstützte Ausgabeformate: **`json`**, **`verbose_json`**
+  - `response_format="text"` wird akzeptiert, gibt aber immer einen JSON-Body zurück – stattdessen `"json"` verwenden
+  - `srt` und `vtt` werden nicht unterstützt (HTTP 400)
 
 ### Unterstützte Eingabeformate
 
@@ -32,7 +33,7 @@ Die folgenden Einschränkungen gelten für dieses Modell bei unserer Plattform:
 - **`language` wie `language="de"`sollte immer explizit gesetzt werden**, um die Genauigkeit zu maximieren.
   Wird kein Wert angegeben, wird **standardmäßig Deutsch (`"de"`)** angenommen, kann aber für anderssprachige Eingaben dann schlechtere Ergebnisse liefern.
 
-### Beispielausgabe (`response_format=json`)
+### Beispielausgabe — `response_format="json"` {#output-json}
 
 ```json
 {
@@ -44,11 +45,33 @@ Die folgenden Einschränkungen gelten für dieses Modell bei unserer Plattform:
 }
 ```
 
+### Beispielausgabe — `response_format="verbose_json"` {#output-verbose}
+
+Gibt zusätzliche Metadaten zurück, darunter erkannte Sprache, Dauer und segmentgenaue Zeitstempel:
+
+```json
+{
+  "text": "Das ist der transkribierte Text.",
+  "language": "de",
+  "duration": "8.0",
+  "words": null,
+  "segments": [
+    {
+      "id": 0,
+      "avg_logprob": -0.45,
+      "text": " Das ist der transkribierte Text.",
+      "start": 0.0,
+      "end": 2.4
+    }
+  ]
+}
+```
+
 ### Best Practices
 
 - **Setze den Parameter `language` immer explizit**, z. B. `language="de"` für deutschsprachige Audiodateien.
 - Segmentiere lange Audiodateien in < 25 MB-Chunks.
-- Für Echtzeit- oder near-real-time-Anwendungen `response_format="text"` verwenden.
+- `response_format="verbose_json"` verwenden, wenn Spracherkennung, Dauer oder segmentgenaue Zeitstempel benötigt werden.
 - Bei mehrsprachigen Aufnahmen: einzelne Sprachen separat transkribieren für bessere Präzision.
 
 ## Nutzungsbedingungen und Lizenzierung
