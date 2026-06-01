@@ -169,6 +169,8 @@ Manuell durchzuführende Schritte:
 :::note
 Beachte, dass der hier verwendete Befehl im `experimental`-Namespace implementiert ist.
 Das bedeutet, dass er sich noch in Entwicklung befindet und sich entsprechend ändern kann.
+Während der zugrunde liegende Code stabil ist, können sich die Befehlsschnittstelle und das Verhalten weiterentwickeln,
+wenn wir Feedback sammeln und die Funktion iterativ verbessern.
 Wir empfehlen dir, die aktuelle Dokumentation auf mögliche Updates oder Änderungen
 des Deployment-Prozesses zu prüfen.
 :::
@@ -176,10 +178,18 @@ des Deployment-Prozesses zu prüfen.
 Die erste Bereitstellung dauert einige Minuten, während die App gebaut und die Hosting-Umgebung eingerichtet wird.
 Sobald die Bereitstellung abgeschlossen ist, kannst du deine App über die bereitgestellte URL aufrufen.
 
-Teste deine App in einem Browser, und falls du Probleme hast, überprüfe die Logs und Konfiguration zur Fehlerbehebung.
+Teste deine App in einem Browser, das Deployment-Kommando erstellt eine Subdomain und verlinkt zum Container-Ziel.
+Falls du Probleme hast, überprüfe die Logs und Konfiguration zur Fehlerbehebung.
+Logs findest du im Container-Bereich in mStudio oder über die CLI mit Container-ID:
+
+```shellsession
+user@local $ mw container logs c-XXXXXX
+```
 
 Nach erfolgreicher Bereitstellung kannst du eine GitHub Action einrichten, um zukünftige Bereitstellungen zu automatisieren, wenn du
 Änderungen in dein Repository pushst. Nutze Git-Tags, um Releases und Rollbacks effektiv zu verwalten.
+Das Aktualisieren der App kann vollständig mit GitHub Actions automatisiert werden, sodass du dich auf das Entwickeln und Verbessern deiner App konzentrieren kannst,
+während der Deployment-Prozess im Hintergrund läuft.
 
 Weiterführende Guides für tiefergehendes Setup:
 
@@ -197,12 +207,15 @@ für Build und Ausführung auszuwählen.
 
 Um die Standard-Build- und Start-Kommandos von Replit zu überschreiben, kannst du
 beim Build folgende Variablen setzen, zum Beispiel um im Beispiel-Monorepo den
-Workspace `hello-world` zu verwenden:
+Workspace `hello-world` zu verwenden. Aus einer GitHub-Action-Workflow-Datei:
 
-```
-RAILPACK_BUILD_CMD: 'pnpm --filter @workspace/hello-world run build'
-RAILPACK_INSTALL_CMD: 'pnpm --filter @workspace/hello-world install'
-RAILPACK_START_CMD: 'pnpm --filter @workspace/hello-world run serve'
+```yaml
+      - name: Deploy to Mittwald Container Hosting
+        uses: mittwald/rp-container-deploy-action@master
+        env:
+          RAILPACK_BUILD_CMD: 'pnpm --filter @workspace/hello-world run build'
+          RAILPACK_INSTALL_CMD: 'pnpm --filter @workspace/hello-world install'
+          RAILPACK_START_CMD: 'pnpm --filter @workspace/hello-world run serve'
 ```
 
 [Replit-Dokumentation zur Git-Schnittstelle](https://docs.replit.com/references/workspace-tools/git-interface)
@@ -233,7 +246,8 @@ Paketmanager-Erkennung und zu Konfigurationsoptionen findest du in der
 Während du dich auf die Bereitstellung vorbereitest, berücksichtige diese Praktiken, die Apps zum Erfolg bringen:
 
 - **Sicherheit und Datenschutz sind wichtig.** Entferne hartcodierte Secrets, verwende Umgebungsvariablen und halte Abhängigkeiten aktuell.
-Diese Praktiken sind unkompliziert und machen deine App zuverlässiger.
+Diese Praktiken sind unkompliziert und machen deine App zuverlässiger. Sowohl das CLI-Kommando als auch die GitHub Action unterstützen Umgebungsvariablen,
+sodass du Secrets aus deinem Code halten und sicher verwalten kannst.
 - **Teste früh.** Stelle lokal bereit, teile mit Freunden und hole dir Feedback ein, bevor du live gehst.
 - **Community ist hier.** Unser mittwald Discord-Server ist ein großartiger Ort, um Fragen zu stellen, deine Projekte zu teilen,
 und von anderen Entwicklern zu lernen.
