@@ -5,6 +5,8 @@ title: Whisper-Large-V3-Turbo
 slug: /platform/aihosting/models/whisper-large-v3-turbo
 ---
 
+The [Speech-to-text guide](../../examples/whisper/) has runnable examples for basic transcription, multi-language usage, large-file chunking, and a transcription + summarisation pipeline.
+
 ## Description
 
 “Whisper-Large-V3-Turbo” is a multilingual automatic speech recognition model (ASR) developed by OpenAI, optimized for speed and efficiency. It is based on the architecture of the well-known “Whisper-Large-V3” model, but uses a lighter decoder structure to significantly reduce latency with only a minimal loss in accuracy. The model supports over 99 languages and is ideal for transcribing speech inputs.
@@ -67,13 +69,6 @@ Returns additional metadata including detected language, duration, and per-segme
   ]
 }
 ```
-
-### Best Practices
-
-- **Always set the `language` parameter explicitly**, e.g. `language="de"` for German audio files.
-- Segment long audio files into chunks of < 25 MB.
-- Use `response_format="verbose_json"` when you need language detection, duration, or segment-level timestamps.
-- For multilingual recordings: transcribe each language separately for better accuracy.
 
 ## Terms of Use and Licensing
 
