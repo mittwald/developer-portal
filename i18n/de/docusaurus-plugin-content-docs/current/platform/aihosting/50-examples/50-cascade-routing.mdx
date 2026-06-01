@@ -1,0 +1,165 @@
+---
+sidebar_label: LLM-Cascade-Routing
+description: Anfragen über drei Modellstufen routen – Kosten senken und Qualität erhalten
+title: LLM-Cascade-Routing
+---
+
+Jede Anfrage mit einem großen Frontier-Modell zu beantworten ist präzise, aber teuer. Günstige Anfragen an ein kleines Modell zu routen und das große Modell für wirklich schwierige Fälle zu reservieren, senkt die Kosten typischerweise um 40–80 % bei weniger als 1 % Qualitätsverlust.
+
+Dieser Guide baut eine dreistufige Kaskade auf mittwald AI Hosting mit nur dem `openai`-Paket:
+
+| Stufe | Modell | Wann einsetzen |
+| ----- | ------ | -------------- |
+| 1 — schnell | `Qwen3.5-0.8B` | Einfache Nachschlagefragen, Ja/Nein, kurze Faktenantworten |
+| 2 — ausgewogen | `Qwen3.6-35B-A3B-FP8` | Mehrschrittiges Reasoning, Code, Vergleiche |
+| 3 — Frontier | `Mistral-Medium-3.5-128B` | Komplexe Analysen, Vision, lange Dokumente, 40+ Sprachen |
+
+Für Stufe 3 kann je nach Workload ein beliebiges großes Modell eingesetzt werden:
+
+| Alternative für Stufe 3 | Stärken |
+| ----------------------- | ------- |
+| `Mistral-Medium-3.5-128B` | 40+ Sprachen, Vision, 256k Context |
+| `Qwen3.5-122B-A10B-FP8` | Thinking-Modus, Vision, starkes Coding |
+| `gpt-oss-120b` | Textbasiertes Reasoning, 131k Context |
+
+Die Modellseiten für Parameterdetails: [Qwen3.5-0.8B](/docs/v2/platform/aihosting/models/qwen3-5-0-8b), [Qwen3.6-35B-A3B-FP8](/docs/v2/platform/aihosting/models/qwen3-6-35b-a3b-fp8), [Mistral-Medium-3.5-128B](/docs/v2/platform/aihosting/models/mistral-medium-3-5-128b), [Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8).
+
+## Einrichtung {#einrichtung}
+
+```shellsession
+user@local $ pip install openai
+user@local $ export OPENAI_API_KEY="sk-…"
+```
+
+## Der Router
+
+Der Router sendet jede Anfrage an `Qwen3.5-0.8B` und lässt die Komplexität in einem Wort klassifizieren. Da die Klassifizierer-Ausgabe nur ein einzelnes Token ist (`simple`, `moderate` oder `complex`), sind die Kosten vernachlässigbar – typischerweise weniger als 0,1 % der Gesamtausgaben.
+
+```python
+import os
+from openai import OpenAI
+
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+
+# Stufe-3-Modell je nach Workload tauschen:
+#   "Mistral-Medium-3.5-128B"  — Vision, 40+ Sprachen, 256k Context
+#   "Qwen3.5-122B-A10B-FP8"   — Thinking-Modus, Vision, starkes Coding
+#   "gpt-oss-120b"             — Textbasiertes Reasoning, 131k Context
+TIERS = {
+    "simple":   "Qwen3.5-0.8B",
+    "moderate": "Qwen3.6-35B-A3B-FP8",
+    "complex":  "Mistral-Medium-3.5-128B",
+}
+
+CLASSIFIER_SYSTEM = """\
+Classify the complexity of the user's question with exactly one word: simple, moderate, or complex.
+
+simple   — factual lookup, yes/no, basic definition, short translation
+moderate — multi-step reasoning, code with explanation, structured comparison
+complex  — research-level analysis, multi-file code review, long-document synthesis,
+           vision + reasoning combined, or anything requiring deep domain knowledge
+
+Reply with only the single classification word and nothing else."""
+
+
+def classify(query: str) -> str:
+    resp = client.chat.completions.create(
+        model="Qwen3.5-0.8B",
+        messages=[
+            {"role": "system", "content": CLASSIFIER_SYSTEM},
+            {"role": "user", "content": query},
+        ],
+        temperature=0.0,
+        max_tokens=5,
+    )
+    label = resp.choices[0].message.content.strip().lower()
+    return label if label in TIERS else "moderate"
+
+
+def answer(query: str, model: str, **kwargs) -> str:
+    resp = client.chat.completions.create(
+        model=model,
+        messages=[{"role": "user", "content": query}],
+        temperature=0.7,
+        **kwargs,
+    )
+    return resp.choices[0].message.content
+
+
+def cascade(query: str) -> dict:
+    tier = classify(query)
+    model = TIERS[tier]
+    text = answer(query, model)
+    return {"tier": tier, "model": model, "answer": text}
+```
+
+## Verwendung
+
+```python
+queries = [
+    "Was ist die Hauptstadt von Frankreich?",                            # simple
+    "Schreibe eine Python-Funktion, die zwei sortierte Listen zusammenführt.",  # moderate
+    "Analysiere die Architektur-Tradeoffs zwischen event-getriebenen und "
+    "Request-Response-Mustern für ein hochvolumiges Zahlungssystem.",    # complex
+]
+
+for q in queries:
+    result = cascade(q)
+    print(f"[{result['tier']:8s}] {result['model']}")
+    print(f"  F: {q[:70]}")
+    print(f"  A: {result['answer'][:120]}\n")
+```
+
+## Eskalation bei kurzen Antworten
+
+Manche Anfragen werden fälschlicherweise als `simple` klassifiziert, aber das kleine Modell liefert eine unbefriedigend kurze Antwort. Mit einer Wortanzahl-Prüfung kann automatisch eskaliert werden:
+
+```python
+def cascade_with_escalation(query: str, min_words: int = 20) -> dict:
+    tier = classify(query)
+    model = TIERS[tier]
+    text = answer(query, model)
+
+    # Eskalieren, wenn Antwort verdächtig kurz und eine größere Stufe verfügbar ist
+    tiers = list(TIERS.keys())
+    current_idx = tiers.index(tier)
+    while len(text.split()) < min_words and current_idx < len(tiers) - 1:
+        current_idx += 1
+        tier = tiers[current_idx]
+        model = TIERS[tier]
+        text = answer(query, model)
+
+    return {"tier": tier, "model": model, "answer": text}
+```
+
+## System-Prompt durchreichen
+
+Um einen System-Prompt hinzuzufügen (z. B. für eine Kundensupport-Persona), diesen an die jeweilige Stufe weitergeben:
+
+```python
+SYSTEM = "Du bist ein knapper Support-Agent für mittwald. Antworte in der Sprache des Nutzers."
+
+def cascade_with_system(query: str) -> dict:
+    tier = classify(query)
+    model = TIERS[tier]
+    resp = client.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": SYSTEM},
+            {"role": "user", "content": query},
+        ],
+        temperature=0.7,
+    )
+    return {"tier": tier, "model": model, "answer": resp.choices[0].message.content}
+```
+
+:::tip Kostenschätzung
+Bei einer typischen Support-Workload (70 % einfach, 20 % mittel, 10 % komplex) und 100.000 Anfragen/Monat bei durchschnittlich 300 Token:
+
+| Szenario | Monatliche Kosten |
+| -------- | ----------------- |
+| Alle Anfragen → Mistral-Medium | ~30 € |
+| Dreistufige Kaskade | ~8 € |
+
+Die Klassifizierer-Anfrage kostet insgesamt weniger als 0,10 € und ist nicht separat aufgeführt.
+:::

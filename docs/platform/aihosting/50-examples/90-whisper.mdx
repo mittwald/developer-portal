@@ -1,0 +1,180 @@
+---
+sidebar_label: Speech-to-text with Whisper
+description: Transcribe audio files using whisper-large-v3-turbo via the OpenAI-compatible API
+title: Speech-to-text with Whisper
+---
+
+`whisper-large-v3-turbo` is accessible via the same `/v1/audio/transcriptions` endpoint as the OpenAI Whisper API, so any code written for OpenAI works as a drop-in replacement by changing `base_url`. See the [Whisper model page](/docs/v2/platform/aihosting/models/whisper-large-v3-turbo) for supported formats, language codes, and inference parameters.
+
+## Setup {#setup}
+
+```shellsession
+user@local $ pip install openai
+user@local $ export OPENAI_API_KEY="sk-…"
+```
+
+For large-file chunking (files over 25 MB):
+
+```shellsession
+user@local $ pip install pydub
+# pydub requires ffmpeg
+user@local $ brew install ffmpeg          # macOS
+user@local $ apt-get install ffmpeg       # Debian/Ubuntu
+```
+
+## Basic transcription {#basic}
+
+```python
+import os
+from openai import OpenAI
+
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+
+with open("recording.mp3", "rb") as f:
+    result = client.audio.transcriptions.create(
+        model="whisper-large-v3-turbo",
+        file=f,
+        language="en",             # Always set explicitly — default is "de"
+        response_format="json",
+        temperature=1.0,
+    )
+
+print(result.text)
+```
+
+:::warning Always set `language`
+If `language` is omitted, the model defaults to German (`"de"`). Transcribing English audio without setting `language="en"` will produce inaccurate results. See the [model page](/docs/v2/platform/aihosting/models/whisper-large-v3-turbo) for the full list of ISO-639-1 codes.
+:::
+
+## Multiple languages {#multiple-languages}
+
+```python
+files_and_languages = [
+    ("meeting_de.mp3", "de"),
+    ("interview_fr.wav", "fr"),
+    ("podcast_en.ogg", "en"),
+    ("lecture_ja.flac", "ja"),
+]
+
+for filename, lang in files_and_languages:
+    with open(filename, "rb") as f:
+        result = client.audio.transcriptions.create(
+            model="whisper-large-v3-turbo",
+            file=f,
+            language=lang,
+            response_format="json",
+            temperature=1.0,
+        )
+    print(f"[{lang}] {result.text[:120]}")
+```
+
+## Large files (> 25 MB) {#large-files}
+
+The API accepts files up to 25 MB. Split larger recordings at silence points using `pydub` so that each chunk is well under the limit and no words are cut mid-utterance:
+
+```python
+from pydub import AudioSegment
+from pydub.silence import split_on_silence
+from io import BytesIO
+
+
+def transcribe_large_file(path: str, language: str = "en") -> str:
+    """Transcribe a file of any size by splitting at silence points."""
+    audio = AudioSegment.from_file(path)
+
+    # Split at pauses longer than 700 ms with silence below -40 dBFS
+    chunks = split_on_silence(
+        audio,
+        min_silence_len=700,
+        silence_thresh=-40,
+        keep_silence=300,   # Keep 300 ms of silence at each edge for context
+    )
+
+    # Guard: if no silence found, fall back to fixed 60-second chunks
+    if not chunks:
+        chunk_ms = 60_000
+        chunks = [audio[i: i + chunk_ms] for i in range(0, len(audio), chunk_ms)]
+
+    transcripts: list[str] = []
+    for chunk in chunks:
+        buf = BytesIO()
+        chunk.export(buf, format="mp3")
+        buf.seek(0)
+        buf.name = "chunk.mp3"   # openai SDK reads the .name attribute for MIME type
+
+        result = client.audio.transcriptions.create(
+            model="whisper-large-v3-turbo",
+            file=buf,
+            language=language,
+            response_format="json",
+            temperature=1.0,
+        )
+        transcripts.append(result.text)
+
+    return " ".join(transcripts)
+
+
+full_text = transcribe_large_file("long_interview.mp3", language="de")
+print(full_text)
+```
+
+## Transcription + summarisation pipeline {#transcription-pipeline}
+
+Chain Whisper with a chat model to go directly from audio to a written summary:
+
+```python
+def transcribe_and_summarise(audio_path: str, language: str = "en") -> dict:
+    # Step 1: transcribe
+    with open(audio_path, "rb") as f:
+        result = client.audio.transcriptions.create(
+            model="whisper-large-v3-turbo",
+            file=f,
+            language=language,
+            response_format="json",
+            temperature=1.0,
+        )
+    transcript = result.text
+
+    # Step 2: summarise
+    summary_resp = client.chat.completions.create(
+        model="Qwen3.6-35B-A3B-FP8",
+        messages=[
+            {
+                "role": "system",
+                "content": "Summarise the transcript concisely. Use bullet points for key topics.",
+            },
+            {"role": "user", "content": transcript},
+        ],
+        temperature=0.7,
+        max_tokens=512,
+        extra_body={"chat_template_kwargs": {"enable_thinking": False}},
+    )
+
+    return {
+        "transcript": transcript,
+        "summary": summary_resp.choices[0].message.content,
+    }
+
+
+output = transcribe_and_summarise("team_standup.mp3", language="en")
+print("Transcript:\n", output["transcript"])
+print("\nSummary:\n", output["summary"])
+```
+
+## Drop-in replacement for OpenAI {#openai-replacement}
+
+Existing code written for the OpenAI Whisper API requires only a `base_url` change:
+
+```python
+# Before (OpenAI)
+client = OpenAI()
+
+# After (mittwald AI Hosting)
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+```
+
+All other code — file handling, `response_format`, `language`, `temperature` — stays identical.
+
+:::note Unsupported formats
+The `response_format` values `srt`, `vtt`, and `verbose_json` are not currently supported. Use `json` (default) or `text`.
+:::
