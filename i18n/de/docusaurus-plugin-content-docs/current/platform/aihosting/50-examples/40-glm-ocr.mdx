@@ -438,6 +438,56 @@ for frage in fragen:
 Für den Produktionseinsatz empfiehlt es sich, die In-Memory-Kosinus-Suche durch **pgvector** zu ersetzen – eine PostgreSQL-Erweiterung für Vektorsimilarität, die auf mittwald Container Hosting zusammen mit n8n läuft. Den kompletten Stack zeigt der [mittwald n8n-Guide](/docs/v2/guides/apps/n8n/).
 :::
 
+## Optional: Reranking mit Qwen3-VL-Reranker-2B {#reranking}
+
+Die Vektorsuche ruft Kandidaten anhand von Embedding-Ähnlichkeit ab – eine schnelle Näherung. Ein Cross-Encoder-Reranker bewertet jeden Kandidaten anhand des vollständigen Fragetexts und sortiert die Ergebnisse nach semantischer Relevanz neu. Der Unterschied ist vor allem bei großen Indizes spürbar, wo viele Abschnitte ähnliche Embeddings haben.
+
+`Qwen3-VL-Reranker-2B` ist über den `/v1/rerank`-Endpunkt verfügbar. Er lässt sich zwischen `abrufen()` und `antworten()` in der [obigen Pipeline](#vollstaendige-pipeline) einfügen:
+
+```python
+import os
+import requests
+
+def neu_sortieren(
+    frage: str,
+    abschnitte: list[str],
+    top_k: int = 3,
+    anweisung: str | None = None,
+) -> list[str]:
+    payload = {
+        "model": "Qwen3-VL-Reranker-2B",
+        "query": frage,
+        "documents": abschnitte,
+    }
+    if anweisung:
+        payload["instruction"] = anweisung
+    resp = requests.post(
+        "https://llm.aihosting.mittwald.de/v1/rerank",
+        headers={"Authorization": f"Bearer {os.environ['OPENAI_API_KEY']}"},
+        json=payload,
+        timeout=30,
+    )
+    resp.raise_for_status()
+    ergebnisse = resp.json()["results"]
+    sortiert = sorted(ergebnisse, key=lambda r: r["relevance_score"], reverse=True)
+    return [abschnitte[r["index"]] for r in sortiert[:top_k]]
+```
+
+Erst einen größeren Kandidatenpool aus dem Vektorindex abrufen, dann durch den Reranker auf die besten Ergebnisse einschränken:
+
+```python
+# 10 Kandidaten abrufen, auf Top 3 einschränken
+kandidaten = abrufen(anfrage_vektor, index, top_k=10)
+kontext_abschnitte = neu_sortieren(
+    frage,
+    kandidaten,
+    top_k=3,
+    anweisung="Gegeben OCR-extrahierte Dokumente, finde die Abschnitte, die am relevantesten für die Anfrage sind.",
+)
+```
+
+Die `/v1/rerank`-Antwort enthält eine `results`-Liste mit einem `index` (Position im ursprünglichen `documents`-Array) und einem `relevance_score` (höher ist besser) für jeden Eintrag. Der optionale `instruction`-Parameter teilt dem Reranker mit, für welche Retrievalaufgabe er optimieren soll – ohne Angabe wird ein generischer Standard verwendet.
+
 ## Vollständige Pipeline mit n8n und pgvector {#n8n}
 
 [n8n](https://n8n.io) ist eine Workflow-Automatisierungsplattform, mit der sich dieselbe OCR → Einbetten → Suchen → Antworten-Pipeline visuell aufbauen lässt – ohne Anwendungscode. mittwald stellt einen eigenen [n8n-Hosting-Guide](/docs/v2/guides/apps/n8n/) bereit, der den gemeinsamen Betrieb von n8n und einer **pgvector**-Datenbank auf mittwald Container Hosting beschreibt. Das ist die empfohlene Produktivumgebung.

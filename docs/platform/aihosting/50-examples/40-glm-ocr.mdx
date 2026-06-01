@@ -440,6 +440,56 @@ for q in questions:
 For production use, replace the in-memory cosine search with **pgvector** — a PostgreSQL extension for vector similarity search that runs on mittwald Container Hosting alongside n8n. See the [full RAG with n8n section](#n8n) below, or the [mittwald n8n guide](/docs/v2/guides/apps/n8n/) for a ready-to-deploy Docker Compose stack.
 :::
 
+## Optional: reranking with Qwen3-VL-Reranker-2B {#reranking}
+
+Vector search retrieves candidates by embedding similarity — a fast approximation. A cross-encoder reranker scores each candidate against the full question text and reorders them by semantic relevance. The improvement is most noticeable on large indexes where many chunks share similar embeddings.
+
+`Qwen3-VL-Reranker-2B` is served via the `/v1/rerank` endpoint. Drop it in between the `retrieve()` and `answer()` steps in the [pipeline above](#full-pipeline):
+
+```python
+import os
+import requests
+
+def rerank(
+    query: str,
+    chunks: list[str],
+    top_k: int = 3,
+    instruction: str | None = None,
+) -> list[str]:
+    payload = {
+        "model": "Qwen3-VL-Reranker-2B",
+        "query": query,
+        "documents": chunks,
+    }
+    if instruction:
+        payload["instruction"] = instruction
+    resp = requests.post(
+        "https://llm.aihosting.mittwald.de/v1/rerank",
+        headers={"Authorization": f"Bearer {os.environ['OPENAI_API_KEY']}"},
+        json=payload,
+        timeout=30,
+    )
+    resp.raise_for_status()
+    results = resp.json()["results"]
+    ranked = sorted(results, key=lambda r: r["relevance_score"], reverse=True)
+    return [chunks[r["index"]] for r in ranked[:top_k]]
+```
+
+Retrieve a wider candidate set from the vector index first, then let the reranker narrow it down:
+
+```python
+# Retrieve 10 candidates, rerank to top 3
+candidates = retrieve(q_vec, index, top_k=10)
+context_chunks = rerank(
+    q,
+    candidates,
+    top_k=3,
+    instruction="Given OCR-extracted documents, find the sections most relevant to the query.",
+)
+```
+
+The `/v1/rerank` response contains a `results` list with an `index` (position in the original `documents` array) and a `relevance_score` (higher is better) for each entry. The optional `instruction` parameter tells the reranker what retrieval task to optimise for — omitting it uses a generic default.
+
 ## Full pipeline with n8n and pgvector {#n8n}
 
 [n8n](https://n8n.io) is a workflow automation platform that lets you build the same OCR → embed → search → answer pipeline visually — without writing application code. mittwald provides a dedicated [n8n hosting guide](/docs/v2/guides/apps/n8n/) that covers running n8n together with a **pgvector** database on mittwald Container Hosting. This is the recommended production setup.
