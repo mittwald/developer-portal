@@ -1,0 +1,201 @@
+---
+sidebar_label: Qwen3.5-0.8B
+description: Detailed information about Qwen3.5-0.8B
+title: Qwen3.5-0.8B
+slug: /platform/aihosting/models/qwen3-5-0-8b
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+## Description
+
+"Qwen3.5-0.8B" is a compact language model by Alibaba with 0.8 billion parameters. Despite its small size it supports a 262,144-token context window and an optional thinking / reasoning mode, making it the most cost-efficient model in the mittwald AI Hosting catalogue.
+
+It supports and is suitable for:
+
+- Text generation within a chat completion (text to text)
+- Tool-calling for agentic workflows
+- Thinking / reasoning for step-by-step problem solving (opt-in)
+- High-throughput, latency-sensitive pipelines
+- Batch processing — classification, routing, summarisation, extraction
+
+The following limitations apply:
+
+- Maximum context length: 262,144 tokens
+- No image / vision support
+- Response quality and reasoning depth are lower than larger models
+- Thinking mode is **disabled by default** — opt in per request via `chat_template_kwargs`
+
+## Thinking mode
+
+Thinking mode is **off by default** on this model — the opposite of `Qwen3.5-122B-A10B-FP8`. Enable it selectively for tasks that benefit from chain-of-thought reasoning:
+
+<Tabs groupId="language">
+  <TabItem value="python" label="Python">
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1",
+    api_key="sk-your-api-key-here",
+)
+
+response = client.chat.completions.create(
+    model="Qwen3.5-0.8B",
+    messages=[{"role": "user", "content": "Solve: if 3x + 7 = 22, what is x?"}],
+    temperature=0.6,
+    top_k=20,
+    max_tokens=8192,
+    extra_body={
+        "chat_template_kwargs": {"enable_thinking": True},
+    },
+)
+
+# Thinking response contains both fields:
+print(response.choices[0].message.reasoning_content)  # chain-of-thought
+print(response.choices[0].message.content)             # final answer
+```
+
+  </TabItem>
+  <TabItem value="javascript" label="JavaScript">
+
+```ts
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  baseURL: "https://llm.aihosting.mittwald.de/v1",
+  apiKey: "sk-your-api-key-here",
+});
+
+const response = await client.chat.completions.create({
+  model: "Qwen3.5-0.8B",
+  messages: [{ role: "user", content: "Solve: if 3x + 7 = 22, what is x?" }],
+  temperature: 0.6,
+  max_tokens: 8192,
+  // @ts-ignore – vLLM extension
+  chat_template_kwargs: { enable_thinking: true },
+} as any);
+
+console.log(response.choices[0].message.content);
+```
+
+  </TabItem>
+</Tabs>
+
+When thinking is enabled the model returns two fields:
+
+| Field | Contents |
+| ----- | -------- |
+| `choices[0].message.reasoning_content` | Internal chain-of-thought |
+| `choices[0].message.content` | Final answer |
+
+## Recommended inference parameters
+
+### Default mode (thinking off)
+
+**General tasks:**
+
+| Parameter          | Value |
+| ------------------ | ----- |
+| `temperature`      | 1.0   |
+| `top_p`            | 1.0   |
+| `top_k`            | 20    |
+| `presence_penalty` | 2.0   |
+
+Do not use greedy decoding (`temperature: 0`) — it causes repetitions. `presence_penalty` above 1.5 can occasionally trigger language mixing on multilingual prompts.
+
+### Thinking mode (`enable_thinking: true`)
+
+**General tasks:**
+
+| Parameter          | Value |
+| ------------------ | ----- |
+| `temperature`      | 1.0   |
+| `top_p`            | 0.95  |
+| `top_k`            | 20    |
+| `presence_penalty` | 1.5   |
+
+**Coding and precise tasks:**
+
+| Parameter          | Value |
+| ------------------ | ----- |
+| `temperature`      | 0.6   |
+| `top_p`            | 0.95  |
+| `top_k`            | 20    |
+| `presence_penalty` | 0.0   |
+
+### Output length
+
+| Task type                              | Recommended `max_tokens` |
+| -------------------------------------- | ------------------------ |
+| Standard queries                       | 32,768                   |
+| Complex problems (math, step-by-step)  | 81,920                   |
+
+## Tips for specific tasks
+
+### Tool calling
+
+The model supports function calling using the Qwen3 XML format. Pass tools via the standard OpenAI `tools` parameter:
+
+```python
+response = client.chat.completions.create(
+    model="Qwen3.5-0.8B",
+    messages=[{"role": "user", "content": "What is the weather in Berlin?"}],
+    tools=[{
+        "type": "function",
+        "function": {
+            "name": "get_weather",
+            "description": "Get current weather for a city",
+            "parameters": {
+                "type": "object",
+                "properties": {"city": {"type": "string"}},
+                "required": ["city"],
+            },
+        },
+    }],
+    tool_choice="auto",
+    temperature=0.2,
+)
+```
+
+Use low temperature (`0.1–0.3`) for tool calls to reduce hallucinations.
+
+### Routing and classification
+
+The small size makes this model ideal as a first-pass classifier that decides which larger model handles a request:
+
+```python
+response = client.chat.completions.create(
+    model="Qwen3.5-0.8B",
+    messages=[
+        {
+            "role": "system",
+            "content": (
+                "Classify the following user message into exactly one category: "
+                "SIMPLE_QA, CODE, MATH, IMAGE_TASK. Respond with only the category name."
+            ),
+        },
+        {"role": "user", "content": user_message},
+    ],
+    temperature=0.1,
+    max_tokens=10,
+)
+category = response.choices[0].message.content.strip()
+```
+
+:::tip Guide ideas
+- **Cascade routing**: Use `Qwen3.5-0.8B` to classify query complexity (simple / code / math / vision), then route to the appropriate tier:
+  - Simple text → `Qwen3.5-0.8B` handles it directly
+  - Moderate → `Qwen3.6-35B-A3B-FP8` (reasoning + vision, mid cost)
+  - Complex / frontier → `Mistral-Medium-3.5-128B` or `Qwen3.5-122B-A10B-FP8`
+  - Vision only → `Ministral-3-14B-Instruct-2512` (cheapest vision model)
+
+  A well-tuned cascade can cut costs by 40–80% while maintaining quality on 95% of queries.
+- **Batch pre-processing**: Summarise, extract entities, or tag documents at scale before passing a curated subset to a heavier model.
+:::
+
+## Terms of use and licensing {#terms-of-use-and-licensing}
+
+The [general terms of use](../../access-and-usage/terms-of-use/) apply. The model is provided by Alibaba under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0.html), and reuse of the generated content is not subject to any additional restrictions.
