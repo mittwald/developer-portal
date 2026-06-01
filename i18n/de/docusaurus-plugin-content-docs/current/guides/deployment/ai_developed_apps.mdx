@@ -147,24 +147,31 @@ Voraussetzungen:
 Manuell durchzuführende Schritte:
 1. Bereite deine mit KI entwickelte App für die Bereitstellung vor: Vergewissere dich, dass sie lokal läuft und dass alle Abhängigkeiten installiert sind.
 
-```shellsession
-user@local $ git clone https://github.com/<your-org>/<your-repo>.git
-user@local $ cd <your-repo>
-```
+    ```shellsession
+    user@local $ git clone https://github.com/<your-org>/<your-repo>.git
+    user@local $ cd <your-repo>
+    ```
 
 2. Stelle sicher, dass dein lokales Repository mit GitHub synchron ist und dass deine Änderungen committed und gepusht sind.
 
-```shellsession
-user@local $ git pull
-user@local $ git status
-```
+    ```shellsession
+    user@local $ git pull
+    user@local $ git status
+    ```
 
 3. Verwende in deinem App-Ordner die mittwald-CLI, um ein Projekt zu erstellen und das Bereitstellungskommando auszuführen.
 
-```shellsession
-user@local $ mw project create --description=<project-name> --update-context
-user@local $ mw experimental deploy
-```
+    ```shellsession
+    user@local $ mw project create --description=<project-name> --update-context
+    user@local $ mw experimental deploy
+    ```
+
+:::note
+Beachte, dass der hier verwendete Befehl im `experimental`-Namespace implementiert ist.
+Das bedeutet, dass er sich noch in Entwicklung befindet und sich entsprechend ändern kann.
+Wir empfehlen dir, die aktuelle Dokumentation auf mögliche Updates oder Änderungen
+des Deployment-Prozesses zu prüfen.
+:::
 
 Die erste Bereitstellung dauert einige Minuten, während die App gebaut und die Hosting-Umgebung eingerichtet wird.
 Sobald die Bereitstellung abgeschlossen ist, kannst du deine App über die bereitgestellte URL aufrufen.
@@ -180,6 +187,46 @@ Weiterführende Guides für tiefergehendes Setup:
 - Für erweiterte Bereitstellungs-Workflows und CI-Beispiele, siehe [Application Deployment mit deployer](/docs/v2/guides/deployment/deployer/).
 - Für Container-Konzepte, Stack-Dateien und Registry-Setup, siehe [Container](/docs/v2/platform/workloads/containers/).
 - Für deklarative Stack-Bereitstellungsbefehle, siehe [mw stack Befehlsreferenz](/docs/v2/cli/reference/stack/).
+
+### Migration von Replit zu mittwald {#migrating-replit-to-mittwald}
+
+Replit exportiert Apps in Node.js-Workspaces als Monorepo-Git-Repository.
+Das bedeutet: Wenn du deine App nach GitHub exportierst, kannst du sie mit ein paar
+Anpassungen auch bei mittwald deployen. Wichtig ist vor allem, den richtigen Workspace
+für Build und Ausführung auszuwählen.
+
+Um die Standard-Build- und Start-Kommandos von Replit zu überschreiben, kannst du
+beim Build folgende Variablen setzen, zum Beispiel um im Beispiel-Monorepo den
+Workspace `hello-world` zu verwenden:
+
+```
+RAILPACK_BUILD_CMD: 'pnpm --filter @workspace/hello-world run build'
+RAILPACK_INSTALL_CMD: 'pnpm --filter @workspace/hello-world install'
+RAILPACK_START_CMD: 'pnpm --filter @workspace/hello-world run serve'
+```
+
+[Replit-Dokumentation zur Git-Schnittstelle](https://docs.replit.com/references/workspace-tools/git-interface)
+
+### Migration von Lovable zu mittwald {#migrating-lovable-to-mittwald}
+
+Mit Lovable erstellte Apps lassen sich als Standard-Node.js-Projekt nach GitHub exportieren.
+Damit eine solche App auf mittwald Hosting deploybar ist, muss die exportierte App eine
+gültige `package.json` mit den nötigen Build- und Start-Skripten enthalten.
+
+Zusätzlich können Lovable-Apps beim Deployment wegen nicht aufgelöster Abhängigkeiten
+oder fehlender Konfigurationsdateien fehlschlagen. Um diese Probleme zu lösen, kann es
+hilfreich sein, zusätzliche Paketmanager wie `bun` zu entfernen und für eine bessere
+Kompatibilität bei `npm` oder `pnpm` zu bleiben:
+
+```shellsession
+user@local $ rm bun.lock
+```
+
+Weiterführende Informationen zu den zugrunde liegenden Heuristiken zur
+Paketmanager-Erkennung und zu Konfigurationsoptionen findest du in der
+[Railpack-Dokumentation](https://railpack.com/languages/node).
+
+[Lovable-Dokumentation zur GitHub-Integration](https://docs.lovable.dev/integrations/github)
 
 ## Auf zum Erfolg: Best Practices {#moving-forward-best-practices}
 
