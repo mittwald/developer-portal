@@ -1,0 +1,318 @@
+---
+sidebar_label: GLM-OCR
+description: Detaillierte Informationen zu GLM-OCR
+title: GLM-OCR
+slug: /platform/aihosting/models/glm-ocr
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+Der [GLM-OCR-Guide](../../examples/glm-ocr/) enthält lauffähige Beispiele für alle gängigen Anwendungsfälle, darunter eine vollständige Pipeline mit [Qwen3-Embedding-8B](/docs/v2/platform/aihosting/models/qwen3-embedding-8b), [Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8), n8n und Vektordatenbank-Optionen (pgvector, Qdrant, ChromaDB).
+
+## Beschreibung
+
+„GLM-OCR" ist ein auf optische Zeichenerkennung (OCR) spezialisiertes Modell von Z.ai (ZhipuAI), das für die präzise Textextraktion aus Dokumenten und Bildern entwickelt wurde. Ein auf unserer Plattform integrierter Dokumenten-Proxy wandelt PDF-, DOCX-, PPTX-, XLSX-, HTML-, SVG- und Rasterbild-Formate automatisch in PNG-Seiten um, bevor das Modell sie verarbeitet.
+
+:::note[Datenverarbeitung]
+**Es werden keine Dokumentdaten auf Datenträgern gespeichert.** Der Proxy wandelt Dokumente im Arbeitsspeicher in PNG-Bilder um und übergibt sie direkt an das Modell — zwischen Anfragen wird nichts gespeichert. Externe URLs in HTML-, CSS- oder SVG-Dateien werden geblockt, um SSRF zu verhindern. Die gesamte Verarbeitung findet auf mittwald-Servern statt.
+:::
+
+Geeignet für und unterstützt:
+
+- Textextraktion aus PDF-, DOCX-, PPTX-, XLSX-, HTML- und vielen weiteren Dokumentenformaten
+- Verarbeitung gescannter Dokumente, Rechnungen, Verträge, Formulare und Berichte
+- Texterkennung in Tabellen und strukturierten Layouts
+- Erkennung von Formeln und mathematischen Ausdrücken
+- Key Information Extraction (KIE) — strukturierte JSON-Ausgabe aus Formularen, Belegen, Zertifikaten und Ausweisen
+- RAG-Vorverarbeitung (Retrieval-Augmented Generation) — hochgenaues Dokumenten-Parsing für Wissensdatenbanken
+- Mehrsprachige Dokumente — Chinesisch, Englisch, Deutsch, Französisch, Spanisch, Russisch, Japanisch, Koreanisch und weitere Sprachen
+
+Folgende Einschränkungen gelten:
+
+- Maximal **30 Seiten** pro Anfrage – bei Überschreitung liefert die API `HTTP 413`. Teile größere Dokumente in Batches von je 30 Seiten auf.
+- Maximale Anfragegröße: **200 MB**
+- Maximale Kontextlänge: 131.072 Token (ca. 4.000 Token pro Seite bei typischer Dokumentdichte)
+- Kein Tool-Calling oder Function-Calling
+- Kein Gedächtnis zwischen Anfragen — das Modell erinnert sich nicht an vorherige Extraktionen. Jeder API-Aufruf ist eigenständig; sende das Dokument erneut, wenn du eine weitere Frage dazu stellen möchtest.
+
+## Unterstützte Eingabeformate
+
+Alle Inhalte werden als Base64-kodierte Data-URI im Feld `image_url` übermittelt. Der Proxy erkennt das Format automatisch und wandelt es in seitenweise PNG-Bilder um, bevor sie an das Modell weitergeleitet werden.
+
+| Format | MIME-Typ für Data-URI | Hinweise |
+| ------ | --------------------- | -------- |
+| PDF | `application/pdf` | Bis zu 30 Seiten pro Anfrage |
+| JPEG | `image/jpeg` | Wird nativ verarbeitet |
+| PNG | `image/png` | Wird nativ verarbeitet |
+| TIFF | `image/tiff` | Mehrere Frames → eine Seite pro Frame |
+| GIF | `image/gif` | Animiert → eine Seite pro Frame |
+| WebP | `image/webp` | Animiert → eine Seite pro Frame |
+| BMP | `image/bmp` | |
+| SVG | `image/svg+xml` | Rasterisierung via cairosvg |
+| HTML | `text/html` | Rendering via WeasyPrint |
+| DOCX | `application/vnd.openxmlformats-officedocument.wordprocessingml.document` | Konvertierung via mammoth + WeasyPrint |
+| PPTX | `application/vnd.openxmlformats-officedocument.presentationml.presentation` | Eine Seite pro Folie |
+| XLSX | `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet` | Eine Seite pro Tabellenblatt, max. 2.000 Zeilen |
+| XLS | `application/vnd.ms-excel` | Älteres Excel-Format |
+
+## API-Nutzung
+
+GLM-OCR wird über den Standard-**Chat-Completions-Endpunkt** (`/v1/chat/completions`) mit dem Modellnamen `GLM-OCR` aufgerufen. Der Dokumenten-Proxy fängt die Anfrage ab, konvertiert das Dokument in PNG-Seiten und leitet sie an das Modell weiter – das manuelle Aufteilen von Seiten ist nicht erforderlich.
+
+### PDF-Dokument extrahieren
+
+<Tabs groupId="language">
+  <TabItem value="python" label="Python">
+
+```python
+import base64
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1",
+    api_key="<dein-api-key>",
+)
+
+with open("dokument.pdf", "rb") as f:
+    pdf_b64 = base64.b64encode(f.read()).decode()
+
+response = client.chat.completions.create(
+    model="GLM-OCR",
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:application/pdf;base64,{pdf_b64}",
+                    },
+                },
+                {
+                    "type": "text",
+                    "text": "Extrahiere den gesamten Text aus diesem Dokument.",
+                },
+            ],
+        }
+    ],
+    temperature=0.1,
+)
+
+print(response.choices[0].message.content)
+```
+
+  </TabItem>
+  <TabItem value="javascript" label="JavaScript">
+
+```ts
+import fs from "fs";
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  baseURL: "https://llm.aihosting.mittwald.de/v1",
+  apiKey: "<dein-api-key>",
+});
+
+const pdfB64 = fs.readFileSync("dokument.pdf").toString("base64");
+
+const response = await client.chat.completions.create({
+  model: "GLM-OCR",
+  messages: [
+    {
+      role: "user",
+      content: [
+        {
+          type: "image_url",
+          image_url: { url: `data:application/pdf;base64,${pdfB64}` },
+        },
+        { type: "text", text: "Extrahiere den gesamten Text aus diesem Dokument." },
+      ],
+    },
+  ],
+  temperature: 0.1,
+});
+
+console.log(response.choices[0].message.content);
+```
+
+  </TabItem>
+  <TabItem value="php" label="PHP">
+
+```php
+<?php
+// composer require openai-php/client guzzlehttp/guzzle
+
+$client = OpenAI::factory()
+    ->withBaseUri('https://llm.aihosting.mittwald.de/v1')
+    ->withApiKey('<dein-api-key>')
+    ->make();
+
+$pdfB64 = base64_encode(file_get_contents('dokument.pdf'));
+
+$response = $client->chat()->create([
+    'model' => 'GLM-OCR',
+    'messages' => [[
+        'role' => 'user',
+        'content' => [
+            [
+                'type' => 'image_url',
+                'image_url' => ['url' => "data:application/pdf;base64,{$pdfB64}"],
+            ],
+            ['type' => 'text', 'text' => 'Extrahiere den gesamten Text aus diesem Dokument.'],
+        ],
+    ]],
+    'temperature' => 0.1,
+]);
+
+echo $response->choices[0]->message->content;
+```
+
+  </TabItem>
+</Tabs>
+
+### Einzelnes Bild extrahieren
+
+Für einzelne Dokumentbilder (JPEG, PNG):
+
+<Tabs groupId="language">
+  <TabItem value="python" label="Python">
+
+```python
+import base64
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1",
+    api_key="<dein-api-key>",
+)
+
+with open("seite.jpg", "rb") as f:
+    img_b64 = base64.b64encode(f.read()).decode()
+
+response = client.chat.completions.create(
+    model="GLM-OCR",
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/jpeg;base64,{img_b64}",
+                    },
+                },
+                {
+                    "type": "text",
+                    "text": "Extrahiere den gesamten Text aus diesem Bild.",
+                },
+            ],
+        }
+    ],
+    temperature=0.1,
+)
+
+print(response.choices[0].message.content)
+```
+
+  </TabItem>
+  <TabItem value="javascript" label="JavaScript">
+
+```ts
+import fs from "fs";
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  baseURL: "https://llm.aihosting.mittwald.de/v1",
+  apiKey: "<dein-api-key>",
+});
+
+const imgB64 = fs.readFileSync("seite.jpg").toString("base64");
+
+const response = await client.chat.completions.create({
+  model: "GLM-OCR",
+  messages: [
+    {
+      role: "user",
+      content: [
+        {
+          type: "image_url",
+          image_url: { url: `data:image/jpeg;base64,${imgB64}` },
+        },
+        { type: "text", text: "Extrahiere den gesamten Text aus diesem Bild." },
+      ],
+    },
+  ],
+  temperature: 0.1,
+});
+
+console.log(response.choices[0].message.content);
+```
+
+  </TabItem>
+  <TabItem value="php" label="PHP">
+
+```php
+<?php
+// composer require openai-php/client guzzlehttp/guzzle
+
+$client = OpenAI::factory()
+    ->withBaseUri('https://llm.aihosting.mittwald.de/v1')
+    ->withApiKey('<dein-api-key>')
+    ->make();
+
+$imgB64 = base64_encode(file_get_contents('seite.jpg'));
+
+$response = $client->chat()->create([
+    'model' => 'GLM-OCR',
+    'messages' => [[
+        'role' => 'user',
+        'content' => [
+            [
+                'type' => 'image_url',
+                'image_url' => ['url' => "data:image/jpeg;base64,{$imgB64}"],
+            ],
+            ['type' => 'text', 'text' => 'Extrahiere den gesamten Text aus diesem Bild.'],
+        ],
+    ]],
+    'temperature' => 0.1,
+]);
+
+echo $response->choices[0]->message->content;
+```
+
+  </TabItem>
+</Tabs>
+
+## Empfohlene Inferenzparameter
+
+GLM-OCR ist ein deterministisches Extraktionsmodell. Verwende niedrige Temperaturen für eine genaue, quellengetreue Textextraktion:
+
+| Parameter     | Wert |
+| ------------- | ---- |
+| `temperature` | 0.1  |
+| `top_p`       | 1.0  |
+| `max_tokens`  | 4096 pro Seite (entsprechend der Seitenanzahl skalieren) |
+
+## Ausgabemodi
+
+Das Ausgabeformat des Modells wird ausschließlich über den Prompt gesteuert – es gibt keinen separaten API-Parameter dafür.
+
+| Modus | Aktivierung | Verhalten |
+| ----- | ----------- | --------- |
+| **Klartext** | `"Extrahiere den gesamten Text aus diesem Dokument."` | Roher Text ohne Formatierung |
+| **Markdown** | `"Extrahiere den Text und formatiere ihn als Markdown. Verwende # für Überschriften und - für Listen."` | Erhält Überschriften, Listen, Hervorhebungen – gut für RAG |
+| **JSON (KIE)** | `"Extrahiere diese Felder und gib sie als JSON zurück: {…}"` | Strukturierte Extraktion; Ausgabe immer in ` ```json ``` `-Blöcken – vor dem Parsen entfernen |
+| **HTML-Tabelle** | `"Gib die Tabelle als HTML-<table>-Element zurück."` | Nützlich für tabellenartige Daten |
+
+:::note[Beobachtetes Modellverhalten]
+- **JSON ist immer mit Code-Blöcken umschlossen.** Das Modell umschließt JSON-Antworten unabhängig vom Prompt mit Markdown-Code-Blöcken. Vor dem Aufruf von `json.loads()` mit `re.sub(r"^```[a-z]*\n?", "", raw.strip())` entfernen.
+- **Markdown-Modus benötigt konkrete Anweisungen.** Ein allgemeines „Wandle in Markdown um" erzeugt keine zuverlässige Überschriften-Syntax – immer `# für Hauptüberschriften, ## für Unterüberschriften, - für Listen` angeben.
+- **HTML-Eingabe → HTML-Tabellenausgabe.** Enthält die Eingabe eine HTML-Datei mit einer `<table>`, gibt das Modell diese als HTML aus – auch wenn Markdown-Tabellen angefordert werden. Für saubere Markdown-Tabellenausgabe eine PDF- oder Bildquelle verwenden.
+- **XLSX-Ausgabe enthält den Tabellenblatt-Namen.** Bei Excel-Dateien gibt das Modell den Tabellenblatt-Namen als erste Zeile aus. Diese Zeile beim programmatischen Weiterverarbeiten herausfiltern.
+- **PPTX und XLSX benötigen gültiges Open XML.** Beschädigte oder programmatisch erzeugte ungültige Office-ZIP-Strukturen führen zu HTTP 400.
+:::
+
+## Nutzungsbedingungen und Lizenzierung {#nutzungsbedingungen-und-lizenzierung}
+
+Es gelten die [allgemeinen Nutzungsbedingungen](../../access-and-usage/terms-of-use/). Das Modell wird von Z.ai unter der [MIT-Lizenz](https://opensource.org/licenses/MIT) angeboten. Die Weiternutzung der extrahierten Inhalte unterliegt keinen zusätzlichen Einschränkungen durch die Modelllizenz.

@@ -1,0 +1,758 @@
+---
+sidebar_label: GLM-OCR-Guide
+description: Praxisleitfaden zur Textextraktion aus Dokumenten, Rechnungen und Formularen mit GLM-OCR – inklusive einer vollständigen RAG-Pipeline
+title: Textextraktion aus Dokumenten mit GLM-OCR
+---
+
+GLM-OCR ist ein OCR-Modell, das ausschließlich für das Lesen von Text entwickelt wurde – nicht für Chat oder Bildverständnis. Nutze es, wenn du PDFs digitalisieren, gescannte Rechnungen parsen oder Felder aus Formularen extrahieren möchtest.
+
+:::tip Wann GLM-OCR einsetzen?
+Nutze GLM-OCR für **Textextraktion** aus Dokumenten (PDF, DOCX, PPTX, XLSX, HTML, Bilder). Wenn du auf Basis eines Dokuments auch Reasoning oder Konversation brauchst – z. B. „Fasse diesen Vertrag zusammen und erkläre ihn" – ist ein allgemeines Vision-Modell wie [Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8) besser geeignet. Beides lässt sich kombinieren: erst OCR, dann den extrahierten Text an ein anderes Modell übergeben.
+
+Unterstützte Formate, Limits, Ausgabemodi, Inferenzparameter und JavaScript-/PHP-Codebeispiele stehen in der [GLM-OCR Modellreferenz](/docs/v2/platform/aihosting/models/glm-ocr).
+:::
+
+## Einrichtung {#einrichtung}
+
+Installiere die OpenAI-Library und hinterlege deinen API-Key aus dem mStudio:
+
+```shellsession
+user@local $ pip install openai
+user@local $ export OPENAI_API_KEY="sk-…"
+```
+
+Alle folgenden Beispiele verwenden einen gemeinsamen Client:
+
+```python
+from openai import OpenAI
+
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+```
+
+## Text aus einem PDF extrahieren
+
+Der häufigste Anwendungsfall: das Lesen eines gescannten oder digitalen PDFs. Der integrierte Proxy wandelt jede Seite automatisch in ein Bild um – du schickst die Datei einfach als Base64-Data-URI.
+
+```python
+import base64
+from openai import OpenAI
+
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+
+with open("rechnung.pdf", "rb") as f:
+    pdf_b64 = base64.b64encode(f.read()).decode()
+
+response = client.chat.completions.create(
+    model="GLM-OCR",
+    messages=[{
+        "role": "user",
+        "content": [
+            {
+                "type": "image_url",
+                "image_url": {"url": f"data:application/pdf;base64,{pdf_b64}"},
+            },
+            {"type": "text", "text": "Extrahiere den gesamten Text aus diesem Dokument."},
+        ],
+    }],
+    temperature=0.1,
+)
+
+print(response.choices[0].message.content)
+```
+
+Pro Anfrage werden bis zu **30 Seiten** verarbeitet – siehe [Große PDFs in Batches verarbeiten](#grosse-pdfs-in-batches-verarbeiten) bei größeren Dokumenten.
+
+## Text aus Bildern extrahieren
+
+Gescannte Seiten als JPEG, PNG, WebP oder SVG werden direkt vom Modell verarbeitet. Nur der MIME-Typ in der Data-URI muss zum Dateiformat passen:
+
+```python
+import base64
+from openai import OpenAI
+
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+
+# Unterstützt: image/jpeg  image/png  image/webp  image/svg+xml
+MIME = {"jpg": "image/jpeg", "jpeg": "image/jpeg", "png": "image/png",
+        "webp": "image/webp", "svg": "image/svg+xml"}
+
+def bild_ocr(pfad: str) -> str:
+    ext = pfad.rsplit(".", 1)[-1].lower()
+    with open(pfad, "rb") as f:
+        b64 = base64.b64encode(f.read()).decode()
+    response = client.chat.completions.create(
+        model="GLM-OCR",
+        messages=[{
+            "role": "user",
+            "content": [
+                {"type": "image_url", "image_url": {"url": f"data:{MIME[ext]};base64,{b64}"}},
+                {"type": "text", "text": "Extrahiere den gesamten Text aus diesem Bild."},
+            ],
+        }],
+        temperature=0.1,
+    )
+    return response.choices[0].message.content
+
+print(bild_ocr("scan.jpg"))
+print(bild_ocr("diagramm.png"))
+print(bild_ocr("grafik.webp"))
+print(bild_ocr("zeichnung.svg"))
+```
+
+## Office-Dokumente lesen (DOCX, PPTX, XLSX)
+
+GLM-OCR akzeptiert Word-, PowerPoint- und Excel-Dateien direkt – keine Vorkonvertierung nötig. Es ändert sich nur der MIME-Typ in der Data-URI:
+
+```python
+import base64
+from openai import OpenAI
+
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+
+MIME = {
+    "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+}
+
+def dokument_lesen(pfad: str) -> str:
+    ext = pfad.rsplit(".", 1)[-1].lower()
+    with open(pfad, "rb") as f:
+        b64 = base64.b64encode(f.read()).decode()
+    response = client.chat.completions.create(
+        model="GLM-OCR",
+        messages=[{
+            "role": "user",
+            "content": [
+                {
+                    "type": "image_url",
+                    "image_url": {"url": f"data:{MIME[ext]};base64,{b64}"},
+                },
+                {"type": "text", "text": "Extrahiere den gesamten Text aus diesem Dokument."},
+            ],
+        }],
+        temperature=0.1,
+    )
+    return response.choices[0].message.content
+
+print(dokument_lesen("vertrag.docx"))
+print(dokument_lesen("praesentation.pptx"))
+print(dokument_lesen("auswertung.xlsx"))
+```
+
+## Markdown-Ausgabe
+
+Lass GLM-OCR die Dokumentstruktur (Überschriften, Aufzählungen, Hervorhebungen) erhalten, wenn die Ausgabe angezeigt oder für RAG gespeichert wird. Konkrete Formatierungsanweisungen sind notwendig – das Modell benötigt klare Vorgaben, um Überschriften-Syntax zuverlässig zu erzeugen:
+
+```python
+import base64
+from openai import OpenAI
+
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+
+with open("bericht.pdf", "rb") as f:
+    pdf_b64 = base64.b64encode(f.read()).decode()
+
+response = client.chat.completions.create(
+    model="GLM-OCR",
+    messages=[{
+        "role": "user",
+        "content": [
+            {
+                "type": "image_url",
+                "image_url": {"url": f"data:application/pdf;base64,{pdf_b64}"},
+            },
+            {
+                "type": "text",
+                "text": (
+                    "Extrahiere den Text aus diesem Dokument und formatiere ihn als Markdown. "
+                    "Verwende # für Hauptüberschriften, ## für Unterüberschriften und - für Aufzählungen."
+                ),
+            },
+        ],
+    }],
+    temperature=0.1,
+)
+
+markdown = response.choices[0].message.content
+print(markdown)
+# Beispielausgabe:
+# # Jahresbericht 2024
+#
+# Umsatz: 50.000 EUR
+#
+# - Q1: 12.000 EUR
+# - Q2: 13.000 EUR
+```
+
+## Strukturierte Daten aus Rechnungen extrahieren (KIE) {#strukturierte-daten-aus-rechnungen-extrahieren}
+
+Key Information Extraction (KIE) ermöglicht es, bestimmte Felder aus einem Dokument als JSON-Objekt herauszulesen. Beschreibe das gewünschte Schema in natürlicher Sprache – das Modell füllt die Werte aus dem Dokument ein.
+
+Das Modell **umschließt die JSON-Ausgabe immer mit Markdown-Code-Blöcken**, unabhängig vom Prompt – diese müssen vor dem Parsen entfernt werden:
+
+```python
+import base64
+import json
+import re
+from openai import OpenAI
+
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+
+with open("rechnung.pdf", "rb") as f:
+    pdf_b64 = base64.b64encode(f.read()).decode()
+
+response = client.chat.completions.create(
+    model="GLM-OCR",
+    messages=[{
+        "role": "user",
+        "content": [
+            {
+                "type": "image_url",
+                "image_url": {"url": f"data:application/pdf;base64,{pdf_b64}"},
+            },
+            {
+                "type": "text",
+                "text": (
+                    "Extrahiere die folgenden Felder aus dieser Rechnung und gib sie als JSON zurück:\n"
+                    '{ "rechnungsnummer": "", "datum": "", "lieferant": "", '
+                    '"gesamtbetrag": "", "positionen": [] }'
+                ),
+            },
+        ],
+    }],
+    temperature=0.1,
+)
+
+# Markdown-Code-Blöcke entfernen, die das Modell immer hinzufügt
+raw = response.choices[0].message.content
+clean = re.sub(r"^```[a-z]*\n?", "", raw.strip())
+clean = re.sub(r"\n?```$", "", clean)
+data = json.loads(clean)
+print(data)
+```
+
+Dasselbe funktioniert für beliebige Dokumenttypen – Schema einfach anpassen:
+
+```python
+# Lohnsteuerbescheinigung
+"text": (
+    "Extrahiere die folgenden Felder und gib sie als JSON zurück:\n"
+    '{ "steuernummer": "", "veranlagungszeitraum": "", "bruttoarbeitslohn": "", '
+    '"lohnsteuer": "", "solidaritaetszuschlag": "" }'
+)
+```
+
+## Große PDFs in Batches verarbeiten {#grosse-pdfs-in-batches-verarbeiten}
+
+Das 30-Seiten-Limit gilt pro Anfrage. Größere Dokumente können mit [pypdf](https://pypdf.readthedocs.io/) aufgeteilt und die Ergebnisse anschließend zusammengeführt werden:
+
+```python
+import base64
+from io import BytesIO
+from pypdf import PdfReader, PdfWriter
+from openai import OpenAI
+
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+
+def _batch_ocr(pdf_bytes: bytes) -> str:
+    b64 = base64.b64encode(pdf_bytes).decode()
+    resp = client.chat.completions.create(
+        model="GLM-OCR",
+        messages=[{
+            "role": "user",
+            "content": [
+                {"type": "image_url", "image_url": {"url": f"data:application/pdf;base64,{b64}"}},
+                {"type": "text", "text": "Extrahiere den gesamten Text aus diesem Dokument."},
+            ],
+        }],
+        temperature=0.1,
+    )
+    return resp.choices[0].message.content
+
+def grosses_pdf_ocr(pfad: str, batch_groesse: int = 30) -> str:
+    reader = PdfReader(pfad)
+    teile = []
+    for start in range(0, len(reader.pages), batch_groesse):
+        writer = PdfWriter()
+        for seite in reader.pages[start : start + batch_groesse]:
+            writer.add_page(seite)
+        buf = BytesIO()
+        writer.write(buf)
+        teile.append(_batch_ocr(buf.getvalue()))
+    return "\n\n".join(teile)
+
+text = grosses_pdf_ocr("jahresbericht.pdf")
+```
+
+## Vollständige Pipeline: OCR → Einbettung → Suche → Antwort {#vollstaendige-pipeline}
+
+Kombiniere drei mittwald AI-Hosting-Modelle zu einer vollständigen Dokumenten-Frage-Antwort-Pipeline:
+
+1. **GLM-OCR** digitalisiert die Dokumente – im **Markdown-Ausgabemodus**, damit Struktur und Überschriften erhalten bleiben, was sauberere Abschnitte und bessere Suchergebnisse liefert als reiner Fließtext
+2. **[Qwen3-Embedding-8B](/docs/v2/platform/aihosting/models/qwen3-embedding-8b)** wandelt Textabschnitte in Vektoren um
+3. **[Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8)** beantwortet Fragen anhand des abgerufenen Kontexts
+
+```shellsession
+user@local $ pip install openai pypdf
+```
+
+```python
+import base64
+import math
+import re
+from io import BytesIO
+from pypdf import PdfReader, PdfWriter
+from openai import OpenAI
+
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+
+
+# ── Schritt 1: OCR (Markdown-Modus für saubere Struktur) ─────────────────────
+
+MIME = {
+    "pdf":  "application/pdf",
+    "jpg":  "image/jpeg",
+    "jpeg": "image/jpeg",
+    "png":  "image/png",
+    "webp": "image/webp",
+    "svg":  "image/svg+xml",
+    "html": "text/html",
+    "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+}
+
+def dokument_ocr(pfad: str) -> str:
+    ext = pfad.rsplit(".", 1)[-1].lower()
+    with open(pfad, "rb") as f:
+        b64 = base64.b64encode(f.read()).decode()
+    resp = client.chat.completions.create(
+        model="GLM-OCR",
+        messages=[{"role": "user", "content": [
+            {"type": "image_url", "image_url": {"url": f"data:{MIME.get(ext, 'application/pdf')};base64,{b64}"}},
+            {
+                "type": "text",
+                "text": (
+                    "Extrahiere den Text aus diesem Dokument und formatiere ihn als Markdown. "
+                    "Verwende # für Hauptüberschriften, ## für Unterüberschriften und - für Aufzählungen."
+                ),
+            },
+        ]}],
+        temperature=0.1,
+    )
+    return resp.choices[0].message.content
+
+
+# ── Schritt 2: Aufteilen (an Markdown-Überschriften, dann nach Wortanzahl) ────
+
+def text_aufteilen(text: str, groesse: int = 400, ueberlappung: int = 50) -> list[str]:
+    # An oberster Überschriftenebene aufteilen, um Abschnitte zusammenzuhalten
+    abschnitte_roh = re.split(r"(?m)^(?=# )", text)
+    abschnitte: list[str] = []
+    for abschnitt in abschnitte_roh:
+        woerter = abschnitt.split()
+        i = 0
+        while i < len(woerter):
+            abschnitte.append(" ".join(woerter[i : i + groesse]))
+            i += groesse - ueberlappung
+    return [a for a in abschnitte if a.strip()]
+
+
+# ── Schritt 3: Einbetten ──────────────────────────────────────────────────────
+
+def einbetten(texte: list[str]) -> list[list[float]]:
+    resp = client.embeddings.create(model="Qwen3-Embedding-8B", input=texte)
+    return [eintrag.embedding for eintrag in resp.data]
+
+
+# ── Schritt 4: Abrufen ────────────────────────────────────────────────────────
+
+def kosinus(a: list[float], b: list[float]) -> float:
+    skalar = sum(x * y for x, y in zip(a, b))
+    norm = math.sqrt(sum(x * x for x in a)) * math.sqrt(sum(x * x for x in b))
+    return skalar / (norm + 1e-9)
+
+def abrufen(anfrage_vektor: list[float], index: list, top_k: int = 3) -> list[str]:
+    bewertet = [(kosinus(anfrage_vektor, vektor), abschnitt) for vektor, abschnitt in index]
+    return [abschnitt for _, abschnitt in sorted(bewertet, reverse=True)[:top_k]]
+
+
+# ── Schritt 5: Antworten ──────────────────────────────────────────────────────
+# Qwen3.5 hat den Thinking-Modus standardmäßig aktiviert – für Q&A deaktivieren,
+# damit die Antwort in message.content zurückkommt, nicht in reasoning_content.
+# Siehe: /docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8
+
+def antworten(frage: str, abschnitte: list[str]) -> str:
+    kontext = "\n\n---\n\n".join(abschnitte)
+    resp = client.chat.completions.create(
+        model="Qwen3.5-122B-A10B-FP8",
+        messages=[
+            {
+                "role": "system",
+                "content": "Beantworte Fragen ausschließlich anhand des bereitgestellten Dokumentenkontexts. Sei präzise und knapp.",
+            },
+            {
+                "role": "user",
+                "content": f"Kontext:\n{kontext}\n\nFrage: {frage}",
+            },
+        ],
+        temperature=0.7,
+        top_p=0.8,
+        max_tokens=1024,
+        extra_body={"chat_template_kwargs": {"enable_thinking": False}},
+    )
+    return resp.choices[0].message.content
+
+
+# ── Index aufbauen ────────────────────────────────────────────────────────────
+
+# Unterstützt PDFs, Bilder (jpg/png/webp/svg), DOCX, PPTX, XLSX, HTML
+dokumente = ["rechnung.pdf", "vertrag.docx"]
+
+index: list[tuple[list[float], str]] = []
+for pfad in dokumente:
+    text = dokument_ocr(pfad)
+    abschnitte = text_aufteilen(text)
+    vektoren = einbetten(abschnitte)
+    index.extend(zip(vektoren, abschnitte))
+
+print(f"{len(index)} Abschnitte aus {len(dokumente)} Dokumenten indiziert.")
+
+
+# ── Fragen stellen ────────────────────────────────────────────────────────────
+
+fragen = [
+    "Wie hoch ist der Gesamtbetrag der Rechnung?",
+    "Wie lange ist die Vertragslaufzeit?",
+]
+
+for frage in fragen:
+    [anfrage_vektor] = einbetten([frage])
+    kontext_abschnitte = abrufen(anfrage_vektor, index)
+    print(f"\nF: {frage}")
+    print(f"A: {antworten(frage, kontext_abschnitte)}")
+```
+
+:::tip Skalierung
+Für den Produktionseinsatz empfiehlt es sich, die In-Memory-Kosinus-Suche durch **pgvector** zu ersetzen – eine PostgreSQL-Erweiterung für Vektorsimilarität, die auf mittwald Container Hosting zusammen mit n8n läuft. Den kompletten Stack zeigt der [mittwald n8n-Guide](/docs/v2/guides/apps/n8n/).
+:::
+
+## Optional: Reranking mit Qwen3-VL-Reranker-2B {#reranking}
+
+Die Vektorsuche ruft Kandidaten anhand von Embedding-Ähnlichkeit ab – eine schnelle Näherung. Ein Cross-Encoder-Reranker bewertet jeden Kandidaten anhand des vollständigen Fragetexts und sortiert die Ergebnisse nach semantischer Relevanz neu. Der Unterschied ist vor allem bei großen Indizes spürbar, wo viele Abschnitte ähnliche Embeddings haben.
+
+`Qwen3-VL-Reranker-2B` ist über den `/v1/rerank`-Endpunkt verfügbar. Er lässt sich zwischen `abrufen()` und `antworten()` in der [obigen Pipeline](#vollstaendige-pipeline) einfügen:
+
+```python
+import os
+import requests
+
+def neu_sortieren(
+    frage: str,
+    abschnitte: list[str],
+    top_k: int = 3,
+    anweisung: str | None = None,
+) -> list[str]:
+    payload = {
+        "model": "Qwen3-VL-Reranker-2B",
+        "query": frage,
+        "documents": abschnitte,
+    }
+    if anweisung:
+        payload["instruction"] = anweisung
+    resp = requests.post(
+        "https://llm.aihosting.mittwald.de/v1/rerank",
+        headers={"Authorization": f"Bearer {os.environ['OPENAI_API_KEY']}"},
+        json=payload,
+        timeout=30,
+    )
+    resp.raise_for_status()
+    ergebnisse = resp.json()["results"]
+    sortiert = sorted(ergebnisse, key=lambda r: r["relevance_score"], reverse=True)
+    return [abschnitte[r["index"]] for r in sortiert[:top_k]]
+```
+
+Erst einen größeren Kandidatenpool aus dem Vektorindex abrufen, dann durch den Reranker auf die besten Ergebnisse einschränken:
+
+```python
+# 10 Kandidaten abrufen, auf Top 3 einschränken
+kandidaten = abrufen(anfrage_vektor, index, top_k=10)
+kontext_abschnitte = neu_sortieren(
+    frage,
+    kandidaten,
+    top_k=3,
+    anweisung="Gegeben OCR-extrahierte Dokumente, finde die Abschnitte, die am relevantesten für die Anfrage sind.",
+)
+```
+
+Die `/v1/rerank`-Antwort enthält eine `results`-Liste mit einem `index` (Position im ursprünglichen `documents`-Array) und einem `relevance_score` (höher ist besser) für jeden Eintrag. Der optionale `instruction`-Parameter teilt dem Reranker mit, für welche Retrievalaufgabe er optimieren soll – ohne Angabe wird ein generischer Standard verwendet.
+
+## Vollständige Pipeline mit n8n und pgvector {#n8n}
+
+[n8n](https://n8n.io) ist eine Workflow-Automatisierungsplattform, mit der sich dieselbe OCR → Einbetten → Suchen → Antworten-Pipeline visuell aufbauen lässt – ohne Anwendungscode. mittwald stellt einen eigenen [n8n-Hosting-Guide](/docs/v2/guides/apps/n8n/) bereit, der den gemeinsamen Betrieb von n8n und einer **pgvector**-Datenbank auf mittwald Container Hosting beschreibt. Das ist die empfohlene Produktivumgebung.
+
+:::info Vektordatenbank auf mittwald hosten
+**[mittwald Container Hosting](/docs/v2/platform/workloads/containers/)** ermöglicht es, beliebige Docker-Images als Container in einem mStudio-Projekt zu betreiben – einschließlich Vektordatenbanken. Das Deployment erfolgt über `mw stack deploy` (Docker Compose) oder die mStudio-Oberfläche, mit persistenter Speicherung über benannte Volumes. Kein externer Datenbankdienst notwendig.
+
+Drei Vektordatenbanken sind als mittwald Container-Templates verfügbar:
+
+| Datenbank | Docker-Image | Geeignet für |
+|-----------|-------------|--------------|
+| **pgvector** | `ankane/pgvector:latest` | PostgreSQL-basiert; native n8n-Unterstützung |
+| **Qdrant** | `qdrant/qdrant:latest` | Leistungsstarke dedizierte Vektorsuche; REST + gRPC API |
+| **ChromaDB** | `chromadb/chroma:latest` | Einfache HTTP-API; schneller Einstieg |
+:::
+
+Da mittwald AI Hosting eine OpenAI-kompatible API bereitstellt, funktionieren die eingebauten OpenAI-Nodes von n8n sofort mit einer eigenen Base-URL.
+
+### n8n + pgvector auf mittwald deployen
+
+Der mittwald n8n-Guide beschreibt das Deployment eines vollständigen Stacks über `mw stack deploy`. Die wesentliche Docker-Compose-Konfiguration:
+
+```yaml
+services:
+  n8n:
+    image: n8nio/n8n:stable
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+    environment:
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=pgvector
+      - DB_POSTGRESDB_DATABASE=n8n
+      - DB_POSTGRESDB_USER=n8n
+      - DB_POSTGRESDB_PASSWORD=<passwort>
+
+  pgvector:
+    image: ankane/pgvector:latest
+    environment:
+      - POSTGRES_DB=n8n
+      - POSTGRES_USER=n8n
+      - POSTGRES_PASSWORD=<passwort>
+    volumes:
+      - pgvector_data:/var/lib/postgresql/data
+
+volumes:
+  n8n_data:
+  pgvector_data:
+```
+
+Die vollständige Einrichtung inklusive eigener Domain, SSL und mStudio-Konfiguration ist im [mittwald n8n-Guide](/docs/v2/guides/apps/n8n/) beschrieben.
+
+### Alternative: Qdrant
+
+Qdrant ist eine dedizierte Vektorsuchmaschine mit REST- und gRPC-API. Als Container neben der Anwendung betreiben:
+
+```yaml
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    ports:
+      - "6333:6333"   # REST API
+      - "6334:6334"   # gRPC
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+volumes:
+  qdrant_data:
+```
+
+Mit `mw stack deploy` deployen und aus Python über den offiziellen Client verbinden:
+
+```python
+# pip install qdrant-client openai
+from qdrant_client import QdrantClient
+from qdrant_client.models import Distance, VectorParams, PointStruct
+from openai import OpenAI
+import uuid
+
+ki = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+qdrant = QdrantClient(host="localhost", port=6333)
+
+# Collection erstellen (einmalig)
+qdrant.create_collection(
+    collection_name="dokumente",
+    vectors_config=VectorParams(size=4096, distance=Distance.COSINE),
+)
+
+def einbetten(texte: list[str]) -> list[list[float]]:
+    resp = ki.embeddings.create(model="Qwen3-Embedding-8B", input=texte)
+    return [eintrag.embedding for eintrag in resp.data]
+
+def abschnitte_indizieren(abschnitte: list[str]) -> None:
+    vektoren = einbetten(abschnitte)
+    qdrant.upsert(
+        collection_name="dokumente",
+        points=[
+            PointStruct(id=str(uuid.uuid4()), vector=vektor, payload={"text": abschnitt})
+            for vektor, abschnitt in zip(vektoren, abschnitte)
+        ],
+    )
+
+def suchen(frage: str, top_k: int = 3) -> list[str]:
+    [anfrage_vektor] = einbetten([frage])
+    ergebnis = qdrant.query_points(collection_name="dokumente", query=anfrage_vektor, limit=top_k)
+    return [treffer.payload["text"] for treffer in ergebnis.points]
+```
+
+### Alternative: ChromaDB
+
+ChromaDB bietet eine einfache HTTP-API und eignet sich gut für schnellen Einstieg und kleinere Dokumentensammlungen:
+
+```yaml
+services:
+  chromadb:
+    image: chromadb/chroma:latest
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+
+volumes:
+  chroma_data:
+```
+
+Verbindung aus Python:
+
+```python
+# pip install chromadb openai
+import chromadb
+from openai import OpenAI
+
+ki = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+chroma = chromadb.HttpClient(host="localhost", port=8000)
+sammlung = chroma.get_or_create_collection("dokumente")
+
+def einbetten(texte: list[str]) -> list[list[float]]:
+    resp = ki.embeddings.create(model="Qwen3-Embedding-8B", input=texte)
+    return [eintrag.embedding for eintrag in resp.data]
+
+def abschnitte_indizieren(abschnitte: list[str]) -> None:
+    vektoren = einbetten(abschnitte)
+    sammlung.add(
+        ids=[str(i) for i in range(len(abschnitte))],
+        embeddings=vektoren,
+        documents=abschnitte,
+    )
+
+def suchen(frage: str, top_k: int = 3) -> list[str]:
+    [anfrage_vektor] = einbetten([frage])
+    ergebnisse = sammlung.query(query_embeddings=[anfrage_vektor], n_results=top_k)
+    return ergebnisse["documents"][0]
+```
+
+### Zugangsdaten in n8n einrichten
+
+Eine neue **OpenAI-API**-Zugangsdaten-Konfiguration in n8n erstellen und die Base-URL überschreiben:
+
+| Feld | Wert |
+|------|------|
+| API-Key | dein mStudio AI-Hosting-Key (`sk-…`) |
+| Base-URL | `https://llm.aihosting.mittwald.de/v1` |
+
+GLM-OCR, [Qwen3-Embedding-8B](/docs/v2/platform/aihosting/models/qwen3-embedding-8b) und [Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8) teilen sich diese eine Zugangsdaten-Konfiguration.
+
+### Dokument-Ingestion-Workflow
+
+Dieser n8n-Workflow digitalisiert und indiziert neue Dokumente automatisch:
+
+```
+[Trigger: neue Datei / Webhook / Zeitplan]
+       ↓
+[Binärdatei lesen]
+       ↓
+[Code-Node]  Datei als Base64 kodieren → Data-URI
+       ↓
+[HTTP-Request]  POST https://llm.aihosting.mittwald.de/v1/chat/completions
+  model: GLM-OCR
+  prompt: "Extrahiere den Text und formatiere ihn als Markdown. Verwende # für Überschriften und - für Listen."
+       ↓
+[Code-Node]  Markdown in 400-Wort-Abschnitte mit 50-Wort-Überlappung aufteilen
+       ↓
+[Embeddings-OpenAI-Node]  model: Qwen3-Embedding-8B
+       ↓
+[Postgres-(pgvector)-Node]  Abschnitte + Vektoren in Vektortabelle einfügen
+```
+
+Der GLM-OCR-Aufruf erfolgt über einen **HTTP-Request**-Node, da die Datei zuerst base64-kodiert werden muss:
+
+```javascript
+// n8n Code-Node — Binärdaten als Base64-Data-URI kodieren
+const binaryData = $input.first().binary.data;
+const b64 = binaryData.data;       // n8n kodiert Binär-Items bereits in Base64
+const mime = binaryData.mimeType;  // z. B. "application/pdf"
+return [{ json: { dataUri: `data:${mime};base64,${b64}` } }];
+```
+
+### Frage-Antwort-Workflow
+
+Ein zweiter Workflow beantwortet Nutzerfragen auf Abruf:
+
+```
+[Trigger: Webhook  ?frage=Wie+lange+ist+die+Vertragslaufzeit%3F]
+       ↓
+[Embeddings-OpenAI-Node]  Frage einbetten  (Qwen3-Embedding-8B)
+       ↓
+[Postgres-(pgvector)-Node]  Top-3 Abschnitte nach Vektorsimilarität abrufen
+       ↓
+[OpenAI-Chat-Node]  model: Qwen3.5-122B-A10B-FP8
+  system: "Beantworte Fragen ausschließlich anhand des bereitgestellten Kontexts."
+  user:   "Kontext: {{abschnitte}}\n\nFrage: {{frage}}"
+       ↓
+[Webhook-Antwort]  Antwort als JSON zurückgeben
+```
+
+:::tip n8n AI Agent Node
+Der **AI-Agent**-Node von n8n (mit einer eigenen OpenAI-Zugangsdaten-Konfiguration, die auf mittwald AI Hosting zeigt) kann mehrstufige Tool-Nutzung automatisch orchestrieren – hilfreich, wenn das Modell selbst entscheiden soll, ob es den Vektorspeicher durchsucht oder direkt antwortet.
+:::
+
+## Prompt-Tipps
+
+### Tabellen – Struktur als Markdown erhalten
+
+Ohne gezielte Anweisung kann das Modell Tabellenzeilen als Fließtext ausgeben. Explizit nach Markdown-Tabellen fragen:
+
+```
+Extrahiere den gesamten Text aus diesem Dokument.
+Erhalte Tabellenstrukturen als Markdown-Tabellen, wo sinnvoll.
+```
+
+:::note
+Bei **HTML-Eingaben** gibt das Modell Tabellen tendenziell als HTML-`<table>`-Elemente aus – auch wenn nach Markdown gefragt wird. Für `|`-Markdown-Tabellensyntax eine PDF- oder Bildquelle verwenden.
+:::
+
+### Tabellen – als HTML ausgeben
+
+Für tabellenartige Daten, die in eine Datenbank eingefügt oder weiterverarbeitet werden sollen, HTML anfordern:
+
+```
+Extrahiere die Tabelle aus diesem Dokument und gib sie als HTML-<table>-Element mit <tr>- und <td>-Tags zurück.
+```
+
+### Formeln – LaTeX-Ausgabe
+
+Für Dokumente mit mathematischen Inhalten LaTeX anfordern, damit das Ergebnis weiterverarbeitet oder neu gerendert werden kann:
+
+```
+Extrahiere den gesamten Text aus diesem Dokument.
+Gib mathematische Formeln in LaTeX aus: $...$ für Inline-Mathematik, $$...$$ für abgesetzte Formeln.
+```
+
+### Schlechte Scanqualität – unsichere Wörter markieren
+
+Bei verblassten oder beschädigten Originalen das Modell anweisen, unklare Stellen zu kennzeichnen statt still zu raten:
+
+```
+Extrahiere allen lesbaren Text aus diesem Dokument.
+Ist ein Wort unklar, schreibe deine beste Einschätzung gefolgt von [?].
+```
+
+### Mehrsprachige Dokumente
+
+GLM-OCR unterstützt Chinesisch, Englisch, Deutsch, Französisch, Spanisch, Russisch, Japanisch und Koreanisch nativ in einer einzigen Anfrage – kein Sprachparameter nötig. Bei gemischtsprachigen Dokumenten die Originalsprache je Abschnitt erhalten:
+
+```
+Extrahiere den gesamten Text aus diesem Dokument. Behalte die Originalsprache jedes Textabschnitts bei – nicht übersetzen.
+```
