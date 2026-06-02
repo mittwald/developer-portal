@@ -12,13 +12,13 @@ This guide builds a three-tier cascade on mittwald AI Hosting using only the `op
 | ---- | ----- | ----------- |
 | 1 — fast | `Qwen3.5-0.8B` | Simple lookups, yes/no, short factual answers |
 | 2 — balanced | `Qwen3.6-35B-A3B-FP8` | Multi-step reasoning, code, comparison |
-| 3 — frontier | `Mistral-Medium-3.5-128B` | Complex analysis, vision, long documents, 40+ languages |
+| 3 — frontier | `Mistral-Medium-3.5-128B` | Complex analysis, long documents, 40+ languages |
 
 For tier 3 you can swap in any large model depending on your workload:
 
 | Tier-3 alternative | Strengths |
 | ------------------ | --------- |
-| `Mistral-Medium-3.5-128B` | 40+ languages, vision, 256k context |
+| `Mistral-Medium-3.5-128B` | 40+ languages, 256k context |
 | `Qwen3.5-122B-A10B-FP8` | Thinking mode, vision, strong coding |
 | `gpt-oss-120b` | Text-centric reasoning, 131k context |
 
@@ -42,7 +42,7 @@ from openai import OpenAI
 client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
 
 # Swap the tier-3 model to match your workload:
-#   "Mistral-Medium-3.5-128B"  — vision, 40+ languages, 256k context
+#   "Mistral-Medium-3.5-128B"  — 40+ languages, 256k context
 #   "Qwen3.5-122B-A10B-FP8"   — thinking mode, vision, strong coding
 #   "gpt-oss-120b"             — text-centric reasoning, 131k context
 TIERS = {
@@ -57,7 +57,7 @@ Classify the complexity of the user's question with exactly one word: simple, mo
 simple   — factual lookup, yes/no, basic definition, short translation
 moderate — multi-step reasoning, code with explanation, structured comparison
 complex  — research-level analysis, multi-file code review, long-document synthesis,
-           vision + reasoning combined, or anything requiring deep domain knowledge
+           or anything requiring deep domain knowledge
 
 Reply with only the single classification word and nothing else."""
 

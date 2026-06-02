@@ -12,13 +12,13 @@ Dieser Guide baut eine dreistufige Kaskade auf mittwald AI Hosting mit nur dem `
 | ----- | ------ | -------------- |
 | 1 — schnell | `Qwen3.5-0.8B` | Einfache Nachschlagefragen, Ja/Nein, kurze Faktenantworten |
 | 2 — ausgewogen | `Qwen3.6-35B-A3B-FP8` | Mehrschrittiges Reasoning, Code, Vergleiche |
-| 3 — Frontier | `Mistral-Medium-3.5-128B` | Komplexe Analysen, Vision, lange Dokumente, 40+ Sprachen |
+| 3 — Frontier | `Mistral-Medium-3.5-128B` | Komplexe Analysen, lange Dokumente, 40+ Sprachen |
 
 Für Stufe 3 kann je nach Workload ein beliebiges großes Modell eingesetzt werden:
 
 | Alternative für Stufe 3 | Stärken |
 | ----------------------- | ------- |
-| `Mistral-Medium-3.5-128B` | 40+ Sprachen, Vision, 256k Context |
+| `Mistral-Medium-3.5-128B` | 40+ Sprachen, 256k Context |
 | `Qwen3.5-122B-A10B-FP8` | Thinking-Modus, Vision, starkes Coding |
 | `gpt-oss-120b` | Textbasiertes Reasoning, 131k Context |
 
@@ -42,7 +42,7 @@ from openai import OpenAI
 client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
 
 # Stufe-3-Modell je nach Workload tauschen:
-#   "Mistral-Medium-3.5-128B"  — Vision, 40+ Sprachen, 256k Context
+#   "Mistral-Medium-3.5-128B"  — 40+ Sprachen, 256k Context
 #   "Qwen3.5-122B-A10B-FP8"   — Thinking-Modus, Vision, starkes Coding
 #   "gpt-oss-120b"             — Textbasiertes Reasoning, 131k Context
 TIERS = {
@@ -57,7 +57,7 @@ Classify the complexity of the user's question with exactly one word: simple, mo
 simple   — factual lookup, yes/no, basic definition, short translation
 moderate — multi-step reasoning, code with explanation, structured comparison
 complex  — research-level analysis, multi-file code review, long-document synthesis,
-           vision + reasoning combined, or anything requiring deep domain knowledge
+           or anything requiring deep domain knowledge
 
 Reply with only the single classification word and nothing else."""
 
