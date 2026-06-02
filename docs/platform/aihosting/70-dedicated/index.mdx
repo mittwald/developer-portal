@@ -1,0 +1,226 @@
+---
+sidebar_label: Overview
+description: Dedicated AI Hosting - exclusive GPU capacity for demanding AI workloads
+title: Dedicated AI Hosting
+---
+
+import DocCardList from "@theme/DocCardList";
+
+Dedicated AI Hosting gives you exclusive access to reserved GPU capacity on the mittwald AI infrastructure. Unlike shared hosting, your workloads run on hardware allocated solely to you.
+
+## What you get {#what-you-get}
+
+| Feature | Description |
+|---------|-------------|
+| **Exclusive GPU capacity** | Your models run on GPUs reserved only for you. |
+| **Your own API endpoint** | You receive a dedicated HTTPS endpoint on a customer subdomain under `llm.aihosting.mittwald.de`, e.g. `https://your-company.llm.aihosting.mittwald.de/v1`. |
+| **Dedicated API key** | Access is controlled by a dedicated API key tied to your endpoint. |
+| **OpenAI-compatible API** | Any application or library that supports OpenAI can connect. |
+| **EU-hosted, GDPR-compliant** | Compute and data remain in EU data centers operated by mittwald. |
+| **Predictable performance** | Your capacity is isolated from other customers. |
+
+## Current product scope {#current-scope}
+
+Dedicated AI Hosting is currently in its first release stage.
+
+### Model scope {#model-scope}
+
+Your available models are defined per customer contract and rollout stage. Model discovery and first-request flow are documented in [Getting started](./getting-started).
+
+### Capacity scope {#capacity-scope}
+
+Your dedicated capacity (for example, instance count and sizing) is provisioned according to your agreed scope.
+
+### Hardware profile (current offering) {#hardware-profile}
+
+Dedicated AI Hosting currently uses **NVIDIA RTX PRO 6000 Blackwell Server Edition** GPUs.
+
+Relevant specs for model planning:
+
+- **96 GB GDDR7 VRAM per GPU**
+- **1597 GB/s memory bandwidth**
+- **Up to 600 W configurable power**
+- **Native Blackwell Tensor Core support for low-precision inference (including FP4/NVFP4-class deployments)**
+
+These values are published by NVIDIA and help estimate whether a model fits on one GPU or needs multi-GPU placement.
+
+### Model sizing guidance (examples) {#model-sizing}
+
+Model fit depends on precision/quantization, context length, KV-cache settings, and concurrent load. As a practical planning rule:
+
+- **Usually fits on 1 GPU (96 GB):** many 7B-32B class models, and some larger quantized variants
+- **Often needs 2 GPUs:** many 70B-120B class deployments, especially with larger context windows
+- **Can stretch across several GPUs:** very large models or configurations with high context and throughput targets
+
+Example patterns (customer-specific, not fixed defaults):
+
+- Single-card style deployment: `Qwen3.6 8B` class, `Llama 3.3 8B` class
+- Two-card style deployment: `Qwen3.6 32B/35B` class, `Llama 3.3 70B` class
+
+Final sizing is validated during onboarding against your target latency and throughput.
+
+### Rough VRAM estimator (before contacting us) {#vram-estimator}
+
+You can do a quick pre-check with a simple calculator:
+
+1. **Weights memory**
+: `weights bytes ~= params count * bytes per weight`
+
+2. **KV cache per token**
+: `kv per token bytes ~= 2 * layer count * kv width * bytes per kv value`
+
+`kv width` is often close to hidden size for rough planning.
+
+3. **Total KV cache**
+: `total kv bytes ~= concurrent sequences * total tokens * kv per token bytes`
+
+`total tokens = input tokens + output tokens`
+
+4. **Total GPU target**
+: `total gpu bytes ~= weights bytes + total kv bytes + runtime overhead`
+
+Use a safety margin for runtime overhead (allocator fragmentation, CUDA buffers, runtime metadata). A practical planning range is **+15% to +30%**.
+
+#### Worked example from Hugging Face: Qwen3.6-35B-A3B {#vram-example}
+
+Model page: [Qwen/Qwen3.6-35B-A3B](https://huggingface.co/Qwen/Qwen3.6-35B-A3B)
+
+How to read values from the model page:
+
+- From **Model size / Parameters**: ~`36B params`
+- From **Model Overview**: `40 layers`, hidden dimension `2048`
+- From **Tensor type**: `BF16` (2 bytes per weight value)
+- From **Context**: up to `262,144` tokens (long context increases KV cache strongly)
+
+Now estimate on **1x RTX PRO 6000 Blackwell (96 GB VRAM)**:
+
+1. Weights memory (BF16)
+: `36,000,000,000 * 2 ~= 72,000,000,000 bytes` (~72 GB decimal)
+
+2. KV cache per token (rough, using hidden size as kv width)
+: `2 * 40 * 2048 * 2 = 327,680 bytes per token` (~0.3125 MiB per token)
+
+3. Add safety headroom
+: with 20% overhead target, usable planning budget is about `96 GB / 1.2 ~= 80 GB`
+
+4. Budget left for KV cache
+: `80 GB - 72 GB ~= 8 GB` for KV cache
+
+5. Rough token capacity on one GPU at concurrency 1
+: `8 GB / 327,680 bytes ~= 24k-26k total tokens`
+
+This `total tokens` is input + output together.  
+Example: `16k input + 8k output = 24k total`.
+
+If you use lower-precision KV cache (for compatible model/checkpoint stacks), this can improve token capacity significantly.
+
+#### Quantization options from Hugging Face model tree (non-GGUF) {#quantization-options}
+
+Source model tree: [Qwen3.6-35B-A3B quantizations](https://huggingface.co/models?other=base_model:quantized:Qwen/Qwen3.6-35B-A3B)
+
+For dedicated server deployments, practical non-GGUF families include:
+
+- **FP8 checkpoints** (example: [Qwen/Qwen3.6-35B-A3B-FP8](https://huggingface.co/Qwen/Qwen3.6-35B-A3B-FP8))
+- **NVFP4 checkpoints** (example: [RedHatAI/Qwen3.6-35B-A3B-NVFP4](https://huggingface.co/RedHatAI/Qwen3.6-35B-A3B-NVFP4))
+- **AWQ INT4 checkpoints** (example families like `...-AWQ` in the same model tree)
+
+We intentionally exclude GGUF variants in this sizing path because this guide targets dedicated API serving stacks rather than local desktop runtimes.
+
+#### How quantization changes the same 1-GPU estimate {#quantization-estimate}
+
+Same assumptions as above:
+
+- 1x RTX PRO 6000 Blackwell (`96 GB`)
+- 20% safety margin -> planning budget ~`80 GB`
+- KV cache per token (BF16 KV) ~`327,680 bytes`
+- KV cache per token (FP8 KV) ~`163,840 bytes` (about half vs BF16 KV)
+
+Approximate weight memory by format:
+
+- **BF16**: `~72 GB` (36B * 2 bytes)
+- **FP8**: `~36 GB` (36B * 1 byte)
+- **4-bit family (NVFP4/AWQ)**: theoretical `~18 GB` (+metadata/scale overhead, so often higher in practice)
+
+Resulting rough total-token budget at concurrency 1 (input + output):
+
+- **BF16 weights + BF16 KV**: ~`24k-26k` tokens
+- **BF16 weights + FP8 KV**: ~`49k-52k` tokens (roughly 2x vs BF16 KV)
+- **FP8 weights + BF16 KV**: ~`130k+` tokens
+- **FP8 weights + FP8 KV**: ~`260k+` tokens (often near model context ceilings)
+- **4-bit weights + BF16 KV**: ~`170k+` tokens (practical real value may be lower due to overhead/runtime limits)
+- **4-bit weights + FP8 KV**: potentially much higher token budget, but usually constrained by model context limits and runtime behavior before raw VRAM is fully used
+
+This is only first-pass planning. Final usable limits depend on checkpoint packaging, KV-cache format support, multimodal memory use, and runtime behavior under concurrency.
+
+#### Quick rule-of-thumb {#quick-rules}
+
+- Longer context and higher concurrency increase KV cache linearly.
+- Quantization lowers weights memory a lot, but KV cache can still dominate at long context.
+- If the estimate is near VRAM limits, plan multi-GPU placement or lower context/concurrency.
+
+### Quantization and precision options {#precision-options}
+
+Depending on model and runtime, deployments can be planned with different numeric formats, for example:
+
+- `BF16` / `FP16` (quality-first, higher memory usage)
+- `FP8` (common performance/capacity tradeoff)
+- `NVFP4` / other low-bit variants (maximize fit and throughput for very large models)
+
+Which format is best depends on your quality requirements, latency target, and context window.
+Not every model is available in every quantization format, so compatibility is validated model-by-model.
+
+Practical KV-cache quantization guidance:
+
+- **FP8 KV cache can roughly double context capacity vs BF16 KV cache** in many setups.
+- This only works reliably when the selected checkpoint includes compatible KV-scale metadata/calibration.
+- If those scales are missing, runtimes may fall back to BF16 KV cache (higher VRAM use) or show quality/performance issues.
+- Some model stacks require BF16 KV cache for stable output quality; we validate this per model before production rollout.
+
+### Model classes seen in current market trends {#model-classes}
+
+Recent Hugging Face trending models span very different classes, including:
+
+- compact models around `7B-9B`
+- mid-size models around `27B-36B` (including MoE/A3B variants)
+- large models in `70B+` classes
+
+This is why dedicated sizing is always use-case specific.
+
+:::note[Sizing is always done together]
+Please plan model, precision, and capacity choices in a personal consultation with us. We validate fit, throughput, and cost before go-live.
+:::
+
+### Included platform features {#platform-features}
+
+- Dedicated endpoint and API key
+- Router-managed distribution across your provisioned capacity
+- Automatic failover within your dedicated setup
+
+### LiteLLM vs Bifrost (when to use what) {#litellm-vs-bifrost}
+
+Many customers do not use only one endpoint. If you route across multiple providers or additional self-hosted endpoints, use this split:
+
+| Goal | Recommended component |
+|------|------------------------|
+| Per-customer key issuance, key revoke/block, spend limits, usage by key | **LiteLLM** |
+| Multi-provider routing, fallback chains, weighted traffic split | **Bifrost** |
+| Both governance + routing across multiple endpoints | **LiteLLM + Bifrost together** |
+
+Typical patterns:
+
+- **Only your dedicated mittwald endpoint + customer key lifecycle**: LiteLLM alone is usually enough.
+- **Dedicated mittwald endpoint + other external/self-hosted model endpoints**: Bifrost is recommended for routing policy.
+- **Dedicated + shared + Anthropic/Claude (or other providers)**: Bifrost is the routing layer for model/provider-specific traffic decisions.
+- **Customer keys + multi-endpoint routing**: run LiteLLM in front of Bifrost.
+: request flow: `client -> LiteLLM -> Bifrost -> selected provider endpoint`
+
+### Not included in the initial scope {#not-included}
+
+- Grafana/metrics dashboards
+- Self-service provisioning via mStudio
+
+:::info Getting started
+Start with the [Getting started guide](./getting-started). If you want multi-key management and usage tracking, follow the [LiteLLM guide](./litellm).
+:::
+
+<DocCardList />

@@ -1,0 +1,223 @@
+---
+sidebar_label: Dokument-Q&A-Pipeline
+description: Vierstufige Pipeline – OCR → Einbettung → Reranking → Antwortgenerierung – mit mittwald AI-Hosting-Modellen
+title: Dokument-Q&A-Pipeline
+---
+
+Dieser Guide baut eine vollständige Dokumenten-Frage-Antwort-Pipeline mit vier mittwald AI-Hosting-Modellen in Folge:
+
+| Stufe | Modell | Was es tut |
+| ----- | ------ | ---------- |
+| 1 — OCR | `GLM-OCR` | Extrahiert Text aus PDF, DOCX, PPTX, XLSX, Bildern |
+| 2 — Einbetten | [Qwen3-Embedding-8B](/docs/v2/platform/aihosting/models/qwen3-embedding-8b) | Wandelt Textabschnitte in Vektoren für die Ähnlichkeitssuche um |
+| 3 — Reranking | [Qwen3-VL-Reranker-2B](/docs/v2/platform/aihosting/models/qwen3-vl-reranker-2b) | Bewertet jeden Kandidaten gegen die vollständige Frage |
+| 4 — Antwort | [Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8) | Generiert eine fundierte Antwort mit Quellenangaben |
+
+Der Hauptvorteil gegenüber einer einfachen Einbetten → Abrufen → Antworten-Pipeline ist **Stufe 3**: Der Reranker liest die tatsächliche Frage gegen jeden abgerufenen Abschnitt als Paar und erkennt relevanten Text, den die Embedding-Ähnlichkeit allein übersieht.
+
+## Einrichtung {#einrichtung}
+
+```shellsession
+user@local $ pip install openai requests pypdf
+user@local $ export OPENAI_API_KEY="sk-…"
+```
+
+## Stufe 1 — OCR: Text aus einem Dokument extrahieren
+
+Die Datei als Base64-Data-URI an `GLM-OCR` senden. Der Proxy auf unserer Plattform wandelt PDF-Seiten und Office-Dokumente automatisch in Bilder um, bevor das Modell sie verarbeitet – kein manuelles Aufteilen notwendig (bis zu 30 Seiten pro Anfrage). Vollständige Formatunterstützung und Einschränkungen auf der GLM-OCR-Modellseite.
+
+```python
+import base64
+import os
+import math
+import re
+import json
+import requests
+from openai import OpenAI
+
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+
+MIME = {
+    "pdf":  "application/pdf",
+    "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "jpg":  "image/jpeg",
+    "jpeg": "image/jpeg",
+    "png":  "image/png",
+}
+
+
+def extract_text(path: str) -> str:
+    """Gesamten Text aus einem Dokument mit GLM-OCR extrahieren."""
+    ext = path.rsplit(".", 1)[-1].lower()
+    mime = MIME.get(ext, "application/pdf")
+    with open(path, "rb") as f:
+        b64 = base64.b64encode(f.read()).decode()
+
+    resp = client.chat.completions.create(
+        model="GLM-OCR",
+        messages=[{
+            "role": "user",
+            "content": [
+                {
+                    "type": "image_url",
+                    "image_url": {"url": f"data:{mime};base64,{b64}"},
+                },
+                {
+                    "type": "text",
+                    "text": (
+                        "Extrahiere den Text aus diesem Dokument und formatiere ihn als Markdown. "
+                        "Verwende # für Hauptüberschriften, ## für Unterüberschriften und - für Aufzählungen."
+                    ),
+                },
+            ],
+        }],
+        temperature=0.1,
+    )
+    return resp.choices[0].message.content
+```
+
+:::note
+Bei Dokumenten mit mehr als 30 Seiten das PDF zuerst in Batches aufteilen. Siehe die [Python-Beispiele](/docs/v2/platform/aihosting/examples/python) für einen `pypdf`-basierten Batch-Splitter.
+:::
+
+## Stufe 2 — Einbetten: Text aufteilen und indizieren
+
+An Markdown-Überschriften aufteilen, dann nach Wortanzahl, damit jeder Abschnitt in das 32.768-Token-Fenster des Rerankers passt.
+
+```python
+def chunk_text(text: str, size: int = 400, overlap: int = 50) -> list[str]:
+    """An oberster Markdown-Überschriftenebene aufteilen, dann nach Wortanzahl mit Überlappung."""
+    sections = re.split(r"(?m)^(?=# )", text)
+    chunks: list[str] = []
+    for section in sections:
+        words = section.split()
+        i = 0
+        while i < len(words):
+            chunks.append(" ".join(words[i: i + size]))
+            i += size - overlap
+    return [c for c in chunks if c.strip()]
+
+
+def embed(texts: list[str]) -> list[list[float]]:
+    resp = client.embeddings.create(model="Qwen3-Embedding-8B", input=texts)
+    return [item.embedding for item in resp.data]
+
+
+def cosine(a: list[float], b: list[float]) -> float:
+    dot = sum(x * y for x, y in zip(a, b))
+    norm = math.sqrt(sum(x * x for x in a)) * math.sqrt(sum(x * x for x in b))
+    return dot / (norm + 1e-9)
+
+
+def build_index(path: str) -> list[tuple[list[float], str]]:
+    """Dokument per OCR einlesen, aufteilen und In-Memory-Vektorindex zurückgeben."""
+    text = extract_text(path)
+    chunks = chunk_text(text)
+    vectors = embed(chunks)
+    return list(zip(vectors, chunks))
+
+
+def retrieve(query: str, index: list, top_k: int = 10) -> list[str]:
+    """Top_k Abschnitte nach Kosinus-Ähnlichkeit zurückgeben."""
+    [q_vec] = embed([query])
+    scored = [(cosine(q_vec, vec), chunk) for vec, chunk in index]
+    scored.sort(key=lambda x: x[0], reverse=True)
+    return [chunk for _, chunk in scored[:top_k]]
+```
+
+## Stufe 3 — Reranking: Präzisionsdurchlauf
+
+Der Reranker liest jedes (Frage, Abschnitt)-Paar als Ganzes und vergibt einen Relevanzscore. Einen größeren Kandidatenpool abrufen (Top-10), damit er genug zum Arbeiten hat, und dann auf Top-3 einschränken.
+
+```python
+def rerank(query: str, candidates: list[str], top_k: int = 3) -> list[str]:
+    resp = requests.post(
+        "https://llm.aihosting.mittwald.de/v1/rerank",
+        headers={"Authorization": f"Bearer {os.environ['OPENAI_API_KEY']}"},
+        json={
+            "model": "Qwen3-VL-Reranker-2B",
+            "query": query,
+            "documents": candidates,
+            "instruction": "Given a document question, find the passages most relevant to answering it.",
+        },
+        timeout=30,
+    )
+    resp.raise_for_status()
+    results = resp.json()["results"]
+    ranked = sorted(results, key=lambda r: r["relevance_score"], reverse=True)
+    return [candidates[r["index"]] for r in ranked[:top_k]]
+```
+
+## Stufe 4 — Antwort: fundierte Generierung
+
+Den neu geordneten Kontext an `Qwen3.5-122B-A10B-FP8` übergeben, mit deaktiviertem Thinking-Modus für schnellere Antworten. Das Modell wird angewiesen, `[Abschnitt N]` zu zitieren, damit Antworten nachvollziehbar sind.
+
+```python
+def answer(question: str, passages: list[str]) -> str:
+    context = "\n\n".join(f"[Abschnitt {i+1}]\n{p}" for i, p in enumerate(passages))
+    resp = client.chat.completions.create(
+        model="Qwen3.5-122B-A10B-FP8",
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "Beantworte die Frage ausschließlich anhand der bereitgestellten Abschnitte. "
+                    "Zitiere Quellen als [Abschnitt N]. "
+                    "Falls die Antwort nicht in den Abschnitten enthalten ist, erkläre dies explizit."
+                ),
+            },
+            {
+                "role": "user",
+                "content": f"Abschnitte:\n{context}\n\nFrage: {question}",
+            },
+        ],
+        temperature=0.7,
+        top_p=0.8,
+        max_tokens=1024,
+        extra_body={"chat_template_kwargs": {"enable_thinking": False}},
+    )
+    return resp.choices[0].message.content
+```
+
+## Vollständige Pipeline
+
+```python
+def document_qa(doc_path: str, question: str) -> str:
+    index = build_index(doc_path)
+    candidates = retrieve(question, index, top_k=10)
+    top_passages = rerank(question, candidates, top_k=3)
+    return answer(question, top_passages)
+
+
+# Beispiel
+response = document_qa(
+    "jahresbericht.pdf",
+    "Was waren die wichtigsten Umsatztreiber im zweiten Quartal?",
+)
+print(response)
+```
+
+## Mehrere Dokumente indizieren
+
+```python
+# Einen kombinierten Index aus mehreren Dokumenten aufbauen
+documents = ["vertrag_a.pdf", "vertrag_b.docx", "anhang.xlsx"]
+
+combined_index: list[tuple[list[float], str]] = []
+for path in documents:
+    combined_index.extend(build_index(path))
+
+print(f"{len(combined_index)} Abschnitte aus {len(documents)} Dokumenten indiziert.")
+
+# Über alle Dokumente abfragen
+frage = "Was sind die Vertragsstrafen?"
+kandidaten = retrieve(frage, combined_index, top_k=10)
+top_abschnitte = rerank(frage, kandidaten, top_k=3)
+print(answer(frage, top_abschnitte))
+```
+
+:::tip Skalierung für den Produktionseinsatz
+Den In-Memory-Index durch **pgvector** ersetzen für persistente, mandantenfähige Speicherung. Siehe den [n8n-Guide](/docs/v2/guides/apps/n8n/) für einen sofort einsetzbaren Docker-Compose-Stack mit pgvector auf mittwald Container Hosting.
+:::

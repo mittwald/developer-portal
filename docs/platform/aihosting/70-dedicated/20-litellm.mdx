@@ -1,0 +1,304 @@
+---
+sidebar_label: Key management with LiteLLM
+description: Run LiteLLM as a self-hosted gateway for API key lifecycle, budgets, limits, and usage analytics
+title: End-to-end key management with LiteLLM
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+Your dedicated endpoint includes one upstream API key. LiteLLM lets you turn this into a full customer-facing key management layer: issue keys per app/team/user, set limits, revoke access, and track usage.
+
+This is especially useful for German web and creative agencies that operate multiple customer projects and need clear tenant separation.
+
+## What LiteLLM adds {#what-it-adds}
+
+- Virtual keys per application, team, or end customer
+- Per-key limits (requests/min, tokens/min, budgets)
+- Key lifecycle controls (block, unblock, rotate, expire)
+- Usage and spend visibility by key, user, and team
+- Admin UI plus API for automation
+
+## Prerequisites {#prerequisites}
+
+- Docker and Docker Compose
+- Your dedicated mittwald endpoint and upstream API key
+- A PostgreSQL database (required for persistent key management)
+
+## A-to-Z setup {#setup}
+
+### 1. Create a `.env` file {#setup-env}
+
+```env
+LITELLM_MASTER_KEY=sk-change-this-master-key
+UPSTREAM_BASE_URL=https://your-company.llm.aihosting.mittwald.de
+UPSTREAM_API_KEY=YOUR_DEDICATED_API_KEY
+POSTGRES_USER=litellm
+POSTGRES_PASSWORD=change-this-db-password
+POSTGRES_DB=litellm
+UI_USERNAME=admin
+UI_PASSWORD=change-this-ui-password
+```
+
+### 2. Create `litellm_config.yaml` {#setup-config}
+
+```yaml
+model_list:
+  - model_name: YOUR_MODEL_ID
+    litellm_params:
+      model: openai/YOUR_MODEL_ID
+      api_base: os.environ/UPSTREAM_BASE_URL
+      api_key: os.environ/UPSTREAM_API_KEY
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+  database_url: os.environ/DATABASE_URL
+```
+
+### 3. Create `docker-compose.yml` {#setup-compose}
+
+```yaml
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - litellm-postgres:/var/lib/postgresql/data
+
+  litellm:
+    image: docker.litellm.ai/berriai/litellm:main-latest
+    depends_on:
+      - postgres
+    ports:
+      - "4000:4000"
+    environment:
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY}
+      UPSTREAM_BASE_URL: ${UPSTREAM_BASE_URL}
+      UPSTREAM_API_KEY: ${UPSTREAM_API_KEY}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    volumes:
+      - ./litellm_config.yaml:/app/config.yaml
+    command: ["--config", "/app/config.yaml"]
+
+volumes:
+  litellm-postgres:
+```
+
+### 4. Start services {#setup-start}
+
+```shellsession
+user@local $ docker compose up -d
+```
+
+### 5. Verify gateway + model passthrough {#setup-verify}
+
+```shellsession
+user@local $ curl http://localhost:4000/v1/models \
+  -H "Authorization: Bearer ${LITELLM_MASTER_KEY}"
+```
+
+Open `http://localhost:4000/ui` and sign in with the `UI_USERNAME` / `UI_PASSWORD` you set in your `.env` file. The Admin UI starts automatically alongside the proxy — no additional flag needed.
+
+## Key lifecycle operations (API) {#key-lifecycle}
+
+The key-management endpoints are documented in LiteLLM's Virtual Keys docs and Swagger.
+
+### Create a virtual key {#create-key}
+
+```shellsession
+user@local $ curl http://localhost:4000/key/generate \
+  -H "Authorization: Bearer ${LITELLM_MASTER_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "models": ["YOUR_MODEL_ID"],
+    "key_alias": "team-a-prod",
+    "metadata": {"owner": "team-a"},
+    "tpm_limit": 120000,
+    "rpm_limit": 300,
+    "max_budget": 250
+  }'
+```
+
+### Inspect key usage and limits {#key-info}
+
+```shellsession
+user@local $ curl "http://localhost:4000/key/info?key=sk-virtual-key" \
+  -H "Authorization: Bearer ${LITELLM_MASTER_KEY}"
+```
+
+Some deployments also expose versioned info routes (`/v2/key/info`) in Swagger.
+
+### Block a key immediately {#key-block}
+
+```shellsession
+user@local $ curl -X POST http://localhost:4000/key/block \
+  -H "Authorization: Bearer ${LITELLM_MASTER_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{"key":"sk-virtual-key"}'
+```
+
+### Unblock a key {#key-unblock}
+
+```shellsession
+user@local $ curl -X POST http://localhost:4000/key/unblock \
+  -H "Authorization: Bearer ${LITELLM_MASTER_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{"key":"sk-virtual-key"}'
+```
+
+### Rotate a key {#key-rotate}
+
+Key rotation is done by creating a new key with the same settings and then deleting the old one. First generate a replacement:
+
+```shellsession
+user@local $ curl http://localhost:4000/key/generate \
+  -H "Authorization: Bearer ${LITELLM_MASTER_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "models": ["YOUR_MODEL_ID"],
+    "key_alias": "team-a-prod-v2",
+    "metadata": {"owner": "team-a"}
+  }'
+```
+
+Then delete the old key:
+
+```shellsession
+user@local $ curl -X POST http://localhost:4000/key/delete \
+  -H "Authorization: Bearer ${LITELLM_MASTER_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{"keys":["sk-old-virtual-key"]}'
+```
+
+### Revoke permanently {#key-revoke}
+
+```shellsession
+user@local $ curl -X POST http://localhost:4000/key/delete \
+  -H "Authorization: Bearer ${LITELLM_MASTER_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{"keys":["sk-virtual-key"]}'
+```
+
+## Admin UI {#ui}
+
+The Admin UI is available at `http://localhost:4000/ui`. Sign in with the credentials you set via `UI_USERNAME` and `UI_PASSWORD` in your `.env` file.
+
+The Swagger API reference (all proxy endpoints) is available at `http://localhost:4000/`.
+
+### Keys {#ui-keys}
+
+The **Keys** section shows all virtual keys with their current spend, limits, and status.
+
+Actions available:
+
+| Action | What it does |
+|--------|-------------|
+| Create key | Set alias, model allowlist, TPM/RPM limits, max budget, expiry date, team/user assignment |
+| Edit key | Update limits, budget, and metadata without recreating the key |
+| Block key | Immediately cut off access — requests with this key return 401 |
+| Unblock key | Restore access |
+| Delete key | Permanently revoke — cannot be undone |
+
+### Spend and usage dashboard {#ui-spend}
+
+The dashboard shows spend and request volume broken down by:
+
+- **Per key** — how much each virtual key has spent
+- **Per user** — spend for each user ID you assigned to keys
+- **Per team** — aggregate spend across all keys belonging to a team
+
+Spend resets are available from the API (`POST /global/spend/reset`) for admin use.
+
+### Teams {#ui-teams}
+
+Teams group keys and users under a shared budget and model allowlist. Create a team, then assign keys to it when generating them. The team dashboard shows aggregate spend and key activity.
+
+### Users {#ui-users}
+
+The **Users** section shows all users with assigned keys and their spend. You can create users and assign them to teams. Users can optionally be invited to log into the UI themselves with their own credentials (self-serve key management — they can only manage their own keys).
+
+### Models {#ui-models}
+
+The **Models** section lets you add or modify models available through the proxy — no proxy restart required. Pricing data can be synced from GitHub to keep cost calculations current.
+
+## Usage statistics and spend control {#statistics}
+
+LiteLLM tracks usage and spend on proxy requests and exposes:
+
+- Per key: usage/spend (`/key/info`)
+- Per user/team: user and team info endpoints
+- Dashboard views for traffic, limits, and key activity
+
+## Reselling dedicated capacity to your own customers {#reselling}
+
+This setup is suitable for reseller scenarios. Your customers can use your AI product while the upstream mittwald dedicated key remains private.
+
+Recommended reseller pattern:
+
+1. Keep the upstream dedicated key only inside LiteLLM
+2. Issue one virtual key per customer/app/environment
+3. Apply per-key limits and budgets according to plan tier
+4. Use block/unblock/rotate/delete for lifecycle control
+
+This gives you tenant-level billing and control without exposing upstream credentials.
+
+For agency business models, this maps well to:
+
+- one virtual key per client project
+- separate quotas for staging vs production
+- contract-driven limits per customer tier
+
+## Use virtual keys in client apps {#clients}
+
+<Tabs>
+<TabItem value="env" label="Environment variables">
+
+```env
+OPENAI_BASE_URL=http://localhost:4000/v1
+OPENAI_API_KEY=sk-virtual-key
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+```python
+from openai import OpenAI
+
+client = OpenAI(api_key="sk-virtual-key", base_url="http://localhost:4000/v1")
+
+response = client.chat.completions.create(
+    model="YOUR_MODEL_ID",
+    messages=[{"role": "user", "content": "Hello"}],
+)
+```
+
+</TabItem>
+<TabItem value="javascript" label="JavaScript / TypeScript">
+
+```typescript
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: "sk-virtual-key",
+  baseURL: "http://localhost:4000/v1",
+});
+```
+
+</TabItem>
+</Tabs>
+
+## Operational recommendations {#ops}
+
+- Keep LiteLLM and database persistent (no in-memory-only setup in production)
+- Use strong, rotated admin credentials (`master_key`)
+- Restrict admin surface and expose UI only where needed
+- Validate key policies with test keys before customer onboarding
+
+## References {#references}
+
+- [LiteLLM Virtual Keys](https://docs.litellm.ai/docs/proxy/virtual_keys)
+- [LiteLLM Admin UI](https://docs.litellm.ai/docs/proxy/ui)
+- [LiteLLM Swagger / Endpoints](https://www.litellm.org/)

@@ -1,0 +1,108 @@
+---
+sidebar_label: Error handling and retries
+description: HTTP error codes, retry guidance, and capacity behavior for the dedicated AI Hosting endpoint
+title: Error handling and retries
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+This page covers the HTTP error codes your application may receive, how to handle capacity behavior, and how to configure retries correctly for the dedicated endpoint.
+
+## HTTP error codes {#error-codes}
+
+| Code | Meaning | What to do |
+|------|---------|------------|
+| `400` | Bad request — input too long or malformed | Reduce input length or fix request format (see context limit below) |
+| `401` | Invalid or missing API key | Check `Authorization: Bearer YOUR_API_KEY` header |
+| `503` | Service temporarily unavailable — endpoint overloaded or restarting | Retry with exponential backoff |
+| `500` | Internal server error | Retry with backoff; contact support if it persists |
+| `502` | Bad gateway | Retry with backoff |
+| `504` | Gateway timeout — request took too long | Reduce input size, lower concurrency, or retry |
+
+:::note 401 response format
+The `401` response body is `{"error": "Unauthorized"}`. This is simpler than the standard OpenAI error object format and does not include `type`, `param`, or `code` fields. Check your error handling code accordingly.
+:::
+
+## Context length limit {#context-limit}
+
+Requests whose total token count (prompt + completion) exceeds the model's configured context window are rejected with `400`. The response uses the OpenAI error object format:
+
+```json
+{
+  "object": "error",
+  "message": "This model's maximum context length is X tokens. However, you requested Y tokens ...",
+  "type": "invalid_request_error",
+  "param": "messages",
+  "code": 400
+}
+```
+
+Check the context window for your provisioned model in the [Getting started guide](../getting-started) via the `/v1/models` endpoint. Plan your input + expected output to stay within that limit.
+
+## Request body size limit {#body-size}
+
+The maximum request body size is **25 MB**. Requests exceeding this are rejected before reaching the model. This limit is only relevant for multimodal inputs (for example, base64-encoded images). Standard text chat requests are far below this limit.
+
+## What to expect under heavy load {#capacity}
+
+The endpoint queues requests internally when all compute slots are occupied. This means:
+
+- Requests do not immediately fail when the model is busy — they wait in the queue.
+- Under very high sustained load, queued requests may eventually time out. The connection closes as a connection reset rather than returning an HTTP error code. This is most visible with streaming responses (see [Streaming and mid-stream failures](#streaming-failures) below).
+- The endpoint returns `503` when it cannot accept new requests at all (for example, during a restart or on a true server error).
+
+If you regularly experience high latency or timeouts under your expected load, contact us to review your provisioned capacity.
+
+## Retry guidance {#retries}
+
+Retry on `503`, `502`, `500`. Do not retry on `400` or `401`.
+
+Recommended retry pattern:
+
+1. On `5xx`: wait, then retry
+2. Start with a **1-second wait**
+3. Double the wait on each subsequent attempt (exponential backoff)
+4. Cap the wait at **60 seconds**
+5. Stop after **5 attempts**
+
+Most OpenAI-compatible client libraries have built-in retry logic you can configure directly:
+
+<Tabs>
+<TabItem value="python" label="Python">
+
+```python
+import openai
+
+client = openai.OpenAI(
+    api_key="YOUR_API_KEY",
+    base_url="https://your-company.llm.aihosting.mittwald.de/v1",
+    max_retries=5,
+)
+```
+
+</TabItem>
+<TabItem value="javascript" label="JavaScript / TypeScript">
+
+```typescript
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: "YOUR_API_KEY",
+  baseURL: "https://your-company.llm.aihosting.mittwald.de/v1",
+  maxRetries: 5,
+});
+```
+
+</TabItem>
+</Tabs>
+
+## Streaming and mid-stream failures {#streaming-failures}
+
+For streaming requests (`"stream": true`), the HTTP `200` response header is written when the first token is ready. If a failure occurs mid-stream (for example, a timeout or a server restart), the connection closes rather than returning an HTTP error code.
+
+Detect this by checking whether the stream ended with the expected stop reason. Retry the full request if not.
+
+## Protocol support {#protocol}
+
+The endpoint supports **HTTPS only**. gRPC is not available.

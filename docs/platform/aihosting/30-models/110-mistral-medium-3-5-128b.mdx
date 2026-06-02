@@ -1,0 +1,137 @@
+---
+sidebar_label: Mistral-Medium-3.5-128B
+description: Detailed information about Mistral-Medium-3.5-128B
+title: Mistral-Medium-3.5-128B
+slug: /platform/aihosting/models/mistral-medium-3-5-128b
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+## Description
+
+"Mistral-Medium-3.5-128B" is a 128-billion-parameter frontier language model by Mistral AI. It supports text and tool calling over a 256,000-token context window and uses EAGLE speculative decoding for fast inference.
+
+It supports and is suitable for:
+
+- Text generation within a chat completion (text to text)
+- Tool-calling for agentic workflows
+- Long-context document analysis and summarisation
+- Multilingual tasks — strong coverage of European languages
+
+The following limitations apply:
+
+- Maximum context length: 256,000 tokens
+- No audio support
+
+## API usage
+
+### Chat
+
+<Tabs groupId="language">
+  <TabItem value="python" label="Python">
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1",
+    api_key="sk-your-api-key-here",
+)
+
+response = client.chat.completions.create(
+    model="Mistral-Medium-3.5-128B",
+    messages=[{"role": "user", "content": "Explain the difference between TCP and UDP."}],
+    temperature=0.7,
+    top_p=0.9,
+    max_tokens=1024,
+)
+
+print(response.choices[0].message.content)
+```
+
+  </TabItem>
+  <TabItem value="javascript" label="JavaScript">
+
+```ts
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  baseURL: "https://llm.aihosting.mittwald.de/v1",
+  apiKey: "sk-your-api-key-here",
+});
+
+const response = await client.chat.completions.create({
+  model: "Mistral-Medium-3.5-128B",
+  messages: [{ role: "user", content: "Explain the difference between TCP and UDP." }],
+  temperature: 0.7,
+  top_p: 0.9,
+  max_tokens: 1024,
+});
+
+console.log(response.choices[0].message.content);
+```
+
+  </TabItem>
+</Tabs>
+
+### Tool calling (function calling)
+
+```python
+from openai import OpenAI
+
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+
+tools = [{
+    "type": "function",
+    "function": {
+        "name": "get_weather",
+        "description": "Get current weather for a city",
+        "parameters": {
+            "type": "object",
+            "properties": {"city": {"type": "string"}},
+            "required": ["city"],
+        },
+    },
+}]
+
+response = client.chat.completions.create(
+    model="Mistral-Medium-3.5-128B",
+    messages=[{"role": "user", "content": "What is the weather in Paris?"}],
+    tools=tools,
+    tool_choice="auto",
+    temperature=0.2,
+)
+
+if response.choices[0].message.tool_calls:
+    call = response.choices[0].message.tool_calls[0]
+    print(f"Function: {call.function.name}")
+    print(f"Arguments: {call.function.arguments}")
+```
+
+## Recommended inference parameters
+
+### General chat
+
+| Parameter     | Value |
+| ------------- | ----- |
+| `temperature` | 0.7   |
+| `top_p`       | 1.0   |
+| `max_tokens`  | 1024–8192 depending on task |
+
+### Tool calling / structured output
+
+| Parameter     | Value |
+| ------------- | ----- |
+| `temperature` | 0.0–0.3 |
+| `top_p`       | 1.0   |
+
+:::tip Guide ideas
+- **Multilingual agentic assistant**: Mistral Medium handles 40+ languages natively. Build a customer service agent that receives queries in any supported language and calls tools (billing, order lookup, escalation) using native function calling — no translation step needed.
+- **LLM cascade**: Use `Qwen3.5-0.8B` as a cheap router. Route simple queries back to itself, moderate complexity to `Qwen3.6-35B-A3B-FP8`, and only genuinely complex tasks to `Mistral-Medium-3.5-128B`. Well-tuned cascades cut token costs by 40–80% while preserving 95% of quality.
+- **Long-document analysis**: The 256k context window fits entire technical reports, legal contracts, or codebases in a single request — no chunking needed for documents under ~190,000 words.
+:::
+
+## Terms of use and licensing {#terms-of-use-and-licensing}
+
+The [general terms of use](../../access-and-usage/terms-of-use/) apply. The model is provided by Mistral AI under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0.html), and reuse of the generated content is not subject to any additional restrictions.

@@ -1,0 +1,199 @@
+---
+sidebar_label: Qwen3.5-0.8B
+description: Detaillierte Informationen zu Qwen3.5-0.8B
+title: Qwen3.5-0.8B
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+## Beschreibung
+
+„Qwen3.5-0.8B" ist ein kompaktes Sprachmodell von Alibaba mit 0,8 Milliarden Parametern. Trotz seiner geringen Größe unterstützt es ein Kontextfenster von 262.144 Token und bietet einen optionalen Thinking-/Reasoning-Modus – und ist damit das kosteneffizienteste Modell im mittwald AI-Hosting-Katalog.
+
+Geeignet für und unterstützt:
+
+- Textgenerierung innerhalb einer Chat-Completion (Text zu Text)
+- Tool-Calling für agentische Workflows
+- Thinking / Reasoning für schrittweises Problemlösen (opt-in)
+- Hochdurchsatz- und latenzempfindliche Pipelines
+- Batch-Verarbeitung: Klassifizierung, Routing, Zusammenfassung, Extraktion
+
+Folgende Einschränkungen gelten:
+
+- Maximale Kontextlänge: 262.144 Token
+- Keine Bild-/Vision-Unterstützung
+- Antwortqualität und Reasoning-Tiefe sind geringer als bei größeren Modellen
+- Thinking-Modus ist standardmäßig **deaktiviert** – opt-in pro Anfrage via `chat_template_kwargs`
+
+## Thinking-Modus
+
+Der Thinking-Modus ist bei diesem Modell **standardmäßig deaktiviert** – anders als bei `Qwen3.5-122B-A10B-FP8`. Aktiviere ihn gezielt für Aufgaben, die von Chain-of-Thought-Reasoning profitieren:
+
+<Tabs groupId="language">
+  <TabItem value="python" label="Python">
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1",
+    api_key="sk-dein-api-key",
+)
+
+response = client.chat.completions.create(
+    model="Qwen3.5-0.8B",
+    messages=[{"role": "user", "content": "Löse: Wenn 3x + 7 = 22, was ist x?"}],
+    temperature=0.6,
+    top_k=20,
+    max_tokens=8192,
+    extra_body={
+        "chat_template_kwargs": {"enable_thinking": True},
+    },
+)
+
+print(response.choices[0].message.reasoning_content)  # Chain-of-Thought
+print(response.choices[0].message.content)             # Endantwort
+```
+
+  </TabItem>
+  <TabItem value="javascript" label="JavaScript">
+
+```ts
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  baseURL: "https://llm.aihosting.mittwald.de/v1",
+  apiKey: "sk-dein-api-key",
+});
+
+const response = await client.chat.completions.create({
+  model: "Qwen3.5-0.8B",
+  messages: [{ role: "user", content: "Löse: Wenn 3x + 7 = 22, was ist x?" }],
+  temperature: 0.6,
+  max_tokens: 8192,
+  // @ts-ignore – vLLM-Erweiterung
+  chat_template_kwargs: { enable_thinking: true },
+} as any);
+
+console.log(response.choices[0].message.content);
+```
+
+  </TabItem>
+</Tabs>
+
+Bei aktiviertem Thinking gibt das Modell zwei Felder zurück:
+
+| Feld | Inhalt |
+| ---- | ------ |
+| `choices[0].message.reasoning_content` | Interner Chain-of-Thought |
+| `choices[0].message.content` | Endantwort |
+
+## Empfohlene Inferenzparameter
+
+### Standardmodus (Thinking aus)
+
+**Allgemeine Aufgaben:**
+
+| Parameter          | Wert |
+| ------------------ | ---- |
+| `temperature`      | 1.0  |
+| `top_p`            | 1.0  |
+| `top_k`            | 20   |
+| `presence_penalty` | 2.0  |
+
+Greedy Decoding (`temperature: 0`) vermeiden – führt zu Wiederholungen. `presence_penalty` über 1,5 kann bei mehrsprachigen Prompts gelegentlich Sprachmischungen auslösen.
+
+### Thinking-Modus (`enable_thinking: true`)
+
+**Allgemeine Aufgaben:**
+
+| Parameter          | Wert |
+| ------------------ | ---- |
+| `temperature`      | 1.0  |
+| `top_p`            | 0.95 |
+| `top_k`            | 20   |
+| `presence_penalty` | 1.5  |
+
+**Coding und präzise Aufgaben:**
+
+| Parameter          | Wert |
+| ------------------ | ---- |
+| `temperature`      | 0.6  |
+| `top_p`            | 0.95 |
+| `top_k`            | 20   |
+| `presence_penalty` | 0.0  |
+
+### Ausgabelänge
+
+| Aufgabentyp                              | Empfohlene `max_tokens` |
+| ---------------------------------------- | ----------------------- |
+| Standardanfragen                         | 32.768                  |
+| Komplexe Probleme (Mathe, Schritt-für-Schritt) | 81.920            |
+
+## Tipps für spezifische Aufgaben
+
+### Tool-Calling
+
+Das Modell unterstützt Funktionsaufrufe im Qwen3-XML-Format. Tools werden über den standardmäßigen OpenAI-`tools`-Parameter übergeben:
+
+```python
+response = client.chat.completions.create(
+    model="Qwen3.5-0.8B",
+    messages=[{"role": "user", "content": "Wie ist das Wetter in Berlin?"}],
+    tools=[{
+        "type": "function",
+        "function": {
+            "name": "get_weather",
+            "description": "Aktuelles Wetter für eine Stadt abrufen",
+            "parameters": {
+                "type": "object",
+                "properties": {"city": {"type": "string"}},
+                "required": ["city"],
+            },
+        },
+    }],
+    tool_choice="auto",
+    temperature=0.2,
+)
+```
+
+Niedrige Temperatur (`0,1–0,3`) für Tool-Calls verwenden, um Halluzinationen zu reduzieren.
+
+### Routing und Klassifizierung
+
+Die geringe Größe macht dieses Modell ideal als First-Pass-Klassifizierer, der entscheidet, welches größere Modell eine Anfrage bearbeitet:
+
+```python
+response = client.chat.completions.create(
+    model="Qwen3.5-0.8B",
+    messages=[
+        {
+            "role": "system",
+            "content": (
+                "Klassifiziere die folgende Benutzernachricht in genau eine Kategorie: "
+                "SIMPLE_QA, CODE, MATH, IMAGE_TASK. Antworte nur mit dem Kategorienamen."
+            ),
+        },
+        {"role": "user", "content": user_message},
+    ],
+    temperature=0.1,
+    max_tokens=10,
+)
+category = response.choices[0].message.content.strip()
+```
+
+:::tip Guide-Ideen
+- **Cascade-Routing**: `Qwen3.5-0.8B` klassifiziert die Anfragekomplexität und leitet an die passende Stufe weiter:
+  - Einfacher Text → `Qwen3.5-0.8B` beantwortet direkt
+  - Mittelstufe → `Qwen3.6-35B-A3B-FP8` (Reasoning + Vision, mittlere Kosten)
+  - Komplex / Frontier → `Mistral-Medium-3.5-128B` oder `Qwen3.5-122B-A10B-FP8`
+  - Nur Vision → `Ministral-3-14B-Instruct-2512` (günstigstes Vision-Modell)
+
+  Eine gut abgestimmte Kaskade kann Kosten um 40–80 % senken und gleichzeitig bei 95 % der Anfragen die Qualität erhalten.
+- **Batch-Vorverarbeitung**: Dokumente in großem Umfang zusammenfassen, Entitäten extrahieren oder taggen, bevor eine kuratierte Teilmenge an ein leistungsstärkeres Modell übergeben wird.
+:::
+
+## Nutzungsbedingungen und Lizenzhinweise {#nutzungsbedingungen-und-lizenzhinweise}
+
+Es gelten die [allgemeinen Nutzungsbedingungen](../../access-and-usage/terms-of-use/). Das Modell wird von Alibaba unter der [Apache 2.0-Lizenz](https://www.apache.org/licenses/LICENSE-2.0.html) bereitgestellt. Die Weiternutzung der generierten Inhalte unterliegt keinen zusätzlichen Einschränkungen.

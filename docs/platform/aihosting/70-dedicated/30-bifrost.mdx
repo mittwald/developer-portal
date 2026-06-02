@@ -1,0 +1,292 @@
+---
+sidebar_label: AI gateway with Bifrost
+description: Run Bifrost as a self-hosted gateway in front of your dedicated endpoint
+title: End-to-end AI gateway setup with Bifrost
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+Bifrost is an AI gateway for routing, failover, and provider governance. In a dedicated setup, Bifrost sits between your apps and your dedicated mittwald endpoint.
+
+For creative/web agencies, Bifrost helps centralize routing across client workloads, campaign spikes, and mixed provider landscapes.
+
+## When to use Bifrost vs LiteLLM {#when-to-use}
+
+- Use **LiteLLM** for virtual end-user key lifecycle, budgets, and spend views.
+- Use **Bifrost** for provider routing, fallback chains, and gateway-level policy.
+- Many teams run both: LiteLLM for customer keys, Bifrost for upstream routing.
+
+## Prerequisites {#prerequisites}
+
+- Docker installed
+- Dedicated endpoint URL and API key from mittwald
+
+## A-to-Z setup {#setup}
+
+### 1. Start Bifrost {#setup-start}
+
+```shellsession
+user@local $ docker run -d \
+  --name bifrost \
+  -p 8080:8080 \
+  -v "$(pwd)/data:/app/data" \
+  maximhq/bifrost
+```
+
+Open `http://localhost:8080`.
+
+### 2. Register your dedicated endpoint as a provider {#setup-register}
+
+Provider registration and key registration are two separate API calls.
+
+**Step 1 — register the provider** (sets base URL and network config):
+
+```shellsession
+user@local $ curl --location 'http://localhost:8080/api/providers' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "provider": "openai",
+    "network_config": {
+      "base_url": "https://your-company.llm.aihosting.mittwald.de/v1"
+    }
+  }'
+```
+
+**Step 2 — add your API key to the provider**:
+
+```shellsession
+user@local $ curl --location 'http://localhost:8080/api/providers/openai/keys' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "name": "mittwald-dedicated",
+    "value": "YOUR_DEDICATED_API_KEY",
+    "models": ["*"],
+    "weight": 1.0
+  }'
+```
+
+### 3. Validate provider config in UI {#setup-validate}
+
+In **Model Providers**, check:
+
+- Key is active
+- Model mapping is correct (`*` or explicit list)
+- Base URL points to your dedicated endpoint
+
+### 4. Send traffic through Bifrost {#setup-traffic}
+
+<Tabs>
+<TabItem value="curl" label="curl">
+
+```shellsession
+user@local $ curl http://localhost:8080/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "openai/YOUR_MODEL_ID",
+    "messages": [
+      {"role": "user", "content": "Hello"}
+    ]
+  }'
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+```python
+from openai import OpenAI
+
+client = OpenAI(api_key="dummy", base_url="http://localhost:8080/openai/v1")
+
+response = client.chat.completions.create(
+    model="YOUR_MODEL_ID",
+    messages=[{"role": "user", "content": "Hello"}],
+)
+```
+
+</TabItem>
+<TabItem value="javascript" label="JavaScript / TypeScript">
+
+```typescript
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: "dummy",
+  baseURL: "http://localhost:8080/openai/v1",
+});
+```
+
+</TabItem>
+</Tabs>
+
+## Routing to mittwald shared AI Hosting (in addition to dedicated) {#shared-routing}
+
+If you also use mittwald shared AI Hosting, add it as another OpenAI-compatible provider.
+
+Shared AI Hosting base URL:
+
+- `https://llm.aihosting.mittwald.de/v1`
+
+Example — register and add a key:
+
+```shellsession
+user@local $ curl --location 'http://localhost:8080/api/providers' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "provider": "mittwald-shared",
+    "network_config": {
+      "base_url": "https://llm.aihosting.mittwald.de/v1"
+    },
+    "custom_provider_config": {
+      "base_provider_type": "openai"
+    }
+  }'
+
+curl --location 'http://localhost:8080/api/providers/mittwald-shared/keys' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "name": "mittwald-shared-key",
+    "value": "YOUR_SHARED_API_KEY",
+    "models": ["*"],
+    "weight": 1.0
+  }'
+```
+
+## Routing rules: when to send traffic to dedicated vs shared {#routing-rules}
+
+Bifrost routing decisions are typically built from:
+
+- model-to-key mapping (`models` per key)
+- weighted distribution (`weight`)
+- fallback ordering (primary provider, secondary provider)
+
+Recommended rules:
+
+1. Premium/contracted workloads -> dedicated provider key
+2. burst or long-tail workloads -> shared provider key
+3. fallback path -> dedicated first, shared second (or inverse, depending on SLO/cost goals)
+
+Example model-specific split:
+
+- Key `dedicated-key`: `models: ["YOUR_PREMIUM_MODEL_ID"]`
+- Key `shared-key`: `models: ["*"]` (or explicit non-premium list)
+
+This keeps high-value traffic on reserved capacity while still allowing scale-out via shared hosting.
+
+You can also add other providers (for example Anthropic / Claude) and route specific workloads there.
+
+Example additional provider:
+
+```shellsession
+user@local $ curl --location 'http://localhost:8080/api/providers' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "provider": "anthropic"
+  }'
+
+curl --location 'http://localhost:8080/api/providers/anthropic/keys' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "name": "claude-key",
+    "value": "YOUR_ANTHROPIC_API_KEY",
+    "models": ["claude-3-7-sonnet", "claude-4-sonnet"],
+    "weight": 1.0
+  }'
+```
+
+## Agency-oriented routing scenarios {#agency-scenarios}
+
+Typical agency setup in Germany:
+
+- multiple client websites/apps
+- mixed workloads (chatbot, content generation, backoffice automation)
+- changing traffic patterns (campaign launches, seasonal peaks)
+
+Recommended policy examples:
+
+- keep premium client workloads on dedicated capacity
+- send non-critical or burst traffic to shared capacity
+- route specific tasks (for example copywriting/review workflows) to Claude if needed
+- keep one fallback route active for outage resilience
+
+This lets agencies offer stable SLAs for key customers while keeping total operating cost predictable.
+
+## Complete multi-lane routing example {#full-example}
+
+This example sets up three lanes in one sequence: dedicated mittwald capacity as the primary lane, shared mittwald capacity as a burst/fallback lane, and Anthropic as a separate lane for specific tasks. Copy and adapt the three provider registrations, then route by model name.
+
+```shellsession
+# Lane 1: dedicated mittwald endpoint (primary, reserved capacity)
+user@local $ curl --location 'http://localhost:8080/api/providers' \
+  --header 'Content-Type: application/json' \
+  --data '{"provider": "openai", "network_config": {"base_url": "https://your-company.llm.aihosting.mittwald.de/v1"}}'
+
+user@local $ curl --location 'http://localhost:8080/api/providers/openai/keys' \
+  --header 'Content-Type: application/json' \
+  --data '{"name": "mittwald-dedicated", "value": "YOUR_DEDICATED_API_KEY", "models": ["YOUR_PREMIUM_MODEL_ID"], "weight": 1.0}'
+
+# Lane 2: shared mittwald endpoint (burst and long-tail workloads)
+user@local $ curl --location 'http://localhost:8080/api/providers' \
+  --header 'Content-Type: application/json' \
+  --data '{"provider": "mittwald-shared", "network_config": {"base_url": "https://llm.aihosting.mittwald.de/v1"}, "custom_provider_config": {"base_provider_type": "openai"}}'
+
+user@local $ curl --location 'http://localhost:8080/api/providers/mittwald-shared/keys' \
+  --header 'Content-Type: application/json' \
+  --data '{"name": "mittwald-shared-key", "value": "YOUR_SHARED_API_KEY", "models": ["*"], "weight": 1.0}'
+
+# Lane 3: Anthropic (for specific task types routed by model name)
+user@local $ curl --location 'http://localhost:8080/api/providers' \
+  --header 'Content-Type: application/json' \
+  --data '{"provider": "anthropic"}'
+
+user@local $ curl --location 'http://localhost:8080/api/providers/anthropic/keys' \
+  --header 'Content-Type: application/json' \
+  --data '{"name": "claude-key", "value": "YOUR_ANTHROPIC_API_KEY", "models": ["claude-3-7-sonnet", "claude-4-sonnet"], "weight": 1.0}'
+```
+
+After registration, send requests to the correct lane by using the matching model name:
+
+- `YOUR_PREMIUM_MODEL_ID` → hits dedicated lane
+- any model matched by `*` on shared → hits shared lane
+- `claude-3-7-sonnet` or `claude-4-sonnet` → hits Anthropic lane
+
+Fallback behavior (dedicated → shared) activates automatically if the primary provider key is unreachable. Adjust `weight` values to control traffic distribution.
+
+## Production configuration patterns {#production-patterns}
+
+### Provider-level failover and load split {#production-failover}
+
+- Add multiple keys/providers
+- Use `weight` to distribute traffic
+- Use model-specific key mapping for premium/basic lanes
+
+### Self-hosted endpoint hardening {#production-hardening}
+
+- Use explicit model allowlists instead of `*` where possible
+- Configure network timeouts in provider `network_config`
+- Use internal DNS/FQDN for Kubernetes cross-namespace routing
+
+### Logging and observability {#production-logging}
+
+Enable provider-level request/response logging options in Bifrost only if required by your compliance profile.
+
+## Combining with LiteLLM (recommended for customer keys) {#combination}
+
+A robust pattern is:
+
+1. Customer apps -> LiteLLM virtual keys
+2. LiteLLM upstream -> Bifrost
+3. Bifrost -> your dedicated endpoint
+
+This gives:
+
+- Customer key lifecycle and spend controls
+- Gateway routing/fallback policies
+- Clear separation of concerns
+
+## References {#references}
+
+- [Bifrost Setting Up](https://docs.getbifrost.ai/quickstart/gateway/setting-up)
+- [Bifrost Provider Configuration](https://docs.getbifrost.ai/quickstart/gateway/provider-configuration)
+- [Bifrost OpenAI SDK Integration](https://docs.getbifrost.ai/integrations/openai-sdk/overview)
+- [LiteLLM key management guide](../litellm)

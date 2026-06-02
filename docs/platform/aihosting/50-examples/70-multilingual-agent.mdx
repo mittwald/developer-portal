@@ -1,0 +1,199 @@
+---
+sidebar_label: Multilingual tool-calling agent
+description: Build a tool-calling agent that handles 40+ languages natively with Mistral-Medium-3.5-128B
+title: Multilingual tool-calling agent
+---
+
+The tool-calling agent pattern in this guide works with any chat model that supports function calling. The example uses [Mistral-Medium-3.5-128B](/docs/v2/platform/aihosting/models/mistral-medium-3-5-128b), but you can substitute any of the following depending on cost and quality requirements:
+
+| Model | Languages | Notes |
+| ----- | --------- | ----- |
+| `Mistral-Medium-3.5-128B` | 40+ | Best multilingual quality |
+| `Qwen3.5-122B-A10B-FP8` | 100+ | Thinking mode available; vision support |
+| `Qwen3.6-35B-A3B-FP8` | 100+ | More cost-efficient; reasoning + vision |
+| `gpt-oss-120b` | English-centric | Best for English-only workloads |
+
+All models use the same OpenAI-compatible tool-calling API — changing the model is a single line swap.
+
+This guide shows a complete agentic loop: the model decides which tools to call, you execute them, and you feed the results back until the model has everything it needs.
+
+## Setup {#setup}
+
+```shellsession
+user@local $ pip install openai
+user@local $ export OPENAI_API_KEY="sk-…"
+```
+
+## Define tools {#define-tools}
+
+Tool names and descriptions are always written in **English**. The model maps any user language onto the correct tool automatically.
+
+```python
+import os
+import json
+from openai import OpenAI
+
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_exchange_rate",
+            "description": "Get the current exchange rate between two currencies.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "from_currency": {
+                        "type": "string",
+                        "description": "ISO 4217 source currency code, e.g. EUR",
+                    },
+                    "to_currency": {
+                        "type": "string",
+                        "description": "ISO 4217 target currency code, e.g. USD",
+                    },
+                },
+                "required": ["from_currency", "to_currency"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_order_status",
+            "description": "Return the status and estimated delivery date for a customer order.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "order_id": {
+                        "type": "string",
+                        "description": "The order identifier, e.g. ORD-12345",
+                    },
+                },
+                "required": ["order_id"],
+            },
+        },
+    },
+]
+```
+
+## Implement tool functions {#implement-tools}
+
+Replace these stubs with real database lookups or API calls:
+
+```python
+def get_exchange_rate(from_currency: str, to_currency: str) -> dict:
+    # Stub — replace with a live FX API
+    rates = {
+        ("EUR", "USD"): 1.08,
+        ("USD", "EUR"): 0.93,
+        ("GBP", "EUR"): 1.17,
+        ("EUR", "GBP"): 0.85,
+    }
+    rate = rates.get((from_currency.upper(), to_currency.upper()))
+    if rate is None:
+        return {"error": f"No rate available for {from_currency}/{to_currency}"}
+    return {"from": from_currency, "to": to_currency, "rate": rate}
+
+
+def get_order_status(order_id: str) -> dict:
+    # Stub — replace with a real order DB query
+    orders = {
+        "ORD-12345": {"status": "shipped",    "delivery": "2026-06-04"},
+        "ORD-99999": {"status": "processing", "delivery": "2026-06-07"},
+    }
+    order = orders.get(order_id.upper())
+    if order is None:
+        return {"error": f"Order {order_id} not found"}
+    return {"order_id": order_id, **order}
+
+
+FUNCTIONS = {
+    "get_exchange_rate": get_exchange_rate,
+    "get_order_status":  get_order_status,
+}
+```
+
+## The agent loop {#agent-loop}
+
+The loop runs until the model stops requesting tool calls (`finish_reason != "tool_calls"`):
+
+```python
+def run_agent(user_message: str, system: str | None = None) -> str:
+    messages = []
+    if system:
+        messages.append({"role": "system", "content": system})
+    messages.append({"role": "user", "content": user_message})
+
+    while True:
+        response = client.chat.completions.create(
+            model="Mistral-Medium-3.5-128B",
+            messages=messages,
+            tools=tools,
+            tool_choice="auto",
+            temperature=0.2,
+        )
+        msg = response.choices[0].message
+        messages.append(msg)
+
+        if response.choices[0].finish_reason != "tool_calls":
+            return msg.content
+
+        # Execute each requested tool and return results
+        for call in msg.tool_calls:
+            args = json.loads(call.function.arguments)
+            result = FUNCTIONS[call.function.name](**args)
+            messages.append({
+                "role": "tool",
+                "tool_call_id": call.id,
+                "content": json.dumps(result),
+            })
+```
+
+## Test in multiple languages {#test-languages}
+
+```python
+queries = [
+    "Was ist der aktuelle EUR/USD-Wechselkurs?",          # German
+    "Quel est le taux de change EUR vers GBP?",           # French
+    "¿Cuál es el estado de mi pedido ORD-12345?",         # Spanish
+    "What is the status of order ORD-99999?",             # English
+    "Wie is de status van mijn bestelling ORD-12345?",    # Dutch
+]
+
+for q in queries:
+    print(f"Q: {q}")
+    print(f"A: {run_agent(q)}\n")
+```
+
+The model answers in the same language the user wrote in, without any explicit language detection or translation in your code.
+
+## Adding a persona via system prompt {#persona}
+
+```python
+SYSTEM = (
+    "You are a friendly customer support agent for mittwald. "
+    "Always reply in the same language the user writes in. "
+    "Be concise and professional."
+)
+
+answer = run_agent("Mein Paket ORD-12345 — wann kommt es an?", system=SYSTEM)
+print(answer)
+# "Ihr Paket ORD-12345 ist bereits versandt und wird voraussichtlich am 4. Juni 2026 geliefert."
+```
+
+## Parallel tool calls {#parallel-tools}
+
+When the user asks a question that requires multiple tools at once, the model may return several `tool_calls` in a single response. The loop above already handles this correctly — it iterates over all calls before making the next model request.
+
+```python
+# This query triggers both tools in one shot
+answer = run_agent(
+    "What is the EUR/USD rate and what is the status of order ORD-12345?"
+)
+print(answer)
+```
+
+:::note
+Tool definitions must be in English for best results across languages. The model reliably maps non-English queries to English-named functions regardless of the user's language.
+:::

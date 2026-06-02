@@ -1,0 +1,187 @@
+---
+sidebar_label: Erste Schritte
+description: So sendest du die erste Anfrage an deinen Dedicated-AI-Hosting-Endpunkt
+title: Erste Schritte mit Dedicated AI Hosting
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+Nach unserem Setup bekommst du:
+
+- **API Base URL** - deinen dedizierten HTTPS-Endpunkt, z. B. `https://dein-unternehmen.llm.aihosting.mittwald.de`
+- **API-Key** - ein Bearer-Token zur Authentifizierung deiner Requests
+
+Halte deinen API-Key vertraulich. Speichere ihn in einer Umgebungsvariablen oder einem Secrets-Manager — trage ihn nie direkt im Quellcode ein oder committe ihn in ein Repository. Falls ein Key kompromittiert wird, melde dich bei uns für eine Rotation.
+
+## Verfügbare Modelle prüfen {#list-models}
+
+```shellsession
+user@local $ curl https://dein-unternehmen.llm.aihosting.mittwald.de/v1/models \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+Verwende eine der zurückgegebenen Modell-IDs als `YOUR_MODEL_ID`.
+
+:::note
+Wenn auf deinem Endpunkt noch kein Modell installiert wurde, kann diese Liste leer sein. In dem Fall melde dich bei uns, damit wir die Modell-Provisionierung abschließen.
+:::
+
+## Erste Anfrage senden {#first-request}
+
+<Tabs>
+<TabItem value="curl" label="curl">
+
+```shellsession
+user@local $ curl https://dein-unternehmen.llm.aihosting.mittwald.de/v1/chat/completions \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "YOUR_MODEL_ID",
+    "messages": [
+      {"role": "user", "content": "Erkläre Retrieval-Augmented Generation in zwei Sätzen."}
+    ]
+  }'
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+```shellsession
+user@local $ pip install openai python-dotenv
+```
+
+```env
+OPENAI_API_KEY=YOUR_API_KEY
+OPENAI_BASE_URL=https://dein-unternehmen.llm.aihosting.mittwald.de/v1
+```
+
+```python
+from openai import OpenAI
+from dotenv import load_dotenv
+
+load_dotenv()
+
+client = OpenAI()
+
+response = client.chat.completions.create(
+    model="YOUR_MODEL_ID",
+    messages=[
+        {"role": "user", "content": "Erkläre Retrieval-Augmented Generation in zwei Sätzen."}
+    ]
+)
+
+print(response.choices[0].message.content)
+```
+
+</TabItem>
+<TabItem value="javascript" label="JavaScript / TypeScript">
+
+```shellsession
+user@local $ npm install openai dotenv
+```
+
+```env
+OPENAI_API_KEY=YOUR_API_KEY
+OPENAI_BASE_URL=https://dein-unternehmen.llm.aihosting.mittwald.de/v1
+```
+
+```typescript
+import OpenAI from "openai";
+import "dotenv/config";
+
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+  baseURL: process.env.OPENAI_BASE_URL,
+});
+
+const response = await client.chat.completions.create({
+  model: "YOUR_MODEL_ID",
+  messages: [
+    { role: "user", content: "Erkläre Retrieval-Augmented Generation in zwei Sätzen." }
+  ],
+});
+
+console.log(response.choices[0].message.content);
+```
+
+</TabItem>
+</Tabs>
+
+## Streaming-Antworten {#streaming}
+
+Mit `"stream": true` empfängst du Tokens direkt beim Generieren, anstatt auf die vollständige Antwort zu warten.
+
+<Tabs>
+<TabItem value="curl" label="curl">
+
+```shellsession
+user@local $ curl https://dein-unternehmen.llm.aihosting.mittwald.de/v1/chat/completions \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "YOUR_MODEL_ID",
+    "stream": true,
+    "messages": [
+      {"role": "user", "content": "Erkläre Retrieval-Augmented Generation in zwei Sätzen."}
+    ]
+  }'
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+```python
+from openai import OpenAI
+
+client = OpenAI(api_key="YOUR_API_KEY", base_url="https://dein-unternehmen.llm.aihosting.mittwald.de/v1")
+
+with client.chat.completions.stream(
+    model="YOUR_MODEL_ID",
+    messages=[{"role": "user", "content": "Erkläre Retrieval-Augmented Generation in zwei Sätzen."}],
+) as stream:
+    for chunk in stream:
+        if chunk.choices[0].delta.content:
+            print(chunk.choices[0].delta.content, end="", flush=True)
+```
+
+</TabItem>
+<TabItem value="javascript" label="JavaScript / TypeScript">
+
+```typescript
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: "YOUR_API_KEY",
+  baseURL: "https://dein-unternehmen.llm.aihosting.mittwald.de/v1",
+});
+
+const stream = await client.chat.completions.create({
+  model: "YOUR_MODEL_ID",
+  stream: true,
+  messages: [{ role: "user", content: "Erkläre Retrieval-Augmented Generation in zwei Sätzen." }],
+});
+
+for await (const chunk of stream) {
+  process.stdout.write(chunk.choices[0]?.delta?.content ?? "");
+}
+```
+
+</TabItem>
+</Tabs>
+
+:::note
+Wenn eine Streaming-Anfrage unterbrochen wird (z. B. durch einen Netzwerk-Timeout oder einen Server-Neustart), schließt sich die Verbindung, anstatt einen HTTP-Fehlercode zurückzugeben. Das HTTP 200 wird beim Start des Streams geschrieben – ein Fehler mitten im Stream sieht auf Client-Seite wie ein Connection-Reset aus. Erkenne unvollständige Streams und sende die Anfrage in diesem Fall erneut.
+:::
+
+## Request-Parameter {#parameters}
+
+Parameterempfehlungen können modellspezifisch sein. Starte mit den SDK-Defaults und tune dann gemäß Modellverhalten und Use Case.
+
+## Drop-in-Replacement {#drop-in}
+
+Da der Endpunkt OpenAI-kompatibel ist, kannst du ihn als Drop-in-Replacement in Frameworks mit eigener Base-URL nutzen. Eine vollständige Übersicht der unterstützten Endpunkte und Parameter — einschließlich Tool Calling und strukturierter Ausgaben — findest du unter [OpenAI-API-Kompatibilität](../openai-compatibility).
+
+## Mehrere API-Keys verwalten {#key-management}
+
+Wenn du getrennte Keys pro App/Team, Nutzungsstatistiken oder per-Key-Rate-Limits brauchst, nutze [LiteLLM](../litellm) als Self-Hosted-Proxy.
