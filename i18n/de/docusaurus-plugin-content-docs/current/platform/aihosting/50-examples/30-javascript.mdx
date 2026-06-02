@@ -12,7 +12,7 @@ import OpenAI from "openai";
 const client = new OpenAI({ baseURL: "https://llm.aihosting.mittwald.de/v1" });
 
 const resp = await client.chat.completions.create({
-  model: "Devstral-Small-2-24B-Instruct-2512",
+  model: "Ministral-3-14B-Instruct-2512",
   messages: [{ role: "user", content: "Hallo aus JS!" }],
 });
 
@@ -85,7 +85,6 @@ console.log(resp.choices[0].message.content);
 | `Qwen3.5-122B-A10B-FP8` | 20+ | Beste Genauigkeit, OCR, komplexe Szenen |
 | `Ministral-3-14B-Instruct-2512` | 4 | Ausgewogenes Verhältnis von Geschwindigkeit und Qualität |
 | `Qwen3.6-35B-A3B-FP8` | 5+ | Schnell bei wiederholten Anfragen |
-| `Devstral-Small-2-24B-Instruct-2512` | 4 | Code-Workflows mit Bildern |
 
 Bei Qwen-Modellen sollte der **Thinking-Modus deaktiviert** werden, um unnötigen Overhead zu vermeiden:
 
@@ -135,7 +134,7 @@ const tools = [
 ];
 
 const resp = await client.chat.completions.create({
-  model: "Devstral-Small-2-24B-Instruct-2512",
+  model: "Ministral-3-14B-Instruct-2512",
   messages: [{ role: "user", content: "Wie ist das Wetter in München?" }],
   tools,
   tool_choice: "auto",
@@ -156,7 +155,7 @@ import OpenAI from "openai";
 const client = new OpenAI({ baseURL: "https://llm.aihosting.mittwald.de/v1" });
 
 const stream = await client.chat.completions.create({
-  model: "Devstral-Small-2-24B-Instruct-2512",
+  model: "Ministral-3-14B-Instruct-2512",
   messages: [
     {
       role: "user",
