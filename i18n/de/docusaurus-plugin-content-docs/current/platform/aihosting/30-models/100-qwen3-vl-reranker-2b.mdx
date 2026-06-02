@@ -1,0 +1,168 @@
+---
+sidebar_label: Qwen3-VL-Reranker-2B
+description: Detaillierte Informationen zu Qwen3-VL-Reranker-2B
+title: Qwen3-VL-Reranker-2B
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+## Beschreibung
+
+„Qwen3-VL-Reranker-2B" ist ein vision-sprachliches Cross-Encoder-Reranking-Modell von Alibaba. Zu einer Anfrage und einer Liste von Kandidatendokumenten bewertet es jedes (Anfrage, Dokument)-Paar nach semantischer Relevanz und gibt eine geordnete Liste zurück. Sowohl die Anfrage als auch die Dokumente können Bilder enthalten, wodurch es für multimodale RAG-Pipelines geeignet ist.
+
+Geeignet für und unterstützt:
+
+- Neugewichtung von Textkandidaten aus einem Vektorindex (RAG-Pipelines)
+- Neugewichtung von Dokumenten, die Bilder enthalten
+- Verbesserung der Retrievalpräzision als zweiter Schritt nach Embedding-basierter Suche
+- Bewertung der Anfrage-Dokument-Relevanz für beliebige Ranking-Aufgaben
+
+Folgende Einschränkungen gelten:
+
+- Nur über `/v1/rerank` zugänglich – nicht über `/v1/chat/completions`
+- Maximale Kontextlänge pro (Anfrage + Dokument)-Paar: 32.768 Token
+- Maximale Bilder pro Anfrage: 5; maximale Videos: 1
+- Maximale Bildgröße: 1.310.720 Pixel – größere Bilder werden proportional skaliert (1 Token pro 32 × 32 Pixel)
+- Kein Streaming – alle Scores werden in einer einzigen Antwort zurückgegeben
+- Nicht für Textgenerierung, Tool-Calling oder Konversation
+- `instruction`-Werte sollten immer auf **Englisch** verfasst werden, auch bei mehrsprachigen Dokumenten – der Großteil der Trainingsdaten ist englischsprachig
+
+## API-Nutzung
+
+Qwen3-VL-Reranker-2B ist über den **`/v1/rerank`**-Endpunkt verfügbar, der dem Cohere-kompatiblen Reranking-API-Format folgt.
+
+### Basis-Reranking
+
+<Tabs groupId="language">
+  <TabItem value="python" label="Python">
+
+```python
+import os
+import requests
+
+response = requests.post(
+    "https://llm.aihosting.mittwald.de/v1/rerank",
+    headers={"Authorization": f"Bearer {os.environ['OPENAI_API_KEY']}"},
+    json={
+        "model": "Qwen3-VL-Reranker-2B",
+        "query": "Was sind die Zahlungsbedingungen?",
+        "documents": [
+            "Zahlung ist innerhalb von 30 Tagen nach Rechnungsstellung fällig.",
+            "Der Lieferant muss die Ware innerhalb von 14 Werktagen liefern.",
+            "Verspätete Zahlungen werden mit 2 % monatlichem Aufschlag berechnet.",
+        ],
+    },
+    timeout=30,
+)
+response.raise_for_status()
+
+for result in sorted(response.json()["results"], key=lambda r: r["relevance_score"], reverse=True):
+    print(f"[{result['relevance_score']:.3f}] index={result['index']}")
+```
+
+  </TabItem>
+  <TabItem value="javascript" label="JavaScript">
+
+```ts
+const response = await fetch(
+  "https://llm.aihosting.mittwald.de/v1/rerank",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: "Qwen3-VL-Reranker-2B",
+      query: "Was sind die Zahlungsbedingungen?",
+      documents: [
+        "Zahlung ist innerhalb von 30 Tagen nach Rechnungsstellung fällig.",
+        "Der Lieferant muss die Ware innerhalb von 14 Werktagen liefern.",
+        "Verspätete Zahlungen werden mit 2 % monatlichem Aufschlag berechnet.",
+      ],
+    }),
+  }
+);
+
+const { results } = await response.json();
+const ranked = results.sort((a, b) => b.relevance_score - a.relevance_score);
+console.log(ranked);
+```
+
+  </TabItem>
+</Tabs>
+
+### Antwortformat
+
+```json
+{
+  "results": [
+    { "index": 0, "relevance_score": 0.912 },
+    { "index": 2, "relevance_score": 0.874 },
+    { "index": 1, "relevance_score": 0.031 }
+  ]
+}
+```
+
+`index` ist die Position im ursprünglichen `documents`-Array. `relevance_score` ist ein Float zwischen 0 und 1 – höher bedeutet relevanter.
+
+### Benutzerdefinierte Anweisung
+
+Das optionale `instruction`-Feld teilt dem Modell mit, für welche Retrievalaufgabe es optimieren soll. Ohne Angabe wird ein generischer Standard verwendet (`"Given a search query, retrieve relevant candidates that answer the query."`):
+
+```python
+response = requests.post(
+    "https://llm.aihosting.mittwald.de/v1/rerank",
+    headers={"Authorization": f"Bearer {os.environ['OPENAI_API_KEY']}"},
+    json={
+        "model": "Qwen3-VL-Reranker-2B",
+        "query": "Gesamtbetrag dieser Rechnung",
+        "documents": abschnitte,
+        "instruction": "Given an OCR-extracted invoice, find sections containing payment amounts or totals.",
+    },
+    timeout=30,
+)
+```
+
+Domänenspezifische Anweisungen verbessern die Präzision bei spezialisierten Korpora (Recht, Medizin, Finanzen) um 1–5 %. Die Anweisung immer auf **Englisch** formulieren – auch bei nicht-englischen Dokumenten.
+
+## Integration in eine RAG-Pipeline
+
+Verwende den Reranker als zweiten Schritt nach der Vektorsuche. Hole zunächst mehr Kandidaten aus dem Index, schränke dann ein:
+
+```python
+import math
+
+def kosinus(a, b):
+    skalar = sum(x * y for x, y in zip(a, b))
+    norm = math.sqrt(sum(x**2 for x in a)) * math.sqrt(sum(x**2 for x in b))
+    return skalar / (norm + 1e-9)
+
+# Schritt 1: Grob-Retrieval via Embedding-Ähnlichkeit (Top 10)
+anfrage_vektor = einbetten([anfrage])[0]
+kandidaten = sorted(index, key=lambda v_c: kosinus(anfrage_vektor, v_c[0]), reverse=True)[:10]
+kandidaten_texte = [c for _, c in kandidaten]
+
+# Schritt 2: Präzises Reranking (Top 3)
+resp = requests.post(
+    "https://llm.aihosting.mittwald.de/v1/rerank",
+    headers={"Authorization": f"Bearer {os.environ['OPENAI_API_KEY']}"},
+    json={"model": "Qwen3-VL-Reranker-2B", "query": anfrage, "documents": kandidaten_texte},
+    timeout=30,
+)
+sortiert = sorted(resp.json()["results"], key=lambda r: r["relevance_score"], reverse=True)
+beste_abschnitte = [kandidaten_texte[r["index"]] for r in sortiert[:3]]
+```
+
+Du kannst GLM-OCR für Textextraktion, Qwen3-Embedding-8B für die Indizierung, Qwen3-VL-Reranker-2B für das Reranking und ein Chat-Modell für die Antwortgenerierung zusammenschalten. Dies ergibt eine vollständige Dokumenten-Frage-Antwort-Pipeline.
+
+:::tip Guide-Ideen
+- **Zweistufige Text-RAG**: Einbetten → Top-10-Kandidaten → Reranking auf Top-3. Die Cross-Attention des Rerankers über das vollständige (Anfrage, Dokument)-Paar erfasst Relevanzsignale, die die reine Embedding-Ähnlichkeit übersieht.
+- **Multimodale Produktsuche**: Produktbilder zusammen mit ihren Beschreibungen indizieren; Ergebnisse für Anfragen wie „dunkel gebeizte Holz-Arbeitsfläche für kleines Home Office" anhand von Text- und Bildinhalt neu ordnen.
+- **Dokument-Q&A-Präzision**: Kombination mit GLM-OCR (Textextraktion), Qwen3-Embedding-8B (Indizierung) und einem Chat-Modell (Antwortgenerierung) ergibt eine vierstufige Pipeline, bei der der Reranker die Kontextqualität vor dem teuren Generierungsschritt maximiert.
+:::
+
+## Nutzungsbedingungen und Lizenzhinweise {#nutzungsbedingungen-und-lizenzhinweise}
+
+Es gelten die [allgemeinen Nutzungsbedingungen](../../access-and-usage/terms-of-use/). Das Modell wird von Alibaba unter der [Apache 2.0-Lizenz](https://www.apache.org/licenses/LICENSE-2.0.html) bereitgestellt. Die Weiternutzung der generierten Inhalte unterliegt keinen zusätzlichen Einschränkungen.

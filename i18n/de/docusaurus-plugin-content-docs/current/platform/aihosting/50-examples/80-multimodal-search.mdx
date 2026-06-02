@@ -1,0 +1,190 @@
+---
+sidebar_label: Multimodale Produktsuche
+description: Produktbilder und -beschreibungen indizieren und Ergebnisse mit Qwen3-VL-Reranker-2B neu ordnen
+title: Multimodale Produktsuche
+---
+
+Standard-Keyword- und Vektorsuche funktioniert gut für Text, aber Produktkataloge enthalten Bilder. [Qwen3-VL-Reranker-2B](/docs/v2/platform/aihosting/models/qwen3-vl-reranker-2b) kann eine Anfrage gegen Dokumente bewerten, die sowohl Text als auch Bilder enthalten, und liefert damit reichhaltigere Relevanzsignale als reiner Text.
+
+Dieser Guide baut eine Katalogsuche, die:
+1. Produktbeschreibungen mit [Qwen3-Embedding-8B](/docs/v2/platform/aihosting/models/qwen3-embedding-8b) für schnelles Kandidaten-Retrieval einbettet
+2. Die Top-Kandidaten mit `Qwen3-VL-Reranker-2B` unter Einbeziehung der Produktbilder neu ordnet
+
+## Einrichtung {#einrichtung}
+
+```shellsession
+user@local $ pip install openai requests
+user@local $ export OPENAI_API_KEY="sk-…"
+```
+
+## Katalogstruktur
+
+Jedes Produkt hat eine Textbeschreibung und ein Bild (Base64-kodiertes JPEG). Bilder sollten vor dem Kodieren auf maximal 1024 px an der längsten Seite skaliert werden – große Bilder erhöhen die Latenz ohne die Ranking-Qualität zu verbessern.
+
+```python
+import os
+import base64
+import math
+import requests
+from openai import OpenAI
+
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+
+def encode_image(path: str) -> str:
+    """Base64-Data-URI für ein JPEG zurückgeben."""
+    with open(path, "rb") as f:
+        b64 = base64.b64encode(f.read()).decode()
+    return f"data:image/jpeg;base64,{b64}"
+
+
+# Beispielkatalog — Bildpfade und Beschreibungen durch echte Daten ersetzen
+CATALOGUE = [
+    {
+        "id": "SCHREIBTISCH-01",
+        "description": "Stehschreibtisch, dunkle Walnuss-Platte, höhenverstellbar 70–120 cm, 160×80 cm Arbeitsfläche",
+        "image": "products/schreibtisch_walnuss.jpg",
+    },
+    {
+        "id": "STUHL-07",
+        "description": "Ergonomischer Bürostuhl, Netzrücken, Lendenwirbelstütze, Armlehnen, schwarz",
+        "image": "products/stuhl_schwarz.jpg",
+    },
+    {
+        "id": "LAMPE-03",
+        "description": "LED-Schreibtischlampe, warmweiß, USB-C-Ladeanschluss, Touch-Dimmer, weiß",
+        "image": "products/lampe_weiss.jpg",
+    },
+    {
+        "id": "REGAL-12",
+        "description": "Wandregal schwebend, Massivholz Eiche, 80 cm, Traglast 25 kg",
+        "image": "products/regal_eiche.jpg",
+    },
+]
+```
+
+## Schritt 1 — Embedding-Index aufbauen
+
+`Qwen3-Embedding-8B` nutzen, um Beschreibungen für den schnellen Erst-Durchlauf einzubetten. Siehe die [Python-Beispiele](/docs/v2/platform/aihosting/examples/python) für das vollständige Embedding-Setup.
+
+```python
+def embed(texts: list[str]) -> list[list[float]]:
+    resp = client.embeddings.create(model="Qwen3-Embedding-8B", input=texts)
+    return [item.embedding for item in resp.data]
+
+
+def cosine(a: list[float], b: list[float]) -> float:
+    dot = sum(x * y for x, y in zip(a, b))
+    norm = math.sqrt(sum(x * x for x in a)) * math.sqrt(sum(x * x for x in b))
+    return dot / (norm + 1e-9)
+
+
+# Index beim Start aufbauen
+descriptions = [p["description"] for p in CATALOGUE]
+index_vectors = embed(descriptions)
+```
+
+## Schritt 2 — Kandidaten per Embedding-Ähnlichkeit abrufen
+
+```python
+def retrieve(query: str, top_k: int = 10) -> list[dict]:
+    """Top_k Produkte nach Kosinus-Ähnlichkeit zur Anfrage zurückgeben."""
+    [q_vec] = embed([query])
+    scored = [
+        (cosine(q_vec, vec), product)
+        for vec, product in zip(index_vectors, CATALOGUE)
+    ]
+    scored.sort(key=lambda x: x[0], reverse=True)
+    return [product for _, product in scored[:top_k]]
+```
+
+## Schritt 3 — Mit Bildern neu ordnen
+
+`Qwen3-VL-Reranker-2B` akzeptiert multimodale Dokumente. Jeder Kandidat wird als Content-Liste übergeben, die Textbeschreibung **und** Produktbild enthält. So kann der Reranker visuelle Signale (Farbe, Form, Stil) erfassen, die die Textbeschreibung möglicherweise nicht vollständig abbildet.
+
+```python
+def rerank(
+    query: str,
+    candidates: list[dict],
+    top_k: int = 3,
+    instruction: str | None = None,
+) -> list[dict]:
+    """Kandidaten anhand von Text + Bild neu ordnen."""
+    documents = []
+    for product in candidates:
+        content = [
+            {"type": "text", "text": product["description"]},
+            {
+                "type": "image_url",
+                "image_url": {"url": encode_image(product["image"])},
+            },
+        ]
+        documents.append({"content": content})
+
+    payload: dict = {
+        "model": "Qwen3-VL-Reranker-2B",
+        "query": query,
+        "documents": documents,
+    }
+    if instruction:
+        payload["instruction"] = instruction
+
+    resp = requests.post(
+        "https://llm.aihosting.mittwald.de/v1/rerank",
+        headers={"Authorization": f"Bearer {os.environ['OPENAI_API_KEY']}"},
+        json=payload,
+        timeout=30,
+    )
+    resp.raise_for_status()
+
+    results = resp.json()["results"]
+    ranked = sorted(results, key=lambda r: r["relevance_score"], reverse=True)
+    return [candidates[r["index"]] for r in ranked[:top_k]]
+```
+
+## Vollständige Such-Pipeline
+
+```python
+def search(query: str, top_k: int = 3) -> list[dict]:
+    candidates = retrieve(query, top_k=min(10, len(CATALOGUE)))
+    return rerank(
+        query,
+        candidates,
+        top_k=top_k,
+        instruction="Given a product search query, find the most visually and functionally relevant items.",
+    )
+
+
+# Beispielanfragen
+for query in [
+    "dunkler Holzschreibtisch für das Home Office",
+    "weiße Lampe mit USB-Ladung",
+    "ergonomischer Sitzplatz für lange Arbeitssitzungen",
+]:
+    results = search(query)
+    print(f"\nAnfrage: {query}")
+    for i, product in enumerate(results, 1):
+        print(f"  {i}. [{product['id']}] {product['description'][:70]}")
+```
+
+## Nur Text-Reranking
+
+Ohne Bilder einfach Zeichenketten übergeben:
+
+```python
+def rerank_text_only(query: str, candidates: list[dict], top_k: int = 3) -> list[dict]:
+    documents = [p["description"] for p in candidates]
+    resp = requests.post(
+        "https://llm.aihosting.mittwald.de/v1/rerank",
+        headers={"Authorization": f"Bearer {os.environ['OPENAI_API_KEY']}"},
+        json={"model": "Qwen3-VL-Reranker-2B", "query": query, "documents": documents},
+        timeout=30,
+    )
+    resp.raise_for_status()
+    results = resp.json()["results"]
+    ranked = sorted(results, key=lambda r: r["relevance_score"], reverse=True)
+    return [candidates[r["index"]] for r in ranked[:top_k]]
+```
+
+:::tip
+Den `instruction`-Wert immer auf **Englisch** formulieren, auch wenn die Suchanfrage auf Deutsch ist. Weitere Details zu Anweisungsformat und Bildgrößenlimits auf der [Qwen3-VL-Reranker-2B-Modellseite](/docs/v2/platform/aihosting/models/qwen3-vl-reranker-2b).
+:::
