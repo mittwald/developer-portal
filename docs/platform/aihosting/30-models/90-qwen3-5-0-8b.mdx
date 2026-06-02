@@ -46,9 +46,9 @@ response = client.chat.completions.create(
     model="Qwen3.5-0.8B",
     messages=[{"role": "user", "content": "Solve: if 3x + 7 = 22, what is x?"}],
     temperature=0.6,
-    top_k=20,
     max_tokens=8192,
     extra_body={
+        "top_k": 20,
         "chat_template_kwargs": {"enable_thinking": True},
     },
 )
