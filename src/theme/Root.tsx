@@ -5,6 +5,7 @@ import {
   useMatomo,
 } from "@datapunt/matomo-tracker-react";
 import { useLocation } from "@docusaurus/router";
+import { setTheme } from "@mittwald/flow-react-components";
 import "@mittwald/flow-react-components/all.css";
 
 function PageViewTracker({ children }: PropsWithChildren<{}>) {
@@ -37,6 +38,37 @@ function PageViewTracker({ children }: PropsWithChildren<{}>) {
 }
 
 export default function Root({ children }: PropsWithChildren<{}>) {
+  useEffect(() => {
+    const html = document.documentElement;
+
+    const syncFlowTheme = () => {
+      const docusaurusTheme = html.getAttribute("data-theme");
+      setTheme(docusaurusTheme === "dark" ? "dark" : "light");
+    };
+
+    syncFlowTheme();
+
+    const observer = new MutationObserver((changes) => {
+      for (const change of changes) {
+        if (
+          change.type === "attributes" &&
+          change.attributeName === "data-theme"
+        ) {
+          syncFlowTheme();
+        }
+      }
+    });
+
+    observer.observe(html, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
   const matomoInstance = createInstance({
     urlBase: "https://developer.mittwald.de/stats/",
     siteId: 1,
