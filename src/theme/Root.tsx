@@ -48,15 +48,8 @@ export default function Root({ children }: PropsWithChildren<{}>) {
 
     syncFlowTheme();
 
-    const observer = new MutationObserver((changes) => {
-      for (const change of changes) {
-        if (
-          change.type === "attributes" &&
-          change.attributeName === "data-theme"
-        ) {
-          syncFlowTheme();
-        }
-      }
+    const observer = new MutationObserver(() => {
+      syncFlowTheme();
     });
 
     observer.observe(html, {
