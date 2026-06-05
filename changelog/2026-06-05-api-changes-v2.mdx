@@ -1,0 +1,292 @@
+---
+title: API changes for v2 API, May 29 to June 5
+authors:
+  - machine
+tags:
+  - apiv2
+  - Container
+  - AI hosting
+  - App
+  - Marketplace
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API introduces several enhancements, including the addition of the new 'stopping' enum value to various response properties and request parameters, as well as the inclusion of optional and required properties across multiple endpoints.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- The new enum value `stopping` has been added to the `/items/status` response property for the response status `200` in the following operations:
+  - `GET /v2/projects/{projectId}/services` (List Services belonging to a Project)
+  - `GET /v2/projects/{projectId}/stacks` (List Stacks belonging to a Project)
+  - `GET /v2/stacks` (List Stacks belonging to the executing user)
+  - `GET /v2/stacks/{stackId}` (Get a Stack)
+  - `PATCH /v2/stacks/{stackId}` (Create, update or delete Services or Volumes belonging to a Stack)
+  - `PUT /v2/stacks/{stackId}` (Declaratively create, update or delete Services or Volumes belonging to a Stack)
+  - `GET /v2/stacks/{stackId}/services/{serviceId}` (Get a Service belonging to a Stack)
+  
+- The new enum value `stopping` has also been added to the `query` request parameter `status` in the operation:
+  - `GET /v2/projects/{projectId}/services` (List Services belonging to a Project)
+
+- The optional property `/items/label` has been added to the response with the `200` status in the following operations:
+  - `GET /v2/ai-hosting-models` (Get a list of currently active models)
+  - `GET /v2/customers/{customerId}/ai-hosting-models` (Get a list of currently active models)
+  - `GET /v2/projects/{projectId}/ai-hosting-models` (Get a list of currently active models)
+
+- The optional property `/items/hostname` has been added to the response with the `200` status in the following operations:
+  - `GET /v2/app-installations` (List AppInstallations that a user has access to)
+  - `GET /v2/projects/{projectId}/app-installations` (List AppInstallations belonging to a Project)
+
+- The optional property `/items/ports` has been added to the response with the `200` status in the following operations:
+  - `GET /v2/app-installations` (List AppInstallations that a user has access to)
+  - `GET /v2/projects/{projectId}/app-installations` (List AppInstallations belonging to a Project)
+
+- The optional property `nextScheduledWebhookExecution` has been added to the response with the `200` status in the following operations:
+  - `GET /v2/customers/{customerId}/extensions/{extensionId}` (Get the ExtensionInstance of a specific customer and extension, if existing)
+  - `GET /v2/projects/{projectId}/extensions/{extensionId}` (Get the ExtensionInstance of a specific project and extension, if existing)
+
+- The required property `webhookExecutionHalted` has been added to the response with the `200` status in the following operations:
+  - `GET /v2/customers/{customerId}/extensions/{extensionId}` (Get the ExtensionInstance of a specific customer and extension, if existing)
+  - `GET /v2/extension-instances` (List ExtensionInstances)
+  - `GET /v2/projects/{projectId}/extensions/{extensionId}` (Get the ExtensionInstance of a specific project and extension, if existing)
+
+- The following endpoints have been added:
+  - `GET /v2/contributors/{contributorId}/webhook-executions` (List all Webhook Executions)
+  - `POST /v2/projects/{projectId}/ai-hosting-keys/{keyId}/actions/link-container` (Links a container with a project licence)
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "List Services belonging to a Project"
+
+
+- added the new 'stopping' enum value to the '/items/status' response property for the response status '200'
+
+- added the new enum value 'stopping' to the 'query' request parameter 'status'
+
+
+For details, refer to the <OperationLink operation="container-list-services" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Stacks belonging to a Project"
+
+
+- added the new 'stopping' enum value to the '/items/services/items/status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="container-list-stacks" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Stacks belonging to the executing user"
+
+
+- added the new 'stopping' enum value to the '/items/services/items/status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="container-list-self-stacks" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Stack"
+
+
+- added the new 'stopping' enum value to the 'services/items/status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="container-get-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create, update or delete Services or Volumes belonging to a Stack"
+
+
+- added the new 'stopping' enum value to the 'services/items/status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="container-update-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Declaratively create, update or delete Services or Volumes belonging to a Stack"
+
+
+- added the new 'stopping' enum value to the 'services/items/status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="container-declare-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Service belonging to a Stack"
+
+
+- added the new 'stopping' enum value to the 'status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="container-get-service" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a list of currently active models"
+
+
+- added the optional property '/items/label' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ai-hosting-get-models" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app installations that a user has access to"
+
+
+- added the optional property '/items/hostname' to the response with the '200' status
+
+- added the optional property '/items/ports' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations-for-user" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an app installation"
+
+
+- added the optional property 'hostname' to the response with the '200' status
+
+- added the optional property 'ports' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-get-appinstallation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List all Webhook Executions"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="extension-list-all-extension-instance-webhook-executions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a list of currently active models"
+
+
+- added the optional property '/items/label' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ai-hosting-customer-get-detailed-models" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the extension instance of a specific customer and extension, if existing"
+
+
+- added the optional property 'nextScheduledWebhookExecution' to the response with the '200' status
+
+- added the required property 'webhookExecutionHalted' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-extension-instance-for-customer" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List extension instances"
+
+
+- added the optional property '/items/nextScheduledWebhookExecution' to the response with the '200' status
+
+- added the required property '/items/webhookExecutionHalted' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-list-extension-instances" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an extension instance"
+
+
+- added the optional property 'nextScheduledWebhookExecution' to the response with the '200' status
+
+- added the required property 'webhookExecutionHalted' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-extension-instance" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Links a container with a project licence"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ai-hosting-project-link-container" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a list of currently active models"
+
+
+- added the optional property '/items/label' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ai-hosting-project-get-detailed-models" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app installations belonging to a Project"
+
+
+- added the optional property '/items/hostname' to the response with the '200' status
+
+- added the optional property '/items/ports' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the extension instance of a specific project and extension, if existing"
+
+
+- added the optional property 'nextScheduledWebhookExecution' to the response with the '200' status
+
+- added the required property 'webhookExecutionHalted' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-extension-instance-for-project" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald JavaScript SDK Release 4.380.0
+
+The mittwald JavaScript SDK has been updated to version 4.380.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.380.0).
+
+### mittwald JavaScript SDK Release 4.379.0
+
+The mittwald JavaScript SDK has been updated to version 4.379.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details on the changes, you can view the [release notes](https://github.com/mittwald/api-client-js/releases/tag/4.379.0).
+
+### mittwald JavaScript SDK Release 4.378.0
+
+The mittwald JavaScript SDK has been updated to version 4.378.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.378.0).
+
