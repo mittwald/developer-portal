@@ -48,6 +48,49 @@ Diese Art von Routen funktionieren nicht mit nutzerungebundenen Access-Tokens, d
 sondern lediglich auf Ressourcen des Extension Context autorisieren.
 :::
 
+### Workaround: Verwendung veralteter projektgebundener Operationen {#workaround-deprecated-operations}
+
+Wenn du Ressourcen innerhalb eines spezifischen Projekt-Gültigkeitsbereichs mit einem Extension Instance-Token auflisten musst,
+gibt es einen Workaround für das oben beschriebene Problem. Die älteren API-Versionen enthielten oft projektgebundene List-
+Operationen, die zugunsten der modernen globalen List-Operationen veraltet sind. Obwohl veraltete
+Endpunkte nicht unbedingt empfohlene Lektüre sind, funktionieren sie tatsächlich mit Extension Instance-Tokens,
+da sie bereits an einen spezifischen Projekt-Kontext gebunden sind.
+
+So kannst du diese Einschränkung umgehen:
+
+**Beispiel: Abrufen von Ingresses für ein Projekt**
+
+```typescript
+// Verwendung des veralteten projektgebundenen Endpunkts über den zugrunde liegenden axios-Client
+const listResp = await apiClient.axios.get(
+  `/v2/projects/${projectId}/ingresses`
+);
+
+if (listResp.status !== 200) {
+  throw new Error(
+    `Failed to fetch ingresses for project ${projectId}. Status: ${listResp.status}`
+  );
+}
+
+const ingresses = listResp.data as Array<{ hostname?: string }>;
+const existingIngress = ingresses.find((ing) => ing.hostname === hostname);
+```
+
+**Muster für die Verwendung dieses Workarounds:**
+
+1. **Identifiziere die Einschränkung**: Wenn eine globale List-Operation nicht mit deinem Extension Instance-
+   Token funktioniert, hast du dieses Problem.
+2. **Überprüfe die OpenAPI-Spezifikation**: Suche nach einer älteren, projektgebundenen Variante der Operation.
+   Vergiss nicht, die veralteten Operationen zu überprüfen – sie sind aus einem Grund gekennzeichnet, und dies ist einer davon.
+3. **Verwende den axios-Client direkt**: Anstelle der typisierten API-Client-Methoden greifst du auf den zugrunde liegenden
+   `apiClient.axios` zu, um den veralteten Endpunkt direkt aufzurufen. Dies umgeht die Typ-Sicherheit des Clients,
+   daher musst du entsprechend vorgehen (z. B. mit `any`-Typen, wo der Client normalerweise
+   strenge Type Guards bereitstellen würde).
+4. **Fehlerbehandlung manuell durchführen**: Da du die Abstraktion des Client umgehst, denk daran, den
+   Antwortstatus selbst zu überprüfen.
+
+Dein Linter könnte eine Meinung zu diesem Ansatz haben, aber er funktioniert.
+
 ## OAuth2
 
 Das mStudio implementiert konform zu [RFC 6749](https://tools.ietf.org/html/rfc6749) OAuth2 als Authentifizierungsmechanismus für die öffentliche API.
