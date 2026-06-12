@@ -1,0 +1,101 @@
+---
+title: API changes for v2 API, June 5 to June 12
+authors:
+  - machine
+tags:
+  - apiv2
+  - Conversation
+  - AI hosting
+  - User
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API introduces several enhancements, including the addition of new enum values and required properties to various response schemas, aimed at improving the clarity and functionality of the API responses.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- The `GET /v2/conversations/{conversationId}/messages` operation has been updated to include the new `mailSendLimitIncrease` enum value in the `messageContent` response property for a `200` status. Additionally, `#/components/schemas/de.mittwald.v1.conversation.ServiceRequestMailSendLimitIncreasePayload` has been added to the `oneOf` list in the `meta` response property for the same status.
+  
+- The `GET /v2/customers/{customerId}/ai-hosting-models` operation now includes an optional property `/items/replacedBy` and a required property `/items/replacesModelNames` in the response for a `200` status.
+
+- The `GET /v2/projects/{projectId}/ai-hosting-models` operation has been updated similarly to include an optional property `/items/replacedBy` and a required property `/items/replacesModelNames` in the response for a `200` status.
+
+- The `GET /v2/users/self/sessions/current/status` operation now includes a required property `tokenId` in the response for a `200` status.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Get all message of the conversation"
+
+
+- added the new 'mailSendLimitIncrease' enum value to the '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.ServiceRequest]/allOf[subschema #2]/messageContent' response property for the response status '200'
+
+- added '#/components/schemas/de.mittwald.v1.conversation.ServiceRequestMailSendLimitIncreasePayload' to the '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.ServiceRequest]/allOf[subschema #2]/meta' response property 'oneOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="conversation-list-messages-by-conversation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a list of currently active models"
+
+
+- added the optional property '/items/replacedBy' to the response with the '200' status
+
+- added the required property '/items/replacesModelNames' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ai-hosting-customer-get-detailed-models" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a list of currently active models"
+
+
+- added the optional property '/items/replacedBy' to the response with the '200' status
+
+- added the required property '/items/replacesModelNames' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ai-hosting-project-get-detailed-models" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Check status of the current session"
+
+
+- added the required property 'tokenId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="user-get-current-session-status" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald JavaScript SDK Release 4.383.0
+
+The mittwald JavaScript SDK has been updated to version 4.383.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.383.0).
+
+### mittwald JavaScript SDK Release 4.382.0
+
+The mittwald JavaScript SDK has been updated to version 4.382.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.382.0).
+
+### mittwald JavaScript SDK Release 4.381.0
+
+The mittwald JavaScript SDK has been updated to version 4.381.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.381.0).
+
