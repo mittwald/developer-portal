@@ -127,7 +127,7 @@ allowing users to deploy their apps directly from GitHub with minimal setup.
 
 Currently, there are two main paths for zero-conf deployment of AI-developed apps:
 - Manually via mittwald CLI
-- Automated via GitHub Actions
+- Automated via GitHub Actions (see [deploying with GitHub Actions](/docs/v2/guides/deployment/container-actions/), specifically the [`zerodeploy-action`](/docs/v2/guides/deployment/container-actions/#deploy-with-zerodeploy-action))
 
 The recommended approach is to start with the manual CLI deployment to understand the
 process and then move towards automation with GitHub Actions for a more streamlined
@@ -186,14 +186,18 @@ Logs can be found in the container section in mStudio or via the CLI with contai
 user@local $ mw container logs c-XXXXXX
 ```
 
-After successful deployment, you can set up a GitHub Action to automate future deployments whenever you push
-changes to your repository. Leverage Git tags to manage releases and rollbacks effectively.
-Updating the app can be fully automated with GitHub Actions, so you can focus on building and
-improving your app while the deployment process runs in the background.
+:::tip Automate with GitHub Actions
+
+After your first manual deployment succeeds, set up automated deployments with GitHub Actions. The [`mittwald/zerodeploy-action`](/docs/v2/guides/deployment/container-actions/#deploy-with-zerodeploy-action) provides a complete workflow that automatically builds and deploys your app on every push.
+
+See the [full GitHub Actions deployment guide](/docs/v2/guides/deployment/container-actions/) for step-by-step instructions.
+
+:::
 
 Related guides for deeper setup:
 
-- For container-based CI/CD with GitHub Actions, see [Deploying containerized applications with GitHub Actions](/docs/v2/guides/deployment/container-actions/).
+- For **automated deployment with GitHub Actions**, start with the [`zerodeploy-action`](/docs/v2/guides/deployment/container-actions/#deploy-with-zerodeploy-action) which requires no Dockerfile or stack.yaml
+- For advanced container deployments with explicit stack definitions, see the [`deploy-container-action`](/docs/v2/guides/deployment/container-actions/#deploy-with-deploy-container-action)
 - For advanced deployment workflows and CI examples, see [Application deployment with deployer](/docs/v2/guides/deployment/deployer/).
 - For container concepts, stack files, and registry setup, see [Containers](/docs/v2/platform/workloads/containers/).
 - For declarative stack deployment commands, see [mw stack command reference](/docs/v2/cli/reference/stack/).

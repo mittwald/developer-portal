@@ -127,7 +127,7 @@ die es Nutzern ermöglicht, ihre Apps direkt von GitHub mit minimalem Setup bere
 
 Gegenwärtig gibt es zwei Hauptwege für das Zero-Conf-Deployment von mit KI entwickelten Apps:
 - Manuell über die mittwald-CLI
-- Automatisiert über GitHub Actions
+- Automatisiert über GitHub Actions (siehe [Deployment mit GitHub Actions](/docs/v2/guides/deployment/container-actions/), insbesondere die [`zerodeploy-action`](/docs/v2/guides/deployment/container-actions/#deploy-mit-zerodeploy-action))
 
 Der empfohlene Ansatz ist, mit der manuellen CLI-Bereitstellung zu beginnen, um den
 Prozess zu verstehen, und dann zur Automatisierung mit GitHub Actions für einen strafferen
@@ -186,14 +186,18 @@ Logs findest du im Container-Bereich in mStudio oder über die CLI mit Container
 user@local $ mw container logs c-XXXXXX
 ```
 
-Nach erfolgreicher Bereitstellung kannst du eine GitHub Action einrichten, um zukünftige Bereitstellungen zu automatisieren, wenn du
-Änderungen in dein Repository pushst. Nutze Git-Tags, um Releases und Rollbacks effektiv zu verwalten.
-Das Aktualisieren der App kann vollständig mit GitHub Actions automatisiert werden, sodass du dich auf das Entwickeln und Verbessern deiner App konzentrieren kannst,
-während der Deployment-Prozess im Hintergrund läuft.
+:::tip Mit GitHub Actions automatisieren
+
+Nachdem deine erste manuelle Bereitstellung erfolgreich war, richte automatisierte Deployments mit GitHub Actions ein. Die [`mittwald/zerodeploy-action`](/docs/v2/guides/deployment/container-actions/#deploy-mit-zerodeploy-action) bietet einen vollständigen Workflow, der deine App bei jedem Push automatisch baut und deployt.
+
+Siehe die [vollständige Anleitung zum GitHub Actions Deployment](/docs/v2/guides/deployment/container-actions/) für schrittweise Anleitungen.
+
+:::
 
 Weiterführende Guides für tiefergehendes Setup:
 
-- Für containergestützte CI/CD mit GitHub Actions, siehe [Deployment von containerisierten Anwendungen mit GitHub Actions](/docs/v2/guides/deployment/container-actions/).
+- Für **automatisiertes Deployment mit GitHub Actions** beginne mit der [`zerodeploy-action`](/docs/v2/guides/deployment/container-actions/#deploy-mit-zerodeploy-action), die kein Dockerfile oder stack.yaml benötigt
+- Für erweiterte Container-Deployments mit expliziten Stack-Definitionen siehe die [`deploy-container-action`](/docs/v2/guides/deployment/container-actions/#deploy-mit-deploy-container-action)
 - Für erweiterte Bereitstellungs-Workflows und CI-Beispiele, siehe [Application Deployment mit deployer](/docs/v2/guides/deployment/deployer/).
 - Für Container-Konzepte, Stack-Dateien und Registry-Setup, siehe [Container](/docs/v2/platform/workloads/containers/).
 - Für deklarative Stack-Bereitstellungsbefehle, siehe [mw stack Befehlsreferenz](/docs/v2/cli/reference/stack/).
