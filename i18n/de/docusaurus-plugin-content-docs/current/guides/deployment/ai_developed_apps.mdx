@@ -1,0 +1,262 @@
+---
+title: Deployment von mit KI entwickelten Apps
+sidebar_label: Mit KI entwickelte Apps
+tags:
+  - Deployment
+  - GitHub
+  - Apps
+description: Struktur und Schnellstart zum Deployen von mit KI entwickelten Apps mit einem Zero-Conf-Ansatz
+---
+
+## Einführung / Motivation {#introduction-motivation}
+
+Mit rasant voranschreitenden KI-getriebenen Entwicklungswerkzeugen ist die Erstellung von Anwendungen zugänglicher als je zuvor.
+Wir möchten es so einfach wie möglich machen, die von dir erstellten Apps — ob schnell prototypisiert oder durchdacht entwickelt — selbstbewusst in die Welt zu bringen und dort zu teilen.
+
+Neben schnellem Prototyping und Entwicklung möchten wir es Nutzern ermöglichen, ihre
+mit KI entwickelten Apps einfach mit anderen zu teilen und in Produktionsumgebungen bereitzustellen, ohne sich
+mit komplexen Bereitstellungsprozessen oder Konfigurationen auseinandersetzen zu müssen.
+
+Ob du eine kleine geschäftliche App oder eine komplexere Anwendung mit KI-getriebener Entwicklung erstellst — dieser Guide hilft dir,
+deine App von deinem lokalen Rechner (oder einer Cloud-basierten IDE) mit minimalem Aufwand in die Welt zu bringen.
+
+Eine App bereitzustellen ist spannend — und es lohnt sich, das durchdacht zu tun. Compliance, Datenschutz, Sicherheit und operative
+Verantwortung sind wichtig. Wir empfehlen dir, dich an unsere Community zu wenden, wenn du Fragen hast.
+
+## Überblick über die mit KI entwickelte App-Landschaft {#ai-developed-app-landscape-overview}
+
+Apps, die durch KI-getriebene Entwicklung entstehen, sind leicht zu erstellen, und es gibt eine Vielzahl von Bereitstellungsoptionen.
+
+Verschiedene Plattformen bieten unterschiedliche Vorteile und Nachteile. Anbieter wie Replit und Lovable priorisieren Entwicklungsgeschwindigkeit
+und Benutzerfreundlichkeit mit ihren speziellen Projektvorlagen, Buildsystemen und Bereitstellungspipelines. Dieser Komfort
+geht mit einem Nachteil einher: Eine spätere Migration auf eine andere Plattform kann Nacharbeit erfordern.
+Andererseits erhältst du einen schnellen Weg in die Produktion mit integrierten Werkzeugen und Support.
+
+Plattformen wie GitHub und mittwald bieten dagegen flexiblere und standardisierte
+Bereitstellungsoptionen, die leicht an verschiedene Umgebungen angepasst werden können.
+
+Durch die Verwendung von GitHub als zentrales Repository für deine mit KI entwickelte App kannst du
+eine klare Historie von Änderungen bewahren, mit anderen zusammenarbeiten und in verschiedene Plattformen
+bereitstellen, ohne an ein spezifisches Vendor-Ökosystem gebunden zu sein.
+
+Dieser Ansatz bietet dir größere Freiheit und Kontrolle über die Bereitstellung deiner App,
+während du weiterhin von der Leichtigkeit und Geschwindigkeit der KI-getriebenen Entwicklung profitierst.
+
+## GitHub ist unser Anker {#github-is-our-anchor}
+
+Wenn wir nach GitHub exportieren können, haben wir gute Chancen, überall zu deployen.
+
+Die meisten Plattformen unterstützen GitHub als Quelle für die Bereitstellung. Ein gut strukturiertes
+GitHub-Repository ermöglicht bessere Zusammenarbeit, Versionskontrolle und Integration
+mit verschiedenen Bereitstellungstools und -diensten. Falls GitHub nicht die bevorzugte Git-Plattform ist,
+gelten die gleichen Prinzipien für jeden anderen Git-Hosting-Dienst mit ähnlichen Funktionen.
+
+Mit dem Moment, in dem wir unsere mit KI entwickelte App nach GitHub exportieren können, erschließen sich
+vielfältige Bereitstellungsoptionen, darunter Continuous Integration und Continuous Deployment (CI/CD)
+Pipelines und Containerisierung.
+
+Viele Tools bieten bidirektionale Synchronisierung mit GitHub. Das bedeutet, dass Änderungen im
+GitHub-Repository automatisch in der Bereitstellungsumgebung sichtbar werden und umgekehrt.
+Dies ermöglicht einen nahtloseren Entwicklungs- und Bereitstellungsprozess,
+denn Entwickler können an ihrem Code in GitHub arbeiten und profitieren gleichzeitig
+von einer live-Bereitstellungsumgebung.
+
+## Prinzipien und Grenzen von Zero-Conf-Deployments {#principles-and-limits-of-zero-conf-deployments}
+
+:::warning
+Die Exportqualität variiert, daher solltest du zuerst lokal testen. Ein gut strukturierter Export mit allem notwendigen Code,
+Konfiguration und Build-Dateien macht Bereitstellung und Wartung viel einfacher.
+Ein unvollständiger Export erfordert möglicherweise Nacharbeit bei der Bereitstellung oder Wartung und kann
+Probleme mit Versionskontrolle und Zusammenarbeit verursachen.
+:::
+
+Da die meisten Plattformen mit benutzerdefinierten Pipelines und Konfigurationen bereitstellen,
+müssen wir einen gemeinsamen Nenner für Zero-Conf-Deployment definieren.
+In diesem Kontext bedeutet Zero-Conf-Deployment, dass wir den exportierten Code von GitHub nehmen
+und ihn auf einer Plattform bereitstellen können, ohne manuelle Änderungen oder Konfigurationen vornehmen zu müssen.
+
+Mit anderen Worten: Endnutzer sollten ihre mit KI entwickelte App mit minimalem Setup bereitstellen können,
+idealerweise nur durch das Verbinden ihres GitHub-Repositorys mit einer Bereitstellungsplattform, die
+Zero-Conf-Deployment unterstützt.
+
+Unglücklicherweise unterstützen nicht alle Plattformen Zero-Conf-Deployment, und selbst die, die es tun, können
+Einschränkungen oder Kompromisse haben. Beispielsweise können einige Plattformen spezifische Dateistrukturen,
+Konfigurationsdateien oder Build-Prozesse erfordern, die nicht damit kompatibel sind,
+wie mit KI entwickelte Apps exportiert werden.
+
+Mit anderen Worten: Während Zero-Conf-Deployment ein ideales Ziel ist, ist es in der Praxis nicht immer erreichbar,
+und Nutzer müssen möglicherweise manuelle Anpassungen oder Konfigurationen vornehmen.
+
+## Tipps und Tricks auf dem Weg zu Zero-Conf-Deployment {#tips-and-tricks-zero-conf-deployment}
+
+:::tip
+Eine gute Praktik, um exportierten Code auf Zero-Conf-Kompatibilität zu überprüfen, ist es, ihn lokal
+mit einem Tool wie Docker oder einem lokalen Entwicklungsserver bereitzustellen, bevor du ihn auf einer Cloud-Plattform bereitstellst.
+Dies kann dabei helfen, Probleme oder fehlende Komponenten zu identifizieren, die vor der Bereitstellung behoben werden müssen.
+:::
+
+Während der Entwicklung können wir bestimmte Praktiken befolgen, um die Chancen auf Zero-Conf-Deployment zu verbessern.
+
+Halte den Stack klein: Je mehr Abhängigkeiten und Services deine App benötigt, desto komplexer wird der Bereitstellungsprozess.
+
+Nutze Standard-Tools und -Konfigurationen: Das Befolgen von weit verbreiteten Tools und Konfigurationen kann die Kompatibilität
+mit verschiedenen Bereitstellungsplattformen erhöhen.
+
+Dokumentiere die Anforderungen und Abhängigkeiten deiner App klar: Dies kann anderen helfen zu verstehen, was für eine
+erfolgreiche Bereitstellung der App erforderlich ist, und kann auch bei der Fehlerbehebung helfen.
+
+Überprüfe bewährte Verfahren für Sicherheit und Datenschutz: Eine App, die Sicherheits- und Datenschutzrichtlinien befolgt,
+kann Probleme bei der Bereitstellung und im laufenden Betrieb verhindern. Vermeide hartcodierte Secrets, verwende Umgebungsvariablen,
+und überprüfe deine Abhängigkeiten regelmäßig auf Sicherheitslücken.
+
+Bereitstellungs-Checkliste:
+- [ ] App läuft lokal ohne Fehler
+- [ ] Alle Secrets/Keys sind nicht in deinem Code!
+- [ ] README erklärt Setup & Verwendung
+- [ ] Build-/Export-Skripte funktionieren
+- [ ] App in einem Browser/Incognito-Fenster getestet
+- [ ] Backups: Speichere eine Kopie deines Projekts!
+- [ ] Wähle einen zuverlässigen Host, der deine Anforderungen erfüllt
+- [ ] Teile den Link mit einem Freund — hole Feedback ein
+- [ ] Feiere dein erstes Deployment! 🎉
+
+## Zero-Conf-Deployment bei mittwald {#zero-conf-deployment-at-mittwald}
+
+mittwald bietet eine Zero-Conf-Deployment-Option für mit KI entwickelte Apps,
+die es Nutzern ermöglicht, ihre Apps direkt von GitHub mit minimalem Setup bereitzustellen.
+
+Gegenwärtig gibt es zwei Hauptwege für das Zero-Conf-Deployment von mit KI entwickelten Apps:
+- Manuell über die mittwald-CLI
+- Automatisiert über GitHub Actions (siehe [Deployment mit GitHub Actions](/docs/v2/guides/deployment/container-actions/), insbesondere die [`zerodeploy-action`](/docs/v2/guides/deployment/container-actions/#deploy-mit-zerodeploy-action))
+
+Der empfohlene Ansatz ist, mit der manuellen CLI-Bereitstellung zu beginnen, um den
+Prozess zu verstehen, und dann zur Automatisierung mit GitHub Actions für einen strafferen
+und effizienter Bereitstellungs-Workflow überzugehen.
+
+Eine separate Erweiterung für mStudio ist in Entwicklung, die den
+Bereitstellungsprozess durch eine integrierte Erfahrung in der Entwicklungsumgebung weiter vereinfacht.
+
+## Schnellstart-Anleitung zum Zero-Conf-Deployment von mit KI entwickelten Apps {#quickstart-zero-conf-deployment-ai-developed-apps}
+
+Voraussetzungen:
+- Eine mit KI entwickelte App mit einem GitHub-Repository
+- Ein mittwald-Hosting-Konto
+- Grundlegendes Verständnis von Git und GitHub
+- mittwald-CLI installiert und konfiguriert
+
+Manuell durchzuführende Schritte:
+1. Bereite deine mit KI entwickelte App für die Bereitstellung vor: Vergewissere dich, dass sie lokal läuft und dass alle Abhängigkeiten installiert sind.
+
+    ```shellsession
+    user@local $ git clone https://github.com/<your-org>/<your-repo>.git
+    user@local $ cd <your-repo>
+    ```
+
+2. Stelle sicher, dass dein lokales Repository mit GitHub synchron ist und dass deine Änderungen committed und gepusht sind.
+
+    ```shellsession
+    user@local $ git pull
+    user@local $ git status
+    ```
+
+3. Verwende in deinem App-Ordner die mittwald-CLI, um ein Projekt zu erstellen und das Bereitstellungskommando auszuführen.
+
+    ```shellsession
+    user@local $ mw project create --description=<project-name> --update-context
+    user@local $ mw experimental deploy
+    ```
+
+:::note
+Beachte, dass der hier verwendete Befehl im `experimental`-Namespace implementiert ist.
+Das bedeutet, dass er sich noch in Entwicklung befindet und sich entsprechend ändern kann.
+Während der zugrunde liegende Code stabil ist, können sich die Befehlsschnittstelle und das Verhalten weiterentwickeln,
+wenn wir Feedback sammeln und die Funktion iterativ verbessern.
+Wir empfehlen dir, die aktuelle Dokumentation auf mögliche Updates oder Änderungen
+des Deployment-Prozesses zu prüfen.
+:::
+
+Die erste Bereitstellung dauert einige Minuten, während die App gebaut und die Hosting-Umgebung eingerichtet wird.
+Sobald die Bereitstellung abgeschlossen ist, kannst du deine App über die bereitgestellte URL aufrufen.
+
+Teste deine App in einem Browser, das Deployment-Kommando erstellt eine Subdomain und verlinkt zum Container-Ziel.
+Falls du Probleme hast, überprüfe die Logs und Konfiguration zur Fehlerbehebung.
+Logs findest du im Container-Bereich in mStudio oder über die CLI mit Container-ID:
+
+```shellsession
+user@local $ mw container logs c-XXXXXX
+```
+
+:::tip Mit GitHub Actions automatisieren
+
+Nachdem deine erste manuelle Bereitstellung erfolgreich war, richte automatisierte Deployments mit GitHub Actions ein. Die [`mittwald/zerodeploy-action`](/docs/v2/guides/deployment/container-actions/#deploy-mit-zerodeploy-action) bietet einen vollständigen Workflow, der deine App bei jedem Push automatisch baut und deployt.
+
+Siehe die [vollständige Anleitung zum GitHub Actions Deployment](/docs/v2/guides/deployment/container-actions/) für schrittweise Anleitungen.
+
+:::
+
+Weiterführende Guides für tiefergehendes Setup:
+
+- Für **automatisiertes Deployment mit GitHub Actions** beginne mit der [`zerodeploy-action`](/docs/v2/guides/deployment/container-actions/#deploy-mit-zerodeploy-action), die kein Dockerfile oder stack.yaml benötigt
+- Für erweiterte Container-Deployments mit expliziten Stack-Definitionen siehe die [`deploy-container-action`](/docs/v2/guides/deployment/container-actions/#deploy-mit-deploy-container-action)
+- Für erweiterte Bereitstellungs-Workflows und CI-Beispiele, siehe [Application Deployment mit deployer](/docs/v2/guides/deployment/deployer/).
+- Für Container-Konzepte, Stack-Dateien und Registry-Setup, siehe [Container](/docs/v2/platform/workloads/containers/).
+- Für deklarative Stack-Bereitstellungsbefehle, siehe [mw stack Befehlsreferenz](/docs/v2/cli/reference/stack/).
+
+### Migration von Replit zu mittwald {#migrating-replit-to-mittwald}
+
+Replit exportiert Apps in Node.js-Workspaces als Monorepo-Git-Repository.
+Das bedeutet: Wenn du deine App nach GitHub exportierst, kannst du sie mit ein paar
+Anpassungen auch bei mittwald deployen. Wichtig ist vor allem, den richtigen Workspace
+für Build und Ausführung auszuwählen.
+
+Um die Standard-Build- und Start-Kommandos von Replit zu überschreiben, kannst du
+beim Build folgende Variablen setzen, zum Beispiel um im Beispiel-Monorepo den
+Workspace `hello-world` zu verwenden. Aus einer GitHub-Action-Workflow-Datei:
+
+```yaml
+      - name: Deploy to Mittwald Container Hosting
+        uses: mittwald/rp-container-deploy-action@master
+        env:
+          RAILPACK_BUILD_CMD: 'pnpm --filter @workspace/hello-world run build'
+          RAILPACK_INSTALL_CMD: 'pnpm --filter @workspace/hello-world install'
+          RAILPACK_START_CMD: 'pnpm --filter @workspace/hello-world run serve'
+```
+
+[Replit-Dokumentation zur Git-Schnittstelle](https://docs.replit.com/references/workspace-tools/git-interface)
+
+### Migration von Lovable zu mittwald {#migrating-lovable-to-mittwald}
+
+Mit Lovable erstellte Apps lassen sich als Standard-Node.js-Projekt nach GitHub exportieren.
+Damit eine solche App auf mittwald Hosting deploybar ist, muss die exportierte App eine
+gültige `package.json` mit den nötigen Build- und Start-Skripten enthalten.
+
+Zusätzlich können Lovable-Apps beim Deployment wegen nicht aufgelöster Abhängigkeiten
+oder fehlender Konfigurationsdateien fehlschlagen. Um diese Probleme zu lösen, kann es
+hilfreich sein, zusätzliche Paketmanager wie `bun` zu entfernen und für eine bessere
+Kompatibilität bei `npm` oder `pnpm` zu bleiben:
+
+```shellsession
+user@local $ rm bun.lock
+```
+
+Weiterführende Informationen zu den zugrunde liegenden Heuristiken zur
+Paketmanager-Erkennung und zu Konfigurationsoptionen findest du in der
+[Railpack-Dokumentation](https://railpack.com/languages/node).
+
+[Lovable-Dokumentation zur GitHub-Integration](https://docs.lovable.dev/integrations/github)
+
+## Auf zum Erfolg: Best Practices {#moving-forward-best-practices}
+
+Während du dich auf die Bereitstellung vorbereitest, berücksichtige diese Praktiken, die Apps zum Erfolg bringen:
+
+- **Sicherheit und Datenschutz sind wichtig.** Entferne hartcodierte Secrets, verwende Umgebungsvariablen und halte Abhängigkeiten aktuell.
+Diese Praktiken sind unkompliziert und machen deine App zuverlässiger. Sowohl das CLI-Kommando als auch die GitHub Action unterstützen Umgebungsvariablen,
+sodass du Secrets aus deinem Code halten und sicher verwalten kannst.
+- **Teste früh.** Stelle lokal bereit, teile mit Freunden und hole dir Feedback ein, bevor du live gehst.
+- **Community ist hier.** Unser mittwald Discord-Server ist ein großartiger Ort, um Fragen zu stellen, deine Projekte zu teilen,
+und von anderen Entwicklern zu lernen.
+- **Eine Größe passt nicht für alle.** Zero-Conf-Deployment funktioniert großartig für viele mit KI entwickelte Apps. Falls deine App spezifische Anforderungen hat — komplexe
+Datenbanken, benutzerdefinierte Infrastruktur oder Compliance-Anforderungen — das ist kein Problem. Plane entsprechend und
+zögere nicht, uns um Orientierung zu bitten.
+
+Du hast etwas Cooles gebaut. Starte es, lerne daraus und iteriere weiter.
