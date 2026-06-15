@@ -20,7 +20,7 @@ WordPress 7.0 enthält den AI Client und die Connectors-Oberfläche als Teil des
 
 #### Schritt 1: AI Provider for mittwald installieren {#step-1-install-mittwald-provider}
 
-Navigiere zu **Plugins** -> **Installieren** in deiner WordPress-Administrationsoberfläche und suche nach „AI Provider for mittwald". Installiere und aktiviere das Plugin, um mittwald AI Hosting als Connector-Option zu aktivieren.
+Navigiere zu **Plugins** -> **Installieren** in deiner WordPress-Administrationsoberfläche und suche nach „AI Provider for mittwald“. Installiere und aktiviere das Plugin, um mittwald AI Hosting als Connector-Option zu aktivieren.
 
 Mit WP-CLI kannst du dies folgendermaßen erreichen:
 
@@ -30,7 +30,7 @@ user@ssh $ wp plugin install mittwald-ai-provider --activate
 
 #### Schritt 2 (optional): AI-Plugin installieren {#step-2-install-ai}
 
-Das [AI-Plugin](https://wordpress.org/plugins/ai/) von WordPress.org bietet zusätzliche KI-gestützte Funktionen im WordPress-Editor, wie Titelgenerierung, Auszugserstellung, Alt-Text-Vorschläge, Bildgenerierung und Kommentarmoderation. Navigiere zu **Plugins** -> **Installieren** und suche nach „AI" von WordPress.org.
+Das [AI-Plugin](https://wordpress.org/plugins/ai/) von WordPress.org bietet zusätzliche KI-gestützte Funktionen im WordPress-Editor, wie Titelgenerierung, Auszugserstellung, Alt-Text-Vorschläge, Bildgenerierung und Kommentarmoderation. Navigiere zu **Plugins** -> **Installieren** und suche nach „AI“ von WordPress.org.
 
 Alternativ mit WP-CLI:
 
@@ -50,7 +50,7 @@ Falls du noch keinen API-Schlüssel hast, folge der [mittwald AI Hosting Zugangs
 
 Navigiere zu **Einstellungen** -> **Connectors** in deiner WordPress-Administrationsoberfläche. Gib deinen mittwald AI Hosting API-Schlüssel in das mittwald-Connector-Feld ein und speichere deine Einstellungen. Dies stellt die Verbindung zwischen deiner WordPress-Website und den mittwald AI-Diensten her.
 
-Alternativ kannst du den API-Schlüssel über `wp-config.php` konfigurieren, indem du die Konstante `MITTWALD_API_KEY` definierst, oder über Umgebungsvariablen.
+Alternativ kannst du den API-Schlüssel über `wp-config.php` konfigurieren, indem du die Konstante `MITTWALD_API_KEY` definierst, oder über die Umgebungsvariable `MITTWALD_API_KEY`. WordPress [löst API-Schlüssel](https://make.wordpress.org/core/2026/03/18/introducing-the-connectors-api-in-wordpress-7-0/) in dieser Reihenfolge auf: Umgebungsvariable, dann PHP-Konstante, dann Datenbank (Admin-Oberfläche).
 
 #### Schritt 3: KI-Funktionen aktivieren (bei Verwendung des AI-Plugins) {#step-3-enable-features}
 
@@ -63,13 +63,15 @@ Falls du das AI-Plugin installiert hast, navigiere zu **Einstellungen** -> **AI*
 - **Bildgenerierung**: Erstelle und bearbeite Bilder aus Beitragsinhalten
 - **Kommentarmoderation**: Moderiere Kommentare automatisch basierend auf Toxizitätserkennung
 
+Eine vollständige Liste aller aktuell verfügbaren Funktionen findest du auf der [offiziellen Plugin-Seite](https://wordpress.org/plugins/ai/).
+
 Speichere deine Einstellungen nach dem Aktivieren der gewünschten Funktionen.
 
 ### KI-Funktionen verwenden {#using-ai-features}
 
 Alle KI-Funktionen in WordPress sind Opt-in und erfordern manuelle Auslösung. Nichts geschieht automatisch ohne deine ausdrückliche Aktion.
 
-Beim Bearbeiten eines Beitrags findest du KI-gestützte Schaltflächen an relevanten Stellen im Editor. Beispielsweise erhält das Titelfeld eine „Generieren"-Schaltfläche, die ein Modal mit KI-generierten Titelvorschlägen öffnet. Die Beitrags-Seitenleiste enthält eine „Auszug generieren"-Schaltfläche für die automatische Zusammenfassungserstellung. Bildblöcke zeigen eine „Alt-Text generieren"-Option zur Erstellung barrierefreier Beschreibungen.
+Beim Bearbeiten eines Beitrags findest du KI-gestützte Schaltflächen an relevanten Stellen im Editor. Beispielsweise erhält das Titelfeld eine „Generieren“-Schaltfläche, die ein Modal mit KI-generierten Titelvorschlägen öffnet. Die Beitrags-Seitenleiste enthält eine „Auszug generieren“-Schaltfläche für die automatische Zusammenfassungserstellung. Bildblöcke zeigen eine „Alt-Text generieren“-Option zur Erstellung barrierefreier Beschreibungen.
 
 ### Unterstützte Modelle und Funktionen {#supported-models}
 
