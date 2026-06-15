@@ -1,15 +1,20 @@
 import clsx from "clsx";
-import styles from "@site/src/components/HomepageFeatures/styles.module.css";
 import FeatureRow from "../FeatureRow";
 import Intro, { IntroHeader } from "../Intro";
 import Translate, { translate } from "@docusaurus/Translate";
-import Link from "@docusaurus/Link";
 import React, { ReactNode } from "react";
 import { IssueTrackerLink } from "@site/src/components/IssueTrackerLink";
 import LinkGroup from "@site/src/components/LinkGroup";
-import { Icon } from "@mittwald/flow-react-components";
+import {
+  Heading,
+  Icon,
+  LayoutCard,
+  Section,
+  Text,
+} from "@mittwald/flow-react-components";
 import { IconPlugConnected } from "@tabler/icons-react";
 import { NewBadge } from "@site/src/components/NewBadge";
+import Link from "@site/src/components/Link";
 
 interface ReferenceLinkProps {
   version: string;
@@ -72,56 +77,62 @@ function APIIntro() {
 function APIDocumentation() {
   return (
     <>
-      <h3>
-        <Translate id="index.reference.title">API documentation</Translate>
-      </h3>
-      <p>
-        <Translate id={"index.reference.body"}>
-          All endpoints and parameters of our API at a glance, including human
-          readable references and machine readable specifications in the OpenAPI
-          format.
-        </Translate>
-      </p>
-      <ul>
-        <li>
-          <ReferenceLink
-            version="v1"
-            title={translate({ id: "index.reference.v1" })}
-            spec={{
-              url: "https://api.mittwald.de/v1/openapi.json",
-              typeLabel: translate({ id: "index.reference.openapi" }),
-              type: "openapi",
-            }}
-          />
-        </li>
-        <li>
-          <ReferenceLink
-            version="v2"
-            title={translate({ id: "index.reference.v2" })}
-            additionalLinks={[
-              <Link key="into" to="/docs/v2/api/intro">
-                <Translate id="index.reference.intro">Introduction</Translate>
-              </Link>,
-            ]}
-            spec={{
-              url: "https://api.mittwald.de/openapi",
-              typeLabel: translate({ id: "index.reference.openapi" }),
-              type: "openapi",
-            }}
-          />
-        </li>
-      </ul>
-      <p>
-        <Translate id="index.reference.tutorials">
-          We also provide tutorials and examples to help you get started with
-          our API.
-        </Translate>{" "}
-        <Link to="/docs/v2/category/how-tos">
-          <Translate id="index.reference.tutorials-link">
-            Check them out!
+      <Section>
+        <Heading>
+          <Translate id="index.reference.title">API documentation</Translate>
+        </Heading>
+        <Text elementType="p">
+          <Translate id={"index.reference.body"}>
+            All endpoints and parameters of our API at a glance, including human
+            readable references and machine readable specifications in the OpenAPI
+            format.
           </Translate>
-        </Link>
-      </p>
+        </Text>
+        <Text>
+          <ul>
+            <li>
+              <ReferenceLink
+                version="v1"
+                title={translate({ id: "index.reference.v1" })}
+                spec={{
+                  url: "https://api.mittwald.de/v1/openapi.json",
+                  typeLabel: translate({ id: "index.reference.openapi" }),
+                  type: "openapi",
+                }}
+              />
+            </li>
+            <li>
+              <ReferenceLink
+                version="v2"
+                title={translate({ id: "index.reference.v2" })}
+                additionalLinks={[
+                  <Link key="into" to="/docs/v2/api/intro">
+                    <Translate id="index.reference.intro">Introduction</Translate>
+                  </Link>,
+                ]}
+                spec={{
+                  url: "https://api.mittwald.de/openapi",
+                  typeLabel: translate({ id: "index.reference.openapi" }),
+                  type: "openapi",
+                }}
+              />
+            </li>
+          </ul>
+        </Text>
+      </Section>
+      <Section>
+        <Text elementType="p">
+          <Translate id="index.reference.tutorials">
+            We also provide tutorials and examples to help you get started with
+            our API.
+          </Translate>{" "}
+          <Link to="/docs/v2/category/how-tos">
+            <Translate id="index.reference.tutorials-link">
+              Check them out!
+            </Translate>
+          </Link>
+        </Text>
+      </Section>
     </>
   );
 }
@@ -129,47 +140,52 @@ function APIDocumentation() {
 function APILibraries() {
   return (
     <>
-      <h3>
-        <Translate id="index.sdks.title">SDKs and Libraries</Translate>
-      </h3>
-      <p>
-        <Translate id={"index.sdks.body"}>
-          Make it easy for yourself and use one of our SDKs or libraries to
-          integrate our API into your application:
-        </Translate>
-      </p>
-      <ul>
-        <li>
-          <Link to="/cli">mittwald CLI</Link>
-        </li>
-        <li>
-          <Link to="/docs/v2/api/sdks/php">mittwald PHP SDK</Link>
-        </li>
-        <li>
-          <Link to="/docs/v2/api/sdks/javascript">mittwald JavaScript SDK</Link>{" "}
-          (Node.js + browser)
-        </li>
-        <li>
-          <Link to="/docs/v2/api/sdks/python">mittwald Python SDK</Link>{" "}
-          <NewBadge />
-        </li>
-        <li>
-          <Link to="/docs/v2/api/sdks/go">mittwald Go SDK</Link>
-        </li>
-      </ul>
-      <p>
-        <strong>
-          <Translate id={"index.sdks.own-sdks"}>
-            Have you built your own library that uses our API?
-          </Translate>{" "}
-          <IssueTrackerLink type="suggestion">
-            <Translate id="index.sdks.issue">
-              Let us know, and we'll link it here!
-            </Translate>
-          </IssueTrackerLink>{" "}
-          💙
-        </strong>
-      </p>
+      <Section>
+        <Heading>
+          <Translate id="index.sdks.title">SDKs and Libraries</Translate>
+        </Heading>
+        <Text elementType="p">
+          <Translate id={"index.sdks.body"}>
+            Make it easy for yourself and use one of our SDKs or libraries to
+            integrate our API into your application:
+          </Translate>
+        </Text>
+        <Text>
+          <ul>
+            <li>
+              <Link to="/cli">mittwald CLI</Link>
+            </li>
+            <li>
+              <Link to="/docs/v2/api/sdks/php">mittwald PHP SDK</Link>
+            </li>
+            <li>
+              <Link to="/docs/v2/api/sdks/javascript">mittwald JavaScript SDK</Link>{" "}
+              (Node.js + browser)
+            </li>
+            <li>
+              <Link to="/docs/v2/api/sdks/python">mittwald Python SDK</Link>{" "}
+              <NewBadge />
+            </li>
+            <li>
+              <Link to="/docs/v2/api/sdks/go">mittwald Go SDK</Link>
+            </li>
+          </ul>
+        </Text>
+      </Section>
+      <Section>
+        <Text elementType="p">
+          <strong>
+            <Translate id={"index.sdks.own-sdks"}>
+              Have you built your own library that uses our API?
+            </Translate>{" "}
+            <IssueTrackerLink type="suggestion">
+              <Translate id="index.sdks.issue">
+                Let us know, and we'll link it here!
+              </Translate>
+            </IssueTrackerLink>
+          </strong>
+        </Text>
+      </Section>
     </>
   );
 }
@@ -183,14 +199,14 @@ export default function APIFeature() {
             <APIIntro />
           </div>
           <div className={clsx("col col--4")}>
-            <div className={clsx("padding--md", styles.feature)}>
+            <LayoutCard>
               <APIDocumentation />
-            </div>
+            </LayoutCard>
           </div>
           <div className={clsx("col col--4")}>
-            <div className={clsx("padding--md", styles.feature)}>
+            <LayoutCard>
               <APILibraries />
-            </div>
+            </LayoutCard>
           </div>
         </div>
       </div>

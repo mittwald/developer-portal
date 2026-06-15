@@ -89,34 +89,26 @@
   --ifm-link-hover-decoration: none;
   --ifm-menu-color: var(--ifm-color-primary);
   --ifm-menu-color-active: var(--ifm-color-info);
-  --ifm-navbar-background-color: var(--ifm-color-primary);
+  --ifm-navbar-background-color: color-mix(in srgb, var(--neutral--color--200) 40%, transparent);
   --ifm-navbar-height: 72px;
-  --ifm-navbar-link-color: #fff;
-  --ifm-navbar-link-hover-color: #fff;
+  --ifm-navbar-link-color: var(--header-navigation--color);
+  --ifm-navbar-link-hover-color: var(--header-navigation--color);
   --ifm-toc-link-color: var(--ifm-link-color);
-  --mw-main-background-color: #ededed;
+  --mw-main-background: linear-gradient(rgb(244, 248, 252) 20%, rgb(208, 214, 243) 100%);
   --mw-main-feature-background-color: #fff;
 }
 
-.hero--primary {
-  background:
-    radial-gradient(circle at 60.52% 67.2%, #264697, transparent 41%),
-    radial-gradient(circle at 56.14% 12.23%, #232b69, transparent 85%),
-    radial-gradient(circle at 6.01% 1.34%, #d989b9, transparent 25%),
-    radial-gradient(circle at 75.71% 4.03%, #0a0d66, transparent 34%),
-    radial-gradient(circle at 99.31% 70.7%, #2fd2eb, transparent 75%),
-    radial-gradient(circle at 76.91% 59.14%, #0a0d66, transparent 71%),
-    radial-gradient(circle at 71.07% 83.33%, #0a0d66, transparent 71%),
-    radial-gradient(circle at 15.11% 70.43%, #1556a1, transparent 64%),
-    radial-gradient(circle at 65.49% 37.9%, #3058a5, transparent 100%),
-    radial-gradient(circle at 99.4% 93.55%, #12f7ff, transparent 100%),
-    radial-gradient(circle at 50% 50%, #8f62aa, #8f62aa 100%);
+.hero {
+    background: none;
 }
 
 .hero__title {
-  color: #fff;
   font-size: 60px;
   font-family: var(--ifm-font-family-headline);
+}
+
+.navbar {
+    backdrop-filter: blur(5px);
 }
 
 .docPage_node_modules-\@docusaurus-theme-classic-lib-theme-DocPage-Layout-styles-module {
@@ -124,8 +116,9 @@
   flex: 1;
 }
 
-main.index {
-  background-color: var(--mw-main-background-color);
+.main-wrapper {
+  background: var(--mw-main-background);
+  background-attachment: fixed;
 }
 
 aside.theme-doc-sidebar-container {
@@ -376,11 +369,10 @@ section.row {
 [data-theme="dark"] {
   --ifm-color-primary: #c9cdde;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
-  --mw-main-background-color: #111;
+  --mw-main-background: linear-gradient(180deg,#121518 0%, #232940 80%);
   --mw-main-feature-background-color: #222;
-  --ifm-navbar-background-color: #1c2658;
-  --ifm-footer-background-color: #1c2658;
-  --ifm-navbar-link-color: #fff;
+  --ifm-navbar-background-color: rgba(18, 21, 24, 0.4);
+  --ifm-footer-background-color: rgba(18, 21, 24, 0.4);
   --ifm-color-info: #80aafa;
   --ifm-color-info-dark: #80aafa;
   --ifm-color-info-darker: #bfd4fd;
@@ -406,21 +398,6 @@ section.row {
   ) !important;
   --status-badge--warning-content-color: var(--ifm-color-warning) !important;
   --status-icon--warning-color: var(--ifm-color-warning) !important;
-}
-
-[data-theme="dark"] .hero--primary {
-  background:
-    radial-gradient(circle at 60.52% 67.2%, #1c2e60, transparent 41%),
-    radial-gradient(circle at 56.14% 12.23%, #232b69, transparent 85%),
-    radial-gradient(circle at 6.01% 1.34%, #562441, transparent 25%),
-    radial-gradient(circle at 75.71% 4.03%, #0a0d66, transparent 34%),
-    radial-gradient(circle at 99.31% 70.7%, #227b85, transparent 75%),
-    radial-gradient(circle at 76.91% 59.14%, #0a0d66, transparent 71%),
-    radial-gradient(circle at 71.07% 83.33%, #0a0d66, transparent 71%),
-    radial-gradient(circle at 15.11% 70.43%, #0f3464, transparent 64%),
-    radial-gradient(circle at 65.49% 37.9%, #25427a, transparent 100%),
-    radial-gradient(circle at 99.4% 93.55%, #288e8f, transparent 100%),
-    radial-gradient(circle at 50% 50%, #8f62aa, #8f62aa 100%);
 }
 
 [data-theme="dark"] .hero {
