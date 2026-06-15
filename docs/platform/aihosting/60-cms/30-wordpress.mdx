@@ -1,36 +1,26 @@
 ---
 sidebar_label: WordPress
-description: Learn how to use the mittwald AI provider with WordPress AI Experiments
+description: Learn how to use the mittwald AI provider with WordPress AI
 title: WordPress
 ---
 
 ## Using the mittwald AI provider for WordPress {#using-mittwald-ai-provider}
 
-The mittwald AI provider plugin enables integration between [WordPress AI Experiments](https://wordpress.org/plugins/ai/) and mittwald AI Hosting. This allows you to leverage mittwald's AI models directly within the WordPress editor for content generation tasks such as generating titles, excerpts, and alt texts. You can find the official plugin on the [WordPress plugin directory](https://wordpress.org/plugins/mittwald-ai-provider).
+The [AI Provider for mittwald](https://wordpress.org/plugins/mittwald-ai-provider) plugin enables integration between WordPress and mittwald AI Hosting. This allows you to leverage mittwald's AI models directly within WordPress for content generation tasks such as generating titles, excerpts, and alt texts.
 
 ### Prerequisites {#prerequisites}
 
-Before installing the mittwald AI provider, you need to have the WordPress AI Experiments plugin installed and activated. This base plugin provides the AI framework that the mittwald provider extends with mittwald-hosted models.
+The mittwald AI provider requires WordPress 7.0 or higher. WordPress 7.0 includes the AI Client and Connectors screen as part of core, which the mittwald provider uses to register as an AI connector.
 
-The AI Experiments plugin requires WordPress 6.9 or higher and PHP 7.4 or higher. It brings experimental AI-powered features into the WordPress editing experience, including title generation, excerpt creation, and alt text suggestions.
+Optionally, you can install the [AI plugin](https://wordpress.org/plugins/ai/) by WordPress.org to access additional AI-powered features in the WordPress editor, such as title generation, excerpt creation, alt text suggestions, image generation, and comment moderation.
 
 ### Installation {#installation}
 
-The installation process involves two plugins: first the AI Experiments base plugin, then the mittwald AI provider.
+WordPress 7.0 includes the AI Client and Connectors screen as part of core. The mittwald AI provider registers as a connector in this screen. Optionally, you can install the AI plugin to access additional AI-powered features in the WordPress editor.
 
-#### Step 1: Install the AI Experiments plugin {#step-1-install-ai-experiments}
+#### Step 1: Install the AI Provider for mittwald {#step-1-install-mittwald-provider}
 
-Navigate to **Plugins** -> **Add New** in your WordPress admin interface and search for "AI Experiments". Install and activate the plugin.
-
-Alternatively, you can use WP-CLI to install and activate the plugin from the command line:
-
-```shellsession
-user@ssh $ wp plugin install ai --activate
-```
-
-#### Step 2: Install the mittwald AI provider {#step-2-install-mittwald-provider}
-
-With the AI Experiments plugin active, install the mittwald AI provider. In your WordPress admin, navigate to **Plugins** -> **Add New** and search for "mittwald AI provider". Install and activate the plugin to enable mittwald AI Hosting as a provider option.
+Navigate to **Plugins** -> **Add New** in your WordPress admin interface and search for "AI Provider for mittwald". Install and activate the plugin to enable mittwald AI Hosting as a connector option.
 
 Using WP-CLI, you can accomplish this with:
 
@@ -38,9 +28,19 @@ Using WP-CLI, you can accomplish this with:
 user@ssh $ wp plugin install mittwald-ai-provider --activate
 ```
 
+#### Step 2 (optional): Install the AI plugin {#step-2-install-ai}
+
+The [AI plugin](https://wordpress.org/plugins/ai/) by WordPress.org provides additional AI-powered features in the WordPress editor, such as title generation, excerpt creation, alt text suggestions, image generation, and comment moderation. Navigate to **Plugins** -> **Add New** and search for "AI" by WordPress.org.
+
+Alternatively, use WP-CLI:
+
+```shellsession
+user@ssh $ wp plugin install ai --activate
+```
+
 ### Configuration {#configuration}
 
-Once both plugins are installed, you'll need to configure your mittwald API credentials and enable the AI experiments you want to use.
+Once the mittwald AI provider is installed, you'll need to configure your API credentials. If you installed the AI plugin, you can also enable its features.
 
 #### Step 1: Obtain your API key {#step-1-obtain-api-key}
 
@@ -48,18 +48,22 @@ If you don't have an API key yet, follow the [mittwald AI Hosting access guide](
 
 #### Step 2: Store your API credentials {#step-2-store-credentials}
 
-Navigate to **Settings** -> **AI Credentials** in your WordPress admin interface. Enter your mittwald AI Hosting API key in the appropriate field and save your settings. This establishes the connection between your WordPress site and mittwald's AI services.
+Navigate to **Settings** -> **Connectors** in your WordPress admin interface. Enter your mittwald AI Hosting API key in the mittwald connector field and save your settings. This establishes the connection between your WordPress site and mittwald's AI services.
 
-#### Step 3: Enable AI experiments {#step-3-enable-experiments}
+Alternatively, you can configure the API key via `wp-config.php` by defining the `MITTWALD_API_KEY` constant, or via environment variables.
 
-Navigate to **Settings** -> **AI Experiments** and click the button to enable experiments globally. You can then toggle individual experiments based on which features you want to use. Available experiments include:
+#### Step 3: Enable AI features (if using the AI plugin) {#step-3-enable-features}
+
+If you installed the AI plugin, navigate to **Settings** -> **AI** and enable the features you want to use. Available features include:
 
 - **Title Generation**: Generate title suggestions with a single click in the post editor
 - **Excerpt Generation**: Automatically create concise summaries for your posts
 - **Content Summarization**: Summarize long-form content into digestible overviews
 - **Alt Text Generation**: Generate descriptive alt text for images to improve accessibility
+- **Image Generation**: Create and edit images from post content
+- **Comment Moderation**: Automatically moderate comments based on toxicity detection
 
-Save your settings after enabling the desired experiments.
+Save your settings after enabling the desired features.
 
 ### Using AI features {#using-ai-features}
 
@@ -71,9 +75,15 @@ When editing a post, you'll find AI-powered buttons in relevant locations throug
 
 The mittwald AI provider supports chat completions with several models optimized for different tasks:
 
-- **GPT-OSS models**: Open-source GPT-compatible models for general content generation
-- **Ministral**: Supports vision and image input capabilities
-These models support standard text generation, JSON output formatting, tool calling, and streaming responses. The Ministral models additionally support image vision capabilities for analyzing and describing images.
+- **gpt-oss-120b**: Open-source GPT-compatible model for general content generation and advanced reasoning
+- **Qwen3.5-122B-A10B-FP8** and **Qwen3.6-35B-A3B-FP8**: Large models with reasoning and vision capabilities
+- **Qwen3.5-0.8B**: Lightweight model for cost-sensitive tasks
+- **Ministral-3-14B-Instruct-2512**: Chat model with vision and image input capabilities
+- **Mistral-Medium-3.5-128B**: Frontier model for complex reasoning and vision workloads
+
+These models support standard text generation, JSON output formatting, tool calling, and streaming responses. The Ministral, Mistral-Medium, and Qwen models additionally support image vision capabilities for analyzing and describing images.
+
+For a complete list of available models and their capabilities, see the [available models](../../models/) documentation.
 
 ### Usage limits {#usage-limits}
 
