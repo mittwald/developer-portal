@@ -21,7 +21,7 @@ Ob du eine kleine geschäftliche App oder eine komplexere Anwendung mit KI-getri
 deine App von deinem lokalen Rechner (oder einer Cloud-basierten IDE) mit minimalem Aufwand in die Welt zu bringen.
 
 Eine App bereitzustellen ist spannend — und es lohnt sich, das durchdacht zu tun. Compliance, Datenschutz, Sicherheit und operative
-Verantwortung sind wichtig. Wir empfehlen dir, dich an unsere Community zu wenden, wenn du Fragen hast.
+Verantwortung sind wichtig. Wir empfehlen dir, dich an unsere [Community](https://discord.gg/Fvtkwkwa8c) zu wenden, wenn du Fragen hast.
 
 ## Überblick über die mit KI entwickelte App-Landschaft {#ai-developed-app-landscape-overview}
 
@@ -75,8 +75,8 @@ müssen wir einen gemeinsamen Nenner für Zero-Conf-Deployment definieren.
 In diesem Kontext bedeutet Zero-Conf-Deployment, dass wir den exportierten Code von GitHub nehmen
 und ihn auf einer Plattform bereitstellen können, ohne manuelle Änderungen oder Konfigurationen vornehmen zu müssen.
 
-Mit anderen Worten: Endnutzer sollten ihre mit KI entwickelte App mit minimalem Setup bereitstellen können,
-idealerweise nur durch das Verbinden ihres GitHub-Repositorys mit einer Bereitstellungsplattform, die
+Mit anderen Worten: Du solltest deine mit KI entwickelte App mit minimalem Setup bereitstellen können,
+idealerweise nur durch das Verbinden deines GitHub-Repositorys mit einer Bereitstellungsplattform, die
 Zero-Conf-Deployment unterstützt.
 
 Unglücklicherweise unterstützen nicht alle Plattformen Zero-Conf-Deployment, und selbst die, die es tun, können
@@ -85,7 +85,7 @@ Konfigurationsdateien oder Build-Prozesse erfordern, die nicht damit kompatibel 
 wie mit KI entwickelte Apps exportiert werden.
 
 Mit anderen Worten: Während Zero-Conf-Deployment ein ideales Ziel ist, ist es in der Praxis nicht immer erreichbar,
-und Nutzer müssen möglicherweise manuelle Anpassungen oder Konfigurationen vornehmen.
+und du musst möglicherweise manuelle Anpassungen oder Konfigurationen vornehmen.
 
 ## Tipps und Tricks auf dem Weg zu Zero-Conf-Deployment {#tips-and-tricks-zero-conf-deployment}
 
@@ -123,7 +123,7 @@ Bereitstellungs-Checkliste:
 ## Zero-Conf-Deployment bei mittwald {#zero-conf-deployment-at-mittwald}
 
 mittwald bietet eine Zero-Conf-Deployment-Option für mit KI entwickelte Apps,
-die es Nutzern ermöglicht, ihre Apps direkt von GitHub mit minimalem Setup bereitzustellen.
+die es dir ermöglicht, deine Apps direkt von GitHub mit minimalem Setup bereitzustellen.
 
 Gegenwärtig gibt es zwei Hauptwege für das Zero-Conf-Deployment von mit KI entwickelten Apps:
 - Manuell über die mittwald-CLI
@@ -140,9 +140,11 @@ Bereitstellungsprozess durch eine integrierte Erfahrung in der Entwicklungsumgeb
 
 Voraussetzungen:
 - Eine mit KI entwickelte App mit einem GitHub-Repository
-- Ein mittwald-Hosting-Konto
+- Ein mittwald-Hosting-Konto mit aktivierten Container-Hosting-Funktionen
 - Grundlegendes Verständnis von Git und GitHub
 - mittwald-CLI installiert und konfiguriert
+- mittwald Skills installiert und für deinen Code-Agenten aktiviert
+  (optional, aber empfohlen für Fehlerbehebung und Unterstützung während der Bereitstellung)
 
 Manuell durchzuführende Schritte:
 1. Bereite deine mit KI entwickelte App für die Bereitstellung vor: Vergewissere dich, dass sie lokal läuft und dass alle Abhängigkeiten installiert sind.
@@ -151,6 +153,12 @@ Manuell durchzuführende Schritte:
     user@local $ git clone https://github.com/<your-org>/<your-repo>.git
     user@local $ cd <your-repo>
     ```
+
+Die konkreten Befehle zum lokalen Ausführen deiner App hängen vom spezifischen Setup deiner App ab.
+Häufige Informationsquellen dafür sind die README-Datei in deinem Repository,
+der `package.json` Scripts-Bereich oder jegliche Dokumentation der KI-Entwicklungsplattform,
+die du verwendet hast. Zusätzlich können Code-Agenten dabei helfen, die korrekten Befehle
+zum lokalen Ausführen deiner App zu identifizieren, indem sie die Projektstruktur und Konfigurationsdateien analysieren.
 
 2. Stelle sicher, dass dein lokales Repository mit GitHub synchron ist und dass deine Änderungen committed und gepusht sind.
 
@@ -204,7 +212,7 @@ Weiterführende Guides für tiefergehendes Setup:
 
 ### Migration von Replit zu mittwald {#migrating-replit-to-mittwald}
 
-Replit exportiert Apps in Node.js-Workspaces als Monorepo-Git-Repository.
+Replit exportiert Apps in npm-Workspaces als Monorepo-Git-Repository.
 Das bedeutet: Wenn du deine App nach GitHub exportierst, kannst du sie mit ein paar
 Anpassungen auch bei mittwald deployen. Wichtig ist vor allem, den richtigen Workspace
 für Build und Ausführung auszuwählen.
@@ -253,7 +261,7 @@ Während du dich auf die Bereitstellung vorbereitest, berücksichtige diese Prak
 Diese Praktiken sind unkompliziert und machen deine App zuverlässiger. Sowohl das CLI-Kommando als auch die GitHub Action unterstützen Umgebungsvariablen,
 sodass du Secrets aus deinem Code halten und sicher verwalten kannst.
 - **Teste früh.** Stelle lokal bereit, teile mit Freunden und hole dir Feedback ein, bevor du live gehst.
-- **Community ist hier.** Unser mittwald Discord-Server ist ein großartiger Ort, um Fragen zu stellen, deine Projekte zu teilen,
+- **Community ist hier.** Unser [mittwald Discord](https://discord.gg/Fvtkwkwa8c)-Server ist ein großartiger Ort, um Fragen zu stellen, deine Projekte zu teilen,
 und von anderen Entwicklern zu lernen.
 - **Eine Größe passt nicht für alle.** Zero-Conf-Deployment funktioniert großartig für viele mit KI entwickelte Apps. Falls deine App spezifische Anforderungen hat — komplexe
 Datenbanken, benutzerdefinierte Infrastruktur oder Compliance-Anforderungen — das ist kein Problem. Plane entsprechend und
