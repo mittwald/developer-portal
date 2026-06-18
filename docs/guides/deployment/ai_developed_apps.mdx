@@ -210,9 +210,9 @@ Related guides for deeper setup:
 - For container concepts, stack files, and registry setup, see [Containers](/docs/v2/platform/workloads/containers/).
 - For declarative stack deployment commands, see [mw stack command reference](/docs/v2/cli/reference/stack/).
 
-### Migrating from Replit to mittwald {#migrating-replit-to-mittwald}
+### Deploying from Replit to mittwald {#deploying-replit-to-mittwald}
 
-Replit ships exported apps in npm workspaces as monorepo Git repository.
+[Replit's Git integration](https://docs.replit.com/references/workspace-tools/git-interface) ships exported apps as a monorepo with multiple npm workspaces.
 This means that if you export your app to GitHub, you can deploy it to mittwald
 with some adjustments, most importantly picking the right workspace to build and serve.
 
@@ -222,7 +222,7 @@ in the example monorepo. From GitHub action workflow file:
 
 ```yaml
       - name: Deploy to Mittwald Container Hosting
-        uses: mittwald/rp-container-deploy-action@master
+        uses: mittwald/zerodeploy-action@master
         env:
           RAILPACK_BUILD_CMD: 'pnpm --filter @workspace/hello-world run build'
           RAILPACK_INSTALL_CMD: 'pnpm --filter @workspace/hello-world install'
@@ -231,9 +231,9 @@ in the example monorepo. From GitHub action workflow file:
 
 [Replit Git interface documentation](https://docs.replit.com/references/workspace-tools/git-interface)
 
-### Migrating from Lovable to mittwald {#migrating-lovable-to-mittwald}
+### Deploying from Lovable to mittwald {#deploying-lovable-to-mittwald}
 
-Apps created with Lovable can be exported to GitHub as a standard Node.js project.
+Apps created with Lovable can be [exported to GitHub](https://docs.lovable.dev/integrations/github) as a standard Node.js project.
 In order to deploy such app to mittwald hosting, we must ensure that the exported app
 has a valid `package.json` file with the necessary build and start scripts defined.
 
@@ -248,8 +248,6 @@ user@local $ rm bun.lock
 
 Further reading on underlying package manager detection heuristics and configuration
 options can be found in the [railpack documentation](https://railpack.com/languages/node).
-
-[Lovable Git integration docs](https://docs.lovable.dev/integrations/github)
 
 ## Moving forward: Best practices for success {#moving-forward-best-practices}
 
