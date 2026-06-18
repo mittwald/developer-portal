@@ -210,9 +210,9 @@ Weiterführende Guides für tiefergehendes Setup:
 - Für Container-Konzepte, Stack-Dateien und Registry-Setup, siehe [Container](/docs/v2/platform/workloads/containers/).
 - Für deklarative Stack-Bereitstellungsbefehle, siehe [mw stack Befehlsreferenz](/docs/v2/cli/reference/stack/).
 
-### Migration von Replit zu mittwald {#migrating-replit-to-mittwald}
+### Deployment von Replit zu mittwald {#deploying-replit-to-mittwald}
 
-Replit exportiert Apps in npm-Workspaces als Monorepo-Git-Repository.
+[Replits Git-Integration](https://docs.replit.com/references/workspace-tools/git-interface) exportiert Apps als Monorepo mit mehreren npm-Workspaces.
 Das bedeutet: Wenn du deine App nach GitHub exportierst, kannst du sie mit ein paar
 Anpassungen auch bei mittwald deployen. Wichtig ist vor allem, den richtigen Workspace
 für Build und Ausführung auszuwählen.
@@ -223,7 +223,7 @@ Workspace `hello-world` zu verwenden. Aus einer GitHub-Action-Workflow-Datei:
 
 ```yaml
       - name: Deploy to Mittwald Container Hosting
-        uses: mittwald/rp-container-deploy-action@master
+        uses: mittwald/zerodeploy-action@master
         env:
           RAILPACK_BUILD_CMD: 'pnpm --filter @workspace/hello-world run build'
           RAILPACK_INSTALL_CMD: 'pnpm --filter @workspace/hello-world install'
@@ -232,9 +232,9 @@ Workspace `hello-world` zu verwenden. Aus einer GitHub-Action-Workflow-Datei:
 
 [Replit-Dokumentation zur Git-Schnittstelle](https://docs.replit.com/references/workspace-tools/git-interface)
 
-### Migration von Lovable zu mittwald {#migrating-lovable-to-mittwald}
+### Deployment von Lovable zu mittwald {#deploying-lovable-to-mittwald}
 
-Mit Lovable erstellte Apps lassen sich als Standard-Node.js-Projekt nach GitHub exportieren.
+Mit Lovable erstellte Apps lassen sich als [Standard-Node.js-Projekt nach GitHub exportieren](https://docs.lovable.dev/integrations/github).
 Damit eine solche App auf mittwald Hosting deploybar ist, muss die exportierte App eine
 gültige `package.json` mit den nötigen Build- und Start-Skripten enthalten.
 
@@ -250,8 +250,6 @@ user@local $ rm bun.lock
 Weiterführende Informationen zu den zugrunde liegenden Heuristiken zur
 Paketmanager-Erkennung und zu Konfigurationsoptionen findest du in der
 [Railpack-Dokumentation](https://railpack.com/languages/node).
-
-[Lovable-Dokumentation zur GitHub-Integration](https://docs.lovable.dev/integrations/github)
 
 ## Auf zum Erfolg: Best Practices {#moving-forward-best-practices}
 
