@@ -29,9 +29,17 @@ You now have two different deployment styles:
 
 If you want the fastest path from repository to running service, use `zerodeploy-action`. If your team already maintains container build and runtime definitions, stay with `deploy-container-action`.
 
+:::info Perfect for AI-developed apps
+
+The `zerodeploy-action` is **ideal for AI-developed applications** exported from platforms like Replit, Lovable, or Cursor. See our dedicated guide on [deploying AI-developed apps](/docs/v2/guides/deployment/ai_developed_apps/) for platform-specific migration tips and best practices.
+
+:::
+
 ## Deploy with `mittwald/zerodeploy-action` {#deploy-with-zerodeploy-action}
 
 The [`mittwald/zerodeploy-action`](https://github.com/mittwald/zerodeploy-action) is designed for repositories that do not have a Docker setup yet. It automatically determines the best way to build a Docker image from your code, and deploys that to your target project, using a dynamically provisioned container registry.
+
+This action is particularly well-suited for apps created with AI development tools. For detailed guidance on deploying from specific platforms like Replit or Lovable, see [Deploying AI-developed apps](/docs/v2/guides/deployment/ai_developed_apps/).
 
 ### Required inputs {#required-inputs-zerodeploy}
 
@@ -194,6 +202,12 @@ with:
 ```
 
 Services not listed are only restarted when the API reports that a restart is actually required.
+
+## Related guides {#related-guides}
+
+- **[Deploying AI-developed apps](/docs/v2/guides/deployment/ai_developed_apps/)** — Zero-configuration deployment for apps from Replit, Lovable, and other AI development platforms
+- **[Application deployment with deployer](/docs/v2/guides/deployment/deployer/)** — Alternative deployment approach using Deployer
+- **[Containers](/docs/v2/platform/workloads/containers/)** — Understanding container concepts, stack files, and registry setup
 
 ## Next steps {#next-steps}
 

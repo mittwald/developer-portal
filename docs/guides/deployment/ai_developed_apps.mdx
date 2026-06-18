@@ -1,0 +1,266 @@
+---
+title: Deploying AI-developed apps
+sidebar_label: AI-developed apps
+tags:
+  - Deployment
+  - GitHub
+  - Apps
+description: Structure and quickstart for shipping AI-developed apps with a zero-conf approach
+---
+
+## Introduction / Motivation {#introduction-motivation}
+
+With rapidly advancing AI-driven development tools, building applications has become more accessible than ever.
+We want to make it as easy as possible to take the apps you create — whether prototyped quickly or developed thoughtfully — and ship them to the world with confidence.
+
+Besides rapid prototyping and development, we want to enable users to easily share their
+AI-developed apps with others and deploy them to production environments without
+needing to worry about complex deployment processes or configurations.
+
+Whether you're building a small business app or a more complex application using AI-driven development, this guide will help you get
+your app from your local machine (or cloud-based IDE) to the world with minimal friction.
+
+Deploying an app is exciting — and worth doing thoughtfully. Compliance, privacy, security and operational
+responsibility matter, and we recommend connecting with our [community](https://discord.gg/Fvtkwkwa8c) if you have questions.
+
+## AI-developed app landscape overview {#ai-developed-app-landscape-overview}
+
+Apps built through AI-driven development are easy to create, and deployment options vary widely.
+
+Different platforms offer different trade-offs. Vendors like Replit and Lovable prioritize developer speed
+and ease of use with their specific project templates, build systems, and deployment pipelines. This convenience
+comes with a trade-off: moving your app to another platform later may require rework.
+On the other hand, you get a fast path to production with integrated tools and support.
+
+Platforms like GitHub and mittwald, however, offer more standard and flexible
+deployment options that can be easily adapted to different environments.
+
+By using GitHub as a central repository for your AI-developed app, you can maintain
+a clear history of changes, collaborate with others, and deploy to various platforms
+without being tied to a specific vendor's ecosystem.
+
+This approach allows for greater freedom and control over your app's deployment
+while still benefiting from the ease and speed that AI-driven development provides.
+
+## GitHub is our anchor {#github-is-our-anchor}
+
+If we can export to GitHub, we have good chances to deploy anywhere.
+
+Most platforms support GitHub as a source for deployment, and having a well-structured
+GitHub repository allows for better collaboration, version control, and integration
+with various deployment tools and services. If GitHub is not the Git platform of choice,
+the same principles apply to any other Git hosting service that supports similar features.
+
+The moment we can export our AI-developed app to GitHub, we can leverage a wide range of
+deployment options, including continuous integration and continuous deployment (CI/CD)
+pipelines and containerization.
+
+Many tools offer two-way synchronization with GitHub, which means that changes made in
+the GitHub repository can be automatically reflected in the deployment environment,
+and vice versa. This allows for a more seamless development and deployment process,
+as developers can work on their code in GitHub while still having the benefits
+of a live deployment environment.
+
+## Principles and limits of zero-conf deployments {#principles-and-limits-of-zero-conf-deployments}
+
+:::warning
+Export quality varies, so test locally first. A well-structured export that includes all necessary code,
+configuration, and build files makes deployment and maintenance much easier.
+A partial or incomplete export may require rework during deployment or maintenance, and can create
+issues with version control and collaboration.
+:::
+
+As most platforms deploy with custom pipelines and configurations,
+we need to define a common denominator for zero-conf deployment.
+In this context, zero-conf deployment means that we can take the exported code from GitHub
+and deploy it to a platform without needing to make any manual changes or configurations.
+
+In other words: You should be able to deploy your AI-developed app with minimal setup,
+ideally just by connecting your GitHub repository to a deployment platform that supports
+zero-conf deployment.
+
+Unfortunately, not all platforms support zero-conf deployment, and even those that do may have
+limitations or trade-offs to consider. For example, some platforms may require specific file
+structures, configuration files, or build processes that may not be compatible with
+the way AI-developed apps are exported.
+
+In other words: while zero-conf deployment is an ideal goal, it may not always be achievable in practice,
+and you may need to be prepared to make some manual adjustments or configurations in certain cases.
+
+## Tips and tricks to work towards zero-conf deployment {#tips-and-tricks-zero-conf-deployment}
+
+:::tip
+A good practice to check exported code for zero-conf compatibility is to try deploying it locally
+using a tool like Docker or a local development server before attempting to deploy it to a cloud platform.
+This can help identify any issues or missing components that may need to be addressed before deployment.
+:::
+
+During development, we can follow certain practices to improve the chances of achieving zero-conf deployment.
+
+Keep the stack small: the more dependencies and services your app relies on, the more complex the deployment process becomes.
+
+Use standard tools and configurations: sticking to widely used tools and configurations can increase compatibility
+with various deployment platforms.
+
+Document your app's requirements and dependencies clearly: this can help others understand what is needed to
+deploy the app successfully and can also assist in troubleshooting any issues that arise during deployment.
+
+Audit security and privacy best practices: ensuring that your app follows security and privacy best practices
+can help prevent issues during deployment and operation. Avoid hardcoding secrets, use environment variables,
+and regularly review your dependencies for vulnerabilities.
+
+Deployment checklist:
+- [ ] App runs locally without errors
+- [ ] All secrets/keys are out of your code!
+- [ ] README explains setup & usage
+- [ ] Build/export scripts work
+- [ ] Tested app in a browser/incognito window
+- [ ] Backups: Save a copy of your project!
+- [ ] Choose a reliable host that meets your needs
+- [ ] Share the link with a friend — get feedback
+- [ ] Celebrate your first deploy! 🎉
+
+## Zero-conf deployment at mittwald {#zero-conf-deployment-at-mittwald}
+
+mittwald offers a zero-conf deployment option for AI-developed apps,
+allowing you to deploy your apps directly from GitHub with minimal setup.
+
+Currently, there are two main paths for zero-conf deployment of AI-developed apps:
+- Manually via mittwald CLI
+- Automated via GitHub Actions (see [deploying with GitHub Actions](/docs/v2/guides/deployment/container-actions/), specifically the [`zerodeploy-action`](/docs/v2/guides/deployment/container-actions/#deploy-with-zerodeploy-action))
+
+The recommended approach is to start with the manual CLI deployment to understand the
+process and then move towards automation with GitHub Actions for a more streamlined
+and efficient deployment workflow.
+
+A separate extension for mStudio is also in the works, which will further simplify
+the deployment process by providing an integrated experience within the development environment.
+
+## Quickstart guide for zero-conf deployment of AI-developed apps {#quickstart-zero-conf-deployment-ai-developed-apps}
+
+Prerequisites:
+- An AI-developed app with a GitHub repository
+- A mittwald hosting account with container hosting capabilities enabled
+- Basic understanding of Git and GitHub
+- mittwald CLI installed and configured
+- mittwald skills installed and enabled for your code agent of choice
+  (optional but recommended for troubleshooting and guidance during deployment)
+
+Manual quickstart steps:
+1. Prepare your AI-developed app for deployment: verify that it runs locally and that all dependencies are installed.
+
+    ```shellsession
+    user@local $ git clone https://github.com/<your-org>/<your-repo>.git
+    user@local $ cd <your-repo>
+    ```
+
+The concrete commands to run your app locally will depend on the specific setup of your app.
+Common sources of information for this are the README file in your repository,
+the `package.json` scripts section, or any documentation provided by the AI development
+platform you used. Additionally, code agents can assist in identifying the correct commands
+to run your app locally by analyzing the project structure and configuration files.
+
+2. Make sure your local repository is in sync with GitHub and that your changes are committed and pushed.
+
+    ```shellsession
+    user@local $ git pull
+    user@local $ git status
+    ```
+
+3. In your app folder, use the mittwald CLI to create a project and run the deployment command.
+
+    ```shellsession
+    user@local $ mw project create --description=<project-name> --update-context
+    user@local $ mw experimental deploy
+    ```
+
+:::note
+Note that the command used here is implemented in the `experimental` namespace,
+which means that it is still in development and may be subject to change.
+While the underlying code is stable, the command interface and behavior may evolve
+as we gather feedback and iterate on the feature.
+We recommend checking the latest documentation for any updates or changes to
+the deployment process.
+:::
+
+Initial deployment takes a few minutes while the app is built and the hosting environment is set up.
+Once the deployment is complete, you can access your app via the provided URL.
+
+Test your app in a browser, deployment command will create a subdomain and link to container target.
+If you encounter any issues, check the logs and configuration to troubleshoot.
+Logs can be found in the container section in mStudio or via the CLI with container ID:
+
+```shellsession
+user@local $ mw container logs c-XXXXXX
+```
+
+:::tip Automate with GitHub Actions
+
+After your first manual deployment succeeds, set up automated deployments with GitHub Actions. The [`mittwald/zerodeploy-action`](/docs/v2/guides/deployment/container-actions/#deploy-with-zerodeploy-action) provides a complete workflow that automatically builds and deploys your app on every push.
+
+See the [full GitHub Actions deployment guide](/docs/v2/guides/deployment/container-actions/) for step-by-step instructions.
+
+:::
+
+Related guides for deeper setup:
+
+- For **automated deployment with GitHub Actions**, start with the [`zerodeploy-action`](/docs/v2/guides/deployment/container-actions/#deploy-with-zerodeploy-action) which requires no Dockerfile or stack.yaml
+- For advanced container deployments with explicit stack definitions, see the [`deploy-container-action`](/docs/v2/guides/deployment/container-actions/#deploy-with-deploy-container-action)
+- For advanced deployment workflows and CI examples, see [Application deployment with deployer](/docs/v2/guides/deployment/deployer/).
+- For container concepts, stack files, and registry setup, see [Containers](/docs/v2/platform/workloads/containers/).
+- For declarative stack deployment commands, see [mw stack command reference](/docs/v2/cli/reference/stack/).
+
+### Deploying from Replit to mittwald {#deploying-replit-to-mittwald}
+
+[Replit's Git integration](https://docs.replit.com/references/workspace-tools/git-interface) ships exported apps as a monorepo with multiple npm workspaces.
+This means that if you export your app to GitHub, you can deploy it to mittwald
+with some adjustments, most importantly picking the right workspace to build and serve.
+
+In order to override Replit's default build and start commands, you can add
+following variables during build time, e.g. to pick the `hello-world` workspace
+in the example monorepo. From GitHub action workflow file:
+
+```yaml
+      - name: Deploy to Mittwald Container Hosting
+        uses: mittwald/zerodeploy-action@master
+        env:
+          RAILPACK_BUILD_CMD: 'pnpm --filter @workspace/hello-world run build'
+          RAILPACK_INSTALL_CMD: 'pnpm --filter @workspace/hello-world install'
+          RAILPACK_START_CMD: 'pnpm --filter @workspace/hello-world run serve'
+```
+
+[Replit Git interface documentation](https://docs.replit.com/references/workspace-tools/git-interface)
+
+### Deploying from Lovable to mittwald {#deploying-lovable-to-mittwald}
+
+Apps created with Lovable can be [exported to GitHub](https://docs.lovable.dev/integrations/github) as a standard Node.js project.
+In order to deploy such app to mittwald hosting, we must ensure that the exported app
+has a valid `package.json` file with the necessary build and start scripts defined.
+
+In addition, Lovable apps might fail in deployment due to unresolved dependencies or
+missing configuration files. To resolve these issues, it might be helpful to even
+remove additional package managers like `bun` and stick to `npm` or `pnpm` for better
+compatibility:
+
+```shellsession
+user@local $ rm bun.lock
+```
+
+Further reading on underlying package manager detection heuristics and configuration
+options can be found in the [railpack documentation](https://railpack.com/languages/node).
+
+## Moving forward: Best practices for success {#moving-forward-best-practices}
+
+As you prepare to deploy, consider these practices that help apps succeed:
+
+- **Security and privacy matter.** Remove hardcoded secrets, use environment variables, and keep dependencies
+up to date. These practices are straightforward and make your app more reliable. Both CLI command and
+GitHub action support environment variables, so you can keep secrets out of your code and manage them securely.
+- **Test early.** Deploy locally first, share with friends, and gather feedback before going live.
+- **Community is here.** Our [mittwald Discord](https://discord.gg/Fvtkwkwa8c) server is a great place to ask questions, share what you're building,
+and learn from other developers.
+- **One size doesn't fit all.** Zero-conf deployment works great for many AI-developed apps. If your app has specific needs — complex
+databases, custom infrastructure, or compliance requirements — that's fine too. Plan accordingly and don't hesitate to
+reach out for guidance.
+
+You've built something cool. Ship it, learn from it, and iterate.

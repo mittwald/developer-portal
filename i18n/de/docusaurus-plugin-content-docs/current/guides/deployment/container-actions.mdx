@@ -29,9 +29,17 @@ Du hast jetzt zwei unterschiedliche Deployment-Ansätze:
 
 Wenn du den kürzesten Weg vom Repository zum laufenden Service willst, nutze `zerodeploy-action`. Wenn dein Team bereits Build- und Runtime-Definitionen für Container pflegt, bleib bei `deploy-container-action`.
 
+:::info Perfekt für mit KI entwickelte Apps
+
+Die `zerodeploy-action` ist **ideal für mit KI entwickelte Anwendungen**, die von Plattformen wie Replit, Lovable oder Cursor exportiert wurden. Siehe unseren dedizierten Guide zum [Deployment von mit KI entwickelten Apps](/docs/v2/guides/deployment/ai_developed_apps/) für plattformspezifische Migrationstipps und Best Practices.
+
+:::
+
 ## Deploy mit `mittwald/zerodeploy-action` {#deploy-mit-zerodeploy-action}
 
 [`mittwald/zerodeploy-action`](https://github.com/mittwald/zerodeploy-action) ist für Repositories gedacht, die noch kein Docker-Setup haben. Sie bestimmt automatisch die beste Methode, um ein Docker-Image aus deinem Code zu erstellen, und deployt dieses in dein Zielprojekt, indem eine dynamisch bereitgestellte Container-Registry verwendet wird.
+
+Diese Action ist besonders gut geeignet für Apps, die mit KI-Entwicklungswerkzeugen erstellt wurden. Für detaillierte Anleitungen zum Deployment von spezifischen Plattformen wie Replit oder Lovable siehe [Deployment von mit KI entwickelten Apps](/docs/v2/guides/deployment/ai_developed_apps/).
 
 ### Benötigte Inputs {#required-inputs-zerodeploy}
 
@@ -194,6 +202,12 @@ with:
 ```
 
 Nicht aufgelistete Dienste werden nur neu gestartet, wenn die API meldet, dass ein Neustart tatsächlich erforderlich ist.
+
+## Weiterführende Guides {#related-guides}
+
+- **[Deployment von mit KI entwickelten Apps](/docs/v2/guides/deployment/ai_developed_apps/)** — Zero-Configuration-Deployment für Apps von Replit, Lovable und anderen KI-Entwicklungsplattformen
+- **[Application Deployment mit deployer](/docs/v2/guides/deployment/deployer/)** — Alternativer Deployment-Ansatz mit Deployer
+- **[Container](/docs/v2/platform/workloads/containers/)** — Container-Konzepte, Stack-Dateien und Registry-Setup verstehen
 
 ## Nächste Schritte {#next-steps}
 
