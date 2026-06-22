@@ -561,6 +561,116 @@ claude-code "rufe https://docs.python.org/3/library/asyncio.html ab und hilf mir
 - Repo-Scope begrenzen; spezifische Dateien/Funktionen anfordern für effizienten Kontext.
 - JSON/Tool-Outputs bevorzugen beim Orchestrieren von Multi-Step-Änderungen.
 
+## mittwald Agent Skills {#agent-skills}
+
+mittwald stellt spezialisierte Agent Skills bereit, die KI-Assistenten durch komplexe Workflows wie Migrationen und Deployments auf der mStudio-Plattform führen. Diese Skills bieten strukturierte, schrittweise Anleitungen und Domänenwissen, ohne dass benutzerdefinierte Prompts erforderlich sind.
+
+### Verfügbare Skills {#agent-skills-available}
+
+#### mittwald-migrate {#agent-skills-migrate}
+
+Führt dich im Dialog durch phasenweise Migrationen beliebiger Workloads zu mittwald mStudio. Die Quelle kann beliebig sein — Kubernetes, Docker Compose, ein VPS, ein anderer Hoster oder ein anderes mStudio-Projekt.
+
+**Workflow:** Discovery → Plan → Provision → Migrate → Verify → Cutover
+
+**Trigger:** „migrate to mittwald", „Umzug nach mittwald", „move to mStudio"
+
+#### mittwald-zerodeploy-skill {#agent-skills-zerodeploy}
+
+Zero-Config-Deployment zu mStudio Container Hosting mit Railpack-Autoerkennung. Kein Dockerfile erforderlich.
+
+**Workflow:** Provision → Local CLI Deploy → GitHub Actions → Verify
+
+**Trigger:** „deploy to mittwald", „help me deploy", „set up mittwald deployment"
+
+### Installation {#agent-skills-installation}
+
+:::note Voraussetzungen
+
+Vor der Verwendung der Skills:
+
+- Aktiver mittwald mStudio-Account
+- API-Token mit `api_write`-Rolle aus den [mStudio-Profileinstellungen](https://studio.mittwald.de/app/profile/api-tokens)
+- mittwald CLI installiert ([Installationsanleitung](/docs/v2/cli/))
+
+:::
+
+#### Skills installieren {#agent-skills-install}
+
+**Für VS Code Copilot:**
+
+```shellsession
+user@local $ # Personal Skills (empfohlen)
+user@local $ mkdir -p ~/.agents/skills
+user@local $ git clone https://github.com/mittwald/agent-skills.git ~/.agents/skills/mittwald-skills
+
+user@local $ # Oder: Projekt-lokale Skills
+user@local $ mkdir -p .agents/skills
+user@local $ git clone https://github.com/mittwald/agent-skills.git .agents/skills/mittwald-skills
+```
+
+**Für Claude Code:**
+
+```shellsession
+user@local $ # In dein Claude Skills-Verzeichnis klonen
+user@local $ mkdir -p ~/.claude/skills
+user@local $ git clone https://github.com/mittwald/agent-skills.git ~/.claude/skills/mittwald-skills
+```
+
+Oder über den Plugin-Marketplace installieren:
+
+```shellsession
+user@local $ /plugin marketplace add mittwald/agent-skills
+user@local $ /plugin install mittwald-migrate@agent-skills
+```
+
+**Für andere KI-Assistenten:** Prüfe die Dokumentation deines Agenten für Skill-Installationspfade und klone dann das Repository dorthin.
+
+### Verwendung {#agent-skills-usage}
+
+Nach der Installation kannst du die Skills einfach in einem Gespräch mit deinem KI-Assistenten auslösen:
+
+**Für Migrationen:**
+
+> „Ich möchte meine WordPress-Seite von Hetzner zu mittwald migrieren."
+
+**Für Deployments:**
+
+> „Hilf mir, meine Express-App zu mittwald zu deployen"
+
+Der KI-Assistent lädt das entsprechende Skill und führt dich mit kontextbezogenen Fragen und schrittweisen Anweisungen durch den Workflow.
+
+### Authentifizierung {#agent-skills-auth}
+
+Die Skills benötigen mindestens eine Möglichkeit zur Kommunikation mit mStudio. Du musst nicht alle drei einrichten — wähle, was am besten passt:
+
+**Option 1 — MCP-Server** (am besten, wenn dein KI-Assistent dies unterstützt)
+
+Konfiguriere den mittwald MCP-Server wie im Abschnitt [MCP und Tool-Verwendung](#continue-mcp) oben beschrieben. Die Skills rufen dann direkt `mcp__mittwald__mittwald_*`-Tools auf.
+
+**Option 2 — `mw` CLI** (am besten für Terminal-Workflows)
+
+Authentifiziere die CLI auf deinem lokalen Rechner:
+
+```shellsession
+user@local $ mw login token  # api_write-Token einfügen
+user@local $ mw user get     # Funktionalität prüfen
+```
+
+**Option 3 — HTTP API** (für Skripte)
+
+Setze die Umgebungsvariable auf deinem lokalen Rechner:
+
+```shellsession
+user@local $ export MITTWALD_API_TOKEN=<dein-api_write-token>
+```
+
+:::tip Weitere Informationen
+
+Für detaillierte Dokumentation, Troubleshooting und Beitragsleitlinien besuche das [mittwald/agent-skills](https://github.com/mittwald/agent-skills)-Repository auf GitHub.
+
+:::
+
 ## Haftungsausschluss
 
 Drittanbieter‑Tools, MCP‑Server und externe Links werden ohne Gewähr und ohne Empfehlung bereitgestellt. Nutzung auf eigenes Risiko; prüfe Lizenzen und Datenschutzhinweise und setze Zugriffe restriktiv (Least Privilege). Sende keine sensiblen Daten an externe Dienste, sofern nicht erforderlich und zulässig.
