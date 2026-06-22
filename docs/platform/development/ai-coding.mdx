@@ -560,6 +560,116 @@ claude-code "fetch https://docs.python.org/3/library/asyncio.html and help me re
 - Limit repo scope; request specific files/functions to keep context efficient.
 - Prefer JSON/tool outputs when orchestrating multi-step changes.
 
+## mittwald agent skills {#agent-skills}
+
+mittwald provides specialized agent skills that guide AI assistants through complex workflows like migrations and deployments on the mStudio platform. These skills provide structured, step-by-step guidance and domain knowledge without requiring custom prompts.
+
+### Available skills {#agent-skills-available}
+
+#### mittwald-migrate {#agent-skills-migrate}
+
+Guides conversational, phase-by-phase migration of arbitrary workloads to mittwald mStudio. The source can be anything — Kubernetes, Docker Compose, a VPS, another hoster, or another mStudio project.
+
+**Workflow:** Discovery → Plan → Provision → Migrate → Verify → Cutover
+
+**Triggers:** "migrate to mittwald", "Umzug nach mittwald", "move to mStudio"
+
+#### mittwald-zerodeploy-skill {#agent-skills-zerodeploy}
+
+Zero-config deployment to mStudio container hosting using Railpack auto-detection. No Dockerfile needed.
+
+**Workflow:** Provision → Local CLI Deploy → GitHub Actions → Verify
+
+**Triggers:** "deploy to mittwald", "help me deploy", "set up mittwald deployment"
+
+### Installation {#agent-skills-installation}
+
+:::note Prerequisites
+
+Before using the skills:
+
+- Active mittwald mStudio account
+- API token with `api_write` role from the [mStudio profile settings](https://studio.mittwald.de/app/profile/api-tokens)
+- mittwald CLI installed ([installation guide](/docs/v2/cli/))
+
+:::
+
+#### Install the skills {#agent-skills-install}
+
+**For VS Code Copilot:**
+
+```shellsession
+user@local $ # Personal skills (recommended)
+user@local $ mkdir -p ~/.agents/skills
+user@local $ git clone https://github.com/mittwald/agent-skills.git ~/.agents/skills/mittwald-skills
+
+user@local $ # Or: Project-local skills
+user@local $ mkdir -p .agents/skills
+user@local $ git clone https://github.com/mittwald/agent-skills.git .agents/skills/mittwald-skills
+```
+
+**For Claude Code:**
+
+```shellsession
+user@local $ # Clone to your Claude skills directory
+user@local $ mkdir -p ~/.claude/skills
+user@local $ git clone https://github.com/mittwald/agent-skills.git ~/.claude/skills/mittwald-skills
+```
+
+Or install via plugin marketplace:
+
+```shellsession
+user@local $ /plugin marketplace add mittwald/agent-skills
+user@local $ /plugin install mittwald-migrate@agent-skills
+```
+
+**For other AI assistants:** Check your agent's documentation for skill installation paths, then clone the repository there.
+
+### Usage {#agent-skills-usage}
+
+Once installed, simply trigger the skills in a conversation with your AI assistant:
+
+**For migrations:**
+
+> "I want to migrate my WordPress site from Hetzner to mittwald."
+
+**For deployments:**
+
+> "Help me deploy my Express app to mittwald"
+
+The AI assistant will load the appropriate skill and guide you through the workflow with contextual questions and step-by-step instructions.
+
+### Authentication {#agent-skills-auth}
+
+The skills need at least one way to communicate with mStudio. You don't have to set up all three — pick whichever fits:
+
+**Option 1 — MCP server** (best if your AI assistant supports it)
+
+Configure the mittwald MCP server as described in the [MCP and tool usage](#continue-mcp) section above. The skills will call `mcp__mittwald__mittwald_*` tools directly.
+
+**Option 2 — `mw` CLI** (best for terminal workflows)
+
+Authenticate the CLI on your local machine:
+
+```shellsession
+user@local $ mw login token  # paste your api_write token
+user@local $ mw user get     # verify it works
+```
+
+**Option 3 — HTTP API** (for scripts)
+
+Set environment variable on your local machine:
+
+```shellsession
+user@local $ export MITTWALD_API_TOKEN=<your-api_write-token>
+```
+
+:::tip More information
+
+For detailed documentation, troubleshooting, and contribution guidelines, visit the [mittwald/agent-skills](https://github.com/mittwald/agent-skills) repository on GitHub.
+
+:::
+
 ## Disclaimer
 
 Third‑party tools, MCP servers and external links are provided for convenience without endorsement or warranty. Use them at your own risk, review licenses and privacy policies, and scope access conservatively (least privilege). Avoid sending sensitive data to external services unless required and permitted.
