@@ -523,4 +523,12 @@ Use the `mw stack set-update-schedule` command:
 user@local $ mw stack set-update-schedule <stack-id> <schedule> [--timezone=<timezone>]
 ```
 
+The `<schedule>` value is a cron expression. For example, to run the update daily at 03:00 UTC:
+
+```shellsession
+user@local $ mw stack set-update-schedule st-abcde "0 3 * * *"
+```
+
+Use the stack short ID as `<stack-id>` (for example `st-abcde`).
+
 Use this especially when your containers reference mutable tags such as `latest`, so new image versions are applied automatically according to your schedule.
