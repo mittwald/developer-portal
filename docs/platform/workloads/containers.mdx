@@ -372,7 +372,7 @@ terraform apply -var="image_tag=v1.0.1"
   </TabItem>
 </Tabs>
 
-### Updating a mutable tag
+### Updating a mutable tag {#updating-a-mutable-tag}
 
 Using this strategy, you will typically update the same container image tag over and over again. Using `docker` commands, this might look like this:
 
@@ -382,6 +382,8 @@ docker push my-registry/my-container:latest
 ```
 
 By default, container images are not automatically updated when the image tag is not changed. You can use the <OperationLink operation="container-pull-image-for-service" apiVersion="v2" /> operation or the `mw container recreate --pull` CLI command to pull the latest image for the container stack. This will update the image tag to the latest version.
+
+For mutable tags (such as `latest`), this is often combined with a recurring update schedule (see [Scheduling recurring container updates](#update-schedule)) so the stack regularly pulls and applies the newest image version.
 
 ## Using volumes
 
@@ -510,3 +512,25 @@ External access for other application protocols than HTTP(S) is not supported at
 
   </TabItem>
 </Tabs>
+
+## Scheduling recurring container updates {#update-schedule}
+
+If your deployment strategy uses mutable tags, you can configure a schedule for your stack updates. This allows the stack to regularly pull newer image versions without running the update command manually each time.
+
+You can configure the update schedule in the mStudio UI, via the CLI, or via the API with <OperationLink operation="container-set-stack-update-schedule" apiVersion="v2" />.
+
+Use the `mw stack set-update-schedule` command:
+
+```shellsession
+user@local $ mw stack set-update-schedule <stack-id> <schedule> [--timezone=<timezone>]
+```
+
+The `<schedule>` value is a cron expression. For example, to run the update daily at 03:00 UTC:
+
+```shellsession
+user@local $ mw stack set-update-schedule 11111111-2222-3333-4444-555555555555 "0 3 * * *"
+```
+
+Use the full stack ID (UUID format) as `<stack-id>`.
+
+Use this especially when your containers reference mutable tags such as `latest`, so new image versions are applied automatically according to your schedule.

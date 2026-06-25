@@ -369,7 +369,7 @@ terraform apply -var="image_tag=v1.0.1"
   </TabItem>
 </Tabs>
 
-### Aktualisieren eines veränderlichen Tags
+### Aktualisieren eines veränderlichen Tags {#updating-a-mutable-tag}
 
 Mit dieser Strategie wirst du typischerweise immer wieder dasselbe Container-Image-Tag aktualisieren. Mit `docker`-Befehlen könnte das so aussehen:
 
@@ -379,6 +379,8 @@ docker push my-registry/my-container:latest
 ```
 
 Standardmäßig werden Container-Images nicht automatisch aktualisiert, wenn das Image-Tag nicht geändert wird. Du kannst die <OperationLink operation="container-pull-image-for-service" apiVersion="v2" />-Operation oder den CLI-Befehl `mw container recreate --pull` verwenden, um das neueste Image für den Container-Stack zu ziehen. Dies wird das Image-Tag auf die neueste Version aktualisieren.
+
+Bei veränderlichen Tags (wie `latest`) wird das häufig mit einem wiederkehrenden Update-Zeitplan kombiniert (siehe [Wiederkehrende Container-Updates planen](#update-schedule)), damit der Stack regelmäßig die neueste Image-Version abruft und anwendet.
 
 ## Verwendung von Volumes
 
@@ -507,3 +509,25 @@ Externer Zugriff für andere Anwendungsprotokolle als HTTP(S) wird derzeit nicht
 
   </TabItem>
 </Tabs>
+
+## Wiederkehrende Container-Updates planen {#update-schedule}
+
+Wenn deine Deployment-Strategie veränderliche Tags verwendet, kannst du einen Zeitplan für Stack-Updates festlegen. So kann der Stack regelmäßig neuere Image-Versionen abrufen, ohne dass du den Update-Befehl jedes Mal manuell ausführen musst.
+
+Du kannst den Update-Zeitplan in der mStudio UI, per CLI oder per API mit der <OperationLink operation="container-set-stack-update-schedule" apiVersion="v2" />-Operation konfigurieren.
+
+Verwende dafür den Befehl `mw stack set-update-schedule`:
+
+```shellsession
+user@local $ mw stack set-update-schedule <stack-id> <schedule> [--timezone=<timezone>]
+```
+
+Der Wert `<schedule>` ist ein Cron-Ausdruck. Um das Update zum Beispiel täglich um 03:00 Uhr UTC auszuführen:
+
+```shellsession
+user@local $ mw stack set-update-schedule 11111111-2222-3333-4444-555555555555 "0 3 * * *"
+```
+
+Verwende als `<stack-id>` die vollständige Stack-ID im UUID-Format.
+
+Nutze das besonders dann, wenn deine Container veränderliche Tags wie `latest` verwenden, damit neue Image-Versionen automatisch gemäß deinem Zeitplan angewendet werden.
