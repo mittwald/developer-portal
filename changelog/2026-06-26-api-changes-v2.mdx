@@ -49,7 +49,7 @@ _Disclaimer: This summary is AI-generated. If you find any discrepancies, please
 
 The response schema has been restructured: all conversation fields are now defined in the `BasicConversation` schema and composed into the response via `allOf`. This is a spec-level reorganization — the response payload is identical for API consumers. All previously required and optional fields (`conversationId`, `createdAt`, `mainUser`, `shortId`, `status`, `title`, `visibility`, `category`, `createdBy`, `lastMessage`, `lastMessageAt`, `lastMessageBy`, `notificationRoles`, `relatedTo`, `relations`, `sharedWith`) remain available via `BasicConversation`.
 
-- ⚠️ **Breaking (spec reorganization only):** the `/items/` response type changed from `object` to `allOf[BasicConversation]` for status `200` — response payload is unchanged
+- (spec reorganization only): the `/items/` response type changed from `object` to `allOf[BasicConversation]` for status `200` — response payload is unchanged
 - added `#/components/schemas/de.mittwald.v1.conversation.BasicConversation` to the `/items/` response `allOf` list for status `200`
 
 For details, refer to the <OperationLink operation="conversation-list-conversations" apiVersion="v2" /> endpoint.
@@ -60,7 +60,7 @@ For details, refer to the <OperationLink operation="conversation-list-conversati
 
 Same restructuring as above — all conversation fields are now defined in `BasicConversation` and composed via `allOf`. The response payload is unchanged.
 
-- ⚠️ **Breaking (spec reorganization only):** the response body type changed from `object` to `allOf[BasicConversation]` for status `200` — response payload is unchanged
+- (spec reorganization only): the response body type changed from `object` to `allOf[BasicConversation]` for status `200` — response payload is unchanged
 - added `#/components/schemas/de.mittwald.v1.conversation.BasicConversation` to the response body `allOf` list for status `200`
 
 For details, refer to the <OperationLink operation="conversation-get-conversation" apiVersion="v2" /> endpoint.
