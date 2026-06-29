@@ -34,17 +34,10 @@ While we generally strive to avoid breaking changes in accordance with our [API 
 
 ## Summary
 
-
-- The property type/format of the response for the `GET /v2/conversations` operation has changed from 'object' to '' for status '200'. This is a breaking change.
-- The following required properties have been removed from the response with status '200' for the `GET /v2/conversations` operation: `/items/conversationId`, `/items/createdAt`, `/items/mainUser`, `/items/shortId`, `/items/status`, `/items/title`, and `/items/visibility`. This is a breaking change.
-- The response body type/format for the `GET /v2/conversations/{conversationId}` operation has changed from 'object' to '' for status '200'. This is a breaking change.
-- The following required properties have been removed from the response with status '200' for the `GET /v2/conversations/{conversationId}` operation: `conversationId`, `createdAt`, `mainUser`, `shortId`, `status`, `title`, and `visibility`. This is a breaking change.
-- The following optional properties have been removed from the response with status '200' for the `GET /v2/conversations` operation: `/items/category`, `/items/createdBy`, `/items/lastMessage`, `/items/lastMessageAt`, `/items/lastMessageBy`, `/items/notificationRoles`, `/items/relatedTo`, `/items/relations`, and `/items/sharedWith`.
-- The following optional properties have been removed from the response with status '200' for the `GET /v2/conversations/{conversationId}` operation: `category`, `createdBy`, `lastMessage`, `lastMessageAt`, `lastMessageBy`, `notificationRoles`, `relatedTo`, `relations`, and `sharedWith`.
 - The following optional properties have been removed from the response with status '200' for the `GET /v2/conversations/{conversationId}/members` operation: `/items/allOf[#/components/schemas/de.mittwald.v1.conversation.User]/atlasGroup`, `/items/allOf[#/components/schemas/de.mittwald.v1.conversation.User]/department`, and `/items/allOf[#/components/schemas/de.mittwald.v1.conversation.User]/group`.
 - The following optional properties have been removed from the response with status '200' for the `GET /v2/conversations/{conversationId}/messages` operation: `/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.Message]/createdBy/atlasGroup`, `/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.Message]/createdBy/department`, `/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.Message]/createdBy/group`, and several properties related to status updates.
 - The schemas `de.mittwald.v1.conversation.Department` and `de.mittwald.v1.conversation.Group` have been removed from the API.
-- New endpoints have been added: 
+- New endpoints have been added:
   - `GET /v2/container-templates` to list Container Templates.
   - `GET /v2/container-templates/{templateId}` to get a Container Template by ID.
   - `GET /v2/customers/{customerId}/projects` to list Projects belonging to a Customer.
@@ -62,91 +55,9 @@ _Disclaimer: This summary is AI-generated. If you find any discrepancies, please
 
 ## Detailed changes
 
-
-
-### Changes in "Get all conversation the authenticated user has created or has access to"
-
-
-- ⚠️ **Breaking:** the '/items/' response's property type/format changed from 'object'/'' to ''/'' for status '200'
-
-- ⚠️ **Breaking:** removed the required property '/items/conversationId' from the response with the '200' status
-
-- ⚠️ **Breaking:** removed the required property '/items/createdAt' from the response with the '200' status
-
-- ⚠️ **Breaking:** removed the required property '/items/mainUser' from the response with the '200' status
-
-- ⚠️ **Breaking:** removed the required property '/items/shortId' from the response with the '200' status
-
-- ⚠️ **Breaking:** removed the required property '/items/status' from the response with the '200' status
-
-- ⚠️ **Breaking:** removed the required property '/items/title' from the response with the '200' status
-
-- ⚠️ **Breaking:** removed the required property '/items/visibility' from the response with the '200' status
-
-- removed the optional property '/items/category' from the response with the '200' status
-
-- removed the optional property '/items/createdBy' from the response with the '200' status
-
-- removed the optional property '/items/lastMessage' from the response with the '200' status
-
-- removed the optional property '/items/lastMessageAt' from the response with the '200' status
-
-- removed the optional property '/items/lastMessageBy' from the response with the '200' status
-
-- removed the optional property '/items/notificationRoles' from the response with the '200' status
-
-- removed the optional property '/items/relatedTo' from the response with the '200' status
-
-- removed the optional property '/items/relations' from the response with the '200' status
-
-- removed the optional property '/items/sharedWith' from the response with the '200' status
-
-- added '#/components/schemas/de.mittwald.v1.conversation.BasicConversation, subschema #2' to the '/items/' response property 'allOf' list for the response status '200'
-
-
-For details, refer to the <OperationLink operation="conversation-list-conversations" apiVersion="v2" /> endpoint.
-
-
-
 ### Changes in "Get a support conversation"
 
-
-- ⚠️ **Breaking:** the response's body type/format changed from 'object'/'' to ''/'' for status '200'
-
-- ⚠️ **Breaking:** removed the required property 'conversationId' from the response with the '200' status
-
-- ⚠️ **Breaking:** removed the required property 'createdAt' from the response with the '200' status
-
-- ⚠️ **Breaking:** removed the required property 'mainUser' from the response with the '200' status
-
-- ⚠️ **Breaking:** removed the required property 'shortId' from the response with the '200' status
-
-- ⚠️ **Breaking:** removed the required property 'status' from the response with the '200' status
-
-- ⚠️ **Breaking:** removed the required property 'title' from the response with the '200' status
-
-- ⚠️ **Breaking:** removed the required property 'visibility' from the response with the '200' status
-
-- removed the optional property 'category' from the response with the '200' status
-
-- removed the optional property 'createdBy' from the response with the '200' status
-
-- removed the optional property 'lastMessage' from the response with the '200' status
-
-- removed the optional property 'lastMessageAt' from the response with the '200' status
-
-- removed the optional property 'lastMessageBy' from the response with the '200' status
-
-- removed the optional property 'notificationRoles' from the response with the '200' status
-
-- removed the optional property 'relatedTo' from the response with the '200' status
-
-- removed the optional property 'relations' from the response with the '200' status
-
-- removed the optional property 'sharedWith' from the response with the '200' status
-
 - added '#/components/schemas/de.mittwald.v1.conversation.BasicConversation, subschema #2' to the response body 'allOf' list for the response status '200'
-
 
 For details, refer to the <OperationLink operation="conversation-get-conversation" apiVersion="v2" /> endpoint.
 
