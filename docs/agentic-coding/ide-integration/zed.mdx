@@ -1,0 +1,69 @@
+---
+title: Zed Editor
+sidebar_label: Zed
+sidebar_position: 4
+---
+
+# Zed with mittwald
+
+[Zed](https://zed.dev) is a high-performance code editor with built-in AI capabilities that supports OpenAI-compatible endpoints.
+
+## Prerequisites
+
+- Zed editor installed
+- mittwald API key from [mStudio profile settings](https://studio.mittwald.de/profile/api-token)
+
+## Configuration
+
+### Via UI
+
+1. Open Agent Panel settings (`agent: open settings`)
+2. Under "LLM Providers", click **Add Provider**
+3. Choose "OpenAI API Compatible"
+4. Configure:
+   - **Provider name**: `mittwald`
+   - **API URL**: `https://llm.aihosting.mittwald.de/v1`
+   - **Model**: `Ministral-3-14B-Instruct-2512`
+
+### Via settings.json
+
+Alternatively, configure Zed via `settings.json`:
+
+```json
+{
+  "language_models": {
+    "openai_compatible": {
+      "mittwald": {
+        "api_url": "https://llm.aihosting.mittwald.de/v1",
+        "available_models": [
+          {
+            "name": "Ministral-3-14B-Instruct-2512",
+            "display_name": "Ministral-3-14B-Instruct-2512",
+            "max_tokens": 262144
+          }
+        ]
+      }
+    }
+  }
+}
+```
+
+**Note:** Zed does not store API keys in `settings.json`. Set your API key as an environment variable:
+
+```bash
+export MITTWALD_API_KEY=<your-api-key>
+```
+
+## Usage
+
+Once configured, you can use mittwald's AI models in Zed's Agent Panel for:
+- Code generation and completion
+- Refactoring and optimization
+- Documentation and explanations
+- Code review and suggestions
+
+## Next Steps
+
+- [Explore other IDEs](./) - Compare different integrations
+- [Learn about MCP](/docs/v2/agentic-coding/mcp/) - Infrastructure management
+- [Best practices](./#best-practices) - Optimize AI usage
