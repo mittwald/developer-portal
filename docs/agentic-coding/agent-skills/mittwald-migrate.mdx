@@ -1,0 +1,149 @@
+---
+title: mittwald-migrate
+sidebar_label: mittwald-migrate
+sidebar_position: 1
+---
+
+# mittwald-migrate Skill
+
+The **mittwald-migrate** skill guides you through a conversational, phase-by-phase migration of arbitrary workloads to mittwald mStudio.
+
+## What It Does
+
+This skill orchestrates a complete migration workflow, handling:
+
+- **Discovery**: Understanding your current infrastructure
+- **Planning**: Creating a migration strategy
+- **Provisioning**: Setting up resources on mStudio
+- **Migration**: Moving data and applications
+- **Verification**: Testing the migrated setup
+- **Cutover**: Switching DNS and going live
+
+## Supported Source Platforms
+
+The skill can handle migrations from:
+
+- Kubernetes clusters
+- Docker Compose setups
+- Virtual Private Servers (VPS)
+- Other hosting providers
+- Existing mStudio projects
+- Any custom infrastructure
+
+## Workflow Phases
+
+### 1. Discovery
+
+The AI assistant asks about your current setup:
+- What are you running? (WordPress, custom app, etc.)
+- Where is it hosted?
+- What databases and services do you use?
+- What's your current traffic and resource usage?
+
+### 2. Plan
+
+Based on your answers, the skill creates:
+- Resource requirements analysis
+- Migration timeline
+- Potential challenges and mitigation strategies
+- Step-by-step migration plan
+
+### 3. Provision
+
+The skill helps you create mStudio resources:
+- Projects and servers
+- Databases (MySQL, PostgreSQL, Redis)
+- Container stacks
+- Domains and SSL certificates
+
+### 4. Migrate
+
+Guided data and application migration:
+- Database exports and imports
+- File transfers
+- Application deployment
+- Configuration updates
+
+### 5. Verify
+
+Testing and validation:
+- Database connectivity checks
+- Application functionality tests
+- Performance verification
+- SSL certificate validation
+
+### 6. Cutover
+
+Final steps to go live:
+- DNS changes
+- Traffic monitoring
+- Rollback plan if needed
+- Post-migration checklist
+
+## How to Use
+
+### Trigger the Skill
+
+Simply tell your AI assistant:
+
+> "I want to migrate my WordPress site from Hetzner to mittwald."
+
+Or:
+
+> "Migrate to mittwald"
+> "Umzug nach mittwald"
+> "Move to mStudio"
+
+### Example Session
+
+**You:** "I want to migrate my Django application from AWS to mittwald."
+
+**AI Assistant:** *Loads mittwald-migrate skill*
+
+"I'll help you migrate your Django application from AWS to mittwald. Let's start with some questions about your current setup:
+
+1. What AWS services are you currently using? (EC2, RDS, etc.)
+2. What version of Django are you running?
+3. Which database are you using and approximately how large is it?
+4. Do you have any background workers or cron jobs?
+5. What's your current traffic volume?"
+
+*...continues through the workflow...*
+
+## Prerequisites
+
+- Active mittwald mStudio account
+- Access to your source infrastructure
+- [Authentication configured](../authentication) (MCP, CLI, or API token)
+
+## Best Practices
+
+1. **Start with Discovery**: Let the skill gather all information before making changes
+2. **Test Thoroughly**: Use the verification phase to catch issues early
+3. **Plan Downtime**: Coordinate the cutover phase with your team
+4. **Keep Backups**: Always maintain backups of your source system
+5. **Document Changes**: The skill helps track what was changed and when
+
+## Troubleshooting
+
+If the migration encounters issues:
+
+1. **Review the Plan**: Check if all prerequisites were met
+2. **Check Authentication**: Ensure your mStudio credentials are valid
+3. **Verify Resources**: Confirm all provisioned resources are accessible
+4. **Consult Logs**: Review migration logs for specific error messages
+5. **Ask for Help**: The skill can suggest specific troubleshooting steps
+
+## Next Steps
+
+- [Install agent skills](./#installation) - Get started
+- [Configure authentication](../authentication) - Set up access
+- [Explore mittwald-zerodeploy](../mittwald-zerodeploy) - Deploy new applications
+
+---
+
+:::tip GitHub Repository
+
+For the complete skill source code, detailed examples, and contribution guidelines, visit [mittwald/agent-skills](https://github.com/mittwald/agent-skills) on GitHub.
+
+:::

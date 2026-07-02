@@ -1,0 +1,122 @@
+---
+title: Continue
+sidebar_label: Continue
+sidebar_position: 2
+---
+
+# Continue with mittwald
+
+[Continue](https://www.continue.dev) is an open-source AI code assistant that works with both JetBrains IDEs and Visual Studio Code.
+
+## Installation
+
+Install the Continue plugin for your IDE:
+
+- **JetBrains IDEs**: [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/22707-continue)
+- **Visual Studio Code**: [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Continue.continue)
+
+## Configuration
+
+Continue is configured via a `config.yaml` file, typically located in `~/.continue/` in your home directory.
+
+### Basic Configuration
+
+Add mittwald as a model provider:
+
+```yaml
+name: mittwald
+version: 1.0.0
+schema: v1
+models:
+  - name: Ministral-3-14B-Instruct-2512
+    provider: openai
+    model: Ministral-3-14B-Instruct-2512
+    apiBase: https://llm.aihosting.mittwald.de/v1
+    apiKey: <INSERT-API-KEY>
+    roles:
+      - chat
+      - edit
+      - apply
+    capabilities:
+      - tool_use
+context:
+  - provider: code
+  - provider: docs
+  - provider: diff
+  - provider: terminal
+  - provider: problems
+  - provider: folder
+  - provider: codebase
+```
+
+Replace `<INSERT-API-KEY>` with your mittwald LLM API key from [mStudio profile settings](https://studio.mittwald.de/profile/api-token).
+
+## MCP Server Integration {#mcp}
+
+Continue supports Model Context Protocol servers for enhanced capabilities. Add MCP servers to your `config.yaml`:
+
+```yaml
+mcpServers:
+  # Context7: Up-to-date library documentation
+  context7:
+    name: Context7
+    command: npx
+    args: ["-y", "@context7/mcp-server", "--stdio"]
+    env: { CONTEXT7_API_KEY: "your-context7-api-key" }
+
+  # Brave Search: Web search with privacy focus
+  brave-search:
+    name: Brave
+    command: npx
+    args: ["-y", "@modelcontextprotocol/server-brave-search", "--stdio"]
+    env: { BRAVE_API_KEY: "your-brave-api-key" }
+
+  # PostgreSQL: Database queries and schema inspection
+  postgres:
+    name: PostgreSQL
+    command: npx
+    args: ["-y", "@modelcontextprotocol/server-postgres", "--stdio"]
+    env:
+      POSTGRES_CONNECTION_STRING: "postgresql://user:pass@localhost:5432/dbname"
+
+  # Directus: Headless CMS data management
+  directus:
+    name: Directus
+    command: npx
+    args: ["-y", "@directus/content-mcp", "--stdio"]
+    env:
+      DIRECTUS_URL: "https://your-directus-instance.com"
+      DIRECTUS_TOKEN: "your-directus-token"
+
+  # mittwald MCP: Infrastructure management
+  mittwald:
+    name: mittwald
+    transport:
+      type: sse
+      url: https://mcp.mittwald.de/mcp
+```
+
+### Using MCP Tools
+
+Ask the assistant explicitly to use a tool:
+- "Use Brave Search to find recent information about React 19..."
+- "Query the PostgreSQL database to show all users..."
+- "Use mittwald MCP to list my projects"
+
+Always scope access narrowly and review any data access or modifications.
+
+## Best Practices
+
+### Safety with MCP Servers
+
+- Scope access narrowly (specific databases, domains, paths)
+- Log all tool calls for audit purposes
+- Use low temperature (≤ 0.2) for tool planning to reduce hallucinations
+- Review diffs and queries before executing
+- Start with read-only access when possible
+
+## Next Steps
+
+- [Explore other IDE integrations](./) - Try different tools
+- [Learn about MCP](/docs/v2/agentic-coding/mcp/) - Deep dive into infrastructure management
+- [Install agent skills](/docs/v2/agentic-coding/agent-skills/) - Add workflow guidance
