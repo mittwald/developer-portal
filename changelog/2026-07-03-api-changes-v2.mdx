@@ -1,0 +1,341 @@
+---
+title: Breaking (!) API changes for v2 API, June 26 to July 3
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Container
+  - Project
+  - File
+  - App
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week's changelog for the mittwald API includes significant updates such as changes in response property types, the addition and removal of required properties, and the introduction of new optional request parameters across various endpoints.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The property type for the response at `GET /v2/container-templates` has changed for the properties `/items/license` and `/items/name` from `string` to `object`. This is a breaking change.
+- The required property `/items/icon` has been removed from the response for `GET /v2/container-templates`. This is a breaking change.
+- The property type for the response at `GET /v2/container-templates/{templateId}` has changed for the properties `license` and `name` from `string` to `object`. This is a breaking change.
+- The required property `icon` has been removed from the response for `GET /v2/container-templates/{templateId}`. This is a breaking change.
+- The response property `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDesiredSystemSoftwareSet]/changes/after` has become nullable for the status `200` in `GET /v2/projects/{projectId}/activities`.
+- The response property `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDesiredSystemSoftwareSet]/changes/before` has become nullable for the status `200` in `GET /v2/projects/{projectId}/activities`.
+- The response property `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDesiredSystemSoftwareSet]/changes/after/softwareVersion` has become optional for the status `200` in `GET /v2/projects/{projectId}/activities`.
+- Several required properties have been removed from the response for `GET /v2/projects/{projectId}/activities`, including:
+  - `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationAppVersionSet]/changes/after/appId`
+  - `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationAppVersionSet]/changes/after/appVersionId`
+  - `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationCopyRequested]/changes`
+  - `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDesiredSystemSoftwareSet]/changes/after/software`
+  - `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDesiredSystemSoftwareSet]/changes/after/updatePolicy`
+  - `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DatabaseMysqlUserCreated]/changes/after/permissions`
+  - `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DatabaseMysqlUserUpdated]/changes/after/permissions`
+  - `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DatabaseMysqlUserUpdated]/changes/before/permissions`
+- The following optional properties have been removed from the response for `GET /v2/projects/{projectId}/activities`:
+  - `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationAppVersionSet]/changes/before/appId`
+  - `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationAppVersionSet]/changes/before/appVersionId`
+  - `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDesiredSystemSoftwareSet]/changes/before/software`
+  - `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDesiredSystemSoftwareSet]/changes/before/updatePolicy`
+  - `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DatabaseMysqlUserCreated]/changes/before/permissions`
+- A new optional request parameter `type` has been added to `GET /v2/container-templates`.
+- Several optional properties have been added to the response for `GET /v2/container-templates`, including:
+  - `/items/domains/items/purpose`
+  - `/items/help`
+  - `/items/license/link`
+  - `/items/supportLink`
+  - `/items/userInputs/items/label`
+- Required properties have been added to the response for `GET /v2/container-templates`, including:
+  - `/items/iconUrl`
+  - `/items/license/name`
+  - `/items/name/de`
+  - `/items/name/en`
+- A new endpoint `GET /v2/container-templates/{templateId}/icon` has been added to retrieve a Container Template icon.
+- Optional properties have been added to the response for `GET /v2/customers/{customerId}/projects` and `GET /v2/projects`, including `/items/serverShortId`.
+- Required properties have been added to the response for `GET /v2/customers/{customerId}/projects` and `GET /v2/projects`, including `/items/deletionRequested`.
+- A non-success response with status `409` has been added for `POST /v2/files`.
+- Optional properties have been added to the response for `GET /v2/projects/{projectId}/activities`, including:
+  - `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationAppVersionSet]/changes/before/version`
+  - `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DatabaseMysqlUserCreated]/changes/before/permissionsRead`
+  - `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DatabaseMysqlUserCreated]/changes/before/permissionsWrite`
+- The response property `/items/action` has been updated to include new schemas in the `anyOf` list for the status `200` in `GET /v2/projects/{projectId}/activities`.
+- The response property `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDesiredSystemSoftwareSet]/parameters` has become required for the status `200` in `GET /v2/projects/{projectId}/activities`.
+- Several required properties have been added to the response for `GET /v2/projects/{projectId}/activities`, including various parameters and descriptions for different actions related to database and app installations.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "List Container Templates"
+
+
+- ⚠️ **Breaking:** the '/items/license' response's property type/format changed from 'string'/'' to 'object'/'' for status '200'
+
+- ⚠️ **Breaking:** the '/items/name' response's property type/format changed from 'string'/'' to 'object'/'' for status '200'
+
+- ⚠️ **Breaking:** removed the required property '/items/icon' from the response with the '200' status
+
+- added the new optional 'query' request parameter 'type'
+
+- added the optional property '/items/domains/items/purpose' to the response with the '200' status
+
+- added the optional property '/items/help' to the response with the '200' status
+
+- added the optional property '/items/license/link' to the response with the '200' status
+
+- added the optional property '/items/supportLink' to the response with the '200' status
+
+- added the optional property '/items/userInputs/items/label' to the response with the '200' status
+
+- added the required property '/items/iconUrl' to the response with the '200' status
+
+- added the required property '/items/license/name' to the response with the '200' status
+
+- added the required property '/items/name/de' to the response with the '200' status
+
+- added the required property '/items/name/en' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-list-templates" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Container Template by ID"
+
+
+- ⚠️ **Breaking:** the 'license' response's property type/format changed from 'string'/'' to 'object'/'' for status '200'
+
+- ⚠️ **Breaking:** the 'name' response's property type/format changed from 'string'/'' to 'object'/'' for status '200'
+
+- ⚠️ **Breaking:** removed the required property 'icon' from the response with the '200' status
+
+- added the optional property 'domains/items/purpose' to the response with the '200' status
+
+- added the optional property 'help' to the response with the '200' status
+
+- added the optional property 'license/link' to the response with the '200' status
+
+- added the optional property 'supportLink' to the response with the '200' status
+
+- added the optional property 'userInputs/items/label' to the response with the '200' status
+
+- added the required property 'iconUrl' to the response with the '200' status
+
+- added the required property 'license/name' to the response with the '200' status
+
+- added the required property 'name/de' to the response with the '200' status
+
+- added the required property 'name/en' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-get-template" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the activities of a project"
+
+
+- ⚠️ **Breaking:** the response property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDesiredSystemSoftwareSet]/changes/after' became nullable for the status '200'
+
+- ⚠️ **Breaking:** the response property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDesiredSystemSoftwareSet]/changes/before' became nullable for the status '200'
+
+- ⚠️ **Breaking:** the response property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDesiredSystemSoftwareSet]/changes/after/softwareVersion' became optional for the status '200'
+
+- ⚠️ **Breaking:** removed the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationAppVersionSet]/changes/after/appId' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationAppVersionSet]/changes/after/appVersionId' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationCopyRequested]/changes' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDesiredSystemSoftwareSet]/changes/after/software' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDesiredSystemSoftwareSet]/changes/after/updatePolicy' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DatabaseMysqlUserCreated]/changes/after/permissions' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DatabaseMysqlUserUpdated]/changes/after/permissions' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DatabaseMysqlUserUpdated]/changes/before/permissions' from the response with the '200' status
+
+- removed the optional property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationAppVersionSet]/changes/before/appId' from the response with the '200' status
+
+- removed the optional property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationAppVersionSet]/changes/before/appVersionId' from the response with the '200' status
+
+- removed the optional property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDesiredSystemSoftwareSet]/changes/before/software' from the response with the '200' status
+
+- removed the optional property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDesiredSystemSoftwareSet]/changes/before/updatePolicy' from the response with the '200' status
+
+- removed the optional property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DatabaseMysqlUserCreated]/changes/before/permissions' from the response with the '200' status
+
+- added the optional property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationAppVersionSet]/changes/before/version' to the response with the '200' status
+
+- added the optional property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DatabaseMysqlUserCreated]/changes/before/permissionsRead' to the response with the '200' status
+
+- added the optional property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DatabaseMysqlUserCreated]/changes/before/permissionsWrite' to the response with the '200' status
+
+- added '#/components/schemas/de.mittwald.v1.activitylog.AppInstallationRequested, #/components/schemas/de.mittwald.v1.activitylog.AppInstallationDesiredSystemSoftwareDeleted' to the '/items/action' response property 'anyOf' list for the response status '200'
+
+- the response property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDesiredSystemSoftwareSet]/parameters' became required for the status '200'
+
+- removed the 'app.systemsoftware-deleted' enum value from the '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDesiredSystemSoftwareSet]/name' response property for the response status '200'
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationAppVersionSet]/changes/after/version' to the response with the '200' status
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationAppVersionSet]/parameters' to the response with the '200' status
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationCopyRequested]/parameters' to the response with the '200' status
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DatabaseCreated]/parameters/description' to the response with the '200' status
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DatabaseDeleted]/parameters/description' to the response with the '200' status
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DatabaseDescriptionSet]/parameters/description' to the response with the '200' status
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DatabaseMysqlNameSet]/parameters/description' to the response with the '200' status
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DatabaseMysqlUserCreated]/changes/after/permissionsRead' to the response with the '200' status
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DatabaseMysqlUserCreated]/changes/after/permissionsWrite' to the response with the '200' status
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DatabaseMysqlUserCreated]/parameters/databaseDescription' to the response with the '200' status
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DatabaseMysqlUserCreated]/parameters/description' to the response with the '200' status
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DatabaseMysqlUserDeleted]/parameters/databaseDescription' to the response with the '200' status
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DatabaseMysqlUserDeleted]/parameters/description' to the response with the '200' status
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DatabaseMysqlUserUpdated]/changes/after/permissionsRead' to the response with the '200' status
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DatabaseMysqlUserUpdated]/changes/after/permissionsWrite' to the response with the '200' status
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DatabaseMysqlUserUpdated]/changes/before/permissionsRead' to the response with the '200' status
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DatabaseMysqlUserUpdated]/changes/before/permissionsWrite' to the response with the '200' status
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DatabaseMysqlUserUpdated]/parameters/databaseDescription' to the response with the '200' status
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DatabaseMysqlUserUpdated]/parameters/description' to the response with the '200' status
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DatabaseVersionSet]/parameters/description' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-list-project-activities" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Container Template icon"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-get-template-icon" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Projects belonging to a Customer"
+
+
+- added the optional property '/items/serverShortId' to the response with the '200' status
+
+- added the required property '/items/deletionRequested' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-list-customer-projects" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a File"
+
+
+- added the non-success response with the status '409'
+
+
+For details, refer to the <OperationLink operation="file-create-file" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Projects belonging to the executing user"
+
+
+- added the optional property '/items/serverShortId' to the response with the '200' status
+
+- added the required property '/items/deletionRequested' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-list-projects" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Request an app installation"
+
+
+- added the new optional request property 'systemSoftware'
+
+
+For details, refer to the <OperationLink operation="app-request-appinstallation" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald JavaScript SDK Release 4.405.0
+
+The mittwald JavaScript SDK has been updated to version 4.405.0. This release includes the following feature:
+
+- Updated the generated client to enhance functionality and performance ([commit c4170b3](https://github.com/mittwald/api-client-js/commit/c4170b3ca5e4577ccfd2c2a2fed8b89f3373bd9d)).
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.405.0).
+
+### mittwald JavaScript SDK Release 4.404.0
+
+The mittwald JavaScript SDK has been updated to version 4.404.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.404.0).
+
+### mittwald JavaScript SDK Release 4.403.0
+
+The mittwald JavaScript SDK has been updated to version 4.403.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.403.0).
+
+### mittwald JavaScript SDK Release 4.402.0
+
+The mittwald JavaScript SDK has been updated to version 4.402.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.402.0).
+
+### mittwald JavaScript SDK Release 4.401.0
+
+The mittwald JavaScript SDK has been updated to version 4.401.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.401.0).
+
+### mittwald JavaScript SDK Release 4.400.0
+
+The mittwald JavaScript SDK has been updated to version 4.400.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details on the changes, you can view the [release notes](https://github.com/mittwald/api-client-js/releases/tag/4.400.0).
+
+### mittwald JavaScript SDK Release 4.399.0
+
+The mittwald JavaScript SDK has been updated to version 4.399.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.399.0).
+
+### mittwald JavaScript SDK Release 4.398.1
+
+The mittwald JavaScript SDK version 4.398.1 has been released. This update includes a bug fix specifically addressing a compile issue within the Models component. For more details on the changes and to view the release notes, visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.398.1).
+
