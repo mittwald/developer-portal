@@ -6,9 +6,9 @@ sidebar_position: 1
 
 # Verbindung zu mittwald MCP herstellen
 
-Willkommen! Diese Anleitung hilft dir, die Authentifizierung für mittwald MCP mit deinem bevorzugten Tool für Agentic Integration einzurichten.
+Willkommen! Diese Anleitung hilft dir, die Authentifizierung für mittwald MCP mit deinem bevorzugten Tool einzurichten.
 
-**Warum Authentifizierung erforderlich ist**: mittwald MCP erfordert authentifizierten Zugriff auf deine mittwald-Ressourcen. OAuth 2.1 ist die empfohlene Methode für interaktive Nutzung, und API-Tokens sind für Headless/CI-Workflows verfügbar.
+**Warum Authentifizierung erforderlich ist**: mittwald MCP erfordert authentifizierten Zugriff auf deine mittwald-Ressourcen. OAuth 2.1 ist die empfohlene Methode für interaktive Nutzung, und API-Tokens stehen für CI/CD und nicht-interaktive Umgebungen zur Verfügung.
 
 ## Wähle dein Tool {#choose-your-tool}
 
@@ -21,7 +21,7 @@ mittwald MCP funktioniert mit 6 beliebten KI-Tools. Wähle dasjenige, das du ver
 - **Typ**: Desktop App / Web App
 - **OAuth-Muster**: Browser-basiert (Connector-Einstellungen UI)
 - **Setup-Zeit**: ~5 Minuten
-- **Komplexität**: ⭐ (Sehr einfach - nur Einstellungs-UI)
+- **Komplexität**: ⭐ (Sehr einfach - nur über die Einstellungen)
 
 → **[Claude Desktop einrichten](./claude-desktop)**
 
@@ -32,7 +32,7 @@ mittwald MCP funktioniert mit 6 beliebten KI-Tools. Wähle dasjenige, das du ver
 - **Typ**: Web App / Mobile App
 - **OAuth-Muster**: Browser-basiert (Connector-Einstellungen UI)
 - **Setup-Zeit**: ~5 Minuten
-- **Komplexität**: ⭐ (Sehr einfach - nur Einstellungs-UI)
+- **Komplexität**: ⭐ (Sehr einfach - nur über die Einstellungen)
 
 → **[ChatGPT einrichten](./chatgpt)**
 
@@ -54,7 +54,7 @@ mittwald MCP funktioniert mit 6 beliebten KI-Tools. Wähle dasjenige, das du ver
 - **Typ**: IDE Extension (mehrere Plattformen)
 - **OAuth-Muster**: IDE-basiert (Dynamic Client Registration)
 - **Setup-Zeit**: ~10 Minuten
-- **Komplexität**: ⭐⭐ (Einfach - IDE-Einstellungen-basiert)
+- **Komplexität**: ⭐⭐ (Einfach - über IDE-Einstellungen)
 
 → **[GitHub Copilot einrichten](./github-copilot)**
 
@@ -63,7 +63,7 @@ mittwald MCP funktioniert mit 6 beliebten KI-Tools. Wähle dasjenige, das du ver
 **Am besten für**: Entwickler, die Cursor IDE verwenden (VS Code Fork mit KI-Features)
 
 - **Typ**: IDE (Desktop Application)
-- **OAuth-Muster**: IDE-basiert (Konfigurationsdatei oder Einstellungs-UI)
+- **OAuth-Muster**: IDE-basiert (Konfigurationsdatei oder Einstellungen)
 - **Setup-Zeit**: ~10 Minuten
 - **Komplexität**: ⭐⭐ (Einfach - JSON-Konfiguration)
 
@@ -76,7 +76,7 @@ mittwald MCP funktioniert mit 6 beliebten KI-Tools. Wähle dasjenige, das du ver
 - **Typ**: Command-line Interface
 - **OAuth-Muster**: RFC 8252 Loopback (Native App Pattern)
 - **Setup-Zeit**: ~10 Minuten
-- **Komplexität**: ⭐⭐ (Einfach - CLI-Befehle, Browser für Auth)
+- **Komplexität**: ⭐⭐ (Einfach - CLI-Befehle plus Browser-Anmeldung)
 
 → **[Codex CLI einrichten](./codex-cli)**
 
@@ -102,7 +102,7 @@ mittwald MCP funktioniert mit 6 beliebten KI-Tools. Wähle dasjenige, das du ver
 
 **Nachteile**:
 
-- Erfordert Browser-Zugriff (nicht für Headless-Umgebungen geeignet)
+- Erfordert Browser-Zugriff (nicht für nicht-interaktive Umgebungen geeignet)
 - Benötigt interaktive Authentifizierung
 
 | Tool           | OAuth-Implementierung               |
@@ -116,7 +116,7 @@ mittwald MCP funktioniert mit 6 beliebten KI-Tools. Wähle dasjenige, das du ver
 
 ### Option 2: API Token {#option-2-api-token}
 
-**Am besten für**: CI/CD-Pipelines, Headless-Server, automatisierte Skripte
+**Am besten für**: CI/CD-Pipelines, nicht-interaktive Server und automatisierte Skripte
 
 **Wie es funktioniert**:
 
@@ -127,8 +127,8 @@ mittwald MCP funktioniert mit 6 beliebten KI-Tools. Wähle dasjenige, das du ver
 
 **Vorteile**:
 
-- **Headless-kompatibel**: Keine Browser-Interaktion erforderlich
-- **Skript-freundlich**: Für Automatisierung geeignet
+- **Für nicht-interaktive Umgebungen geeignet**: Keine Browser-Interaktion erforderlich
+- **Gut für Skripte**: Für Automatisierung geeignet
 - **Einfach**: Keine OAuth-Flows
 
 **Nachteile**:
