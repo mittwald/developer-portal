@@ -1,0 +1,175 @@
+---
+title: Agent Skills
+sidebar_label: Überblick
+sidebar_position: 0
+---
+
+# mittwald Agent Skills
+
+mittwald stellt spezialisierte Agent Skills bereit, die KI-Assistenten durch komplexe Workflows wie Migrationen und Deployments auf mStudio führen. Die Skills liefern strukturierte Schritt-für-Schritt-Anleitungen und Domain-Wissen ohne aufwendige Custom-Prompts.
+
+## Was sind Agent Skills?
+
+Agent Skills sind vorgefertigte Workflow-Templates, mit denen KI-Assistenten komplexe, mehrstufige Prozesse umsetzen können. Statt jedes Mal alles neu zu erklären, startest du einen Skill und wirst konversationell durch den gesamten Ablauf geführt.
+
+**Klassischer Ansatz:**
+> "Projekt erstellen, Node.js konfigurieren, MySQL einrichten, Backup-Plan anlegen..."
+
+**Mit Agent Skills:**
+> "Deploye meine Express-App auf mittwald"
+
+Der Skill übernimmt die Workflow-Komplexität, stellt Rückfragen bei Bedarf und führt den kompletten Prozess aus.
+
+## Verfügbare Skills
+
+### mittwald-migrate
+
+Leitet dich durch eine konversationelle, phasenweise Migration beliebiger Workloads zu mittwald mStudio.
+
+**Qüllen:** Kubernetes, Docker Compose, VPS, andere Hoster oder bestehende mStudio-Projekte
+
+**Workflow:** Discovery → Plan → Provision → Migrate → Verify → Cutover
+
+**Trigger:** "migrate to mittwald", "Umzug nach mittwald", "move to mStudio"
+
+[Mehr erfahren →](./mittwald-migrate)
+
+### mittwald-zerodeploy
+
+Zero-Config-Deployment zu mStudio Container Hosting mit Railpack Auto-Erkennung. Kein Dockerfile nötig.
+
+**Workflow:** Provision → Local CLI Deploy → GitHub Actions → Verify
+
+**Trigger:** "deploy to mittwald", "help me deploy", "set up mittwald deployment"
+
+[Mehr erfahren →](./mittwald-zerodeploy)
+
+## Installation
+
+### Voraussetzungen
+
+Vor der Nutzung der Skills:
+
+- Aktiver mittwald mStudio-Account
+- API-Token mit Rolle `api_write` aus den [mStudio Profileinstellungen](https://studio.mittwald.de/profile/api-token)
+- Installierte mittwald CLI ([Installationsanleitung](/docs/v2/cli/))
+
+### Installationsanleitung
+
+#### Für VS Code Copilot
+
+**Persönliche Skills (empfohlen):**
+
+```shellsession
+user@local $ mkdir -p ~/.agents/skills
+user@local $ git clone https://github.com/mittwald/agent-skills.git ~/.agents/skills/mittwald-skills
+```
+
+**Projektlokale Skills:**
+
+```shellsession
+user@local $ mkdir -p .agents/skills
+user@local $ git clone https://github.com/mittwald/agent-skills.git .agents/skills/mittwald-skills
+```
+
+#### Für Claude Code
+
+```shellsession
+user@local $ mkdir -p ~/.claude/skills
+user@local $ git clone https://github.com/mittwald/agent-skills.git ~/.claude/skills/mittwald-skills
+```
+
+Oder über den Plugin Marketplace:
+
+```shellsession
+user@local $ /plugin marketplace add mittwald/agent-skills
+user@local $ /plugin install mittwald-migrate@agent-skills
+```
+
+#### Für andere KI-Assistenten
+
+Prüfe die Skill-Installationspfade in der Dokumentation deines Assistenten und clone das Repository dorthin.
+
+## Nutzung
+
+Nach der Installation triggerst du die Skills direkt im Chat mit deinem KI-Assistenten:
+
+**Für Migrationen:**
+> "Ich möchte meine WordPress-Seite von Hetzner zu mittwald migrieren."
+
+**Für Deployments:**
+> "Hilf mir, meine Express-App auf mittwald zu deployen"
+
+Der Assistent lädt den passenden Skill und führt dich mit Kontextfragen durch den Workflow.
+
+## Authentifizierung
+
+Die Skills brauchen mindestens eine Methode, um mit mStudio zu sprechen. Du musst nicht alle drei einrichten:
+
+### Option 1: MCP Server (Empfohlen)
+
+Konfiguriere den [mittwald MCP-Server](/docs/v2/agentic-integration/mcp/) in deinem KI-Assistenten. Die Skills rufen dann `mcp__mittwald__mittwald_*` Tools direkt auf.
+
+**Am besten für:** KI-Assistenten mit MCP-Support
+
+### Option 2: mittwald CLI
+
+Authentifiziere die CLI lokal:
+
+```shellsession
+user@local $ mw login token
+user@local $ mw user get
+```
+
+**Am besten für:** Terminal-basierte Workflows
+
+### Option 3: HTTP API
+
+Setze lokal eine Umgebungsvariable:
+
+```shellsession
+user@local $ export MITTWALD_API_TOKEN=<dein-api_write-token>
+```
+
+**Am besten für:** Skripte und Automatisierung
+
+[Mehr zur Authentifizierung →](./authentication)
+
+## Nächste Schritte
+
+<div className="row">
+  <div className="col col--6">
+    <div className="card">
+      <div className="card__header">
+        <h3>mittwald-migrate</h3>
+      </div>
+      <div className="card__body">
+        <p>Konversationeller Migrations-Workflow von jeder Plattform zu mStudio</p>
+      </div>
+      <div className="card__footer">
+        <a href="./mittwald-migrate" className="button button--primary button--block">Mehr erfahren</a>
+      </div>
+    </div>
+  </div>
+  <div className="col col--6">
+    <div className="card">
+      <div className="card__header">
+        <h3>mittwald-zerodeploy</h3>
+      </div>
+      <div className="card__body">
+        <p>Zero-Config-Deployment mit automatischer Erkennung</p>
+      </div>
+      <div className="card__footer">
+        <a href="./mittwald-zerodeploy" className="button button--primary button--block">Mehr erfahren</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+---
+
+:::tip Mehr Informationen
+
+Ausführliche Dokumentation, Troubleshooting und Contribution-Hinweise findest du im Repository [mittwald/agent-skills](https://github.com/mittwald/agent-skills).
+
+:::

@@ -1,0 +1,135 @@
+---
+title: Authentication
+sidebar_label: Authentication
+sidebar_position: 3
+---
+
+# Authentifizierung für Agent Skills
+
+mittwald Agent Skills müssen mit deinem mStudio-Account kommunizieren, um Ressourcen bereitzustellen und Infrastruktur zu verwalten. Du kannst eine oder mehrere Authentifizierungsmethoden passend zu deinem Workflow verwenden.
+
+## Authentifizierungsoptionen
+
+### Option 1: MCP Server (Empfohlen)
+
+Konfiguriere den [mittwald MCP-Server](/docs/v2/agentic-integration/mcp/) in deinem KI-Assistenten. Die Skills rufen dann `mcp__mittwald__mittwald_*` Tools direkt auf.
+
+**Vorteile:**
+- Native Integration in KI-Assistenten
+- OAuth 2.1 mit PKCE
+- Granulare Berechtigungen
+- Automatische Token-Aktualisierung
+- Funktioniert in Desktop- und CLI-Umgebungen
+
+**Setup:**
+Folge der [MCP-Verbindungsanleitung](/docs/v2/agentic-integration/mcp/getting-connected/) für dein Tool.
+
+**Beispielkonfiguration (Continue):**
+
+```yaml
+mcpServers:
+  mittwald:
+    name: mittwald
+    transport:
+      type: sse
+      url: https://mcp.mittwald.de/mcp
+```
+
+### Option 2: mittwald CLI
+
+Authentifiziere die CLI lokal. Skills können dann `mw`-Befehle direkt ausführen.
+
+**Vorteile:**
+- Einfaches Setup
+- Gut für Terminal-Workflows
+- Vertraut für CLI-Nutzer
+- Ideal für lokale Entwicklung
+
+**Setup:**
+
+```shellsession
+user@local $ brew install mittwald/cli/mw
+user@local $ mw login token
+user@local $ mw user get
+```
+
+Dein API-Token bekommst du in den [mStudio Profileinstellungen](https://studio.mittwald.de/profile/api-token) (Rolle `api_write`).
+
+### Option 3: HTTP API
+
+Setze das mittwald API-Token als Umgebungsvariable. Skills verwenden dann direkte HTTP-API-Aufrufe.
+
+**Vorteile:**
+- Gut für Skripte und Automatisierung
+- Kein zusätzliches Tooling erforderlich
+- Geeignet für CI/CD-Pipelines
+
+**Setup:**
+
+```shellsession
+user@local $ export MITTWALD_API_TOKEN=<dein-api_write-token>
+```
+
+Dein API-Token bekommst du in den [mStudio Profileinstellungen](https://studio.mittwald.de/profile/api-token) (Rolle `api_write`).
+
+## Welche Option passt zu dir?
+
+| Use Case | Empfohlene Option | Warum |
+|----------|-------------------|-------|
+| Desktop-Assistenten (Claude Desktop, VS Code Copilot) | **MCP Server** | Native Integration, beste UX |
+| Terminal-Workflows | **mittwald CLI** | Vertrautes Tool, gut lokal |
+| CI/CD-Pipelines | **HTTP API** | Einfach, ohne zusätzliche Abhängigkeiten |
+| Gemischte Nutzung | **Alle drei** | Je Kontext die passende Methode |
+
+## Mehrere Methoden parallel
+
+Du kannst mehrere Methoden gleichzeitig einrichten. Die Skills versuchen in dieser Reihenfolge:
+
+1. MCP Server (wenn MCP-Tools verfügbar sind)
+2. mittwald CLI (wenn `mw` verfügbar ist)
+3. HTTP API (wenn `MITTWALD_API_TOKEN` gesetzt ist)
+
+## Token-Berechtigungen
+
+**Erforderliche Rolle:** `api_write`
+
+Damit kannst du:
+- Projekte erstellen und verwalten
+- Anwendungen und Container deployen
+- Datenbanken und Services konfigurieren
+- Domains und SSL-Zertifikate verwalten
+- Backups erstellen und steürn
+
+## Security Best Practices
+
+- Speichere Tokens nie in Versionskontrolle
+- Nutze Umgebungsvariablen oder Secret-Vaults
+- Rotiere Tokens regelmässig
+- Widerrufe ungenutzte Tokens sofort
+- Prüfe Token-Nutzung in [mStudio](https://studio.mittwald.de/profile/api-token)
+
+## Troubleshooting
+
+### "Authentication failed"
+
+Prüfe:
+1. Token ist gültig und nicht abgelaufen
+2. Token hat Rolle `api_write`
+3. Umgebungsvariable ist korrekt gesetzt
+4. CLI ist authentifiziert (`mw user get`)
+5. MCP-Server ist im Assistenten verbunden
+
+### Skills finden keine Authentifizierung
+
+Prüfe:
+1. Mindestens eine Methode ist eingerichtet
+2. Für CLI: `which mw` liefert einen Pfad
+3. Für HTTP API: `echo $MITTWALD_API_TOKEN` gibt einen Wert aus
+4. Für MCP: Verbindung im Tool ist aktiv
+
+## Nächste Schritte
+
+- [Agent Skills installieren](../#installation)
+- [mittwald-migrate nutzen](../mittwald-migrate)
+- [mittwald-zerodeploy nutzen](../mittwald-zerodeploy)
+- [MCP kennenlernen](/docs/v2/agentic-integration/mcp/)

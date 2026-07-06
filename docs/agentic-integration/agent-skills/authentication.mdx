@@ -1,0 +1,181 @@
+---
+title: Authentication
+sidebar_label: Authentication
+sidebar_position: 3
+---
+
+# Authenticating Agent Skills
+
+mittwald agent skills need to communicate with your mStudio account to provision resources and manage infrastructure. You can choose one or more authentication methods based on your workflow.
+
+## Authentication Options
+
+### Option 1: MCP Server (Recommended)
+
+Configure the [mittwald MCP server](/docs/v2/agentic-integration/mcp/) in your AI assistant. The skills will call `mcp__mittwald__mittwald_*` tools directly.
+
+**Advantages:**
+- Native integration with AI assistants
+- OAuth 2.1 with PKCE security
+- Scoped permissions
+- Token refresh handled automatically
+- Works in desktop and CLI environments
+
+**Setup:**
+Follow the [MCP getting connected guide](/docs/v2/agentic-integration/mcp/getting-connected/) for your specific AI assistant.
+
+**Configuration example (Continue):**
+
+```yaml
+mcpServers:
+  mittwald:
+    name: mittwald
+    transport:
+      type: sse
+      url: https://mcp.mittwald.de/mcp
+```
+
+### Option 2: mittwald CLI
+
+Authenticate the CLI on your local machine. Skills will execute `mw` commands directly.
+
+**Advantages:**
+- Simple setup
+- Works in terminal-based workflows
+- Familiar to CLI users
+- Good for local development
+
+**Setup:**
+
+```bash
+# Install CLI if not already installed
+brew install mittwald/cli/mw  # macOS
+# or follow https://docs.mittwald.de/v2/cli/
+
+# Authenticate
+mw login token  # paste your api_write token from mStudio
+
+# Verify authentication
+mw user get
+```
+
+Get your API token from [mStudio profile settings](https://studio.mittwald.de/profile/api-token) (requires `api_write` role).
+
+### Option 3: HTTP API
+
+Set the mittwald API token as an environment variable. Skills will use direct HTTP API calls.
+
+**Advantages:**
+- Simple for scripts and automation
+- No additional tool installation required
+- Good for CI/CD pipelines
+
+**Setup:**
+
+```bash
+# Linux/macOS
+export MITTWALD_API_TOKEN=<your-api_write-token>
+
+# Windows PowerShell
+$env:MITTWALD_API_TOKEN="<your-api_write-token>"
+
+# Windows CMD
+set MITTWALD_API_TOKEN=<your-api_write-token>
+```
+
+Get your API token from [mStudio profile settings](https://studio.mittwald.de/profile/api-token) (requires `api_write` role).
+
+## Which Option Should You Choose?
+
+Choose based on your primary use case:
+
+| Use Case | Recommended Option | Why |
+|----------|-------------------|-----|
+| Desktop AI assistants (Claude Desktop, VS Code Copilot) | **MCP Server** | Native integration, best UX |
+| Terminal workflows | **mittwald CLI** | Familiar tool, good for local dev |
+| CI/CD pipelines | **HTTP API** | Simple, no dependencies |
+| Mixed usage | **All three** | Use what fits each context |
+
+## Multiple Authentication Methods
+
+You can set up multiple authentication methods. Skills will try them in this order:
+
+1. MCP Server (if AI assistant has MCP tools)
+2. mittwald CLI (if `mw` command is available)
+3. HTTP API (if `MITTWALD_API_TOKEN` environment variable is set)
+
+This allows flexible usage across different environments.
+
+## Token Permissions
+
+Ensure your API token has the correct permissions:
+
+**Required role:** `api_write`
+
+This grants:
+- Create and manage projects
+- Deploy applications and containers
+- Configure databases and services
+- Manage domains and SSL certificates
+- Create and manage backups
+
+**Creating a token:**
+
+1. Go to [mStudio profile settings](https://studio.mittwald.de/profile/api-token)
+2. Click "Create API Token"
+3. Select role: `api_write`
+4. Add description (e.g., "Agent Skills Authentication")
+5. Copy the token (it's only shown once!)
+
+## Security Best Practices
+
+### Protect Your Tokens
+
+- Never commit tokens to version control
+- Use environment variables or secure vaults
+- Rotate tokens periodically
+- Revoke unused tokens immediately
+
+### Scope Access Appropriately
+
+- Use MCP with OAuth for desktop work (automatic token refresh)
+- Use CLI authentication for local development
+- Use environment variables only when necessary
+- Consider creating separate tokens for different purposes
+
+### Monitor Token Usage
+
+- Review token usage in [mStudio](https://studio.mittwald.de/profile/api-token)
+- Revoke suspicious or unused tokens
+- Set up alerts for unusual activity
+
+## Troubleshooting
+
+### "Authentication failed" Error
+
+**Check:**
+1. Token is valid and not expired
+2. Token has `api_write` role
+3. Environment variable is set correctly (if using HTTP API)
+4. CLI is authenticated (run `mw user get` to test)
+5. MCP server is connected (check AI assistant settings)
+
+### Skills Don't Find Authentication
+
+**Verify:**
+1. At least one authentication method is configured
+2. For CLI: `which mw` returns a path
+3. For HTTP API: `echo $MITTWALD_API_TOKEN` shows your token
+4. For MCP: Check AI assistant's MCP server connection status
+
+### Token Permission Errors
+
+**Solution:**
+Your token likely lacks `api_write` role. Create a new token with the correct permissions from [mStudio profile settings](https://studio.mittwald.de/profile/api-token).
+
+## Next Steps
+
+- [Install agent skills](../#installation) - Set up the skills
+- [Use mittwald-migrate](../mittwald-migrate) - Migrate workloads
+- [Use mittwald-zerodeploy](../mittwald-zerodeploy) - Deploy applications
+- [Learn about MCP](/docs/v2/agentic-integration/mcp/) - Explore infrastructure management

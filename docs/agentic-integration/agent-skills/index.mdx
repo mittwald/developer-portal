@@ -1,0 +1,175 @@
+---
+title: Agent Skills
+sidebar_label: Overview
+sidebar_position: 0
+---
+
+# mittwald Agent Skills
+
+mittwald provides specialized agent skills that guide AI assistants through complex workflows like migrations and deployments on the mStudio platform. These skills provide structured, step-by-step guidance and domain knowledge without requiring custom prompts.
+
+## What Are Agent Skills?
+
+Agent skills are pre-built workflow templates that teach AI assistants how to handle complex, multi-step processes. Instead of explaining your requirements from scratch each time, you trigger a skill and the AI assistant guides you through the entire workflow conversationally.
+
+**Traditional approach:**
+> "Create a project, configure Node.js, set up MySQL, create backup schedule..."
+
+**With agent skills:**
+> "Deploy my Express app to mittwald"
+
+The skill handles the workflow complexity, asks clarifying questions when needed, and executes the entire process.
+
+## Available Skills
+
+### mittwald-migrate
+
+Guides you through a conversational, phase-by-phase migration of arbitrary workloads to mittwald mStudio.
+
+**Source:** Kubernetes, Docker Compose, VPS, another hosting provider, or another mStudio project
+
+**Workflow:** Discovery → Plan → Provision → Migrate → Verify → Cutover
+
+**Triggers:** "migrate to mittwald", "Umzug nach mittwald", "move to mStudio"
+
+[Learn more →](./mittwald-migrate)
+
+### mittwald-zerodeploy
+
+Zero-config deployment to mStudio container hosting using Railpack auto-detection. No Dockerfile needed.
+
+**Workflow:** Provision → Local CLI Deploy → GitHub Actions → Verify
+
+**Triggers:** "deploy to mittwald", "help me deploy", "set up mittwald deployment"
+
+[Learn more →](./mittwald-zerodeploy)
+
+## Installation
+
+### Prerequisites
+
+Before using the skills:
+
+- Active mittwald mStudio account
+- API token with `api_write` role from [mStudio profile settings](https://studio.mittwald.de/profile/api-token)
+- mittwald CLI installed ([installation guide](/docs/v2/cli/))
+
+### Installation Instructions
+
+#### For VS Code Copilot
+
+**Personal skills (recommended):**
+
+```bash
+mkdir -p ~/.agents/skills
+git clone https://github.com/mittwald/agent-skills.git ~/.agents/skills/mittwald-skills
+```
+
+**Project-local skills:**
+
+```bash
+mkdir -p .agents/skills
+git clone https://github.com/mittwald/agent-skills.git .agents/skills/mittwald-skills
+```
+
+#### For Claude Code
+
+```bash
+mkdir -p ~/.claude/skills
+git clone https://github.com/mittwald/agent-skills.git ~/.claude/skills/mittwald-skills
+```
+
+Or install via plugin marketplace:
+
+```bash
+/plugin marketplace add mittwald/agent-skills
+/plugin install mittwald-migrate@agent-skills
+```
+
+#### For Other AI Assistants
+
+Check your agent's documentation for skill installation paths, then clone the repository there.
+
+## Usage
+
+Once installed, simply trigger the skills in a conversation with your AI assistant:
+
+**For migrations:**
+> "I want to migrate my WordPress site from Hetzner to mittwald."
+
+**For deployments:**
+> "Help me deploy my Express app to mittwald"
+
+The AI assistant will load the appropriate skill and guide you through the workflow with contextual questions and step-by-step instructions.
+
+## Authentication
+
+The skills need at least one way to communicate with mStudio. You don't have to set up all three — pick whichever fits your workflow:
+
+### Option 1: MCP Server (Recommended)
+
+Configure the [mittwald MCP server](/docs/v2/agentic-integration/mcp/) in your AI assistant. The skills will call `mcp__mittwald__mittwald_*` tools directly.
+
+**Best for:** AI assistants with MCP support
+
+### Option 2: mittwald CLI
+
+Authenticate the CLI on your local machine:
+
+```bash
+mw login token  # paste your api_write token
+mw user get     # verify it works
+```
+
+**Best for:** Terminal-based workflows
+
+### Option 3: HTTP API
+
+Set environment variable on your local machine:
+
+```bash
+export MITTWALD_API_TOKEN=<your-api_write-token>
+```
+
+**Best for:** Scripts and automation
+
+[Learn more about authentication →](./authentication)
+
+## Next Steps
+
+<div className="row">
+  <div className="col col--6">
+    <div className="card">
+      <div className="card__header">
+        <h3>mittwald-migrate</h3>
+      </div>
+      <div className="card__body">
+        <p>Conversational migration workflow from any platform to mStudio</p>
+      </div>
+      <div className="card__footer">
+        <a href="./mittwald-migrate" className="button button--primary button--block">Learn More</a>
+      </div>
+    </div>
+  </div>
+  <div className="col col--6">
+    <div className="card">
+      <div className="card__header">
+        <h3>mittwald-zerodeploy</h3>
+      </div>
+      <div className="card__body">
+        <p>Zero-config deployment with automatic detection</p>
+      </div>
+      <div className="card__footer">
+        <a href="./mittwald-zerodeploy" className="button button--primary button--block">Learn More</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+---
+
+:::tip More Information
+
+For detailed documentation, troubleshooting, and contribution guidelines, visit the [mittwald/agent-skills](https://github.com/mittwald/agent-skills) repository on GitHub.
+
+:::

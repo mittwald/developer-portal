@@ -43,7 +43,7 @@ function MCPPageHeader() {
         <div className={styles.buttons}>
           <Link
             className="button button--success button--lg"
-            to="/docs/v2/agentic-coding/mcp/getting-connected"
+            to="/docs/v2/agentic-integration/mcp/getting-connected"
           >
             <Icon>
               <IconRocket />
@@ -52,7 +52,7 @@ function MCPPageHeader() {
           </Link>
           <Link
             className="button button--secondary button--lg"
-            to="/docs/v2/agentic-coding/mcp"
+            to="/docs/v2/agentic-integration/mcp"
           >
             <Icon>
               <IconBook />
@@ -104,7 +104,7 @@ function ServerURLSection() {
             id="mcp.url.setupGuides"
             values={{
               link: (
-                <Link to="/docs/v2/agentic-coding/mcp/getting-connected">
+                <Link to="/docs/v2/agentic-integration/mcp/getting-connected">
                   <Translate id="mcp.url.setupGuides.link">
                     setup guides
                   </Translate>
@@ -217,7 +217,7 @@ function OverviewFeature() {
                 </li>
               </ul>
               <p>
-                <Link to="/docs/v2/agentic-coding/mcp/getting-connected">
+                <Link to="/docs/v2/agentic-integration/mcp/getting-connected">
                   <Translate id="mcp.overview.auth.link">
                     Setup guides →
                   </Translate>
@@ -268,20 +268,20 @@ function GettingStartedFeature() {
               </p>
               <ul>
                 <li>
-                  <Link to="/docs/v2/agentic-coding/mcp/getting-connected/claude-code">
+                  <Link to="/docs/v2/agentic-integration/mcp/getting-connected/claude-code">
                     Claude Code
                   </Link>
                 </li>
                 <li>
-                  <Link to="/docs/v2/agentic-coding/mcp/getting-connected/github-copilot">
+                  <Link to="/docs/v2/agentic-integration/mcp/getting-connected/github-copilot">
                     GitHub Copilot
                   </Link>
                 </li>
                 <li>
-                  <Link to="/docs/v2/agentic-coding/mcp/getting-connected/cursor">Cursor</Link>
+                  <Link to="/docs/v2/agentic-integration/mcp/getting-connected/cursor">Cursor</Link>
                 </li>
                 <li>
-                  <Link to="/docs/v2/agentic-coding/mcp/getting-connected/codex-cli">
+                  <Link to="/docs/v2/agentic-integration/mcp/getting-connected/codex-cli">
                     Codex CLI
                   </Link>
                 </li>
@@ -303,7 +303,7 @@ function GettingStartedFeature() {
               </p>
               <ul>
                 <li>
-                  <Link to="/docs/v2/agentic-coding/mcp/tutorials">
+                  <Link to="/docs/v2/agentic-integration/mcp/tutorials">
                     <Translate id="mcp.getStarted.learn.tutorials">
                       Tutorials
                     </Translate>
@@ -314,7 +314,7 @@ function GettingStartedFeature() {
                   </Translate>
                 </li>
                 <li>
-                  <Link to="/docs/v2/agentic-coding/mcp/how-to">
+                  <Link to="/docs/v2/agentic-integration/mcp/how-to">
                     <Translate id="mcp.getStarted.learn.howto">
                       How-To Playbooks
                     </Translate>
@@ -325,7 +325,7 @@ function GettingStartedFeature() {
                   </Translate>
                 </li>
                 <li>
-                  <Link to="/docs/v2/agentic-coding/mcp/runbooks">
+                  <Link to="/docs/v2/agentic-integration/mcp/runbooks">
                     <Translate id="mcp.getStarted.learn.runbooks">
                       Runbooks
                     </Translate>
@@ -465,7 +465,7 @@ function TutorialsFeature() {
                 </Translate>
               </p>
               <p>
-                <Link to="/docs/v2/agentic-coding/mcp/tutorials">
+                <Link to="/docs/v2/agentic-integration/mcp/tutorials">
                   <Translate id="mcp.tutorials.link">
                     Browse all tutorials →
                   </Translate>
