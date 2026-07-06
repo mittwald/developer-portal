@@ -6,7 +6,7 @@ sidebar_position: 1
 
 # Verbindung zu mittwald MCP herstellen
 
-Willkommen! Diese Anleitung hilft dir, die Authentifizierung für mittwald MCP mit deinem bevorzugten Agentic Integration Tool einzurichten.
+Willkommen! Diese Anleitung hilft dir, die Authentifizierung für mittwald MCP mit deinem bevorzugten Tool für Agentic Integration einzurichten.
 
 **Warum Authentifizierung erforderlich ist**: mittwald MCP erfordert authentifizierten Zugriff auf deine mittwald-Ressourcen. OAuth 2.1 ist die empfohlene Methode für interaktive Nutzung, und API-Tokens sind für Headless/CI-Workflows verfügbar.
 
