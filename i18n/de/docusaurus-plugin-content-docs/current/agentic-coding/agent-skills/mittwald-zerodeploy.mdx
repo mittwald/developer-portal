@@ -1,0 +1,164 @@
+---
+title: mittwald-zerodeploy
+sidebar_label: mittwald-zerodeploy
+sidebar_position: 2
+---
+
+# mittwald-zerodeploy Skill
+
+Der **mittwald-zerodeploy** Skill liefert Zero-Config-Deployments auf mStudio Container Hosting mit Railpack Auto-Erkennung. Ein Dockerfile ist nicht notwendig.
+
+## Was der Skill macht
+
+Der Skill automatisiert den Deployment-Prozess:
+
+- **Auto-Erkennung**: Framework und Anforderungen erkennen
+- **Provisioning**: Notwendige mStudio-Ressourcen anlegen
+- **Local Deployment**: Deployment von deinem lokalen Rechner per CLI
+- **CI/CD Setup**: GitHub Actions fuer automatische Deployments einrichten
+- **Verification**: Ausgerollte Anwendung testen
+
+## Unterstuetzte Frameworks
+
+Railpack erkennt automatisch u. a.:
+
+- Node.js (Express, Next.js, NestJS, ...)
+- Python (Django, Flask, FastAPI, ...)
+- Ruby (Rails, Sinatra, ...)
+- PHP (Laravel, Symfony, ...)
+- Go-Anwendungen
+- Statische Websites
+- und weitere Laufzeiten
+
+## Workflow-Phasen
+
+### 1. Provision
+
+- Projekt- und Serverauswahl
+- Container-Stack anlegen
+- Datenbanksetup (falls notwendig)
+- Domain-Konfiguration
+
+### 2. Local CLI Deploy
+
+- Framework erkennen
+- Anwendung bauen und paketieren
+- Upload nach mStudio
+- Container starten
+
+### 3. GitHub Actions Setup
+
+- Workflow-Datei erzeugen
+- mStudio-Credentials hinterlegen
+- Deployment-Trigger konfigurieren
+- CI/CD-Pipeline pruefen
+
+### 4. Verify
+
+- Erreichbarkeit der Anwendung testen
+- Health-Checks validieren
+- Datenbankverbindung pruefen
+- Performance-Basiswert erfassen
+
+## So nutzt du den Skill
+
+Trigger-Beispiele:
+
+> "Hilf mir, meine Express-App auf mittwald zu deployen"
+
+Oder:
+
+> "Deploy to mittwald"
+> "Set up mittwald deployment"
+> "help me deploy"
+
+## Voraussetzungen
+
+- Aktiver mittwald mStudio-Account
+- Installierte und authentifizierte mittwald CLI ([Installationsanleitung](/docs/v2/cli/))
+- Quellcode lokal oder in GitHub
+- [Eingerichtete Authentifizierung](../authentication) (MCP, CLI oder API-Token)
+
+## Key Features
+
+### Zero Configuration
+
+Der Skill uebernimmt automatisch:
+- Framework-/Versions-Erkennung
+- Build- und Start-Kommandos
+- Umgebungskonfiguration
+- Health-Check-Basics
+
+### Flexible Deployments
+
+Deployment-Quellen:
+- **Lokal**: Direkt per CLI
+- **GitHub**: Automatisierte CI/CD-Pipeline
+- **Andere CI-Systeme**: Ueber Integrationen
+
+### Smart Defaults
+
+Sinnvolle Defaults fuer:
+- CPU- und RAM-Ressourcen
+- Port-Konfiguration
+- Umgebungsvariablen
+- Health-Check-Endpoints
+
+## Optionale Konfiguration
+
+```yaml
+runtime:
+  type: nodejs
+  version: "20"
+resources:
+  memory: 512Mi
+  cpu: "0.5"
+healthCheck:
+  path: /health
+  interval: 30s
+```
+
+## Best Practices
+
+1. Vorher lokal testen
+2. Konfiguration ueber Umgebungsvariablen steuern
+3. Health-Checks aktiv konfigurieren
+4. CI/CD fuer reproduzierbare Deployments nutzen
+5. Nach erstem Deployment Logs beobachten
+
+## Troubleshooting
+
+### App startet nicht
+
+- Build-Logs auf Fehler pruefen
+- Umgebungsvariablen kontrollieren
+- Abhaengigkeiten in package.json/requirements.txt sicherstellen
+- Port auf `PORT`-Variable hoeren lassen
+
+### Datenbankverbindung fehlgeschlagen
+
+- Credentials in Umgebungsvariablen pruefen
+- Datenbankprojekt/-status kontrollieren
+- Connection-String-Format validieren
+
+### GitHub Actions Deployment fehlgeschlagen
+
+- GitHub Secrets pruefen
+- Workflow-Syntax kontrollieren
+- CLI-Version aktualisieren
+- Logs im Actions-Run auswerten
+
+## Naechste Schritte
+
+- [Agent Skills installieren](../#installation)
+- [Authentifizierung konfigurieren](../authentication)
+- [mittwald-migrate ansehen](../mittwald-migrate)
+- [MCP kennenlernen](/docs/v2/agentic-coding/mcp/)
+
+---
+
+:::tip GitHub Repository
+
+Vollstaendigen Skill-Quellcode, Beispiele und Contribution-Hinweise findest du unter [mittwald/agent-skills](https://github.com/mittwald/agent-skills).
+
+:::

@@ -1,0 +1,86 @@
+---
+title: OpenCode CLI
+sidebar_label: OpenCode
+sidebar_position: 6
+---
+
+# OpenCode mit mittwald
+
+[OpenCode](https://opencode.ai) ist ein CLI-basierter KI-Coding-Agent mit OpenAI-kompatiblen Providern.
+
+## Installation
+
+Folge der [OpenCode Installationsanleitung](https://opencode.ai), um das CLI-Tool zu installieren.
+
+## Konfiguration
+
+OpenCode kann global oder pro Projekt konfiguriert werden:
+
+- **Global**: `~/.config/opencode/opencode.json`
+- **Pro Projekt**: `opencode.json` im Projekt-Root
+
+### Beispielkonfiguration
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "mittwald": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "mittwald AI",
+      "options": {
+        "baseURL": "https://llm.aihosting.mittwald.de/v1",
+        "apiKey": "sk-..."
+      },
+      "models": {
+        "Ministral-3-14B-Instruct-2512": {
+          "name": "Ministral-3-14B-Instruct-2512"
+        }
+      }
+    }
+  }
+}
+```
+
+Ersetze `sk-...` durch deinen mittwald LLM API-Key aus den [mStudio Profileinstellungen](https://studio.mittwald.de/profile/api-token).
+
+## Nutzung
+
+```shellsession
+user@local $ opencode run "migrate database schema to add user roles table"
+user@local $ opencode run "optimize the database queries in user_service.py"
+user@local $ opencode run "add email validation to the registration form"
+```
+
+## MCP Server Integration {#mcp}
+
+OpenCode unterstuetzt MCP-Server per Konfiguration:
+
+```json
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@context7/mcp-server", "--stdio"],
+      "env": { "CONTEXT7_API_KEY": "your-key" }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "--stdio"],
+      "env": { "POSTGRES_CONNECTION_STRING": "postgresql://..." }
+    },
+    "mittwald": {
+      "transport": {
+        "type": "sse",
+        "url": "https://mcp.mittwald.de/mcp"
+      }
+    }
+  }
+}
+```
+
+## Naechste Schritte
+
+- [IDE-Integrationen ansehen](./)
+- [MCP kennenlernen](/docs/v2/agentic-coding/mcp/)
+- [Agent Skills installieren](/docs/v2/agentic-coding/agent-skills/)

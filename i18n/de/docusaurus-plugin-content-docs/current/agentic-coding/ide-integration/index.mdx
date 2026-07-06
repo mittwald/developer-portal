@@ -1,0 +1,82 @@
+---
+title: IDE Integration
+sidebar_label: Überblick
+sidebar_position: 0
+---
+
+import PlanCompatibility from "@site/src/components/PlanCompatibility";
+
+# IDE Integration
+
+<PlanCompatibility features={["ai"]} />
+
+Nutze mittwalds [DSGVO-konforme KI-Modelle](/docs/v2/platform/aihosting) direkt in deiner Entwicklungsumgebung fuer Code-Generierung, Completion, Refactoring und Debugging. Alle Modelle werden in Deutschland gehostet, ohne Nutzerdaten zu speichern oder zum Training zu verwenden.
+
+## Verfuegbare Modelle
+
+Der Service bietet mehrere Modelle fuer unterschiedliche Entwicklungsaufgaben. Eine vollstaendige Liste findest du in der [Dokumentation zu KI-Modellen](/docs/v2/platform/aihosting/models).
+
+**Empfohlene Modelle:**
+- **Ministral-3-14B-Instruct-2512**: Chat, Vision, General Assistants, multimodale UX, agentic coding, Tool Use
+- **gpt-oss-120b**: Komplexe textzentrierte Aufgaben und praezise Automatisierungen
+
+## Unterstuetzte IDEs und Tools
+
+| IDE/Tool                                 | Integrationen                                                                         |
+| ---------------------------------------- | ------------------------------------------------------------------------------------ |
+| Jetbrains IDEs (IntelliJ, PHPStorm, ...) | [JetBrains AI](./jetbrains-ai), [Continue](./continue)                               |
+| Visual Studio Code                       | [Continue](./continue), [Cline](./cline), [Kilo Code](./kilo-code)                   |
+| Cursor                                   | [Cline](./cline)                                                                     |
+| Windsurf                                 | [Cline](./cline)                                                                     |
+| Zed                                      | [Zed](./zed)                                                                         |
+| CLI                                      | [OpenCode](./opencode)                                                               |
+
+## Schnellstart
+
+1. **API-Key holen**: In den [mStudio Profileinstellungen](https://studio.mittwald.de/profile/api-token)
+2. **IDE waehlen**: Eine der Integrationen oben nutzen
+3. **Endpoint konfigurieren**: `https://llm.aihosting.mittwald.de/v1`
+4. **Modell waehlen**: `Ministral-3-14B-Instruct-2512`
+
+## Best Practices
+
+### Modellwahl
+
+- **Ministral-3-14B-Instruct-2512**: Fuer die meisten Coding-Aufgaben, inkl. Tool Use und Vision
+- **gpt-oss-120b**: Fuer komplexes Reasoning, praezise Dokumentation und anspruchsvolle Automatisierung
+
+### Tipps fuer Long Context (256k)
+
+- Nicht das ganze Repo senden, nur relevante Dateien/Funktionskoerper
+- Vorherige Schritte zusammenfassen und IDs/Anker fuer Rehydration nutzen
+- Antworten streamen, `max_tokens` nur bei Bedarf erhoehen
+- Fuer Tools/Edits deterministisch bleiben: `temperature <= 0.2`
+- Repo-Scope bewusst klein halten
+- Bei Orchestrierung mehrstufiger Aenderungen bevorzugt strukturierte Outputs (JSON/Tool-Output) nutzen
+
+### MCP Server Integration
+
+Viele IDEs unterstuetzen [Model Context Protocol (MCP)](/docs/v2/agentic-coding/mcp/) Server fuer erweiterte Faehigkeiten:
+
+- **Context7**: Aktuelle Library-Dokumentation
+- **Brave Search**: Websuche mit Privacy-Fokus
+- **PostgreSQL**: Datenbankabfragen und Schema-Inspektion
+- **Directus**: Headless-CMS-Management
+- **mittwald**: Infrastruktur-Management in natuerlicher Sprache
+
+Details zur MCP-Konfiguration findest du in den jeweiligen IDE-Guides.
+
+## Naechste Schritte
+
+Waehle deine IDE bzw. dein Tool:
+
+- [JetBrains AI](./jetbrains-ai) - IntelliJ, PHPStorm, WebStorm, etc.
+- [Continue](./continue) - VS Code und JetBrains IDEs
+- [Cline](./cline) - VS Code, Cursor, Windsurf
+- [Zed](./zed) - Zed Editor
+- [Kilo Code](./kilo-code) - VS Code Extension
+- [OpenCode](./opencode) - CLI Agent
+
+## Disclaimer
+
+Drittanbieter-Tools, MCP-Server und externe Links werden zur Vereinfachung bereitgestellt, ohne Gewaehrleistung oder Empfehlung. Nutze sie auf eigenes Risiko, pruefe Lizenzen und Datenschutzrichtlinien und vergib nur die noetigen Berechtigungen (Least Privilege).
