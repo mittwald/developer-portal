@@ -11,6 +11,7 @@ Unter macOS ist die empfohlene Methode zur Installation der CLI die Verwendung v
 
 ```
 $ brew tap mittwald/cli
+$ brew trust --formula mittwald/cli/mw
 $ brew install mw
 $ mw --help
 ```
