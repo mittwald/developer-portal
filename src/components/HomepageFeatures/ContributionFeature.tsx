@@ -106,7 +106,7 @@ function ToolsFeature() {
           </Translate>
           <br />
           <Link href="https://github.com/mittwald/flow">GitHub</Link> |{" "}
-          <Link href="https://mittwald.github.io/flow">Documentation</Link>
+          <Link href="https://flow.mittwald.de">Documentation</Link>
         </li>
       </ul>
       <p>
