@@ -121,10 +121,10 @@ echo $response->choices[0]->message->content;
 
 Wenn der Thinking-Modus **aktiviert** ist (Standard), liefert das Modell zwei separate Felder:
 
-| Feld | Inhalt |
-| ---- | ------ |
+| Feld                                   | Inhalt                                      |
+| -------------------------------------- | ------------------------------------------- |
 | `choices[0].message.reasoning_content` | Interne Gedankenkette (kann sehr lang sein) |
-| `choices[0].message.content` | Endgültige Antwort |
+| `choices[0].message.content`           | Endgültige Antwort                          |
 
 Wenn `content` leer ist, hat das Modell seine Antwort in den Reasoning-Block geschrieben — deaktiviere den Thinking-Modus, damit `content` immer befüllt wird.
 
@@ -150,12 +150,13 @@ Das Modell hat je nach Anwendungsfall unterschiedliche empfohlene Einstellungen.
 
 **Präzise Coding-Aufgaben / Webentwicklung:**
 
-| Parameter          | Wert |
-| ------------------ | ---- |
-| `temperature`      | 0.6  |
-| `top_p`            | 0.95 |
-| `top_k`            | 20   |
-| `presence_penalty` | 0.0  |
+| Parameter     | Wert |
+| ------------- | ---- |
+| `temperature` | 0.6  |
+| `top_p`       | 0.95 |
+| `top_k`       | 20   |
+
+Für präzise Coding-Aufgaben empfiehlt Qwen `presence_penalty=0.0`. Falls dabei leere `content`-Antworten bzw. Reasoning-only-Loops auftreten, kann `presence_penalty=1.0` als stabilerer Betriebswert getestet werden; Werte bis 2.0 sind laut Qwen je nach Framework zulässig, können aber ebenso zu Fehlern führen.
 
 ### Non-Thinking-Modus (`enable_thinking: false`)
 
@@ -202,11 +203,11 @@ Ein fertiges Beispiel, das Qwen3.5-122B-A10B-FP8 als Antwortmodell in einer Doku
 
 Empfohlene Parameter für Vision:
 
-| Parameter     | Wert |
-| ------------- | ---- |
-| `temperature` | 0.7  |
-| `top_p`       | 0.8  |
-| `top_k`       | 20   |
+| Parameter     | Wert                     |
+| ------------- | ------------------------ |
+| `temperature` | 0.7                      |
+| `top_p`       | 0.8                      |
+| `top_k`       | 20                       |
 | `max_tokens`  | 512–2048 je nach Aufgabe |
 
 Für präzise Texterkennung (OCR) oder das Auslesen von Daten empfiehlt sich stattdessen `temperature=0.1`.

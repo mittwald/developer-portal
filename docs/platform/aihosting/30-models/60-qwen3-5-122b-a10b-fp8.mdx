@@ -122,10 +122,10 @@ echo $response->choices[0]->message->content;
 
 When thinking mode is **enabled** (default), the model returns two separate fields:
 
-| Field | Contents |
-| ----- | -------- |
+| Field                                  | Contents                                     |
+| -------------------------------------- | -------------------------------------------- |
 | `choices[0].message.reasoning_content` | Internal chain-of-thought (may be very long) |
-| `choices[0].message.content` | Final answer |
+| `choices[0].message.content`           | Final answer                                 |
 
 If `content` is empty, the model placed its answer inside the reasoning block — disable thinking mode to ensure `content` is always populated.
 
@@ -151,12 +151,13 @@ The model has different recommended settings depending on the use case. Do not u
 
 **Precise coding / web development:**
 
-| Parameter          | Value |
-| ------------------ | ----- |
-| `temperature`      | 0.6   |
-| `top_p`            | 0.95  |
-| `top_k`            | 20    |
-| `presence_penalty` | 0.0   |
+| Parameter     | Value |
+| ------------- | ----- |
+| `temperature` | 0.6   |
+| `top_p`       | 0.95  |
+| `top_k`       | 20    |
+
+Qwen recommends `presence_penalty=0.0` for precise coding tasks. If this produces empty `content` responses or reasoning-only loops, `presence_penalty=1.0` can be tested as a more stable operating value; values up to 2.0 are permitted by Qwen depending on the framework, but may likewise cause errors.
 
 ### Non-thinking mode (`enable_thinking: false`)
 
@@ -182,10 +183,10 @@ The model has different recommended settings depending on the use case. Do not u
 
 Set `max_tokens` according to task complexity to control cost and latency:
 
-| Task type                                      | Recommended `max_tokens` |
-| ---------------------------------------------- | ------------------------ |
-| Standard queries                               | 32,768                   |
-| Complex problems (math, programming contests)  | 81,920                   |
+| Task type                                     | Recommended `max_tokens` |
+| --------------------------------------------- | ------------------------ |
+| Standard queries                              | 32,768                   |
+| Complex problems (math, programming contests) | 81,920                   |
 
 ## Tips for specific tasks
 
@@ -203,11 +204,11 @@ For a ready-to-run example using Qwen3.5-122B-A10B-FP8 as the answering model in
 
 Recommended parameters for vision:
 
-| Parameter     | Value |
-| ------------- | ----- |
-| `temperature` | 0.7   |
-| `top_p`       | 0.8   |
-| `top_k`       | 20    |
+| Parameter     | Value                      |
+| ------------- | -------------------------- |
+| `temperature` | 0.7                        |
+| `top_p`       | 0.8                        |
+| `top_k`       | 20                         |
 | `max_tokens`  | 512–2048 depending on task |
 
 For accurate text extraction (OCR) or data reading, use `temperature=0.1` instead.
