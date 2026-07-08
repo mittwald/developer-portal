@@ -159,7 +159,8 @@ const config: Config = {
       title: "Developer Portal",
       logo: {
         alt: "mittwald",
-        src: "img/mittwald-logo.svg",
+        src: "img/mittwald-logo-black.svg",
+        srcDark: "img/mittwald-logo.svg",
       },
       items: [
         {
