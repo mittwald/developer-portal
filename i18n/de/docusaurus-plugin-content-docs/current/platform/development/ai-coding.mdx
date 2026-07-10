@@ -4,677 +4,83 @@ sidebar_label: KI-unterstützte Entwicklung
 ---
 
 import PlanCompatibility from "@site/src/components/PlanCompatibility";
+import DocCardList from "@theme/DocCardList";
 
 # KI-unterstützte Entwicklung
 
 <PlanCompatibility features={["ai"]} />
 
-Du kannst mittwalds [KI-Modelle](/docs/v2/platform/aihosting) verwenden, um dich in deinem Entwicklungsprozess zu unterstützen. Die Modelle sind DSGVO-konform und werden in Deutschland gehostet, ohne Nutzerdaten zu speichern oder für das Training zu verwenden.
+:::info Dokumentation umgezogen
 
-## Verfügbare Modelle
-
-Der Service bietet verschiedene KI-Modelle, die für unterschiedliche Entwicklungsaufgaben optimiert sind. Eine vollständige Liste der verfügbaren Modelle und ihrer Spezifikationen findest du in der [KI-Modelle-Dokumentation](/docs/v2/platform/aihosting/models).
-
-## IDE-Integration
-
-### Übersicht
-
-| IDE/Tool                                 | Integrationen                                                   |
-| ---------------------------------------- | --------------------------------------------------------------- |
-| Jetbrains IDEs (IntelliJ, PHPStorm, ...) | [Continue](#continue), [Jetbrains AI](#jetbrains-ai)            |
-| Visual Studio Code                       | [Continue](#continue), [Cline](#cline), [Kilo Code](#kilo-code) |
-| Cursor                                   | [Cline](#cline)                                                 |
-| Windsurf                                 | [Cline](#cline)                                                 |
-| Zed                                      | [Zed](#zed)                                                     |
-| CLI                                      | [OpenCode](#opencode)                                           |
-
-### Jetbrains AI (für Jetbrains IDEs, wie IntelliJ, PHPStorm, WebStorm, ...) {#jetbrains-ai}
-
-Der JetBrains AI Assistant unterstützt OpenAI-kompatible Endpunkte per
-Bring Your Own Key (BYOK). Konfiguriere ihn direkt in der IDE:
-
-1. Öffne `Settings | Tools | AI Assistant | Models & API keys`.
-2. Unter „Third-party AI providers“ **OpenAI-compatible** auswählen.
-3. API-Key und Endpunkt-URL
-   `https://llm.aihosting.mittwald.de/v1` eintragen und Verbindung testen.
-4. (Optional) „Tool calling“ aktivieren, wenn das Modell MCP-Tools nutzen soll.
-
-Hinweis: Einige AI-Assistant-Funktionen können trotz Drittanbieter-Setup eine
-JetBrains-AI-Subscription erfordern.
-
-### Continue (für Visual Studio Code oder Jetbrains IDEs) {#continue}
-
-[Continue](https://www.continue.dev) funktioniert sowohl mit Jetbrains IDEs als auch mit Visual Studio Code.
-
-Installiere zuerst das Plugin für deine IDE:
-
-- [Jetbrains IDEs](https://plugins.jetbrains.com/plugin/22707-continue)
-- [Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=Continue.continue)
-
-Modelle werden normalerweise in der `config.yaml`-Datei konfiguriert (normalerweise im `~/.continue/`-Verzeichnis in deinem Home-Verzeichnis zu finden). Du kannst die mittwald-Modelle (`Qwen3.6-35B-A3B-FP8` funktioniert gut für Code-Generierung) mit der folgenden Konfiguration einrichten:
-
-```yaml
-name: mittwald
-version: 1.0.0
-schema: v1
-models:
-  - name: Ministral-3-14B-Instruct-2512
-    provider: openai
-    model: Ministral-3-14B-Instruct-2512
-    apiBase: https://llm.aihosting.mittwald.de/v1
-    apiKey: <API-SCHLÜSSEL-EINFÜGEN>
-    roles:
-      - chat
-      - edit
-      - apply
-    capabilities:
-      - tool_use
-context:
-  - provider: code
-  - provider: docs
-  - provider: diff
-  - provider: terminal
-  - provider: problems
-  - provider: folder
-  - provider: codebase
-```
-
-### Cline (für Visual Studio Code, Cursor oder Windsurf) {#cline}
-
-[Cline](https://cline.bot) funktioniert mit Visual Studio Code, Cursor und Windsurf. Installiere zuerst das [entsprechende IDE-Plugin](https://marketplace.visualstudio.com/items?itemName=saoudrizwan.claude-dev).
-
-Bei der Konfiguration von Cline über die Benutzeroberfläche wähle die folgenden Optionen:
-
-- **API Provider**: Wähle "OpenAI Compatible"
-- **Base URL**: Gib `https://llm.aihosting.mittwald.de/v1` ein
-- **OpenAI Compatible API Key**: Gib deinen LLM-API-Schlüssel aus dem mStudio ein
-- **Model ID**: Gib `Ministral-3-14B-Instruct-2512` ein
-
-### Zed {#zed}
-
-[Zed](https://zed.dev) unterstützt OpenAI-kompatible Endpunkte im integrierten Agent Panel.
-
-- Öffne die Agent-Panel-Einstellungen (`agent: open settings`).
-- Unter „LLM Providers“ auf „Add Provider“ klicken und „OpenAI API Compatible“
-  wählen.
-- Provider-Name `mittwald`, API-URL
-  `https://llm.aihosting.mittwald.de/v1`, Modell
-  `Ministral-3-14B-Instruct-2512`.
-
-Du kannst das auch in `settings.json` konfigurieren:
-
-```json
-{
-  "language_models": {
-    "openai_compatible": {
-      "mittwald": {
-        "api_url": "https://llm.aihosting.mittwald.de/v1",
-        "available_models": [
-          {
-            "name": "Ministral-3-14B-Instruct-2512",
-            "display_name": "Ministral-3-14B-Instruct-2512",
-            "max_tokens": 262144
-          }
-        ]
-      }
-    }
-  }
-}
-```
-
-Zed speichert API-Keys nicht in `settings.json`. Setze `MITTWALD_API_KEY` in
-deiner Umgebung.
-
-### Kilo Code {#kilo-code}
-
-Kilo Code ist als Visual-Studio-Code-Extension verfügbar und unterstützt
-OpenAI-kompatible Anbieter. Konfiguriere wie folgt:
-
-- Installiere die Extension aus dem
-  [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=kilocode.Kilo-Code).
-
-- Provider: OpenAI Compatible
-- Base URL: `https://llm.aihosting.mittwald.de/v1`
-- API Key: dein LLM-API-Schlüssel aus dem mStudio
-- Modell: `Ministral-3-14B-Instruct-2512`
-
-Beispiel-Umgebung:
-
-```sh
-export OPENAI_API_KEY=sk-...
-export OPENAI_BASE_URL=https://llm.aihosting.mittwald.de/v1
-```
-
-Wähle anschließend das Modell in Kilo Codes Modell-Auswahl für Agent-Aufgaben.
-
-## CLI-Coding-Agenten
-
-### OpenCode {#opencode}
-
-[OpenCode](https://opencode.ai) unterstützt OpenAI-kompatible Anbieter. Diese
-werden entweder global in der Datei `~/.config/opencode/opencode.json` oder
-pro Projekt in einer `opencode.json` Datei im Projekt-Wurzelverzeichnis konfiguriert.
-
-Unabhängig vom Speicherort könnte die jeweilige Provider-Konfiguration wie folgt aussehen:
-
-```json
-{
-  "$schema": "https://opencode.ai/config.json",
-  "provider": {
-    "mittwald": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "mittwald AI",
-      "options": {
-        "baseURL": "https://llm.aihosting.mittwald.de/v1",
-        "apiKey": "sk-..."
-      },
-      "models": {
-        "Ministral-3-14B-Instruct-2512": {
-          "name": "Ministral-3-14B-Instruct-2512"
-        }
-      }
-    }
-  }
-}
-```
-
-Verwendung:
-
-```sh
-opencode run "migriere Datenbankschema für User-Rollen-Tabelle"
-opencode run "optimiere die Datenbankabfragen in user_service.py"
-```
-
-Für MCP-Server-Konfiguration siehe den [OpenCode-MCP-Abschnitt](#opencode-mcp) weiter unten.
-
-## MCP und Tool-Verwendung
-
-In diesem Abschnitt stellen wir Konfigurationsbeispiele und Tipps zur Verwendung von [Model Context Protocol](https://modelcontextprotocol.io/)-Servern und Web-Fetching mit gängigen Coding-Agenten bereit.
-
-### Häufig verwendete MCP-Server
-
-- [Context7 MCP](https://www.npmjs.com/package/@context7/mcp-server): Stellt aktuelle Dokumentation für beliebte Bibliotheken und Frameworks bereit und stellt sicher, dass das Modell Zugriff auf die neuesten API-Änderungen und Best Practices hat.
-- [Brave Search MCP](https://www.npmjs.com/package/@modelcontextprotocol/server-brave-search): Ermöglicht Web-Suchfunktionen mit starkem Datenschutz, nützlich für das Finden aktueller Lösungen, Dokumentationen oder zur Überprüfung aktueller Informationen.
-- [PostgreSQL MCP](https://www.npmjs.com/package/@modelcontextprotocol/server-postgres): Ermöglicht sichere Datenbank-Inspektion und Abfragen und hilft bei Schema-Design, Abfrage-Optimierung und Datenanalyse.
-- [Directus MCP](https://www.npmjs.com/package/@directus/content-mcp): Bietet KI-Assistenten kontrollierten Zugriff auf dein Directus CMS und ermöglicht Content-Erstellung, Updates, Abfragen von Collections und Asset-Management durch natürliche Sprache. Ideal für Content-Editoren und Datenanalysten.
-- [OpenSearch MCP](https://github.com/opensearch-project/opensearch-mcp-server-py): Ermöglicht KI-Assistenten die Interaktion mit OpenSearch-Clustern, um Operationen wie das Durchsuchen von Indizes, Abrufen von Mappings, Analysieren der Cluster-Gesundheit und Verwalten von Shards über das Model Context Protocol durchzuführen.
-- [Apache Solr MCP](https://github.com/allenday/solr-mcp): Ermöglicht der KI, leistungsstarke hybride Suchabfragen gegen Solr-Indizes durchzuführen, die sowohl Keyword- als auch Vektorsuche für Enterprise-Suchanwendungen kombinieren.
-- [TYPO3 MCP](https://github.com/hn/typo3-mcp-server): Bietet KI-Assistenten kontrollierten Zugriff auf deine TYPO3-CMS-Installation und ermöglicht Content-Management, Seitenoperationen und Backend-Automatisierung durch natürliche Sprache. Verwendet den Befehl [`mw app exec`](/docs/v2/cli/reference/app#mw-app-exec-command) der [mittwald CLI](/docs/v2/cli) für die Verbindung via STDIO-Transport. Ersetze `a-XXXXX` durch deine TYPO3-App-Installations-ID (finden via `mw app list`). Benötigt das Composer-Paket [hn/typo3-mcp-server](https://github.com/hn/typo3-mcp-server), das in deiner TYPO3-Instanz installiert sein muss. **Hinweis:** Umgeht derzeit die TYPO3-Backend-Zugriffskontrollen und funktioniert nur mit lokalen MCP-Clients aufgrund von Plattformbeschränkungen bei der `.well-known/` OAuth-Discovery.
-
-Für eine umfassende Liste weiterer MCP-Server siehe die [MCP-Server-Registry](https://github.com/modelcontextprotocol/servers).
-
-### Continue {#continue-mcp}
-
-Continue kann über das Model Context Protocol (MCP) kontrollierten Zugriff auf externe Tools und Services erhalten.
-
-MCP-Server in `~/.continue/config.yaml` hinzufügen:
-
-```yaml
-mcpServers:
-  # Context7: Aktuelle Bibliotheksdokumentation
-  context7:
-    name: Context7
-    command: npx
-    args: ["-y", "@context7/mcp-server", "--stdio"]
-    env: { CONTEXT7_API_KEY: "dein-context7-api-key" }
-
-  # Brave Search: Web-Suche mit Datenschutz-Fokus
-  brave-search:
-    name: Brave
-    command: npx
-    args: ["-y", "@modelcontextprotocol/server-brave-search", "--stdio"]
-    env: { BRAVE_API_KEY: "dein-brave-api-key" }
-
-  # PostgreSQL: Datenbankabfragen und Schema-Inspektion
-  postgres:
-    name: PostgreSQL
-    command: npx
-    args: ["-y", "@modelcontextprotocol/server-postgres", "--stdio"]
-    env:
-      POSTGRES_CONNECTION_STRING: "postgresql://user:pass@localhost:5432/dbname"
-
-  # Directus: Headless CMS Datenverwaltung
-  directus:
-    name: Directus
-    command: npx
-    args: ["-y", "@directus/content-mcp", "--stdio"]
-    env:
-      DIRECTUS_URL: "https://deine-directus-instanz.com"
-      DIRECTUS_TOKEN: "dein-directus-token"
-
-  # OpenSearch: Such- und Analyse-Engine
-  opensearch:
-    name: OpenSearch
-    command: npx
-    args: ["-y", "@opensearch-project/mcp-server", "--stdio"]
-    env:
-      OPENSEARCH_URL: "https://localhost:9200"
-      OPENSEARCH_USERNAME: "admin"
-      OPENSEARCH_PASSWORD: "admin"
-
-  # Apache Solr: Enterprise-Suchplattform
-  solr:
-    name: Solr
-    command: uvx
-    args: ["solr-mcp"]
-    env:
-      SOLR_URL: "http://localhost:8983/solr"
-
-  # TYPO3: CMS-Content und Backend-Verwaltung (benötigt mittwald CLI)
-  typo3:
-    name: TYPO3
-    command: mw
-    args:
-      [
-        "app",
-        "exec",
-        "--quiet",
-        "--installation-id=a-XXXXX",
-        "vendor/bin/typo3 mcp:server",
-      ]
-```
-
-Bitte den Assistenten explizit, ein Tool zu nutzen (z. B. „nutze Brave Search, um aktuelle Informationen über ... zu finden" oder „durchsuche unseren Solr-Index nach Dokumenten über ..."). Beschränke den Zugriff stets eng und überprüfe Datenzugriffe oder Änderungen.
-
-### Kilo Code {#kilo-code-mcp}
-
-Kilo Code kann ebenfalls MCP-Server verwenden. Füge sie über die Einstellungen (Tools → Add MCP Server) oder in der Konfigurationsdatei hinzu.
-
-Konfigurationsbeispiel:
-
-```json
-{
-  "mcpServers": {
-    "context7": {
-      "command": "npx",
-      "args": ["-y", "@context7/mcp-server", "--stdio"],
-      "env": { "CONTEXT7_API_KEY": "dein-schlüssel" }
-    },
-    "brave-search": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-brave-search", "--stdio"],
-      "env": { "BRAVE_API_KEY": "dein-schlüssel" }
-    },
-    "postgres": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-postgres", "--stdio"],
-      "env": { "POSTGRES_CONNECTION_STRING": "postgresql://..." }
-    },
-    "directus": {
-      "command": "npx",
-      "args": ["-y", "@directus/content-mcp", "--stdio"],
-      "env": {
-        "DIRECTUS_URL": "https://deine-directus-instanz.com",
-        "DIRECTUS_TOKEN": "dein-directus-token"
-      }
-    },
-    "opensearch": {
-      "command": "npx",
-      "args": ["-y", "@opensearch-project/mcp-server", "--stdio"],
-      "env": {
-        "OPENSEARCH_URL": "https://localhost:9200",
-        "OPENSEARCH_USERNAME": "admin",
-        "OPENSEARCH_PASSWORD": "admin"
-      }
-    },
-    "solr": {
-      "command": "uvx",
-      "args": ["solr-mcp"],
-      "env": {
-        "SOLR_URL": "http://localhost:8983/solr"
-      }
-    },
-    "typo3": {
-      "command": "mw",
-      "args": [
-        "app",
-        "exec",
-        "--quiet",
-        "--installation-id=a-XXXXX",
-        "vendor/bin/typo3 mcp:server"
-      ]
-    }
-  }
-}
-```
-
-:::tip Best Practices für Sicherheit
-
-- Zugriff eng eingrenzen (spezifische Datenbanken, Domains, Pfade)
-- Alle Tool-Aufrufe zu Audit-Zwecken protokollieren
-- Niedrige Temperatur (≤ 0,2) für Tool-Planung nutzen, um Halluzinationen zu reduzieren
-- Diffs und Abfragen vor der Ausführung überprüfen
-- Wenn möglich, mit read-only Zugriff starten
+Diese Dokumentation wurde neu strukturiert. Die Inhalte dieser Seite sind jetzt
+Teil des Bereichs **[Agentic Integration](/docs/v2/agentic-integration/)**.
 
 :::
 
-Kilo Code kann (falls in deinem Setup aktiviert) ein Web-Fetch-/Browsing-Tool verwenden, um externe Seiten abzurufen und zusammenzufassen.
+## Finde, was du brauchst
 
-- Aktiviere das Web-/Browsing-Tool in den Kilo-Code-Einstellungen bzw. in der Tool-Liste.
-- Bevorzuge öffentliche URLs (ohne Auth) und gib die exakten Ziel-Links in deinem Prompt an.
-- Halte den Netzwerkscope klein: eine einzelne Seite oder geringe Tiefe; bitte den Agenten, Quellen zu zitieren.
+### IDE Integration
 
-Prompt-Muster
+Du willst mittwalds KI-Modelle in deiner Entwicklungsumgebung nutzen?
 
-- „Rufe https://example.com/spec ab und fasse die wichtigsten Endpunkte in 10 Stichpunkten zusammen. Mit kanonischen Links."
-- „Öffne https://huggingface.co/mistralai/Ministral-3-14B-Instruct-2512 und extrahiere Kontextlänge, Modalitäten und Lizenz. Als JSON zurückgeben."
+**→ [IDE-Integration-Guide](/docs/v2/agentic-integration/ide-integration/)**
 
-:::tip Best Practices für Web-Fetching
+Konfiguriere deine IDE oder deinen Editor:
+- [JetBrains AI](/docs/v2/agentic-integration/ide-integration/jetbrains-ai) (IntelliJ, PHPStorm, WebStorm)
+- [Continue](/docs/v2/agentic-integration/ide-integration/continue) (VS Code und JetBrains)
+- [Cline](/docs/v2/agentic-integration/ide-integration/cline) (VS Code, Cursor, Windsurf)
+- [Zed](/docs/v2/agentic-integration/ide-integration/zed)
+- [Kilo Code](/docs/v2/agentic-integration/ide-integration/kilo-code) (VS Code)
+- [OpenCode](/docs/v2/agentic-integration/ide-integration/opencode) (CLI)
 
-- Bitte den Agenten, neben jeder Aussage die Quell-URL zu nennen.
-- Für faktenbasierte Extraktion deterministisch samplen: `temperature <= 0.2`.
-- Bei langen Seiten erst ein Inhaltsverzeichnis erstellen lassen und dann abschnittsweise (per Anker) vertiefen.
+### MCP Integration
 
-:::
+Du willst Infrastruktur über KI-Assistenten verwalten?
 
-### OpenCode {#opencode-mcp}
+**→ [MCP-Integration-Guide](/docs/v2/agentic-integration/mcp/)**
 
-OpenCode unterstützt MCP-Server über die globale Konfigurationsdatei unter `~/.config/opencode/opencode.json` oder projektspezifisch in einer `opencode.json`-Datei im Projekt-Wurzelverzeichnis.
+- [Getting Connected](/docs/v2/agentic-integration/mcp/getting-connected/) — Setup-Guides für Claude, Copilot, ChatGPT und mehr
+- [Tutorials](/docs/v2/agentic-integration/mcp/tutorials/) — End-to-End-Anleitungen
+- [How-To Guides](/docs/v2/agentic-integration/mcp/how-to/) — Aufgabenfokussierte Anleitungen
 
-```json
-{
-  "mcpServers": {
-    "context7": {
-      "command": "npx",
-      "args": ["-y", "@context7/mcp-server", "--stdio"],
-      "env": { "CONTEXT7_API_KEY": "dein-schlüssel" }
+### Agent Skills
+
+Du suchst vorgefertigte Workflows für Migrationen und Deployments?
+
+**→ [Agent-Skills-Guide](/docs/v2/agentic-integration/agent-skills/)**
+
+- [mittwald-migrate](/docs/v2/agentic-integration/agent-skills/mittwald-migrate) — Konversationeller Migrations-Workflow
+- [mittwald-zerodeploy](/docs/v2/agentic-integration/agent-skills/mittwald-zerodeploy) — Zero-Config-Deployment
+
+## Schnellzugriffe
+
+<DocCardList
+  items={[
+    {
+      type: "link",
+      label: "Erste Schritte",
+      href: "/docs/v2/agentic-integration/",
+      description: "Neu bei Agentic Integration? Starte mit dem Überblick.",
     },
-    "postgres": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-postgres", "--stdio"],
-      "env": { "POSTGRES_CONNECTION_STRING": "postgresql://..." }
+    {
+      type: "link",
+      label: "IDE Setup",
+      href: "/docs/v2/agentic-integration/ide-integration/",
+      description: "Konfiguriere deinen Editor mit mittwald KI-Modellen.",
     },
-    "directus": {
-      "command": "npx",
-      "args": ["-y", "@directus/content-mcp", "--stdio"],
-      "env": {
-        "DIRECTUS_URL": "https://deine-directus-instanz.com",
-        "DIRECTUS_TOKEN": "dein-directus-token"
-      }
+    {
+      type: "link",
+      label: "Infrastruktur",
+      href: "/docs/v2/agentic-integration/mcp/",
+      description: "Verwalte mStudio mit natürlicher Sprache.",
     },
-    "opensearch": {
-      "command": "npx",
-      "args": ["-y", "@opensearch-project/mcp-server", "--stdio"],
-      "env": {
-        "OPENSEARCH_URL": "https://localhost:9200",
-        "OPENSEARCH_USERNAME": "admin",
-        "OPENSEARCH_PASSWORD": "admin"
-      }
-    },
-    "solr": {
-      "command": "uvx",
-      "args": ["solr-mcp"],
-      "env": {
-        "SOLR_URL": "http://localhost:8983/solr"
-      }
-    },
-    "typo3": {
-      "command": "mw",
-      "args": [
-        "app",
-        "exec",
-        "--quiet",
-        "--installation-id=a-XXXXX",
-        "vendor/bin/typo3 mcp:server"
-      ]
-    }
-  }
-}
-```
+  ]}
+/>
 
-### Claude Code {#claude-code-mcp}
+---
 
-In Claude Code werden MCP-Server entweder global (in der Datei `~/.claude.json` in deinem Home-Verzeichnis) oder pro Projekt (in einer `.mcp.json`-Datei im Projektstamm) konfiguriert.
+## Über mittwald KI-Modelle
 
-In beiden Konfigurationsdateien definiert der Abschnitt `mcpServers` die verfügbaren MCP-Server:
-
-```json
-{
-  "mcpServers": {
-    "context7": {
-      "command": "npx",
-      "args": ["-y", "@context7/mcp-server", "--stdio"],
-      "env": {
-        "CONTEXT7_API_KEY": "dein-context7-api-key"
-      }
-    },
-    "brave-search": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-brave-search", "--stdio"],
-      "env": {
-        "BRAVE_API_KEY": "dein-brave-api-key"
-      }
-    },
-    "postgres": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-postgres", "--stdio"],
-      "env": {
-        "POSTGRES_CONNECTION_STRING": "postgresql://user:password@localhost:5432/dbname"
-      }
-    },
-    "directus": {
-      "command": "npx",
-      "args": ["-y", "@directus/content-mcp", "--stdio"],
-      "env": {
-        "DIRECTUS_URL": "https://deine-directus-instanz.com",
-        "DIRECTUS_TOKEN": "dein-directus-token"
-      }
-    },
-    "opensearch": {
-      "command": "npx",
-      "args": ["-y", "@opensearch-project/mcp-server", "--stdio"],
-      "env": {
-        "OPENSEARCH_URL": "https://localhost:9200",
-        "OPENSEARCH_USERNAME": "admin",
-        "OPENSEARCH_PASSWORD": "admin"
-      }
-    },
-    "solr": {
-      "command": "uvx",
-      "args": ["solr-mcp"],
-      "env": {
-        "SOLR_URL": "http://localhost:8983/solr"
-      }
-    },
-    "typo3": {
-      "command": "mw",
-      "args": [
-        "app",
-        "exec",
-        "--quiet",
-        "--installation-id=a-XXXXX",
-        "vendor/bin/typo3 mcp:server"
-      ]
-    }
-  }
-}
-```
-
-#### WebFetch-Konfiguration
-
-Claude Code unterstützt integrierte Web-Fetching-Funktionen. Konfiguration in `settings.json`:
-
-```json
-{
-  "webFetch": {
-    "enabled": true,
-    "allowedDomains": [
-      "github.com",
-      "stackoverflow.com",
-      "docs.python.org",
-      "developer.mozilla.org"
-    ],
-    "blockedDomains": [],
-    "maxDepth": 2,
-    "followRedirects": true,
-    "timeout": 10000,
-    "userAgent": "ClaudeCode/1.0",
-    "maxContentLength": 1048576
-  }
-}
-```
-
-#### WebFetch-Verwendungsbeispiele
-
-```sh
-# API-Dokumentation abrufen und analysieren
-claude-code "rufe https://api.github.com/docs ab und fasse die Authentifizierungsmethoden zusammen"
-
-# Implementierungen vergleichen
-claude-code "rufe https://github.com/user/repo/blob/main/auth.py ab und vergleiche mit unserer aktuellen auth.py-Implementierung"
-
-# Best Practices recherchieren
-claude-code "rufe https://docs.python.org/3/library/asyncio.html ab und hilf mir, unseren Code für async/await umzuschreiben"
-```
-
-#### WebFetch-Verhalten feinabstimmen
-
-```json
-{
-  "webFetch": {
-    "enabled": true,
-    "allowedDomains": ["*.github.com", "docs.*", "*.readthedocs.io"],
-    "maxDepth": 1,
-    "extractionRules": {
-      "removeSelectors": [".sidebar", ".footer", "nav"],
-      "focusSelectors": ["article", "main", ".documentation"]
-    },
-    "caching": {
-      "enabled": true,
-      "ttl": 3600
-    }
-  }
-}
-```
-
-## Modellauswahl
-
-- Ministral-3-14B-Instruct-2512: Chat + Vision, allgemeine Assistenten, multimodale UX, agentisches Coding, Tool-Use.
-- gpt-oss-120b: Komplexe textbasierte Workloads und fortgeschrittene Automatisierungen mit hoher Präzision.
-
-## Long-Context-Tipps (256k)
-
-- Sende nicht das gesamte Repository; nur relevante Dateien/Funktionsinhalte.
-- Fasse vorherige Schritte zusammen und nutze IDs/Anker zur Kontextrekonstruktion.
-- Nutze Streaming; `max_tokens` nur erhöhen, wenn nötig.
-- Für Tools und Edits deterministisch samplen: `temperature <= 0.2`.
-- Repo-Scope begrenzen; spezifische Dateien/Funktionen anfordern für effizienten Kontext.
-- JSON/Tool-Outputs bevorzugen beim Orchestrieren von Multi-Step-Änderungen.
-
-## mittwald Agent Skills {#agent-skills}
-
-mittwald stellt spezialisierte Agent Skills bereit, die KI-Assistenten durch komplexe Workflows wie Migrationen und Deployments auf der mStudio-Plattform führen. Diese Skills bieten strukturierte, schrittweise Anleitungen und Domänenwissen, ohne dass benutzerdefinierte Prompts erforderlich sind.
-
-### Verfügbare Skills {#agent-skills-available}
-
-#### mittwald-migrate {#agent-skills-migrate}
-
-Führt dich im Dialog durch phasenweise Migrationen beliebiger Workloads zu mittwald mStudio. Die Quelle kann beliebig sein — Kubernetes, Docker Compose, ein VPS, ein anderer Hoster oder ein anderes mStudio-Projekt.
-
-**Workflow:** Discovery → Plan → Provision → Migrate → Verify → Cutover
-
-**Trigger:** „Migration zu mittwald“, „Umzug nach mittwald“, „Umzug ins mStudio“
-
-#### mittwald-zerodeploy-skill {#agent-skills-zerodeploy}
-
-Zero-Config-Deployment zu mStudio Container Hosting mit Railpack-Autoerkennung. Kein Dockerfile erforderlich.
-
-**Workflow:** Provision → Local CLI Deploy → GitHub Actions → Verify
-
-**Trigger:** „deploy zu mittwald“, „hilf mir beim Deploy zu mittwald“, „Setze mittwald Deployment auf“
-
-### Installation {#agent-skills-installation}
-
-:::note Voraussetzungen
-
-Vor der Verwendung der Skills:
-
-- Aktiver mittwald mStudio-Account
-- API-Token mit `api_write`-Rolle aus den [mStudio-Profileinstellungen](https://studio.mittwald.de/profile/api-token)
-- mittwald CLI installiert ([Installationsanleitung](/docs/v2/cli/))
-
-:::
-
-#### Skills installieren {#agent-skills-install}
-
-**Für VS Code Copilot:**
-
-```shellsession
-user@local $ # Persönliche Skills (empfohlen)
-user@local $ mkdir -p ~/.agents/skills
-user@local $ git clone https://github.com/mittwald/agent-skills.git ~/.agents/skills/mittwald-skills
-
-user@local $ # Oder: Projekt-lokale Skills
-user@local $ mkdir -p .agents/skills
-user@local $ git clone https://github.com/mittwald/agent-skills.git .agents/skills/mittwald-skills
-```
-
-**Für Claude Code:**
-
-```shellsession
-user@local $ # In dein Claude Skills-Verzeichnis klonen
-user@local $ mkdir -p ~/.claude/skills
-user@local $ git clone https://github.com/mittwald/agent-skills.git ~/.claude/skills/mittwald-skills
-```
-
-Oder über den Plugin-Marketplace installieren:
-
-```shellsession
-user@local $ /plugin marketplace add mittwald/agent-skills
-user@local $ /plugin install mittwald-migrate@agent-skills
-```
-
-**Für andere KI-Assistenten:** Prüfe die Dokumentation deines Agenten für Skill-Installationspfade und klone dann das Repository dorthin.
-
-### Verwendung {#agent-skills-usage}
-
-Nach der Installation kannst du die Skills einfach in einem Gespräch mit deinem KI-Assistenten auslösen:
-
-**Für Migrationen:**
-
-> „Ich möchte meine WordPress-Seite von Hetzner zu mittwald migrieren.“
-
-**Für Deployments:**
-
-> „Hilf mir, meine Express-App zu mittwald zu deployen“
-
-Der KI-Assistent lädt den entsprechenden Skill und führt dich mit kontextbezogenen Fragen und schrittweisen Anweisungen durch den Workflow.
-
-### Authentifizierung {#agent-skills-auth}
-
-Die Skills benötigen mindestens eine Möglichkeit zur Kommunikation mit mStudio. Du musst nicht alle drei einrichten — wähle, was am besten passt:
-
-**Option 1 — MCP-Server** (am besten, wenn dein KI-Assistent dies unterstützt)
-
-Konfiguriere den mittwald MCP-Server wie im Abschnitt [MCP und Tool-Verwendung](#continue-mcp) oben beschrieben. Die Skills rufen dann direkt `mcp__mittwald__mittwald_*`-Tools auf.
-
-**Option 2 — `mw` CLI** (am besten für Terminal-Workflows)
-
-Authentifiziere die CLI auf deinem lokalen Rechner:
-
-```shellsession
-user@local $ mw login token  # api_write-Token einfügen
-user@local $ mw user get     # Funktionalität prüfen
-```
-
-**Option 3 — HTTP API** (für Skripte)
-
-Setze die Umgebungsvariable auf deinem lokalen Rechner:
-
-```shellsession
-user@local $ export MITTWALD_API_TOKEN=<dein-api_write-token>
-```
-
-:::tip Weitere Informationen
-
-Für detaillierte Dokumentation, Troubleshooting und Beitragsleitlinien besuche das [mittwald/agent-skills](https://github.com/mittwald/agent-skills)-Repository auf GitHub.
-
-:::
-
-## Haftungsausschluss
-
-Drittanbieter‑Tools, MCP‑Server und externe Links werden ohne Gewähr und ohne Empfehlung bereitgestellt. Nutzung auf eigenes Risiko; prüfe Lizenzen und Datenschutzhinweise und setze Zugriffe restriktiv (Least Privilege). Sende keine sensiblen Daten an externe Dienste, sofern nicht erforderlich und zulässig.
-
-## Nutzungslimits
-
-Nutzungslimits werden durch den jeweils gebuchten Tarif festgelegt.
+mittwald bietet DSGVO-konforme KI-Modelle an, die in Deutschland gehostet werden.
+Eine vollständige Liste verfügbarer Modelle und Spezifikationen findest du in
+der [Dokumentation zu KI-Modellen](/docs/v2/platform/aihosting/models).
