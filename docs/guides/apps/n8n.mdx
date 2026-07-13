@@ -123,6 +123,22 @@ During development and testing, some of these aspects can be simplified, but for
 n8n ships with a (security audit tool)[https://docs.n8n.io/hosting/securing/security-audit/], which is recommended for productive environment checks.
 :::
 
+## Reasoning models and thinking mode {#reasoning-models-and-thinking-mode}
+
+Some mittwald AI Hosting models — for example [Qwen3.6-35B-A3B-FP8](../../../platform/aihosting/models/qwen3-6-35b-a3b-fp8) and [Qwen3.5-122B-A10B-FP8](../../../platform/aihosting/models/qwen3-5-122b-a10b-fp8) — ship with "thinking mode" enabled by default. Disabling (or, for other models, enabling) it requires sending `enable_thinking` nested inside `chat_template_kwargs` via the `extra_body` field of the chat completion request. See the respective model page for the exact request format.
+
+n8n's built-in **OpenAI Chat Model** node does not expose a way to set `extra_body` / `chat_template_kwargs`, so thinking mode cannot be toggled through that node.
+
+**Workaround:** use a community node that forwards arbitrary OpenAI-compatible parameters, such as [`@rlquilez/n8n-nodes-openai-litellm`](https://www.npmjs.com/package/@rlquilez/n8n-nodes-openai-litellm):
+
+1. In n8n, go to **Settings → Community Nodes** and install `@rlquilez/n8n-nodes-openai-litellm`.
+2. Configure the node with your mittwald AI Hosting credentials: base URL `https://llm.aihosting.mittwald.de/v1` and your API key.
+3. Set the node's extra body option to `{"chat_template_kwargs": {"enable_thinking": false}}` (or `true`, depending on the model and desired behavior).
+
+:::note
+This limitation is specific to n8n's built-in node, not to the mittwald AI Hosting API. If you call the API directly — for example with an HTTP Request node, or from your own backend — the standard `extra_body` approach shown on the model pages works without any community node.
+:::
+
 ## Use cases
 
 ### RAG with PostgreSQL and mittwald AI Hosting
