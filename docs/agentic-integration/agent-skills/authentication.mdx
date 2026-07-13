@@ -61,30 +61,6 @@ mw user get
 
 Get your API token from [mStudio profile settings](https://studio.mittwald.de/profile/api-token) (requires `api_write` role).
 
-### Option 3: HTTP API
-
-Set the mittwald API token as an environment variable. Skills will use direct HTTP API calls.
-
-**Advantages:**
-- Simple for scripts and automation
-- No additional tool installation required
-- Good for CI/CD pipelines
-
-**Setup:**
-
-```bash
-# Linux/macOS
-export MITTWALD_API_TOKEN=<your-api_write-token>
-
-# Windows PowerShell
-$env:MITTWALD_API_TOKEN="<your-api_write-token>"
-
-# Windows CMD
-set MITTWALD_API_TOKEN=<your-api_write-token>
-```
-
-Get your API token from [mStudio profile settings](https://studio.mittwald.de/profile/api-token) (requires `api_write` role).
-
 ## Which Option Should You Choose?
 
 Choose based on your primary use case:
@@ -93,16 +69,13 @@ Choose based on your primary use case:
 |----------|-------------------|-----|
 | Desktop AI assistants (Claude Desktop, VS Code Copilot) | **MCP Server** | Native integration, best UX |
 | Terminal workflows | **mittwald CLI** | Familiar tool, good for local dev |
-| CI/CD pipelines | **HTTP API** | Simple, no dependencies |
-| Mixed usage | **All three** | Use what fits each context |
 
 ## Multiple Authentication Methods
 
-You can set up multiple authentication methods. Skills will try them in this order:
+You can set up both authentication methods. Skills will try them in this order:
 
 1. MCP Server (if AI assistant has MCP tools)
 2. mittwald CLI (if `mw` command is available)
-3. HTTP API (if `MITTWALD_API_TOKEN` environment variable is set)
 
 This allows flexible usage across different environments.
 
@@ -165,8 +138,7 @@ This grants:
 **Verify:**
 1. At least one authentication method is configured
 2. For CLI: `which mw` returns a path
-3. For HTTP API: `echo $MITTWALD_API_TOKEN` shows your token
-4. For MCP: Check AI assistant's MCP server connection status
+3. For MCP: Check AI assistant's MCP server connection status
 
 ### Token Permission Errors
 
