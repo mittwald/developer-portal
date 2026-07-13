@@ -123,6 +123,22 @@ Im Entwicklungs- und Testbetrieb können einige dieser Aspekte vereinfacht werde
 n8n bietet auch ein (Werkzeug für Security Audits)[https://docs.n8n.io/hosting/securing/security-audit/], mit dem Produktivumgebungen geprüft werden können.
 :::
 
+## Reasoning-Modelle und Thinking-Modus {#reasoning-models-and-thinking-mode}
+
+Einige Modelle im mittwald AI Hosting – zum Beispiel [Qwen3.6-35B-A3B-FP8](../../../platform/aihosting/models/qwen3-6-35b-a3b-fp8) und [Qwen3.5-122B-A10B-FP8](../../../platform/aihosting/models/qwen3-5-122b-a10b-fp8) – haben den "Thinking-Modus" standardmäßig aktiviert. Um ihn zu deaktivieren (bzw. bei anderen Modellen zu aktivieren), muss `enable_thinking` verschachtelt in `chat_template_kwargs` über das `extra_body`-Feld der Chat-Completion-Anfrage gesendet werden. Das genaue Request-Format zeigt die jeweilige Modellseite.
+
+Der eingebaute **OpenAI Chat Model**-Node von n8n bietet keine Möglichkeit, `extra_body` / `chat_template_kwargs` zu setzen – der Thinking-Modus lässt sich darüber also nicht umschalten.
+
+**Workaround:** Verwende eine Community-Node, die beliebige OpenAI-kompatible Parameter durchreicht, z. B. [`@rlquilez/n8n-nodes-openai-litellm`](https://www.npmjs.com/package/@rlquilez/n8n-nodes-openai-litellm):
+
+1. Gehe in n8n zu **Settings → Community Nodes** und installiere `@rlquilez/n8n-nodes-openai-litellm`.
+2. Konfiguriere die Node mit deinen mittwald AI Hosting Zugangsdaten: Base-URL `https://llm.aihosting.mittwald.de/v1` und deinem API-Key.
+3. Setze die Extra-Body-Option der Node auf `{"chat_template_kwargs": {"enable_thinking": false}}` (bzw. `true`, je nach Modell und gewünschtem Verhalten).
+
+:::note
+Diese Einschränkung betrifft nur die eingebaute Node von n8n, nicht die mittwald AI Hosting API selbst. Wenn du die API direkt aufrufst – z. B. über eine HTTP-Request-Node oder aus deinem eigenen Backend – funktioniert der auf den Modellseiten gezeigte `extra_body`-Ansatz auch ohne Community-Node.
+:::
+
 ## Use cases
 
 ### RAG mit postgreSQL und mittwald AI-Hosting
