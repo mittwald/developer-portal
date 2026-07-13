@@ -55,39 +55,19 @@ user@local $ mw user get
 
 Dein API-Token bekommst du in den [mStudio Profileinstellungen](https://studio.mittwald.de/profile/api-token) (Rolle `api_write`).
 
-### Option 3: HTTP API
-
-Setze das mittwald API-Token als Umgebungsvariable. Skills verwenden dann direkte HTTP-API-Aufrufe.
-
-**Vorteile:**
-- Gut für Skripte und Automatisierung
-- Kein zusätzliches Tooling erforderlich
-- Geeignet für CI/CD-Pipelines
-
-**Einrichtung:**
-
-```shellsession
-user@local $ export MITTWALD_API_TOKEN=<dein-api_write-token>
-```
-
-Dein API-Token bekommst du in den [mStudio Profileinstellungen](https://studio.mittwald.de/profile/api-token) (Rolle `api_write`).
-
 ## Welche Option passt zu dir?
 
 | Anwendungsfall | Empfohlene Option | Warum |
 |----------|-------------------|-------|
 | Desktop-Assistenten (Claude Desktop, VS Code Copilot) | **MCP Server** | Native Integration, beste UX |
 | Terminal-Workflows | **mittwald CLI** | Vertrautes Tool, gut lokal |
-| CI/CD-Pipelines | **HTTP API** | Einfach, ohne zusätzliche Abhängigkeiten |
-| Gemischte Nutzung | **Alle drei** | Je Kontext die passende Methode |
 
 ## Mehrere Methoden parallel
 
-Du kannst mehrere Methoden gleichzeitig einrichten. Die Skills versuchen in dieser Reihenfolge:
+Du kannst beide Methoden gleichzeitig einrichten. Die Skills versuchen in dieser Reihenfolge:
 
 1. MCP Server (wenn MCP-Tools verfügbar sind)
 2. mittwald CLI (wenn `mw` verfügbar ist)
-3. HTTP API (wenn `MITTWALD_API_TOKEN` gesetzt ist)
 
 ## Token-Berechtigungen
 
@@ -124,8 +104,7 @@ Prüfe:
 Prüfe:
 1. Mindestens eine Methode ist eingerichtet
 2. Für CLI: `which mw` liefert einen Pfad
-3. Für HTTP API: `echo $MITTWALD_API_TOKEN` gibt einen Wert aus
-4. Für MCP: Verbindung im Tool ist aktiv
+3. Für MCP: Verbindung im Tool ist aktiv
 
 ## Nächste Schritte
 
