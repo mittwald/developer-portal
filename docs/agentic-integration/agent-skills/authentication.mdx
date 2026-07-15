@@ -1,7 +1,7 @@
 ---
 title: Authentication
 sidebar_label: Authentication
-sidebar_position: 3
+sidebar_position: 1
 ---
 
 # Authenticating Agent Skills
@@ -15,6 +15,7 @@ mittwald agent skills need to communicate with your mStudio account to provision
 Configure the [mittwald MCP server](/docs/v2/agentic-integration/mcp/) in your AI assistant. The skills will call `mcp__mittwald__mittwald_*` tools directly.
 
 **Advantages:**
+
 - Native integration with AI assistants
 - OAuth 2.1 with PKCE security
 - Scoped permissions
@@ -40,6 +41,7 @@ mcpServers:
 Authenticate the CLI on your local machine. Skills will execute `mw` commands directly.
 
 **Advantages:**
+
 - Simple setup
 - Works in terminal-based workflows
 - Familiar to CLI users
@@ -65,10 +67,10 @@ Get your API token from [mStudio profile settings](https://studio.mittwald.de/pr
 
 Choose based on your primary use case:
 
-| Use Case | Recommended Option | Why |
-|----------|-------------------|-----|
-| Desktop AI assistants (Claude Desktop, VS Code Copilot) | **MCP Server** | Native integration, best UX |
-| Terminal workflows | **mittwald CLI** | Familiar tool, good for local dev |
+| Use Case                                                | Recommended Option | Why                               |
+| ------------------------------------------------------- | ------------------ | --------------------------------- |
+| Desktop AI assistants (Claude Desktop, VS Code Copilot) | **MCP Server**     | Native integration, best UX       |
+| Terminal workflows                                      | **mittwald CLI**   | Familiar tool, good for local dev |
 
 ## Multiple Authentication Methods
 
@@ -86,6 +88,7 @@ Ensure your API token has the correct permissions:
 **Required role:** `api_write`
 
 This grants:
+
 - Create and manage projects
 - Deploy applications and containers
 - Configure databases and services
@@ -127,6 +130,7 @@ This grants:
 ### "Authentication failed" Error
 
 **Check:**
+
 1. Token is valid and not expired
 2. Token has `api_write` role
 3. Environment variable is set correctly (if using HTTP API)
@@ -136,6 +140,7 @@ This grants:
 ### Skills Don't Find Authentication
 
 **Verify:**
+
 1. At least one authentication method is configured
 2. For CLI: `which mw` returns a path
 3. For MCP: Check AI assistant's MCP server connection status

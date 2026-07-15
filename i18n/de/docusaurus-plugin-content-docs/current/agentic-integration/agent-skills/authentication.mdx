@@ -1,7 +1,7 @@
 ---
 title: Authentifizierung
 sidebar_label: Authentifizierung
-sidebar_position: 3
+sidebar_position: 1
 ---
 
 # Authentifizierung für Agent Skills
@@ -15,6 +15,7 @@ mittwald Agent Skills müssen mit deinem mStudio-Account kommunizieren, um Resso
 Konfiguriere den [mittwald MCP-Server](/docs/v2/agentic-integration/mcp/) in deinem KI-Assistenten. Die Skills rufen dann `mcp__mittwald__mittwald_*` Tools direkt auf.
 
 **Vorteile:**
+
 - Native Integration in KI-Assistenten
 - OAuth 2.1 mit PKCE
 - Granulare Berechtigungen
@@ -40,6 +41,7 @@ mcpServers:
 Authentifiziere die CLI lokal. Skills können dann `mw`-Befehle direkt ausführen.
 
 **Vorteile:**
+
 - Einfaches Setup
 - Gut für Terminal-Workflows
 - Vertraut für CLI-Nutzer
@@ -57,10 +59,10 @@ Dein API-Token bekommst du in den [mStudio Profileinstellungen](https://studio.m
 
 ## Welche Option passt zu dir?
 
-| Anwendungsfall | Empfohlene Option | Warum |
-|----------|-------------------|-------|
-| Desktop-Assistenten (Claude Desktop, VS Code Copilot) | **MCP Server** | Native Integration, beste UX |
-| Terminal-Workflows | **mittwald CLI** | Vertrautes Tool, gut lokal |
+| Anwendungsfall                                        | Empfohlene Option | Warum                        |
+| ----------------------------------------------------- | ----------------- | ---------------------------- |
+| Desktop-Assistenten (Claude Desktop, VS Code Copilot) | **MCP Server**    | Native Integration, beste UX |
+| Terminal-Workflows                                    | **mittwald CLI**  | Vertrautes Tool, gut lokal   |
 
 ## Mehrere Methoden parallel
 
@@ -74,6 +76,7 @@ Du kannst beide Methoden gleichzeitig einrichten. Die Skills versuchen in dieser
 **Erforderliche Rolle:** `api_write`
 
 Damit kannst du:
+
 - Projekte erstellen und verwalten
 - Anwendungen und Container deployen
 - Datenbanken und Services konfigurieren
@@ -93,6 +96,7 @@ Damit kannst du:
 ### "Authentication failed"
 
 Prüfe:
+
 1. Token ist gültig und nicht abgelaufen
 2. Token hat Rolle `api_write`
 3. Umgebungsvariable ist korrekt gesetzt
@@ -102,6 +106,7 @@ Prüfe:
 ### Skills finden keine Authentifizierung
 
 Prüfe:
+
 1. Mindestens eine Methode ist eingerichtet
 2. Für CLI: `which mw` liefert einen Pfad
 3. Für MCP: Verbindung im Tool ist aktiv
