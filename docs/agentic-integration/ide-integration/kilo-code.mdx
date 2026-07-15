@@ -1,0 +1,121 @@
+---
+title: Kilo Code
+sidebar_label: Kilo Code
+sidebar_position: 5
+---
+
+# Kilo Code with mittwald
+
+Kilo Code is a Visual Studio Code extension that provides AI-powered coding assistance with support for OpenAI-compatible providers.
+
+## Installation
+
+Install the Kilo Code extension from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=kilocode.Kilo-Code).
+
+## Configuration
+
+Configure Kilo Code with mittwald's AI models:
+
+1. Open Kilo Code settings in VS Code
+2. Set **Provider**: OpenAI Compatible
+3. Set **Base URL**: `https://llm.aihosting.mittwald.de/v1`
+4. Set **API Key**: Your mittwald LLM API key from [mStudio](https://studio.mittwald.de/profile/api-token)
+5. Set **Model**: `Ministral-3-14B-Instruct-2512`
+
+### Environment Variables
+
+Alternatively, configure via environment variables:
+
+```bash
+export OPENAI_API_KEY=<your-mittwald-api-key>
+export OPENAI_BASE_URL=https://llm.aihosting.mittwald.de/v1
+```
+
+Then select the model in Kilo Code's model picker for agent tasks.
+
+## MCP Server Integration {#mcp}
+
+Kilo Code supports MCP servers. Add them via settings (Tools → Add MCP Server) or in the configuration file:
+
+```json
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@context7/mcp-server", "--stdio"],
+      "env": { "CONTEXT7_API_KEY": "your-key" }
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search", "--stdio"],
+      "env": { "BRAVE_API_KEY": "your-key" }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "--stdio"],
+      "env": { "POSTGRES_CONNECTION_STRING": "postgresql://..." }
+    },
+    "directus": {
+      "command": "npx",
+      "args": ["-y", "@directus/content-mcp", "--stdio"],
+      "env": {
+        "DIRECTUS_URL": "https://your-directus-instance.com",
+        "DIRECTUS_TOKEN": "your-directus-token"
+      }
+    },
+    "opensearch": {
+      "command": "npx",
+      "args": ["-y", "@opensearch-project/mcp-server", "--stdio"],
+      "env": {
+        "OPENSEARCH_URL": "https://localhost:9200",
+        "OPENSEARCH_USERNAME": "your-opensearch-username",
+        "OPENSEARCH_PASSWORD": "your-opensearch-password"
+      }
+    },
+    "solr": {
+      "command": "uvx",
+      "args": ["solr-mcp"],
+      "env": {
+        "SOLR_URL": "http://localhost:8983/solr"
+      }
+    },
+    "typo3": {
+      "command": "mw",
+      "args": [
+        "app",
+        "exec",
+        "--quiet",
+        "--installation-id=a-XXXXX",
+        "vendor/bin/typo3 mcp:server"
+      ]
+    },
+    "mittwald": {
+      "transport": {
+        "type": "sse",
+        "url": "https://mcp.mittwald.de/mcp"
+      }
+    }
+  }
+}
+```
+
+### Web Fetching
+
+Kilo Code can use web-fetch/browsing tools to retrieve and summarize external pages:
+
+**Best practices:**
+- Prefer public URLs (no auth)
+- Provide exact target links in your prompt
+- Keep network scope small
+- Ask the agent to include citation URLs next to each claim
+- Use deterministic sampling for factual extraction: `temperature <= 0.2`
+
+**Example prompts:**
+- "Fetch https://example.com/spec and summarize key endpoints in 10 bullet points. Include canonical links."
+- "Open https://huggingface.co/model-page and extract context length, modalities, and license. Return as JSON."
+
+## Next Steps
+
+- [Try other integrations](./) - Compare different tools
+- [Learn about MCP](/docs/v2/agentic-integration/mcp/) - Infrastructure management
+- [Best practices](../#best-practices) - Optimize your AI usage

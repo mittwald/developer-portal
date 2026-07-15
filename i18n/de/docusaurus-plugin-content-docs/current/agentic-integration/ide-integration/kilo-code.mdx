@@ -1,0 +1,102 @@
+---
+title: Kilo Code
+sidebar_label: Kilo Code
+sidebar_position: 5
+---
+
+# Kilo Code mit mittwald
+
+Kilo Code ist eine Visual Studio Code Extension für KI-gestützte Entwicklungsunterstützung mit OpenAI-kompatiblen Providern.
+
+## Installation
+
+Installiere Kilo Code über den [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=kilocode.Kilo-Code).
+
+## Konfiguration
+
+1. Kilo-Code-Einstellungen in VS Code öffnen
+2. **Provider**: OpenAI Compatible
+3. **Base URL**: `https://llm.aihosting.mittwald.de/v1`
+4. **API Key**: Dein mittwald LLM API-Key aus [mStudio](https://studio.mittwald.de/profile/api-token)
+5. **Model**: `Ministral-3-14B-Instruct-2512`
+
+### Umgebungsvariablen
+
+Alternativ lokal per Umgebungsvariablen:
+
+```shellsession
+user@local $ export OPENAI_API_KEY=<dein-mittwald-api-key>
+user@local $ export OPENAI_BASE_URL=https://llm.aihosting.mittwald.de/v1
+```
+
+## MCP Server Integration {#mcp}
+
+Kilo Code unterstützt MCP-Server per UI (Tools → Add MCP Server) oder Konfigurationsdatei:
+
+```json
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@context7/mcp-server", "--stdio"],
+      "env": { "CONTEXT7_API_KEY": "your-key" }
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search", "--stdio"],
+      "env": { "BRAVE_API_KEY": "your-key" }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "--stdio"],
+      "env": { "POSTGRES_CONNECTION_STRING": "postgresql://..." }
+    },
+    "directus": {
+      "command": "npx",
+      "args": ["-y", "@directus/content-mcp", "--stdio"],
+      "env": {
+        "DIRECTUS_URL": "https://your-directus-instance.com",
+        "DIRECTUS_TOKEN": "your-directus-token"
+      }
+    },
+    "opensearch": {
+      "command": "npx",
+      "args": ["-y", "@opensearch-project/mcp-server", "--stdio"],
+      "env": {
+        "OPENSEARCH_URL": "https://localhost:9200",
+        "OPENSEARCH_USERNAME": "your-opensearch-username",
+        "OPENSEARCH_PASSWORD": "your-opensearch-password"
+      }
+    },
+    "solr": {
+      "command": "uvx",
+      "args": ["solr-mcp"],
+      "env": {
+        "SOLR_URL": "http://localhost:8983/solr"
+      }
+    },
+    "typo3": {
+      "command": "mw",
+      "args": [
+        "app",
+        "exec",
+        "--quiet",
+        "--installation-id=a-XXXXX",
+        "vendor/bin/typo3 mcp:server"
+      ]
+    },
+    "mittwald": {
+      "transport": {
+        "type": "sse",
+        "url": "https://mcp.mittwald.de/mcp"
+      }
+    }
+  }
+}
+```
+
+## Nächste Schritte
+
+- [Weitere Integrationen testen](./)
+- [MCP kennenlernen](/docs/v2/agentic-integration/mcp/)
+- [Best Practices](../#best-practices)

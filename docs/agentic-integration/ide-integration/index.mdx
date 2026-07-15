@@ -1,0 +1,87 @@
+---
+title: IDE Integration
+sidebar_label: Overview
+sidebar_position: 0
+---
+
+import PlanCompatibility from "@site/src/components/PlanCompatibility";
+
+# IDE Integration
+
+<PlanCompatibility features={["ai"]} />
+
+Use mittwald's [GDPR-compliant AI models](/docs/v2/platform/aihosting) directly in your development environment for code generation, completion, refactoring, and debugging. All models are hosted in Germany without storing user data or using it for training.
+
+## Available Models
+
+The service offers several AI models optimized for different development tasks. For a complete list of available models and their specifications, see the [AI models documentation](/docs/v2/platform/aihosting/models).
+
+**Recommended models:**
+- **Ministral-3-14B-Instruct-2512**: Chat, vision, general assistants, multimodal UX, agentic coding, tool use
+- **gpt-oss-120b**: Complex text-centric workloads and advanced automations requiring precision
+
+## Supported IDEs and Tools
+
+| IDE/Tool                                 | Integrations                                                                         |
+| ---------------------------------------- | ------------------------------------------------------------------------------------ |
+| Jetbrains IDEs (IntelliJ, PHPStorm, ...) | [JetBrains AI](./jetbrains-ai), [Continue](./continue)                               |
+| Visual Studio Code                       | [Continue](./continue), [Cline](./cline), [Kilo Code](./kilo-code)                   |
+| Cursor                                   | [Cline](./cline)                                                                     |
+| Windsurf                                 | [Cline](./cline)                                                                     |
+| Zed                                      | [Zed](./zed)                                                                         |
+| CLI                                      | [OpenCode](./opencode)                                                               |
+
+## Quick Start
+
+1. **Get your API key**: Visit [mStudio profile settings](https://studio.mittwald.de/profile/api-token)
+2. **Choose your IDE**: Select from the integrations above
+3. **Configure endpoint**: `https://llm.aihosting.mittwald.de/v1`
+4. **Select model**: `Ministral-3-14B-Instruct-2512`
+
+## Best Practices
+
+### Model Selection
+
+- **Ministral-3-14B-Instruct-2512**: Best for most coding tasks, supports tool use and vision
+- **gpt-oss-120b**: Use for complex reasoning, precise documentation, or advanced automations
+
+### Long-Context Tips (256k)
+
+- Avoid sending entire repositories; retrieve relevant files/function bodies only
+- Summarize prior steps and include IDs/anchors to rehydrate context on demand
+- Stream responses; raise `max_tokens` only when necessary
+- Prefer deterministic sampling for tools and edits: `temperature <= 0.2`
+- Limit repo scope; request specific files/functions to keep context efficient
+- Prefer JSON/tool outputs when orchestrating multi-step changes
+
+### MCP Server Integration
+
+Many IDEs support [Model Context Protocol (MCP)](/docs/v2/agentic-integration/mcp/) servers for enhanced capabilities:
+
+- **Context7**: Up-to-date library documentation
+- **Brave Search**: Web search with privacy
+- **PostgreSQL**: Database queries and schema inspection
+- **Directus**: Headless CMS management
+- **OpenSearch**: Search, index inspection, mappings, and cluster diagnostics
+- **Apache Solr**: Hybrid keyword/vector search for enterprise search workflows
+- **TYPO3**: TYPO3 CMS content and backend automation through MCP
+- **mittwald**: Infrastructure management through natural language
+
+For a broader ecosystem list, see the [MCP Server Registry](https://github.com/modelcontextprotocol/servers).
+
+See individual IDE guides for MCP configuration details.
+
+## Next Steps
+
+Choose your IDE or tool to get started:
+
+- [JetBrains AI](./jetbrains-ai) - IntelliJ, PHPStorm, WebStorm, etc.
+- [Continue](./continue) - VS Code & JetBrains IDEs
+- [Cline](./cline) - VS Code, Cursor, Windsurf
+- [Zed](./zed) - Zed editor
+- [Kilo Code](./kilo-code) - VS Code extension
+- [OpenCode](./opencode) - CLI agent
+
+## Disclaimer
+
+Third‑party tools, MCP servers and external links are provided for convenience without endorsement or warranty. Use them at your own risk, review licenses and privacy policies, and scope access conservatively (least privilege). Avoid sending sensitive data to external services unless required and permitted.
