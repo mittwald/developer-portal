@@ -152,6 +152,21 @@ curl -i -X POST https://llm.aihosting.mittwald.de/v1/chat/completions \
 This endpoint provides access to the **Responses API**, following the structure of the [OpenAI Responses API](https://platform.openai.com/docs/api-reference/responses).
 As the route is still **experimental**, not all features are fully supported. Some extended parameters may behave differently compared to the [OpenAI Responses API](https://platform.openai.com/docs/api-reference/responses).
 
+Supported on all models: single-turn and multi-turn (full history passed in `input`) text generation, streaming.
+
+Function/tool calling and `reasoning.effort` are supported on gpt-oss-120b, Qwen3.5-122B-A10B-FP8, Qwen3.6-35B-A3B-FP8, and Qwen3.5-0.8B. Ministral-3-14B-Instruct-2512 and Mistral-Medium-3.5-128B don't support tool calling on this endpoint (Mistral-Medium-3.5-128B also doesn't support `reasoning.effort`); use `/v1/chat/completions` for these two models instead. See the full per-model table in [Responses API support](../../dedicated/openai-compatibility#responses-api).
+
+Not supported on any model:
+
+- Stateful conversations — `previous_response_id` and retrieving a stored response (`GET /v1/responses/{id}`) are rejected. Pass the full conversation history in `input` on every call instead.
+- `background: true` (background/async responses).
+- Multimodal input (`input_image` content parts) — use `/v1/chat/completions` for [vision](#vision-image--text) instead.
+- Built-in tools such as `web_search`, `file_search`, or `code_interpreter`. Only custom function tools are supported.
+
+:::caution
+Sending an image to a model without vision support doesn't return an error. Only send images to vision-capable models.
+:::
+
 Structured output such as schema-based JSON **cannot currently be enforced** with this endpoint.
 If structured output is required, the `/v1/chat/completions` endpoint should be used instead.
 
