@@ -26,40 +26,40 @@ Der Modellname ändert sich ebenfalls. Verwende die ID aus `/v1/models` statt ei
 
 ## Unterstützte Endpunkte {#endpoints}
 
-| Endpunkt | Unterstützt |
-|----------|-------------|
-| `GET /v1/models` | ✅ |
-| `POST /v1/chat/completions` | ✅ |
-| `POST /v1/completions` | ✅ (Legacy-Text-Completions) |
-| `POST /v1/responses` | ✅ |
-| `POST /v1/embeddings` | ❌ — dieser Endpunkt betreibt ein generatives Modell, kein Embedding-Modell |
-| Assistants API (`/v1/assistants`, `/v1/threads`, …) | ❌ |
-| Batch API (`/v1/batches`) | ❌ |
-| Fine-tuning API (`/v1/fine_tuning`) | ❌ |
-| Files API (`/v1/files`) | ❌ |
-| Moderations API (`/v1/moderations`) | ❌ |
-| Audio-/Bild-Endpunkte | ❌ |
+| Endpunkt                                            | Unterstützt                                                                 |
+| --------------------------------------------------- | --------------------------------------------------------------------------- |
+| `GET /v1/models`                                    | ✅                                                                          |
+| `POST /v1/chat/completions`                         | ✅                                                                          |
+| `POST /v1/completions`                              | ✅ (Legacy-Text-Completions)                                                |
+| `POST /v1/responses`                                | ⚠️ — nur Teilmenge, siehe [Responses-API-Support](#responses-api)           |
+| `POST /v1/embeddings`                               | ❌ — dieser Endpunkt betreibt ein generatives Modell, kein Embedding-Modell |
+| Assistants API (`/v1/assistants`, `/v1/threads`, …) | ❌                                                                          |
+| Batch API (`/v1/batches`)                           | ❌                                                                          |
+| Fine-tuning API (`/v1/fine_tuning`)                 | ❌                                                                          |
+| Files API (`/v1/files`)                             | ❌                                                                          |
+| Moderations API (`/v1/moderations`)                 | ❌                                                                          |
+| Audio-/Bild-Endpunkte                               | ❌                                                                          |
 
 ## Parameter-Unterstützung für /v1/chat/completions {#parameters}
 
-| Parameter | Support | Hinweise |
-|-----------|---------|----------|
-| `model` | ✅ | Modell-ID aus `/v1/models` verwenden |
-| `messages` | ✅ | |
-| `stream` | ✅ | Siehe [Streaming](../getting-started#streaming) |
-| `temperature`, `top_p` | ✅ | |
-| `max_tokens` / `max_completion_tokens` | ✅ | |
-| `stop` | ✅ | |
-| `n` | ✅ | Mehrere Completions pro Anfrage |
-| `presence_penalty`, `frequency_penalty` | ✅ | |
-| `logprobs`, `top_logprobs` | ✅ | |
-| `tools`, `tool_choice` | ✅ | Siehe [Tool Calling](#tool-calling) |
-| `parallel_tool_calls` | ✅ | `false` begrenzt auf einen Tool-Call; `true` (Standard) erlaubt mehrere |
-| `response_format` | ✅ | Siehe [Strukturierte Ausgaben](#structured-outputs) |
-| `seed` | ⚠️ | Wird akzeptiert und weitergeleitet — Reproduzierbarkeit ist Best-Effort aufgrund von GPU-Nicht-Determinismus |
-| `user` | ⚠️ | Wird akzeptiert, aber ignoriert |
-| `logit_bias` | ✅ | Unterstützt; Token-IDs außerhalb des Modell-Vokabulars geben einen Validierungsfehler zurück |
-| `stream_options` | ✅ | Unterstützt bei `stream: true`; ohne Streaming gibt es einen Validierungsfehler. `include_usage: true` hängt am Ende des Streams einen Usage-Chunk an |
+| Parameter                               | Support | Hinweise                                                                                                                                              |
+| --------------------------------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `model`                                 | ✅      | Modell-ID aus `/v1/models` verwenden                                                                                                                  |
+| `messages`                              | ✅      |                                                                                                                                                       |
+| `stream`                                | ✅      | Siehe [Streaming](../getting-started#streaming)                                                                                                       |
+| `temperature`, `top_p`                  | ✅      |                                                                                                                                                       |
+| `max_tokens` / `max_completion_tokens`  | ✅      |                                                                                                                                                       |
+| `stop`                                  | ✅      |                                                                                                                                                       |
+| `n`                                     | ✅      | Mehrere Completions pro Anfrage                                                                                                                       |
+| `presence_penalty`, `frequency_penalty` | ✅      |                                                                                                                                                       |
+| `logprobs`, `top_logprobs`              | ✅      |                                                                                                                                                       |
+| `tools`, `tool_choice`                  | ✅      | Siehe [Tool Calling](#tool-calling)                                                                                                                   |
+| `parallel_tool_calls`                   | ✅      | `false` begrenzt auf einen Tool-Call; `true` (Standard) erlaubt mehrere                                                                               |
+| `response_format`                       | ✅      | Siehe [Strukturierte Ausgaben](#structured-outputs)                                                                                                   |
+| `seed`                                  | ⚠️      | Wird akzeptiert und weitergeleitet — Reproduzierbarkeit ist Best-Effort aufgrund von GPU-Nicht-Determinismus                                          |
+| `user`                                  | ⚠️      | Wird akzeptiert, aber ignoriert                                                                                                                       |
+| `logit_bias`                            | ✅      | Unterstützt; Token-IDs außerhalb des Modell-Vokabulars geben einen Validierungsfehler zurück                                                          |
+| `stream_options`                        | ✅      | Unterstützt bei `stream: true`; ohne Streaming gibt es einen Validierungsfehler. `include_usage: true` hängt am Ende des Streams einen Usage-Chunk an |
 
 ## Strukturierte Ausgaben {#structured-outputs}
 
@@ -70,8 +70,13 @@ Sowohl JSON-Object-Modus als auch JSON-Schema-Modus werden unterstützt.
 ```json
 {
   "model": "YOUR_MODEL_ID",
-  "messages": [{"role": "user", "content": "Gib ein JSON-Objekt mit den Feldern name und age zurück."}],
-  "response_format": {"type": "json_object"}
+  "messages": [
+    {
+      "role": "user",
+      "content": "Gib ein JSON-Objekt mit den Feldern name und age zurück."
+    }
+  ],
+  "response_format": { "type": "json_object" }
 }
 ```
 
@@ -80,7 +85,9 @@ Sowohl JSON-Object-Modus als auch JSON-Schema-Modus werden unterstützt.
 ```json
 {
   "model": "YOUR_MODEL_ID",
-  "messages": [{"role": "user", "content": "Extrahiere Name und Alter der Person."}],
+  "messages": [
+    { "role": "user", "content": "Extrahiere Name und Alter der Person." }
+  ],
   "response_format": {
     "type": "json_schema",
     "json_schema": {
@@ -89,8 +96,8 @@ Sowohl JSON-Object-Modus als auch JSON-Schema-Modus werden unterstützt.
       "schema": {
         "type": "object",
         "properties": {
-          "name": {"type": "string"},
-          "age": {"type": "integer"}
+          "name": { "type": "string" },
+          "age": { "type": "integer" }
         },
         "required": ["name", "age"],
         "additionalProperties": false
@@ -144,6 +151,40 @@ tool_calls = response.choices[0].message.tool_calls
 ```
 
 `parallel_tool_calls=False` begrenzt das Modell auf maximal einen Tool-Call pro Turn, was die Verarbeitung in mehrstufigen Agent-Loops vereinfacht.
+
+## Responses-API-Support {#responses-api}
+
+`POST /v1/responses` ist erreichbar und folgt der Struktur der [OpenAI Responses API](https://platform.openai.com/docs/api-reference/responses), aber nur ein Teil davon funktioniert, und die Unterstützung unterscheidet sich **pro Modell**.
+
+| Fähigkeit                                                                                | Support | Hinweise                                                                                                                                          |
+| ---------------------------------------------------------------------------------------- | :-----: | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Single-Turn-Texteingabe (`input` als String)                                             |   ✅    |                                                                                                                                                   |
+| Multi-Turn über vollständigen Gesprächsverlauf (`input` als Message-Array)               |   ✅    |                                                                                                                                                   |
+| Streaming (`stream: true`)                                                               |   ✅    |                                                                                                                                                   |
+| `text.format` (strukturierte Ausgabe / JSON-Schema)                                      |   ⚠️    | Wird akzeptiert, aber nicht per Guided Decoding erzwungen — für erzwungene Schemata `/v1/chat/completions` mit `response_format` verwenden        |
+| Serverseitig gespeicherte Konversationen (`previous_response_id`, `store: true` + Abruf) |   ❌    | `previous_response_id` liefert `400`, `GET /v1/responses/{id}` liefert `500`; stattdessen den vollständigen Gesprächsverlauf in `input` übergeben |
+| `background: true`                                                                       |   ❌    | Liefert `400`                                                                                                                                     |
+| Multimodale Eingabe (`input_image`-Content-Parts)                                        |   ❌    | Liefert `400` — für [Vision](../../api-endpoints/supported-endpoints#vision-bild--text) `/v1/chat/completions` verwenden                          |
+| Eingebaute Tools (`web_search`, `file_search`, `code_interpreter`, …)                    |   ❌    | Stattdessen Custom-Function-Tools verwenden                                                                                                       |
+
+Tool Calling und `reasoning.effort` unterscheiden sich zusätzlich pro Modell:
+
+| Modell                        | Tool Calling | `reasoning.effort` |
+| ----------------------------- | :----------: | :----------------: |
+| gpt-oss-120b                  |      ✅      |         ✅         |
+| Qwen3.5-122B-A10B-FP8         |      ✅      |         ✅         |
+| Qwen3.6-35B-A3B-FP8           |      ✅      |         ✅         |
+| Qwen3.5-0.8B                  |      ✅      |         ✅         |
+| Ministral-3-14B-Instruct-2512 |      ❌      |         ✅         |
+| Mistral-Medium-3.5-128B       |      ❌      |         ❌         |
+
+Beide Mistral-Modelle unterstützen Tool Calling über `/v1/chat/completions` — für Tool Calling mit diesen Modellen diesen Endpunkt verwenden.
+
+:::caution
+Ein Bild an ein Modell ohne Vision-Support zu senden, führt auf keinem der beiden Endpunkte zu einem Fehler. Bilder nur an Modelle senden, die als vision-fähig dokumentiert sind (Ministral-3-14B-Instruct-2512, Qwen3.5-122B-A10B-FP8, Qwen3.6-35B-A3B-FP8, Mistral-Medium-3.5-128B, GLM-OCR).
+:::
+
+Für Produktivworkloads `/v1/chat/completions` bevorzugen. `/v1/responses` dort einsetzen, wo das spezifische Ausgabeformat benötigt wird und das Modell die dafür nötigen Fähigkeiten auf diesem Endpunkt unterstützt.
 
 ## Client-Timeouts konfigurieren {#timeouts}
 

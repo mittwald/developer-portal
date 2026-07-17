@@ -26,40 +26,40 @@ The model name also changes. Use the ID returned by `/v1/models` instead of an O
 
 ## Supported endpoints {#endpoints}
 
-| Endpoint | Supported |
-|----------|-----------|
-| `GET /v1/models` | ✅ |
-| `POST /v1/chat/completions` | ✅ |
-| `POST /v1/completions` | ✅ (legacy text completions) |
-| `POST /v1/responses` | ✅ |
-| `POST /v1/embeddings` | ❌ — this endpoint serves a generative model, not an embedding model |
-| Assistants API (`/v1/assistants`, `/v1/threads`, …) | ❌ |
-| Batch API (`/v1/batches`) | ❌ |
-| Fine-tuning API (`/v1/fine_tuning`) | ❌ |
-| Files API (`/v1/files`) | ❌ |
-| Moderations API (`/v1/moderations`) | ❌ |
-| Audio / image endpoints | ❌ |
+| Endpoint                                            | Supported                                                            |
+| --------------------------------------------------- | -------------------------------------------------------------------- |
+| `GET /v1/models`                                    | ✅                                                                   |
+| `POST /v1/chat/completions`                         | ✅                                                                   |
+| `POST /v1/completions`                              | ✅ (legacy text completions)                                         |
+| `POST /v1/responses`                                | ⚠️ — subset only, see [Responses API support](#responses-api)        |
+| `POST /v1/embeddings`                               | ❌ — this endpoint serves a generative model, not an embedding model |
+| Assistants API (`/v1/assistants`, `/v1/threads`, …) | ❌                                                                   |
+| Batch API (`/v1/batches`)                           | ❌                                                                   |
+| Fine-tuning API (`/v1/fine_tuning`)                 | ❌                                                                   |
+| Files API (`/v1/files`)                             | ❌                                                                   |
+| Moderations API (`/v1/moderations`)                 | ❌                                                                   |
+| Audio / image endpoints                             | ❌                                                                   |
 
 ## /v1/chat/completions parameter support {#parameters}
 
-| Parameter | Support | Notes |
-|-----------|---------|-------|
-| `model` | ✅ | Use the model ID from `/v1/models` |
-| `messages` | ✅ | |
-| `stream` | ✅ | See [Streaming](../getting-started#streaming) |
-| `temperature`, `top_p` | ✅ | |
-| `max_tokens` / `max_completion_tokens` | ✅ | |
-| `stop` | ✅ | |
-| `n` | ✅ | Multiple completions per request |
-| `presence_penalty`, `frequency_penalty` | ✅ | |
-| `logprobs`, `top_logprobs` | ✅ | |
-| `tools`, `tool_choice` | ✅ | See [Tool calling](#tool-calling) |
-| `parallel_tool_calls` | ✅ | `false` limits to one tool call; `true` (default) allows multiple |
-| `response_format` | ✅ | See [Structured outputs](#structured-outputs) |
-| `seed` | ⚠️ | Accepted and passed through — reproducibility is best-effort due to GPU non-determinism |
-| `user` | ⚠️ | Accepted but ignored |
-| `logit_bias` | ✅ | Supported; token IDs outside the model vocabulary return a validation error |
-| `stream_options` | ✅ | Supported when `stream: true`; passing it without streaming returns a validation error. `include_usage: true` appends a usage chunk at the end of the stream |
+| Parameter                               | Support | Notes                                                                                                                                                        |
+| --------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `model`                                 | ✅      | Use the model ID from `/v1/models`                                                                                                                           |
+| `messages`                              | ✅      |                                                                                                                                                              |
+| `stream`                                | ✅      | See [Streaming](../getting-started#streaming)                                                                                                                |
+| `temperature`, `top_p`                  | ✅      |                                                                                                                                                              |
+| `max_tokens` / `max_completion_tokens`  | ✅      |                                                                                                                                                              |
+| `stop`                                  | ✅      |                                                                                                                                                              |
+| `n`                                     | ✅      | Multiple completions per request                                                                                                                             |
+| `presence_penalty`, `frequency_penalty` | ✅      |                                                                                                                                                              |
+| `logprobs`, `top_logprobs`              | ✅      |                                                                                                                                                              |
+| `tools`, `tool_choice`                  | ✅      | See [Tool calling](#tool-calling)                                                                                                                            |
+| `parallel_tool_calls`                   | ✅      | `false` limits to one tool call; `true` (default) allows multiple                                                                                            |
+| `response_format`                       | ✅      | See [Structured outputs](#structured-outputs)                                                                                                                |
+| `seed`                                  | ⚠️      | Accepted and passed through — reproducibility is best-effort due to GPU non-determinism                                                                      |
+| `user`                                  | ⚠️      | Accepted but ignored                                                                                                                                         |
+| `logit_bias`                            | ✅      | Supported; token IDs outside the model vocabulary return a validation error                                                                                  |
+| `stream_options`                        | ✅      | Supported when `stream: true`; passing it without streaming returns a validation error. `include_usage: true` appends a usage chunk at the end of the stream |
 
 ## Structured outputs {#structured-outputs}
 
@@ -70,8 +70,13 @@ Both JSON mode and JSON schema mode are supported.
 ```json
 {
   "model": "YOUR_MODEL_ID",
-  "messages": [{"role": "user", "content": "Return a JSON object with keys name and age."}],
-  "response_format": {"type": "json_object"}
+  "messages": [
+    {
+      "role": "user",
+      "content": "Return a JSON object with keys name and age."
+    }
+  ],
+  "response_format": { "type": "json_object" }
 }
 ```
 
@@ -80,7 +85,9 @@ Both JSON mode and JSON schema mode are supported.
 ```json
 {
   "model": "YOUR_MODEL_ID",
-  "messages": [{"role": "user", "content": "Extract the person's name and age."}],
+  "messages": [
+    { "role": "user", "content": "Extract the person's name and age." }
+  ],
   "response_format": {
     "type": "json_schema",
     "json_schema": {
@@ -89,8 +96,8 @@ Both JSON mode and JSON schema mode are supported.
       "schema": {
         "type": "object",
         "properties": {
-          "name": {"type": "string"},
-          "age": {"type": "integer"}
+          "name": { "type": "string" },
+          "age": { "type": "integer" }
         },
         "required": ["name", "age"],
         "additionalProperties": false
@@ -144,6 +151,40 @@ tool_calls = response.choices[0].message.tool_calls
 ```
 
 `parallel_tool_calls=False` restricts the model to at most one tool call per turn, which simplifies handling in multi-step agent loops.
+
+## Responses API support {#responses-api}
+
+`POST /v1/responses` is reachable and follows the [OpenAI Responses API](https://platform.openai.com/docs/api-reference/responses) shape, but only a subset of it works, and support varies **per model**.
+
+| Capability                                                                 | Support | Notes                                                                                                                           |
+| -------------------------------------------------------------------------- | :-----: | ------------------------------------------------------------------------------------------------------------------------------- |
+| Single-turn text input (`input` as string)                                 |   ✅    |                                                                                                                                 |
+| Multi-turn via full conversation history (`input` as message array)        |   ✅    |                                                                                                                                 |
+| Streaming (`stream: true`)                                                 |   ✅    |                                                                                                                                 |
+| `text.format` (structured output / JSON schema)                            |   ⚠️    | Accepted, not enforced with guided decoding — use `/v1/chat/completions` `response_format` for enforced schemas                 |
+| Stateful conversations (`previous_response_id`, `store: true` + retrieval) |   ❌    | `previous_response_id` returns `400`, `GET /v1/responses/{id}` returns `500`; pass full conversation history in `input` instead |
+| `background: true`                                                         |   ❌    | Returns `400`                                                                                                                   |
+| Multimodal input (`input_image` content parts)                             |   ❌    | Returns `400` — use `/v1/chat/completions` for [vision](../../api-endpoints/supported-endpoints#vision-image--text)             |
+| Built-in tools (`web_search`, `file_search`, `code_interpreter`, …)        |   ❌    | Use custom function tools instead                                                                                               |
+
+Tool and `reasoning.effort` support also varies by model:
+
+| Model                         | Tool calling | `reasoning.effort` |
+| ----------------------------- | :----------: | :----------------: |
+| gpt-oss-120b                  |      ✅      |         ✅         |
+| Qwen3.5-122B-A10B-FP8         |      ✅      |         ✅         |
+| Qwen3.6-35B-A3B-FP8           |      ✅      |         ✅         |
+| Qwen3.5-0.8B                  |      ✅      |         ✅         |
+| Ministral-3-14B-Instruct-2512 |      ❌      |         ✅         |
+| Mistral-Medium-3.5-128B       |      ❌      |         ❌         |
+
+Both Mistral-family models support tool calling on `/v1/chat/completions` — use that endpoint instead if you need tool calling with them.
+
+:::caution
+Sending image content to a model without vision support doesn't return an error on either endpoint. Only send images to models documented as vision-capable (Ministral-3-14B-Instruct-2512, Qwen3.5-122B-A10B-FP8, Qwen3.6-35B-A3B-FP8, Mistral-Medium-3.5-128B, GLM-OCR).
+:::
+
+Prefer `/v1/chat/completions` for production workloads. Use `/v1/responses` where you specifically need its output format, on a model that supports the features you need on this endpoint.
 
 ## Configuring client timeouts {#timeouts}
 
