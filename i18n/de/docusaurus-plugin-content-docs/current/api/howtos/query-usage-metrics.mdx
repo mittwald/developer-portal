@@ -35,7 +35,7 @@ Content-Type: application/json
 ```
 
 Wie du einen API-Token erhältst, erfährst du in der
-[Einführung zur API](/docs/v2/api/intro).
+[Einführung zur API](../../intro).
 
 ## Autorisierung {#authorization}
 
@@ -67,7 +67,7 @@ kein leeres Ergebnis, sondern einen Fehler für die betreffende Abfrage:
 
 ```
 unauthorized: authorizer failed (must be authorized to access the resources
-referenced in the query labels): user is not allowed to access project group s-kc6yrn
+referenced in the query labels): user is not allowed to access project group s-XXXXXX
 ```
 
 Wichtig dabei: **Zugriff auf ein Projekt bedeutet nicht automatisch Zugriff auf
@@ -81,7 +81,7 @@ Wenn du nur Zugriff auf Projektebene hast, kannst du weiterhin absolute
 Verbrauchswerte abfragen, da diese nur über `project` selektieren:
 
 ```promql
-SUM (cloudhosting_project_usage_memory_bytes:5m:max{project="p-zrblbi"})
+SUM (cloudhosting_project_usage_memory_bytes:5m:max{project="p-XXXXXX"})
 ```
 
 Beachte außerdem, dass die _zurückgelieferten_ Zeitreihen ein
@@ -125,8 +125,8 @@ Datenbank-Instanzen nicht Teil der Workloads eines Projekts sind. Um den
 
 ### Label {#labels}
 
-- `project` enthält die **Kurz-ID** eines Projekts im Format `p-xxxxxx`.
-- `project_group` enthält die **Kurz-ID** eines Servers im Format `s-xxxxxx`.
+- `project` enthält die **Kurz-ID** eines Projekts im Format `p-XXXXXX`.
+- `project_group` enthält die **Kurz-ID** eines Servers im Format `s-XXXXXX`.
   "Project Group" ist die interne Bezeichnung für das, was im mStudio Server
   heißt.
 
@@ -150,8 +150,8 @@ Auslastung, die auch im mStudio angezeigt wird.
 ### Speicherauslastung eines einzelnen Projekts {#memory-utilization-project}
 
 ```promql
-SUM (cloudhosting_project_usage_memory_bytes:5m:max{project="p-zrblbi"}) /
-SUM (cloudhosting_projectgroup_limits_memory_bytes:5m{project_group="s-kc6yrn"})
+SUM (cloudhosting_project_usage_memory_bytes:5m:max{project="p-XXXXXX"}) /
+SUM (cloudhosting_projectgroup_limits_memory_bytes:5m{project_group="s-XXXXXX"})
 ```
 
 Diese Abfrage setzt den Speicherverbrauch eines einzelnen Projekts ins
@@ -161,16 +161,16 @@ Verhältnis zum Limit des Servers, auf dem es läuft – beantwortet also die Fr
 ### CPU-Auslastung eines einzelnen Projekts {#cpu-utilization-project}
 
 ```promql
-SUM (cloudhosting_project_usage_cpu_seconds_total_rate:5m{project="p-zrblbi"}) /
-SUM (cloudhosting_projectgroup_limits_cpu_seconds:5m{project_group="s-kc6yrn"})
+SUM (cloudhosting_project_usage_cpu_seconds_total_rate:5m{project="p-XXXXXX"}) /
+SUM (cloudhosting_projectgroup_limits_cpu_seconds:5m{project_group="s-XXXXXX"})
 ```
 
 ### Speicherauslastung eines gesamten Servers {#memory-utilization-server}
 
 ```promql
-(SUM (cloudhosting_databasesetmember_usage_memory_bytes:5m:max{project_group="s-kc6yrn"} or vector (0)) +
- SUM (cloudhosting_project_usage_memory_bytes:5m:max{project_group="s-kc6yrn"})) /
-SUM (cloudhosting_projectgroup_limits_memory_bytes:5m{project_group="s-kc6yrn"})
+(SUM (cloudhosting_databasesetmember_usage_memory_bytes:5m:max{project_group="s-XXXXXX"} or vector (0)) +
+ SUM (cloudhosting_project_usage_memory_bytes:5m:max{project_group="s-XXXXXX"})) /
+SUM (cloudhosting_projectgroup_limits_memory_bytes:5m{project_group="s-XXXXXX"})
 ```
 
 Hier wird das Label `project_group` auch auf den Verbrauchsmetriken verwendet,
@@ -185,9 +185,9 @@ statt lediglich des Projektverbrauchs.
 ### CPU-Auslastung eines gesamten Servers {#cpu-utilization-server}
 
 ```promql
-(SUM (cloudhosting_databasesetmember_usage_cpu_seconds_total_rate:5m{project_group="s-kc6yrn"} or vector (0)) +
- SUM (cloudhosting_project_usage_cpu_seconds_total_rate:5m{project_group="s-kc6yrn"})) /
-SUM (cloudhosting_projectgroup_limits_cpu_seconds:5m{project_group="s-kc6yrn"})
+(SUM (cloudhosting_databasesetmember_usage_cpu_seconds_total_rate:5m{project_group="s-XXXXXX"} or vector (0)) +
+ SUM (cloudhosting_project_usage_cpu_seconds_total_rate:5m{project_group="s-XXXXXX"})) /
+SUM (cloudhosting_projectgroup_limits_cpu_seconds:5m{project_group="s-XXXXXX"})
 ```
 
 ### Absolute Werte {#absolute-values}
@@ -196,7 +196,7 @@ Wenn dich absolute Zahlen statt Auslastungsverhältnissen interessieren, lass
 einfach die Division weg:
 
 ```promql
-SUM (cloudhosting_project_usage_memory_bytes:5m:max{project="p-zrblbi"})
+SUM (cloudhosting_project_usage_memory_bytes:5m:max{project="p-XXXXXX"})
 ```
 
 Oder lass das `SUM` weg, um eine Zeitreihe je Projekt auf dem Server zu
@@ -204,7 +204,7 @@ erhalten. Das ist nützlich, um aufzuschlüsseln, welches Projekt eines Servers
 die meisten Ressourcen verbraucht:
 
 ```promql
-cloudhosting_project_usage_memory_bytes:5m:max{project_group="s-kc6yrn"}
+cloudhosting_project_usage_memory_bytes:5m:max{project_group="s-XXXXXX"}
 ```
 
 ## Eine Abfrage senden {#sending-a-query}
@@ -224,7 +224,7 @@ Abfragen werden an den Grafana-Endpunkt
         "type": "prometheus",
         "uid": "MetricsAuthPrometheus"
       },
-      "expr": "SUM (cloudhosting_project_usage_memory_bytes:5m:max{project=\"p-zrblbi\"}) / SUM (cloudhosting_projectgroup_limits_memory_bytes:5m{project_group=\"s-kc6yrn\"})",
+      "expr": "SUM (cloudhosting_project_usage_memory_bytes:5m:max{project=\"p-XXXXXX\"}) / SUM (cloudhosting_projectgroup_limits_memory_bytes:5m{project_group=\"s-XXXXXX\"})",
       "intervalMs": 300000,
       "maxDataPoints": 288
     }
@@ -246,9 +246,12 @@ Die relevanten Felder sind:
 - `expr` enthält den PromQL-Ausdruck.
 - `intervalMs` ist die Schrittweite. Da die zugrundeliegenden Daten auf fünf
   Minuten heruntergerechnet sind, ist `300000` der sinnvollste Wert.
-- `maxDataPoints` begrenzt die Anzahl zurückgelieferter Datenpunkte. Grafana
-  erhöht die Schrittweite, wenn der angefragte Zeitraum geteilt durch
-  `intervalMs` diesen Wert überschreitet.
+- `maxDataPoints` begrenzt die Anzahl zurückgelieferter Datenpunkte.
+  Überschreitet der angefragte Zeitraum geteilt durch `intervalMs` diesen Wert,
+  erhöht Grafana die Schrittweite und du erhältst gröbere Daten als angefragt.
+  Setze den Wert daher mindestens auf die Anzahl der Buckets in deinem Zeitraum
+  – für die oben verwendeten 24 Stunden bei Fünf-Minuten-Auflösung sind das
+  `24 × 60 / 5 = 288`.
 
 ### Die Antwort interpretieren {#interpreting-the-response}
 
