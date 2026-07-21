@@ -40,6 +40,12 @@ jobs:
         run: npm run generate
       - name: Build
         run: npm run build
+      - name: Install Playwright Browsers Dependencies
+        run: npx playwright install-deps
+      - name: Install Playwright Browsers
+        run: npx playwright install
+      - name: Run smoke and dark mode regression tests
+        run: npx playwright test tests/smoke.test.ts tests/dark-mode-flow.test.ts --project=chromium
       - name: Upload Artifact
         uses: actions/upload-artifact@v7
         with:
