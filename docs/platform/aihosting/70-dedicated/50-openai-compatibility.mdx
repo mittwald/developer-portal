@@ -176,12 +176,11 @@ Tool and `reasoning.effort` support also varies by model:
 | Qwen3.6-35B-A3B-FP8           |      ✅      |         ✅         |
 | Qwen3.5-0.8B                  |      ✅      |         ✅         |
 | Ministral-3-14B-Instruct-2512 |      ❌      |         ✅         |
-| Mistral-Medium-3.5-128B       |      ❌      |         ❌         |
 
-Both Mistral-family models support tool calling on `/v1/chat/completions` — use that endpoint instead if you need tool calling with them.
+Ministral-3-14B-Instruct-2512 supports tool calling on `/v1/chat/completions` — use that endpoint instead if you need tool calling with it.
 
 :::caution
-Sending image content to a model without vision support doesn't return an error on either endpoint. Only send images to models documented as vision-capable (Ministral-3-14B-Instruct-2512, Qwen3.5-122B-A10B-FP8, Qwen3.6-35B-A3B-FP8, Mistral-Medium-3.5-128B, GLM-OCR).
+Sending image content to a model without vision support doesn't return an error on either endpoint. Only send images to models documented as vision-capable (Ministral-3-14B-Instruct-2512, Qwen3.5-122B-A10B-FP8, Qwen3.6-35B-A3B-FP8, GLM-OCR).
 :::
 
 Prefer `/v1/chat/completions` for production workloads. Use `/v1/responses` where you specifically need its output format, on a model that supports the features you need on this endpoint.
