@@ -1,0 +1,340 @@
+---
+sidebar_label: Auslastungsmetriken abfragen
+sidebar_position: 30
+title: CPU- und RAM-Auslastung über die API abfragen
+description: Dieser Artikel erklärt, wie CPU- und Speicherauslastung von Projekten und Servern über die Metrics-API abgefragt werden können.
+tags:
+  - Metrics
+  - Monitoring
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+Die mStudio-API stellt die CPU- und Speicherauslastung bereit, die du auch im
+mStudio siehst. Anders als der Rest der API werden diese Daten nicht über
+reguläre REST-Operationen ausgeliefert: Die Route `/v2/apps/metrics` ist ein
+**transparenter Proxy auf eine Grafana-Instanz**. Alles unterhalb dieses Pfads
+ist die Grafana-HTTP-API, `POST /v2/apps/metrics/api/ds/query` ist also Grafanas
+Endpunkt zum Abfragen von Datenquellen.
+
+Die dahinterliegende Datenquelle ist eine Prometheus-Instanz. Die Abfragen, die
+du sendest, sind daher
+[PromQL](https://prometheus.io/docs/prometheus/querying/basics/)-Ausdrücke.
+
+## Authentifizierung {#authentication}
+
+Die Authentifizierung funktioniert genau wie beim Rest der API: Übergib deinen
+API-Token im `Authorization`-Header.
+
+```http
+POST /v2/apps/metrics/api/ds/query HTTP/1.1
+Host: api.mittwald.de
+Authorization: Bearer <YOUR_API_TOKEN>
+Content-Type: application/json
+```
+
+Wie du einen API-Token erhältst, erfährst du in der
+[Einführung zur API](../../intro).
+
+## Autorisierung {#authorization}
+
+Der Metrics-Proxy authentifiziert nicht nur deinen Token, sondern prüft auch die
+**Label-Selektoren in deinem PromQL-Ausdruck** einzeln auf Berechtigungen. Dabei
+gibt es zwei voneinander unabhängige Regeln, die mit unterschiedlichen Fehlern
+fehlschlagen.
+
+### Jede Abfrage muss eingegrenzt sein {#query-scoping}
+
+Jeder Selektor auf einer `cloudhosting_project_*`-Metrik muss mindestens eines
+der Label `project`, `project_group` oder `placement_group` enthalten. Eine
+nicht eingegrenzte Abfrage wie
+`SUM(cloudhosting_project_usage_memory_bytes:5m:max)` wird unabhängig von deinen
+Berechtigungen direkt abgelehnt:
+
+```
+unauthorized: authorizer failed (one of the following authorizers must match:
+[when metric matches '^cloudhosting_project_.*$', must have labels map[project:{}]],
+[when metric matches '^cloudhosting_project_.*$', must have labels map[project_group:{}]],
+[when metric matches '^cloudhosting_project_.*$', must have labels map[placement_group:{}]]):
+none of the authorizers matched
+```
+
+### Du musst Zugriff auf die selektierte Ressource haben {#resource-access}
+
+Wählst du eine Ressource aus, auf die dein Token keinen Zugriff hat, erhältst du
+kein leeres Ergebnis, sondern einen Fehler für die betreffende Abfrage:
+
+```
+unauthorized: authorizer failed (must be authorized to access the resources
+referenced in the query labels): user is not allowed to access project group s-XXXXXX
+```
+
+Wichtig dabei: **Zugriff auf ein Projekt bedeutet nicht automatisch Zugriff auf
+dessen Server.** Beides wird getrennt autorisiert, was konkrete Auswirkungen auf
+die weiter unten stehenden Auslastungs-Beispiele hat: Sie teilen alle durch eine
+über `project_group` selektierte `cloudhosting_projectgroup_limits_*`-Metrik und
+benötigen deshalb Zugriff auf **Server-Ebene** – auch dann, wenn dich nur ein
+einzelnes Projekt interessiert.
+
+Wenn du nur Zugriff auf Projektebene hast, kannst du weiterhin absolute
+Verbrauchswerte abfragen, da diese nur über `project` selektieren:
+
+```promql
+SUM (cloudhosting_project_usage_memory_bytes:5m:max{project="p-XXXXXX"})
+```
+
+Beachte außerdem, dass die _zurückgelieferten_ Zeitreihen ein
+`project_group`-Label tragen, auch wenn du nur über `project` selektierst. Dieses
+Label im Ergebnis lesen zu können bedeutet nicht, dass du danach selektieren
+darfst.
+
+## Verfügbare Metriken {#available-metrics}
+
+Bei allen Metriken handelt es sich um **Recording Rules**, nicht um rohe
+Zeitreihen. Das Suffix `:5m` bezeichnet das Downsampling-Intervall: Die Werte
+sind in Fünf-Minuten-Buckets voraggregiert. Eine feinere Auflösung als fünf
+Minuten abzufragen bringt daher nichts – du erhältst schlicht denselben
+Bucket-Wert mehrfach.
+
+Das Suffix nach dem Intervall beschreibt die innerhalb eines Buckets angewendete
+Aggregationsfunktion (`:max` für Spitzenwerte). Metriken, die auf `_rate` enden,
+wurden bereits mit `rate()` verarbeitet und dürfen daher **nicht** erneut in
+`rate()` verpackt werden.
+
+### Verbrauchsmetriken {#usage-metrics}
+
+| Metrik                                                           | Label                      | Einheit              | Bedeutung                                                                                       |
+| ---------------------------------------------------------------- | -------------------------- | -------------------- | ----------------------------------------------------------------------------------------------- |
+| `cloudhosting_project_usage_memory_bytes:5m:max`                 | `project`, `project_group` | Bytes                | Maximal genutzter Speicher der Workloads eines Projekts innerhalb eines Fünf-Minuten-Buckets    |
+| `cloudhosting_project_usage_cpu_seconds_total_rate:5m`           | `project`, `project_group` | CPU-Sekunden/Sekunde | Durchschnittlicher CPU-Verbrauch der Workloads eines Projekts; `1` entspricht einem vollen Kern |
+| `cloudhosting_databasesetmember_usage_memory_bytes:5m:max`       | `project_group`            | Bytes                | Maximal genutzter Speicher der Datenbank-Instanzen (MySQL, Redis, …) eines Servers              |
+| `cloudhosting_databasesetmember_usage_cpu_seconds_total_rate:5m` | `project_group`            | CPU-Sekunden/Sekunde | Durchschnittlicher CPU-Verbrauch der Datenbank-Instanzen eines Servers                          |
+
+Der Datenbankverbrauch wird getrennt vom Projektverbrauch erfasst, da
+Datenbank-Instanzen nicht Teil der Workloads eines Projekts sind. Um den
+**Gesamtverbrauch** eines Servers zu erhalten, musst du daher beides addieren
+(siehe die Beispiele weiter unten).
+
+### Limit-Metriken {#limit-metrics}
+
+| Metrik                                             | Label           | Einheit      | Bedeutung                           |
+| -------------------------------------------------- | --------------- | ------------ | ----------------------------------- |
+| `cloudhosting_projectgroup_limits_memory_bytes:5m` | `project_group` | Bytes        | Für den Server verfügbarer Speicher |
+| `cloudhosting_projectgroup_limits_cpu_seconds:5m`  | `project_group` | CPU-Sekunden | Für den Server verfügbare CPU-Kerne |
+
+### Label {#labels}
+
+- `project` enthält die **Kurz-ID** eines Projekts im Format `p-XXXXXX`.
+- `project_group` enthält die **Kurz-ID** eines Servers im Format `s-XXXXXX`.
+  "Project Group" ist die interne Bezeichnung für das, was im mStudio Server
+  heißt.
+
+Beachte, dass es sich hierbei um die Kurz-IDs handelt und **nicht** um die
+IDs im UUID-Format, die die meisten REST-Operationen der API erwarten.
+
+Ein drittes Label, `placement_group`, wird vom Authorizer ebenfalls als gültige
+Eingrenzung akzeptiert. Für die Abfragen in diesem Artikel wird es nicht
+benötigt.
+
+Die zurückgelieferten Zeitreihen tragen zusätzlich Label wie
+`project_environment`, `cluster` und `tier`. Diese sind intern und sollten nicht
+verwendet werden.
+
+## Beispielabfragen {#example-queries}
+
+Die folgenden Abfragen liefern jeweils ein **Verhältnis zwischen 0 und 1**;
+multipliziere mit 100, um einen Prozentwert zu erhalten. Das entspricht der
+Auslastung, die auch im mStudio angezeigt wird.
+
+### Speicherauslastung eines einzelnen Projekts {#memory-utilization-project}
+
+```promql
+SUM (cloudhosting_project_usage_memory_bytes:5m:max{project="p-XXXXXX"}) /
+SUM (cloudhosting_projectgroup_limits_memory_bytes:5m{project_group="s-XXXXXX"})
+```
+
+Diese Abfrage setzt den Speicherverbrauch eines einzelnen Projekts ins
+Verhältnis zum Limit des Servers, auf dem es läuft – beantwortet also die Frage
+"Wie viel vom RAM meines Servers verbraucht dieses Projekt?".
+
+### CPU-Auslastung eines einzelnen Projekts {#cpu-utilization-project}
+
+```promql
+SUM (cloudhosting_project_usage_cpu_seconds_total_rate:5m{project="p-XXXXXX"}) /
+SUM (cloudhosting_projectgroup_limits_cpu_seconds:5m{project_group="s-XXXXXX"})
+```
+
+### Speicherauslastung eines gesamten Servers {#memory-utilization-server}
+
+```promql
+(SUM (cloudhosting_databasesetmember_usage_memory_bytes:5m:max{project_group="s-XXXXXX"} or vector (0)) +
+ SUM (cloudhosting_project_usage_memory_bytes:5m:max{project_group="s-XXXXXX"})) /
+SUM (cloudhosting_projectgroup_limits_memory_bytes:5m{project_group="s-XXXXXX"})
+```
+
+Hier wird das Label `project_group` auch auf den Verbrauchsmetriken verwendet,
+sodass _alle_ Projekte des Servers aufsummiert werden und der Datenbankverbrauch
+zusätzlich hinzukommt.
+
+Der Fallback `or vector (0)` ist dabei wichtig: Hat ein Server überhaupt keine
+Datenbanken, existiert die `cloudhosting_databasesetmember_*`-Zeitreihe nicht,
+und ohne den Fallback würde die gesamte Addition ein leeres Ergebnis liefern
+statt lediglich des Projektverbrauchs.
+
+### CPU-Auslastung eines gesamten Servers {#cpu-utilization-server}
+
+```promql
+(SUM (cloudhosting_databasesetmember_usage_cpu_seconds_total_rate:5m{project_group="s-XXXXXX"} or vector (0)) +
+ SUM (cloudhosting_project_usage_cpu_seconds_total_rate:5m{project_group="s-XXXXXX"})) /
+SUM (cloudhosting_projectgroup_limits_cpu_seconds:5m{project_group="s-XXXXXX"})
+```
+
+### Absolute Werte {#absolute-values}
+
+Wenn dich absolute Zahlen statt Auslastungsverhältnissen interessieren, lass
+einfach die Division weg:
+
+```promql
+SUM (cloudhosting_project_usage_memory_bytes:5m:max{project="p-XXXXXX"})
+```
+
+Oder lass das `SUM` weg, um eine Zeitreihe je Projekt auf dem Server zu
+erhalten. Das ist nützlich, um aufzuschlüsseln, welches Projekt eines Servers
+die meisten Ressourcen verbraucht:
+
+```promql
+cloudhosting_project_usage_memory_bytes:5m:max{project_group="s-XXXXXX"}
+```
+
+## Eine Abfrage senden {#sending-a-query}
+
+Abfragen werden an den Grafana-Endpunkt
+`POST /v2/apps/metrics/api/ds/query` gesendet. Der Request-Body folgt Grafanas
+[Data-Source-Query-API](https://grafana.com/docs/grafana/latest/developer-resources/api-reference/http-api/api-legacy/data_source/):
+
+```json
+{
+  "from": "now-24h",
+  "to": "now",
+  "queries": [
+    {
+      "refId": "A",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "MetricsAuthPrometheus"
+      },
+      "expr": "SUM (cloudhosting_project_usage_memory_bytes:5m:max{project=\"p-XXXXXX\"}) / SUM (cloudhosting_projectgroup_limits_memory_bytes:5m{project_group=\"s-XXXXXX\"})",
+      "intervalMs": 300000,
+      "maxDataPoints": 288
+    }
+  ]
+}
+```
+
+Die relevanten Felder sind:
+
+- `from` und `to` definieren den Zeitraum. Sie akzeptieren entweder
+  Epoch-Millisekunden oder Grafanas relative Zeitsyntax (`now`, `now-24h`,
+  `now-7d`).
+- `datasource.uid` muss `MetricsAuthPrometheus` lauten. Du kannst das zur
+  Laufzeit über `GET /v2/apps/metrics/api/datasources` bestätigen, was die
+  verfügbaren Datenquellen auflistet.
+- `refId` ist ein frei wählbarer Bezeichner, nach dem die Antwort geschlüsselt
+  ist. Sende mehrere Einträge in `queries` mit unterschiedlichen `refId`s, um
+  mehrere Ausdrücke in einem einzigen Request auszuwerten.
+- `expr` enthält den PromQL-Ausdruck.
+- `intervalMs` ist die Schrittweite. Da die zugrundeliegenden Daten auf fünf
+  Minuten heruntergerechnet sind, ist `300000` der sinnvollste Wert.
+- `maxDataPoints` begrenzt die Anzahl zurückgelieferter Datenpunkte.
+  Überschreitet der angefragte Zeitraum geteilt durch `intervalMs` diesen Wert,
+  erhöht Grafana die Schrittweite und du erhältst gröbere Daten als angefragt.
+  Setze den Wert daher mindestens auf die Anzahl der Buckets in deinem Zeitraum
+  – für die oben verwendeten 24 Stunden bei Fünf-Minuten-Auflösung sind das
+  `24 × 60 / 5 = 288`.
+
+### Die Antwort interpretieren {#interpreting-the-response}
+
+Die Antwort ist ein Grafana-**Data-Frame**, der Werte spaltenweise speichert und
+nicht als Liste von Zeitstempel-Wert-Paaren:
+
+```json
+{
+  "results": {
+    "A": {
+      "frames": [
+        {
+          "schema": {
+            "refId": "A",
+            "fields": [
+              { "name": "Time", "type": "time" },
+              { "name": "Value", "type": "number" }
+            ]
+          },
+          "data": {
+            "values": [
+              [1753048800000, 1753049100000, 1753049400000],
+              [0.4213, 0.4198, 0.4402]
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+`data.values` enthält je ein Array pro Feld aus `schema.fields`, in derselben
+Reihenfolge. Das erste Array enthält die Zeitstempel (Epoch-Millisekunden), das
+zweite die Werte. Für den _n_-ten Datenpunkt liest du also Index _n_ aus jedem
+Array.
+
+Schlägt eine Abfrage fehl, enthält der zugehörige `results`-Eintrag statt
+`frames` eine `error`-Eigenschaft. Beachte, dass dies **pro Abfrage** passieren
+kann, auch wenn der HTTP-Statuscode `200` lautet – prüfe daher immer jede
+gesendete `refId` auf `error`.
+
+## Client-Bibliotheken {#client-libraries}
+
+Keines der mittwald-SDKs deckt diesen Endpunkt ab, da er nicht Teil der
+OpenAPI-Spezifikation ist. Du hast zwei sinnvolle Möglichkeiten:
+
+**Einen einfachen HTTP-Client verwenden.** Request und Response sind
+überschaubar genug, dass das oft der unkomplizierteste Weg ist. Du brauchst
+lediglich einen POST mit JSON-Body und die oben beschriebene Dekodierung der
+beiden Arrays.
+
+**Eine Grafana-Client-Bibliothek verwenden**, um dir das Dekodieren der
+Data-Frames abzunehmen. Nützlich sind:
+
+<Tabs groupId="language">
+<TabItem value="typescript" label="TypeScript">
+
+[`@grafana/data`](https://www.npmjs.com/package/@grafana/data) stellt
+`dataFrameFromJSON()` bereit, das die rohen Frames der Antwort in typisierte
+`DataFrame`-Objekte umwandelt, sowie Hilfsfunktionen zum Iterieren über Felder.
+Es ist eine umfangreiche Abhängigkeit und lohnt sich daher nur, wenn du
+intensiver mit den Daten arbeitest.
+
+</TabItem>
+<TabItem value="go" label="Go">
+
+[`github.com/grafana/grafana-plugin-sdk-go/data`](https://pkg.go.dev/github.com/grafana/grafana-plugin-sdk-go/data)
+enthält den kanonischen `data.Frame`-Typ inklusive `UnmarshalJSON`-Unterstützung.
+Damit kannst du die Frames der Antwort direkt in typisierte Go-Strukturen
+dekodieren.
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+[`grafana-client`](https://github.com/grafana-toolbox/grafana-client) kapselt die
+Grafana-HTTP-API inklusive Datenquellen-Abfragen. Richte den Client auf
+`https://api.mittwald.de/v2/apps/metrics` und authentifiziere dich mit deinem
+mittwald-API-Token.
+
+</TabItem>
+</Tabs>
+
+Da der Proxy die Grafana-HTTP-API unverändert bereitstellt, funktioniert jeder
+generische Grafana-Client, sofern du eine eigene Basis-URL und einen
+Bearer-Token konfigurieren kannst.
