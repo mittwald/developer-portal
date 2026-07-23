@@ -1,0 +1,366 @@
+---
+title: Building and deploying a Shopware image for container hosting
+sidebar_label: Shopware
+tags:
+  - Shopware
+  - Container
+  - Deployment
+description: Learn how to build a Shopware container image, push it to a registry, and deploy it to mittwald container hosting, including the theme and plugin workflow for a read-only runtime.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+Shopware's `docker` recipe sets up the infrastructure services (`database`, `opensearch`, `mailer`) and drops a `docker/Dockerfile` into your project, but it does not give you a running application container. This guide covers the missing part: building an application image from that Dockerfile, pushing it to a registry, and deploying it to mittwald container hosting. It ends with the theme and plugin workflow, which needs some care because the runtime container is effectively read-only.
+
+## Prerequisites {#prerequisites}
+
+- **mStudio API token** with the required permissions; see [obtaining an API token](/docs/v2/api/intro#obtaining-an-api-token)
+- A Shopware project on your local machine, either an existing one or a new project (the next section shows how to create one)
+- **Composer** and **PHP** locally, to create the project and add the Docker setup
+- **Docker with Buildx** on your local machine, so you can build for the `linux/amd64` platform that mittwald runs
+- The **mittwald CLI** (`mw`) installed and logged in; see the [CLI documentation](/docs/v2/cli/)
+
+The Caddy config in the image must run without its own TLS, because TLS is terminated by the mittwald ingress. Set `auto_https off` and let Caddy listen on a plain HTTP port such as `8000`.
+
+## Set up the project {#set-up-the-project}
+
+If you already have a Shopware project, skip to the next step. To start from scratch, create a project with Composer:
+
+```shellsession title="Local shell session"
+$ composer create-project shopware/production <folder>
+$ cd <folder>
+```
+
+To pin a specific Shopware version, pass it to the package name, for example `shopware/production:6.6.7.0`.
+
+Next, add the Docker setup. The `shopware/docker` package installs a ready-made `docker/Dockerfile` into your project through a Symfony Flex recipe, so you get the official build setup rather than writing one by hand:
+
+```shellsession title="Local shell session"
+$ composer require shopware/docker
+```
+
+This is also the recommended way to keep the Dockerfile current: because it comes from a Flex recipe, updating the package pulls in upstream changes to the build.
+
+## Configure the environment {#configure-the-environment}
+
+Shopware needs a few environment variables at runtime. Provide them to the container rather than baking them into the image, so the same image works across environments.
+
+- **`APP_URL`**: the public URL of your shop, e.g. `https://your-domain.example`
+- **`APP_SECRET`**: the Symfony runtime secret; generate one with `openssl rand -hex 128`
+- **`DATABASE_URL`**: the connection string for your database service
+- **`TRUSTED_PROXIES`**: set to `REMOTE_ADDR` so Shopware trusts the mittwald ingress
+
+## Prepare the Dockerfile {#prepare-the-dockerfile}
+
+The Dockerfile that `shopware/docker` added is a multi-stage build. It uses `ghcr.io/shopware/shopware-cli` to build the project (`shopware-cli project ci`), then copies the built application into the FrankenPHP runtime base `ghcr.io/shopware/docker-base:${PHP_VERSION}-frankenphp`.
+
+For mittwald, the runtime needs one adjustment: the container must not do any TLS work, because TLS is terminated at the mittwald ingress. Add a Caddyfile under `docker/caddy/Caddyfile` that turns automatic HTTPS off and listens on a plain HTTP port:
+
+```text title="docker/caddy/Caddyfile"
+{
+	skip_install_trust
+	auto_https off
+
+	{$CADDY_GLOBAL_OPTIONS}
+
+	frankenphp {
+		{$FRANKENPHP_CONFIG}
+	}
+}
+
+{$CADDY_EXTRA_CONFIG}
+
+:{$CADDY_HTTP_PORT:8000} {
+	root * /var/www/html/public
+	encode zstd gzip
+	log
+
+	@phpRoute {
+		not file {path}
+	}
+	rewrite @phpRoute index.php
+
+	@frontController path index.php
+	php @frontController
+
+	file_server {
+		hide *.php
+	}
+}
+```
+
+Then extend the runtime stage of the Dockerfile so it uses that Caddyfile and pins the HTTP port. Everything above the runtime stage stays exactly as `shopware/docker` generated it. The only changes are in the final stage: the `COPY` of the Caddyfile and the two environment variables.
+
+```diff title="docker/Dockerfile (runtime stage section)"
+ FROM base-image
+
+ ENV SHOPWARE_DISABLE_UPDATE_CHECK=1
+
++# Drop in the TLS opt-out Caddyfile (auto_https off + configurable port).
++COPY --link docker/caddy/Caddyfile /etc/caddy/Caddyfile
++
++# Neutralise any injected SERVER_NAME so Caddy cannot be flipped into HTTPS
++# mode, and set the plain-HTTP port to release on mittwald.
++ENV SERVER_NAME=":8000" \
++    CADDY_HTTP_PORT=8000
++
+ COPY --from=build --chown=82 --link /src /var/www/html
++
++EXPOSE 8000
+```
+
+`SERVER_NAME=":8000"` is host-less on purpose. Even if something set `auto_https` back on, a host-less address never triggers certificate management, so the container stays plain HTTP.
+
+The complete file, with the unchanged build stages included, is in [Full Dockerfile](#full-dockerfile) at the end of this guide.
+
+## Build the image {#build-the-image}
+
+mittwald containers run on `linux/amd64`. On an Apple Silicon Mac you therefore build twice: an `arm64` image for fast local testing, and an `amd64` image for the deployment.
+
+For local testing on Apple Silicon:
+
+```shellsession title="Local shell session"
+$ docker buildx build \
+  --platform linux/arm64 \
+  -f docker/Dockerfile \
+  --build-arg PHP_VERSION=8.3 \
+  -t sw-prod-local:fresh \
+  --load \
+  .
+```
+
+For the mittwald-compatible deployment image, build for `amd64` and push straight to your registry (replace the registry host with your own, see the next section):
+
+```shellsession title="Local shell session"
+$ docker buildx build \
+  --platform linux/amd64 \
+  -f docker/Dockerfile \
+  --build-arg PHP_VERSION=8.3 \
+  -t docker.p-XXXXXX.project.space/shopware/sw-prod-app:8.3-frankenphp \
+  --push \
+  .
+```
+
+Pin the PHP version through the `PHP_VERSION` build argument so the base image (`ghcr.io/shopware/docker-base:${PHP_VERSION}-frankenphp`) does not drift between builds. If your project pulls commercial Store extensions, add the `packages_token` build secret as shown in [Full Dockerfile](#full-dockerfile).
+
+## Test locally with Compose {#test-locally-with-compose}
+
+Before pushing, verify the image runs. Point the `app` service in your `compose.yaml` at the local image (`sw-prod-local:fresh`), then start the stack:
+
+```shellsession title="Local shell session"
+$ docker compose -f compose.yaml -f compose.override.yaml up -d
+```
+
+Watch the application logs until Shopware has booted:
+
+```shellsession title="Local shell session"
+$ docker compose logs -f app
+```
+
+With the stack running, initialize Shopware inside the container:
+
+```shellsession title="Local shell session"
+$ docker compose exec app bin/console database:migrate --all
+$ docker compose exec app bin/console dal:refresh:index
+$ docker compose exec app bin/console cache:clear
+$ docker compose exec app bin/console plugin:refresh
+```
+
+Create an admin user when you need one:
+
+```shellsession title="Local shell session"
+$ docker compose exec app bin/console user:create admin
+```
+
+## Create a registry {#create-a-registry}
+
+mittwald pulls your deployment image from a registry attached to your project. If you built and pushed the `amd64` image in the build step above, you still need the registry to exist first.
+
+<Tabs groupId="access-mode">
+  <TabItem value="mstudio" label="mStudio">
+    1. Open your project in mStudio.
+    2. Select the "Containers" menu item in the sidebar.
+    3. Switch to the "Registries" tab.
+    4. Click "Add registry".
+    5. Configure the registry URL and credentials.
+  </TabItem>
+  <TabItem value="cli" label="CLI">
+    Use the `mw registry create` command:
+
+    ```shellsession title="Local shell session"
+    $ mw registry create \
+    --description "Shopware registry" \
+    --uri docker.p-XXXXXX.project.space \
+    --username <username>
+    ```
+
+    When you pass `--username`, the command prompts for the password interactively. See the [`mw registry create` reference](/docs/v2/cli/reference/registry) for details.
+
+  </TabItem>
+</Tabs>
+
+For more on private registries, see [Using private registries](/docs/v2/platform/workloads/containers/#private-registries).
+
+## Push the image {#push-the-image}
+
+If you built the image with `--push` already, skip this step. If you built locally first and want to promote that exact image, tag it for the registry and push:
+
+```shellsession title="Local shell session"
+$ docker tag sw-prod-local:fresh docker.p-XXXXXX.project.space/shopware/sw-prod-app:8.3-frankenphp
+$ docker login docker.p-XXXXXX.project.space
+$ docker push docker.p-XXXXXX.project.space/shopware/sw-prod-app:8.3-frankenphp
+```
+
+## Deploy to mittwald {#deploy-to-mittwald}
+
+Create the container from your pushed image, publish the HTTP port, and route a domain to it.
+
+<Tabs groupId="access-mode">
+  <TabItem value="mstudio" label="mStudio">
+    1. Open your project in mStudio and select "Containers".
+    2. Click "Create Container".
+    3. In the wizard, select your image `docker.p-XXXXXX.project.space/shopware/sw-prod-app:8.3-frankenphp`.
+    4. Provide the environment variables from the configuration step, publish port `8000`, and complete the wizard.
+  </TabItem>
+  <TabItem value="cli" label="CLI">
+    ```shellsession title="Local shell session"
+    $ mw container run \
+    --name sw-prod-app \
+    --env APP_URL=https://your-domain.example \
+    --env TRUSTED_PROXIES=REMOTE_ADDR \
+    -p 8000:8000/tcp \
+    docker.p-XXXXXX.project.space/shopware/sw-prod-app:8.3-frankenphp
+    ```
+
+    See the [`mw container run` reference](/docs/v2/cli/reference/container) for the full flag list.
+
+  </TabItem>
+</Tabs>
+
+TLS is handled by the mittwald ingress, so the container itself only serves plain HTTP on port `8000`. To make it reachable, add an [ingress](/docs/v2/platform/workloads/containers/#ingress-http) that maps your domain to the container port.
+
+## Post-deploy checks {#post-deploy-checks}
+
+Once the container is running, verify Shopware inside it:
+
+```shellsession title="Local shell session"
+$ mw container exec <container-id> -- php /var/www/html/bin/console about
+$ mw container exec <container-id> -- php /var/www/html/bin/console system:check
+$ mw container exec <container-id> -- php /var/www/html/bin/console plugin:refresh
+$ mw container exec <container-id> -- php /var/www/html/bin/console cache:clear
+```
+
+{/* VERIFY: confirm the exact `mw container exec` syntax against the CLI reference at /docs/v2/cli/reference/container. The notes use `mw container exec CONTAINER-ID -- COMMAND` without `-it`; the reference page did not resolve at draft time. */}
+
+## Theme and plugin workflow {#theme-and-plugin-workflow}
+
+Inside the mittwald runtime container, `/var/www/html` is effectively not writable. Anything that generates files (creating a theme or a plugin) must happen at build time, not at runtime. The working split is:
+
+- Run `theme:create` and `plugin:create` locally.
+- Commit the generated files under `custom/plugins/...`.
+- Build, push, and deploy a new image.
+- Inside the container, only run commands that do not write into the source tree: `plugin:refresh`, `plugin:install --activate`, and `theme:compile`.
+
+## Persistent volumes {#persistent-volumes}
+
+Shopware recommends persisting the directories that receive user-generated or generated content. Mount volumes onto:
+
+- `/var/www/html/files`
+- `/var/www/html/public/theme`
+- `/var/www/html/public/media`
+- `/var/www/html/public/thumbnail`
+- `/var/www/html/public/sitemap`
+
+## Common issues {#common-issues}
+
+### `Only linux/amd64 supported` {#only-amd64}
+
+The image was built for the wrong architecture. Rebuild the deployment image with `--platform linux/amd64`.
+
+### `mw container exec -it` fails {#exec-it-fails}
+
+Run `mw container exec` without the `-it` flag when there is no interactive terminal, for example in scripts or CI.
+
+### `permission denied` in `/var/www/html` {#permission-denied}
+
+Something tried to write into the read-only source tree at runtime. Move that step into the image build instead of running it inside the deployed container. See the theme and plugin workflow above.
+
+### `Could not find theme with name "Storefront"` {#theme-not-found}
+
+The theme did not make it into the container, or its Sales Channel assignment is missing. Check that the theme is present under `custom/plugins` in the built image, and verify the theme's parent dependency and Sales Channel theme assignment.
+
+## Full Dockerfile {#full-dockerfile}
+
+For reference, here is the complete `docker/Dockerfile`. The build stages are the ones `shopware/docker` generates; only the runtime stage carries the mittwald additions shown above. If you use commercial Store extensions, pass your Shopware account token as a build secret named `packages_token` rather than baking it into the image.
+
+```dockerfile title="docker/Dockerfile"
+# syntax=docker/dockerfile:1.7
+
+ARG PHP_VERSION=8.3
+
+# Runtime base (FrankenPHP variant), as documented by Shopware.
+FROM ghcr.io/shopware/docker-base:${PHP_VERSION}-frankenphp AS base-image
+
+# Build tooling image.
+FROM ghcr.io/shopware/shopware-cli:latest-php-${PHP_VERSION} AS shopware-cli
+
+# Build stage
+FROM shopware-cli AS build
+
+WORKDIR /src
+ADD . /src
+
+ENV SHOPWARE_CACHE_ID=docker
+
+RUN --mount=type=secret,id=composer_auth,dst=/src/auth.json \
+--mount=type=secret,id=packages_token,env=SHOPWARE_PACKAGES_TOKEN \
+--mount=type=cache,target=/root/.composer \
+--mount=type=cache,target=/root/.npm \
+/usr/local/bin/entrypoint.sh shopware-cli project ci /src
+
+# Runtime stage
+FROM base-image
+
+ENV SHOPWARE_DISABLE_UPDATE_CHECK=1
+
+# [mittwald] TLS opt-out. mittwald terminates TLS at the platform ingress and
+# routes a domain to a released container port over plain HTTP, so the container
+# must do no certificate work.
+COPY --link docker/caddy/Caddyfile /etc/caddy/Caddyfile
+
+ENV SERVER_NAME=":8000" \
+CADDY_HTTP_PORT=8000
+
+COPY --from=build --chown=82 --link /src /var/www/html
+
+# Release this port for your domain (plain HTTP; TLS is terminated by the ingress).
+EXPOSE 8000
+```
+
+Build with the token as a secret, for example:
+
+```shellsession title="Local shell session"
+$ SHOPWARE_PACKAGES_TOKEN=<your-token> docker buildx build \
+--platform linux/amd64 \
+-f docker/Dockerfile \
+--secret id=packages_token,env=SHOPWARE_PACKAGES_TOKEN \
+-t docker.p-XXXXXX.project.space/shopware/sw-prod-app:8.3-frankenphp \
+--push \
+.
+```
+
+If you only use free packages, drop the `packages_token` secret line from both the Dockerfile and the build command.
+
+## Related guides {#related-guides}
+
+- **[Managing and deploying containerized applications](/docs/v2/platform/workloads/containers/)** covers container concepts, registries, and ingress in depth.
+- **[Deploying containerized applications with GitHub Actions](/docs/v2/guides/deployment/container-actions/)** automates the build and push steps shown here.
+- **[Infrastructure as code with Terraform](/docs/v2/guides/deployment/terraform/)** manages the project, registry, and container declaratively.
+
+## Next steps {#next-steps}
+
+- Automate the build, push, and deploy steps in a CI pipeline that tags a new image per release.
+- Add health checks to the container so mittwald can tell when Shopware is ready to serve traffic.
+
+[shopware-docker]: https://developer.shopware.com/docs/guides/hosting/installation-updates/docker.html
