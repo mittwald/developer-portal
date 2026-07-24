@@ -177,7 +177,9 @@ Tool Calling und `reasoning.effort` unterscheiden sich zusätzlich pro Modell:
 | Qwen3.5-0.8B                  |      ✅      |         ✅         |
 | Ministral-3-14B-Instruct-2512 |      ❌      |         ✅         |
 
-Ministral-3-14B-Instruct-2512 unterstützt Tool Calling über `/v1/chat/completions` — für Tool Calling mit diesem Modell diesen Endpunkt verwenden.
+:::info
+Tool Calling über `/v1/responses` ist modellspezifisch (Tabelle oben). Ministral-3-14B-Instruct-2512 unterstützt es dort nicht — stattdessen `/v1/chat/completions` verwenden, das Tool Calling für alle hier gelisteten Modelle unterstützt.
+:::
 
 :::caution
 Ein Bild an ein Modell ohne Vision-Support zu senden, führt auf keinem der beiden Endpunkte zu einem Fehler. Bilder nur an Modelle senden, die als vision-fähig dokumentiert sind (Ministral-3-14B-Instruct-2512, Qwen3.5-122B-A10B-FP8, Qwen3.6-35B-A3B-FP8, GLM-OCR).

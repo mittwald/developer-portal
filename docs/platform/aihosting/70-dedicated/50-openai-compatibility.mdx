@@ -177,7 +177,9 @@ Tool and `reasoning.effort` support also varies by model:
 | Qwen3.5-0.8B                  |      ✅      |         ✅         |
 | Ministral-3-14B-Instruct-2512 |      ❌      |         ✅         |
 
-Ministral-3-14B-Instruct-2512 supports tool calling on `/v1/chat/completions` — use that endpoint instead if you need tool calling with it.
+:::info
+Tool calling on `/v1/responses` is model-specific (table above). Ministral-3-14B-Instruct-2512 doesn't support it there — use `/v1/chat/completions` instead, which supports tool calling for every model listed here.
+:::
 
 :::caution
 Sending image content to a model without vision support doesn't return an error on either endpoint. Only send images to models documented as vision-capable (Ministral-3-14B-Instruct-2512, Qwen3.5-122B-A10B-FP8, Qwen3.6-35B-A3B-FP8, GLM-OCR).
