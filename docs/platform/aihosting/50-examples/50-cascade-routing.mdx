@@ -12,17 +12,20 @@ This guide builds a three-tier cascade on mittwald AI Hosting using only the `op
 | ---- | ----- | ----------- |
 | 1 — fast | `Qwen3.5-0.8B` | Simple lookups, yes/no, short factual answers |
 | 2 — balanced | `Qwen3.6-35B-A3B-FP8` | Multi-step reasoning, code, comparison |
-| 3 — frontier | `Mistral-Medium-3.5-128B` | Complex analysis, long documents, 40+ languages |
+| 3 — frontier | `Qwen3.5-122B-A10B-FP8` | Complex analysis, long documents, vision |
 
 For tier 3 you can swap in any large model depending on your workload:
 
 | Tier-3 alternative | Strengths |
 | ------------------ | --------- |
-| `Mistral-Medium-3.5-128B` | 40+ languages, 256k context |
-| `Qwen3.5-122B-A10B-FP8` | Thinking mode, vision, strong coding |
+| `Qwen3.5-122B-A10B-FP8` | Thinking mode, vision, strong coding, 245k context |
 | `gpt-oss-120b` | Text-centric reasoning, 131k context |
 
-See the model pages for parameter details: [Qwen3.5-0.8B](/docs/v2/platform/aihosting/models/qwen3-5-0-8b), [Qwen3.6-35B-A3B-FP8](/docs/v2/platform/aihosting/models/qwen3-6-35b-a3b-fp8), [Mistral-Medium-3.5-128B](/docs/v2/platform/aihosting/models/mistral-medium-3-5-128b), [Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8).
+See the model pages for parameter details: [Qwen3.5-0.8B](/docs/v2/platform/aihosting/models/qwen3-5-0-8b), [Qwen3.6-35B-A3B-FP8](/docs/v2/platform/aihosting/models/qwen3-6-35b-a3b-fp8), [Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8).
+
+:::tip Thinking mode
+`Qwen3.5-122B-A10B-FP8` has thinking mode enabled by default, which adds latency. For a cascade favoring fast turnaround, disable it via `extra_body={"chat_template_kwargs": {"enable_thinking": False}}` — see [Disabling thinking mode](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8#disable-thinking). Leave it enabled if tier-3 queries benefit from step-by-step reasoning.
+:::
 
 ## Setup {#setup}
 
@@ -42,13 +45,12 @@ from openai import OpenAI
 client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
 
 # Swap the tier-3 model to match your workload:
-#   "Mistral-Medium-3.5-128B"  — 40+ languages, 256k context
-#   "Qwen3.5-122B-A10B-FP8"   — thinking mode, vision, strong coding
+#   "Qwen3.5-122B-A10B-FP8"   — thinking mode, vision, strong coding, 245k context
 #   "gpt-oss-120b"             — text-centric reasoning, 131k context
 TIERS = {
     "simple":   "Qwen3.5-0.8B",
     "moderate": "Qwen3.6-35B-A3B-FP8",
-    "complex":  "Mistral-Medium-3.5-128B",
+    "complex":  "Qwen3.5-122B-A10B-FP8",
 }
 
 CLASSIFIER_SYSTEM = """\
@@ -121,7 +123,7 @@ Expected output:
   Q: Write a Python function that merges two sorted lists.
   A: def merge_sorted(a, b): ...
 
-[complex ] Mistral-Medium-3.5-128B
+[complex ] Qwen3.5-122B-A10B-FP8
   Q: Analyse the architectural tradeoffs between event-driven and request-response…
   A: Event-driven architectures decouple producers from consumers…
 ```
@@ -174,7 +176,7 @@ With a typical support workload (70% simple, 20% moderate, 10% complex) and 100k
 
 | Scenario | Monthly cost |
 | -------- | ------------ |
-| All requests → Mistral-Medium | ~€30 |
+| All requests → Qwen3.5-122B-A10B-FP8 | ~€30 |
 | Three-tier cascade | ~€8 |
 
 The classifier call costs less than €0.10 total and is not shown separately.

@@ -10,7 +10,6 @@ Wir bieten aktuell die nachfolgenden Modelle an, die sich im Laufe der Zeit änd
 | gpt-oss-120b                  | Chat + Reasoning          | Text, Tool-Calling                            | 131.072             | Apache 2.0 |
 | Qwen3.5-0.8B                  | Chat + Reasoning          | Text, Tool-Calling                            | 262.144             | Apache 2.0 |
 | Ministral-3-14B-Instruct-2512 | Chat + Vision             | Text, Bild, Tool-Calling                      | 262.144             | Apache 2.0 |
-| Mistral-Medium-3.5-128B       | Chat + Vision             | Text, Bild, Tool-Calling                      | 256.000             | Apache 2.0 |
 | Qwen3.5-122B-A10B-FP8         | Chat + Reasoning + Vision | Text, Bild, Tool-Calling                      | 245.760             | Apache 2.0 |
 | Qwen3.6-35B-A3B-FP8           | Chat + Reasoning + Vision | Text, Bild, Tool-Calling                      | 256.000             | Apache 2.0 |
 | GLM-OCR                       | Dokument OCR              | PDF, DOCX, PPTX, XLSX, HTML, SVG, Bild → Text | 131.072             | MIT        |
@@ -18,14 +17,14 @@ Wir bieten aktuell die nachfolgenden Modelle an, die sich im Laufe der Zeit änd
 | Qwen3-VL-Reranker-2B          | Reranking                 | Text, Bild → Score                            | 32.768              | Apache 2.0 |
 | whisper-large-v3-turbo        | Speech-to-Text            | Audio → Text                                  | n/a (Audio-basiert) | MIT        |
 
+Tool-Calling in dieser Tabelle bezieht sich auf die Unterstützung über `/v1/chat/completions`. Die Unterstützung über `/v1/responses` ist modellspezifisch — die genaue Aufschlüsselung pro Modell findet sich unter [Responses-API-Support](../dedicated/openai-compatibility#responses-api).
+
 ## Modellauswahl {#picking-models}
 
 - Für komplexe textzentrierte Workloads und fortgeschrittene Automatisierungen, bei denen hohe Präzision und umfangreiches Wissen erforderlich sind \
   verwende `gpt-oss-120b`.
 - Für hochdurchsatz- und kostensensitive Aufgaben ohne Vision-Bedarf, etwa einfache Frage-Antwort-Szenarien, Routing, Klassifizierung und Batch-Verarbeitung \
   verwende `Qwen3.5-0.8B`.
-- Für komplexe Reasoning-, mehrsprachige oder Vision-Aufgaben, bei denen ein großes Frontier-Modell erforderlich ist \
-  verwende `Mistral-Medium-3.5-128B`.
 - Für generelle, skalierbare und kostenbewusste Chat- sowie einfache multimodale Workflows (Text + Bild) \
   verwende `Ministral-3-14B-Instruct-2512`.
 - Für umfangreiche Reasoning- und Vision-Aufgaben, bei denen hohe Modellkapazität erforderlich ist \
