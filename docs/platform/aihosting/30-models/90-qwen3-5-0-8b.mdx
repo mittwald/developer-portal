@@ -191,7 +191,7 @@ category = response.choices[0].message.content.strip()
 - **Cascade routing**: Use `Qwen3.5-0.8B` to classify query complexity (simple / code / math / vision), then route to the appropriate tier:
   - Simple text → `Qwen3.5-0.8B` handles it directly
   - Moderate → `Qwen3.6-35B-A3B-FP8` (reasoning + vision, mid cost)
-  - Complex / frontier → `Mistral-Medium-3.5-128B` or `Qwen3.5-122B-A10B-FP8`
+  - Complex / frontier → `Qwen3.5-122B-A10B-FP8`
   - Vision only → `Ministral-3-14B-Instruct-2512` (cheapest vision model)
 
   A well-tuned cascade can cut costs by 40–80% while maintaining quality on 95% of queries.
