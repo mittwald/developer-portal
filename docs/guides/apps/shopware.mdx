@@ -118,11 +118,10 @@ The complete file, with the unchanged build stages included, is in [Full Dockerf
 
 mittwald containers run on `linux/amd64`. On an Apple Silicon Mac you therefore build twice: an `arm64` image for fast local testing, and an `amd64` image for the deployment.
 
-For local testing on Apple Silicon:
+For local testing:
 
 ```shellsession title="Local shell session"
-$ docker buildx build \
-  --platform linux/arm64 \
+$ docker build \
   -f docker/Dockerfile \
   --build-arg PHP_VERSION=8.3 \
   -t sw-prod-local:fresh \
