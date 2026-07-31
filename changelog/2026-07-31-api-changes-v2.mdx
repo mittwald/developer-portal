@@ -1,0 +1,637 @@
+---
+title: Breaking (!) API changes for v2 API, July 24 to July 31
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Cronjob
+  - Customer
+  - Project
+  - Notification
+  - App
+  - Container
+  - Contract
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API introduces several updates, including changes to default values for request parameters, the addition of new optional properties and parameters, and the removal of deprecated operation IDs across various endpoints.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The default value for the `limit` request parameter in the `GET /v2/cronjobs/{cronjobId}/executions` operation has been changed from `1000.00` to `10000.00`. This is a breaking change.
+- Default values for the `limit` and `skip` request parameters have been added to the following operations:
+  - `GET /v2/customer-invites`: `limit` is `1000.00`, `skip` is `0.00`.
+  - `GET /v2/customer-memberships`: `limit` is `1000.00`, `skip` is `0.00`.
+  - `GET /v2/customers/{customerId}/invites`: `limit` is `1000.00`, `skip` is `0.00`.
+  - `GET /v2/customers/{customerId}/memberships`: `limit` is `1000.00`, `skip` is `0.00`.
+  - `GET /v2/project-invites`: `limit` is `1000.00`, `skip` is `0.00`.
+  - `GET /v2/project-memberships`: `limit` is `1000.00`, `skip` is `0.00`.
+  - `GET /v2/projects/{projectId}/invites`: `limit` is `1000.00`, `skip` is `0.00`.
+  - `GET /v2/projects/{projectId}/memberships`: `limit` is `1000.00`, `skip` is `0.00`.
+- The minimum value for the `limit` request parameter has been set to `0.00` for the following operations:
+  - `GET /v2/customer-invites`
+  - `GET /v2/customer-memberships`
+  - `GET /v2/customers/{customerId}/invites`
+  - `GET /v2/customers/{customerId}/memberships`
+  - `GET /v2/project-invites`
+  - `GET /v2/project-memberships`
+  - `GET /v2/projects/{projectId}/invites`
+  - `GET /v2/projects/{projectId}/memberships`
+- The new optional request parameter `page` has been added to the following operations:
+  - `GET /v2/customers/{customerId}/invites`
+  - `GET /v2/customers/{customerId}/memberships`
+  - `GET /v2/projects/{projectId}/invites`
+  - `GET /v2/projects/{projectId}/memberships`
+- The new optional request property `databases` has been added to the `PATCH /v2/app-installations/{appInstallationId}` operation.
+- A non-success response with status `400` has been added to the `PATCH /v2/app-installations/{appInstallationId}` operation.
+- The following API operation IDs have been removed and replaced with deprecated versions:
+  - `PATCH /v2/app-installations/{appInstallationId}/database/replace` is now `PATCH /v2/app-installations/{appInstallationId}/database/replace`.
+  - `PATCH /v2/cronjobs/{cronjobId}/app-installation-id` is now `PATCH /v2/cronjobs/{cronjobId}/app-installation-id`.
+  - `PUT /v2/cronjobs/{cronjobId}/app-installation-id` is now `PUT /v2/cronjobs/{cronjobId}/app-installation-id`.
+  - `GET /v2/customers/{customerId}/ai-hosting/contract` is now `GET /v2/customers/{customerId}/ai-hostings/{aiHostingId}/contract`.
+  - `PATCH /v2/project-backups/{projectBackupId}/description` is now `PATCH /v2/project-backups/{projectBackupId}/description`.
+  - `PUT /v2/project-backups/{projectBackupId}/expiration-time` is now `PUT /v2/project-backups/{projectBackupId}/expiration-time`.
+  - `PATCH /v2/projects/{projectId}/description` is now `PATCH /v2/projects/{projectId}/description`.
+  - `PUT /v2/projects/{projectId}/storage-space-notification-threshold` is now `PUT /v2/projects/{projectId}/storage-space-notification-threshold`.
+  - `PATCH /v2/servers/{serverId}/description` is now `PATCH /v2/servers/{serverId}/description`.
+  - `PUT /v2/servers/{serverId}/storage-space-notification-threshold` is now `PUT /v2/servers/{serverId}/storage-space-notification-threshold`.
+  - `PUT /v2/stacks/{stackId}/update-schedule` is now `PUT /v2/stacks/{stackId}/update-schedule`.
+- The following optional properties have been added to responses with status `200`:
+  - `GET /v2/container-templates`: `/items/userInputs/items/positionMeta`.
+  - `GET /v2/container-templates/{templateId}`: `userInputs/items/positionMeta`.
+  - `GET /v2/projects/{projectId}/activities`: `#/components/schemas/de.mittwald.v1.activitylog.DatabaseMysqlUserPasswordSet`.
+  - `GET /v2/projects/{projectId}/services`: `/items/templateId`.
+  - `GET /v2/projects/{projectId}/stacks`: `/items/services/items/templateId`.
+  - `POST /v2/projects/{projectId}/stacks`: `services/items/templateId`.
+  - `GET /v2/stacks`: `/items/services/items/templateId`.
+  - `GET /v2/stacks/{stackId}`: `services/items/templateId`.
+  - `PATCH /v2/stacks/{stackId}`: `services/items/templateId`.
+  - `PUT /v2/stacks/{stackId}`: `services/items/templateId`.
+  - `GET /v2/stacks/{stackId}/services/{serviceId}`: `templateId`.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "List cronjob executions belonging to a cronjob"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', default value was changed from '1000.00' to '10000.00'
+
+
+For details, refer to the <OperationLink operation="cronjob-list-executions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List customer invites belonging to the executing user"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', default value '1000.00' was added
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'skip', default value '0.00' was added
+
+- for the 'query' request parameter 'limit', the min was set to '0.00'
+
+
+For details, refer to the <OperationLink operation="customer-list-customer-invites" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List customer memberships belonging to the executing user"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', default value '1000.00' was added
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'skip', default value '0.00' was added
+
+- for the 'query' request parameter 'limit', the min was set to '0.00'
+
+
+For details, refer to the <OperationLink operation="customer-list-customer-memberships" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Invites belonging to a Customer"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', default value '1000.00' was added
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'skip', default value '0.00' was added
+
+- for the 'query' request parameter 'limit', the min was set to '0.00'
+
+- added the new optional 'query' request parameter 'page'
+
+
+For details, refer to the <OperationLink operation="customer-list-invites-for-customer" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Memberships belonging to a Customer"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', default value '1000.00' was added
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'skip', default value '0.00' was added
+
+- for the 'query' request parameter 'limit', the min was set to '0.00'
+
+- added the new optional 'query' request parameter 'page'
+
+
+For details, refer to the <OperationLink operation="customer-list-memberships-for-customer" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List ProjectInvites belonging to the executing user"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', default value '1000.00' was added
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'skip', default value '0.00' was added
+
+- for the 'query' request parameter 'limit', the min was set to '0.00'
+
+
+For details, refer to the <OperationLink operation="project-list-project-invites" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List ProjectMemberships belonging to the executing user"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', default value '1000.00' was added
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'skip', default value '0.00' was added
+
+- for the 'query' request parameter 'limit', the min was set to '0.00'
+
+
+For details, refer to the <OperationLink operation="project-list-project-memberships" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Invites belonging to a Project"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', default value '1000.00' was added
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'skip', default value '0.00' was added
+
+- for the 'query' request parameter 'limit', the min was set to '0.00'
+
+- added the new optional 'query' request parameter 'page'
+
+
+For details, refer to the <OperationLink operation="project-list-invites-for-project" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Memberships belonging to a Project"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', default value '1000.00' was added
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'skip', default value '0.00' was added
+
+- for the 'query' request parameter 'limit', the min was set to '0.00'
+
+- added the new optional 'query' request parameter 'page'
+
+
+For details, refer to the <OperationLink operation="project-list-memberships-for-project" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Mark all notifications as read"
+
+
+- added the new 'unread' enum value to the 'status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="notifications-read-all-notifications" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Mark all notifications as read (deprecated)"
+
+
+- added the new 'unread' enum value to the 'status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="notifications-read-all-notifications-deprecated" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Mark notification as read"
+
+
+- added the new 'unread' enum value to the 'status' response property for the response status '200'
+
+- added the new 'unread' enum value to the request property 'status'
+
+
+For details, refer to the <OperationLink operation="notifications-read-notification" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update properties belonging to an app installation"
+
+
+- added the new optional request property 'databases'
+
+- added the non-success response with the status '400'
+
+
+For details, refer to the <OperationLink operation="app-patch-appinstallation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "app-replace-database"
+
+
+- api operation id 'app-replace-database' removed and replaced with 'deprecated-app-replace-database'
+
+
+For details, refer to the <OperationLink operation="app-replace-database" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Container Templates"
+
+
+- added the optional property '/items/userInputs/items/positionMeta' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-list-templates" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Container Template by ID"
+
+
+- added the optional property 'userInputs/items/positionMeta' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-get-template" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "cronjob-update-cronjob-app-id-deprecated"
+
+
+- api operation id 'cronjob-update-cronjob-app-id-deprecated' removed and replaced with 'deprecated-cronjob-update-cronjob-app-id'
+
+
+For details, refer to the <OperationLink operation="cronjob-update-cronjob-app-id-deprecated" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "cronjob-replace-cronjob-app-installation-id"
+
+
+- api operation id 'cronjob-replace-cronjob-app-installation-id' removed and replaced with 'deprecated-cronjob-replace-cronjob-app-installation-id'
+
+
+For details, refer to the <OperationLink operation="cronjob-replace-cronjob-app-installation-id" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the AI Hosting Contract for the given Customer"
+
+
+- api operation id 'contract-get-detail-of-contract-by-ai-hosting' removed and replaced with 'deprecated-contract-get-detail-of-contract-by-ai-hosting'
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-ai-hosting" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "backup-update-project-backup-description"
+
+
+- api operation id 'backup-update-project-backup-description' removed and replaced with 'deprecated-backup-update-project-backup-description'
+
+
+For details, refer to the <OperationLink operation="backup-update-project-backup-description" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "backup-replace-project-backup-expiration-time"
+
+
+- api operation id 'backup-replace-project-backup-expiration-time' removed and replaced with 'deprecated-backup-replace-project-backup-expiration-time'
+
+
+For details, refer to the <OperationLink operation="backup-replace-project-backup-expiration-time" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the activities of a project"
+
+
+- added '#/components/schemas/de.mittwald.v1.activitylog.DatabaseMysqlUserPasswordSet' to the '/items/action' response property 'anyOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="project-list-project-activities" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "project-update-project-description"
+
+
+- api operation id 'project-update-project-description' removed and replaced with 'deprecated-project-update-project-description'
+
+
+For details, refer to the <OperationLink operation="project-update-project-description" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Services belonging to a Project"
+
+
+- added the optional property '/items/templateId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-list-services" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Stacks belonging to a Project"
+
+
+- added the optional property '/items/services/items/templateId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-list-stacks" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a Stack"
+
+
+- added the optional property 'services/items/templateId' to the response with the '201' status
+
+
+For details, refer to the <OperationLink operation="container-create-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "storagespace-replace-project-notification-threshold"
+
+
+- api operation id 'storagespace-replace-project-notification-threshold' removed and replaced with 'deprecated-storagespace-replace-project-notification-threshold'
+
+
+For details, refer to the <OperationLink operation="storagespace-replace-project-notification-threshold" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "project-update-server-description"
+
+
+- api operation id 'project-update-server-description' removed and replaced with 'deprecated-project-update-server-description'
+
+
+For details, refer to the <OperationLink operation="project-update-server-description" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "storagespace-replace-server-notification-threshold"
+
+
+- api operation id 'storagespace-replace-server-notification-threshold' removed and replaced with 'deprecated-storagespace-replace-server-notification-threshold'
+
+
+For details, refer to the <OperationLink operation="storagespace-replace-server-notification-threshold" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Stacks belonging to the executing user"
+
+
+- added the optional property '/items/services/items/templateId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-list-self-stacks" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Stack"
+
+
+- added the optional property 'services/items/templateId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-get-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create, update or delete Services or Volumes belonging to a Stack"
+
+
+- added the optional property 'services/items/templateId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-update-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Declaratively create, update or delete Services or Volumes belonging to a Stack"
+
+
+- added the optional property 'services/items/templateId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-declare-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Service belonging to a Stack"
+
+
+- added the optional property 'templateId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-get-service" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "container-set-stack-update-schedule"
+
+
+- api operation id 'container-set-stack-update-schedule' removed and replaced with 'deprecated-container-set-stack-update-schedule'
+
+
+For details, refer to the <OperationLink operation="container-set-stack-update-schedule" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK Release v2.1.210
+
+The latest release of the mittwald PHP SDK, [v2.1.210](https://github.com/mittwald/api-client-php/releases/tag/v2.1.210), introduces several new features and improvements aimed at enhancing functionality and type safety.
+
+#### Features Added
+- **New Schemas**: `DesiredSystemSoftware` and `PatchLinkedDatabase` schemas have been introduced to enhance the Patch App Installation requests.
+- **Request Body Updates**: The `DeclareStack` and `UpdateStack` request bodies have been updated to include new service and volume declaration structures.
+
+#### Changes
+
+##### General Changes
+- Improved type safety by updating multiple classes to replace `mixed[]` type hints with more specific array types.
+
+##### Patch App Installation
+- The `PatchAppinstallationRequestBody` now includes `DesiredSystemSoftware` and `PatchLinkedDatabase`.
+- Method signatures have been updated to specify concrete return types for better type checking.
+
+##### Request App Installation
+- The `RequestAppinstallationRequestBody` has been modified to utilize `DesiredSystemSoftware`.
+
+##### Declare and Update Stack
+- `DeclareStackRequestBody` and `UpdateStackRequestBody` now incorporate `ServiceDeclareRequest` and `VolumeDeclareRequest`.
+
+##### Marketplace Extensions
+- Updated `ExtensionPatchExtensionRequestBody` and `ExtensionRegisterExtensionRequestBody` to use the `FrontendFragment` schema, enhancing frontend integration.
+
+##### User Schema
+- The `User` class has been refined to specify more precise types for `customerMemberships` and `projectMemberships`.
+
+##### Reflective Changes
+- Adjustments in parameter types and return values for classes like `GenericAction` and `DetailMetrics` to improve validation and error handling.
+
+These updates collectively aim to enhance type safety, improve the API's robustness, and provide a clearer contract between systems utilizing these APIs.
+
+### mittwald PHP SDK Release v2.1.209
+
+The mittwald PHP SDK has released version v2.1.209, introducing several new features and improvements. You can view the full release details [here](https://github.com/mittwald/api-client-php/releases/tag/v2.1.209).
+
+#### Features
+- **Deprecated Database Operations**: The operations for linking and replacing MySQL databases are now deprecated. Users should transition to the new `PATCH /v2/app-installations/{appInstallationId}` endpoint.
+- **Enhanced Request Handling**: New requests for replacing and linking databases have been introduced, consolidating functionalities for easier management.
+
+#### Breaking Changes
+- **Deprecated Methods**: The `linkDatabase` and `replaceDatabase` methods are deprecated, with functionality moved to the new PATCH endpoint.
+- **Request Changes**: New request classes such as `DeprecatedAppReplaceDatabaseRequest` and `DeprecatedAppLinkDatabaseRequest` have been created for better organization.
+
+#### Improvements
+- **Default Values for Pagination**: Default values for `limit` and `skip` parameters in request classes simplify API usage.
+- **Query Limitations Enhanced**: New checks and defaults for limit and skip queries ensure smoother paging.
+
+#### General Enhancements
+- **Container Templates Updates**: Added `positionMeta` to container-related template schemas.
+- **User Input Processing Extensions**: Enhanced management of user input within templates.
+
+#### Cleanups
+- **Code Refactoring**: Removal of outdated methods to decrease code complexity and improve maintainability.
+
+These updates aim to streamline API interactions and improve usability while facilitating a smooth transition from deprecated methods.
+
+### Mittwald PHP SDK Release v2.1.208
+
+The latest release of the mittwald PHP SDK, version v2.1.208, introduces several new features, improvements, and deprecations. 
+
+#### Features
+- **App Installation Patch**: Support for patching app installations has been added, including a new field for specifying changes to linked databases.
+- **Backup Modifications**: Backup operations have been refactored to include deprecated routes and new response types for smoother transitions.
+- **Container Stack Updates**: Methods have been updated to reflect deprecations and provide alternatives for setting stack update schedules.
+
+#### Bug Fixes and Improvements
+- Improved response handling in the App client for patch requests, particularly for 400 errors.
+- Refactored backup operations to handle legacy requests and improve error handling.
+- Resolved inconsistencies in response structures across deprecated endpoints.
+- Cleaned up project notification responses for better clarity and reduced complexity.
+
+#### Deprecations
+- Several backup methods and endpoints have been deprecated. Clients are encouraged to transition to newer alternatives for better stability and support.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.208).
+
+### mittwald PHP SDK Release v2.1.207
+
+The latest release of the mittwald PHP SDK, version v2.1.207, introduces several enhancements aimed at improving data handling and service metadata management. 
+
+#### Features
+
+- **Increased Default Limit for ListExecutionsRequest**: The default limit for executing requests in the `ListExecutionsRequest` class has been increased from 1,000 to 10,000. This enhancement allows for more efficient bulk data operations by retrieving a larger number of execution results in a single request.
+
+- **Template ID Support in ServiceResponse**: A new property, `templateId`, has been added to the `ServiceResponse` class. This property stores the ID of the template used during service creation, if applicable.
+
+- **Getter and Setter Methods for Template ID**:
+  - `getTemplateId()`: Retrieves the `templateId`.
+  - `withTemplateId(string $templateId)`: Sets the `templateId` with validation.
+  - `withoutTemplateId()`: Clears the `templateId`.
+
+#### Bug Fixes
+
+- No bug fixes were identified in this release.
+
+#### Notes
+
+These updates enhance the API's usability and flexibility, particularly for handling larger data sets and managing additional metadata related to services.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.207).
+
+### mittwald JavaScript SDK Release 4.433.0
+
+The mittwald JavaScript SDK has been updated to version 4.433.0. This release includes the following feature:
+
+- Updated the generated client to enhance functionality and performance ([commit 65a3485](https://github.com/mittwald/api-client-js/commit/65a3485bbb4caff43f740a4f177d0dd4595729cc)).
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.433.0).
+
+### mittwald JavaScript SDK Release 4.432.0
+
+The mittwald JavaScript SDK has been updated to version 4.432.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.432.0).
+
+### mittwald JavaScript SDK Release 4.431.0
+
+The mittwald JavaScript SDK has been updated to version 4.431.0. This release includes the following feature:
+
+- Updated the generated client to enhance functionality and performance ([commit 2be8e78](https://github.com/mittwald/api-client-js/commit/2be8e78344762086842e541067dcb09a9ab4568d)).
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.431.0).
+
+### mittwald JavaScript SDK Release 4.430.0
+
+The mittwald JavaScript SDK has been updated to version 4.430.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, please refer to the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.430.0).
+
+### mittwald JavaScript SDK Release 4.429.1
+
+The mittwald JavaScript SDK version 4.429.1 has been released. This update includes a bug fix for the project module, specifically addressing the use of a generic patch route for updating project descriptions. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.429.1).
+
+### mittwald JavaScript SDK Release 4.429.0
+
+The mittwald JavaScript SDK has been updated to version 4.429.0. This release includes an update to the generated client, enhancing its functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.429.0).
+
+### mittwald JavaScript SDK Release 4.428.0
+
+The mittwald JavaScript SDK has been updated to version 4.428.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details on the changes and to view the release notes, visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.428.0).
+
