@@ -63,6 +63,10 @@ The Dockerfile that `shopware/docker` added is a multi-stage build. It uses `ghc
 
 For mittwald you do not need to change it. The base image already listens on plain-HTTP port `8000`, and the `CADDY_GLOBAL_OPTIONS=auto_https off` variable from the previous step keeps Caddy out of the TLS business. Build and deploy the Dockerfile exactly as `shopware/docker` generated it — no custom Caddyfile, no runtime-stage patch.
 
+:::note
+For the full build setup, its options, and how to keep it up to date, see Shopware's [Docker deployment guide][shopware-docker].
+:::
+
 ## Build the image {#build-the-image}
 
 mittwald containers run on `linux/amd64`. Build a native image for fast local testing, and a dedicated `amd64` image for the deployment.
@@ -166,14 +170,15 @@ user@local $ docker push docker.p-XXXXXX.project.space/shopware/shopware-app:8.3
 
 ## Deploy to mittwald {#deploy-to-mittwald}
 
-Create the container from your pushed image, publish the HTTP port, and route a domain to it.
+Create the container from your pushed image, publish the HTTP port, mount volumes for Shopware's persistent data, and route a domain to it. Because the runtime filesystem is read-only and containers are recreated on every deploy, the directories that receive user-generated or generated content must live on [persistent volumes](#persistent-volumes) — otherwise media, generated themes, thumbnails, and sitemaps are lost. The examples below mount all of them.
 
 <Tabs groupId="access-mode">
   <TabItem value="mstudio" label="mStudio">
     1. Open your project in mStudio and select "Containers".
     2. Click "Create Container".
     3. In the wizard, select your image `docker.p-XXXXXX.project.space/shopware/shopware-app:8.3-frankenphp`.
-    4. Provide the environment variables from the configuration step, publish port `8000`, and complete the wizard.
+    4. Provide the environment variables from the configuration step and publish port `8000`.
+    5. Under **Volumes**, add a mount for each of Shopware's [persistent directories](#persistent-volumes), then complete the wizard.
   </TabItem>
   <TabItem value="cli" label="CLI">
     ```shellsession
@@ -183,10 +188,16 @@ Create the container from your pushed image, publish the HTTP port, and route a 
     --env TRUSTED_PROXIES=REMOTE_ADDR \
     --env CADDY_GLOBAL_OPTIONS="auto_https off" \
     -p 8000:8000/tcp \
+    --volume shopware-files:/var/www/html/files \
+    --volume shopware-theme:/var/www/html/public/theme \
+    --volume shopware-media:/var/www/html/public/media \
+    --volume shopware-thumbnail:/var/www/html/public/thumbnail \
+    --volume shopware-sitemap:/var/www/html/public/sitemap \
+    --create-volumes \
     docker.p-XXXXXX.project.space/shopware/shopware-app:8.3-frankenphp
     ```
 
-    See the [`mw container run` reference](/docs/v2/cli/reference/container) for the full flag list.
+    The `--create-volumes` flag creates the named volumes on first run. See the [`mw container run` reference](/docs/v2/cli/reference/container) for the full flag list.
 
   </TabItem>
   <TabItem value="stack" label="mw stack deploy">
@@ -204,6 +215,18 @@ Create the container from your pushed image, publish the HTTP port, and route a 
           - DATABASE_URL=<your-database-url>
           - TRUSTED_PROXIES=REMOTE_ADDR
           - CADDY_GLOBAL_OPTIONS=auto_https off
+        volumes:
+          - shopware-files:/var/www/html/files
+          - shopware-theme:/var/www/html/public/theme
+          - shopware-media:/var/www/html/public/media
+          - shopware-thumbnail:/var/www/html/public/thumbnail
+          - shopware-sitemap:/var/www/html/public/sitemap
+    volumes:
+      shopware-files:
+      shopware-theme:
+      shopware-media:
+      shopware-thumbnail:
+      shopware-sitemap:
     ```
 
     Then deploy the stack (`mw stack deploy` reads `./docker-compose.yml` by default):
@@ -219,6 +242,35 @@ Create the container from your pushed image, publish the HTTP port, and route a 
 
 TLS is handled by the mittwald ingress, so the container itself only serves plain HTTP on port `8000`. To make it reachable, add an [ingress](/docs/v2/platform/workloads/containers/#ingress-http) that maps your domain to the container port.
 
+## Persistent volumes {#persistent-volumes}
+
+The deploy step above mounts a volume for each directory that Shopware recommends persisting — the ones that receive user-generated or generated content. Without them, this data is lost whenever the container is recreated. For reference, the paths are:
+
+- `/var/www/html/files`
+- `/var/www/html/public/theme`
+- `/var/www/html/public/media`
+- `/var/www/html/public/thumbnail`
+- `/var/www/html/public/sitemap`
+
+:::note
+As an alternative to volumes, Shopware recommends storing these files in external S3-compatible object storage. Configuring the `public` filesystem also moves theme, asset, and sitemap files there, so no volumes are needed. This is set up in Shopware's [filesystem configuration][shopware-filesystem] (not in mStudio) and requires a third-party S3-compatible provider.
+:::
+
+## Theme and plugin workflow {#theme-and-plugin-workflow}
+
+Inside the mittwald runtime container, `/var/www/html` is effectively not writable. Anything that generates files (creating a theme or a plugin) must happen at build time, not at runtime.
+
+Adding themes and plugins is a build-time task in this setup: their source lives in `custom/plugins` and their assets in `public/bundles`, both part of the read-only image — not the [persistent volumes](#persistent-volumes) above, which only hold runtime-generated content like media and compiled theme output. So creating or installing extensions happens in the image build, not in the running container. The working split is:
+
+- Run `theme:create` and `plugin:create` locally.
+- Commit the generated files under `custom/plugins/...`.
+- Build, push, and deploy a new image.
+- Inside the container, only run commands that do not write into the source tree: `plugin:refresh`, `plugin:install --activate`, and `theme:compile`.
+
+:::note
+Shopware can technically manage extensions at runtime if `custom/plugins` and `public/bundles` are mounted as volumes, but that is not recommended for containerized deployments and conflicts with the read-only setup used here (see [the extension Store issue](#extension-store)).
+:::
+
 ## Post-deploy checks {#post-deploy-checks}
 
 Once the container is running, verify Shopware inside it:
@@ -229,25 +281,6 @@ user@local $ mw container exec <container-id> -- php /var/www/html/bin/console s
 user@local $ mw container exec <container-id> -- php /var/www/html/bin/console plugin:refresh
 user@local $ mw container exec <container-id> -- php /var/www/html/bin/console cache:clear
 ```
-
-## Theme and plugin workflow {#theme-and-plugin-workflow}
-
-Inside the mittwald runtime container, `/var/www/html` is effectively not writable. Anything that generates files (creating a theme or a plugin) must happen at build time, not at runtime. The working split is:
-
-- Run `theme:create` and `plugin:create` locally.
-- Commit the generated files under `custom/plugins/...`.
-- Build, push, and deploy a new image.
-- Inside the container, only run commands that do not write into the source tree: `plugin:refresh`, `plugin:install --activate`, and `theme:compile`.
-
-## Persistent volumes {#persistent-volumes}
-
-Shopware recommends persisting the directories that receive user-generated or generated content. Mount volumes onto:
-
-- `/var/www/html/files`
-- `/var/www/html/public/theme`
-- `/var/www/html/public/media`
-- `/var/www/html/public/thumbnail`
-- `/var/www/html/public/sitemap`
 
 ## Common issues {#common-issues}
 
@@ -299,3 +332,4 @@ The theme did not make it into the container, or its Sales Channel assignment is
 
 [shopware-docker]: https://developer.shopware.com/docs/guides/hosting/installation-updates/docker.html
 [shopware-extension-management]: https://developer.shopware.com/docs/guides/hosting/installation-updates/extension-management.html
+[shopware-filesystem]: https://developer.shopware.com/docs/guides/hosting/infrastructure/filesystem.html

@@ -63,6 +63,10 @@ Das Dockerfile, das `shopware/docker` hinzugefügt hat, ist ein Multi-Stage-Buil
 
 Für mittwald musst du es nicht ändern. Das Base-Image lauscht bereits auf dem einfachen HTTP-Port `8000`, und die Variable `CADDY_GLOBAL_OPTIONS=auto_https off` aus dem vorherigen Schritt hält Caddy aus dem TLS-Geschäft heraus. Baue und deploye das Dockerfile exakt so, wie `shopware/docker` es generiert hat — kein eigener Caddyfile, kein Patch der Runtime-Stage.
 
+:::note
+Das vollständige Build-Setup, seine Optionen und wie du es aktuell hältst, beschreibt Shopwares [Docker-Deployment-Guide][shopware-docker].
+:::
+
 ## Image bauen {#build-the-image}
 
 mittwald-Container laufen auf `linux/amd64`. Baue ein natives Image für den schnellen lokalen Test und ein dediziertes `amd64`-Image für das Deployment.
@@ -166,14 +170,15 @@ user@local $ docker push docker.p-XXXXXX.project.space/shopware/shopware-app:8.3
 
 ## Auf mittwald deployen {#deploy-to-mittwald}
 
-Erstelle den Container aus deinem gepushten Image, gib den HTTP-Port frei und route eine Domain darauf.
+Erstelle den Container aus deinem gepushten Image, gib den HTTP-Port frei, mounte Volumes für Shopwares persistente Daten und route eine Domain darauf. Da das Runtime-Dateisystem schreibgeschützt ist und Container bei jedem Deploy neu erstellt werden, müssen die Verzeichnisse mit nutzergenerierten oder erzeugten Inhalten auf [persistenten Volumes](#persistent-volumes) liegen, sonst gehen Medien, generierte Themes, Thumbnails und Sitemaps verloren. Die Beispiele unten mounten sie alle.
 
 <Tabs groupId="access-mode">
   <TabItem value="mstudio" label="mStudio">
     1. Öffne dein Projekt im mStudio und wähle "Container".
     2. Klicke auf "Container erstellen".
     3. Wähle im Assistenten dein Image `docker.p-XXXXXX.project.space/shopware/shopware-app:8.3-frankenphp`.
-    4. Gib die Umgebungsvariablen aus dem Konfigurationsschritt an, gib Port `8000` frei und schließe den Assistenten ab.
+    4. Gib die Umgebungsvariablen aus dem Konfigurationsschritt an und gib Port `8000` frei.
+    5. Füge unter **Volumes** für jedes von Shopwares [persistenten Verzeichnissen](#persistent-volumes) ein Mount hinzu und schließe dann den Assistenten ab.
   </TabItem>
   <TabItem value="cli" label="CLI">
     ```shellsession
@@ -183,10 +188,16 @@ Erstelle den Container aus deinem gepushten Image, gib den HTTP-Port frei und ro
     --env TRUSTED_PROXIES=REMOTE_ADDR \
     --env CADDY_GLOBAL_OPTIONS="auto_https off" \
     -p 8000:8000/tcp \
+    --volume shopware-files:/var/www/html/files \
+    --volume shopware-theme:/var/www/html/public/theme \
+    --volume shopware-media:/var/www/html/public/media \
+    --volume shopware-thumbnail:/var/www/html/public/thumbnail \
+    --volume shopware-sitemap:/var/www/html/public/sitemap \
+    --create-volumes \
     docker.p-XXXXXX.project.space/shopware/shopware-app:8.3-frankenphp
     ```
 
-    Siehe die [Referenz zu `mw container run`](/docs/v2/cli/reference/container) für die vollständige Flag-Liste.
+    Das Flag `--create-volumes` legt die benannten Volumes beim ersten Start an. Siehe die [Referenz zu `mw container run`](/docs/v2/cli/reference/container) für die vollständige Flag-Liste.
 
   </TabItem>
   <TabItem value="stack" label="mw stack deploy">
@@ -204,6 +215,18 @@ Erstelle den Container aus deinem gepushten Image, gib den HTTP-Port frei und ro
           - DATABASE_URL=<your-database-url>
           - TRUSTED_PROXIES=REMOTE_ADDR
           - CADDY_GLOBAL_OPTIONS=auto_https off
+        volumes:
+          - shopware-files:/var/www/html/files
+          - shopware-theme:/var/www/html/public/theme
+          - shopware-media:/var/www/html/public/media
+          - shopware-thumbnail:/var/www/html/public/thumbnail
+          - shopware-sitemap:/var/www/html/public/sitemap
+    volumes:
+      shopware-files:
+      shopware-theme:
+      shopware-media:
+      shopware-thumbnail:
+      shopware-sitemap:
     ```
 
     Deploye den Stack anschließend (`mw stack deploy` liest standardmäßig `./docker-compose.yml`):
@@ -219,6 +242,35 @@ Erstelle den Container aus deinem gepushten Image, gib den HTTP-Port frei und ro
 
 TLS übernimmt der mittwald-Ingress, der Container selbst liefert also nur einfaches HTTP auf Port `8000` aus. Um ihn erreichbar zu machen, füge ein [Ingress](/docs/v2/platform/workloads/containers/#ingress-http) hinzu, das deine Domain auf den Container-Port mappt.
 
+## Persistente Volumes {#persistent-volumes}
+
+Der Deploy-Schritt oben mountet für jedes Verzeichnis, das Shopware zu persistieren empfiehlt, ein Volume — also die, die nutzergenerierte oder erzeugte Inhalte aufnehmen. Ohne sie gehen diese Daten verloren, sobald der Container neu erstellt wird. Zur Referenz die Pfade:
+
+- `/var/www/html/files`
+- `/var/www/html/public/theme`
+- `/var/www/html/public/media`
+- `/var/www/html/public/thumbnail`
+- `/var/www/html/public/sitemap`
+
+:::note
+Als Alternative zu Volumes empfiehlt Shopware, diese Dateien in externem, S3-kompatiblem Object Storage abzulegen. Konfigurierst du das `public`-Filesystem, wandern auch Theme-, Asset- und Sitemap-Dateien dorthin, sodass keine Volumes nötig sind. Das wird in Shopwares [Filesystem-Konfiguration][shopware-filesystem] eingerichtet (nicht in mStudio) und benötigt einen externen S3-kompatiblen Provider.
+:::
+
+## Theme- und Plugin-Workflow {#theme-and-plugin-workflow}
+
+Im mittwald-Runtime-Container ist `/var/www/html` effektiv nicht schreibbar. Alles, was Dateien erzeugt (ein Theme oder ein Plugin anlegen), muss zur Build-Zeit passieren, nicht zur Laufzeit.
+
+Themes und Plugins hinzuzufügen ist in diesem Setup eine Build-Zeit-Aufgabe: Ihr Quellcode liegt in `custom/plugins`, ihre Assets in `public/bundles` — beides Teil des read-only Images, nicht der [persistenten Volumes](#persistent-volumes) oben, die nur zur Laufzeit erzeugte Inhalte wie Medien und kompilierte Theme-Ausgaben enthalten. Extensions anzulegen oder zu installieren passiert also im Image-Build, nicht im laufenden Container. Die funktionierende Aufteilung ist:
+
+- Führe `theme:create` und `plugin:create` lokal aus.
+- Committe die erzeugten Dateien unter `custom/plugins/...`.
+- Baue, pushe und deploye ein neues Image.
+- Führe im Container nur Befehle aus, die nicht in den Quellbaum schreiben: `plugin:refresh`, `plugin:install --activate` und `theme:compile`.
+
+:::note
+Shopware kann Extensions technisch auch zur Laufzeit verwalten, wenn `custom/plugins` und `public/bundles` als Volumes gemountet sind. Das ist für containerisierte Deployments jedoch nicht empfohlen und widerspricht dem hier verwendeten read-only-Setup (siehe [das Extension-Store-Problem](#extension-store)).
+:::
+
 ## Checks nach dem Deployment {#post-deploy-checks}
 
 Sobald der Container läuft, prüfe Shopware darin:
@@ -229,25 +281,6 @@ user@local $ mw container exec <container-id> -- php /var/www/html/bin/console s
 user@local $ mw container exec <container-id> -- php /var/www/html/bin/console plugin:refresh
 user@local $ mw container exec <container-id> -- php /var/www/html/bin/console cache:clear
 ```
-
-## Theme- und Plugin-Workflow {#theme-and-plugin-workflow}
-
-Im mittwald-Runtime-Container ist `/var/www/html` effektiv nicht schreibbar. Alles, was Dateien erzeugt (ein Theme oder ein Plugin anlegen), muss zur Build-Zeit passieren, nicht zur Laufzeit. Die funktionierende Aufteilung ist:
-
-- Führe `theme:create` und `plugin:create` lokal aus.
-- Committe die erzeugten Dateien unter `custom/plugins/...`.
-- Baue, pushe und deploye ein neues Image.
-- Führe im Container nur Befehle aus, die nicht in den Quellbaum schreiben: `plugin:refresh`, `plugin:install --activate` und `theme:compile`.
-
-## Persistente Volumes {#persistent-volumes}
-
-Shopware empfiehlt, die Verzeichnisse zu persistieren, die nutzergenerierte oder erzeugte Inhalte aufnehmen. Mounte Volumes auf:
-
-- `/var/www/html/files`
-- `/var/www/html/public/theme`
-- `/var/www/html/public/media`
-- `/var/www/html/public/thumbnail`
-- `/var/www/html/public/sitemap`
 
 ## Häufige Probleme {#common-issues}
 
@@ -299,3 +332,4 @@ Das Theme ist nicht in den Container gelangt, oder seine Sales-Channel-Zuordnung
 
 [shopware-docker]: https://developer.shopware.com/docs/guides/hosting/installation-updates/docker.html
 [shopware-extension-management]: https://developer.shopware.com/docs/guides/hosting/installation-updates/extension-management.html
+[shopware-filesystem]: https://developer.shopware.com/docs/guides/hosting/infrastructure/filesystem.html
