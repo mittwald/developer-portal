@@ -182,7 +182,7 @@ const config: Config = {
         },
         {
           type: "doc",
-          docId: "/category/guides/deployment",
+          docId: "guides/deployment/index",
           position: "left",
           label: "Guides",
         },
