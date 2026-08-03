@@ -31,7 +31,7 @@ TLS is terminated by the mittwald ingress, so the container only serves plain HT
 If you already have a Shopware project, skip to the next step. To start from scratch, create a project with Composer:
 
 ```shellsession
-user@local $ composer create-project shopware/production <folder>
+user@local $ npx @shopware-ag/shopware-cli project create <folder>
 user@local $ cd <folder>
 ```
 
@@ -40,7 +40,7 @@ To pin a specific Shopware version, pass it to the package name, for example `sh
 Next, add the Docker setup. The `shopware/docker` package installs a ready-made `docker/Dockerfile` into your project through a Symfony Flex recipe, so you get the official build setup rather than writing one by hand:
 
 ```shellsession
-user@local $ composer require shopware/docker
+user@local $ composer require shopware/docker shopware/deployment-helper
 ```
 
 This is also the recommended way to keep the Dockerfile current: because it comes from a Flex recipe, updating the package pulls in upstream changes to the build.
@@ -113,10 +113,7 @@ user@local $ docker compose logs -f app
 With the stack running, initialize Shopware inside the container:
 
 ```shellsession
-user@local $ docker compose exec app bin/console database:migrate --all
-user@local $ docker compose exec app bin/console dal:refresh:index
-user@local $ docker compose exec app bin/console cache:clear
-user@local $ docker compose exec app bin/console plugin:refresh
+user@local $ docker compose exec app vendor/bin/shopware-deployment-helper run
 ```
 
 Create an admin user when you need one:
