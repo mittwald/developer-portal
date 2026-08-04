@@ -28,19 +28,19 @@ TLS terminiert der mittwald-Ingress, der Container liefert also nur einfaches HT
 
 ## Projekt einrichten {#set-up-the-project}
 
-Wenn du bereits ein Shopware-Projekt hast, springe zum nächsten Schritt. Um von Grund auf zu starten, erstelle ein Projekt mit Composer:
+Wenn du bereits ein Shopware-Projekt hast, springe zum nächsten Schritt. Um von Grund auf zu starten, erstelle ein Projekt mit der Shopware-CLI:
 
 ```shellsession
-user@local $ composer create-project shopware/production <folder>
+user@local $ npx @shopware-ag/shopware-cli project create <folder>
 user@local $ cd <folder>
 ```
 
-Um eine bestimmte Shopware-Version zu pinnen, hänge sie an den Paketnamen an, zum Beispiel `shopware/production:6.6.7.0`.
+Um eine bestimmte Shopware-Version zu pinnen, übergib sie als zweites Argument, zum Beispiel `npx @shopware-ag/shopware-cli project create <folder> 6.6.7.0`.
 
 Füge als Nächstes das Docker-Setup hinzu. Das Paket `shopware/docker` installiert über ein Symfony-Flex-Recipe ein fertiges `docker/Dockerfile` in dein Projekt, sodass du das offizielle Build-Setup erhältst, statt eines von Hand zu schreiben:
 
 ```shellsession
-user@local $ composer require shopware/docker
+user@local $ composer require shopware/docker shopware/deployment-helper
 ```
 
 Das ist zugleich der empfohlene Weg, das Dockerfile aktuell zu halten: Da es aus einem Flex-Recipe stammt, zieht ein Update des Pakets die Upstream-Änderungen am Build nach.
@@ -113,10 +113,7 @@ user@local $ docker compose logs -f app
 Wenn der Stack läuft, initialisiere Shopware im Container:
 
 ```shellsession
-user@local $ docker compose exec app bin/console database:migrate --all
-user@local $ docker compose exec app bin/console dal:refresh:index
-user@local $ docker compose exec app bin/console cache:clear
-user@local $ docker compose exec app bin/console plugin:refresh
+user@local $ docker compose exec app vendor/bin/shopware-deployment-helper run
 ```
 
 Lege bei Bedarf einen Admin-Benutzer an:
