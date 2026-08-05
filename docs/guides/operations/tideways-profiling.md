@@ -192,7 +192,9 @@ Your API key is a credential. Anyone with filesystem access to your project can 
 
 Changes to files in `~/.config/php/php.d` are detected automatically, and the PHP-FPM service is restarted for you. There is no need to restart anything manually.
 
-The configuration applies to the whole project, so all PHP apps in it will report to Tideways. Loading a PHP extension is a system-level setting and therefore cannot be done in a per-directory `.user.ini` file.
+The configuration applies to the whole project, so all PHP apps in it will report to Tideways. This includes PHP running on the command line, which means cron jobs, queue workers and console commands are profiled as well, without any additional configuration.
+
+Loading a PHP extension is a system-level setting and therefore cannot be done in a per-directory `.user.ini` file.
 
 :::
 
@@ -238,10 +240,6 @@ After installing it and logging in with your Tideways account, click the Tideway
 - Confirm that your app runs a PHP version that includes the extension (see [Prerequisites](#prerequisites)).
 - Make sure the configuration file is located in `~/.config/php/php.d/` and has an `.ini` extension. `extension=tideways.so` has no effect in a per-directory `.user.ini` file.
 - Check the PHP error log of your app at `/var/log/php_errors.log` for messages about a failed extension load.
-
-### Traces are missing for CLI scripts and cron jobs {#troubleshooting-cli}
-
-The extension's default behavior differs between web requests and CLI scripts. If you want to monitor cron jobs, queue workers or console commands, refer to the [Tideways documentation on background jobs and CLI monitoring](https://support.tideways.com/documentation/).
 
 ### Profiling a containerized PHP application {#troubleshooting-containers}
 

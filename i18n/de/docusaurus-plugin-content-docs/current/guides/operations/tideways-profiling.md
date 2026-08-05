@@ -192,7 +192,9 @@ Dein API-Key ist ein Zugangsschlüssel. Jede Person mit Dateisystemzugriff auf d
 
 Änderungen an Dateien in `~/.config/php/php.d` werden automatisch erkannt, und der PHP-FPM-Dienst wird für dich neu gestartet. Du musst nichts manuell neu starten.
 
-Die Konfiguration gilt für das gesamte Projekt, es melden also alle darin enthaltenen PHP-Apps an Tideways. Das Laden einer PHP-Extension ist eine systemweite Einstellung und kann deshalb nicht in einer verzeichnisbezogenen `.user.ini`-Datei erfolgen.
+Die Konfiguration gilt für das gesamte Projekt, es melden also alle darin enthaltenen PHP-Apps an Tideways. Das schließt PHP auf der Kommandozeile mit ein: Cronjobs, Queue-Worker und Console-Commands werden ohne zusätzliche Konfiguration ebenfalls profiliert.
+
+Das Laden einer PHP-Extension ist eine systemweite Einstellung und kann deshalb nicht in einer verzeichnisbezogenen `.user.ini`-Datei erfolgen.
 
 :::
 
@@ -238,10 +240,6 @@ Nachdem du sie installiert und dich mit deinem Tideways-Account angemeldet hast,
 - Vergewissere dich, dass deine App eine PHP-Version verwendet, die die Extension enthält (siehe [Voraussetzungen](#prerequisites)).
 - Stelle sicher, dass die Konfigurationsdatei in `~/.config/php/php.d/` liegt und die Endung `.ini` hat. `extension=tideways.so` hat in einer verzeichnisbezogenen `.user.ini`-Datei keine Wirkung.
 - Prüfe das PHP-Error-Log deiner App unter `/var/log/php_errors.log` auf Meldungen über eine fehlgeschlagene Extension-Ladung.
-
-### Für CLI-Skripte und Cronjobs fehlen Traces {#troubleshooting-cli}
-
-Das Standardverhalten der Extension unterscheidet sich zwischen Web-Requests und CLI-Skripten. Wenn du Cronjobs, Queue-Worker oder Console-Commands überwachen möchtest, wirf einen Blick in die [Tideways-Dokumentation zu Background-Jobs und CLI-Monitoring](https://support.tideways.com/documentation/).
 
 ### Profiling einer containerisierten PHP-Anwendung {#troubleshooting-containers}
 
