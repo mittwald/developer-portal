@@ -230,14 +230,14 @@ Nachdem du sie installiert und dich mit deinem Tideways-Account angemeldet hast,
 
 - Prüfe, ob der Daemon-Container läuft und Port `9135` veröffentlicht ist. Ohne veröffentlichten Port ist der Container aus deiner App nicht erreichbar.
 - Prüfe, ob `tideways.connection` den internen DNS-Namen des Containers verwendet und nicht dessen Anzeigenamen oder Container-ID. Den DNS-Namen findest du im mStudio UI oder über `mw container list`.
-- Sieh dir die Daemon-Logs mit `mw container logs tideways-daemon` auf Verbindungs- oder Authentifizierungsfehler an.
+- Sieh dir das PHP-Error-Log unter `/var/log/php_errors.log` und die Daemon-Logs mit `mw container logs tideways-daemon` auf Verbindungs- oder Authentifizierungsfehler an.
 - Stelle sicher, dass der API-Key zu dem Tideways-Projekt gehört, das du dir gerade ansiehst.
 
 ### Die Extension wird nicht geladen {#troubleshooting-extension}
 
 - Vergewissere dich, dass deine App eine PHP-Version verwendet, die die Extension enthält (siehe [Voraussetzungen](#prerequisites)).
 - Stelle sicher, dass die Konfigurationsdatei in `~/.config/php/php.d/` liegt und die Endung `.ini` hat. `extension=tideways.so` hat in einer verzeichnisbezogenen `.user.ini`-Datei keine Wirkung.
-- Prüfe das PHP-Error-Log deiner App auf Meldungen über eine fehlgeschlagene Extension-Ladung.
+- Prüfe das PHP-Error-Log deiner App unter `/var/log/php_errors.log` auf Meldungen über eine fehlgeschlagene Extension-Ladung.
 
 ### Für CLI-Skripte und Cronjobs fehlen Traces {#troubleshooting-cli}
 

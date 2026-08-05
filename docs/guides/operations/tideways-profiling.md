@@ -230,14 +230,14 @@ After installing it and logging in with your Tideways account, click the Tideway
 
 - Verify that the daemon container is running and that port `9135` is published. Without a published port, the container is not reachable from your app.
 - Check that `tideways.connection` uses the container's internal DNS name, not its display name or container ID. You can look up the DNS name in the mStudio UI or with `mw container list`.
-- Inspect the daemon logs with `mw container logs tideways-daemon` for connection or authentication errors.
+- Inspect the PHP error logs at `/var/log/php_errors.log` and the daemon logs with `mw container logs tideways-daemon` for connection or authentication errors.
 - Make sure the API key belongs to the Tideways project you are looking at.
 
 ### The extension is not loaded {#troubleshooting-extension}
 
 - Confirm that your app runs a PHP version that includes the extension (see [Prerequisites](#prerequisites)).
 - Make sure the configuration file is located in `~/.config/php/php.d/` and has an `.ini` extension. `extension=tideways.so` has no effect in a per-directory `.user.ini` file.
-- Check the PHP error log of your app for messages about a failed extension load.
+- Check the PHP error log of your app at `/var/log/php_errors.log` for messages about a failed extension load.
 
 ### Traces are missing for CLI scripts and cron jobs {#troubleshooting-cli}
 
