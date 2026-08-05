@@ -5,7 +5,7 @@ tags:
   - PHP
   - Containers
 description: |
-  Erfahre, wie du deine PHP-Anwendungen mit Tideways profilst und überwachst – mit der mitgelieferten PHP-Extension und einem containerisierten Tideways-Daemon.
+  Erfahre, wie du Profiling und Überwachung mit Tideways für deine PHP-Anwendungen nutzt – mit der mitgelieferten PHP-Extension und einem containerisierten Tideways-Daemon.
 ---
 
 [Tideways](https://tideways.com/) ist ein kommerzieller Dienst für Application Performance Monitoring (APM) und Profiling von PHP-Anwendungen. Tideways zeichnet kontinuierlich auf, wie lange deine Requests dauern, wo diese Zeit verbraucht wird und welche Fehler auftreten — bis hinunter zu einzelnen Funktionsaufrufen und Datenbankabfragen.
