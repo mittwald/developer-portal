@@ -48,7 +48,7 @@ Weitere Informationen zur Verwaltung der PHP-Version findest du unter [PHP-Anwen
 
 Die PHP-Extension kommuniziert nicht direkt mit dem Tideways-Backend. Stattdessen schickt sie ihre Daten über eine TCP-Verbindung an den Tideways-Daemon, der sich um Pufferung und Übertragung kümmert. Du benötigst daher genau einen Daemon-Container pro Projekt, den sich alle deine PHP-Apps teilen können.
 
-Für diesen Container verwenden wir das Image `ghcr.io/tideways/daemon:latest` aus der [GitHub Container Registry](https://github.com/tideways/daemon/pkgs/container/daemon). Der Daemon lauscht auf dem TCP-Port `9135` und benötigt keinen persistenten Speicher, es sind also keine Volumes erforderlich.
+Wir betreiben diesen Daemon als [Container in deinem Projekt](/docs/v2/platform/workloads/containers/) und verwenden dafür das Image `ghcr.io/tideways/daemon:latest` aus der [GitHub Container Registry](https://github.com/tideways/daemon/pkgs/container/daemon). Der Daemon lauscht auf dem TCP-Port `9135` und benötigt keinen persistenten Speicher, es sind also keine Volumes erforderlich.
 
 :::note
 
@@ -111,7 +111,7 @@ user@local $ mw container run \
 
 ### Alternative: Verwendung des `mw stack deploy`-Befehls {#daemon-cli-stack}
 
-Alternativ kannst du den Befehl `mw stack deploy` verwenden, der mit Docker Compose kompatibel ist. Erstelle dazu eine `docker-compose.yml`-Datei mit folgendem Inhalt:
+Alternativ kannst du den [Befehl `mw stack deploy`](/docs/v2/cli/reference/stack/) verwenden, der mit Docker Compose kompatibel ist. Erstelle dazu eine `docker-compose.yml`-Datei mit folgendem Inhalt:
 
 ```yaml
 services:
