@@ -12,10 +12,16 @@ There is more than one way to get an application onto the mittwald cloud platfor
 
 ## Two runtime models {#runtime-models}
 
-Most of the decision follows from one question: **should your application run as a managed app, or as a container?**
+Most of the decision follows from one question: **should your application run in a managed environment, or as a container?**
 
-- **Managed apps** run in a webspace, on a runtime that is provided and maintained by mittwald (PHP, Node.js, or static files). You deploy _source code_, usually over SSH, and the platform takes care of the webserver, the language runtime, TLS certificates and so on. This is the classic model for PHP applications like TYPO3, Shopware or WordPress.
+- **Managed environments** (in the form of a custom PHP or Node.js app) run in a webspace, on a runtime that is provided and maintained by mittwald (PHP, Node.js, or static files). You deploy _source code_, usually over SSH, and the platform takes care of the webserver, the language runtime, TLS certificates and so on. This is the classic model for PHP applications like TYPO3, Shopware or WordPress.
 - **Containers** run a Docker image that you build yourself. You control the entire runtime, which makes this the right choice for anything that the managed runtimes do not cover, or when you want reproducible builds. See [Containers](/docs/v2/platform/workloads/containers/) for the underlying concepts.
+
+:::note
+
+Note that actual **Managed apps** (like a managed TYPO3 or WordPress) are a special case of the managed environment model. They are not covered in this guide, because they are deployed and updated through the mittwald mStudio (or command-line tools like `mw app install wordpress`) rather than through Git or CI/CD.
+
+:::
 
 If you are unsure how these fit together, have a look at the [platform overview](/docs/v2/platform/overview/).
 

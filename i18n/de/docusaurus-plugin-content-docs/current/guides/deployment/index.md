@@ -12,10 +12,16 @@ Es gibt mehr als einen Weg, eine Anwendung auf die mittwald Cloud-Plattform zu b
 
 ## Zwei Laufzeitmodelle {#runtime-models}
 
-Der größte Teil der Entscheidung ergibt sich aus einer einzigen Frage: **Soll deine Anwendung als Managed App oder als Container laufen?**
+Der größte Teil der Entscheidung ergibt sich aus einer einzigen Frage: **Soll deine Anwendung in einer Managed-Umgebung oder als Container laufen?**
 
-- **Managed Apps** laufen in einem Webspace, auf einer Laufzeitumgebung, die von mittwald bereitgestellt und gepflegt wird (PHP, Node.js oder statische Dateien). Du deployst _Quellcode_, in der Regel über SSH, und die Plattform kümmert sich um Webserver, Sprachlaufzeit, TLS-Zertifikate und Ähnliches. Das ist das klassische Modell für PHP-Anwendungen wie TYPO3, Shopware oder WordPress.
+- **Managed-Umgebungen** (in Form einer eigenen PHP- oder Node.js-App) laufen in einem Webspace, auf einer Laufzeitumgebung, die von mittwald bereitgestellt und gepflegt wird (PHP, Node.js oder statische Dateien). Du deployst _Quellcode_, in der Regel über SSH, und die Plattform kümmert sich um Webserver, Sprachlaufzeit, TLS-Zertifikate und Ähnliches. Das ist das klassische Modell für PHP-Anwendungen wie TYPO3, Shopware oder WordPress.
 - **Container** führen ein Docker-Image aus, das du selbst baust. Du kontrollierst die komplette Laufzeitumgebung. Das ist die richtige Wahl für alles, was die Managed Runtimes nicht abdecken, oder wenn du reproduzierbare Builds möchtest. Die zugrundeliegenden Konzepte findest du unter [Container](/docs/v2/platform/workloads/containers/).
+
+:::note
+
+Beachte, dass echte **Managed Apps** (etwa ein Managed TYPO3 oder WordPress) ein Sonderfall des Modells der Managed-Umgebungen sind. Sie werden in dieser Anleitung nicht behandelt, weil sie über das mittwald mStudio (oder Kommandozeilenwerkzeuge wie `mw app install wordpress`) deployt und aktualisiert werden und nicht über Git oder CI/CD.
+
+:::
 
 Wenn du dir unsicher bist, wie das zusammenhängt, wirf einen Blick auf den [Plattform-Überblick](/docs/v2/platform/overview/).
 
@@ -47,7 +53,7 @@ Sobald das funktioniert, kannst du es mit der [`mittwald/zerodeploy-action`](/do
 
 **Abwägung:** Komfort vor Kontrolle. Das Build-Verhalten wird abgeleitet, deshalb brauchen ungewöhnliche Projektstrukturen (Monorepos, exotische Paketmanager) unter Umständen ein paar Umgebungsvariablen, um den Build in die richtige Richtung zu lenken.
 
-Weiterlesen:
+Was du als Nächstes lesen kannst:
 
 - [Deployment von containerisierten Anwendungen mit GitHub Actions](/docs/v2/guides/deployment/container-actions/) für die automatisierte Variante.
 - [Deployment von mit KI entwickelten Apps](/docs/v2/guides/deployment/ai_developed_apps/) für die manuelle Anleitung mit der CLI. Trotz des Titels ist das die Referenz für den Zero-Conf-Workflow im Allgemeinen; die Anleitung geht lediglich zusätzlich auf Exporte aus KI-Entwicklungstools ein, weil der Workflow dort am häufigsten eingesetzt wird.
@@ -68,7 +74,7 @@ Weiterlesen: [Deployment von containerisierten Anwendungen mit GitHub Actions](/
 
 [Deployer](https://deployer.org/) kopiert jedes Release in ein eigenes Verzeichnis und schwenkt anschließend einen `current`-Symlink um. Damit ist ein Deployment atomar und umkehrbar. Das [mittwald-Recipe](https://packagist.org/packages/mittwald/deployer-recipes) übernimmt zusätzlich das Anlegen des SSH-Users, das Verknüpfen von Domains, die Installation von Laufzeitabhängigkeiten und das Leeren des OPcache.
 
-**Abwägung:** Der Ansatz ist PHP-lastig und benötigt SSH-Zugriff, ist dafür aber der ausgereifteste Weg für klassisches PHP-Hosting und lässt sich sowohl in GitHub Actions als auch in GitLab CI einbinden.
+**Abwägung:** Der Ansatz ist PHP-lastig und benötigt SSH-Zugriff. Dafür ist er der ausgereifteste Weg für klassisches PHP-Hosting und lässt sich sowohl in GitHub Actions als auch in GitLab CI einbinden.
 
 Weiterlesen: [PHP-Anwendungen mit Deployer deployen](/docs/v2/guides/deployment/deployer/)
 
