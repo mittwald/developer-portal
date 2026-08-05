@@ -47,7 +47,7 @@ Once that works, automate it with the [`mittwald/zerodeploy-action`](/docs/v2/gu
 
 **Trade-off:** convenience over control. The build behaviour is inferred, so unusual project layouts (monorepos, exotic package managers) may need a few environment variables to point the build in the right direction.
 
-Where to read on:
+What to read next:
 
 - [Deploying containerized applications with GitHub Actions](/docs/v2/guides/deployment/container-actions/) for the automated variant.
 - [Deploying AI-developed apps](/docs/v2/guides/deployment/ai_developed_apps/) for the manual CLI walkthrough. Despite the title, that guide is the reference for the zero-conf workflow in general; it just spends extra time on exports from AI development tools, because that is where the workflow is most commonly used.
@@ -56,11 +56,11 @@ Where to read on:
 
 **Use it when:** your team already owns the build. You have a `Dockerfile`, you push images to a registry, and you want to describe services, ports and volumes yourself.
 
-A GitHub Actions workflow builds and pushes the image, and then hands your stack definition to mStudio. You keep full control over which services are recreated on a rollout, and you can deploy the same stack into several environments.
+A GitHub Actions workflow builds and pushes the image, then hands your stack definition to mStudio. You keep full control over which services are recreated on a rollout, and you can deploy the same stack into several environments.
 
 **Trade-off:** more moving parts to maintain, but nothing about the runtime is implicit.
 
-Read on: [Deploying containerized applications with GitHub Actions](/docs/v2/guides/deployment/container-actions/)
+Further reading: [Deploying containerized applications with GitHub Actions](/docs/v2/guides/deployment/container-actions/)
 
 ### Deployer {#deployer}
 
@@ -68,9 +68,9 @@ Read on: [Deploying containerized applications with GitHub Actions](/docs/v2/gui
 
 [Deployer](https://deployer.org/) copies each release into its own directory and then flips a `current` symlink, which makes a deployment atomic and revertible. The [mittwald recipe](https://packagist.org/packages/mittwald/deployer-recipes) additionally takes care of creating the SSH user, linking up domains, installing runtime dependencies and flushing the OPcache.
 
-**Trade-off:** it is PHP-centric and requires SSH access, but it is the most mature path for classic PHP hosting, and it integrates with both GitHub Actions and GitLab CI.
+**Trade-off:** it is PHP-centric and requires SSH access. However, it is the most mature path for classic PHP hosting, and it integrates with both GitHub Actions and GitLab CI.
 
-Read on: [Deploying PHP applications with Deployer](/docs/v2/guides/deployment/deployer/)
+Further reading: [Deploying PHP applications with Deployer](/docs/v2/guides/deployment/deployer/)
 
 ### TYPO3 Surf {#surf}
 
@@ -78,7 +78,7 @@ Read on: [Deploying PHP applications with Deployer](/docs/v2/guides/deployment/d
 
 Surf fills the same role as Deployer, with tooling built specifically around TYPO3 and Neos. If you are starting fresh and have no strong preference, Deployer offers the deeper mittwald integration.
 
-Read on: [Deploying PHP applications with TYPO3 Surf](/docs/v2/guides/deployment/typo3surf/)
+Further reading: [Deploying PHP applications with TYPO3 Surf](/docs/v2/guides/deployment/typo3surf/)
 
 ### Terraform {#terraform}
 
