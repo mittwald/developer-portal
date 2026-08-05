@@ -113,6 +113,67 @@ const config: Config = {
       },
     ],
     webpackCryptoFallbackPlugin,
+    [
+      "docusaurus-plugin-llms",
+      {
+        // Options here
+        generateLLMsTxt: true,
+        generateLLMsFullTxt: false,
+        docsDir: "docs",
+        title: "mittwald developer documentation",
+        description:
+          "Complete reference documentation for the mittwald hosting platform.",
+        rootContent: `This document provides a complete reference for the mittwald hosting platform.
+It is optimized for AI assistants and LLMs.
+        
+This documentation covers:
+- Documentation and guides on the hosting platform itself
+- Specific deployment guides for various programming languages and frameworks
+- Instructions on how to integrate the mittwald platform into various agentic AI systems
+- Reference documentation for the mittwald LLM hosting platform (in \`llms-aihosting.txt\`)
+- Reference documentation for the mittwald API (in \`llms-api.txt\`)
+- Reference documentation for the mittwald CLI (in \`llms-cli.txt\`)`,
+        includeBlog: false,
+        includeOrder: [
+          "platform/workloads/**",
+          "platform/databases/**",
+          "api/**",
+          "guides/**",
+          "agentic-integration/**",
+        ],
+        includeUnmatchedLast: false,
+        customLLMFiles: [
+          {
+            filename: "llms-api.txt",
+            includePatterns: ["reference/**"],
+            fullContent: false,
+            title: "API Reference",
+            description: "Complete reference for the mittwald mStudio REST API",
+          },
+          {
+            filename: "llms-aihosting.txt",
+            includePatterns: ["platform/aihosting/**"],
+            fullContent: false,
+            title: "AI hosting reference",
+            description: "Complete reference for the mittwald AI hosting",
+          },
+          {
+            filename: "llms-cli.txt",
+            includePatterns: ["cli/**"],
+            fullContent: false,
+            title: "CLI Reference",
+            description: "Complete reference for the mittwald CLI",
+          },
+        ],
+        excludeImports: true,
+        removeDuplicateHeadings: true,
+        generateMarkdownFiles: true,
+        addMdExtension: true,
+        pathTransformation: {
+          ignorePaths: ["docs"],
+        },
+      },
+    ],
   ],
 
   presets: [
