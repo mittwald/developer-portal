@@ -14,11 +14,25 @@ The [Speech-to-text guide](../../examples/whisper/) has runnable examples for ba
 The following limitations apply to this model on our platform:
 
 - Maximum file size: 25 MB per upload
-- No explicit context length limit – depends on audio duration and file size
+- Maximum audio duration: 10 minutes (600 seconds) per request
 - Translation is currently not supported (`to_language`)
 - Supported output formats: **`json`**, **`verbose_json`**
   - `response_format="text"` is accepted but returns a JSON body regardless — use `"json"` instead
   - `srt` and `vtt` are not supported (HTTP 400)
+
+### Audio duration and file size {#duration-limit}
+
+:::warning Both limits apply independently
+A file well below 25 MB can still be rejected for being too long. At typical speech bitrates the duration limit is the one you hit first: 25 MB holds roughly 52 minutes of 64 kbps mono audio, but everything beyond 10 minutes is rejected.
+
+Exceeding the duration returns HTTP 400:
+
+```text
+Audio exceeds maximum allowed duration of 600s (file contains 1500.6s at 44100Hz).
+```
+
+Split longer recordings before uploading. The [speech-to-text guide](../../examples/whisper/#large-files) contains a ready-to-use `pydub` example that cuts at silence points and keeps every chunk under both limits.
+:::
 
 ### Supported Input Formats
 

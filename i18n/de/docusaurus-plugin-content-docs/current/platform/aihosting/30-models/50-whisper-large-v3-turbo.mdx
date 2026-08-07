@@ -13,11 +13,25 @@ Der [Spracherkennungs-Guide](../../examples/whisper/) enthält lauffähige Beisp
 Die folgenden Einschränkungen gelten für dieses Modell bei unserer Plattform:
 
 - Maximale Dateigröße: 25 MB pro Upload
-- Keine explizite Kontextlängenbegrenzung – abhängig von Audiodauer und Dateigröße
+- Maximale Audiolänge: 10 Minuten (600 Sekunden) pro Anfrage
 - Es ist derzeit keine Übersetzung möglich (`to_language`)
 - Unterstützte Ausgabeformate: **`json`**, **`verbose_json`**
   - `response_format="text"` wird akzeptiert, gibt aber immer einen JSON-Body zurück – stattdessen `"json"` verwenden
   - `srt` und `vtt` werden nicht unterstützt (HTTP 400)
+
+### Audiolänge und Dateigröße {#duration-limit}
+
+:::warning Beide Limits gelten unabhängig voneinander
+Eine Datei kann deutlich unter 25 MB liegen und trotzdem wegen ihrer Länge abgelehnt werden. Bei üblichen Sprach-Bitraten greift das Längenlimit zuerst: In 25 MB passen rund 52 Minuten Audio bei 64 kbps mono, akzeptiert wird davon aber nur, was 10 Minuten nicht überschreitet.
+
+Wird die Länge überschritten, kommt HTTP 400 zurück:
+
+```text
+Audio exceeds maximum allowed duration of 600s (file contains 1500.6s at 44100Hz).
+```
+
+Längere Aufnahmen vor dem Upload aufteilen. Der [Spracherkennungs-Guide](../../examples/whisper/#grosse-dateien) enthält ein fertiges `pydub`-Beispiel, das an Stille-Stellen schneidet und jeden Abschnitt unter beiden Limits hält.
+:::
 
 ### Unterstützte Eingabeformate
 

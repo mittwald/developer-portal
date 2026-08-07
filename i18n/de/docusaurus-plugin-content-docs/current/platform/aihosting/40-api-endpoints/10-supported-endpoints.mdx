@@ -228,7 +228,7 @@ curl -X POST https://llm.aihosting.mittwald.de/v1/audio/transcriptions \
     -F "model=whisper-large-v3-turbo"
 ```
 
-Der `file`-Parameter sollte die zu transkribierende Audiodatei enthalten. Unterstützte Formate sind MP3, OGG, WAV und FLAC. Die maximale Dateigröße beträgt 25 MB. Der `model`-Parameter gibt an, welches Whisper-Modell für die Transkription verwendet werden soll.
+Der `file`-Parameter sollte die zu transkribierende Audiodatei enthalten. Unterstützte Formate sind MP3, OGG, WAV und FLAC. Die maximale Dateigröße beträgt 25 MB, die maximale Audiolänge 10 Minuten (600 Sekunden). Beide Limits gelten unabhängig voneinander. Der `model`-Parameter gibt an, welches Whisper-Modell für die Transkription verwendet werden soll.
 
 Zusätzlich können folgende optionale Parameter übermittelt werden:
 
@@ -250,4 +250,4 @@ curl -X POST https://llm.aihosting.mittwald.de/v1/audio/transcriptions \
 
 - Übersetzungsfunktion (`to_language`-Parameter) wird nicht unterstützt
 - Für beste Ergebnisse sollte der `language`-Parameter immer explizit angegeben werden
-- Segmentiere große Audiodateien bei Bedarf in Teile kleiner als 25 MB
+- Segmentiere Audiodateien bei Bedarf in Teile kleiner als 25 MB und kürzer als 10 Minuten. Wird die Länge überschritten, kommt HTTP 400 mit `Audio exceeds maximum allowed duration of 600s` zurück. Ein Beispiel dazu im [Spracherkennungs-Guide](../../examples/whisper/#grosse-dateien)

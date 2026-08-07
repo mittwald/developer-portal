@@ -13,7 +13,7 @@ user@local $ pip install openai
 user@local $ export OPENAI_API_KEY="sk-…"
 ```
 
-For large-file chunking (files over 25 MB):
+For chunking long or large files (over 10 minutes or over 25 MB):
 
 ```shellsession
 user@local $ pip install pydub
@@ -68,18 +68,20 @@ for filename, lang in files_and_languages:
     print(f"[{lang}] {result.text[:120]}")
 ```
 
-## Large files (> 25 MB) {#large-files}
+## Long or large files (> 10 minutes or > 25 MB) {#large-files}
 
-The API accepts files up to 25 MB. Split larger recordings at silence points using `pydub` so that each chunk is well under the limit and no words are cut mid-utterance:
+The API accepts files up to 25 MB and up to 10 minutes of audio. Both limits apply independently, and for speech recordings the duration limit is usually the binding one. Split longer recordings at silence points using `pydub` so that each chunk stays below both limits and no words are cut mid-utterance:
 
 ```python
 from pydub import AudioSegment
 from pydub.silence import split_on_silence
 from io import BytesIO
 
+MAX_CHUNK_MS = 9 * 60 * 1000   # Stay below the 10-minute duration limit
+
 
 def transcribe_large_file(path: str, language: str = "en") -> str:
-    """Transcribe a file of any size by splitting at silence points."""
+    """Transcribe a file of any size or length by splitting at silence points."""
     audio = AudioSegment.from_file(path)
 
     # Split at pauses longer than 700 ms with silence below -40 dBFS
@@ -95,8 +97,18 @@ def transcribe_large_file(path: str, language: str = "en") -> str:
         chunk_ms = 60_000
         chunks = [audio[i: i + chunk_ms] for i in range(0, len(audio), chunk_ms)]
 
-    transcripts: list[str] = []
+    # Guard: a passage without pauses can still exceed the 10-minute limit
+    bounded: list[AudioSegment] = []
     for chunk in chunks:
+        if len(chunk) <= MAX_CHUNK_MS:
+            bounded.append(chunk)
+        else:
+            bounded.extend(
+                chunk[i: i + MAX_CHUNK_MS] for i in range(0, len(chunk), MAX_CHUNK_MS)
+            )
+
+    transcripts: list[str] = []
+    for chunk in bounded:
         buf = BytesIO()
         chunk.export(buf, format="mp3")
         buf.seek(0)
