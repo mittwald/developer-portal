@@ -1,0 +1,256 @@
+---
+title: Breaking (!) API changes for v2 API, July 31 to August 7
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Project
+  - Mail
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week's update to the mittwald API includes the removal of an API path without deprecation, several changes to required and optional response properties across various endpoints, and the addition of new enum values, enhancing the overall functionality and flexibility of the API.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The API path `/v2/container-templates/{templateId}/assets/{assetPath}` for the `GET` operation `container-get-template-asset` has been removed without deprecation, which is a breaking change.
+- The required properties `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDatabaseLinked]/changes/after/database`, `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDatabaseLinked]/changes/before/database`, `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDatabaseUnlinked]/changes/after/database`, and `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDatabaseUnlinked]/changes/before/database` have been removed from the response with the '200' status for the `GET` operation `project-list-project-activities`.
+- The optional property `/items/originalAddress` has been added to the response with the '200' status for the `GET` operation `mail-list-mail-addresses-for-user` at the path `/v2/mail-addresses/`.
+- The optional property `originalAddress` has been added to the response with the '200' status for the `GET` operation `mail-get-mail-address` at the path `/v2/mail-addresses/{mailAddressId}`.
+- Multiple optional properties related to DNS record sets, including `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsARecordSet]/changes/after/ttl`, `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsARecordSet]/changes/before/ttl`, `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsCaaRecordSet]/changes/after/ttl`, `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsCaaRecordSet]/changes/before/ttl`, `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsCnameRecordSet]/changes/after/ttl`, `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsCnameRecordSet]/changes/before/ttl`, `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsMxRecordSet]/changes/after/ttl`, `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsMxRecordSet]/changes/before/ttl`, `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsSrvRecordSet]/changes/after/ttl`, `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsSrvRecordSet]/changes/before/ttl`, `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsTxtRecordSet]/changes/after/ttl`, and `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsTxtRecordSet]/changes/before/ttl` have been added to the response with the '200' status for the `GET` operation `project-list-project-activities`.
+- The required properties `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDatabaseLinked]/changes/after/name`, `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDatabaseLinked]/changes/after/purpose`, `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDatabaseLinked]/changes/before/name`, `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDatabaseLinked]/changes/before/purpose`, `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDatabaseUnlinked]/changes/after/name`, `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDatabaseUnlinked]/changes/after/purpose`, `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDatabaseUnlinked]/changes/before/name`, and `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDatabaseUnlinked]/changes/before/purpose` have been added to the response with the '200' status for the `GET` operation `project-list-project-activities`.
+- The required properties `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsARecordSetManaged]/changes/before/aRecords` and `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsMxRecordSetManaged]/changes/before/mx` have been added to the response with the '200' status for the `GET` operation `project-list-project-activities`.
+- The optional property `/items/originalAddress` has been added to the response with the '200' status for the `GET` operation `mail-list-mail-addresses` at the path `/v2/projects/{projectId}/mail-addresses`.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "container-get-template-asset"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+
+For details, refer to the <OperationLink operation="container-get-template-asset" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the activities of a project"
+
+
+- ⚠️ **Breaking:** removed the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDatabaseLinked]/changes/after/database' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDatabaseLinked]/changes/before/database' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDatabaseUnlinked]/changes/after/database' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDatabaseUnlinked]/changes/before/database' from the response with the '200' status
+
+- added the new 'managed' enum value to the '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsARecordSetManaged]/changes/after/aRecords' response property for the response status '200'
+
+- added the new 'managed' enum value to the '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsMxRecordSetManaged]/changes/after/mx' response property for the response status '200'
+
+- added the optional property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsARecordSet]/changes/after/ttl' to the response with the '200' status
+
+- added the optional property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsARecordSet]/changes/before/ttl' to the response with the '200' status
+
+- added the optional property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsCaaRecordSet]/changes/after/ttl' to the response with the '200' status
+
+- added the optional property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsCaaRecordSet]/changes/before/ttl' to the response with the '200' status
+
+- added the optional property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsCnameRecordSet]/changes/after/ttl' to the response with the '200' status
+
+- added the optional property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsCnameRecordSet]/changes/before/ttl' to the response with the '200' status
+
+- added the optional property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsMxRecordSet]/changes/after/ttl' to the response with the '200' status
+
+- added the optional property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsMxRecordSet]/changes/before/ttl' to the response with the '200' status
+
+- added the optional property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsSrvRecordSet]/changes/after/ttl' to the response with the '200' status
+
+- added the optional property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsSrvRecordSet]/changes/before/ttl' to the response with the '200' status
+
+- added the optional property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsTxtRecordSet]/changes/after/ttl' to the response with the '200' status
+
+- added the optional property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsTxtRecordSet]/changes/before/ttl' to the response with the '200' status
+
+- added '#/components/schemas/de.mittwald.v1.activitylog.DatabaseVersionSet, #/components/schemas/de.mittwald.v1.activitylog.AppInstallationFailed' to the '/items/action' response property 'anyOf' list for the response status '200'
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDatabaseLinked]/changes/after/name' to the response with the '200' status
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDatabaseLinked]/changes/after/purpose' to the response with the '200' status
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDatabaseLinked]/changes/before/name' to the response with the '200' status
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDatabaseLinked]/changes/before/purpose' to the response with the '200' status
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDatabaseUnlinked]/changes/after/name' to the response with the '200' status
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDatabaseUnlinked]/changes/after/purpose' to the response with the '200' status
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDatabaseUnlinked]/changes/before/name' to the response with the '200' status
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDatabaseUnlinked]/changes/before/purpose' to the response with the '200' status
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsARecordSetManaged]/changes/before/aRecords' to the response with the '200' status
+
+- added the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsMxRecordSetManaged]/changes/before/mx' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-list-project-activities" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List mail addresses"
+
+
+- added the optional property '/items/originalAddress' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="mail-list-mail-addresses-for-user" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a mail address"
+
+
+- added the optional property 'originalAddress' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="mail-get-mail-address" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List mail addresses belonging to a Project"
+
+
+- added the optional property '/items/originalAddress' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="mail-list-mail-addresses" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK Release v2.1.214
+
+The latest release of the mittwald PHP SDK, version v2.1.214, introduces several significant changes aimed at improving the efficiency and clarity of the API usage. 
+
+#### Breaking Changes
+- The deprecated method `deprecatedContainerGetTemplateAsset` has been removed. Users are advised to use direct asset URLs from the Template's fields instead.
+
+#### Deprecations
+- The function for retrieving a Container Template asset is now deprecated. Users should use the direct URLs provided in the Template's `iconUrl` and `screenshots` fields.
+- The call to get a Container Template icon is deprecated. The recommended route is `GET /v2/container-templates/{templateId}/assets/icon.svg`.
+
+#### Cleanups
+- All classes and dependencies related to the deprecated Container Template asset retrieval have been removed. This includes several specific request and response classes related to the deprecated method.
+- These cleanups simplify the client and reduce the maintained codebase, enhancing the overall clarity and efficiency of the API.
+
+For more details, please visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.214).
+
+### mittwald PHP SDK Release v2.1.213
+
+The mittwald PHP SDK has released version v2.1.213, introducing several new features and improvements. This update focuses on enhancing logging capabilities and schema updates to provide users with a more comprehensive overview of database interactions.
+
+#### Key Features and Changes:
+
+- **New Database Version Set Activity Logs**: 
+  - Introduction of the `DatabaseVersionSet` schema to log changes in database version sets.
+  - Enhanced logging for modifications to database versions managed by users.
+
+- **Activity Log Schema Updates**:
+  - Updated schemas such as `AppInstallationDatabaseLinked` and `AppInstallationDatabaseUnlinked` to include `name` and `purpose` properties.
+  - Added enums for purposes like `unspecified`, `primary`, `cache`, and `custom`.
+
+- **New Enum Types**:
+  - Introduced enums like `AppInstallationDatabaseLinkedChangesAfterPurpose` and `DatabaseVersionSetName` for better state representation in activity logs.
+
+- **Improvements in Existing Schemas**:
+  - Added TTL support for DNS records with options for integer values and 'auto'.
+  - Enhanced validation for improved error handling during input processing.
+
+- **Consolidated Data Structures**:
+  - Merged similar database structures and introduced validation schemas to ensure consistency and reduce redundancy.
+
+- **Documentation Updates**:
+  - Enriched documentation with details of new classes, properties, and usage patterns for both new and existing features.
+
+This release aims to improve tracking and debugging processes by providing a more detailed logging mechanism. For more information, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.213).
+
+### mittwald PHP SDK Release v2.1.212
+
+The mittwald PHP SDK has been updated to version v2.1.212. This release introduces several changes and new features, focusing on deprecating certain methods and enhancing response handling.
+
+#### Features
+- **Deprecated Methods for Container Template Assets**: A deprecated method, `deprecatedContainerGetTemplateAsset`, has been added for retrieving Container Template assets. Users are encouraged to use the direct asset URLs provided in the Template's `iconUrl` and `screenshots` fields.
+
+#### Changes
+- **Deprecation of `getTemplateAsset`**: The `getTemplateAsset` method has been removed from the `ContainerClient` interface. A new method, `deprecatedContainerGetTemplateAsset`, has been introduced to replace the deprecated functionality, with a recommendation to use alternative approaches.
+- **New Responses for Deprecated Methods**: New classes have been added to handle responses from the `deprecatedContainerGetTemplateAsset` method, including:
+  - `DeprecatedContainerGetTemplateAssetBadRequestResponse`
+  - `DeprecatedContainerGetTemplateAssetNotFoundResponse`
+  - `DeprecatedContainerGetTemplateAssetForbiddenResponse`
+  - `DeprecatedContainerGetTemplateAssetInternalServerErrorResponse`
+  - `DeprecatedContainerGetTemplateAssetServiceUnavailableResponse`
+  - `DeprecatedContainerGetTemplateAssetTooManyRequestsResponse`
+- **Added `originalAddress` Field in Mail Address Schema**: A new field, `originalAddress`, has been introduced in the `MailAddress` class to store the address the mailbox had before it was archived.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.212).
+
+### mittwald PHP SDK v2.1.211 Release Summary
+
+The latest release of the mittwald PHP SDK, version v2.1.211, introduces enhancements aimed at improving integration with Go clients. Notably, new metadata fields have been added to the `GetFileRequest` and `GetFileWithNameRequest` to enhance documentation and type safety. Specifically, the `x-go-type` field has been incorporated for the `accept` and `content-disposition` parameters in both request types. These improvements are designed to facilitate better code generation and reduce errors during file retrieval processes.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.211).
+
+### mittwald JavaScript SDK Release 4.438.0
+
+The mittwald JavaScript SDK has been updated to version 4.438.0. This release includes the following feature:
+
+- Updated the generated client to enhance functionality and performance ([commit df0110c](https://github.com/mittwald/api-client-js/commit/df0110c6a6ca3aaf5874c19284f366bb88f8b8e4)).
+
+For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.438.0).
+
+### mittwald JavaScript SDK Release 4.437.0
+
+The mittwald JavaScript SDK has been updated to version 4.437.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.437.0](https://github.com/mittwald/api-client-js/releases/tag/4.437.0).
+
+### mittwald JavaScript SDK Release 4.436.0
+
+The mittwald JavaScript SDK has been updated to version 4.436.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.436.0](https://github.com/mittwald/api-client-js/releases/tag/4.436.0).
+
+### mittwald JavaScript SDK Release 4.435.0
+
+The mittwald JavaScript SDK has been updated to version 4.435.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.435.0).
+
+### mittwald JavaScript SDK Release 4.434.0
+
+The mittwald JavaScript SDK has been updated to version 4.434.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald/api-client-js v4.434.0](https://github.com/mittwald/api-client-js/releases/tag/4.434.0).
+
