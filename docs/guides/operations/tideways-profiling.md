@@ -164,8 +164,10 @@ tideways.api_key=YOUR_API_KEY
 ; The internal DNS name and port of your daemon container
 tideways.connection=tcp://tideways-daemon:9135
 
-; Groups the collected data within your Tideways project
-tideways.service=web
+; Optional: Override the default service name for this app. Use this
+; with caution, as some apps will automatically set the service name
+; depending in which interface you're using (e.g. storefront/backend/API)
+; tideways.service=...
 
 ; Percentage of requests that are recorded with the timeline profiler
 tideways.trace_sample_rate=25
@@ -177,7 +179,7 @@ The settings have the following meaning:
 
 - `tideways.api_key` (**required**) authenticates your traces against your Tideways project.
 - `tideways.connection` (**required** in this setup) points the extension at your daemon. Without it, the extension looks for a daemon on a local Unix socket, which does not exist on the mittwald platform.
-- `tideways.service` groups monitoring data into independent units within a project, each with its own performance and error statistics. Use it to tell your web frontend, your API and your background workers apart. It defaults to `app`.
+- `tideways.service` lets you override the default service name that Tideways assigns to your app. See [the docs on Configuring Services](https://support.tideways.com/documentation/setup/configuration/services.html) for more information.
 - `tideways.trace_sample_rate` controls the percentage of requests that are recorded with the full timeline profiler. It defaults to `25`. All other requests are still covered by performance and error monitoring.
 
 See the [Tideways configuration documentation](https://support.tideways.com/documentation/setup/configuration/configure-tideways-globally-via-php-ini.html) for the complete list of settings.
@@ -210,6 +212,12 @@ The output should contain `tideways`. To also confirm that your settings were pi
 
 ```shellsession title="SSH shell session"
 user@ssh $ php -i | grep tideways
+```
+
+The output of this command should contain a section like this:
+
+```
+Can connect to tideways-daemon? => Yes, version 1.15.2
 ```
 
 Next, check that the daemon is running and accepting connections:

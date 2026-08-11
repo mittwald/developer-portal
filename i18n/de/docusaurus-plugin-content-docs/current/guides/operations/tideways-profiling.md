@@ -164,8 +164,11 @@ tideways.api_key=YOUR_API_KEY
 ; Interner DNS-Name und Port deines Daemon-Containers
 tideways.connection=tcp://tideways-daemon:9135
 
-; Gruppiert die gesammelten Daten innerhalb deines Tideways-Projekts
-tideways.service=web
+; Optional: Überschreibt den Standard-Servicenamen für diese App. Nutze
+; das mit Bedacht, da manche Anwendungen den Servicenamen automatisch
+; setzen, je nachdem, welche Oberfläche gerade genutzt wird (z. B.
+; Storefront/Backend/API)
+; tideways.service=...
 
 ; Prozentsatz der Requests, die mit dem Timeline-Profiler aufgezeichnet werden
 tideways.trace_sample_rate=25
@@ -177,7 +180,7 @@ Die Einstellungen haben folgende Bedeutung:
 
 - `tideways.api_key` (**erforderlich**) authentifiziert deine Traces gegenüber deinem Tideways-Projekt.
 - `tideways.connection` (in diesem Setup **erforderlich**) verweist die Extension auf deinen Daemon. Ohne diese Einstellung sucht die Extension einen Daemon auf einem lokalen Unix-Socket, den es auf der mittwald-Plattform nicht gibt.
-- `tideways.service` gruppiert die Monitoring-Daten in voneinander unabhängige Einheiten innerhalb eines Projekts, jeweils mit eigenen Performance- und Fehlerstatistiken. Damit kannst du zum Beispiel Webfrontend, API und Hintergrund-Worker voneinander trennen. Der Standardwert ist `app`.
+- `tideways.service` erlaubt dir, den Standard-Servicenamen zu überschreiben, den Tideways deiner App zuweist. Weitere Informationen findest du in der [Dokumentation zur Konfiguration von Services](https://support.tideways.com/documentation/setup/configuration/services.html).
 - `tideways.trace_sample_rate` steuert, wie viel Prozent der Requests mit dem vollständigen Timeline-Profiler aufgezeichnet werden. Der Standardwert ist `25`. Alle übrigen Requests werden weiterhin vom Performance- und Fehler-Monitoring erfasst.
 
 Die vollständige Liste der Einstellungen findest du in der [Tideways-Konfigurationsdokumentation](https://support.tideways.com/documentation/setup/configuration/configure-tideways-globally-via-php-ini.html).
@@ -210,6 +213,12 @@ Die Ausgabe sollte `tideways` enthalten. Um zusätzlich zu prüfen, ob deine Ein
 
 ```shellsession title="SSH-Sitzung"
 user@ssh $ php -i | grep tideways
+```
+
+Die Ausgabe dieses Befehls sollte einen Abschnitt wie diesen enthalten:
+
+```
+Can connect to tideways-daemon? => Yes, version 1.15.2
 ```
 
 Prüfe als Nächstes, ob der Daemon läuft und Verbindungen annimmt:
