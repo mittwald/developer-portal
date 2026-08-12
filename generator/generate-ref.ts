@@ -33,7 +33,7 @@ function determineServerURLAndBasePath(
     spec.servers?.[0].url ?? `https://api.mittwald.de/${apiVersion}`;
   if (serverURL) {
     const parsedServerURL = url.parse(serverURL);
-    basePath = parsedServerURL.pathname;
+    basePath = parsedServerURL.pathname ?? "";
   }
 
   return [serverURL, basePath];
@@ -90,7 +90,11 @@ async function renderAPISpecToFile(
   apiVersion: APIVersion,
 ) {
   const withSDKExamples = apiVersion !== "v1";
-  const summary: string = canonicalizeTitle(spec.summary);
+  const summary = canonicalizeTitle(spec.summary);
+
+  if (!spec.operationId) {
+    return;
+  }
 
   const descriptionOverridePre = loadDescriptionOverride(
     apiVersion,
@@ -152,7 +156,7 @@ function exportSpecToSource(
 async function renderTagIndexPage(
   apiVersion: APIVersion,
   name: string,
-  description: string,
+  description: string | undefined,
   outputPath: string,
 ): Promise<void> {
   const indexFile = path.join(outputPath, "index.mdx");
@@ -252,14 +256,14 @@ class APIDocRenderer {
       fs.mkdirSync(operationsDir, { recursive: true });
 
       for (const urlPath of Object.keys(spec.paths)) {
-        const operations = spec.paths[urlPath];
+        const operations = spec.paths[urlPath]!;
         const urlPathWithBase =
           basePath + urlPath.replace(new RegExp(`${basePath}/`), "/");
         for (const method of Object.keys(operations) as HttpMethods[]) {
-          const operation = operations[method];
-          if (operation.tags.includes(name)) {
+          const operation = operations[method]!;
+          if (operation.tags?.includes(name)) {
             // Strip trailing dot from summary because they are annoying in the sidebar
-            const summary: string = canonicalizeTitle(operation.summary);
+            const summary = canonicalizeTitle(operation.summary);
             const operationFile = path.join(
               operationsDir,
               operation.operationId + ".mdx",
