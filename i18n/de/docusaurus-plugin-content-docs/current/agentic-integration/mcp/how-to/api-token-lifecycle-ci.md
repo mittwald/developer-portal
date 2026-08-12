@@ -29,7 +29,7 @@ Do not delete/revoke tokens until I approve.
 ## Was du (Mensch) noch tun musst {#what-you-must-do}
 
 - Neuen Token im CI-Secret-Manager speichern.
-- Cutover-Timing bestätigen.
+- Zeitpunkt für die Umstellung bestätigen.
 - Widerruf des alten Tokens genehmigen.
 
 ## Verifizierungs-Prompt {#verification-prompt}

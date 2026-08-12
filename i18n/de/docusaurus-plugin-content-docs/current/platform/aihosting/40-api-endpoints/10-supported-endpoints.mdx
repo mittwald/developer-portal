@@ -152,6 +152,21 @@ curl -i -X POST https://llm.aihosting.mittwald.de/v1/chat/completions \
 Dieser Endpunkt bietet Zugriff auf die **Responses API**, welcher auf der Struktur von der [OpenAI Responses API](https://platform.openai.com/docs/api-reference/responses) basiert.
 Da die Route noch **experimentell** ist, sind nicht alle Funktionen vollständig verfügbar. Einige erweiterte Parameter können sich anders verhalten als in der [OpenAI Responses API](https://platform.openai.com/docs/api-reference/responses).
 
+Bei allen Modellen unterstützt: Single-Turn- und Multi-Turn-Texterzeugung (vollständiger Verlauf in `input`), Streaming.
+
+Function/Tool Calling und `reasoning.effort` sind bei gpt-oss-120b, Qwen3.5-122B-A10B-FP8, Qwen3.6-35B-A3B-FP8 und Qwen3.5-0.8B unterstützt. Ministral-3-14B-Instruct-2512 unterstützt kein Tool Calling auf diesem Endpunkt; für dieses Modell stattdessen `/v1/chat/completions` verwenden. Die vollständige Modell-Tabelle steht unter [Responses-API-Support](../../dedicated/openai-compatibility#responses-api).
+
+Bei keinem Modell unterstützt:
+
+- Serverseitig gespeicherte Konversationen — `previous_response_id` und der Abruf einer gespeicherten Response (`GET /v1/responses/{id}`) werden abgelehnt. Stattdessen bei jedem Aufruf den vollständigen Gesprächsverlauf in `input` übergeben.
+- `background: true` (Background-/Async-Responses).
+- Multimodale Eingabe (`input_image`-Content-Parts) — für [Vision](#vision-bild--text) stattdessen `/v1/chat/completions` verwenden.
+- Eingebaute Tools wie `web_search`, `file_search` oder `code_interpreter`. Nur Custom-Function-Tools werden unterstützt.
+
+:::caution
+Ein Bild an ein Modell ohne Vision-Support zu senden, führt nicht zu einem Fehler. Bilder nur an vision-fähige Modelle senden.
+:::
+
 Strukturierte Ausgaben wie schema-basiertes JSON können über diesen Endpunkt derzeit nicht erzwungen werden.
 Falls ein festes Ausgabeformat benötigt wird, sollte stattdessen der Endpunkt /v1/chat/completions verwendet werden
 
@@ -213,7 +228,7 @@ curl -X POST https://llm.aihosting.mittwald.de/v1/audio/transcriptions \
     -F "model=whisper-large-v3-turbo"
 ```
 
-Der `file`-Parameter sollte die zu transkribierende Audiodatei enthalten. Unterstützte Formate sind MP3, OGG, WAV und FLAC. Die maximale Dateigröße beträgt 25 MB. Der `model`-Parameter gibt an, welches Whisper-Modell für die Transkription verwendet werden soll.
+Der `file`-Parameter sollte die zu transkribierende Audiodatei enthalten. Unterstützte Formate sind MP3, OGG, WAV und FLAC. Die maximale Dateigröße beträgt 25 MB, die maximale Audiolänge 10 Minuten (600 Sekunden). Beide Limits gelten unabhängig voneinander. Der `model`-Parameter gibt an, welches Whisper-Modell für die Transkription verwendet werden soll.
 
 Zusätzlich können folgende optionale Parameter übermittelt werden:
 
@@ -235,4 +250,4 @@ curl -X POST https://llm.aihosting.mittwald.de/v1/audio/transcriptions \
 
 - Übersetzungsfunktion (`to_language`-Parameter) wird nicht unterstützt
 - Für beste Ergebnisse sollte der `language`-Parameter immer explizit angegeben werden
-- Segmentiere große Audiodateien bei Bedarf in Teile kleiner als 25 MB
+- Segmentiere Audiodateien bei Bedarf in Teile kleiner als 25 MB und kürzer als 10 Minuten. Wird die Länge überschritten, kommt HTTP 400 mit `Audio exceeds maximum allowed duration of 600s` zurück. Ein Beispiel dazu im [Spracherkennungs-Guide](../../examples/whisper/#grosse-dateien)

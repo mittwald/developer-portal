@@ -1,0 +1,351 @@
+---
+title: Breaking (!) API changes for v2 API, July 10 to July 17
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Container
+  - Project
+  - Contract
+  - Marketplace
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+During the week of July 10 to July 17, 2026, the mittwald API introduced several changes, including the removal of certain media types and required properties, the addition of optional properties and request parameters, and updates to response types and enumerations across various endpoints.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The media type `application/octet-stream` has been removed for the response with the status `200` in the `GET` operation at the path `/v2/container-templates/{templateId}/icon`. This is a breaking change.
+- Several response properties in the `GET` operation at the path `/v2/projects/{projectId}/activities` have become optional for the status `200`: 
+  - `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsARecordSet]/changes/after/aRecords`
+  - `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsARecordSet]/changes/after/aaaaRecords`
+  - `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsARecordSet]/changes/before/aRecords`
+  - `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsARecordSet]/changes/before/aaaaRecords`
+- The response property type for `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsARecordSetManaged]/changes/after/aRecords` has changed from `object` to `string` for the status `200` in the `GET` operation at the path `/v2/projects/{projectId}/activities`.
+- The response property type for `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsMxRecordSetManaged]/changes/after/mx` has changed from `object` to `string` for the status `200` in the `GET` operation at the path `/v2/projects/{projectId}/activities`.
+- The required property `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsARecordSetManaged]/changes/after/aRecords/managedByIngressId` has been removed from the response with the status `200` in the `GET` operation at the path `/v2/projects/{projectId}/activities`.
+- The required property `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsMxRecordSetManaged]/changes/after/mx/managed` has been removed from the response with the status `200` in the `GET` operation at the path `/v2/projects/{projectId}/activities`.
+- The new enum value `notReachable` has been added to the `status/items/type` response property for the status `200` in both the `GET` operation at the path `/v2/customers/{customerId}/invoice-settings` and the `PUT` operation at the same path.
+- The schemas `de.mittwald.v1.activitylog.DatabaseMysqlNameSet` and `de.mittwald.v1.activitylog.DatabaseVersionSet` have been removed from the API schema.
+- A new optional request parameter `sortOrder` has been added to the `GET` operation at the path `/v2/container-templates`.
+- An optional property `/items/screenshots` has been added to the response with the status `200` in the `GET` operation at the path `/v2/container-templates`.
+- An optional property `screenshots` has been added to the response with the status `200` in the `GET` operation at the path `/v2/container-templates/{templateId}`.
+- A new endpoint has been added for the `GET` operation at the path `/v2/container-templates/{templateId}/assets/{assetPath}`.
+- The API operation ID `container-get-template-icon` has been removed and replaced with `deprecated-container-get-template-icon` for the `GET` operation at the path `/v2/container-templates/{templateId}/icon`.
+- A new media type `image/webp` has been added for the response with the status `200` in the `GET` operation at the path `/v2/container-templates/{templateId}/icon`.
+- Several new optional request parameters have been added to the `GET` operation at the path `/v2/contributors/{contributorId}/contract-partners`: `sort`, `page`, `limit`, `order`, and `skip`.
+- Optional properties `/items/requestedChanges/purgeScopes` and `/items/requestedChanges/purgeWebhookUrls` have been added to the response with the status `200` in the `GET` operation at the path `/v2/contributors/{contributorId}/extensions`.
+- Optional properties `requestedChanges/purgeScopes` and `requestedChanges/purgeWebhookUrls` have been added to the response with the status `200` in the `GET` operation at the path `/v2/contributors/{contributorId}/extensions/{extensionId}`.
+- Optional properties `requestedChanges/purgeScopes` and `requestedChanges/purgeWebhookUrls` have been added to the response with the status `200` in the `PATCH` operation at the path `/v2/contributors/{contributorId}/extensions/{extensionId}`.
+- A non-success response with the status `403` has been added for the `GET` operation at the path `/v2/extension-instances/{extensionInstanceId}`.
+- The response property `anyOf` list for the `/items/action` response in the `GET` operation at the path `/v2/projects/{projectId}/activities` has been updated to include new schemas: `de.mittwald.v1.activitylog.AppInstallationDescriptionSet`, `de.mittwald.v1.activitylog.AppInstallationDeleted`, `de.mittwald.v1.activitylog.AppInstallationDatabaseLinked`, and `de.mittwald.v1.activitylog.AppInstallationDatabaseUnlinked`.
+- The response property `anyOf` list for the `/items/action` response in the `GET` operation at the path `/v2/projects/{projectId}/activities` has had the schemas `de.mittwald.v1.activitylog.DatabaseVersionSet` and `de.mittwald.v1.activitylog.DatabaseMysqlNameSet` removed.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Get a Container Template icon"
+
+
+- ⚠️ **Breaking:** removed the media type 'application/octet-stream' for the response with the status '200'
+
+- added the media type 'image/webp' for the response with the status '200'
+
+
+For details, refer to the <OperationLink operation="deprecated-container-get-template-icon" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the activities of a project"
+
+
+- ⚠️ **Breaking:** the response property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsARecordSet]/changes/after/aRecords' became optional for the status '200'
+
+- ⚠️ **Breaking:** the response property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsARecordSet]/changes/after/aaaaRecords' became optional for the status '200'
+
+- ⚠️ **Breaking:** the response property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsARecordSet]/changes/before/aRecords' became optional for the status '200'
+
+- ⚠️ **Breaking:** the response property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsARecordSet]/changes/before/aaaaRecords' became optional for the status '200'
+
+- ⚠️ **Breaking:** the '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsARecordSetManaged]/changes/after/aRecords' response's property type/format changed from 'object'/'' to 'string'/'' for status '200'
+
+- ⚠️ **Breaking:** the '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsMxRecordSetManaged]/changes/after/mx' response's property type/format changed from 'object'/'' to 'string'/'' for status '200'
+
+- ⚠️ **Breaking:** removed the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsARecordSetManaged]/changes/after/aRecords/managedByIngressId' from the response with the '200' status
+
+- ⚠️ **Breaking:** removed the required property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsMxRecordSetManaged]/changes/after/mx/managed' from the response with the '200' status
+
+- added '#/components/schemas/de.mittwald.v1.activitylog.AppInstallationDescriptionSet, #/components/schemas/de.mittwald.v1.activitylog.AppInstallationDeleted, #/components/schemas/de.mittwald.v1.activitylog.AppInstallationDatabaseLinked, #/components/schemas/de.mittwald.v1.activitylog.AppInstallationDatabaseUnlinked' to the '/items/action' response property 'anyOf' list for the response status '200'
+
+- removed '#/components/schemas/de.mittwald.v1.activitylog.DatabaseVersionSet, #/components/schemas/de.mittwald.v1.activitylog.DatabaseMysqlNameSet' from the '/items/action' response property 'anyOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="project-list-project-activities" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get InvoiceSettings of a Customer"
+
+
+- added the new 'notReachable' enum value to the 'status/items/type' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="invoice-get-detail-of-invoice-settings" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update InvoiceSettings of a Customer"
+
+
+- added the new 'notReachable' enum value to the 'status/items/type' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="invoice-update-invoice-settings" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in ""
+
+
+- removed the schema 'de.mittwald.v1.activitylog.DatabaseMysqlNameSet'
+
+- removed the schema 'de.mittwald.v1.activitylog.DatabaseVersionSet'
+
+
+For details, refer to the <OperationLink operation="" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Container Templates"
+
+
+- added the new optional 'query' request parameter 'sortOrder'
+
+- added the optional property '/items/screenshots' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-list-templates" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Container Template by ID"
+
+
+- added the optional property 'screenshots' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-get-template" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Container Template asset"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-get-template-asset" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "container-get-template-icon"
+
+
+- api operation id 'container-get-template-icon' removed and replaced with 'deprecated-container-get-template-icon'
+
+
+For details, refer to the <OperationLink operation="container-get-template-icon" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List ContractPartners of the contributor"
+
+
+- added the new optional 'query' request parameter 'limit'
+
+- added the new optional 'query' request parameter 'order'
+
+- added the new optional 'query' request parameter 'page'
+
+- added the new optional 'query' request parameter 'skip'
+
+- added the new optional 'query' request parameter 'sort'
+
+
+For details, refer to the <OperationLink operation="contributor-list-contract-partners-of-contributor" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Extensions of own contributor"
+
+
+- added the optional property '/items/requestedChanges/purgeScopes' to the response with the '200' status
+
+- added the optional property '/items/requestedChanges/purgeWebhookUrls' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-list-own-extensions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get Extension of own contributor"
+
+
+- added the optional property 'requestedChanges/purgeScopes' to the response with the '200' status
+
+- added the optional property 'requestedChanges/purgeWebhookUrls' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-get-own-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Patch Extension"
+
+
+- added the optional property 'requestedChanges/purgeScopes' to the response with the '200' status
+
+- added the optional property 'requestedChanges/purgeWebhookUrls' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="extension-patch-extension" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an extension instance"
+
+
+- added the non-success response with the status '403'
+
+
+For details, refer to the <OperationLink operation="extension-get-extension-instance" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK Release v2.1.202
+
+The latest release of the mittwald PHP SDK, version v2.1.202, introduces new features and changes to enhance data management capabilities.
+
+#### New Features
+- **Purge Options**: Added new boolean properties `purgeScopes` and `purgeWebhookUrls` to the `OwnExtension` and `OwnExtensionRequestedChanges` schemas. These options provide improved control over data management.
+
+#### Changes
+- **OwnExtension Class**: 
+  - Introduced `purgeScopes` and `purgeWebhookUrls` as boolean types in the schema definition.
+
+- **OwnExtensionRequestedChanges Class**:
+  - Added `purgeScopes` and `purgeWebhookUrls` as boolean properties.
+  - Implemented getter methods for these properties.
+  - Created setter methods `withPurgeScopes` and `withPurgeWebhookUrls` with validation.
+  - Added methods `withoutPurgeScopes` and `withoutPurgeWebhookUrls` for property removal.
+  - Updated object construction and output serialization to include these new properties.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.202).
+
+### Mittwald PHP SDK Release v2.1.201
+
+The latest release of the Mittwald PHP SDK, version v2.1.201, introduces several new features and improvements. Key highlights include:
+
+- **Template Asset Management**: A new request and response structure has been introduced for managing assets associated with container templates, enhancing flexibility in specifying and retrieving template-related resources.
+  
+- **Deprecated Functionality**: The `getTemplateIcon` method is deprecated in favor of the new `getTemplateAsset` method, which offers more comprehensive handling of template resources.
+
+- **Enhanced List Templates Request**: A `sortOrder` parameter has been added to the list templates request, allowing sorting by specific criteria such as trend over 30 days.
+
+- **Core Changes**: Updates to the `ContainerClient` interface and implementation, including new request and response classes for template asset management.
+
+- **Domain Migration Adjustments**: Enhancements to the `NonMigratableDomain` schema and introduction of the `OwnerContactIssue` class to manage domain migration issues.
+
+- **Activity Log Enhancements**: New classes for handling activity logs related to app installations.
+
+- **Template Enhancements**: Introduction of the `TemplateScreenshotsItem` class for managing screenshots associated with container templates.
+
+- **Bug Fixes and Improvements**: Improved validation and construction logic for better error handling and usability.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.201).
+
+### mittwald PHP SDK Release v2.1.200
+
+The mittwald PHP SDK has been updated to version v2.1.200. This release introduces several new features and improvements:
+
+- **Enhanced `ContributorListContractPartnersOfContributorRequest` Object**: 
+  - Added pagination, sorting, and filtering capabilities with new parameters: `limit`, `skip`, `page`, `sort`, and `order`.
+  - Validation methods have been introduced to ensure data integrity for these parameters.
+
+- **New `ExtensionGetExtensionInstanceForbiddenResponse` Class**:
+  - This class handles 403 Forbidden responses, improving the API's robustness by encapsulating error handling for forbidden requests.
+
+For more details, please visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.200).
+
+### mittwald PHP SDK Release v2.1.199
+
+The latest release of the mittwald PHP SDK, version 2.1.199, introduces a new feature and several changes:
+
+#### Features Added
+- A new status, **notReachable**, has been added to the invoice settings. This provides additional granularity for handling invoice statuses.
+
+#### Changes
+- The `InvoiceSettingsStatus` class has been updated to include the new `notReachable` status.
+- The `InvoiceSettingsStatusType` enumeration has been modified to define the new `notReachable` status.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.199).
+
+### mittwald JavaScript SDK Release 4.416.0
+
+The mittwald JavaScript SDK has been updated to version 4.416.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.416.0).
+
+### mittwald JavaScript SDK Release 4.415.0
+
+The mittwald JavaScript SDK version 4.415.0 has been released on July 16, 2026. This update includes the following feature:
+
+- Updated the generated client to enhance functionality and performance ([commit 32836b7](https://github.com/mittwald/api-client-js/commit/32836b79182000e0f457a2ce2b288dbaf6e3e440)).
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.415.0).
+
+### mittwald JavaScript SDK Release 4.414.0
+
+The mittwald JavaScript SDK has been updated to version 4.414.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details on the changes and to view the release, visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.414.0).
+
+### mittwald JavaScript SDK Release 4.413.0
+
+The mittwald JavaScript SDK has been updated to version 4.413.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.413.0).
+
+### mittwald JavaScript SDK Release 4.412.0
+
+The mittwald JavaScript SDK has been updated to version 4.412.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more detailed information, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.412.0).
+
+### mittwald JavaScript SDK Release 4.411.0
+
+The mittwald JavaScript SDK has been updated to version 4.411.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.411.0).
+
+### mittwald JavaScript SDK Release 4.410.0
+
+The mittwald JavaScript SDK has been updated to version 4.410.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.410.0).
+

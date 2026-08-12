@@ -50,7 +50,7 @@ function MCPPageHeader() {
         <div className={styles.buttons}>
           <DocusaurusLink
             className="button button--success button--lg"
-            to="/docs/v2/mcp/getting-connected"
+            to="/docs/v2/agentic-integration/mcp/getting-connected"
           >
             <Icon>
               <IconRocket />
@@ -59,7 +59,7 @@ function MCPPageHeader() {
           </DocusaurusLink>
           <DocusaurusLink
             className="button button--secondary button--lg"
-            to="/docs/v2/mcp"
+            to="/docs/v2/agentic-integration/mcp"
           >
             <Icon>
               <IconBook />
@@ -111,7 +111,7 @@ function ServerURLSection() {
             id="mcp.url.setupGuides"
             values={{
               link: (
-                <Link to="/docs/v2/mcp/getting-connected">
+                <Link to="/docs/v2/agentic-integration/mcp/getting-connected">
                   <Translate id="mcp.url.setupGuides.link">
                     setup guides
                   </Translate>
@@ -233,7 +233,7 @@ function OverviewFeature() {
               </Section>
               <Section>
                 <Text elementType="p">
-                  <Link to="/docs/v2/mcp/getting-connected">
+                  <Link to="/docs/v2/agentic-integration/mcp/getting-connected">
                     <Translate id="mcp.overview.auth.link">
                       Setup guides →
                     </Translate>
@@ -287,20 +287,22 @@ function GettingStartedFeature() {
                 <Text>
                   <ul>
                     <li>
-                      <Link to="/docs/v2/mcp/getting-connected/claude-code">
+                      <Link to="/docs/v2/agentic-integration/mcp/getting-connected/claude-code">
                         Claude Code
                       </Link>
                     </li>
                     <li>
-                      <Link to="/docs/v2/mcp/getting-connected/github-copilot">
+                      <Link to="/docs/v2/agentic-integration/mcp/getting-connected/github-copilot">
                         GitHub Copilot
                       </Link>
                     </li>
                     <li>
-                      <Link to="/docs/v2/mcp/getting-connected/cursor">Cursor</Link>
+                      <Link to="/docs/v2/agentic-integration/mcp/getting-connected/cursor">
+                        Cursor
+                      </Link>
                     </li>
                     <li>
-                      <Link to="/docs/v2/mcp/getting-connected/codex-cli">
+                      <Link to="/docs/v2/agentic-integration/mcp/getting-connected/codex-cli">
                         Codex CLI
                       </Link>
                     </li>
@@ -326,7 +328,7 @@ function GettingStartedFeature() {
                 <Text>
                   <ul>
                     <li>
-                      <Link to="/docs/v2/mcp/tutorials">
+                      <Link to="/docs/v2/agentic-integration/mcp/tutorials">
                         <Translate id="mcp.getStarted.learn.tutorials">
                           Tutorials
                         </Translate>
@@ -337,7 +339,7 @@ function GettingStartedFeature() {
                       </Translate>
                     </li>
                     <li>
-                      <Link to="/docs/v2/mcp/how-to">
+                      <Link to="/docs/v2/agentic-integration/mcp/how-to">
                         <Translate id="mcp.getStarted.learn.howto">
                           How-To Playbooks
                         </Translate>
@@ -348,7 +350,7 @@ function GettingStartedFeature() {
                       </Translate>
                     </li>
                     <li>
-                      <Link to="/docs/v2/mcp/runbooks">
+                      <Link to="/docs/v2/agentic-integration/mcp/runbooks">
                         <Translate id="mcp.getStarted.learn.runbooks">
                           Runbooks
                         </Translate>
@@ -426,7 +428,9 @@ function WorkflowFeature() {
                         id="mcp.workflow.steps.auth"
                         values={{ bold: <strong>Auth</strong> }}
                       >
-                        {"{bold} — OAuth or token auth is used for each tool call"}
+                        {
+                          "{bold} — OAuth or token auth is used for each tool call"
+                        }
                       </Translate>
                     </li>
                     <li>
@@ -496,7 +500,7 @@ function TutorialsFeature() {
                 </Translate>
               </p>
               <p>
-                <Link to="/docs/v2/mcp/tutorials">
+                <Link to="/docs/v2/agentic-integration/mcp/tutorials">
                   <Translate id="mcp.tutorials.link">
                     Browse all tutorials →
                   </Translate>

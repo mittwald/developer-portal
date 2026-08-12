@@ -23,9 +23,9 @@ Do not modify existing memberships beyond sending the invite unless I approve.
 
 ## Was der Agent automatisch tun wird {#what-agent-will-do}
 
-- Mitgliedschaften und Einladungen aufzählen.
+- Mitgliedschaften und Einladungen auflisten.
 - Einladung nach Genehmigung erstellen.
-- Post-Change-Zugriffsstatus zusammenfassen.
+- Zugriffsstatus nach der Änderung zusammenfassen.
 
 ## Was du (Mensch) noch tun musst {#what-you-must-do}
 

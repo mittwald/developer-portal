@@ -19,6 +19,7 @@ $ mw --help
 
 ```
 $ brew tap mittwald/cli
+$ brew trust --formula mittwald/cli/mw
 $ brew install mw
 $ mw --help
 ```

@@ -156,6 +156,136 @@ Get server status for [server-id]
 Create a backup for project [project-id]
 ```
 
+## Claude Code MCP-Server-Beispiele {#claude-code-mcp-server-examples}
+
+In Claude Code lassen sich MCP-Server global (in `~/.claude.json`) oder pro
+Projekt (in `.mcp.json`) konfigurieren.
+
+Nutze `mcpServers`, um neben mittwald zusätzliche Server zu definieren:
+
+```json
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@context7/mcp-server", "--stdio"],
+      "env": {
+        "CONTEXT7_API_KEY": "your-context7-api-key"
+      }
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search", "--stdio"],
+      "env": {
+        "BRAVE_API_KEY": "your-brave-api-key"
+      }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "--stdio"],
+      "env": {
+        "POSTGRES_CONNECTION_STRING": "postgresql://user:password@localhost:5432/dbname"
+      }
+    },
+    "directus": {
+      "command": "npx",
+      "args": ["-y", "@directus/content-mcp", "--stdio"],
+      "env": {
+        "DIRECTUS_URL": "https://your-directus-instance.com",
+        "DIRECTUS_TOKEN": "your-directus-token"
+      }
+    },
+    "opensearch": {
+      "command": "npx",
+      "args": ["-y", "@opensearch-project/mcp-server", "--stdio"],
+      "env": {
+        "OPENSEARCH_URL": "https://localhost:9200",
+        "OPENSEARCH_USERNAME": "your-opensearch-username",
+        "OPENSEARCH_PASSWORD": "your-opensearch-password"
+      }
+    },
+    "solr": {
+      "command": "uvx",
+      "args": ["solr-mcp"],
+      "env": {
+        "SOLR_URL": "http://localhost:8983/solr"
+      }
+    },
+    "typo3": {
+      "command": "mw",
+      "args": [
+        "app",
+        "exec",
+        "--quiet",
+        "--installation-id=a-XXXXX",
+        "vendor/bin/typo3 mcp:server"
+      ]
+    }
+  }
+}
+```
+
+## WebFetch-Konfiguration {#webfetch-configuration}
+
+Claude Code unterstützt integriertes Web-Fetching. Konfiguriere es in
+`settings.json`:
+
+```json
+{
+  "webFetch": {
+    "enabled": true,
+    "allowedDomains": [
+      "github.com",
+      "stackoverflow.com",
+      "docs.python.org",
+      "developer.mozilla.org"
+    ],
+    "blockedDomains": [],
+    "maxDepth": 2,
+    "followRedirects": true,
+    "timeout": 10000,
+    "userAgent": "ClaudeCode/1.0",
+    "maxContentLength": 1048576
+  }
+}
+```
+
+## WebFetch-Nutzungsbeispiele {#webfetch-usage-examples}
+
+Nutze in Claude Code zum Beispiel folgende Prompts:
+
+```text
+Fetch https://api.github.com/docs and summarize the authentication methods.
+```
+
+```text
+Fetch https://github.com/user/repo/blob/main/auth.py and compare it with our current auth.py implementation.
+```
+
+```text
+Fetch https://docs.python.org/3/library/asyncio.html and propose how to refactor our code to use async/await.
+```
+
+## WebFetch-Verhalten feinabstimmen {#fine-tune-webfetch-behavior}
+
+```json
+{
+  "webFetch": {
+    "enabled": true,
+    "allowedDomains": ["*.github.com", "docs.*", "*.readthedocs.io"],
+    "maxDepth": 1,
+    "extractionRules": {
+      "removeSelectors": [".sidebar", ".footer", "nav"],
+      "focusSelectors": ["article", "main", ".documentation"]
+    },
+    "caching": {
+      "enabled": true,
+      "ttl": 3600
+    }
+  }
+}
+```
+
 ## Fehlerbehebung {#troubleshooting}
 
 ### Fehler: "Browser Didn't Open" {#error-browser-didnt-open}
@@ -260,7 +390,7 @@ Create a backup for project [project-id]
 ## Nächste Schritte {#next-steps}
 
 - **[Tutorials](../../tutorials/)**: Sieh dir Praxisbeispiele an
-- **[Andere Tools](./)**: Richte GitHub Copilot, Cursor oder Codex CLI ein
+- **[Andere Tools](../)**: Richte GitHub Copilot, Cursor oder Codex CLI ein
 
 ## Offizielle Dokumentation {#official-documentation}
 

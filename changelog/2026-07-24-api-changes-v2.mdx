@@ -1,0 +1,412 @@
+---
+title: Breaking (!) API changes for v2 API, July 17 to July 24
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Cronjob
+  - Container
+  - Database
+  - Backup
+  - Project
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API introduces several enhancements, including default values for request parameters, the addition of new endpoints for updating various resources, and the removal of deprecated operation IDs to streamline API usage.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- For the `GET` operation `cronjob-list-executions` at the path `/v2/cronjobs/{cronjobId}/executions`, default values of `1000.00` for the `limit` request parameter and `0.00` for the `skip` request parameter have been added. Note that this is a breaking change.
+- The `header` request parameter `Accept-Language` has been removed from the `GET` operation `cronjob-get-execution-analysis` at the path `/v2/cronjobs/{cronjobId}/executions/{executionId}/analysis`.
+- The required property `/items/type` has been added to the response with the `200` status for the `GET` operation `container-list-templates` at the path `/v2/container-templates`.
+- The required property `type` has been added to the response with the `200` status for the `GET` operation `container-get-template` at the path `/v2/container-templates/{templateId}`.
+- The API operation ID `database-update-mysql-database-default-charset` has been removed and replaced with `deprecated-database-update-mysql-database-default-charset` for the `PATCH` operation at the path `/v2/mysql-databases/{mysqlDatabaseId}/default-charset`.
+- The API operation ID `database-update-mysql-database-description` has been removed and replaced with `deprecated-database-update-mysql-database-description` for the `PATCH` operation at the path `/v2/mysql-databases/{mysqlDatabaseId}/description`.
+- A new endpoint has been added for the `PATCH` operation `database-update-mysql-user` at the path `/v2/mysql-users/{mysqlUserId}`.
+- The API operation ID `database-update-mysql-user` has been removed and replaced with `deprecated-database-replace-mysql-user` for the `PUT` operation at the path `/v2/mysql-users/{mysqlUserId}`.
+- The API operation ID `database-update-mysql-user-password` has been removed and replaced with `deprecated-database-update-mysql-user-password` for the `PATCH` operation at the path `/v2/mysql-users/{mysqlUserId}/password`.
+- A new endpoint has been added for the `PATCH` operation `backup-update-project-backup` at the path `/v2/project-backups/{projectBackupId}`.
+- A new endpoint has been added for the `PATCH` operation `project-update-project` at the path `/v2/projects/{projectId}`.
+- A new endpoint has been added for the `PATCH` operation `storagespace-update-project-statistics` at the path `/v2/projects/{projectId}/storage-space-statistics`.
+- The API operation ID `database-update-redis-database-configuration` has been removed and replaced with `deprecated-database-update-redis-database-configuration` for the `PATCH` operation at the path `/v2/redis-databases/{redisDatabaseId}/configuration`.
+- The API operation ID `database-update-redis-database-description` has been removed and replaced with `deprecated-database-update-redis-database-description` for the `PATCH` operation at the path `/v2/redis-databases/{redisDatabaseId}/description`.
+- A new endpoint has been added for the `PATCH` operation `project-update-server` at the path `/v2/servers/{serverId}`.
+- A new endpoint has been added for the `PATCH` operation `storagespace-update-server-statistics` at the path `/v2/servers/{serverId}/storage-space-statistics`.
+- A new optional request property `updateSchedule` has been added for the `PATCH` operation `container-update-stack` at the path `/v2/stacks/{stackId}`.
+- A new endpoint has been added for the `POST` operation `container-add-template-component` at the path `/v2/stacks/{stackId}/actions/add-template-component`.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "List cronjob executions belonging to a cronjob"
+
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'limit', default value '1000.00' was added
+
+- ⚠️ **Breaking:** for the 'query' request parameter 'skip', default value '0.00' was added
+
+
+For details, refer to the <OperationLink operation="cronjob-list-executions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a cronjob execution analysis for failed executions"
+
+
+- deleted the 'header' request parameter 'Accept-Language'
+
+
+For details, refer to the <OperationLink operation="cronjob-get-execution-analysis" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Container Templates"
+
+
+- added the required property '/items/type' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-list-templates" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Container Template by ID"
+
+
+- added the required property 'type' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-get-template" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "database-update-mysql-database-default-charset"
+
+
+- api operation id 'database-update-mysql-database-default-charset' removed and replaced with 'deprecated-database-update-mysql-database-default-charset'
+
+
+For details, refer to the <OperationLink operation="database-update-mysql-database-default-charset" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "database-update-mysql-database-description"
+
+
+- api operation id 'database-update-mysql-database-description' removed and replaced with 'deprecated-database-update-mysql-database-description'
+
+
+For details, refer to the <OperationLink operation="database-update-mysql-database-description" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a MySQL user"
+
+
+- endpoint added
+
+- api operation id 'database-update-mysql-user' removed and replaced with 'deprecated-database-replace-mysql-user'
+
+
+For details, refer to the <OperationLink operation="database-update-mysql-user" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "database-update-mysql-user-password"
+
+
+- api operation id 'database-update-mysql-user-password' removed and replaced with 'deprecated-database-update-mysql-user-password'
+
+
+For details, refer to the <OperationLink operation="database-update-mysql-user-password" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a project backup"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="backup-update-project-backup" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a Project"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="project-update-project" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a Project's storage space statistics"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="storagespace-update-project-statistics" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "database-update-redis-database-configuration"
+
+
+- api operation id 'database-update-redis-database-configuration' removed and replaced with 'deprecated-database-update-redis-database-configuration'
+
+
+For details, refer to the <OperationLink operation="database-update-redis-database-configuration" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "database-update-redis-database-description"
+
+
+- api operation id 'database-update-redis-database-description' removed and replaced with 'deprecated-database-update-redis-database-description'
+
+
+For details, refer to the <OperationLink operation="database-update-redis-database-description" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a Server"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="project-update-server" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a Server's storage space statistics"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="storagespace-update-server-statistics" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create, update or delete Services or Volumes belonging to a Stack"
+
+
+- added the new optional request property 'updateSchedule'
+
+
+For details, refer to the <OperationLink operation="container-update-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Add a template component to a Stack"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-add-template-component" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK Release v2.1.206
+
+The mittwald PHP SDK has been updated to version 2.1.206. This release introduces several new features, enhancements, and changes to improve functionality and usability.
+
+#### Features
+- **Update Schedule for Automatic Image Updates**: A new `updateSchedule` feature for stacks allows users to schedule automatic image updates using a cron expression and timezone. Users can remove the schedule by setting it to `null` or omit the property to keep it unchanged.
+- **New Template Types**: The `Template` schema now includes a `type` field, distinguishing between 'component' and 'standalone' templates.
+
+#### Enhancements
+- **Documentation Updates**: Added clarifications to the `declare-stack` endpoint documentation, detailing which stack properties can be modified directly and which require separate PATCH requests.
+
+#### Changes
+- **Schema Modifications**: 
+  - The `UpdateStackRequest` and `UpdateStackRequestBody` classes now include the `updateSchedule` property.
+  - A new class, `UpdateStackRequestBodyUpdateSchedule`, has been introduced for handling update schedules, including validation for cron and timezone formats.
+  - The `Template` schema now requires a `type` property to specify the template's nature.
+
+- **Class Updates**: 
+  - New methods for managing the `updateSchedule` property in the `UpdateStackRequestBody` class.
+  - The `Template` class now includes methods for accessing the `type` property, with constructor modifications to accept this parameter.
+
+#### New Files
+- **TemplateType.php**: This file defines the enum for template types, enhancing type safety and clarity in template-related code.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.206).
+
+### mittwald PHP SDK Release v2.1.205
+
+The mittwald PHP SDK has been updated to version v2.1.205. This release introduces several new features and updates to existing interfaces, enhancing the SDK's functionality for managing backups, containers, and project details.
+
+#### Added Features
+
+- **Backup Client**: 
+  - `updateProjectBackup`: A new method to update project backup information.
+
+- **Container Client**: 
+  - `addTemplateComponent`: Allows adding a template component to a stack.
+
+- **Project Client**: 
+  - `updateProject`: Enables updating project details.
+  - `updateServer`: Facilitates updating server details.
+
+- **Storage Space Statistics**: 
+  - `storagespaceUpdateProjectStatistics`: Updates project storage space statistics.
+  - `storagespaceUpdateServerStatistics`: Manages server storage space statistics.
+
+#### Updated Interfaces and Implementations
+
+- **BackupClient**: Includes the new `updateProjectBackup` method.
+- **ContainerClient**: Now supports the `addTemplateComponent` method.
+- **ProjectClient**: Expanded with `updateProject` and `updateServer` methods.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.205).
+
+### mittwald PHP SDK Release v2.1.204
+
+The mittwald PHP SDK has released version v2.1.204. This update introduces a legacy endpoint for user password updates, allowing the use of deprecated methods for MySQL and Redis database updates. The release includes several deprecated methods and new response classes to handle responses for these deprecated endpoints, ensuring backward compatibility while providing flexibility.
+
+#### Key Updates:
+- **Deprecated Methods**: 
+  - `deprecatedDatabaseReplaceMysqlUser`
+  - `deprecatedDatabaseUpdateMysqlDatabaseDefaultCharset`
+  - `deprecatedDatabaseUpdateMysqlDatabaseDescription`
+  - `deprecatedDatabaseUpdateMysqlUserPassword`
+  - `deprecatedDatabaseUpdateRedisDatabaseConfiguration`
+  - `deprecatedDatabaseUpdateRedisDatabaseDescription`
+
+- **New Response Classes**: 
+  - `DeprecatedDatabaseReplaceMysqlUserBadRequestResponse`
+  - `DeprecatedDatabaseReplaceMysqlUserDefaultResponse`
+  - `DeprecatedDatabaseReplaceMysqlUserNotFoundResponse`
+  - `DeprecatedDatabaseReplaceMysqlUserTooManyRequestsResponse`
+  - `DeprecatedDatabaseUpdateMysqlDatabaseDefaultCharsetBadRequestResponse`
+  - `DeprecatedDatabaseUpdateMysqlDatabaseDefaultCharsetDefaultResponse`
+  - `DeprecatedDatabaseUpdateMysqlDatabaseDefaultCharsetNotFoundResponse`
+  - `DeprecatedDatabaseUpdateMysqlDatabaseDefaultCharsetTooManyRequestsResponse`
+  - `DeprecatedDatabaseUpdateMysqlDatabaseDescriptionBadRequestResponse`
+  - `DeprecatedDatabaseUpdateMysqlDatabaseDescriptionDefaultResponse`
+  - `DeprecatedDatabaseUpdateMysqlDatabaseDescriptionNotFoundResponse`
+  - `DeprecatedDatabaseUpdateMysqlDatabaseDescriptionTooManyRequestsResponse`
+  - `DeprecatedDatabaseUpdateMysqlUserPasswordBadRequestResponse`
+  - `DeprecatedDatabaseUpdateMysqlUserPasswordDefaultResponse`
+  - `DeprecatedDatabaseUpdateMysqlUserPasswordNotFoundResponse`
+  - `DeprecatedDatabaseUpdateRedisDatabaseConfigurationBadRequestResponse`
+  - `DeprecatedDatabaseUpdateRedisDatabaseConfigurationDefaultResponse`
+  - `DeprecatedDatabaseUpdateRedisDatabaseConfigurationNotFoundResponse`
+  - `DeprecatedDatabaseUpdateRedisDatabaseConfigurationTooManyRequestsResponse`
+  - `DeprecatedDatabaseUpdateRedisDatabaseDescriptionBadRequestResponse`
+  - `DeprecatedDatabaseUpdateRedisDatabaseDescriptionDefaultResponse`
+  - `DeprecatedDatabaseUpdateRedisDatabaseDescriptionNotFoundResponse`
+  - `DeprecatedDatabaseUpdateRedisDatabaseDescriptionTooManyRequestsResponse`
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.204).
+
+### mittwald PHP SDK Release v2.1.203
+
+The mittwald PHP SDK has released version v2.1.203, which includes several breaking changes, new features, improvements, and deprecated functionalities. 
+
+#### Breaking Changes
+- Removal of several request and response classes related to updating MySQL and Redis database properties, including:
+  - `UpdateMysqlDatabaseDefaultCharsetRequest`
+  - `UpdateMysqlDatabaseDescriptionRequest`
+  - `UpdateMysqlUserPasswordRequest`
+  - `UpdateRedisDatabaseConfigurationRequest`
+  - `UpdateRedisDatabaseDescriptionRequest`
+
+#### Features
+- The `UpdateMysqlUserRequest` method has been changed from `PUT` to `PATCH`, allowing for partial updates to users, including optional password updates.
+- Descriptions and default charset updates for MySQL databases have been removed from user and database management.
+
+#### Improvements
+- The `UpdateMysqlUserRequestBody` has been streamlined to optionally include access levels, descriptions, external access, and a password, enhancing flexibility during user updates.
+- Request construction and validation have been simplified across request classes to improve maintainability.
+
+#### Deprecated Functionalities
+- Classes related to updating MySQL database charset, descriptions, and Redis database configurations are now deprecated. Users are advised to migrate to alternative approaches for managing database properties.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.203).
+
+### mittwald JavaScript SDK Release 4.427.0
+
+The mittwald JavaScript SDK has been updated to version 4.427.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.427.0).
+
+### mittwald JavaScript SDK Release 4.426.0
+
+The mittwald JavaScript SDK has been updated to version 4.426.0. This release includes the following feature:
+
+- Updated the generated client to enhance functionality.
+
+For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.426.0).
+
+### mittwald JavaScript SDK Release 4.425.0
+
+The mittwald JavaScript SDK has been updated to version 4.425.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.425.0).
+
+### mittwald JavaScript SDK Release 4.424.0
+
+The mittwald JavaScript SDK has been updated to version 4.424.0. This release includes an update to the generated client, enhancing its functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.424.0](https://github.com/mittwald/api-client-js/releases/tag/4.424.0).
+
+### mittwald JavaScript SDK Release 4.422.0
+
+The mittwald JavaScript SDK has been updated to version 4.422.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.422.0).
+
+### mittwald JavaScript SDK Release 4.421.0
+
+The mittwald JavaScript SDK has been updated to version 4.421.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.421.0](https://github.com/mittwald/api-client-js/releases/tag/4.421.0).
+
+### mittwald JavaScript SDK Release 4.420.0
+
+The mittwald JavaScript SDK has been updated to version 4.420.0. This release includes the following feature:
+
+- Updated the generated client to improve functionality and performance. For more details, refer to the commit [d7b86cb](https://github.com/mittwald/api-client-js/commit/d7b86cbd1bf81cb77e146f091be2dfc413634bb9).
+
+For further information and to view the release, visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.420.0).
+
+### mittwald JavaScript SDK Release 4.419.0
+
+The mittwald JavaScript SDK has been updated to version 4.419.0. This release includes the following feature:
+
+- Updated the generated client to enhance functionality ([commit 5934764](https://github.com/mittwald/api-client-js/commit/5934764d24bead20f0e95db9c7b35b1adae8f2f8)).
+
+For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.419.0).
+
+### mittwald JavaScript SDK Release 4.418.0
+
+The mittwald JavaScript SDK has been updated to version 4.418.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.418.0](https://github.com/mittwald/api-client-js/releases/tag/4.418.0).
+
+### mittwald JavaScript SDK Release 4.417.0
+
+The mittwald JavaScript SDK has been updated to version 4.417.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.417.0).
+

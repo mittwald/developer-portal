@@ -1,0 +1,244 @@
+---
+title: API changes for v2 API, July 3 to July 10
+authors:
+  - machine
+tags:
+  - apiv2
+  - Project
+  - Container
+  - Domain
+  - Mail
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+In the week of July 3 to July 10, 2026, the mittwald API introduced several changes, including the addition of new endpoints for mail rate limits and template statistics, the removal of optional properties from project activity responses, and the addition of required properties and new optional request parameters across various endpoints.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- In the `GET /v2/projects/{projectId}/activities` operation, the following changes were made:
+  - The optional property `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsZoneCreated]/changes/after` was removed from the response with the '200' status.
+  - The optional property `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsZoneCreated]/changes/before` was removed from the response with the '200' status.
+  - The new enum value `app.version-updated` was added to the `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationAppVersionSet]/name` response property for the response status '200'.
+  - The following schemas were added to the `/items/action` response property 'anyOf' list for the response status '200': `#/components/schemas/de.mittwald.v1.activitylog.DnsDomainDeleted`, `#/components/schemas/de.mittwald.v1.activitylog.DnsIngressDeleted`, `#/components/schemas/de.mittwald.v1.activitylog.DnsARecordSetManaged`, and `#/components/schemas/de.mittwald.v1.activitylog.DnsMxRecordSetManaged`.
+
+- The `GET /v2/container-template-statistics` operation had an endpoint added.
+
+- The `GET /v2/ingresses` operation had a new optional request parameter `containerId` added.
+
+- In the `GET /v2/mail-addresses/` operation, the following changes were made:
+  - The optional property `/items/rateLimitChangeRequest` was added to the response with the '200' status.
+  - The required property `/items/mailbox/mailsystemSettings` was added to the response with the '200' status.
+
+- In the `GET /v2/mail-addresses/{mailAddressId}` operation, the following changes were made:
+  - The optional property `rateLimitChangeRequest` was added to the response with the '200' status.
+  - The required property `mailbox/mailsystemSettings` was added to the response with the '200' status.
+
+- The `POST /v2/mail-addresses/{mailAddressId}/actions/request-rate-limit-change` operation had an endpoint added.
+
+- The `GET /v2/mail-rate-limits` operation had an endpoint added.
+
+- The `GET /v2/mail-rate-limits/{mailRateLimitId}` operation had an endpoint added.
+
+- In the `GET /v2/projects/{projectId}/mail-addresses` operation, the following changes were made:
+  - The optional property `/items/rateLimitChangeRequest` was added to the response with the '200' status.
+  - The required property `/items/mailbox/mailsystemSettings` was added to the response with the '200' status.
+
+- The `GET /v2/projects/{projectId}/stacks` operation had a new optional request parameter `searchTerm` added.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Get the activities of a project"
+
+
+- removed the optional property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsZoneCreated]/changes/after' from the response with the '200' status
+
+- removed the optional property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.DnsZoneCreated]/changes/before' from the response with the '200' status
+
+- added the new 'app.version-updated' enum value to the '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.AppInstallationAppVersionSet]/name' response property for the response status '200'
+
+- added '#/components/schemas/de.mittwald.v1.activitylog.DnsDomainDeleted, #/components/schemas/de.mittwald.v1.activitylog.DnsIngressDeleted, #/components/schemas/de.mittwald.v1.activitylog.DnsARecordSetManaged, #/components/schemas/de.mittwald.v1.activitylog.DnsMxRecordSetManaged' to the '/items/action' response property 'anyOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="project-list-project-activities" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Container Template statistics"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-list-template-statistics" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Ingresses"
+
+
+- added the new optional 'query' request parameter 'containerId'
+
+
+For details, refer to the <OperationLink operation="ingress-list-ingresses" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List mail addresses"
+
+
+- added the optional property '/items/rateLimitChangeRequest' to the response with the '200' status
+
+- added the required property '/items/mailbox/mailsystemSettings' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="mail-list-mail-addresses-for-user" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a mail address"
+
+
+- added the optional property 'rateLimitChangeRequest' to the response with the '200' status
+
+- added the required property 'mailbox/mailsystemSettings' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="mail-get-mail-address" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Request a rate limit change for a mail address"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="mail-request-mail-address-rate-limit-change" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Mail RateLimits"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="mail-list-mail-rate-limits" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Mail RateLimit"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="mail-get-mail-rate-limit" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List mail addresses belonging to a Project"
+
+
+- added the optional property '/items/rateLimitChangeRequest' to the response with the '200' status
+
+- added the required property '/items/mailbox/mailsystemSettings' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="mail-list-mail-addresses" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Stacks belonging to a Project"
+
+
+- added the new optional 'query' request parameter 'searchTerm'
+
+
+For details, refer to the <OperationLink operation="container-list-stacks" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK Release v2.1.198
+
+The mittwald PHP SDK has been updated to version v2.1.198. This release introduces several new features and improvements:
+
+#### Features
+
+- **New Endpoints**:
+  - **Accept Model Terms for Customer**: A method to accept model terms for a customer, with no operation if terms are already accepted.
+  - **Get Detailed Models for Customer**: Retrieve a list of currently active models for a specified customer.
+  - **Get Detailed Models for Project**: Obtain a list of currently active models associated with a specific project.
+  - **Link Container to Project License**: Link a container with a project license, updating the license with the container metadata.
+
+- **Updated Project Usage**: The response for project usage now includes a property indicating if model terms approval is required.
+
+#### Added Methods
+
+- **AIHostingClient Interface**:
+  - `customerAcceptModelTerms`
+  - `customerGetDetailedModels`
+  - `projectGetDetailedModels`
+  - `projectLinkContainer`
+
+- **AIHostingClient Implementation**: Implementations for the new methods added in the `AIHostingClient` interface.
+
+#### Updated Validation Responses
+
+- Redesigned error handling responses for several API calls, enhancing the structure of response objects.
+
+#### Deprecated Endpoints
+
+- Old endpoints are marked as deprecated due to their transition to newer mechanisms.
+
+#### Documentation
+
+- Updated markdown documentation to reflect changes in methods, endpoints, and their usage.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.198).
+
+### mittwald JavaScript SDK Release 4.409.0
+
+The mittwald JavaScript SDK has been updated to version 4.409.0. This release includes the following feature:
+
+- Updated the generated client to enhance functionality and performance ([commit 27571d7](https://github.com/mittwald/api-client-js/commit/27571d760dcc005efbbf612197f4056c5f174855)).
+
+For more details, please visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.409.0).
+
+### mittwald JavaScript SDK Release 4.408.0
+
+The mittwald JavaScript SDK has been updated to version 4.408.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.408.0).
+
+### mittwald JavaScript SDK Release 4.407.0
+
+The mittwald JavaScript SDK has been updated to version 4.407.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.407.0](https://github.com/mittwald/api-client-js/releases/tag/4.407.0).
+
+### mittwald JavaScript SDK Release 4.406.0
+
+The mittwald JavaScript SDK has been updated to version 4.406.0. This release includes the following feature:
+
+- Updated generated client ([commit 74a36fd](https://github.com/mittwald/api-client-js/commit/74a36fddaa098e63f6e474bb37abf5462e7ab12e))
+
+For more details, please visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.406.0).
+
+### mittwald JavaScript SDK Release 4.405.1
+
+The mittwald JavaScript SDK has been updated to version 4.405.1. This release is a version bump only for the package root, with no additional changes or features introduced. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.405.1).
+

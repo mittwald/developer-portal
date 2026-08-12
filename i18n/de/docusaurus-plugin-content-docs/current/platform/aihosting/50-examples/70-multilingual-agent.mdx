@@ -1,14 +1,13 @@
 ---
 sidebar_label: Mehrsprachiger Tool-Calling-Agent
-description: Einen Tool-Calling-Agenten bauen, der mit Mistral-Medium-3.5-128B über 40 Sprachen nativ unterstützt
+description: Einen Tool-Calling-Agenten bauen, der mit Qwen3.5-122B-A10B-FP8 über 100 Sprachen unterstützt
 title: Mehrsprachiger Tool-Calling-Agent
 ---
 
-Das Tool-Calling-Agenten-Muster in diesem Guide funktioniert mit jedem Chat-Modell, das Funktionsaufrufe unterstützt. Das Beispiel verwendet [Mistral-Medium-3.5-128B](/docs/v2/platform/aihosting/models/mistral-medium-3-5-128b), aber es kann je nach Kosten- und Qualitätsanforderungen ein beliebiges der folgenden Modelle eingesetzt werden:
+Das Tool-Calling-Agenten-Muster in diesem Guide funktioniert mit jedem Chat-Modell, das Funktionsaufrufe unterstützt. Das Beispiel verwendet [Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8), aber es kann je nach Kosten- und Qualitätsanforderungen ein beliebiges der folgenden Modelle eingesetzt werden:
 
 | Modell | Sprachen | Hinweise |
 | ------ | -------- | -------- |
-| `Mistral-Medium-3.5-128B` | 40+ | Beste mehrsprachige Qualität |
 | `Qwen3.5-122B-A10B-FP8` | 100+ | Thinking-Modus verfügbar; Vision |
 | `Qwen3.6-35B-A3B-FP8` | 100+ | Kosteneffizienter; Reasoning + Vision |
 | `gpt-oss-120b` | Englisch-zentriert | Am besten für rein englische Workloads |
@@ -127,11 +126,14 @@ def run_agent(user_message: str, system: str | None = None) -> str:
 
     while True:
         response = client.chat.completions.create(
-            model="Mistral-Medium-3.5-128B",
+            model="Qwen3.5-122B-A10B-FP8",
             messages=messages,
             tools=tools,
             tool_choice="auto",
             temperature=0.2,
+            extra_body={"chat_template_kwargs": {"enable_thinking": False}},
+            # Thinking-Modus ist bei diesem Modell standardmäßig aktiv — hier deaktivieren,
+            # um die Tool-Call-Latenz in der Agenten-Schleife niedrig zu halten.
         )
         msg = response.choices[0].message
         messages.append(msg)
