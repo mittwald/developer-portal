@@ -85,22 +85,11 @@ If you want to test the authentication and execution of domain actions per OAuth
 This can either be the localhost or a domain with an entry to your local host configuration.
 You should ensure that no public domain is used as an entry to your local host configuration that is not in your control to mitigate security risk.
 
-## Testing Lifecycle Webhooks {#testing-lifecycle-webhooks}
+## Making Your Local Extension Reachable {#making-your-local-extension-reachable}
 
 Lifecycle webhooks are always sent by the mStudio backend to the webhook URL configured for your Extension.
 There is currently **no way to receive real lifecycle webhooks without making your locally running Extension publicly reachable**.
-Both methods described below therefore require a tunnel from the public internet to your machine.
-
-:::note Do you need to test the webhook handling itself?
-The technical side of lifecycle webhooks — accepting the call, verifying the signature, parsing the payload, and dispatching it to the right handler — is generic plumbing that you do not have to build yourself, and therefore do not have to test yourself.
-Libraries such as [`@weissaufschwarz/mitthooks`](https://www.npmjs.com/package/@weissaufschwarz/mitthooks), which is also used by the [Reference Extension](../../getting-started/reference-extension), cover all of it.
-
-What is left is your **domain logic**: what your Extension does when an Extension Instance is added, updated, or removed.
-That is ordinary application code, and you can test it locally in isolation — no tunnel and no mStudio required.
-Use the methods below to verify the integration as a whole.
-:::
-
-### Making Your Local Extension Reachable {#making-your-local-extension-reachable}
+A tunnel from the public internet to your machine is therefore part of every local setup that involves webhooks.
 
 In principle, **any tunneling technique** works.
 If you already use [ngrok](https://ngrok.com/) or [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/), keep using them.
@@ -121,6 +110,20 @@ You can do this in the "Webhooks" tab of your Extension in the mStudio, or progr
 :::info
 For a step-by-step walkthrough of this setup, and to see how it fits into a complete Extension,
 see [Expose Extension](../../getting-started/expose-extension) in the getting started guide.
+:::
+
+## Testing Lifecycle Webhooks {#testing-lifecycle-webhooks}
+
+Both methods described below deliver webhooks to the configured webhook URL of your Extension,
+so they require your local Extension to be reachable as described in [making your local Extension reachable](#making-your-local-extension-reachable).
+
+:::note Do you need to test the webhook handling itself?
+The technical side of lifecycle webhooks — accepting the call, verifying the signature, parsing the payload, and dispatching it to the right handler — is generic plumbing that you do not have to build yourself, and therefore do not have to test yourself.
+Libraries such as [`@weissaufschwarz/mitthooks`](https://www.npmjs.com/package/@weissaufschwarz/mitthooks), which is also used by the [Reference Extension](../../getting-started/reference-extension), cover all of it.
+
+What is left is your **domain logic**: what your Extension does when an Extension Instance is added, updated, or removed.
+That is ordinary application code, and you can test it locally in isolation — no tunnel and no mStudio required.
+Use the methods below to verify the integration as a whole.
 :::
 
 ### ...via Dry Run Webhooks (recommended) {#via-dry-run-webhooks}
@@ -156,7 +159,7 @@ Installing your Extension is the most realistic test, because it triggers webhoo
 by adding your Extension to a context, changing its state, and removing it again.
 Each of these actions produces a genuine, signed webhook call.
 
-1. Make your local Extension reachable and configure the webhook URL, as described above.
+1. Make your local Extension reachable and configure the webhook URL, as described in [making your local Extension reachable](#making-your-local-extension-reachable).
 2. Create an Extension Instance, as described in [Creating an Extension Instance](#creating-an-extension-instance).
    This triggers the `ExtensionAddedToContext` webhook.
 3. Activate or deactivate the Extension Instance to trigger `InstanceUpdated` webhooks.
