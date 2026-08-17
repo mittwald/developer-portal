@@ -1,0 +1,301 @@
+---
+sidebar_label: Qwen3-TTS-CustomVoice
+description: Detaillierte Informationen zu Qwen3-TTS-12Hz-1.7B-CustomVoice
+title: Qwen3-TTS-12Hz-1.7B-CustomVoice
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+Im [Text-to-Speech-Guide](../../examples/text-to-speech/) findest du lauffähige Beispiele für die neun Stimmen, die Ausgabeformate, das Sprechtempo und das Aufteilen langer Texte.
+
+## Beschreibung
+
+„Qwen3-TTS-12Hz-1.7B-CustomVoice" ist ein Text-to-Speech-Modell von Alibaba mit 1,7 Milliarden Parametern. Du schickst Text hin und bekommst eine Audiodatei zurück. Es ist das Gegenstück zu [Whisper-Large-V3-Turbo](./whisper-large-v3-turbo), das den umgekehrten Weg geht und aus Audio Text macht.
+
+Das Modell bedient die Route `/v1/audio/speech` und bringt neun eingebaute Stimmen für dreizehn Sprachen und Dialekte mit. Die Sprachausgabe entsteht schneller als in Echtzeit: Für eine Sekunde Audio braucht das Modell auf unserer Hardware etwa eine achtel Sekunde.
+
+Das Modell eignet sich für:
+
+- Sprachausgabe in dreizehn Sprachen und Dialekten
+- Neun verschiedene eingebaute Stimmen, pro Anfrage wählbar
+- Fünf Ausgabeformate, darunter komprimierte für die direkte Auslieferung an den Browser
+- Ein Sprechtempo zwischen 0,25 und 4,0
+- Streaming, damit die Wiedergabe rund 25-mal früher starten kann als beim Warten auf die ganze Datei
+
+Diese Einschränkungen gelten:
+
+- Voice-Cloning mit eigenem Referenz-Audio ist auf dieser Route nicht verfügbar
+- `response_format="aac"` wird nicht unterstützt, obwohl die OpenAI-API es vorsieht
+- Der Parameter `language` erwartet großgeschriebene Sprachnamen, nicht die ISO-639-1-Codes, die [Whisper](./whisper-large-v3-turbo) verwendet
+- Das Modell hat keine Chat-Route. `/v1/chat/completions` steht dafür nicht zur Verfügung
+
+:::warning[`language` nimmt hier keine ISO-Codes]
+Whisper akzeptiert `de`, `en`, `fr`. Dieses Modell weist sie ab und antwortet mit HTTP 400:
+
+```text
+Invalid language 'De'. Supported: Auto, Beijing_Dialect, Chinese, English, French, German, Italian, Japanese, Korean, Portuguese, Russian, Sichuan_Dialect, Spanish
+```
+
+Schreib `German` statt `de`. Wenn du einen gemeinsamen Wrapper um beide Audio-Modelle baust, ist das der Parameter, über den du stolperst: Derselbe Wert ist auf der einen Route gültig und wird auf der anderen abgelehnt.
+
+Du kannst `language` auch ganz weglassen. Der Standard ist `Auto`, und der hat in unseren Tests Deutsch und Englisch zuverlässig erkannt.
+:::
+
+## Verfügbare Stimmen
+
+Alle neun funktionieren auf dieser Route. Es gibt keine getrennte Liste für „Custom Voices", die du erst freischalten müsstest.
+
+`aiden`, `dylan`, `eric`, `ono_anna`, `ryan`, `serena`, `sohee`, `uncle_fu`, `vivian`
+
+`voice` ist optional. Ohne Angabe nimmt das Modell seine Standardstimme. Ein unbekannter Wert führt zu HTTP 400, die Antwort nennt die gültigen Werte:
+
+```text
+Invalid voice 'bob'. Supported: aiden, dylan, eric, ono_anna, ryan, serena, sohee, uncle_fu, vivian
+```
+
+## Gültige Werte für den Parameter `language`
+
+`Auto`, `Beijing_Dialect`, `Chinese`, `English`, `French`, `German`, `Italian`, `Japanese`, `Korean`, `Portuguese`, `Russian`, `Sichuan_Dialect`, `Spanish`
+
+## Ausgabeformate
+
+| `response_format` | Content-Type | Größe für dieselben 4,5 s Sprache |
+| ----------------- | ------------ | --------------------------------- |
+| `wav`             | `audio/wav`  | 73 kB                             |
+| `pcm`             | `audio/pcm`  | 92 kB                             |
+| `flac`            | `audio/flac` | 50 kB                             |
+| `mp3`             | `audio/mpeg` | 15 kB                             |
+| `opus`            | `audio/ogg`  | 8,6 kB                            |
+
+`wav` ist der Standard und die richtige Wahl, wenn du das Audio weiterverarbeitest. Für die Auslieferung an Browser oder Telefon ist `opus` bei Sprachqualität rund ein Zehntel so groß.
+
+`aac` führt zu HTTP 400:
+
+```text
+Input should be 'wav', 'pcm', 'flac', 'mp3' or 'opus'
+```
+
+## Erste Schritte
+
+<Tabs groupId="language">
+<TabItem value="python" label="Python">
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1",
+    api_key="sk-your-api-key-here",
+)
+
+response = client.audio.speech.create(
+    model="Qwen3-TTS-12Hz-1.7B-CustomVoice",
+    voice="ryan",
+    input="Hallo und herzlich willkommen bei mittwald.",
+    response_format="mp3",
+)
+
+response.write_to_file("willkommen.mp3")
+```
+
+</TabItem>
+<TabItem value="javascript" label="JavaScript">
+
+```javascript
+import OpenAI from "openai";
+import { writeFile } from "node:fs/promises";
+
+const client = new OpenAI({
+  baseURL: "https://llm.aihosting.mittwald.de/v1",
+  apiKey: "sk-your-api-key-here",
+});
+
+const response = await client.audio.speech.create({
+  model: "Qwen3-TTS-12Hz-1.7B-CustomVoice",
+  voice: "ryan",
+  input: "Hallo und herzlich willkommen bei mittwald.",
+  response_format: "mp3",
+});
+
+await writeFile("willkommen.mp3", Buffer.from(await response.arrayBuffer()));
+```
+
+</TabItem>
+<TabItem value="php" label="PHP">
+
+```php
+<?php
+
+$payload = [
+    "model" => "Qwen3-TTS-12Hz-1.7B-CustomVoice",
+    "voice" => "ryan",
+    "input" => "Hallo und herzlich willkommen bei mittwald.",
+    "response_format" => "mp3",
+];
+
+$ch = curl_init("https://llm.aihosting.mittwald.de/v1/audio/speech");
+curl_setopt_array($ch, [
+    CURLOPT_POST => true,
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_HTTPHEADER => [
+        "Authorization: Bearer sk-your-api-key-here",
+        "Content-Type: application/json",
+    ],
+    CURLOPT_POSTFIELDS => json_encode($payload),
+]);
+
+file_put_contents("willkommen.mp3", curl_exec($ch));
+curl_close($ch);
+```
+
+</TabItem>
+</Tabs>
+
+## Empfohlene Parameter
+
+| Parameter         | Wert                 | Wirkung                                                  |
+| ----------------- | -------------------- | -------------------------------------------------------- |
+| `voice`           | einer der neun Namen | Optional. Ohne Angabe die Standardstimme                 |
+| `language`        | `Auto`               | Optional. Setz ihn, wenn der Text Sprachen mischt        |
+| `response_format` | `wav` oder `opus`    | `wav` zum Weiterverarbeiten, `opus` zum Ausliefern       |
+| `speed`           | `1.0`                | Zwischen 0,25 und 4,0, siehe [Sprechtempo](#sprechtempo) |
+
+### Sprechtempo {#sprechtempo}
+
+`speed` skaliert die Dauer annähernd umgekehrt proportional. Derselbe deutsche Satz, drei Durchläufe je Einstellung:
+
+| `speed` | Gemessene Dauer |
+| ------- | --------------- |
+| `0.5`   | 9,28 s          |
+| `1.0`   | 4,85 s          |
+| `2.0`   | 2,23 s          |
+
+Die Länge schwankt auch bei identischer Eingabe leicht, weil das Modell sampelt. Nimm die Zahlen als Verlauf, nicht als exakte Werte.
+
+## Latenz
+
+Auf unserer Hardware gemessen, Deutsch und Englisch, eine Anfrage zur Zeit:
+
+| Länge der Eingabe | Zeit bis zum ersten Byte | Erzeugtes Audio |
+| ----------------- | ------------------------ | --------------- |
+| 51 Zeichen        | 443 ms                   | 3,5 s           |
+| 177 Zeichen       | 1497 ms                  | 12,2 s          |
+| 366 Zeichen       | 3206 ms                  | 26,6 s          |
+
+Das Verhältnis von Rechenzeit zu Audiolänge bleibt über diesen Bereich flach bei etwa 0,12. Die Wartezeit kannst du also aus der Textlänge abschätzen: Rechne mit einem Achtel der Abspieldauer, die du anforderst, plus einem kleinen festen Anteil.
+
+Diese Zahlen gelten für eine gepufferte Anfrage, bei der die ganze Datei auf einmal ankommt. Wenn jemand auf das Audio wartet, streame es stattdessen.
+
+## Streaming {#streaming}
+
+Setz `stream` auf `true`, dann kommt das erste Audio in deutlich unter einer Sekunde, egal wie lang der Text ist. Gemessen am selben Satz wie in der Tabelle darüber:
+
+| Modus                      | Content-Type        | Erster Chunk |
+| -------------------------- | ------------------- | ------------ |
+| gepuffert (Standard)       | `audio/wav`         | 1497 ms      |
+| `"stream": true`           | `text/event-stream` | 175 ms       |
+| `"stream_format": "sse"`   | `text/event-stream` | 57 ms        |
+| `"stream_format": "audio"` | `audio/wav`         | 61 ms        |
+
+Die beiden SSE-Modi schicken `speech.audio.delta`- und `speech.audio.done`-Events im OpenAI-Format, das Audio steckt Base64-kodiert in jedem Delta. `"stream_format": "audio"` lässt die Event-Hülle weg und liefert rohe Audio-Chunks im angeforderten Format. Das ist der einfachere Weg, wenn du direkt in einen Player schreibst.
+
+<Tabs groupId="language">
+<TabItem value="python" label="Python">
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1",
+    api_key="sk-your-api-key-here",
+)
+
+with client.audio.speech.with_streaming_response.create(
+    model="Qwen3-TTS-12Hz-1.7B-CustomVoice",
+    voice="ryan",
+    input="Ein laengerer Text, bei dem die Wiedergabe sofort starten soll.",
+    response_format="wav",
+    extra_body={"stream_format": "audio"},
+) as response:
+    response.stream_to_file("ausgabe.wav")
+```
+
+</TabItem>
+<TabItem value="javascript" label="JavaScript">
+
+```javascript
+import OpenAI from "openai";
+import { createWriteStream } from "node:fs";
+import { Readable } from "node:stream";
+
+const client = new OpenAI({
+  baseURL: "https://llm.aihosting.mittwald.de/v1",
+  apiKey: "sk-your-api-key-here",
+});
+
+const response = await client.audio.speech.create({
+  model: "Qwen3-TTS-12Hz-1.7B-CustomVoice",
+  voice: "ryan",
+  input: "Ein laengerer Text, bei dem die Wiedergabe sofort starten soll.",
+  response_format: "wav",
+  // @ts-expect-error stream_format steht noch nicht in den OpenAI-Typen
+  stream_format: "audio",
+});
+
+Readable.fromWeb(response.body).pipe(createWriteStream("ausgabe.wav"));
+```
+
+</TabItem>
+<TabItem value="php" label="PHP">
+
+```php
+<?php
+
+$payload = [
+    "model" => "Qwen3-TTS-12Hz-1.7B-CustomVoice",
+    "voice" => "ryan",
+    "input" => "Ein laengerer Text, bei dem die Wiedergabe sofort starten soll.",
+    "response_format" => "wav",
+    "stream_format" => "audio",
+];
+
+$out = fopen("ausgabe.wav", "w");
+
+$ch = curl_init("https://llm.aihosting.mittwald.de/v1/audio/speech");
+curl_setopt_array($ch, [
+    CURLOPT_POST => true,
+    CURLOPT_HTTPHEADER => [
+        "Authorization: Bearer sk-your-api-key-here",
+        "Content-Type: application/json",
+    ],
+    CURLOPT_POSTFIELDS => json_encode($payload),
+    CURLOPT_WRITEFUNCTION => function ($ch, $chunk) use ($out) {
+        fwrite($out, $chunk);
+        return strlen($chunk);
+    },
+]);
+
+curl_exec($ch);
+curl_close($ch);
+fclose($out);
+```
+
+</TabItem>
+</Tabs>
+
+Bei sehr langen Texten lohnt sich das Aufteilen trotzdem, denn dann kannst du die nächste Anfrage schon stellen, während der aktuelle Teil abspielt. Ein ausgearbeitetes Beispiel steht im [Text-to-Speech-Guide](../../examples/text-to-speech/#lange-texte).
+
+## Fehlerantworten
+
+| Situation                     | Status | Meldung                                                 |
+| ----------------------------- | ------ | ------------------------------------------------------- |
+| `input` ist ein leerer String | 400    | `Input text cannot be empty`                            |
+| Unbekannte `voice`            | 400    | `Invalid voice '…'. Supported: …`                       |
+| Unbekannte `language`         | 400    | `Invalid language '…'. Supported: …`                    |
+| `response_format="aac"`       | 400    | `Input should be 'wav', 'pcm', 'flac', 'mp3' or 'opus'` |
+| Unbekannter Modellname        | 404    | `The model '…' does not exist.`                         |
+
+## Lizenz und Nutzungsbedingungen
+
+Alibaba veröffentlicht das Modell unter der Apache-2.0-Lizenz. Bevor du es nutzen kannst, musst du die Nutzungsbedingungen im mStudio annehmen. Siehe [Nutzungsbedingungen](../access-and-usage/terms-of-use/).
