@@ -9,7 +9,7 @@ import TabItem from "@theme/TabItem";
 
 ## Beschreibung
 
-„Qwen3.8-27B-NVFP4" ist ein dichtes Sprachmodell von Alibaba mit 27 Milliarden Parametern und eingebautem Vision-Encoder. Anders als die Mixture-of-Experts-Modelle in dieser Liste sind hier alle Parameter an jedem Forward-Pass beteiligt, was das Modell bei mehrstufigen Aufgaben wie Tool-Loops und länger laufenden Agent-Durchläufen ruhiger macht. Als Nachfolger von Qwen3.6 bringt es deutliche Zugewinne bei Coding, fachlichen Aufgaben und langlaufenden agentischen Workflows.
+„Qwen3.8-27B-NVFP4" ist ein dichtes Sprachmodell von Alibaba mit 27 Milliarden Parametern und eingebautem Vision-Encoder. Bei den Mixture-of-Experts-Modellen in dieser Liste rechnet pro Token nur ein Teil des Netzes mit, hier rechnen immer alle Parameter mit. Das kostet mehr Rechenzeit, hält dafür aber mehrstufige Abläufe wie Tool-Loops und länger laufende Agenten zuverlässiger durch. Gegenüber Qwen3.6 ist das Modell vor allem beim Programmieren, bei fachlichen Aufgaben und bei lang laufenden agentischen Abläufen stärker.
 
 Geeignet für und unterstützt:
 
@@ -21,21 +21,21 @@ Geeignet für und unterstützt:
 
 Folgende Limitierungen gelten:
 
-- Maximale Context-Länge: 262.144 Token
+- Maximale Context-Länge: 256.000 Token
 - Maximal 5 Bilder pro Anfrage
 - Bilder müssen als Base64-kodierte Data-URLs übermittelt werden (keine externen URLs)
-- Video-Input wird über diesen Endpunkt nicht angeboten, auch wenn das Modell selbst Video verarbeiten kann
+- Video verarbeitet das Modell zwar, wir bieten es über diesen Endpunkt aber nicht an
 
-**Der Thinking-Modus ist standardmäßig aktiviert, und zwar in der höchsten Reasoning-Tiefe des
-Modells.** Die günstigeren Stufen zeigt [Reasoning-Tiefe steuern](#reasoning-tiefe-steuern), das
-Abschalten zeigt [Thinking-Modus deaktivieren](#thinking-modus-deaktivieren) — die Parameter müssen
-in `chat_template_kwargs` verschachtelt werden.
+**Der Thinking-Modus ist standardmäßig an, und zwar in der tiefsten Stufe, die das Modell kennt.**
+Die günstigeren Stufen findest du unter [Reasoning-Tiefe steuern](#reasoning-tiefe-steuern), das
+Abschalten unter [Thinking-Modus deaktivieren](#thinking-modus-deaktivieren). Beide Parameter
+gehören in `chat_template_kwargs`, nicht auf die oberste Ebene der Anfrage.
 
 :::warning[Eine Antwort kann leer zurückkommen, wenn `max_tokens` zu klein ist]
-Das Modell denkt vor der Antwort nach, und in der Standardtiefe (`xhigh`) kann allein die interne
-Gedankenkette mehrere hundert Token lang sein. Wenn `max_tokens` aufgebraucht ist, während das
-Modell noch nachdenkt, kommt eine Antwort mit leerem `content` und `finish_reason: length` zurück —
-die Reasoning-Token werden trotzdem abgerechnet.
+Das Modell denkt vor der Antwort nach, und in der Standardtiefe `xhigh` geht allein dafür oft
+mehr als ein halbes Tausend Token weg. Ist `max_tokens` aufgebraucht, bevor das Nachdenken fertig
+ist, bekommst du eine Antwort mit leerem `content` und `finish_reason: length`. Abgerechnet werden
+die Reasoning-Token trotzdem.
 
 Gleicher Prompt, gleiches Bild, an diesem Modell gemessen:
 
@@ -46,22 +46,27 @@ Gleicher Prompt, gleiches Bild, an diesem Modell gemessen:
 | `reasoning_effort: "low"` | 500          | 149             | vorhanden                     |
 | `enable_thinking: false`  | 500          | 0               | vorhanden                     |
 
-Also entweder in `max_tokens` reichlich Luft lassen, die Reasoning-Tiefe senken oder den
-Thinking-Modus für die Anfrage abschalten. Bei leerem `content` zuerst `finish_reason` prüfen.
+Lass also bei `max_tokens` genug Luft, senke die Reasoning-Tiefe oder schalte den Thinking-Modus
+für diese Anfrage ab. Bekommst du einen leeren `content`, schau zuerst auf `finish_reason`.
 :::
 
 Nutzt du dieses Modell aus n8n heraus? Der eingebaute OpenAI Chat Model-Node kann `chat_template_kwargs` nicht setzen — siehe [Reasoning-Modelle und Thinking-Modus](../../../../guides/apps/n8n#reasoning-models-and-thinking-mode) für einen Workaround per Community-Node.
 
 ### Reasoning-Tiefe steuern {#reasoning-tiefe-steuern}
 
-Das Modell akzeptiert drei Reasoning-Tiefen. Eine niedrigere Tiefe senkt Latenz und Token-Kosten pro
-Turn:
+Das Modell kennt drei Reasoning-Tiefen. Je niedriger die Tiefe, desto kürzer die Wartezeit und
+desto weniger Token pro Turn:
 
-| Stufe              | Wofür                                                            |
-| ------------------ | ---------------------------------------------------------------- |
-| `xhigh` (Standard) | Komplexe Aufgaben, die eine gründliche Analyse brauchen          |
-| `medium`           | Kompromiss zwischen Genauigkeit und Geschwindigkeit              |
-| `low`              | Geschwindigkeit und Kosten, um den Preis einer flacheren Analyse |
+| Stufe              | Wofür                                                   |
+| ------------------ | ------------------------------------------------------- |
+| `xhigh` (Standard) | Komplexe Aufgaben, die eine gründliche Analyse brauchen |
+| `medium`           | Wenn Genauigkeit und Geschwindigkeit beide zählen       |
+| `low`              | Wenn es schnell und günstig sein soll                   |
+
+Andere Werte nimmt das Modell nicht an, und es achtet auf Groß- und Kleinschreibung: `Low` wird
+genauso abgewiesen wie eine unbekannte Stufe. Kommst du von OpenAI, beachte, dass es `minimal`
+hier nicht gibt, nimm stattdessen `low`. Auf einen ungültigen Wert antwortet die API mit `400`,
+nennt den gesendeten Wert und listet die erlaubten auf.
 
 <Tabs groupId="language">
   <TabItem value="python" label="Python">
@@ -146,13 +151,13 @@ echo $response->choices[0]->message->content;
   </TabItem>
 </Tabs>
 
-Bei mehrstufigen Agent-Aufgaben wird die Gesamtaufgabe mit niedrigerer Reasoning-Tiefe nicht
-automatisch schneller fertig. Einzelne Turns kommen zügiger zurück, eine flachere Analyse führt aber
-zu mehr fehlgeschlagenen Schritten und Wiederholungen, was Gesamtlatenz und Token-Verbrauch erhöhen
-kann. Messe die ganze Aufgabe, nicht einen Turn.
+Bei mehrstufigen Agent-Aufgaben wird die ganze Aufgabe mit einer niedrigeren Tiefe nicht
+automatisch schneller fertig. Die einzelnen Turns kommen zügiger zurück, aber das Modell analysiert
+flacher, verrennt sich häufiger und probiert es noch einmal. Unterm Strich kann das länger dauern
+und mehr Token kosten als `xhigh`. Miss deshalb die ganze Aufgabe und nicht einen Turn.
 
-Auf `/v1/responses` steht dieselbe Steuerung als natives Feld `reasoning.effort` bereit, ohne
-`chat_template_kwargs`.
+Über `/v1/responses` geht dasselbe direkt über das Feld `reasoning.effort`, dort brauchst du
+`chat_template_kwargs` nicht.
 
 ### Thinking-Modus deaktivieren {#thinking-modus-deaktivieren}
 
@@ -244,12 +249,12 @@ echo $response->choices[0]->message->content;
 
 ### Reasoning über mehrere Turns {#preserve-thinking}
 
-Standardmäßig behält das Modell die Reasoning-Blöcke aller vorherigen Nachrichten, nicht nur die der
-letzten. Das hält Entscheidungen über einen Agent-Durchlauf hinweg konsistent und verbessert die
-Wiederverwendung des Prefix-Caches, was die Latenz in Folge-Turns senkt. Es bedeutet aber auch, dass
-das Reasoning früherer Turns auf das Context-Fenster angerechnet wird.
+Standardmäßig behält das Modell die Reasoning-Blöcke aller vorherigen Nachrichten, nicht nur die
+der letzten. Damit bleiben Entscheidungen über einen ganzen Agent-Durchlauf hinweg stabil, und der
+Prefix-Cache greift öfter, was Folge-Turns schneller macht. Dafür zählt das Reasoning früherer
+Turns mit ins Context-Fenster.
 
-Wenn nur das Reasoning der letzten User-Nachricht behalten werden soll:
+Soll nur das Reasoning der letzten Nachricht erhalten bleiben:
 
 ```python
 extra_body={"chat_template_kwargs": {"preserve_thinking": False}}
@@ -264,10 +269,10 @@ Wenn der Thinking-Modus **aktiviert** ist (Standard), liefert das Modell zwei se
 | `choices[0].message.reasoning_content` | Interne Gedankenkette (kann sehr lang sein) |
 | `choices[0].message.content`           | Endgültige Antwort                          |
 
-Wenn `content` leer ist, zuerst `finish_reason` prüfen: `length` heißt, das Token-Budget ist beim
-Nachdenken ausgegangen (siehe Warnung oben), `stop` heißt, das Modell hat seine Antwort in den
-Reasoning-Block geschrieben — dann den Thinking-Modus deaktivieren, damit `content` immer befüllt
-wird.
+Ist `content` leer, schau zuerst auf `finish_reason`. Bei `length` ist das Token-Budget beim
+Nachdenken ausgegangen, das beschreibt die Warnung weiter oben. Bei `stop` hat das Modell seine
+Antwort in den Reasoning-Block geschrieben. Dann deaktiviere den Thinking-Modus, damit `content`
+verlässlich gefüllt ist.
 
 ```python
 print(response.choices[0].message.reasoning_content)  # interne Gedankenkette
@@ -296,14 +301,13 @@ Das Modell hat je nach Anwendungsfall unterschiedliche empfohlene Einstellungen.
 | `top_k`            | 20   |
 | `presence_penalty` | 1.5  |
 
-Bei endlosen Wiederholungen `presence_penalty` schrittweise bis 2.0 erhöhen. Höhere Werte können
-gelegentlich Sprachen mischen und etwas Qualität kosten, deshalb nur so weit erhöhen wie nötig.
+Wiederholt sich das Modell endlos, erhöhe `presence_penalty` schrittweise bis 2.0. Hohe Werte
+mischen gelegentlich Sprachen und kosten etwas Qualität, gehe also nur so hoch wie nötig.
 
 ### Ausgabelänge
 
-Setze `max_tokens` entsprechend der Aufgabenkomplexität, um Kosten und Latenz zu steuern. Weil
-Reasoning-Token aus demselben Budget kommen, darf der Wert großzügiger sein als bei einem Modell
-ohne Reasoning:
+Über `max_tokens` steuerst du Kosten und Wartezeit. Weil die Reasoning-Token aus demselben Budget
+kommen, darf der Wert hier höher liegen als bei einem Modell ohne Reasoning:
 
 | Aufgabentyp                                            | Empfohlenes `max_tokens` |
 | ------------------------------------------------------ | ------------------------ |
@@ -330,11 +334,11 @@ Empfohlene Parameter für Vision:
 | `top_k`       | 20                       |
 | `max_tokens`  | 512–2048 je nach Aufgabe |
 
-Für präzise Texterkennung (OCR) oder das Auslesen von Daten empfiehlt sich stattdessen `temperature=0.1`. Für ganze Dokumente passt `GLM-OCR` besser.
+Für präzise Texterkennung (OCR) oder das Auslesen von Daten nimm stattdessen `temperature=0.1`. Geht es um ganze Dokumente, ist `GLM-OCR` das passendere Modell.
 
 Bilder sollten vor der Base64-Kodierung auf maximal 1024 px an der längsten Seite skaliert werden – große Bilder erhöhen die Wartezeit bis zum ersten Token (TTFT) erheblich. Die erste Anfrage für ein neues Bild hat eine längere TTFT, während der Bild-Encoder aufwärmt; nachfolgende Anfragen mit demselben Bild profitieren vom Caching. Fertige Hilfsfunktionen sind in den [Python-Beispielen](../../examples/python/#vision-encoding) und [JavaScript-Beispielen](../../examples/javascript/#vision-encoding) verfügbar.
 
-In eine Anfrage passen maximal 5 Bilder. Größere Mengen auf mehrere Anfragen aufteilen.
+In eine Anfrage passen höchstens 5 Bilder. Hast du mehr, teile sie auf mehrere Anfragen auf.
 
 ### Mathematikaufgaben
 
@@ -351,6 +355,34 @@ Für konsistente, parsierbare Ausgaben bei Multiple-Choice-Aufgaben füge Folgen
 ```
 Please show your choice in the 'answer' field with only the choice letter, e.g., 'answer': 'C'.
 ```
+
+## Wechsel von Qwen3.6-35B-A3B-FP8 {#wechsel-von-qwen3-6}
+
+Beide Modelle stehen unter Apache 2.0, kosten pro Token dasselbe und nehmen dieselben 256.000 Token
+Context. Der Wechsel ist deshalb im Kern ein anderer Wert bei `model`. Vier Dinge verhalten sich
+anders:
+
+|                                      | Qwen3.6-35B-A3B-FP8 | Qwen3.8-27B-NVFP4                                                         |
+| ------------------------------------ | ------------------- | ------------------------------------------------------------------------- |
+| Thinking                             | an oder aus         | an oder aus, dazu drei Tiefen über `reasoning_effort`                     |
+| Standardtiefe                        | eine feste Tiefe    | `xhigh`, die tiefste. Rechne mit mehr Reasoning-Token pro Antwort         |
+| `presence_penalty` im Thinking-Modus | 1.5                 | 0.0                                                                       |
+| Reasoning früherer Turns             | fällt weg           | bleibt erhalten, siehe [Reasoning über mehrere Turns](#preserve-thinking) |
+
+Wenn du eine laufende Integration umziehst:
+
+1. Setze `model` auf `Qwen3.8-27B-NVFP4`.
+2. Nimm `presence_penalty` im Thinking-Modus auf 0.0 herunter, oder lass den Parameter weg und
+   arbeite mit dem Standard.
+3. Erhöhe `max_tokens`, oder setze `reasoning_effort` auf `medium` oder `low`. An der tieferen
+   Standardstufe merken die meisten Umzüge den Unterschied zuerst, entweder an höheren
+   Token-Rechnungen oder an leeren Antworten.
+4. Schickt deine Integration lange Verläufe, prüfe deinen Context-Verbrauch. Die erhaltenen
+   Reasoning-Blöcke zählen mit. Mit `preserve_thinking: false` bekommst du das alte Verhalten
+   zurück.
+
+Sonst bleibt alles gleich: dieselbe Verschachtelung in `chat_template_kwargs`, dieselben
+Base64-Data-URLs für Bilder, dasselbe Format für Tool-Calling.
 
 ## Nutzungsbedingungen und Lizenzhinweise {#nutzungsbedingungen-und-lizenzhinweise}
 

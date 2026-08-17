@@ -22,7 +22,7 @@ It supports and is suitable for:
 
 The following limitations apply:
 
-- Maximum context length: 262,144 tokens
+- Maximum context length: 256,000 tokens
 - At most 5 images per request
 - Images must be submitted as Base64-encoded data URLs (no remote URLs)
 - Video input is not offered on this endpoint, even though the model itself can process video
@@ -63,6 +63,11 @@ turn:
 | `xhigh` (default) | Complex tasks that need thorough analysis          |
 | `medium`          | Balance between accuracy and speed                 |
 | `low`             | Speed and cost, at the price of shallower analysis |
+
+Those three spellings are the only ones the model accepts, and they are case-sensitive: `Low`
+is rejected the same way as an unknown level. If you are porting code from OpenAI, note that
+`minimal` does not exist here — use `low`. An unsupported value comes back as a `400` that names
+the value you sent and lists the accepted ones.
 
 <Tabs groupId="language">
   <TabItem value="python" label="Python">
@@ -350,6 +355,30 @@ To get consistent, parseable output on multiple-choice tasks, add this to your p
 ```
 Please show your choice in the 'answer' field with only the choice letter, e.g., 'answer': 'C'.
 ```
+
+## Switching from Qwen3.6-35B-A3B-FP8 {#switching-from-qwen3-6}
+
+Both models are Apache 2.0, cost the same per token and accept the same 256,000-token context, so
+a switch is mostly a change of the `model` string. Four things do behave differently:
+
+|                                     | Qwen3.6-35B-A3B-FP8 | Qwen3.8-27B-NVFP4                                                    |
+| ----------------------------------- | ------------------- | -------------------------------------------------------------------- |
+| Thinking                            | on or off           | on or off, plus three depths through `reasoning_effort`              |
+| Default reasoning depth             | one fixed depth     | `xhigh`, the deepest one, so expect more reasoning tokens per answer |
+| `presence_penalty` in thinking mode | 1.5                 | 0.0                                                                  |
+| Reasoning of earlier turns          | dropped             | kept, see [Reasoning across turns](#preserve-thinking)               |
+
+What to do when you move a working integration across:
+
+1. Change `model` to `Qwen3.8-27B-NVFP4`.
+2. Drop `presence_penalty` to 0.0 for thinking-mode requests, or leave it out and take the default.
+3. Raise `max_tokens`, or set `reasoning_effort` to `medium` or `low`. The deeper default is where
+   most migrations first notice a difference, either as higher token bills or as empty answers.
+4. If your integration sends long conversations, check your context use. Kept reasoning blocks
+   count towards the window; `preserve_thinking: false` restores the old behaviour.
+
+Nothing else changes: the same `chat_template_kwargs` nesting, the same Base64 data URLs for
+images, the same tool-calling format.
 
 ## Terms of use and licensing {#terms-of-use-and-licensing}
 
