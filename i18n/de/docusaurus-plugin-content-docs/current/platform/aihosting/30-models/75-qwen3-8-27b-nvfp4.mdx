@@ -1,0 +1,357 @@
+---
+sidebar_label: Qwen3.8-27B-NVFP4
+description: Detaillierte Informationen zu Qwen3.8-27B-NVFP4
+title: Qwen3.8-27B-NVFP4
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+## Beschreibung
+
+„Qwen3.8-27B-NVFP4" ist ein dichtes Sprachmodell von Alibaba mit 27 Milliarden Parametern und eingebautem Vision-Encoder. Anders als die Mixture-of-Experts-Modelle in dieser Liste sind hier alle Parameter an jedem Forward-Pass beteiligt, was das Modell bei mehrstufigen Aufgaben wie Tool-Loops und länger laufenden Agent-Durchläufen ruhiger macht. Als Nachfolger von Qwen3.6 bringt es deutliche Zugewinne bei Coding, fachlichen Aufgaben und langlaufenden agentischen Workflows.
+
+Geeignet für und unterstützt:
+
+- Textgenerierung innerhalb einer Chat-Completion (Text zu Text)
+- Tool-Calling für agentische Workflows
+- Bildverständnis (Vision)
+- Thinking / Reasoning für schrittweises Problemlösen, mit drei wählbaren Reasoning-Tiefen
+- Verarbeitung langer Dokumente und erweiterter Kontexte
+
+Folgende Limitierungen gelten:
+
+- Maximale Context-Länge: 262.144 Token
+- Maximal 5 Bilder pro Anfrage
+- Bilder müssen als Base64-kodierte Data-URLs übermittelt werden (keine externen URLs)
+- Video-Input wird über diesen Endpunkt nicht angeboten, auch wenn das Modell selbst Video verarbeiten kann
+
+**Der Thinking-Modus ist standardmäßig aktiviert, und zwar in der höchsten Reasoning-Tiefe des
+Modells.** Die günstigeren Stufen zeigt [Reasoning-Tiefe steuern](#reasoning-tiefe-steuern), das
+Abschalten zeigt [Thinking-Modus deaktivieren](#thinking-modus-deaktivieren) — die Parameter müssen
+in `chat_template_kwargs` verschachtelt werden.
+
+:::warning[Eine Antwort kann leer zurückkommen, wenn `max_tokens` zu klein ist]
+Das Modell denkt vor der Antwort nach, und in der Standardtiefe (`xhigh`) kann allein die interne
+Gedankenkette mehrere hundert Token lang sein. Wenn `max_tokens` aufgebraucht ist, während das
+Modell noch nachdenkt, kommt eine Antwort mit leerem `content` und `finish_reason: length` zurück —
+die Reasoning-Token werden trotzdem abgerechnet.
+
+Gleicher Prompt, gleiches Bild, an diesem Modell gemessen:
+
+| Einstellung               | `max_tokens` | Reasoning-Token | `content`                     |
+| ------------------------- | ------------ | --------------- | ----------------------------- |
+| `xhigh` (Standard)        | 500          | 500             | leer, `finish_reason: length` |
+| `xhigh` (Standard)        | 2.000        | 308             | vorhanden                     |
+| `reasoning_effort: "low"` | 500          | 149             | vorhanden                     |
+| `enable_thinking: false`  | 500          | 0               | vorhanden                     |
+
+Also entweder in `max_tokens` reichlich Luft lassen, die Reasoning-Tiefe senken oder den
+Thinking-Modus für die Anfrage abschalten. Bei leerem `content` zuerst `finish_reason` prüfen.
+:::
+
+Nutzt du dieses Modell aus n8n heraus? Der eingebaute OpenAI Chat Model-Node kann `chat_template_kwargs` nicht setzen — siehe [Reasoning-Modelle und Thinking-Modus](../../../../guides/apps/n8n#reasoning-models-and-thinking-mode) für einen Workaround per Community-Node.
+
+### Reasoning-Tiefe steuern {#reasoning-tiefe-steuern}
+
+Das Modell akzeptiert drei Reasoning-Tiefen. Eine niedrigere Tiefe senkt Latenz und Token-Kosten pro
+Turn:
+
+| Stufe              | Wofür                                                            |
+| ------------------ | ---------------------------------------------------------------- |
+| `xhigh` (Standard) | Komplexe Aufgaben, die eine gründliche Analyse brauchen          |
+| `medium`           | Kompromiss zwischen Genauigkeit und Geschwindigkeit              |
+| `low`              | Geschwindigkeit und Kosten, um den Preis einer flacheren Analyse |
+
+<Tabs groupId="language">
+  <TabItem value="python" label="Python">
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1",
+    api_key="sk-your-api-key-here",
+)
+
+response = client.chat.completions.create(
+    model="Qwen3.8-27B-NVFP4",
+    messages=[{"role": "user", "content": "Fasse diesen Changelog-Eintrag in einem Satz zusammen."}],
+    temperature=1.0,
+    top_p=0.95,
+    max_tokens=32768,
+    extra_body={
+        "chat_template_kwargs": {"reasoning_effort": "low"},
+    },
+)
+
+print(response.choices[0].message.content)
+```
+
+  </TabItem>
+  <TabItem value="javascript" label="JavaScript">
+
+```ts
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  baseURL: "https://llm.aihosting.mittwald.de/v1",
+  apiKey: "sk-your-api-key-here",
+});
+
+const response = await client.chat.completions.create({
+  model: "Qwen3.8-27B-NVFP4",
+  messages: [
+    {
+      role: "user",
+      content: "Fasse diesen Changelog-Eintrag in einem Satz zusammen.",
+    },
+  ],
+  temperature: 1.0,
+  top_p: 0.95,
+  max_tokens: 32768,
+  // @ts-ignore – vLLM-Erweiterung
+  chat_template_kwargs: { reasoning_effort: "low" },
+} as any);
+
+console.log(response.choices[0].message.content);
+```
+
+  </TabItem>
+  <TabItem value="php" label="PHP">
+
+```php
+<?php
+// composer require openai-php/client guzzlehttp/guzzle
+
+$client = OpenAI::factory()
+    ->withBaseUri('https://llm.aihosting.mittwald.de/v1')
+    ->withApiKey('sk-your-api-key-here')
+    ->make();
+
+$response = $client->chat()->create([
+    'model' => 'Qwen3.8-27B-NVFP4',
+    'messages' => [
+        ['role' => 'user', 'content' => 'Fasse diesen Changelog-Eintrag in einem Satz zusammen.'],
+    ],
+    'temperature' => 1.0,
+    'top_p' => 0.95,
+    'max_tokens' => 32768,
+    'chat_template_kwargs' => ['reasoning_effort' => 'low'],
+]);
+
+echo $response->choices[0]->message->content;
+```
+
+  </TabItem>
+</Tabs>
+
+Bei mehrstufigen Agent-Aufgaben wird die Gesamtaufgabe mit niedrigerer Reasoning-Tiefe nicht
+automatisch schneller fertig. Einzelne Turns kommen zügiger zurück, eine flachere Analyse führt aber
+zu mehr fehlgeschlagenen Schritten und Wiederholungen, was Gesamtlatenz und Token-Verbrauch erhöhen
+kann. Messe die ganze Aufgabe, nicht einen Turn.
+
+Auf `/v1/responses` steht dieselbe Steuerung als natives Feld `reasoning.effort` bereit, ohne
+`chat_template_kwargs`.
+
+### Thinking-Modus deaktivieren {#thinking-modus-deaktivieren}
+
+<Tabs groupId="language">
+  <TabItem value="python" label="Python">
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1",
+    api_key="sk-your-api-key-here",
+)
+
+response = client.chat.completions.create(
+    model="Qwen3.8-27B-NVFP4",
+    messages=[{"role": "user", "content": "Was ist 2 + 2?"}],
+    temperature=0.7,
+    top_p=0.8,
+    presence_penalty=1.5,
+    max_tokens=32768,
+    extra_body={
+        "chat_template_kwargs": {"enable_thinking": False},
+        #                        ^^^^^^^^^^^^^^^^^^^^^^^^
+        # Muss hier verschachtelt sein — enable_thinking auf Top-Level-Ebene
+        # wird von der API stillschweigend ignoriert.
+    },
+)
+
+print(response.choices[0].message.content)
+```
+
+  </TabItem>
+  <TabItem value="javascript" label="JavaScript">
+
+```ts
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  baseURL: "https://llm.aihosting.mittwald.de/v1",
+  apiKey: "sk-your-api-key-here",
+});
+
+const response = await client.chat.completions.create({
+  model: "Qwen3.8-27B-NVFP4",
+  messages: [{ role: "user", content: "Was ist 2 + 2?" }],
+  temperature: 0.7,
+  top_p: 0.8,
+  presence_penalty: 1.5,
+  max_tokens: 32768,
+  // @ts-ignore – vLLM-Erweiterung; muss hier verschachtelt sein, nicht enable_thinking auf Top-Level
+  chat_template_kwargs: { enable_thinking: false },
+} as any);
+
+console.log(response.choices[0].message.content);
+```
+
+  </TabItem>
+  <TabItem value="php" label="PHP">
+
+```php
+<?php
+// composer require openai-php/client guzzlehttp/guzzle
+
+$client = OpenAI::factory()
+    ->withBaseUri('https://llm.aihosting.mittwald.de/v1')
+    ->withApiKey('sk-your-api-key-here')
+    ->make();
+
+$response = $client->chat()->create([
+    'model' => 'Qwen3.8-27B-NVFP4',
+    'messages' => [
+        ['role' => 'user', 'content' => 'Was ist 2 + 2?'],
+    ],
+    'temperature' => 0.7,
+    'top_p' => 0.8,
+    'presence_penalty' => 1.5,
+    'max_tokens' => 32768,
+    'chat_template_kwargs' => ['enable_thinking' => false],
+    // Muss hier verschachtelt sein — 'enable_thinking' => false auf Top-Level-Ebene
+    // wird von der API stillschweigend ignoriert.
+]);
+
+echo $response->choices[0]->message->content;
+```
+
+  </TabItem>
+</Tabs>
+
+### Reasoning über mehrere Turns {#preserve-thinking}
+
+Standardmäßig behält das Modell die Reasoning-Blöcke aller vorherigen Nachrichten, nicht nur die der
+letzten. Das hält Entscheidungen über einen Agent-Durchlauf hinweg konsistent und verbessert die
+Wiederverwendung des Prefix-Caches, was die Latenz in Folge-Turns senkt. Es bedeutet aber auch, dass
+das Reasoning früherer Turns auf das Context-Fenster angerechnet wird.
+
+Wenn nur das Reasoning der letzten User-Nachricht behalten werden soll:
+
+```python
+extra_body={"chat_template_kwargs": {"preserve_thinking": False}}
+```
+
+### Antwort auslesen
+
+Wenn der Thinking-Modus **aktiviert** ist (Standard), liefert das Modell zwei separate Felder:
+
+| Feld                                   | Inhalt                                      |
+| -------------------------------------- | ------------------------------------------- |
+| `choices[0].message.reasoning_content` | Interne Gedankenkette (kann sehr lang sein) |
+| `choices[0].message.content`           | Endgültige Antwort                          |
+
+Wenn `content` leer ist, zuerst `finish_reason` prüfen: `length` heißt, das Token-Budget ist beim
+Nachdenken ausgegangen (siehe Warnung oben), `stop` heißt, das Modell hat seine Antwort in den
+Reasoning-Block geschrieben — dann den Thinking-Modus deaktivieren, damit `content` immer befüllt
+wird.
+
+```python
+print(response.choices[0].message.reasoning_content)  # interne Gedankenkette
+print(response.choices[0].message.content)             # endgültige Antwort
+```
+
+## Empfohlene Inferenzparameter
+
+Das Modell hat je nach Anwendungsfall unterschiedliche empfohlene Einstellungen. Greedy-Decoding (temperature 0) sollte vermieden werden – es kann zu Leistungseinbußen und endlosen Wiederholungen führen.
+
+### Thinking-Modus (Standard)
+
+| Parameter          | Wert |
+| ------------------ | ---- |
+| `temperature`      | 1.0  |
+| `top_p`            | 0.95 |
+| `top_k`            | 20   |
+| `presence_penalty` | 0.0  |
+
+### Non-Thinking-Modus (`enable_thinking: false`)
+
+| Parameter          | Wert |
+| ------------------ | ---- |
+| `temperature`      | 0.7  |
+| `top_p`            | 0.8  |
+| `top_k`            | 20   |
+| `presence_penalty` | 1.5  |
+
+Bei endlosen Wiederholungen `presence_penalty` schrittweise bis 2.0 erhöhen. Höhere Werte können
+gelegentlich Sprachen mischen und etwas Qualität kosten, deshalb nur so weit erhöhen wie nötig.
+
+### Ausgabelänge
+
+Setze `max_tokens` entsprechend der Aufgabenkomplexität, um Kosten und Latenz zu steuern. Weil
+Reasoning-Token aus demselben Budget kommen, darf der Wert großzügiger sein als bei einem Modell
+ohne Reasoning:
+
+| Aufgabentyp                                            | Empfohlenes `max_tokens` |
+| ------------------------------------------------------ | ------------------------ |
+| Standardanfragen                                       | 32.768                   |
+| Komplexe Aufgaben (Mathematik, Programmierwettbewerbe) | 81.920                   |
+| Lange Agent-Durchläufe mit `reasoning_effort: xhigh`   | 131.072                  |
+
+## Tipps für spezifische Aufgaben
+
+### Vision (Bild zu Text) {#vision}
+
+Für Vision-Aufgaben sollte der Thinking-Modus immer deaktiviert werden – er erhöht die Latenz, ohne das Bildverständnis zu verbessern:
+
+```python
+extra_body={"chat_template_kwargs": {"enable_thinking": False}}
+```
+
+Empfohlene Parameter für Vision:
+
+| Parameter     | Wert                     |
+| ------------- | ------------------------ |
+| `temperature` | 0.7                      |
+| `top_p`       | 0.8                      |
+| `top_k`       | 20                       |
+| `max_tokens`  | 512–2048 je nach Aufgabe |
+
+Für präzise Texterkennung (OCR) oder das Auslesen von Daten empfiehlt sich stattdessen `temperature=0.1`. Für ganze Dokumente passt `GLM-OCR` besser.
+
+Bilder sollten vor der Base64-Kodierung auf maximal 1024 px an der längsten Seite skaliert werden – große Bilder erhöhen die Wartezeit bis zum ersten Token (TTFT) erheblich. Die erste Anfrage für ein neues Bild hat eine längere TTFT, während der Bild-Encoder aufwärmt; nachfolgende Anfragen mit demselben Bild profitieren vom Caching. Fertige Hilfsfunktionen sind in den [Python-Beispielen](../../examples/python/#vision-encoding) und [JavaScript-Beispielen](../../examples/javascript/#vision-encoding) verfügbar.
+
+In eine Anfrage passen maximal 5 Bilder. Größere Mengen auf mehrere Anfragen aufteilen.
+
+### Mathematikaufgaben
+
+Für beste Ergebnisse bei mathematischen Aufgaben füge folgende Anweisung an deinen Prompt an:
+
+```
+Please reason step by step, and put your final answer within \boxed{}.
+```
+
+### Multiple-Choice-Fragen
+
+Für konsistente, parsierbare Ausgaben bei Multiple-Choice-Aufgaben füge Folgendes an deinen Prompt an:
+
+```
+Please show your choice in the 'answer' field with only the choice letter, e.g., 'answer': 'C'.
+```
+
+## Nutzungsbedingungen und Lizenzhinweise {#nutzungsbedingungen-und-lizenzhinweise}
+
+Es gelten die [allgemeinen Nutzungsbedingungen](../../access-and-usage/terms-of-use/). Das Modell wird von Alibaba unter der [Apache 2.0-Lizenz](https://www.apache.org/licenses/LICENSE-2.0.html) angeboten, eine Weiternutzung der generierten Inhalte unterliegt keiner zusätzlichen Restriktion.
