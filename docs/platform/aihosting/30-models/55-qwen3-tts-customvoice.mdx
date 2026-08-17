@@ -49,7 +49,7 @@ All nine work on this endpoint. There is no separate "custom voice" list to requ
 
 `aiden`, `dylan`, `eric`, `ono_anna`, `ryan`, `serena`, `sohee`, `uncle_fu`, `vivian`
 
-`voice` is optional. Leaving it out gives you the model default. An unknown value returns HTTP 400 and lists the valid ones:
+`voice` is optional in the API itself, but the OpenAI Python SDK requires it as a keyword argument, so pass it explicitly. An unknown value returns HTTP 400 and lists the valid ones:
 
 ```text
 Invalid voice 'bob'. Supported: aiden, dylan, eric, ono_anna, ryan, serena, sohee, uncle_fu, vivian
