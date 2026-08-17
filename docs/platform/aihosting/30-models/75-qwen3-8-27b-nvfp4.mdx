@@ -28,7 +28,7 @@ The following limitations apply:
 - Video input is not offered on this endpoint, even though the model itself can process video
 
 **Thinking mode is enabled by default, at the model's highest reasoning depth.** See
-[Controlling reasoning depth](#reasoning-effort) for the cheaper levels and
+[Controlling reasoning depth](#reasoning-effort) for the cheaper levels, [What the default costs](#reasoning-cost) for what that is worth in tokens, and
 [Disabling thinking mode](#disable-thinking) for turning it off — the parameters must be nested
 inside `chat_template_kwargs`.
 
@@ -151,6 +151,45 @@ echo $response->choices[0]->message->content;
 
   </TabItem>
 </Tabs>
+
+### What the default costs, and when to turn it down {#reasoning-cost}
+
+The default depth is the expensive one, and the reasoning tokens count against your monthly token
+quota exactly like the answer does. The [AI Hosting plans](https://www.mittwald.de/mstudio/ai-hosting)
+start at 5 million tokens per month, so on a small plan the reasoning is the part that runs the
+quota down.
+
+Measured on two everyday tasks, five runs each, median reasoning tokens per answer with the range
+across runs:
+
+| Task                            | `xhigh` (default) | `medium`      | `low`         | thinking off |
+| ------------------------------- | ----------------- | ------------- | ------------- | ------------ |
+| Classify one sentence           | 308 (144–1,484)   | 372 (292–466) | 286 (152–406) | 0            |
+| Four-sentence support answer    | 235 (176–329)     | 236 (139–449) | 252 (148–300) | 0            |
+| Total tokens per answer, median | 332               | 368           | 354           | 54           |
+
+Two things follow from that, and the second one is the one that saves money:
+
+- **On easy tasks the three depths cost about the same.** Between 235 and 372 reasoning tokens
+  either way. Turning `xhigh` down to `low` is not where the saving is.
+- **Turning thinking off is where the saving is.** For the classification the median answer went
+  from 312 tokens to 2, for the short support answer from 351 to 122.
+
+So the recommendation, by task:
+
+| Task                                                        | Setting                        |
+| ----------------------------------------------------------- | ------------------------------ |
+| Classification, routing, extraction, short standard answers | `"enable_thinking": false`     |
+| Everyday chat, drafting, translation, summaries             | `"reasoning_effort": "low"`    |
+| Code with several steps, tool loops, planning               | `"reasoning_effort": "medium"` |
+| Hard analysis, tricky debugging, long agent runs            | leave it at `xhigh`            |
+
+One more reason not to leave `xhigh` on for everything: it is the least predictable setting. On the
+classification task its reasoning ran between 144 and 1,484 tokens for the same prompt, which is a
+factor of ten in cost between two identical requests. At 250 reasoning tokens per answer, 5 million
+tokens are gone after roughly 20,000 answers, with nothing of that spent on text a user sees.
+
+mStudio notifies you at 75% of your quota and again by email at 90%.
 
 In multi-turn agent tasks a lower reasoning depth does not automatically finish the whole task
 faster. Individual turns come back quicker, but shallower analysis leads to more failed steps and

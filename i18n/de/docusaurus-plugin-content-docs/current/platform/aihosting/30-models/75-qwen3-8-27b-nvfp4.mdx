@@ -27,7 +27,8 @@ Folgende Limitierungen gelten:
 - Video verarbeitet das Modell zwar, wir bieten es über diesen Endpunkt aber nicht an
 
 **Der Thinking-Modus ist standardmäßig an, und zwar in der tiefsten Stufe, die das Modell kennt.**
-Die günstigeren Stufen findest du unter [Reasoning-Tiefe steuern](#reasoning-tiefe-steuern), das
+Die günstigeren Stufen findest du unter [Reasoning-Tiefe steuern](#reasoning-tiefe-steuern), was das
+in Token wert ist unter [Was der Standard kostet](#reasoning-kosten), das
 Abschalten unter [Thinking-Modus deaktivieren](#thinking-modus-deaktivieren). Beide Parameter
 gehören in `chat_template_kwargs`, nicht auf die oberste Ebene der Anfrage.
 
@@ -150,6 +151,45 @@ echo $response->choices[0]->message->content;
 
   </TabItem>
 </Tabs>
+
+### Was der Standard kostet und wann du ihn herunterdrehst {#reasoning-kosten}
+
+Die Standardtiefe ist die teure, und die Reasoning-Token zählen genauso auf dein monatliches
+Token-Kontingent wie die Antwort selbst. Die [AI-Hosting-Tarife](https://www.mittwald.de/mstudio/ai-hosting)
+starten bei 5 Mio. Token pro Monat. In einem kleinen Tarif ist das Nachdenken also der Posten, der
+dein Kontingent leer zieht.
+
+Gemessen an zwei Alltagsaufgaben, je fünf Durchläufe, Median der Reasoning-Token pro Antwort mit der
+Spanne über die Durchläufe:
+
+| Aufgabe                          | `xhigh` (Standard) | `medium`      | `low`         | Thinking aus |
+| -------------------------------- | ------------------ | ------------- | ------------- | ------------ |
+| Einen Satz klassifizieren        | 308 (144–1.484)    | 372 (292–466) | 286 (152–406) | 0            |
+| Support-Antwort in vier Sätzen   | 235 (176–329)      | 236 (139–449) | 252 (148–300) | 0            |
+| Token pro Antwort gesamt, Median | 332                | 368           | 354           | 54           |
+
+Daraus folgen zwei Dinge, und das zweite ist das, was Geld spart:
+
+- **Bei einfachen Aufgaben kosten die drei Tiefen etwa gleich viel.** So oder so zwischen 235 und
+  372 Reasoning-Token. Von `xhigh` auf `low` zu gehen bringt hier fast nichts.
+- **Das Nachdenken abzuschalten bringt es.** Bei der Klassifikation ging die Antwort im Median von
+  312 Token auf 2 zurück, bei der kurzen Support-Antwort von 351 auf 122.
+
+Die Empfehlung nach Aufgabe:
+
+| Aufgabe                                                      | Einstellung                    |
+| ------------------------------------------------------------ | ------------------------------ |
+| Klassifizieren, Routing, Extraktion, kurze Standardantworten | `"enable_thinking": false`     |
+| Alltagschat, Textentwürfe, Übersetzung, Zusammenfassungen    | `"reasoning_effort": "low"`    |
+| Code über mehrere Schritte, Tool-Loops, Planung              | `"reasoning_effort": "medium"` |
+| Harte Analyse, kniffliges Debugging, lange Agent-Läufe       | bei `xhigh` lassen             |
+
+Noch ein Grund, `xhigh` nicht überall anzulassen: es ist die unberechenbarste Stufe. Bei der
+Klassifikation lag das Nachdenken beim identischen Prompt zwischen 144 und 1.484 Token, also Faktor
+zehn Kostenunterschied zwischen zwei gleichen Anfragen. Bei 250 Reasoning-Token pro Antwort sind
+5 Mio. Token nach rund 20.000 Antworten weg, ohne dass davon ein Zeichen beim Nutzer angekommen ist.
+
+mStudio meldet sich bei 75 Prozent des Kontingents, bei 90 Prozent zusätzlich per E-Mail.
 
 Bei mehrstufigen Agent-Aufgaben wird die ganze Aufgabe mit einer niedrigeren Tiefe nicht
 automatisch schneller fertig. Die einzelnen Turns kommen zügiger zurück, aber das Modell analysiert
