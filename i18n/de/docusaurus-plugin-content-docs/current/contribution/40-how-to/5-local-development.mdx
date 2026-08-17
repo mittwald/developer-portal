@@ -11,7 +11,7 @@ Neben der Möglichkeit, die mStudio API zu mocken, was sich ohne Kenntnisse der 
 existieren dennoch Mittel und Wege, um die lokale Entwicklung von Extensions zu erleichtern.
 Diese werden im Folgenden vorgestellt.
 
-## Erstellen einer Extension Instance
+## Erstellen einer Extension Instance {#creating-an-extension-instance}
 
 :::note
 Es muss bereits ein [Context](../../glossary/#extension-context) zugewiesen sein, bevor du eine Extension Instance erstellen kannst.
@@ -94,37 +94,64 @@ Dies kann entweder localhost oder eine Domain sein, für die ein lokaler Host-Ei
 Es sollte darauf geachtet werden, dass bei Verwendung eines Host-Eintrags keine potenziell öffentlich auflösbare Domain verwendet wird,
 die nicht unter der Kontrolle des Entwicklers steht, um Sicherheitsrisiken zu vermeiden.
 
-## Testen der Lifecycle Webhooks
+## Deine lokale Extension erreichbar machen {#making-your-local-extension-reachable}
 
-### ...mittels lokalem Development Server
+Lifecycle Webhooks werden immer vom mStudio Backend an die an der Extension konfigurierte Webhook-URL gesendet.
+Es gibt derzeit **keine Möglichkeit, echte Lifecycle Webhooks zu empfangen, ohne die lokal laufende Extension öffentlich erreichbar zu machen**.
+Ein Tunnel aus dem öffentlichen Internet auf deinen Rechner gehört daher zu jedem lokalen Setup, in dem Webhooks eine Rolle spielen.
 
-Auf Github existiert das [marketplace-local-dev-server](https://github.com/mittwald/marketplace-local-dev-server)-Repository,
-welches dafür gedacht ist, lokal Lifecycle Webhooks samt Verifizierung der Sender-Identität zu testen.
+Grundsätzlich funktioniert **jede Tunneling-Technik**.
+Wenn du bereits [ngrok](https://ngrok.com/) oder [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/) verwendest, bleib dabei.
+Wir empfehlen [zrok](https://zrok.io/) als kostenlose Open-Source-Option, die sowohl self-hosted als auch als SaaS-Lösung genutzt werden kann.
 
-:::note
+Wir empfehlen, eine **stabile URL** zu reservieren, die einen Neustart des Tunnels übersteht,
+damit du die Webhook-URL deiner Extension nicht bei jedem Neustart neu konfigurieren musst.
+Mit der zrok SaaS-Lösung sind das drei Befehle:
 
-Zum aktuellen Zeitpunkt ist der Marktplatz und die Contribution noch nicht für die Allgemeinheit offen.
-Um Zugriff auf das Repository zu erhalten, kontaktiere bitte deinen Ansprechpartner bei mittwald.
+```bash
+zrok enable <dein-token>          # einmal pro Rechner, Token von myzrok.io
+zrok reserve public 3000          # einmalig, reserviert eine stabile URL für deinen lokalen Port
+zrok share reserved <share-token> # startet den Tunnel
+```
 
+Anschließend konfigurierst du die entstandene öffentliche URL samt deines Webhook-Pfads als Webhook-URL deiner Extension.
+Das geht im Tab "Webhooks" deiner Extension im mStudio oder programmatisch über die <OperationLink operation="extension-patch-extension" />-Operation.
+
+:::info
+Eine Schritt-für-Schritt-Anleitung für dieses Setup, und wie es sich in eine vollständige Extension einfügt,
+findest du unter [Expose Extension](../../getting-started/expose-extension) im Getting-Started-Guide.
 :::
 
-Es enthält eine Docker-Compose-Konfiguration, die einen lokalen Server startet, der Lifecycle Webhooks versenden kann.
-Dazu wird eine API angeboten, mit der Lifecycle Webhooks angefragt werden können.
-Die Werte, die in den Webhooks enthalten sind, können dabei frei gewählt werden.
-Falls Werte nicht gesetzt sind, werden sie zufällig generiert.
+## Testen der Lifecycle Webhooks {#testing-lifecycle-webhooks}
 
-Wenn bspw. die Extension Instance ID selbst vergeben wird, können so auch ganze Lebenszyklen von Extension Instances simuliert werden,
-indem für verschiedene Webhooks eine stabile Extension Instance ID verwendet wird.
+Beide im Folgenden beschriebenen Methoden senden Webhooks an die konfigurierte Webhook-URL deiner Extension.
+Sie setzen daher voraus, dass deine lokale Extension erreichbar ist, wie unter [deine lokale Extension erreichbar machen](#making-your-local-extension-reachable) beschrieben.
 
-### ...mittels Dry Run Webhooks
+:::note Musst du das Webhook-Handling überhaupt testen?
+Die technische Seite von Lifecycle Webhooks — den Call annehmen, die Signatur verifizieren, den Payload parsen und ihn an den richtigen Handler weiterreichen — ist generische Infrastruktur, die du nicht selbst bauen und deshalb auch nicht selbst testen musst.
+Bibliotheken wie [`@weissaufschwarz/mitthooks`](https://www.npmjs.com/package/@weissaufschwarz/mitthooks), die auch die [Reference Extension](../../getting-started/reference-extension) verwendet, decken das vollständig ab.
+
+Übrig bleibt deine **Domänenlogik**: was deine Extension tut, wenn eine Extension Instance hinzugefügt, aktualisiert oder entfernt wird.
+Das ist gewöhnlicher Anwendungscode, den du lokal isoliert testen kannst — ganz ohne Tunnel und ohne mStudio.
+Nutze die folgenden Methoden, um die Integration als Ganzes zu verifizieren.
+:::
+
+### ...mittels Dry Run Webhooks (empfohlen) {#via-dry-run-webhooks}
 
 Mithilfe der <OperationLink operation="extension-dry-run-webhook" />-Operation können Lifecycle Webhooks auch über das mStudio Backend simuliert werden.
 Dabei wird der angefragte Lifecycle Webhook an die an der Extension konfigurierten URL gesendet.
 Dry Run Webhooks können nur für Extension Instances des Contributors ausgeführt werden.
-Sie können genau wie beim lokalen Development Server mit beliebigen Werten gefüllt werden oder zufällige Werte enthalten.
+Die Werte der Lifecycle Webhooks können frei gewählt werden oder vom mStudio Backend zufällig generiert werden.
 Für eine Übersicht, welche Werte statisch gesetzt werden können, siehe in der verlinkten Operation.
 
 Das Ergebnis samt Response Body, Headern und Status Code wird dabei als Antwort auf die Operation zurückgegeben.
+
+Dry Run Webhooks sind der praktischste Weg, um während der Entwicklung zu iterieren:
+
+- Du musst deine Extension nicht für jeden Versuch neu installieren und wieder entfernen.
+- Das mStudio führt Dry Run Webhooks **synchron** aus. Du bekommst die Antwort deines Webhook-Handlers also unmittelbar zurück, statt in deinen lokalen Logs nachsehen zu müssen.
+- Dadurch kannst du denselben Webhook beliebig oft und in einer selbst gewählten Reihenfolge senden.
+  Echte Lifecycle Webhooks werden asynchron zugestellt, wodurch du deutlich weniger Kontrolle über Zeitpunkt und Wiederholung hast.
 
 :::caution
 Um den Webhook als Dry Run erkennbar zu machen, wird dem Webhook der Query-Parameter `dry-run=true` hinzugefügt.
@@ -135,6 +162,23 @@ da es sich um eine Simulation handelt und so die Daten inkonsistent werden könn
 Zu Dokumentationszwecken kann zusätzlich der `executing-user-id` Query-Parameter ausgewertet werden.
 Dieser wird ebenfalls automatisch jedem Dry Run Webhook beigefügt.
 Er enthält die ID des Benutzers, der den Dry Run Webhook ausgelöst hat.
+
+### ...durch Installation deiner Extension {#by-installing-your-extension}
+
+Die Installation deiner Extension ist der realistischste Test, denn sie löst Webhooks genauso aus, wie es später deine Nutzer tun:
+indem die Extension zu einem Context hinzugefügt, ihr Zustand verändert und sie wieder entfernt wird.
+Jede dieser Aktionen erzeugt einen echten, signierten Webhook-Call.
+
+1. Mache deine lokale Extension erreichbar und konfiguriere die Webhook-URL, wie unter [deine lokale Extension erreichbar machen](#making-your-local-extension-reachable) beschrieben.
+2. Erstelle eine Extension Instance, wie unter [Erstellen einer Extension Instance](#creating-an-extension-instance) beschrieben.
+   Das löst den `ExtensionAddedToContext`-Webhook aus.
+3. Aktiviere oder deaktiviere die Extension Instance, um `InstanceUpdated`-Webhooks auszulösen.
+4. Entferne die Extension aus dem Context, um den `InstanceRemovedFromContext`-Webhook auszulösen.
+
+Die Bedeutung der einzelnen Webhooks ist unter [Lifecycle Webhooks](../../overview/concepts/lifecycle-webhooks) beschrieben.
+
+Da alle Extension Instances innerhalb deines Contributors kostenlos sind, kannst du diesen Zyklus beliebig oft wiederholen.
+Da das mStudio diese Webhooks asynchron zustellt, eignet sich diese Methode eher dazu, die Integration als Ganzes zu bestätigen, als im Detail zu iterieren.
 
 ## Frontend Fragments testen {#testing-frontend-fragments}
 
