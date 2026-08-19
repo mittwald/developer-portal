@@ -1,12 +1,17 @@
 import FeatureRow from "@site/src/components/FeatureRow";
 import clsx from "clsx";
-import styles from "@site/src/components/HomepageFeatures/styles.module.css";
 import React from "react";
 import Intro, { IntroHeader } from "@site/src/components/Intro";
-import { Icon } from "@mittwald/flow-react-components";
+import {
+  Heading,
+  Icon,
+  LayoutCard,
+  Section,
+  Text,
+} from "@mittwald/flow-react-components";
 import { IconScript } from "@tabler/icons-react";
 import Translate from "@docusaurus/Translate";
-import Link from "@docusaurus/Link";
+import Link from "@site/src/components/Link";
 import CodeBlock from "@theme/CodeBlock";
 
 function DevelopmentIntro() {
@@ -35,40 +40,42 @@ function DevelopmentIntro() {
 
 function DevelopmentDocumentation() {
   return (
-    <>
-      <h3>
+    <Section>
+      <Heading>
         <Translate id="cli.dev.features.title">Development features</Translate>
-      </h3>
-      <p>
+      </Heading>
+      <Text elementType="p">
         <Translate id={"cli.dev.features.body"}>
           Typical development tasks that can be simplified with the mittwald CLI
           include:
         </Translate>
-      </p>
-      <ul>
-        <li>
-          <Translate id="cli.dev.features.bootstrapping">
-            Bootstrapping new projects on the mittwald platform
-          </Translate>
-        </li>
-        <li>
-          <Translate id="cli.dev.features.localdev">
-            Setting up local development environments
-          </Translate>
-        </li>
-        <li>
-          <Translate id="cli.dev.features.operations">
-            Supporting operational tasks
-          </Translate>
-        </li>
-      </ul>
-    </>
+      </Text>
+      <Text>
+        <ul>
+          <li>
+            <Translate id="cli.dev.features.bootstrapping">
+              Bootstrapping new projects on the mittwald platform
+            </Translate>
+          </li>
+          <li>
+            <Translate id="cli.dev.features.localdev">
+              Setting up local development environments
+            </Translate>
+          </li>
+          <li>
+            <Translate id="cli.dev.features.operations">
+              Supporting operational tasks
+            </Translate>
+          </li>
+        </ul>
+      </Text>
+    </Section>
   );
 }
 
 function DevelopmentExample() {
   return (
-    <>
+    <Section>
       <CodeBlock language="shell-session">{`$ # Setup ddev project
 $ mw ddev init
 
@@ -77,14 +84,14 @@ $ ddev pull mittwald
 
 $ # Start your local environment
 $ ddev start`}</CodeBlock>
-      <p className="padding--md">
+      <Text elementType="p">
         <Link to="/docs/v2/platform/development/ddev/">
           <Translate id={"cli.dev.ddev"}>
             More about our DDEV integration
           </Translate>
         </Link>
-      </p>
-    </>
+      </Text>
+    </Section>
   );
 }
 
@@ -97,14 +104,14 @@ export default function DevelopmentFeature() {
             <DevelopmentIntro />
           </div>
           <div className={clsx("col col--4")}>
-            <div className={clsx("padding--md", styles.feature)}>
+            <LayoutCard>
               <DevelopmentDocumentation />
-            </div>
+            </LayoutCard>
           </div>
           <div className={clsx("col col--4")}>
-            <div className={clsx(styles.feature)}>
+            <LayoutCard>
               <DevelopmentExample />
-            </div>
+            </LayoutCard>
           </div>
         </div>
       </div>

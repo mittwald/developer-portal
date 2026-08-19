@@ -1,9 +1,16 @@
 import React from "react";
 import clsx from "clsx";
-import Link from "@docusaurus/Link";
+import DocusaurusLink from "@docusaurus/Link";
 import Layout from "@theme/Layout";
 import Translate, { translate } from "@docusaurus/Translate";
-import { CodeBlock, Icon } from "@mittwald/flow-react-components";
+import {
+  CodeBlock,
+  Heading,
+  Icon,
+  LayoutCard,
+  Section,
+  Text,
+} from "@mittwald/flow-react-components";
 import {
   IconBook,
   IconBrandGithub,
@@ -17,9 +24,9 @@ import {
 import styles from "./cli.module.css";
 import mcpStyles from "./mcp.module.css";
 import demo from "@site/static/img/mcp-demo.png";
-import featureStyles from "@site/src/components/HomepageFeatures/styles.module.css";
 import FeatureRow from "@site/src/components/FeatureRow";
 import Intro, { IntroHeader } from "@site/src/components/Intro";
+import Link from "@site/src/components/Link";
 
 function MCPPageHeader() {
   return (
@@ -41,7 +48,7 @@ function MCPPageHeader() {
           />
         </p>
         <div className={styles.buttons}>
-          <Link
+          <DocusaurusLink
             className="button button--success button--lg"
             to="/docs/v2/agentic-integration/mcp/getting-connected"
           >
@@ -49,8 +56,8 @@ function MCPPageHeader() {
               <IconRocket />
             </Icon>
             <Translate id="mcp.cta.firstWorkflow">Run First Workflow</Translate>
-          </Link>
-          <Link
+          </DocusaurusLink>
+          <DocusaurusLink
             className="button button--secondary button--lg"
             to="/docs/v2/agentic-integration/mcp"
           >
@@ -58,8 +65,8 @@ function MCPPageHeader() {
               <IconBook />
             </Icon>
             <Translate id="mcp.cta.documentation">Documentation</Translate>
-          </Link>
-          <Link
+          </DocusaurusLink>
+          <DocusaurusLink
             className="button button--secondary button--lg"
             href="https://github.com/mittwald/mcp-server"
           >
@@ -67,7 +74,7 @@ function MCPPageHeader() {
               <IconBrandGithub />
             </Icon>
             GitHub
-          </Link>
+          </DocusaurusLink>
         </div>
       </div>
     </header>
@@ -83,7 +90,7 @@ function ServerURLSection() {
       }}
     >
       <div className={clsx("container", mcpStyles.urlContainer)}>
-        <p>
+        <Text elementType="p">
           <strong>
             <Translate id="mcp.url.intro.bold">
               Just want to get started quickly?
@@ -92,14 +99,14 @@ function ServerURLSection() {
           <Translate id="mcp.url.intro">
             Use this MCP URL in the AI assistant of your choice:
           </Translate>
-        </p>
+        </Text>
         <CodeBlock
           copyable
           code="https://mcp.mittwald.de/mcp"
           language="text"
           className={mcpStyles.urlField}
         />
-        <p>
+        <Text elementType="p">
           <Translate
             id="mcp.url.setupGuides"
             values={{
@@ -114,7 +121,7 @@ function ServerURLSection() {
           >
             {"See our {link} for more detailed instructions."}
           </Translate>
-        </p>
+        </Text>
       </div>
     </section>
   );
@@ -147,83 +154,93 @@ function OverviewFeature() {
             </Intro>
           </div>
           <div className={clsx("col col--4")}>
-            <div className={clsx("padding--md", featureStyles.feature)}>
-              <h3>
-                <Translate id="mcp.overview.toolset.title">
-                  Comprehensive Toolset
-                </Translate>
-              </h3>
-              <p>
-                <Translate id="mcp.overview.toolset.body">
-                  Full coverage across projects, apps, databases, DNS, mail,
-                  security, and automation. One MCP endpoint for all mittwald
-                  operations.
-                </Translate>
-              </p>
-              <ul>
-                <li>
-                  <Translate id="mcp.overview.toolset.projects">
-                    Project and app management
+            <LayoutCard>
+              <Section>
+                <Heading>
+                  <Translate id="mcp.overview.toolset.title">
+                    Comprehensive Toolset
                   </Translate>
-                </li>
-                <li>
-                  <Translate id="mcp.overview.toolset.database">
-                    Database provisioning
+                </Heading>
+                <Text elementType="p">
+                  <Translate id="mcp.overview.toolset.body">
+                    Full coverage across projects, apps, databases, DNS, mail,
+                    security, and automation. One MCP endpoint for all mittwald
+                    operations.
                   </Translate>
-                </li>
-                <li>
-                  <Translate id="mcp.overview.toolset.domain">
-                    Domain and SSL configuration
-                  </Translate>
-                </li>
-                <li>
-                  <Translate id="mcp.overview.toolset.backup">
-                    Backup and restore
-                  </Translate>
-                </li>
-              </ul>
-            </div>
+                </Text>
+                <Text>
+                  <ul>
+                    <li>
+                      <Translate id="mcp.overview.toolset.projects">
+                        Project and app management
+                      </Translate>
+                    </li>
+                    <li>
+                      <Translate id="mcp.overview.toolset.database">
+                        Database provisioning
+                      </Translate>
+                    </li>
+                    <li>
+                      <Translate id="mcp.overview.toolset.domain">
+                        Domain and SSL configuration
+                      </Translate>
+                    </li>
+                    <li>
+                      <Translate id="mcp.overview.toolset.backup">
+                        Backup and restore
+                      </Translate>
+                    </li>
+                  </ul>
+                </Text>
+              </Section>
+            </LayoutCard>
           </div>
           <div className={clsx("col col--4")}>
-            <div className={clsx("padding--md", featureStyles.feature)}>
-              <h3>
-                <Translate id="mcp.overview.auth.title">
-                  Flexible Authentication
-                </Translate>
-              </h3>
-              <p>
-                <Translate id="mcp.overview.auth.body">
-                  Choose the auth method that fits your workflow:
-                </Translate>
-              </p>
-              <ul>
-                <li>
-                  <Translate
-                    id="mcp.overview.auth.oauth"
-                    values={{ bold: <strong>OAuth 2.1</strong> }}
-                  >
-                    {
-                      "{bold} for interactive agents with automatic token refresh"
-                    }
+            <LayoutCard>
+              <Section>
+                <Heading>
+                  <Translate id="mcp.overview.auth.title">
+                    Flexible Authentication
                   </Translate>
-                </li>
-                <li>
-                  <Translate
-                    id="mcp.overview.auth.token"
-                    values={{ bold: <strong>API tokens</strong> }}
-                  >
-                    {"{bold} for CI/CD pipelines and headless environments"}
+                </Heading>
+                <Text elementType="p">
+                  <Translate id="mcp.overview.auth.body">
+                    Choose the auth method that fits your workflow:
                   </Translate>
-                </li>
-              </ul>
-              <p>
-                <Link to="/docs/v2/agentic-integration/mcp/getting-connected">
-                  <Translate id="mcp.overview.auth.link">
-                    Setup guides →
-                  </Translate>
-                </Link>
-              </p>
-            </div>
+                </Text>
+                <Text>
+                  <ul>
+                    <li>
+                      <Translate
+                        id="mcp.overview.auth.oauth"
+                        values={{ bold: <strong>OAuth 2.1</strong> }}
+                      >
+                        {
+                          "{bold} for interactive agents with automatic token refresh"
+                        }
+                      </Translate>
+                    </li>
+                    <li>
+                      <Translate
+                        id="mcp.overview.auth.token"
+                        values={{ bold: <strong>API tokens</strong> }}
+                      >
+                        {"{bold} for CI/CD pipelines and headless environments"}
+                      </Translate>
+                    </li>
+                  </ul>
+                </Text>
+              </Section>
+              <Section>
+                <Text elementType="p">
+                  <Link to="/docs/v2/agentic-integration/mcp/getting-connected">
+                    <Translate id="mcp.overview.auth.link">
+                      Setup guides →
+                    </Translate>
+                  </Link>
+                </Text>
+              </Section>
+            </LayoutCard>
           </div>
         </div>
       </div>
@@ -255,88 +272,98 @@ function GettingStartedFeature() {
             </Intro>
           </div>
           <div className={clsx("col col--4")}>
-            <div className={clsx("padding--md", featureStyles.feature)}>
-              <h3>
-                <Translate id="mcp.getStarted.connect.title">
-                  Connect Your Assistant
-                </Translate>
-              </h3>
-              <p>
-                <Translate id="mcp.getStarted.connect.body">
-                  Step-by-step setup guides for popular AI coding tools:
-                </Translate>
-              </p>
-              <ul>
-                <li>
-                  <Link to="/docs/v2/agentic-integration/mcp/getting-connected/claude-code">
-                    Claude Code
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/docs/v2/agentic-integration/mcp/getting-connected/github-copilot">
-                    GitHub Copilot
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/docs/v2/agentic-integration/mcp/getting-connected/cursor">Cursor</Link>
-                </li>
-                <li>
-                  <Link to="/docs/v2/agentic-integration/mcp/getting-connected/codex-cli">
-                    Codex CLI
-                  </Link>
-                </li>
-              </ul>
-            </div>
+            <LayoutCard>
+              <Section>
+                <Heading>
+                  <Translate id="mcp.getStarted.connect.title">
+                    Connect Your Assistant
+                  </Translate>
+                </Heading>
+                <Text elementType="p">
+                  <Translate id="mcp.getStarted.connect.body">
+                    Step-by-step setup guides for popular AI coding tools:
+                  </Translate>
+                </Text>
+                <Text>
+                  <ul>
+                    <li>
+                      <Link to="/docs/v2/agentic-integration/mcp/getting-connected/claude-code">
+                        Claude Code
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/docs/v2/agentic-integration/mcp/getting-connected/github-copilot">
+                        GitHub Copilot
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/docs/v2/agentic-integration/mcp/getting-connected/cursor">
+                        Cursor
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/docs/v2/agentic-integration/mcp/getting-connected/codex-cli">
+                        Codex CLI
+                      </Link>
+                    </li>
+                  </ul>
+                </Text>
+              </Section>
+            </LayoutCard>
           </div>
           <div className={clsx("col col--4")}>
-            <div className={clsx("padding--md", featureStyles.feature)}>
-              <h3>
-                <Translate id="mcp.getStarted.learn.title">
-                  Learn the Pattern
-                </Translate>
-              </h3>
-              <p>
-                <Translate id="mcp.getStarted.learn.body">
-                  Human intent in prompts, MCP tools for execution, explicit
-                  approvals for risky actions.
-                </Translate>
-              </p>
-              <ul>
-                <li>
-                  <Link to="/docs/v2/agentic-integration/mcp/tutorials">
-                    <Translate id="mcp.getStarted.learn.tutorials">
-                      Tutorials
-                    </Translate>
-                  </Link>{" "}
-                  —{" "}
-                  <Translate id="mcp.getStarted.learn.tutorials.desc">
-                    guided walkthroughs
+            <LayoutCard>
+              <Section>
+                <Heading>
+                  <Translate id="mcp.getStarted.learn.title">
+                    Learn the Pattern
                   </Translate>
-                </li>
-                <li>
-                  <Link to="/docs/v2/agentic-integration/mcp/how-to">
-                    <Translate id="mcp.getStarted.learn.howto">
-                      How-To Playbooks
-                    </Translate>
-                  </Link>{" "}
-                  —{" "}
-                  <Translate id="mcp.getStarted.learn.howto.desc">
-                    task recipes
+                </Heading>
+                <Text elementType="p">
+                  <Translate id="mcp.getStarted.learn.body">
+                    Human intent in prompts, MCP tools for execution, explicit
+                    approvals for risky actions.
                   </Translate>
-                </li>
-                <li>
-                  <Link to="/docs/v2/agentic-integration/mcp/runbooks">
-                    <Translate id="mcp.getStarted.learn.runbooks">
-                      Runbooks
-                    </Translate>
-                  </Link>{" "}
-                  —{" "}
-                  <Translate id="mcp.getStarted.learn.runbooks.desc">
-                    incident recovery
-                  </Translate>
-                </li>
-              </ul>
-            </div>
+                </Text>
+                <Text>
+                  <ul>
+                    <li>
+                      <Link to="/docs/v2/agentic-integration/mcp/tutorials">
+                        <Translate id="mcp.getStarted.learn.tutorials">
+                          Tutorials
+                        </Translate>
+                      </Link>{" "}
+                      —{" "}
+                      <Translate id="mcp.getStarted.learn.tutorials.desc">
+                        guided walkthroughs
+                      </Translate>
+                    </li>
+                    <li>
+                      <Link to="/docs/v2/agentic-integration/mcp/how-to">
+                        <Translate id="mcp.getStarted.learn.howto">
+                          How-To Playbooks
+                        </Translate>
+                      </Link>{" "}
+                      —{" "}
+                      <Translate id="mcp.getStarted.learn.howto.desc">
+                        task recipes
+                      </Translate>
+                    </li>
+                    <li>
+                      <Link to="/docs/v2/agentic-integration/mcp/runbooks">
+                        <Translate id="mcp.getStarted.learn.runbooks">
+                          Runbooks
+                        </Translate>
+                      </Link>{" "}
+                      —{" "}
+                      <Translate id="mcp.getStarted.learn.runbooks.desc">
+                        incident recovery
+                      </Translate>
+                    </li>
+                  </ul>
+                </Text>
+              </Section>
+            </LayoutCard>
           </div>
         </div>
       </div>
@@ -369,71 +396,79 @@ function WorkflowFeature() {
             </Intro>
           </div>
           <div className={clsx("col col--8")}>
-            <div className={clsx("padding--md", featureStyles.feature)}>
-              <h3>
-                <Translate id="mcp.workflow.steps.title">
-                  The Agent Workflow
-                </Translate>
-              </h3>
-              <ol>
-                <li>
-                  <Translate
-                    id="mcp.workflow.steps.intent"
-                    values={{ bold: <strong>Intent</strong> }}
-                  >
-                    {"{bold} — You prompt the outcome you want on mittwald"}
+            <LayoutCard>
+              <Section>
+                <Heading>
+                  <Translate id="mcp.workflow.steps.title">
+                    The Agent Workflow
                   </Translate>
-                </li>
-                <li>
+                </Heading>
+                <Text>
+                  <ol>
+                    <li>
+                      <Translate
+                        id="mcp.workflow.steps.intent"
+                        values={{ bold: <strong>Intent</strong> }}
+                      >
+                        {"{bold} — You prompt the outcome you want on mittwald"}
+                      </Translate>
+                    </li>
+                    <li>
+                      <Translate
+                        id="mcp.workflow.steps.discovery"
+                        values={{ bold: <strong>Discovery</strong> }}
+                      >
+                        {
+                          "{bold} — Your agent discovers relevant MCP tools and required inputs"
+                        }
+                      </Translate>
+                    </li>
+                    <li>
+                      <Translate
+                        id="mcp.workflow.steps.auth"
+                        values={{ bold: <strong>Auth</strong> }}
+                      >
+                        {
+                          "{bold} — OAuth or token auth is used for each tool call"
+                        }
+                      </Translate>
+                    </li>
+                    <li>
+                      <Translate
+                        id="mcp.workflow.steps.execution"
+                        values={{ bold: <strong>Execution</strong> }}
+                      >
+                        {
+                          "{bold} — The agent performs tool calls and reports results"
+                        }
+                      </Translate>
+                    </li>
+                    <li>
+                      <Translate
+                        id="mcp.workflow.steps.verify"
+                        values={{ bold: <strong>Verify</strong> }}
+                      >
+                        {
+                          "{bold} — You run read checks and decide whether to proceed, retry, or roll back"
+                        }
+                      </Translate>
+                    </li>
+                  </ol>
+                </Text>
+              </Section>
+              <Section>
+                <Text elementType="p">
                   <Translate
-                    id="mcp.workflow.steps.discovery"
-                    values={{ bold: <strong>Discovery</strong> }}
+                    id="mcp.workflow.responsibility"
+                    values={{ bold: <strong>Human responsibility:</strong> }}
                   >
                     {
-                      "{bold} — Your agent discovers relevant MCP tools and required inputs"
+                      "{bold} Destructive or cost-impacting changes should be approved explicitly. Treat the agent as an operator, not as an unattended process."
                     }
                   </Translate>
-                </li>
-                <li>
-                  <Translate
-                    id="mcp.workflow.steps.auth"
-                    values={{ bold: <strong>Auth</strong> }}
-                  >
-                    {"{bold} — OAuth or token auth is used for each tool call"}
-                  </Translate>
-                </li>
-                <li>
-                  <Translate
-                    id="mcp.workflow.steps.execution"
-                    values={{ bold: <strong>Execution</strong> }}
-                  >
-                    {
-                      "{bold} — The agent performs tool calls and reports results"
-                    }
-                  </Translate>
-                </li>
-                <li>
-                  <Translate
-                    id="mcp.workflow.steps.verify"
-                    values={{ bold: <strong>Verify</strong> }}
-                  >
-                    {
-                      "{bold} — You run read checks and decide whether to proceed, retry, or roll back"
-                    }
-                  </Translate>
-                </li>
-              </ol>
-              <p>
-                <Translate
-                  id="mcp.workflow.responsibility"
-                  values={{ bold: <strong>Human responsibility:</strong> }}
-                >
-                  {
-                    "{bold} Destructive or cost-impacting changes should be approved explicitly. Treat the agent as an operator, not as an unattended process."
-                  }
-                </Translate>
-              </p>
-            </div>
+                </Text>
+              </Section>
+            </LayoutCard>
           </div>
         </div>
       </div>
@@ -474,66 +509,74 @@ function TutorialsFeature() {
             </Intro>
           </div>
           <div className={clsx("col col--4")}>
-            <div className={clsx("padding--md", featureStyles.feature)}>
-              <h3>
-                <Translate id="mcp.tutorials.freelancers.title">
-                  Freelancers & Agencies
-                </Translate>
-              </h3>
-              <ul>
-                <li>
-                  <Translate id="mcp.tutorials.freelancers.onboarding">
-                    Client onboarding automation
+            <LayoutCard>
+              <Section>
+                <Heading>
+                  <Translate id="mcp.tutorials.freelancers.title">
+                    Freelancers & Agencies
                   </Translate>
-                </li>
-                <li>
-                  <Translate id="mcp.tutorials.freelancers.visibility">
-                    Cross-project visibility
-                  </Translate>
-                </li>
-                <li>
-                  <Translate id="mcp.tutorials.freelancers.access">
-                    Team access management
-                  </Translate>
-                </li>
-                <li>
-                  <Translate id="mcp.tutorials.freelancers.backup">
-                    Backup monitoring
-                  </Translate>
-                </li>
-              </ul>
-            </div>
+                </Heading>
+                <Text>
+                  <ul>
+                    <li>
+                      <Translate id="mcp.tutorials.freelancers.onboarding">
+                        Client onboarding automation
+                      </Translate>
+                    </li>
+                    <li>
+                      <Translate id="mcp.tutorials.freelancers.visibility">
+                        Cross-project visibility
+                      </Translate>
+                    </li>
+                    <li>
+                      <Translate id="mcp.tutorials.freelancers.access">
+                        Team access management
+                      </Translate>
+                    </li>
+                    <li>
+                      <Translate id="mcp.tutorials.freelancers.backup">
+                        Backup monitoring
+                      </Translate>
+                    </li>
+                  </ul>
+                </Text>
+              </Section>
+            </LayoutCard>
           </div>
           <div className={clsx("col col--4")}>
-            <div className={clsx("padding--md", featureStyles.feature)}>
-              <h3>
-                <Translate id="mcp.tutorials.devops.title">
-                  E-Commerce & DevOps
-                </Translate>
-              </h3>
-              <ul>
-                <li>
-                  <Translate id="mcp.tutorials.devops.launch">
-                    Launch day preparation
+            <LayoutCard>
+              <Section>
+                <Heading>
+                  <Translate id="mcp.tutorials.devops.title">
+                    E-Commerce & DevOps
                   </Translate>
-                </li>
-                <li>
-                  <Translate id="mcp.tutorials.devops.database">
-                    Database performance checks
-                  </Translate>
-                </li>
-                <li>
-                  <Translate id="mcp.tutorials.devops.container">
-                    Container stack deployment
-                  </Translate>
-                </li>
-                <li>
-                  <Translate id="mcp.tutorials.devops.cicd">
-                    CI/CD pipeline integration
-                  </Translate>
-                </li>
-              </ul>
-            </div>
+                </Heading>
+                <Text>
+                  <ul>
+                    <li>
+                      <Translate id="mcp.tutorials.devops.launch">
+                        Launch day preparation
+                      </Translate>
+                    </li>
+                    <li>
+                      <Translate id="mcp.tutorials.devops.database">
+                        Database performance checks
+                      </Translate>
+                    </li>
+                    <li>
+                      <Translate id="mcp.tutorials.devops.container">
+                        Container stack deployment
+                      </Translate>
+                    </li>
+                    <li>
+                      <Translate id="mcp.tutorials.devops.cicd">
+                        CI/CD pipeline integration
+                      </Translate>
+                    </li>
+                  </ul>
+                </Text>
+              </Section>
+            </LayoutCard>
           </div>
         </div>
       </div>
