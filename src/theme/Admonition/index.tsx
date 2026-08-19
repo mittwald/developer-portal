@@ -10,7 +10,11 @@ type Props = WrapperProps<typeof AdmonitionType>;
 
 export default function AdmonitionWrapper(props: Props): React.JSX.Element {
   const status =
-    props.type === "warning" || props.type === "caution" ? "warning" : "info";
+    props.type === "danger"
+      ? "danger"
+      : props.type === "warning" || props.type === "caution"
+        ? "warning"
+        : "info";
 
   return (
     <Alert status={status}>
