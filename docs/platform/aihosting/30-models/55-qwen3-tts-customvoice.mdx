@@ -30,6 +30,9 @@ The following limitations apply:
 - `response_format="aac"` is not supported, although the OpenAI API defines it
 - The `language` parameter takes capitalised language names, not the ISO-639-1 codes that [Whisper](/docs/v2/platform/aihosting/models/whisper-large-v3-turbo) uses
 - The model has no chat endpoint. `/v1/chat/completions` is not available for it
+- There is no markup language. `[angry]`, `<laugh>`, and SSML tags are read out loud or dropped, see [Controlling delivery with instructions](#instructions)
+- German text needs preparation before you send it, and short German lines are unreliable, see [Writing text for German](#german-text)
+- `seed` is accepted but does not reproduce a previous result, see [Reproducibility](#reproducibility)
 
 :::warning[`language` does not take ISO codes here]
 Whisper accepts `de`, `en`, `fr`. This model rejects them and returns HTTP 400:
@@ -41,6 +44,15 @@ Invalid language 'De'. Supported: Auto, Beijing_Dialect, Chinese, English, Frenc
 Write `German` instead of `de`. If you build one wrapper around both audio models, this is the parameter that will bite you, because the same value is valid on one route and rejected on the other.
 
 You can also leave `language` out entirely. The default is `Auto` and it detects German and English reliably in our testing.
+
+A wrong but _valid_ value is worse than an invalid one, because it still returns HTTP 200. German text sent with `language: "English"` comes back as English-sounding nonsense:
+
+```text
+Input:  Die Lieferung kommt am Dienstagmorgen an, und die Rechnung wurde bereits an Ihre Adresse geschickt.
+Spoken: Deliver on camped on beanstalk market and keongty you were the brights and your addres
+```
+
+`German`, `Auto`, and omitting the parameter all produce correct German. So pass the right value or none at all, and don't hard-code `English` as a default in a wrapper that also handles German copy.
 :::
 
 ## Supported voices
@@ -48,6 +60,22 @@ You can also leave `language` out entirely. The default is `Auto` and it detects
 All nine work on this endpoint. There is no separate "custom voice" list to request.
 
 `aiden`, `dylan`, `eric`, `ono_anna`, `ryan`, `serena`, `sohee`, `uncle_fu`, `vivian`
+
+Every voice speaks every supported language, and all nine transcribe back cleanly in German and English in our tests, so pick by how the voice sounds rather than by its native language. Measured average pitch on English text:
+
+| Voice      | Native language   | Pitch  |
+| ---------- | ----------------- | ------ |
+| `aiden`    | English           | 147 Hz |
+| `dylan`    | Chinese (Beijing) | 164 Hz |
+| `ryan`     | English           | 171 Hz |
+| `eric`     | Chinese (Sichuan) | 177 Hz |
+| `uncle_fu` | Chinese           | 218 Hz |
+| `sohee`    | Korean            | 220 Hz |
+| `serena`   | Chinese           | 246 Hz |
+| `vivian`   | Chinese           | 250 Hz |
+| `ono_anna` | Japanese          | 264 Hz |
+
+Two things to know before you pick one for German. The voices whose native language is not German carry an audible accent, which is a matter of taste rather than a defect. And `instructions` only shapes the delivery of voices with an English-native voice on English text, see [Controlling delivery with instructions](#instructions), so on German the voice itself is the only lever you have over the character of the output.
 
 `voice` is optional in the API itself, but the OpenAI Python SDK requires it as a keyword argument, so pass it explicitly. An unknown value returns HTTP 400 and lists the valid ones:
 
@@ -76,6 +104,8 @@ Invalid voice 'bob'. Supported: aiden, dylan, eric, ono_anna, ryan, serena, sohe
 ```text
 Input should be 'wav', 'pcm', 'flac', 'mp3' or 'opus'
 ```
+
+Audio is 24 kHz, 16-bit, mono in every format. The loudness is not normalised: across our test set the peak level ranged from 0.23 to 0.89 of full scale, about 11 dB between the quietest and the loudest clip. If you play several clips one after another, run them through a loudness normaliser first.
 
 ## Getting started
 
@@ -155,12 +185,14 @@ curl_close($ch);
 
 ## Recommended inference parameters
 
-| Parameter         | Value                 | Effect                                                    |
-| ----------------- | --------------------- | --------------------------------------------------------- |
-| `voice`           | one of the nine names | Optional. Model default if omitted                        |
-| `language`        | `Auto`                | Optional. Set it explicitly when the text mixes languages |
-| `response_format` | `wav` or `opus`       | `wav` to process further, `opus` to deliver               |
-| `speed`           | `1.0`                 | Between 0.25 and 4.0, see [Speaking rate](#speaking-rate) |
+| Parameter         | Value                       | Effect                                                                      |
+| ----------------- | --------------------------- | --------------------------------------------------------------------------- |
+| `voice`           | one of the nine names       | Optional. Model default if omitted                                          |
+| `language`        | `Auto`                      | Optional. Set it explicitly when the text mixes languages                   |
+| `response_format` | `wav` or `opus`             | `wav` to process further, `opus` to deliver                                 |
+| `speed`           | `1.0`                       | Between 0.25 and 4.0, see [Speaking rate](#speaking-rate)                   |
+| `instructions`    | free text, ≤ 500 characters | Optional. Describes how to speak, see [Controlling delivery](#instructions) |
+| `seed`            | any integer                 | Accepted, but does not reproduce, see [Reproducibility](#reproducibility)   |
 
 ### Speaking rate {#speaking-rate}
 
@@ -173,6 +205,257 @@ curl_close($ch);
 | `2.0`   | 2.23 s            |
 
 Output length varies a little between runs even with identical input, because the model samples. Treat the numbers as the shape of the curve, not as exact values.
+
+`speed` has no effect while you stream. If you need a slower or faster reading of streamed audio, change the playback rate on your side.
+
+## Controlling delivery with instructions {#instructions}
+
+There is no markup language on this endpoint. Square-bracket tags, angle-bracket tags, and SSML are not parsed. They are either read out loud or dropped, and which one you get is not predictable:
+
+| You send                                               | The model says                                          |
+| ------------------------------------------------------ | ------------------------------------------------------- |
+| `[angry] The delivery arrives on Tuesday morning.`     | "**Hey,** the delivery arrives on Tuesday morning."     |
+| `<laugh> The delivery arrives on Tuesday morning.`     | "The delivery arrives on Tuesday morning." (no laugh)   |
+| `(excited) The delivery arrives on Tuesday morning!`   | "The delivery arrives on Tuesday morning." (no emotion) |
+| `The delivery arrives … <break time="1s"/> Thank you.` | "The delivery arrives … **They** thank you."            |
+| `<speak><prosody rate="slow">…</prosody></speak>`      | "**Speaks to rate slow pitch,** the delivery arrives …" |
+
+Strip any markup from your text and put the intent into the `instructions` parameter instead. It takes a plain sentence describing how the line should be delivered, up to 500 characters. Longer values return HTTP 400.
+
+:::warning[`instructions` works on English, barely on German]
+Measured on our hardware, five runs per setting, English text on the `ryan` voice: pitch moves between 156 Hz without instructions and 222 Hz for "shout", and the speaking rate between 10.6 characters per second for "whisper" and 18.6 for "speak very fast and excitedly". Both move in the direction you asked for.
+
+On German text the same instructions barely register. The pitch range across all emotions collapses to 17 Hz and the rate range to 1.1 characters per second, which is inside the run-to-run noise. Writing the instruction in German instead of English does not change that.
+
+For German, choose a different `voice` and adjust `speed` instead of describing an emotion.
+:::
+
+### Example: section-by-section voiceover for a client site
+
+A web agency builds a landing page for a client and wants a spoken version of each section: a calm product intro, a friendlier feature paragraph, and a call to action with some drive. One voice throughout keeps it recognisable as the same narrator, `instructions` change the delivery, and `opus` keeps the files small enough to ship with the page.
+
+Note that `language` and `instructions` are sent differently: `instructions` is a first-class parameter in the OpenAI SDKs, `language` is specific to this model and goes into `extra_body`.
+
+<Tabs groupId="language">
+<TabItem value="python" label="Python">
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1",
+    api_key="sk-your-api-key-here",
+)
+
+sections = [
+    (
+        "01-intro",
+        "Your hosting, fully managed. No servers to patch and no pager at three in the morning.",
+        "Speak calmly and clearly, like a product narrator.",
+    ),
+    (
+        "02-feature",
+        "Every deploy ships in seconds, and any change is one click away from a rollback.",
+        "Speak in a cheerful, upbeat tone.",
+    ),
+    (
+        "03-cta",
+        "Start your free trial today and put your first site online in ten minutes.",
+        "Speak fast and excitedly, like a short radio advert.",
+    ),
+]
+
+for name, text, instructions in sections:
+    response = client.audio.speech.create(
+        model="Qwen3-TTS-12Hz-1.7B-CustomVoice",
+        voice="ryan",
+        input=text,
+        instructions=instructions,
+        response_format="opus",
+        extra_body={"language": "English"},
+    )
+    response.write_to_file(f"{name}.opus")
+```
+
+</TabItem>
+<TabItem value="javascript" label="JavaScript">
+
+```javascript
+import OpenAI from "openai";
+import { writeFile } from "node:fs/promises";
+
+const client = new OpenAI({
+  baseURL: "https://llm.aihosting.mittwald.de/v1",
+  apiKey: "sk-your-api-key-here",
+});
+
+const sections = [
+  [
+    "01-intro",
+    "Your hosting, fully managed. No servers to patch and no pager at three in the morning.",
+    "Speak calmly and clearly, like a product narrator.",
+  ],
+  [
+    "02-feature",
+    "Every deploy ships in seconds, and any change is one click away from a rollback.",
+    "Speak in a cheerful, upbeat tone.",
+  ],
+  [
+    "03-cta",
+    "Start your free trial today and put your first site online in ten minutes.",
+    "Speak fast and excitedly, like a short radio advert.",
+  ],
+];
+
+for (const [name, input, instructions] of sections) {
+  const response = await client.audio.speech.create({
+    model: "Qwen3-TTS-12Hz-1.7B-CustomVoice",
+    voice: "ryan",
+    input,
+    instructions,
+    response_format: "opus",
+    // @ts-expect-error language is specific to this model
+    language: "English",
+  });
+
+  await writeFile(`${name}.opus`, Buffer.from(await response.arrayBuffer()));
+}
+```
+
+</TabItem>
+<TabItem value="php" label="PHP">
+
+```php
+<?php
+
+$sections = [
+    [
+        "01-intro",
+        "Your hosting, fully managed. No servers to patch and no pager at three in the morning.",
+        "Speak calmly and clearly, like a product narrator.",
+    ],
+    [
+        "02-feature",
+        "Every deploy ships in seconds, and any change is one click away from a rollback.",
+        "Speak in a cheerful, upbeat tone.",
+    ],
+    [
+        "03-cta",
+        "Start your free trial today and put your first site online in ten minutes.",
+        "Speak fast and excitedly, like a short radio advert.",
+    ],
+];
+
+foreach ($sections as [$name, $input, $instructions]) {
+    $payload = [
+        "model" => "Qwen3-TTS-12Hz-1.7B-CustomVoice",
+        "voice" => "ryan",
+        "input" => $input,
+        "instructions" => $instructions,
+        "language" => "English",
+        "response_format" => "opus",
+    ];
+
+    $ch = curl_init("https://llm.aihosting.mittwald.de/v1/audio/speech");
+    curl_setopt_array($ch, [
+        CURLOPT_POST => true,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER => [
+            "Authorization: Bearer sk-your-api-key-here",
+            "Content-Type: application/json",
+        ],
+        CURLOPT_POSTFIELDS => json_encode($payload),
+    ]);
+
+    file_put_contents("{$name}.opus", curl_exec($ch));
+    curl_close($ch);
+}
+```
+
+</TabItem>
+</Tabs>
+
+Running that produced three files of 26 kB, 25 kB, and 18 kB, and the delivery follows the instructions:
+
+| Section      | Instruction           | Duration | Speaking rate     |
+| ------------ | --------------------- | -------- | ----------------- |
+| `01-intro`   | calm product narrator | 5.76 s   | 14.9 characters/s |
+| `02-feature` | cheerful, upbeat      | 4.88 s   | 16.4 characters/s |
+| `03-cta`     | fast and excited      | 4.24 s   | 17.5 characters/s |
+
+For the German version of the same page, drop `instructions` and vary `voice` and `speed`:
+
+```python
+sections_de = [
+    ("de-01-intro", "Dein Hosting, vollständig verwaltet. Keine Server zum Patchen und kein Pager um drei Uhr nachts.", "serena", 0.95),
+    ("de-02-feature", "Jedes Deployment ist in Sekunden ausgerollt, und jede Änderung lässt sich mit einem Klick zurücknehmen.", "serena", 1.0),
+    ("de-03-cta", "Starte heute deine kostenlose Testphase und bring deine erste Website in zehn Minuten online.", "vivian", 1.15),
+]
+
+for name, text, voice, speed in sections_de:
+    response = client.audio.speech.create(
+        model="Qwen3-TTS-12Hz-1.7B-CustomVoice",
+        voice=voice,
+        input=text,
+        speed=speed,
+        response_format="opus",
+        extra_body={"language": "German"},
+    )
+    response.write_to_file(f"{name}.opus")
+```
+
+That gave 12.9, 15.5, and 17.1 characters per second across the three sections, so the same build-up in pace without relying on `instructions`.
+
+## Writing text for German {#german-text}
+
+:::warning[Short German text is unreliable]
+Below roughly 80 characters, German synthesis fails often enough to matter. Same voice, `language: "German"`, six runs per length, scored by transcribing the audio back:
+
+| Input length   | Average word error rate | Runs badly wrong |
+| -------------- | ----------------------- | ---------------- |
+| 19 characters  | 0.167                   | 2 of 6           |
+| 58 characters  | 0.259                   | 3 of 6           |
+| 99 characters  | 0.022                   | 0 of 6           |
+| 187 characters | 0.007                   | 0 of 6           |
+
+A failure sounds like English, not like a mistake: "Willkommen bei uns. Wie können wir dir heute weiterhelfen?" came back as "We come in by uns, we come with your heart and vital health." The response is still HTTP 200 and the audio is still well-formed, so nothing downstream catches it.
+
+From about 100 characters upwards we did not reproduce it. If you generate short German lines, such as greetings, button labels, or one-sentence notifications, either batch several of them into one request and cut the audio afterwards, or check the result before you ship it. English is not affected at these lengths.
+:::
+
+German copy needs a pass before you send it. The model reads well-formed German prose correctly, but three things in ordinary source text come out wrong, and none of them fail loudly.
+
+:::warning[Send real umlauts, not `ae`, `oe`, `ue`]
+This is the single biggest quality difference we measured. The same sentence, ten runs each, scored by transcribing the audio back and comparing it to the input:
+
+| Input spelling                              | Runs transcribed back correctly | Average word error rate |
+| ------------------------------------------- | ------------------------------- | ----------------------- |
+| `Größere Änderungen an der Übersicht …`     | 10 of 10                        | 0.000                   |
+| `Groessere Aenderungen an der Uebersicht …` | 0 of 10                         | 0.215                   |
+
+The transliterated version produced "Gräser Erinnerungen", "Braceränderungen", and "Geißere Änderungen" for "Größere Änderungen". If your CMS or export pipeline strips umlauts, restore them before the request.
+:::
+
+Second, expand abbreviations and write numbers out. The compact forms a CMS or a language model produces are read incorrectly:
+
+| You send                     | The model says                        | Write instead                                                      |
+| ---------------------------- | ------------------------------------- | ------------------------------------------------------------------ |
+| `Bestellung 45312`           | "Bestellung 4FOR 5002"                | `fünfundvierzigtausenddreihundertzwölf`                            |
+| `1.299,99 Euro`              | "1.29,999", "Euro" dropped            | `eintausendzweihundertneunundneunzig Euro und neunundneunzig Cent` |
+| `u. a. … z. B. … ggf. inkl.` | "O.A. … setz bei … die geben English" | `unter anderem … zum Beispiel … gegebenenfalls inklusive`          |
+| `GmbH & Co. KG`              | "GmbH & Co, Kagi"                     | `GmbH und Co. KG`                                                  |
+
+Dates such as `20.05.2026`, percentages such as `19 %`, and phone numbers such as `05772 293-100` are read correctly as written. Phone numbers are spoken digit by digit, which is right but slow: budget roughly four times the audio length of ordinary prose for the same number of characters.
+
+English is not affected. `Order 45312 shipped on May 20th, 2026. The total is 1,299.99 euros including 19 percent VAT.` comes back essentially word for word.
+
+Third, English technical terms inside German sentences are the weakest case we found. `Kubernetes-Cluster`, `Continuous Deployment`, and `Zero-Downtime-Updates` in one German sentence came back partly garbled. Proper nouns are unreliable in the same way, and no spelling trick fixes them: we tried a brand name plain, respelled, hyphenated and spaced, and with instructions asking for German pronunciation, and 1 of 21 attempts came out right. There is no pronunciation lexicon on this endpoint. If a name has to be right every time, keep it out of the synthesized copy or splice in a recording of it.
+
+## Reproducibility {#reproducibility}
+
+`seed` is accepted and returns HTTP 200, but it does not give you the same audio twice. Three identical requests with `seed: 42` produced three different files with durations of 6.64 s, 6.48 s, and 6.32 s. All three were perfectly intelligible, so this is a reproducibility limit and not a quality problem.
+
+If you need a clip to stay identical across deploys, generate it once and cache the bytes.
 
 ## Latency
 
@@ -289,13 +572,21 @@ For very long texts, splitting still helps even with streaming, because it lets 
 
 ## Error responses
 
-| Situation                  | Status | Message                                                 |
-| -------------------------- | ------ | ------------------------------------------------------- |
-| `input` is an empty string | 400    | `Input text cannot be empty`                            |
-| Unknown `voice`            | 400    | `Invalid voice '…'. Supported: …`                       |
-| Unknown `language`         | 400    | `Invalid language '…'. Supported: …`                    |
-| `response_format="aac"`    | 400    | `Input should be 'wav', 'pcm', 'flac', 'mp3' or 'opus'` |
-| Unknown model name         | 404    | `The model '…' does not exist.`                         |
+| Situation                                                                  | Status | Message                                                             |
+| -------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------- |
+| `input` is an empty string                                                 | 400    | `Input text cannot be empty`                                        |
+| Unknown `voice`                                                            | 400    | `Invalid voice '…'. Supported: …`                                   |
+| Unknown `language`                                                         | 400    | `Invalid language '…'. Supported: …`                                |
+| `response_format="aac"`                                                    | 400    | `Input should be 'wav', 'pcm', 'flac', 'mp3' or 'opus'`             |
+| `instructions` over 500 characters                                         | 400    | `Instructions too long (max 500 characters)`                        |
+| `ref_audio`, `ref_text`, `speaker_embedding` or `task_type` in the request | 400    | Voice cloning is not available, see [Voice cloning](#voice-cloning) |
+| Unknown model name                                                         | 404    | `The model '…' does not exist.`                                     |
+
+## Voice cloning {#voice-cloning}
+
+Cloning a voice from your own reference audio is not available. This model ships the nine built-in voices and no speaker encoder, so there is nothing that could turn a sample of your voice into one it can speak with. Requests carrying `ref_audio`, `ref_text`, `speaker_embedding` or `task_type` are rejected with HTTP 400 rather than producing an unusable result.
+
+If you need a specific voice, work with the nine you have: pick by pitch as described in [Supported voices](#supported-voices), and use `instructions` and `speed` to shape the delivery.
 
 ## Licence and terms of use
 
