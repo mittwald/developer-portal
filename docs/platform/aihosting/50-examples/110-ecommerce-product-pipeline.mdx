@@ -4,11 +4,11 @@ description: Turn product photos into German names, descriptions, tags and alt t
 title: E-commerce product pipeline
 ---
 
-New products arrive at agencies as photos — usually without any metadata. Someone shoots or downloads a picture, drops it into a folder, and the shop team has to write the name, description, tags and alt text by hand. This guide builds a pipeline that does that step automatically with [Qwen3.8-27B-NVFP4](/docs/v2/platform/aihosting/models/qwen3-8-27b-nvfp4) and writes the result into a running Shopware instance:
+New products arrive at agencies as photos — usually without any metadata. Someone shoots or downloads a picture, drops it into a folder, and the shop team has to write the name, description, tags and alt text by hand. This guide builds a pipeline that does that step automatically with `Qwen3.8-27B-NVFP4` and writes the result into a running Shopware instance:
 
 | Stage | Model | What it does |
 | ----- | ----- | ------------ |
-| 1 — Generate | [Qwen3.8-27B-NVFP4](/docs/v2/platform/aihosting/models/qwen3-8-27b-nvfp4) | Writes a German product name, description, tags and an image alt text per photo (strict JSON contract) |
+| 1 — Generate | `Qwen3.8-27B-NVFP4` | Writes a German product name, description, tags and an image alt text per photo (strict JSON contract) |
 | 2 — Review | human | Signs off every text before anything goes live |
 | 3 — Push | none (Shopware Admin API) | Creates tags, uploads the media and creates the product with SEO fields |
 

@@ -4,11 +4,11 @@ description: Produktfotos zu deutschen Namen, Beschreibungen, Tags und Alt-Texte
 title: E-Commerce-Produkt-Pipeline
 ---
 
-Neue Produkte kommen bei Agenturen als Fotos an — meist ohne jegliche Metadaten. Jemand macht oder lädt ein Bild, legt es in einen Ordner, und das Shop-Team muss Name, Beschreibung, Tags und Alt-Text von Hand schreiben. Diese Anleitung baut eine Pipeline, die diesen Schritt automatisch mit [Qwen3.8-27B-NVFP4](/docs/v2/platform/aihosting/models/qwen3-8-27b-nvfp4) erledigt und das Ergebnis in eine laufende Shopware-Instanz schreibt:
+Neue Produkte kommen bei Agenturen als Fotos an — meist ohne jegliche Metadaten. Jemand macht oder lädt ein Bild, legt es in einen Ordner, und das Shop-Team muss Name, Beschreibung, Tags und Alt-Text von Hand schreiben. Diese Anleitung baut eine Pipeline, die diesen Schritt automatisch mit `Qwen3.8-27B-NVFP4` erledigt und das Ergebnis in eine laufende Shopware-Instanz schreibt:
 
 | Stufe | Modell | Was sie tut |
 | ----- | ------ | ----------- |
-| 1 — Generieren | [Qwen3.8-27B-NVFP4](/docs/v2/platform/aihosting/models/qwen3-8-27b-nvfp4) | Schreibt pro Foto einen deutschen Produktnamen, eine Beschreibung, Tags und einen Alt-Text (strikter JSON-Vertrag) |
+| 1 — Generieren | `Qwen3.8-27B-NVFP4` | Schreibt pro Foto einen deutschen Produktnamen, eine Beschreibung, Tags und einen Alt-Text (strikter JSON-Vertrag) |
 | 2 — Review | Mensch | Prüft jeden Text, bevor er live geht |
 | 3 — Übernehmen | keine (Shopware Admin API) | Legt Tags an, lädt Medien hoch und erstellt das Produkt inkl. SEO-Felder |
 
