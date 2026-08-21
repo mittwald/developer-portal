@@ -5,17 +5,18 @@ import DocCardList from "@theme/DocCardList";
 
 We currently offer the following models, which may change or expand over time. Each is described along with model-specific parameters.
 
-| Model Name                    | Type                      | Modalities                                      | Context (Tokens)  | License    |
-| ----------------------------- | ------------------------- | ----------------------------------------------- | ----------------- | ---------- |
-| gpt-oss-120b                  | Chat + reasoning          | Text, tool-calling                              | 131,072           | Apache 2.0 |
-| Qwen3.5-0.8B                  | Chat + reasoning          | Text, tool-calling                              | 262,144           | Apache 2.0 |
-| Ministral-3-14B-Instruct-2512 | Chat + vision             | Text, image, tool-calling                       | 262,144           | Apache 2.0 |
-| Qwen3.5-122B-A10B-FP8         | Chat + reasoning + vision | Text, image, tool-calling                       | 245,760           | Apache 2.0 |
-| Qwen3.6-35B-A3B-FP8           | Chat + reasoning + vision | Text, image, tool-calling                       | 262,144           | Apache 2.0 |
-| GLM-OCR                       | Document OCR              | PDF, DOCX, PPTX, XLSX, HTML, SVG, image to text | 131,072           | MIT        |
-| Qwen3-Embedding-8B            | Embedding                 | Text to vector                                  | 32,768            | Apache 2.0 |
-| Qwen3-VL-Reranker-2B          | Reranking                 | Text, image to score                            | 32,768            | Apache 2.0 |
-| whisper-large-v3-turbo        | Speech-to-Text            | Audio to text                                   | N/A (audio-based) | MIT        |
+| Model Name                      | Type                      | Modalities                                      | Context (Tokens)  | License    |
+| ------------------------------- | ------------------------- | ----------------------------------------------- | ----------------- | ---------- |
+| gpt-oss-120b                    | Chat + reasoning          | Text, tool-calling                              | 131,072           | Apache 2.0 |
+| Qwen3.5-0.8B                    | Chat + reasoning + vision | Text, image, tool-calling                       | 262,144           | Apache 2.0 |
+| Ministral-3-14B-Instruct-2512   | Chat + vision             | Text, image, tool-calling                       | 262,144           | Apache 2.0 |
+| Qwen3.5-122B-A10B-FP8           | Chat + reasoning + vision | Text, image, tool-calling                       | 245,760           | Apache 2.0 |
+| Qwen3.6-35B-A3B-FP8             | Chat + reasoning + vision | Text, image, tool-calling                       | 262,144           | Apache 2.0 |
+| GLM-OCR                         | Document OCR              | PDF, DOCX, PPTX, XLSX, HTML, SVG, image to text | 131,072           | MIT        |
+| Qwen3-Embedding-8B              | Embedding                 | Text to vector                                  | 32,768            | Apache 2.0 |
+| Qwen3-VL-Reranker-2B            | Reranking                 | Text, image to score                            | 32,768            | Apache 2.0 |
+| whisper-large-v3-turbo          | Speech-to-Text            | Audio to text                                   | N/A (audio-based) | MIT        |
+| Qwen3-TTS-12Hz-1.7B-CustomVoice | Text-to-Speech            | Text to audio                                   | N/A (audio-based) | Apache 2.0 |
 
 Tool-calling in this table reflects support on `/v1/chat/completions`. Support on `/v1/responses` is model-specific — see [Responses API support](../dedicated/openai-compatibility#responses-api) for the exact per-model breakdown.
 
@@ -23,7 +24,7 @@ Tool-calling in this table reflects support on `/v1/chat/completions`. Support o
 
 - For complex text-centric workloads and advanced automations when precision and vast knowledge are required \
   use `gpt-oss-120b`.
-- For high-throughput, cost-sensitive tasks that don't require vision (e.g. simple Q&A, routing, classification, and batch processing) \
+- For high-throughput, cost-sensitive tasks — simple Q&A, routing, classification, batch processing, and basic image descriptions \
   use `Qwen3.5-0.8B`.
 - For broad, scalable, cost-conscious chat and basic multimodal (text + image) workflows \
   use `Ministral-3-14B-Instruct-2512`.
@@ -38,6 +39,8 @@ Tool-calling in this table reflects support on `/v1/chat/completions`. Support o
     use `Qwen3-Embedding-8B`
   - For any audio transcription or voice-command needs \
     use `whisper-large-v3-turbo`
+  - For reading text out loud, for example voice responses, accessibility, or audio versions of written content \
+    use `Qwen3-TTS-12Hz-1.7B-CustomVoice`
   - To improve RAG retrieval precision by adding it as a second-pass reranker after vector search \
     use `Qwen3-VL-Reranker-2B`
 

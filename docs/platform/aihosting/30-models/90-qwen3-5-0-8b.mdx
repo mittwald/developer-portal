@@ -15,6 +15,7 @@ import TabItem from "@theme/TabItem";
 It supports and is suitable for:
 
 - Text generation within a chat completion (text to text)
+- Image understanding from Base64 data URLs — descriptions, alt texts, visual classification
 - Tool-calling for agentic workflows
 - Thinking / reasoning for step-by-step problem solving (opt-in)
 - High-throughput, latency-sensitive pipelines
@@ -23,7 +24,8 @@ It supports and is suitable for:
 The following limitations apply:
 
 - Maximum context length: 262,144 tokens
-- No image / vision support
+- Images must be sent as Base64 data URLs — remote image URLs return HTTP 400
+- In multi-image requests only the first image is reliably described — send one image per request
 - Response quality and reasoning depth are lower than larger models
 - Thinking mode is **disabled by default** — opt in per request via `chat_template_kwargs`
 
@@ -189,10 +191,10 @@ category = response.choices[0].message.content.strip()
 
 :::tip Guide ideas
 - **Cascade routing**: Use `Qwen3.5-0.8B` to classify query complexity (simple / code / math / vision), then route to the appropriate tier:
-  - Simple text → `Qwen3.5-0.8B` handles it directly
+  - Simple text or basic vision (descriptions, alt texts) → `Qwen3.5-0.8B` handles it directly
   - Moderate → `Qwen3.6-35B-A3B-FP8` (reasoning + vision, mid cost)
   - Complex / frontier → `Qwen3.5-122B-A10B-FP8`
-  - Vision only → `Ministral-3-14B-Instruct-2512` (cheapest vision model)
+  - Demanding vision → `Ministral-3-14B-Instruct-2512`
 
   A well-tuned cascade can cut costs by 40–80% while maintaining quality on 95% of queries.
 - **Batch pre-processing**: Summarise, extract entities, or tag documents at scale before passing a curated subset to a heavier model.

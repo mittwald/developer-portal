@@ -1,0 +1,354 @@
+---
+sidebar_label: E-commerce product pipeline
+description: Turn product photos into German names, descriptions, tags and alt texts with Qwen3.8-27B-NVFP4 and push them into Shopware via the Admin API
+title: E-commerce product pipeline
+---
+
+New products arrive at agencies as photos — usually without any metadata. Someone shoots or downloads a picture, drops it into a folder, and the shop team has to write the name, description, tags and alt text by hand. This guide builds a pipeline that does that step automatically with `Qwen3.8-27B-NVFP4` and writes the result into a running Shopware instance:
+
+| Stage | Model | What it does |
+| ----- | ----- | ------------ |
+| 1 — Generate | `Qwen3.8-27B-NVFP4` | Writes a German product name, description, tags and an image alt text per photo (strict JSON contract) |
+| 2 — Review | human | Signs off every text before anything goes live |
+| 3 — Push | none (Shopware Admin API) | Creates tags, uploads the media and creates the product with SEO fields |
+
+:::note[Scope]
+The pipeline targets **Shopware 6.6 LTS** (tested on 6.6.10). Catalog writes go through the **Admin API**, not the Store-API — the Store-API serves the storefront (reads, cart, checkout) and exposes no product-write routes. If your client runs an older 6.x version, the same endpoints exist under the `/api/v2` prefix; everything else in this guide is unchanged.
+:::
+
+## Setup {#setup}
+
+```shellsession
+user@local $ pip install openai pillow requests
+```
+
+You need two things: access to the vision model and a Shopware instance with integration credentials.
+
+For the model, use the playground gateway until Qwen3.8 lands on the public gateway — the base URL below needs no API key:
+
+```python
+from openai import OpenAI
+
+client = OpenAI(base_url="https://qwen3-8-27b-nvfp4.llm-1.m3.services/v1", api_key="x")
+VISION_MODEL = "Qwen3.8-27B-NVFP4"
+```
+
+For Shopware, create an integration in the Admin UI: **Settings → Integrations → Create integration** (with admin rights), then copy the *access key* and *secret*. For local testing, the quickest way to get a 6.6 instance is a single container:
+
+```shellsession
+user@local $ docker run -d --name sw-test -p 80:80 dockware/shopware:6.6-latest
+```
+
+Create three fixture photos in `products/`. The filenames are deliberately misleading — `mug-001.jpg` is actually a plate — to prove the model looks at the pixels, not the filename:
+
+| File | Content | Known price |
+| ---- | ------- | ----------- |
+| `products/mug-001.jpg` | White dinner plate with a rim ornament | 14.90 EUR |
+| `products/backpack-001.jpg` | Embroidered leather backpack | 89.00 EUR |
+| `products/headphones-001.jpg` | DSLR camera set with lens and notebook | 249.00 EUR |
+
+That is all the input data: three JPEGs and a price each. Everything else comes out of stage 1.
+
+## Stage 1 — Product data from photos {#stage-generate}
+
+Send each photo to `Qwen3.8-27B-NVFP4` with a strict output contract. The prompt is in German on purpose: the model writes German product copy, and the measured output quality is better when the rules are stated in the target language (same pattern as the [BFSG accessibility pipeline](/docs/v2/platform/aihosting/examples/bfsg-accessibility#stage-alt-texts)).
+
+```python
+import base64
+import io
+import json
+import re
+import time
+from pathlib import Path
+
+from PIL import Image
+
+PROMPT = (
+    "Du bist E-Commerce-Experte und schreibst Produkttexte auf Deutsch fuer einen Online-Shop. "
+    "Beschreibe das Produkt auf dem Bild sachlich und kauftraechtig. "
+    "Regeln: name maximal 60 Zeichen, description 2-4 Saetze ohne uebertreibungen, "
+    "tags sind 3-5 kurze Keywords, alt_text maximal 125 Zeichen und beschreibt nur das Bild. "
+    "Keine Erfindungen von Marken oder Eigenschaften, die nicht sichtbar sind. "
+    'Antworte nur mit JSON: {"name": "...", "description": "...", '
+    '"tags": ["...", "..."], "alt_text": "..."}'
+)
+
+
+def encode_image(path: Path, max_px: int = 1024) -> str:
+    """Resize to max_px on the longest edge and return a Base64 data URL."""
+    with Image.open(path) as img:
+        w, h = img.size
+        scale = min(1.0, max_px / max(w, h))
+        if scale < 1.0:
+            img = img.resize((int(w * scale), int(h * scale)), Image.LANCZOS)
+        buf = io.BytesIO()
+        img.save(buf, format="JPEG", quality=85)
+    return f"data:image/jpeg;base64,{base64.b64encode(buf.getvalue()).decode()}"
+
+
+def generate_product_data(image_path: Path) -> dict:
+    t0 = time.time()
+    resp = client.chat.completions.create(
+        model=VISION_MODEL,
+        messages=[{"role": "user", "content": [
+            {"type": "image_url", "image_url": {"url": encode_image(image_path)}},
+            {"type": "text", "text": PROMPT},
+        ]}],
+        temperature=0.4,
+        max_tokens=2000,  # reasoning tokens count against this budget
+    )
+    dt = time.time() - t0
+    raw = resp.choices[0].message.content.strip()
+    raw = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw)
+    data = json.loads(raw)
+    return {
+        "name": str(data["name"])[:60],
+        "description": str(data["description"]),
+        "tags": [str(t)[:40] for t in data.get("tags", [])][:5],
+        "alt_text": str(data.get("alt_text", ""))[:125],
+        "seconds": round(dt, 1),
+        "tokens": resp.usage.total_tokens,
+        "reasoning_tokens": resp.usage.completion_tokens_details.reasoning_tokens,
+    }
+```
+
+Images must be Base64 data URLs; see [Encoding and resizing images](/docs/v2/platform/aihosting/examples/python#vision-encoding) for the general pattern.
+
+:::warning[Reasoning tokens eat your max_tokens budget]
+`Qwen3.8-27B-NVFP4` is a reasoning model: before it answers, it spends tokens on internal reasoning that you cannot see but that counts against `max_tokens`. Measured on the fixture photos with `max_tokens=600`: the response came back with `finish_reason=length` and either truncated or **empty** content (the reasoning alone used 524–600 of the 600-token budget). With `max_tokens=2000` every call completed. Budget at least 2000 tokens for product copy, and treat an empty `content` as a retry signal, not a model failure.
+:::
+
+Two behaviours worth knowing from the fixture run:
+
+- **Brands only when visible.** The camera photo carries a legible Canon logo, so the model wrote "Canon Spiegelreflexkamera" — correct, because it is visible. The prompt explicitly forbids inventing brands or properties that are not in the image; small models are less disciplined here, which is what the review stage is for.
+- **Filenames are ignored.** `mug-001.jpg` came back as "Weißer Teller …" (a plate), because that is what the photo shows.
+
+## Stage 2 — Human review {#stage-review}
+
+Generate a review sheet that a person signs off line by line, exactly like the [BFSG pipeline's review stage](/docs/v2/platform/aihosting/examples/bfsg-accessibility#stage-review). Nothing goes into the shop before this step:
+
+```python
+def write_review_sheet(results: dict, out: Path) -> None:
+    lines = [
+        "# Review — Produkttexte (E-Commerce-Pipeline)",
+        "",
+        "Bitte jeden Text pruefen, bevor er im Shop erscheint.",
+        "",
+        "| | SKU | Name | Beschreibung | Tags | Alt-Text | OK? |",
+        "|---|-----|------|--------------|------|----------|-----|",
+    ]
+    for sku, r in results.items():
+        lines.append(
+            f"| [ ] | {sku} | {r['name']} | {r['description'][:80]}… "
+            f"| {', '.join(r['tags'])} | {r['alt_text'][:50]}… | ☐ |"
+        )
+    out.write_text("\n".join(lines) + "\n", encoding="utf-8")
+```
+
+The sheet for the fixture:
+
+```markdown
+# Review — Produkttexte (E-Commerce-Pipeline)
+
+Bitte jeden Text pruefen, bevor er im Shop erscheint.
+
+| | SKU | Name | Beschreibung | Tags | Alt-Text | OK? |
+|---|-----|------|--------------|------|----------|-----|
+| [ ] | mug-001 | Weißer Teller mit dezentem Randmuster | Dieser weiße Teller überzeugt durch sein schlichtes, rundes Design. Ein dezent g… | Teller, Weiß, Randmuster, Essgeschirr, Rund | Weißer runder Teller mit dezentem grauem Wellenmus… | ☐ |
+| [ ] | backpack-001 | Ethnisch bestickter Leder-Rucksack mit Schultergurt | Dieser Rucksack aus dunklem Leder wird über einer Schulter getragen und besticht… | Rucksack, Leder, bestickt, ethno, Frauen | Person in lila T-Shirt und Jeans trägt einen dunkl… | ☐ |
+| [ ] | headphones-001 | Canon DSLR Kamera Set mit Objektiv und Notizbuch | Das Set enthält eine schwarze Canon-Spiegelreflexkamera mit aufgesetztem Objekti… | Kamera, Canon, Notizbuch, Fotografie, Zubehör | Schwarze Canon DSLR mit Objektiv, zweites Objektiv… | ☐ |
+```
+
+After sign-off, apply the accepted texts and run stage 3. Re-running the pipeline afterwards should produce an empty diff in the review sheet.
+
+## Stage 3 — Push to Shopware {#stage-shopware}
+
+### Authentication {#authentication}
+
+The Admin API authenticates with a short-lived JWT exchanged for the integration credentials (`client_credentials` grant):
+
+```python
+import requests
+
+SHOPWARE_URL = "http://localhost/api"  # Admin API base (no version prefix on 6.6+)
+INTEGRATION_KEY = "SWIA…"          # Admin UI -> Settings -> Integrations
+INTEGRATION_SECRET = "…"
+
+
+def get_jwt() -> str:
+    r = requests.post(
+        f"{SHOPWARE_URL}/oauth/token",
+        data={
+            "grant_type": "client_credentials",
+            "client_id": INTEGRATION_KEY,
+            "client_secret": INTEGRATION_SECRET,
+        },
+        timeout=30,
+    )
+    r.raise_for_status()
+    return r.json()["access_token"]
+```
+
+The token expires after 10 minutes — refresh it for long catalog runs.
+
+### Write semantics: 204 plus exact filter {#write-semantics}
+
+Two quirks of the current Admin API shape, both verified against 6.6.10:
+
+- **Write operations return `204 No Content`** — no body, no created id. To work with the entity afterwards, look it up again with an **exact filter** (`equalsAll`). Fuzzy `search-term` matching is not reliable for this (it happily matches `-001` across different files).
+- **Multipart file uploads break under PHP-FPM.** The classic `POST /api/_action/media/{id}/upload` with `multipart/form-data` fails with `CONTENT__MEDIA_INVALID_CONTENT_LENGTH`, because PHP-FPM empties `php://input` for multipart bodies. Send the file as a **raw binary body** instead (or point the endpoint at a URL with `Content-Type: application/json` and `{"url": "..."}` if the image already lives on a CDN).
+
+```python
+def sw(method: str, path: str, token: str, **kwargs):
+    r = requests.request(method, f"{SHOPWARE_URL}/{path.lstrip('/')}",
+                         headers={"Authorization": f"Bearer {token}"},
+                         timeout=60, **kwargs)
+    if r.status_code >= 400:
+        raise RuntimeError(f"{method} {path} -> {r.status_code}: {r.text[:400]}")
+    return r
+
+
+def find_id(entity: str, field: str, value: str, token: str) -> str:
+    """Writes return 204 without an id — look the entity up by an exact filter."""
+    r = sw("GET", entity, token, params={
+        "filter[0][type]": "equalsAll",
+        "filter[0][field]": field,
+        "filter[0][value]": value,
+        "fields[]": "id",
+    })
+    elements = r.json()["data"]
+    if not elements:
+        raise RuntimeError(f"{entity} with {field}={value!r} not found")
+    return elements[0]["id"]
+
+
+def ensure_tag(name: str, token: str) -> str:
+    r = sw("GET", "tag", token, params={
+        "filter[0][type]": "equalsAll",
+        "filter[0][field]": "name",
+        "filter[0][value]": name,
+        "fields[]": "id",
+    })
+    if r.json()["data"]:
+        return r.json()["data"][0]["id"]
+    sw("POST", "tag", token, json={"name": name})
+    return find_id("tag", "name", name, token)
+
+
+def create_media(file_name: str, alt: str, image_bytes: bytes, token: str) -> str:
+    sw("POST", "media", token, json={"fileName": file_name, "alt": alt})
+    media_id = find_id("media", "fileName", file_name, token)
+    # raw binary body: multipart/form-data breaks under PHP-FPM (php://input is empty)
+    r = requests.post(
+        f"{SHOPWARE_URL}/_action/media/{media_id}/upload",
+        headers={"Authorization": f"Bearer {token}", "Content-Type": "image/jpeg"},
+        params={"fileName": file_name, "extension": "jpg"},
+        data=image_bytes,
+        timeout=60,
+    )
+    if r.status_code >= 400:
+        raise RuntimeError(f"media upload -> {r.status_code}: {r.text[:400]}")
+    return media_id
+```
+
+### Creating the product {#creating-the-product}
+
+The product payload needs a few fields that are easy to miss (each one was a hard 400 during testing): `taxId`, `stock`, a `price` entry with `currencyId`/`gross`/`net`/`linked`, and media entries keyed by `mediaId` — not `id`. The German texts go into `translations`; the SEO fields are called `metaTitle`/`metaDescription` there.
+
+```python
+TAX_RATE = 19.0  # German standard VAT
+
+
+def create_product(sku: str, data: dict, price_gross: float,
+                   tax_id: str, currency_id: str, de_lang: str,
+                   media_id: str, tag_ids: list[str], token: str) -> None:
+    net = round(price_gross / (1 + TAX_RATE / 100), 2)
+    payload = {
+        "productNumber": sku,
+        "name": data["name"],
+        "description": data["description"],
+        "taxId": tax_id,
+        "stock": 10,
+        "price": [{"currencyId": currency_id, "gross": price_gross,
+                   "net": net, "linked": True}],
+        "media": [{"mediaId": media_id}],
+        "tags": [{"id": tid} for tid in tag_ids],
+        "translations": [{
+            "languageId": de_lang,
+            "name": data["name"],
+            "description": data["description"],
+            "metaTitle": f"{data['name']} – kaufen online",
+            "metaDescription": data["description"].split(". ")[0][:158],
+        }],
+    }
+    sw("POST", "product", token, json=payload)
+```
+
+The driver resolves the fixed ids once (tax rate, EUR currency, German language) and loops over the reviewed products:
+
+```python
+CATALOG = {
+    "mug-001": {"price_gross": 14.90},
+    "backpack-001": {"price_gross": 89.00},
+    "headphones-001": {"price_gross": 249.00},
+}
+
+
+def main():
+    # stages 1 and 2 first — see above; `results` holds the reviewed data
+    token = get_jwt()
+
+    taxes = sw("GET", "tax", token, params={"limit": 50,
+                                            "fields[]": "id", "fields[]": "taxRate"})
+    tax_id = next(d["id"] for d in taxes.json()["data"]
+                  if d["attributes"].get("taxRate") == TAX_RATE)
+    currencies = sw("GET", "currency", token, params={"limit": 50,
+                                                      "fields[]": "id", "fields[]": "name"})
+    currency_id = next(d["id"] for d in currencies.json()["data"]
+                       if "Euro" in str(d["attributes"].get("name")))
+    languages = sw("GET", "language", token, params={"limit": 50,
+                                                     "fields[]": "id", "fields[]": "name"})
+    de_lang = next(d["id"] for d in languages.json()["data"]
+                   if d["attributes"].get("name") == "Deutsch")
+
+    for sku, data in results.items():
+        image_bytes = (PRODUCTS_DIR / f"{sku}.jpg").read_bytes()
+        media_id = create_media(f"{sku}.jpg", data["alt_text"], image_bytes, token)
+        tag_ids = [ensure_tag(t, token) for t in data["tags"]]
+        create_product(sku, data, CATALOG[sku]["price_gross"], tax_id,
+                       currency_id, de_lang, media_id, tag_ids, token)
+        print(f"  {sku}: product + media + {len(tag_ids)} tags created")
+```
+
+Verified result on the fixture run — all three products exist in the shop with generated German copy:
+
+```text
+mug-001       "Weißer Teller mit dezentem Randmuster"
+              metaTitle: "Weißer Teller mit dezentem Randmuster – kaufen online"
+              price: 14.90 gross / 12.52 net EUR, stock 10, 5 tags, cover media with alt text
+backpack-001  "Ethnisch bestickter Leder-Rucksack mit Schultergurt"
+              price: 89.00 gross / 74.79 net EUR, stock 10, 5 tags
+headphones-001 "Canon DSLR Kamera Set mit Objektiv und Notizbuch"
+               price: 249.00 gross / 209.24 net EUR, stock 10, 5 tags
+```
+
+Products without a category do not appear in storefront listings — assign categories in the Admin UI (or extend the pipeline with a category mapping) as part of the review sign-off.
+
+## Cost profile {#cost-profile}
+
+Measured on the playground with ~600 px JPEGs:
+
+| Call | Tokens | Time | Notes |
+| ---- | ------ | ---- | ----- |
+| One product (incl. reasoning) | 957–1,178 total | 6.4–9.0 s | 369–504 of those are reasoning tokens |
+| Three-product fixture | ~3,200 total | ~24 s | plus trivial Admin API traffic |
+
+A 50-photo catalog costs roughly 50,000–60,000 tokens of `Qwen3.8-27B-NVFP4` traffic — a few cents on the 5-million-token plans, which makes a full catalog import a billable automation instead of a week of copywriting. If you want cheaper drafts, `Ministral-3-14B-Instruct-2512` on the public gateway handles standard product photos well; the JSON contract and the rest of the pipeline stay identical.
+
+## Limitations {#limitations}
+
+- **Human review is part of the process.** Vision models misdescribe images, the brand rule is prompt-enforced but not guaranteed, and only a person can judge whether a generated claim is safe to publish.
+- **Price, stock and category are inputs, not outputs.** The model sees the product, not your margin. Keep those in the `CATALOG` table (or read them from a spreadsheet).
+- **The Shopware parts were tested on 6.6 LTS.** Shopware 6.7 moved the Store-API to `/store-api` and reshaped some Admin API responses; the flow documented here (JWT, exact filters, raw-binary media upload) is what 6.6 LTS gives you today.
+- **One language per run.** The example writes German only; add another `translations` entry per language and let the model translate its own output if you need multilingual shops.
+- **Nothing here is a replacement for the client's editorial standards.** Shops with regulated product claims (food, cosmetics, medical) need an extra compliance check in the review sheet.
