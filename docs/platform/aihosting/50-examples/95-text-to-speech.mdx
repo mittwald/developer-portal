@@ -41,7 +41,7 @@ print("written to willkommen.mp3")
 
 Without streaming, nothing arrives until the whole file is generated. For a 26-second clip that is a 3-second wait. With streaming the first audio arrives in well under a second regardless of length, so use it whenever a person is waiting.
 
-`stream_format="audio"` sends raw audio chunks in the format you asked for, which is the simplest option when you write to a file or pipe into a player.
+Set `stream` to `true` to enable streaming. Then choose `stream_format="audio"` for raw audio chunks in the requested format, which is the simplest option when you write to a file or pipe into a player.
 
 ```python
 import os
@@ -56,11 +56,12 @@ with client.audio.speech.with_streaming_response.create(
     model="Qwen3-TTS-12Hz-1.7B-CustomVoice",
     voice="ryan",
     input=(
-        "Dieser Text ist lang genug, dass sich das Warten auf die vollstaendige "
-        "Datei bemerkbar machen wuerde. Mit Streaming beginnt die Wiedergabe sofort."
+        "This text is long enough for waiting on the complete file to become "
+        "noticeable. With streaming, playback can start immediately."
     ),
     response_format="wav",
-    extra_body={"stream_format": "audio"},
+    stream_format="audio",
+    extra_body={"stream": True},
 ) as response:
     response.stream_to_file("ausgabe.wav")
 ```
@@ -226,7 +227,8 @@ with client.audio.speech.with_streaming_response.create(
     voice="serena",
     input=answer,
     response_format="mp3",
-    extra_body={"stream_format": "audio"},
+    stream_format="audio",
+    extra_body={"stream": True},
 ) as speech:
     speech.stream_to_file("antwort.mp3")
 ```

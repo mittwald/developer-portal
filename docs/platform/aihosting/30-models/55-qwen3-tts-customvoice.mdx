@@ -473,16 +473,15 @@ Those numbers are for a buffered request, where the whole file arrives at once. 
 
 ## Streaming {#streaming}
 
-Set `stream` to `true` and the first audio arrives in well under a second, no matter how long the text is. Measured on the same sentence as the table above:
+Set `stream` to `true` and choose either `stream_format="audio"` or `stream_format="sse"`. The first audio then arrives in well under a second, no matter how long the text is. Measured on the same sentence as the table above:
 
-| Mode                       | Content type        | First chunk |
-| -------------------------- | ------------------- | ----------- |
-| buffered (default)         | `audio/wav`         | 1497 ms     |
-| `"stream": true`           | `text/event-stream` | 175 ms      |
-| `"stream_format": "sse"`   | `text/event-stream` | 57 ms       |
-| `"stream_format": "audio"` | `audio/wav`         | 61 ms       |
+| Mode                     | Content type        | First chunk |
+| ------------------------ | ------------------- | ----------- |
+| buffered (default)       | `audio/wav`         | 1497 ms     |
+| streaming with `"sse"`   | `text/event-stream` | 57 ms       |
+| streaming with `"audio"` | `audio/wav`         | 61 ms       |
 
-The two SSE modes emit OpenAI `speech.audio.delta` and `speech.audio.done` events with Base64 audio in each delta. `"stream_format": "audio"` skips the event framing and sends raw audio chunks in the format you asked for, which is the simpler option when you are piping straight into a player.
+The SSE mode emits OpenAI `speech.audio.delta` and `speech.audio.done` events with Base64 audio in each delta. `"stream_format": "audio"` skips the event framing and sends raw audio chunks in the format you asked for, which is the simpler option when you are piping straight into a player.
 
 <Tabs groupId="language">
 <TabItem value="python" label="Python">
@@ -498,9 +497,10 @@ client = OpenAI(
 with client.audio.speech.with_streaming_response.create(
     model="Qwen3-TTS-12Hz-1.7B-CustomVoice",
     voice="ryan",
-    input="Ein laengerer Text, bei dem die Wiedergabe sofort starten soll.",
+    input="A longer text whose playback should start immediately.",
     response_format="wav",
-    extra_body={"stream_format": "audio"},
+    stream_format="audio",
+    extra_body={"stream": True},
 ) as response:
     response.stream_to_file("ausgabe.wav")
 ```
@@ -512,6 +512,7 @@ with client.audio.speech.with_streaming_response.create(
 import OpenAI from "openai";
 import { createWriteStream } from "node:fs";
 import { Readable } from "node:stream";
+import { finished } from "node:stream/promises";
 
 const client = new OpenAI({
   baseURL: "https://llm.aihosting.mittwald.de/v1",
@@ -521,13 +522,16 @@ const client = new OpenAI({
 const response = await client.audio.speech.create({
   model: "Qwen3-TTS-12Hz-1.7B-CustomVoice",
   voice: "ryan",
-  input: "Ein laengerer Text, bei dem die Wiedergabe sofort starten soll.",
+  input: "A longer text whose playback should start immediately.",
   response_format: "wav",
-  // @ts-expect-error stream_format is not in the OpenAI types yet
+  // @ts-expect-error stream is supported by the hosted endpoint
+  stream: true,
   stream_format: "audio",
 });
 
-Readable.fromWeb(response.body).pipe(createWriteStream("ausgabe.wav"));
+await finished(
+  Readable.fromWeb(response.body).pipe(createWriteStream("ausgabe.wav")),
+);
 ```
 
 </TabItem>
@@ -539,8 +543,9 @@ Readable.fromWeb(response.body).pipe(createWriteStream("ausgabe.wav"));
 $payload = [
     "model" => "Qwen3-TTS-12Hz-1.7B-CustomVoice",
     "voice" => "ryan",
-    "input" => "Ein laengerer Text, bei dem die Wiedergabe sofort starten soll.",
+    "input" => "A longer text whose playback should start immediately.",
     "response_format" => "wav",
+    "stream" => true,
     "stream_format" => "audio",
 ];
 
@@ -561,7 +566,6 @@ curl_setopt_array($ch, [
 ]);
 
 curl_exec($ch);
-curl_close($ch);
 fclose($out);
 ```
 

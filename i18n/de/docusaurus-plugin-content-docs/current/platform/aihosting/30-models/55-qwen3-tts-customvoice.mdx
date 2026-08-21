@@ -472,16 +472,15 @@ Diese Zahlen gelten für eine gepufferte Anfrage, bei der die ganze Datei auf ei
 
 ## Streaming {#streaming}
 
-Setz `stream` auf `true`, dann kommt das erste Audio in deutlich unter einer Sekunde, egal wie lang der Text ist. Gemessen am selben Satz wie in der Tabelle darüber:
+Setz `stream` auf `true` und wähle dazu entweder `stream_format="audio"` oder `stream_format="sse"`. Dann kommt das erste Audio in deutlich unter einer Sekunde, egal wie lang der Text ist. Gemessen am selben Satz wie in der Tabelle darüber:
 
-| Modus                      | Content-Type        | Erster Chunk |
-| -------------------------- | ------------------- | ------------ |
-| gepuffert (Standard)       | `audio/wav`         | 1497 ms      |
-| `"stream": true`           | `text/event-stream` | 175 ms       |
-| `"stream_format": "sse"`   | `text/event-stream` | 57 ms        |
-| `"stream_format": "audio"` | `audio/wav`         | 61 ms        |
+| Modus                   | Content-Type        | Erster Chunk |
+| ----------------------- | ------------------- | ------------ |
+| gepuffert (Standard)    | `audio/wav`         | 1497 ms      |
+| Streaming mit `"sse"`   | `text/event-stream` | 57 ms        |
+| Streaming mit `"audio"` | `audio/wav`         | 61 ms        |
 
-Die beiden SSE-Modi schicken `speech.audio.delta`- und `speech.audio.done`-Events im OpenAI-Format, das Audio steckt Base64-kodiert in jedem Delta. `"stream_format": "audio"` lässt die Event-Hülle weg und liefert rohe Audio-Chunks im angeforderten Format. Das ist der einfachere Weg, wenn du direkt in einen Player schreibst.
+Der SSE-Modus schickt `speech.audio.delta`- und `speech.audio.done`-Events im OpenAI-Format, das Audio steckt Base64-kodiert in jedem Delta. `"stream_format": "audio"` lässt die Event-Hülle weg und liefert rohe Audio-Chunks im angeforderten Format. Das ist der einfachere Weg, wenn du direkt in einen Player schreibst.
 
 <Tabs groupId="language">
 <TabItem value="python" label="Python">
@@ -497,9 +496,10 @@ client = OpenAI(
 with client.audio.speech.with_streaming_response.create(
     model="Qwen3-TTS-12Hz-1.7B-CustomVoice",
     voice="ryan",
-    input="Ein laengerer Text, bei dem die Wiedergabe sofort starten soll.",
+    input="Ein längerer Text, bei dem die Wiedergabe sofort starten soll.",
     response_format="wav",
-    extra_body={"stream_format": "audio"},
+    stream_format="audio",
+    extra_body={"stream": True},
 ) as response:
     response.stream_to_file("ausgabe.wav")
 ```
@@ -511,6 +511,7 @@ with client.audio.speech.with_streaming_response.create(
 import OpenAI from "openai";
 import { createWriteStream } from "node:fs";
 import { Readable } from "node:stream";
+import { finished } from "node:stream/promises";
 
 const client = new OpenAI({
   baseURL: "https://llm.aihosting.mittwald.de/v1",
@@ -520,13 +521,16 @@ const client = new OpenAI({
 const response = await client.audio.speech.create({
   model: "Qwen3-TTS-12Hz-1.7B-CustomVoice",
   voice: "ryan",
-  input: "Ein laengerer Text, bei dem die Wiedergabe sofort starten soll.",
+  input: "Ein längerer Text, bei dem die Wiedergabe sofort starten soll.",
   response_format: "wav",
-  // @ts-expect-error stream_format steht noch nicht in den OpenAI-Typen
+  // @ts-expect-error stream wird vom gehosteten Endpunkt unterstützt
+  stream: true,
   stream_format: "audio",
 });
 
-Readable.fromWeb(response.body).pipe(createWriteStream("ausgabe.wav"));
+await finished(
+  Readable.fromWeb(response.body).pipe(createWriteStream("ausgabe.wav")),
+);
 ```
 
 </TabItem>
@@ -538,8 +542,9 @@ Readable.fromWeb(response.body).pipe(createWriteStream("ausgabe.wav"));
 $payload = [
     "model" => "Qwen3-TTS-12Hz-1.7B-CustomVoice",
     "voice" => "ryan",
-    "input" => "Ein laengerer Text, bei dem die Wiedergabe sofort starten soll.",
+    "input" => "Ein längerer Text, bei dem die Wiedergabe sofort starten soll.",
     "response_format" => "wav",
+    "stream" => true,
     "stream_format" => "audio",
 ];
 
@@ -560,7 +565,6 @@ curl_setopt_array($ch, [
 ]);
 
 curl_exec($ch);
-curl_close($ch);
 fclose($out);
 ```
 
