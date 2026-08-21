@@ -1,0 +1,396 @@
+---
+sidebar_label: BFSG accessibility pipeline
+description: Audit a website for missing alt texts, generate them with Qwen3.5-0.8B, add audio versions with Qwen3-TTS, and ship a human review sheet
+title: BFSG accessibility pipeline
+---
+
+Since 28 June 2025, the [Barrierefreiheitsstärkungsgesetz (BFSG)](https://www.gesetze-im-internet.de/bfsg/) has required consumer-facing websites and shops in Germany to meet accessibility requirements, with fines of up to 100,000 euros for violations. Two of the most common gaps are **images without meaningful alt text** and **no audio alternative for text-heavy pages**.
+
+This guide builds a pipeline that finds both gaps, drafts fixes with mittwald AI Hosting models, and hands the result to a human reviewer — a workflow your agency can run for every client site:
+
+| Stage | Model | What it does |
+| ----- | ----- | ------------ |
+| 1 — Audit | none (plain HTML parsing) | Finds `<img>` tags with missing, empty, or placeholder alt texts |
+| 2 — Alt text | [Qwen3.5-0.8B](/docs/v2/platform/aihosting/models/qwen3-5-0-8b) | Writes a German alt text per image and flags decorative ones |
+| 3 — Audio | [Qwen3-TTS-12Hz-1.7B-CustomVoice](/docs/v2/platform/aihosting/models/qwen3-tts-customvoice) | Reads key pages aloud as Opus files for on-page playback |
+| 4 — Review | human | Signs off every suggestion before anything goes live |
+
+:::note[Scope]
+The BFSG applies to businesses selling goods or services to consumers; very small companies (fewer than 10 employees and under 2 million euros annual turnover) are exempt. This guide is engineering documentation, not legal advice — check whether a given client is in scope before quoting a compliance project.
+:::
+
+The pipeline runs against a local copy of the site's HTML, so you never point it at a live client site while testing.
+
+## Setup {#setup}
+
+```shellsession
+user@local $ pip install openai beautifulsoup4 pillow
+user@local $ export OPENAI_API_KEY="sk-…"
+```
+
+Create a small fixture site to work on. Two pages are enough to exercise every stage:
+
+```html
+<!-- site/index.html -->
+<!DOCTYPE html>
+<html lang="de">
+<head><meta charset="utf-8"><title>Garten &amp; Wohnen</title></head>
+<body>
+<h1>Ihr Shop fuer Garten und Wohnen</h1>
+<p>Willkommen bei uns! Entdecken Sie ueber 500 Produkte.</p>
+<img src="img/hund.jpg">
+<img src="img/kanu.jpg" alt="">
+<img src="img/robbe.jpg" alt="Bild1">
+<img src="logo.png" alt="Garten und Wohnen Logo">
+</body>
+</html>
+```
+
+```html
+<!-- site/kontakt.html -->
+<!DOCTYPE html>
+<html lang="de">
+<head><meta charset="utf-8"><title>Kontakt</title></head>
+<body>
+<h1>Kontakt</h1>
+<p>Sie erreichen uns moeglichst werktags zwischen neun und sechzehn Uhr unter der
+Telefonnummer 05772 293-100. Schreiben Sie uns auch gerne eine E-Mail an
+info@example-shop.de. Unser Team antwortet in der Regel innerhalb eines
+Werktages auf Ihre Anfrage.</p>
+<img src="img/team.jpg">
+</body>
+</html>
+```
+
+Put real JPEGs into `site/img/` (any photos do). Note what the fixture deliberately contains: an image with **no** `alt` attribute, one with an **empty** `alt` (decorative), one with a **placeholder** alt (`Bild1`), one with a good alt, and a referenced image whose file is missing. Old client sites typically spell German without umlauts (`fuer`, `ueber`) — the fixture keeps that on purpose.
+
+## Stage 1 — Audit: find the broken images {#stage-audit}
+
+Parse every HTML file and classify each `<img>`:
+
+```python
+import base64
+import io
+import os
+import re
+from pathlib import Path
+
+from bs4 import BeautifulSoup
+from PIL import Image
+from openai import OpenAI
+
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+
+SITE = Path("site")
+BAD_ALT_RE = re.compile(r"^(bild|foto|image|picture|abbildung)\s*\d*$", re.I)
+
+
+def encode_image(path: Path, max_px: int = 1024) -> str:
+    """Resize to max_px on the longest edge and return a Base64 data URL."""
+    with Image.open(path) as img:
+        w, h = img.size
+        scale = min(1.0, max_px / max(w, h))
+        if scale < 1.0:
+            img = img.resize((int(w * scale), int(h * scale)), Image.LANCZOS)
+        buf = io.BytesIO()
+        img.save(buf, format="JPEG", quality=85)
+        b64 = base64.b64encode(buf.getvalue()).decode()
+    return f"data:image/jpeg;base64,{b64}"
+
+
+def audit_site(site: Path) -> list[dict]:
+    """Find every <img> in the site and classify its alt attribute."""
+    findings = []
+    for html_file in sorted(site.glob("**/*.html")):
+        soup = BeautifulSoup(html_file.read_text(encoding="utf-8"), "html.parser")
+        for tag in soup.find_all("img"):
+            src = tag.get("src", "")
+            alt = tag.get("alt")
+            if alt is None:
+                status = "missing"
+            elif alt.strip() == "":
+                status = "empty"          # intentional: decorative image
+            elif BAD_ALT_RE.match(alt.strip()) or len(alt.strip()) < 5:
+                status = "bad"
+            else:
+                status = "ok"
+            findings.append({
+                "page": html_file.name,
+                "src": src,
+                "alt": alt,
+                "status": status,
+                "path": (html_file.parent / src).resolve(),
+            })
+    return findings
+```
+
+An empty `alt=""` is **not** a defect — it is the correct way to mark a decorative image, so the audit keeps it as-is. Running the audit on the fixture:
+
+```text
+missing  index.html      img/hund.jpg    alt=None
+empty    index.html      img/kanu.jpg    alt=''
+bad      index.html      img/robbe.jpg   alt='Bild1'
+ok       index.html      logo.png        alt='Garten und Wohnen Logo'
+missing  kontakt.html    img/team.jpg    alt=None
+```
+
+For a real client site, fetch the pages with `requests` first and store them under `site/` — the rest of the pipeline works on local files, which keeps re-runs cheap and reproducible.
+
+## Stage 2 — Alt texts: one image per request {#stage-alt-texts}
+
+Send each flagged image to `Qwen3.5-0.8B` with a strict output contract. The prompt is in German on purpose: the model writes German alt texts, and the measured output quality is better when the rules are stated in the target language.
+
+```python
+ALT_MODEL = "Qwen3.5-0.8B"
+
+ALT_PROMPT = (
+    "Du bist Accessibility-Experte und schreibst Alt-Texte auf Deutsch. "
+    "Regeln: maximal 125 Zeichen, kein 'Bild von' oder 'Foto von', "
+    "Inhalt und Zweck beschreiben, keine Stilangaben (Farben, Licht), "
+    "keine Spekulationen. Ein Bild ist nur dekorativ, wenn es eindeutig ziert "
+    "(Hintergrundmuster, Trennlinie, Logo neben gleichlautendem Text). "
+    "Im Zweifel gilt: informativ. "
+    "Antworte nur mit JSON: {\"decorative\": true/false, \"alt\": \"...\"}."
+)
+
+
+def generate_alt(image_path: Path, context: str = "") -> dict:
+    """One image per request — see the multi-image note below."""
+    content = [{"type": "image_url", "image_url": {"url": encode_image(image_path)}}]
+    if context:
+        content.insert(0, {"type": "text", "text": f"Das Bild steht auf der Seite '{context}'."})
+    content.append({"type": "text", "text": ALT_PROMPT})
+    resp = client.chat.completions.create(
+        model=ALT_MODEL,
+        messages=[{"role": "user", "content": content}],
+        temperature=0.3,
+        max_tokens=300,
+    )
+    raw = resp.choices[0].message.content.strip()
+    raw = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw)
+    try:
+        result = json.loads(raw)
+    except json.JSONDecodeError:
+        # small models occasionally answer in plain text — treat it as the alt text
+        result = {"decorative": False, "alt": raw[:125]}
+    return {
+        "decorative": bool(result.get("decorative")),
+        "alt": str(result.get("alt", ""))[:125],
+        "usage": resp.usage.total_tokens,
+    }
+```
+
+:::warning[Do not batch multiple images into one request]
+We tested sending three images in a single message and asking for one alt text each. In every run, the model described only the first image and stopped. Send one image per request and loop — that is what the stage-4 driver below does.
+:::
+
+Images must be Base64 data URLs; remote image URLs are rejected with HTTP 400. See [Encoding and resizing images](/docs/v2/platform/aihosting/examples/python#vision-encoding) for the general pattern.
+
+### Choosing the model {#model-choice}
+
+`Qwen3.5-0.8B` is the cheapest model in the catalogue and handles standard product and team photos well, but it is a small model. On the same fixture images, side by side:
+
+| Image | `Qwen3.5-0.8B` | `Ministral-3-14B-Instruct-2512` |
+| ----- | -------------- | ------------------------------- |
+| Puppy on wooden floor | "Ein schwarzer Labrador-Pudel sitzt auf einer Holzplatte und blickt nach oben." | "Schwarzer Labradorwelpe mit aufmerksamen Augen sitzt auf Holzuntergrund." |
+| Walruses on a beach | "Walder auf Sand" | "Zwei Walrosse auf sandigem Untergrund mit typischen Stoßzähnen und faltiger Haut, ruhend am Strand." |
+
+If a page carries hero imagery where wording matters, switch `ALT_MODEL` to `Ministral-3-14B-Instruct-2512` for those images. Either way, nothing ships without the review stage.
+
+## Stage 3 — Audio versions for key pages {#stage-audio}
+
+Not every page needs an audio version — pick the ones visitors actually read: home, contact, shipping terms, imprint. Extract their visible text, prepare it for German speech synthesis, and render it with [Qwen3-TTS](/docs/v2/platform/aihosting/examples/text-to-speech).
+
+```python
+import json
+
+TTS_MODEL = "Qwen3-TTS-12Hz-1.7B-CustomVoice"
+VOICE = "serena"
+
+
+def restore_umlauts(text: str) -> str:
+    """Restore umlauts stripped by old CMS exports. Heuristic — review the result."""
+    for ascii_form, umlaut in (("AE", "Ä"), ("OE", "Ö"), ("UE", "Ü"),
+                               ("ae", "ä"), ("oe", "ö"), ("ue", "ü")):
+        text = text.replace(ascii_form, umlaut)
+    return text
+
+
+def prepare_german_text(text: str) -> str:
+    """Apply the German TTS preparation rules from the Qwen3-TTS model page."""
+    text = text.replace("&amp;", "und").replace("&", "und")
+    text = re.sub(r"\s+", " ", text).strip()
+    return restore_umlauts(text)
+
+
+def chunk_sentences(text: str, min_chars: int = 100, max_chars: int = 350) -> list[str]:
+    """Group sentences into chunks of at least min_chars (short German lines are unreliable)."""
+    sentences = re.split(r"(?<=[.!?])\s+", text)
+    chunks, current = [], ""
+    for sentence in sentences:
+        if current and len(current) + len(sentence) + 1 > max_chars:
+            chunks.append(current)
+            current = sentence
+        else:
+            current = f"{current} {sentence}".strip()
+    if current:
+        chunks.append(current)
+    # merge a trailing short chunk into the previous one
+    if len(chunks) > 1 and len(chunks[-1]) < min_chars:
+        chunks[-2] = f"{chunks[-2]} {chunks[-1]}"
+        chunks.pop()
+    return chunks
+
+
+def synthesize_page(page_name: str, body_text: str, out_dir: Path) -> list[Path]:
+    prepared = prepare_german_text(body_text)
+    files = []
+    for i, chunk in enumerate(chunk_sentences(prepared)):
+        out = out_dir / f"{page_name}_{i:02d}.opus"
+        response = client.audio.speech.create(
+            model=TTS_MODEL,
+            voice=VOICE,
+            input=chunk,
+            response_format="opus",
+            extra_body={"language": "German"},
+        )
+        response.write_to_file(out)
+        files.append(out)
+    return files
+```
+
+Three things in `prepare_german_text` and `chunk_sentences` come straight from the measurements on the [Qwen3-TTS model page](/docs/v2/platform/aihosting/models/qwen3-tts-customvoice#german-text):
+
+- **Real umlauts, not `ae`/`oe`/`ue`.** Transliterated German comes out badly wrong (average word error rate 0.215 vs 0.000 with real umlauts in our tests). The `restore_umlauts` step is a heuristic — words like "Duell" become "Düell" — which is another reason the review stage exists.
+- **Chunks of at least ~100 characters.** Below roughly 80 characters, German synthesis fails often enough to matter, and the failure sounds like fluent English.
+- **Numbers and abbreviations.** Dates and percentages are read correctly as written, but order numbers and prices are not. Expand them in the source text or accept that the spoken version will stumble — the reviewer hears this.
+
+Use `opus` for on-page playback: it is roughly a tenth of the size of `wav` at speech quality. Loudness is not normalised across clips, so if a page plays several clips back to back, run them through a loudness normaliser first. Voice choice is a taste call — `serena` and `vivian` are the higher-pitched voices, see [Choosing a voice](/docs/v2/platform/aihosting/examples/text-to-speech#voices).
+
+On the fixture, the contact page (258 characters including a phone number) renders to a 24.7-second Opus file in a single request:
+
+```text
+kontakt.html: 259 chars -> 1 chunks
+  [258 chars] -> kontakt_00.opus (106 kB)
+```
+
+Phone numbers are spoken digit by digit, which is correct but slow — budget roughly four times the audio length of ordinary prose for the same character count.
+
+## Stage 4 — Human review {#stage-review}
+
+Generate a review sheet that a person signs off line by line. This step is not optional: the stage-2 model produced "Walder auf Sand" for a walrus photo, and an accessibility feature that misdescribes content is worse than none.
+
+```python
+def write_review_sheet(findings: list[dict], results: dict, audio: dict, out: Path) -> None:
+    lines = [
+        "# Review — Barrierefreiheit (BFSG)",
+        "",
+        "Bitte jeden Vorschlag prüfen, bevor er live geht. AI-Alt-Texte können falsch sein.",
+        "",
+        "| | Seite | Datei | Aktueller Alt | Vorschlag | OK? |",
+        "|---|-------|-------|---------------|-----------|-----|",
+    ]
+    for f in findings:
+        if f["status"] == "ok":
+            continue
+        key = f"{f['page']}::{f['src']}"
+        r = results.get(key)
+        if f["status"] == "empty":
+            suggestion = "(dekorativ — leer lassen)"
+        elif r is None:
+            suggestion = "(nicht generiert — Datei fehlt?)"
+        elif r["decorative"]:
+            suggestion = '"" (dekorativ)'
+        else:
+            suggestion = f'"{r["alt"]}"'
+        lines.append(f"| [ ] | {f['page']} | {f['src']} | `{f['alt']}` | {suggestion} | ☐ |")
+    lines += ["", "## Audio-Versionen", ""]
+    for page, files in audio.items():
+        for fp in files:
+            lines.append(f"- {page}: {fp.name} ({fp.stat().st_size // 1024} kB)")
+    lines.append("")
+    out.write_text("\n".join(lines), encoding="utf-8")
+```
+
+The sheet for the fixture:
+
+```markdown
+# Review — Barrierefreiheit (BFSG)
+
+Bitte jeden Vorschlag prüfen, bevor er live geht. AI-Alt-Texte können falsch sein.
+
+| | Seite | Datei | Aktueller Alt | Vorschlag | OK? |
+|---|-------|-------|---------------|-----------|-----|
+| [ ] | index.html | img/hund.jpg | `None` | "" (dekorativ) | ☐ |
+| [ ] | index.html | img/kanu.jpg | `` | (dekorativ — leer lassen) | ☐ |
+| [ ] | index.html | img/robbe.jpg | `Bild1` | "" (dekorativ) | ☐ |
+| [ ] | kontakt.html | img/team.jpg | `None` | (nicht generiert — Datei fehlt?) | ☐ |
+
+## Audio-Versionen
+
+- index.html: index_00.opus (30 kB)
+- kontakt.html: kontakt_00.opus (106 kB)
+```
+
+After sign-off, apply the accepted alt texts to the HTML (or hand the sheet to the client's CMS editor) and serve the Opus files next to the pages they belong to. Re-running the audit afterwards should report only `ok` and deliberate `empty` entries.
+
+## Full pipeline {#full-pipeline}
+
+```python
+def main():
+    print("== Stage 1: audit ==")
+    findings = audit_site(SITE)
+    for f in findings:
+        print(f"  {f['status']:8s} {f['page']:15s} {f['src']:15s} alt={f['alt']!r}")
+
+    print("\n== Stage 2: alt texts ==")
+    results = {}
+    for f in findings:
+        if f["status"] not in ("missing", "bad"):
+            continue
+        key = f"{f['page']}::{f['src']}"
+        if not f["path"].exists():
+            print(f"  SKIP {key} (file not found)")
+            continue
+        r = generate_alt(f["path"], context=f["page"])
+        results[key] = r
+        print(f"  {key}: decorative={r['decorative']} alt={r['alt']!r} ({r['usage']} tokens)")
+
+    print("\n== Stage 3: audio versions ==")
+    audio = {}
+    for page in ("index.html", "kontakt.html"):
+        soup = BeautifulSoup((SITE / page).read_text(encoding="utf-8"), "html.parser")
+        text = " ".join(p.get_text() for p in soup.find_all(["h1", "p"]))
+        out_dir = Path("audio") / page.replace(".html", "")
+        out_dir.mkdir(parents=True, exist_ok=True)
+        audio[page] = synthesize_page(page, text, out_dir)
+        for fp in audio[page]:
+            print(f"  {page} -> {fp} ({fp.stat().st_size // 1024} kB)")
+
+    print("\n== Stage 4: review sheet ==")
+    write_review_sheet(findings, results, audio, Path("REVIEW.md"))
+    print("  wrote REVIEW.md")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+## Cost profile {#cost-profile}
+
+Measured on the public gateway with an 800×600 JPEG:
+
+| Call | Tokens / size | Notes |
+| ---- | ------------- | ----- |
+| One alt text (`Qwen3.5-0.8B`) | ~640 total (~475 multimodal) | ~0.7 s round trip |
+| One alt text (`Ministral-3-14B-Instruct-2512`) | ~725 total | ~0.6 s round trip |
+| One audio chunk (~260 chars, `opus`) | 106 kB file, 24.7 s of audio | ~2 s generation |
+
+A 100-image client site costs roughly 60,000 tokens of `Qwen3.5-0.8B` traffic plus a handful of TTS requests for the key pages. `Qwen3.5-0.8B` is the most cost-efficient model in the catalogue, which is what makes a per-site audit a billable line item instead of a manual afternoon.
+
+## Limitations {#limitations}
+
+- **Human review is part of the process.** Small-model alt texts contain errors (see the walrus example), the umlaut restoration is a heuristic, and only a person can judge whether an image is decorative in context.
+- **The audit covers `<img>` tags.** Background images in CSS, SVGs with embedded text, and video without captions are not checked — extend `audit_site` for those if the client site uses them.
+- **Audio versions cover the pages you choose.** The BFSG does not require every page to have an audio alternative; picking the text-heavy ones is a sensible interpretation, not a guarantee.
+- **Nothing here is legal advice.** Scope, exemptions, and penalties belong in a conversation with the client's counsel.
