@@ -251,3 +251,56 @@ curl -X POST https://llm.aihosting.mittwald.de/v1/audio/transcriptions \
 - Translation functionality (`to_language` parameter) is not supported
 - For best results, always specify the `language` parameter explicitly
 - Segment audio files into chunks smaller than 25 MB and shorter than 10 minutes if needed. Exceeding the duration returns HTTP 400 with `Audio exceeds maximum allowed duration of 600s`. See the [speech-to-text guide](../../examples/whisper/#large-files) for a chunking example
+
+## /v1/audio/speech
+
+This endpoint turns text into speech using [Qwen3-TTS-12Hz-1.7B-CustomVoice](../../models/qwen3-tts-customvoice/). It is the counterpart to `/v1/audio/transcriptions` above: text goes in, an audio file comes back.
+
+```sh
+curl -X POST https://llm.aihosting.mittwald.de/v1/audio/speech \
+    -H "Authorization: Bearer $APIKEY" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "model": "Qwen3-TTS-12Hz-1.7B-CustomVoice",
+      "input": "Hallo und herzlich willkommen bei mittwald.",
+      "voice": "ryan",
+      "response_format": "mp3"
+    }' \
+    --output willkommen.mp3
+```
+
+The response body is the audio file itself, not JSON. Write it straight to a file or pass it to your audio player. Only errors come back as JSON.
+
+The `input` parameter holds the text to speak and must not be empty. The `model` parameter selects the TTS model.
+
+Additional optional parameters can be provided:
+
+- `voice`: One of `aiden`, `dylan`, `eric`, `ono_anna`, `ryan`, `serena`, `sohee`, `uncle_fu`, `vivian`. Omitting it uses the model default
+- `response_format`: One of `wav` (default), `pcm`, `flac`, `mp3`, `opus`. `aac` is **not** supported
+- `language`: One of `Auto` (default), `Beijing_Dialect`, `Chinese`, `English`, `French`, `German`, `Italian`, `Japanese`, `Korean`, `Portuguese`, `Russian`, `Sichuan_Dialect`, `Spanish`
+- `speed`: Speaking rate between 0.25 and 4.0, default 1.0
+- `stream`: Set to `true` to receive audio as it is generated
+- `stream_format`: `sse` for OpenAI `speech.audio.*` events, or `audio` for raw audio chunks
+
+Streaming cuts the wait for the first audio from about 1500 ms to under 200 ms, so use it whenever someone is waiting for playback:
+
+```sh
+curl -N -X POST https://llm.aihosting.mittwald.de/v1/audio/speech \
+    -H "Authorization: Bearer $APIKEY" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "model": "Qwen3-TTS-12Hz-1.7B-CustomVoice",
+      "input": "Ein laengerer Text, bei dem die Wiedergabe sofort starten soll.",
+      "voice": "ryan",
+      "response_format": "wav",
+      "stream_format": "audio"
+    }' \
+    --output ausgabe.wav
+```
+
+**Important notes:**
+
+- The two audio endpoints take the `language` parameter in **different formats**. `/v1/audio/transcriptions` wants ISO-639-1 codes such as `de`; `/v1/audio/speech` wants capitalised names such as `German` and rejects `de` with HTTP 400. See [the warning on the model page](../../models/qwen3-tts-customvoice/) before you write shared code against both
+- Without streaming, generation takes roughly an eighth of the playback time you request, and nothing arrives until it is finished
+- Voice cloning from your own reference audio is not offered on this endpoint
+- Split long texts and request the parts separately. See the [text-to-speech guide](../../examples/text-to-speech/#long-texts) for a worked example
