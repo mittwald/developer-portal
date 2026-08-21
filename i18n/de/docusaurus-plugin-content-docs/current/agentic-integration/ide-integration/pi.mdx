@@ -1,0 +1,129 @@
+---
+title: pi CLI
+sidebar_label: pi
+sidebar_position: 7
+---
+
+# pi mit mittwald
+
+[pi](https://pi.dev) ist ein minimalistischer Terminal-Coding-Agent. Er kommt mit einem kleinen Werkzeugkasten (`read`, `write`, `edit`, `bash`) und einem bewusst kompakten System-Prompt aus, dadurch bleibt jede Anfrage schlank — auch bei offenen Modellen. Gemessen an diesem Gateway passt die Basis von pi (System-Prompt plus alle Tool-Definitionen plus eine kurze Aufgabe) in rund **1.900 Input-Token im ersten Turn**, und eine kleine Coding-Aufgabe über drei Turns (zwei Dateien schreiben, einen Test ausführen) hat insgesamt etwa **2.200 Input- und 300 Output-Token** verbraucht. Damit wird agentisches Coding auf den monatlichen Token-Kontingenten von mittwald wirtschaftlich, wo schwerere CLIs ihren größten Budgetanteil für Gerüstcode ausgeben, bevor sie deinen Code überhaupt anfassen.
+
+## Installation
+
+```bash
+npm install -g --ignore-scripts @earendil-works/pi-coding-agent
+```
+
+Alternative per Installer:
+
+```bash
+curl -fsSL https://pi.dev/install.sh | sh
+```
+
+## Konfiguration
+
+pi liest eigene Provider aus `~/.pi/agent/models.json`. Füge mittwald AI Hosting als OpenAI-kompatiblen Provider hinzu:
+
+```json
+{
+  "providers": {
+    "mittwald": {
+      "name": "mittwald AI Hosting",
+      "baseUrl": "https://llm.aihosting.mittwald.de/v1",
+      "api": "openai-completions",
+      "apiKey": "$MITTWALD_API_KEY",
+      "models": [
+        {
+          "id": "Qwen3.8-27B-NVFP4",
+          "reasoning": true,
+          "input": ["text", "image"],
+          "contextWindow": 256000,
+          "maxTokens": 32768,
+          "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+          "thinkingLevelMap": {
+            "minimal": null,
+            "low": "low",
+            "medium": "medium",
+            "high": null,
+            "xhigh": "xhigh",
+            "max": null
+          },
+          "compat": {
+            "thinkingFormat": "qwen-chat-template"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+Setze den Schlüssel einmal in deiner Shell, zum Beispiel `export MITTWALD_API_KEY="sk-..."`, mit deinem mittwald LLM API Key aus den [mStudio-Profil-Einstellungen](https://studio.mittwald.de/profile/api-token). Statt des Umgebungsbezugs kannst du den Schlüssel auch wörtlich in `apiKey` schreiben.
+
+Lass `cost` bei Null: AI Hosting rechnet über das monatliche Token-Kontingent ab, nicht nach Token-Preisen. pi erfasst und zeigt trotzdem pro Session die Token-Anzahl, damit du immer siehst, was eine Aufgabe verbraucht hat.
+
+### So werden Thinking-Stufen ans Gateway gesendet {#thinking}
+
+Der `compat`-Block sagt pi, die Thinking-Steuerung verschachtelt in `chat_template_kwargs` zu senden — die Form, die die Qwen-Modelle an diesem Gateway verlangen:
+
+| pi-Stufe  | Gesendet an das Gateway        | Effekt                                                    |
+| --------- | ------------------------------ | --------------------------------------------------------- |
+| `off`     | `enable_thinking: false`       | Kein Reasoning — am schnellsten und günstigsten           |
+| `low`     | `enable_thinking: true`        | Thinking an, in der Standardtiefe des Modells (`xhigh`)   |
+| `medium`  | `enable_thinking: true`        | Wie `low`                                                 |
+| `xhigh`   | `enable_thinking: true`        | Wie `low`                                                 |
+
+Gemeinsam mit dem Schalter sendet pi `preserve_thinking: true`. Dadurch bleiben die Reasoning-Blöcke früherer Turns im Gespräch — das verbessert die Prefix-Cache-Wiederverwendung und hält Entscheidungen über einen ganzen Agent-Durchlauf hinweg konsistent.
+
+Stufen, die in `thinkingLevelMap` auf `null` stehen, blendet pi aus dem Stufen-Umschalter aus.
+
+:::note[Ohne den compat-Block]
+pi fällt dann auf Top-Level-`reasoning_effort` zurück. Bei der Stufe `off` sendet er in diesem Fall gar nichts, und das Modell denkt weiter in seiner Standardtiefe. Erst der compat-Block oben schaltet bei `off` das Denken wirklich aus.
+:::
+
+#### Reasoning-Tiefen {#depths}
+
+Das Modell kennt außerdem drei Reasoning-Tiefen (`low`, `medium`, `xhigh`) über `reasoning_effort`. Damit pi neben dem Schalter auch die Tiefe steuert, ersetze den `compat`-Block durch eine konfigurierbare `chat_template_kwargs`-Abbildung:
+
+```json
+"compat": {
+  "thinkingFormat": "chat-template",
+  "chatTemplateKwargs": {
+    "enable_thinking": { "$var": "thinking.enabled" },
+    "reasoning_effort": { "$var": "thinking.effort" },
+    "preserve_thinking": true
+  }
+}
+```
+
+Mit dieser Variante sendet `off` `enable_thinking: false`, und `low` / `medium` / `xhigh` senden `enable_thinking: true` plus den passenden `reasoning_effort`-Wert. Behalte das `thinkingLevelMap` von oben bei, damit der Umschalter nur Stufen anbietet, die das Modell akzeptiert.
+
+Weitere Modelle aus dem Katalog laufen im selben Provider-Block — füge sie einfach als zusätzliche Einträge unter `models` hinzu. Modelle ohne Thinking-Modus (zum Beispiel `Ministral-3-14B-Instruct-2512`) lassen die Felder `compat` und `thinkingLevelMap` einfach weg.
+
+## Nutzung
+
+```bash
+cd your-project
+pi                                     # interaktive Session
+pi -p "Refaktorisiere utils.ts auf benannte Exports"   # einmalig, beendet sich nach der Antwort
+pi --thinking off -p "Korrigiere den Tippfehler in README.md"  # günstige Änderung ohne Reasoning
+cat error.log | pi -p "Erkläre diesen Fehler"          # Stdin in den Prompt leiten
+pi @src/app.ts "Was macht dieses Modul?"               # Dateien mit @ anhängen
+pi --list-models                             # prüfen, ob der Provider geladen ist
+```
+
+Die Fußzeile zeigt live den Token-Verbrauch und die Kontextauslastung; `/session` gibt die Summen aus. Weil die Basis klein ist, siehst du genau, was eine Aufgabe gegen dein monatliches Kontingent kostet.
+
+Wechsle die Thinking-Stufe während einer Session mit Shift+Tab oder starte mit fester Stufe über `--thinking <stufe>`.
+
+## Datenschutz
+
+- Alle Anfragen gehen an `llm.aihosting.mittwald.de` — Code und Prompts bleiben auf Servern in Deutschland.
+- Setze `PI_OFFLINE=1`, um die Netzwerkoperationen von pi beim Start abzuschalten (Versionsprüfung und Telemetrie Richtung pi.dev). Mit gesetzter Variable spricht pi nur noch mit dem konfigurierten Provider.
+- pi hat bewusst keinen eingebauten Sandbox-Bereich. Für unbeaufsichtigte Läufe in Kunden-Repos läuft er am besten in einem Container oder tmux-Fenster, in dem du beobachten kannst, was er ausführt.
+
+## Nächste Schritte
+
+- [IDE-Integrationen entdecken](./) - Visuelle Editoren ausprobieren
+- [Mehr über MCP erfahren](/docs/v2/agentic-integration/mcp/) - Infrastruktur steuern
+- [Agent Skills installieren](/docs/v2/agentic-integration/agent-skills/) - Workflow-Anleitungen hinzufügen

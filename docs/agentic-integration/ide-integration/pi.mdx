@@ -1,0 +1,129 @@
+---
+title: pi CLI
+sidebar_label: pi
+sidebar_position: 7
+---
+
+# pi with mittwald
+
+[pi](https://pi.dev) is a minimal terminal coding agent. It ships with a small tool set (`read`, `write`, `edit`, `bash`) and a deliberately compact system prompt, so every request stays lean — even with open-weight models. Measured against this gateway, pi's baseline (system prompt plus all tool definitions plus a short task) fits into roughly **1,900 input tokens on the first turn**, and a small three-turn coding task (write two files, run a test) used about **2,200 input and 300 output tokens** in total. That makes agentic coding economical on mittwald's monthly token quotas, where heavier CLIs spend most of their budget on scaffolding before they touch your code.
+
+## Installation
+
+```bash
+npm install -g --ignore-scripts @earendil-works/pi-coding-agent
+```
+
+Installer alternative:
+
+```bash
+curl -fsSL https://pi.dev/install.sh | sh
+```
+
+## Configuration
+
+pi reads custom providers from `~/.pi/agent/models.json`. Add mittwald AI Hosting as an OpenAI-compatible provider:
+
+```json
+{
+  "providers": {
+    "mittwald": {
+      "name": "mittwald AI Hosting",
+      "baseUrl": "https://llm.aihosting.mittwald.de/v1",
+      "api": "openai-completions",
+      "apiKey": "$MITTWALD_API_KEY",
+      "models": [
+        {
+          "id": "Qwen3.8-27B-NVFP4",
+          "reasoning": true,
+          "input": ["text", "image"],
+          "contextWindow": 256000,
+          "maxTokens": 32768,
+          "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+          "thinkingLevelMap": {
+            "minimal": null,
+            "low": "low",
+            "medium": "medium",
+            "high": null,
+            "xhigh": "xhigh",
+            "max": null
+          },
+          "compat": {
+            "thinkingFormat": "qwen-chat-template"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+Set the key once in your shell, for example `export MITTWALD_API_KEY="sk-..."`, using your mittwald LLM API key from [mStudio profile settings](https://studio.mittwald.de/profile/api-token). You can also put the literal key into `apiKey` instead of the environment reference.
+
+Leave `cost` at zero: AI Hosting bills by monthly token quota, not per-token rates. pi still tracks and displays tokens per session, so you always see what a task used.
+
+### How thinking levels map to the gateway {#thinking}
+
+The `compat` block tells pi to send thinking control nested inside `chat_template_kwargs` — the form the Qwen models on this gateway require:
+
+| pi level  | Sent to the gateway                | Effect                                            |
+| --------- | ---------------------------------- | ------------------------------------------------- |
+| `off`     | `enable_thinking: false`           | No reasoning — fastest and cheapest               |
+| `low`     | `enable_thinking: true`            | Thinking on, at the model's default depth (`xhigh`) |
+| `medium`  | `enable_thinking: true`            | Same as `low`                                     |
+| `xhigh`   | `enable_thinking: true`            | Same as `low`                                     |
+
+`preserve_thinking: true` is sent together with the toggle, which keeps the reasoning blocks of earlier turns in the conversation — that improves prefix-cache reuse and keeps decisions consistent across an agent run.
+
+Levels marked `null` in `thinkingLevelMap` are hidden from pi's level cycler.
+
+:::note[Without the compat block]
+pi falls back to sending top-level `reasoning_effort`. At level `off` it then sends nothing at all, and the model keeps thinking at its default depth. The compat block above is what makes `off` actually disable thinking.
+:::
+
+#### Reasoning depths {#depths}
+
+The model also supports three reasoning depths (`low`, `medium`, `xhigh`) via `reasoning_effort`. To let pi control the depth as well as the on/off toggle, replace the `compat` block with a configurable `chat_template_kwargs` mapping:
+
+```json
+"compat": {
+  "thinkingFormat": "chat-template",
+  "chatTemplateKwargs": {
+    "enable_thinking": { "$var": "thinking.enabled" },
+    "reasoning_effort": { "$var": "thinking.effort" },
+    "preserve_thinking": true
+  }
+}
+```
+
+With this variant, `off` sends `enable_thinking: false`, and `low` / `medium` / `xhigh` send `enable_thinking: true` plus the matching `reasoning_effort` value. Keep the `thinkingLevelMap` from above so the cycler only offers levels the model accepts.
+
+Other models from the catalogue work in the same provider block — add them as further entries under `models`. Models without a thinking mode (for example `Ministral-3-14B-Instruct-2512`) simply omit the `compat` and `thinkingLevelMap` fields.
+
+## Usage
+
+```bash
+cd your-project
+pi                                     # interactive session
+pi -p "Refactor utils.ts to named exports"   # one-shot, exits after the answer
+pi --thinking off -p "Fix the typo in README.md"  # cheap edit without reasoning
+cat error.log | pi -p "Explain this error"       # pipe stdin into the prompt
+pi @src/app.ts "What does this module do?"       # attach files with @
+pi --list-models                             # verify the provider loaded
+```
+
+The footer shows live token usage and context fill; `/session` prints the totals. Because the baseline is small, you can watch exactly how much a task costs against your monthly quota.
+
+Cycle the thinking level with Shift+Tab during a session, or start with a fixed level via `--thinking <level>`.
+
+## Privacy
+
+- All requests go to `llm.aihosting.mittwald.de` — code and prompts stay on servers in Germany.
+- Set `PI_OFFLINE=1` to disable pi's startup network operations (version check and telemetry towards pi.dev). With it set, pi talks only to the provider you configured.
+- pi has no built-in sandbox by design. For unattended runs on client repositories, run it in a container or a tmux pane where you can observe what it executes.
+
+## Next Steps
+
+- [Explore IDE integrations](./) - Try visual editors
+- [Learn about MCP](/docs/v2/agentic-integration/mcp/) - Infrastructure management
+- [Install agent skills](/docs/v2/agentic-integration/agent-skills/) - Add workflow guidance
