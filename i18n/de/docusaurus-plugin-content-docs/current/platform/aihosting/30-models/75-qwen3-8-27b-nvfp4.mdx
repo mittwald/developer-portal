@@ -9,9 +9,9 @@ import TabItem from "@theme/TabItem";
 
 ## Beschreibung
 
-„Qwen3.8-27B-NVFP4" ist ein dichtes Sprachmodell von Alibaba mit 27 Milliarden Parametern und eingebautem Vision-Encoder. Bei den Mixture-of-Experts-Modellen in dieser Liste rechnet pro Token nur ein Teil des Netzes mit, hier rechnen immer alle Parameter mit. Das kostet mehr Rechenzeit, hält dafür aber mehrstufige Abläufe wie Tool-Loops und länger laufende Agenten zuverlässiger durch. Gegenüber Qwen3.6 ist das Modell vor allem beim Programmieren, bei fachlichen Aufgaben und bei lang laufenden agentischen Abläufen stärker.
+„Qwen3.8-27B-NVFP4“ ist ein denses Sprachmodell von Alibaba mit 27 Milliarden Parametern und eingebautem Vision-Encoder. Bei den Mixture-of-Experts-Modellen in dieser Liste rechnet pro Token nur ein Teil des Netzes mit, hier rechnen immer alle Parameter mit. Das kostet mehr Rechenzeit, hält dafür aber mehrstufige Abläufe wie Tool-Loops und länger laufende Agenten zuverlässiger durch. Gegenüber Qwen3.6 ist das Modell vor allem beim Programmieren, bei fachlichen Aufgaben und bei langlaufenden agentischen Abläufen stärker.
 
-Geeignet für und unterstützt:
+Es eignet sich für und unterstützt:
 
 - Textgenerierung innerhalb einer Chat-Completion (Text zu Text)
 - Tool-Calling für agentische Workflows
@@ -33,10 +33,10 @@ Abschalten unter [Thinking-Modus deaktivieren](#thinking-modus-deaktivieren). Be
 gehören in `chat_template_kwargs`, nicht auf die oberste Ebene der Anfrage.
 
 :::warning[Eine Antwort kann leer zurückkommen, wenn `max_tokens` zu klein ist]
-Das Modell denkt vor der Antwort nach, und in der Standardtiefe `xhigh` geht allein dafür oft
-mehr als ein halbes Tausend Token weg. Ist `max_tokens` aufgebraucht, bevor das Nachdenken fertig
-ist, bekommst du eine Antwort mit leerem `content` und `finish_reason: length`. Abgerechnet werden
-die Reasoning-Token trotzdem.
+Das Modell denkt vor der Antwort nach, und in der Standardtiefe `xhigh` kann die interne
+Gedankenkette allein schon mehrere hundert Token lang sein. Ist `max_tokens` aufgebraucht, bevor
+das Nachdenken fertig ist, bekommst du eine Antwort mit leerem `content` und
+`finish_reason: length`. Abgerechnet werden die Reasoning-Token trotzdem.
 
 Gleicher Prompt, gleiches Bild, an diesem Modell gemessen:
 
@@ -58,14 +58,14 @@ Nutzt du dieses Modell aus n8n heraus? Der eingebaute OpenAI Chat Model-Node kan
 Das Modell kennt drei Reasoning-Tiefen. Je niedriger die Tiefe, desto kürzer die Wartezeit und
 desto weniger Token pro Turn:
 
-| Stufe              | Wofür                                                   |
-| ------------------ | ------------------------------------------------------- |
-| `xhigh` (Standard) | Komplexe Aufgaben, die eine gründliche Analyse brauchen |
-| `medium`           | Wenn Genauigkeit und Geschwindigkeit beide zählen       |
-| `low`              | Wenn es schnell und günstig sein soll                   |
+| Stufe              | Wofür                                                                     |
+| ------------------ | ------------------------------------------------------------------------- |
+| `xhigh` (Standard) | Komplexe Aufgaben, die eine gründliche Analyse brauchen                   |
+| `medium`           | Wenn Genauigkeit und Geschwindigkeit beide zählen                         |
+| `low`              | Wenn es schnell und günstig sein soll, auf Kosten einer flacheren Analyse |
 
 Andere Werte nimmt das Modell nicht an, und es achtet auf Groß- und Kleinschreibung: `Low` wird
-genauso abgewiesen wie eine unbekannte Stufe. Kommst du von OpenAI, beachte, dass es `minimal`
+genauso abgewiesen wie eine unbekannte Stufe. Wenn du Code von OpenAI übernimmst, beachte, dass es `minimal`
 hier nicht gibt, nimm stattdessen `low`. Auf einen ungültigen Wert antwortet die API mit `400`,
 nennt den gesendeten Wert und listet die erlaubten auf.
 
@@ -185,19 +185,20 @@ Die Empfehlung nach Aufgabe:
 | Harte Analyse, kniffliges Debugging, lange Agent-Läufe       | bei `xhigh` lassen             |
 
 Noch ein Grund, `xhigh` nicht überall anzulassen: es ist die unberechenbarste Stufe. Bei der
-Klassifikation lag das Nachdenken beim identischen Prompt zwischen 144 und 1.484 Token, also Faktor
-zehn Kostenunterschied zwischen zwei gleichen Anfragen. Bei 250 Reasoning-Token pro Antwort sind
+Klassifikation lag das Nachdenken beim identischen Prompt zwischen 144 und 1.484 Token, bei zwei
+identischen Anfragen also ein Faktor zehn bei den Kosten. Bei 250 Reasoning-Token pro Antwort sind
 5 Mio. Token nach rund 20.000 Antworten weg, ohne dass davon ein Zeichen beim Nutzer angekommen ist.
 
 mStudio meldet sich bei 75 Prozent des Kontingents, bei 90 Prozent zusätzlich per E-Mail.
 
 Bei mehrstufigen Agent-Aufgaben wird die ganze Aufgabe mit einer niedrigeren Tiefe nicht
 automatisch schneller fertig. Die einzelnen Turns kommen zügiger zurück, aber das Modell analysiert
-flacher, verrennt sich häufiger und probiert es noch einmal. Unterm Strich kann das länger dauern
-und mehr Token kosten als `xhigh`. Miss deshalb die ganze Aufgabe und nicht einen Turn.
+flacher, Schritte schlagen häufiger fehl und müssen wiederholt werden. Unterm Strich kann das
+länger dauern und mehr Token kosten als `xhigh`. Miss deshalb die ganze Aufgabe und nicht einen
+Turn.
 
-Über `/v1/responses` geht dasselbe direkt über das Feld `reasoning.effort`, dort brauchst du
-`chat_template_kwargs` nicht.
+Bei `/v1/responses` steht dieselbe Steuerung nativ als Feld `reasoning.effort` zur Verfügung,
+ohne `chat_template_kwargs`.
 
 ### Thinking-Modus deaktivieren {#thinking-modus-deaktivieren}
 
@@ -294,7 +295,7 @@ der letzten. Damit bleiben Entscheidungen über einen ganzen Agent-Durchlauf hin
 Prefix-Cache greift öfter, was Folge-Turns schneller macht. Dafür zählt das Reasoning früherer
 Turns mit ins Context-Fenster.
 
-Soll nur das Reasoning der letzten Nachricht erhalten bleiben:
+Damit nur das Reasoning der letzten Nutzernachricht behalten wird, sende:
 
 ```python
 extra_body={"chat_template_kwargs": {"preserve_thinking": False}}
@@ -310,7 +311,7 @@ Wenn der Thinking-Modus **aktiviert** ist (Standard), liefert das Modell zwei se
 | `choices[0].message.content`           | Endgültige Antwort                          |
 
 Ist `content` leer, schau zuerst auf `finish_reason`. Bei `length` ist das Token-Budget beim
-Nachdenken ausgegangen, das beschreibt die Warnung weiter oben. Bei `stop` hat das Modell seine
+Nachdenken ausgegangen, wie in der Warnung weiter oben beschrieben. Bei `stop` hat das Modell seine
 Antwort in den Reasoning-Block geschrieben. Dann deaktiviere den Thinking-Modus, damit `content`
 verlässlich gefüllt ist.
 
@@ -398,9 +399,9 @@ Please show your choice in the 'answer' field with only the choice letter, e.g.,
 
 ## Wechsel von Qwen3.6-35B-A3B-FP8 {#wechsel-von-qwen3-6}
 
-Beide Modelle stehen unter Apache 2.0, kosten pro Token dasselbe und nehmen dieselben 256.000 Token
-Context. Der Wechsel ist deshalb im Kern ein anderer Wert bei `model`. Vier Dinge verhalten sich
-anders:
+Beide Modelle stehen unter Apache 2.0, kosten pro Token dasselbe und unterstützen denselben
+Context von 256.000 Token. Der Wechsel ist deshalb im Kern ein anderer Wert bei `model`. Vier
+Dinge verhalten sich anders:
 
 |                                      | Qwen3.6-35B-A3B-FP8 | Qwen3.8-27B-NVFP4                                                         |
 | ------------------------------------ | ------------------- | ------------------------------------------------------------------------- |
@@ -409,14 +410,14 @@ anders:
 | `presence_penalty` im Thinking-Modus | 1.5                 | 0.0                                                                       |
 | Reasoning früherer Turns             | fällt weg           | bleibt erhalten, siehe [Reasoning über mehrere Turns](#preserve-thinking) |
 
-Wenn du eine laufende Integration umziehst:
+Wenn du eine laufende Integration migrierst:
 
 1. Setze `model` auf `Qwen3.8-27B-NVFP4`.
 2. Nimm `presence_penalty` im Thinking-Modus auf 0.0 herunter, oder lass den Parameter weg und
    arbeite mit dem Standard.
 3. Erhöhe `max_tokens`, oder setze `reasoning_effort` auf `medium` oder `low`. An der tieferen
-   Standardstufe merken die meisten Umzüge den Unterschied zuerst, entweder an höheren
-   Token-Rechnungen oder an leeren Antworten.
+   Standardstufe merkt man bei den meisten Migrationen den Unterschied zuerst, entweder an
+   höheren Token-Rechnungen oder an leeren Antworten.
 4. Schickt deine Integration lange Verläufe, prüfe deinen Context-Verbrauch. Die erhaltenen
    Reasoning-Blöcke zählen mit. Mit `preserve_thinking: false` bekommst du das alte Verhalten
    zurück.
