@@ -307,7 +307,7 @@ Wenn der Thinking-Modus **aktiviert** ist (Standard), liefert das Modell zwei se
 
 | Feld                                   | Inhalt                                      |
 | -------------------------------------- | ------------------------------------------- |
-| `choices[0].message.reasoning_content` | Interne Gedankenkette (kann sehr lang sein) |
+| `choices[0].message.reasoning`         | Interne Gedankenkette (kann sehr lang sein) |
 | `choices[0].message.content`           | Endgültige Antwort                          |
 
 Ist `content` leer, schau zuerst auf `finish_reason`. Bei `length` ist das Token-Budget beim
@@ -316,7 +316,7 @@ Antwort in den Reasoning-Block geschrieben. Dann deaktiviere den Thinking-Modus,
 verlässlich gefüllt ist.
 
 ```python
-print(response.choices[0].message.reasoning_content)  # interne Gedankenkette
+print(response.choices[0].message.reasoning)          # interne Gedankenkette
 print(response.choices[0].message.content)             # endgültige Antwort
 ```
 

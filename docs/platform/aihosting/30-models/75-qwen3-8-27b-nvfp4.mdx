@@ -305,7 +305,7 @@ When thinking mode is **enabled** (default), the model returns two separate fiel
 
 | Field                                  | Contents                                     |
 | -------------------------------------- | -------------------------------------------- |
-| `choices[0].message.reasoning_content` | Internal chain-of-thought (may be very long) |
+| `choices[0].message.reasoning`        | Internal chain-of-thought (may be very long) |
 | `choices[0].message.content`           | Final answer                                 |
 
 If `content` is empty, check `finish_reason`: `length` means the token budget ran out during
@@ -313,7 +313,7 @@ reasoning (see the warning above), while `stop` means the model placed its answe
 reasoning block — in that case disable thinking mode to ensure `content` is always populated.
 
 ```python
-print(response.choices[0].message.reasoning_content)  # internal chain-of-thought
+print(response.choices[0].message.reasoning)          # internal chain-of-thought
 print(response.choices[0].message.content)             # final answer
 ```
 
