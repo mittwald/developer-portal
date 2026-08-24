@@ -6,11 +6,11 @@ title: E-commerce product pipeline
 
 New products arrive at agencies as photos — usually without any metadata. Someone shoots or downloads a picture, drops it into a folder, and the shop team has to write the name, description, tags and alt text by hand. This guide builds a pipeline that does that step automatically with [Qwen3.8-27B-NVFP4](/docs/v2/platform/aihosting/models/qwen3-8-27b-nvfp4) and writes the result into a running Shopware instance:
 
-| Stage | Model | What it does |
-| ----- | ----- | ------------ |
+| Stage        | Model                                                                     | What it does                                                                                           |
+| ------------ | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
 | 1 — Generate | [Qwen3.8-27B-NVFP4](/docs/v2/platform/aihosting/models/qwen3-8-27b-nvfp4) | Writes a German product name, description, tags and an image alt text per photo (strict JSON contract) |
-| 2 — Review | human | Signs off every text before anything goes live |
-| 3 — Push | none (Shopware Admin API) | Creates tags, uploads the media and creates the product with SEO fields |
+| 2 — Review   | human                                                                     | Signs off every text before anything goes live                                                         |
+| 3 — Push     | none (Shopware Admin API)                                                 | Creates tags, uploads the media and creates the product with SEO fields                                |
 
 :::note[Scope]
 The pipeline targets **Shopware 6.6 LTS** (tested on 6.6.10). Catalog writes go through the **Admin API**, not the Store-API — the Store-API serves the storefront (reads, cart, checkout) and exposes no product-write routes. If your client runs an older 6.x version, the same endpoints exist under the `/api/v2` prefix; everything else in this guide is unchanged.
@@ -33,7 +33,7 @@ client = OpenAI(base_url="https://qwen3-8-27b-nvfp4.llm-1.m3.services/v1", api_k
 VISION_MODEL = "Qwen3.8-27B-NVFP4"
 ```
 
-For Shopware, create an integration in the Admin UI: **Settings → Integrations → Create integration** (with admin rights), then copy the *access key* and *secret*. For local testing, the quickest way to get a 6.6 instance is a single container:
+For Shopware, create an integration in the Admin UI: **Settings → Integrations → Create integration** (with admin rights), then copy the _access key_ and _secret_. For local testing, the quickest way to get a 6.6 instance is a single container:
 
 ```shellsession
 user@local $ docker run -d --name sw-test -p 80:80 dockware/shopware:6.6-latest
@@ -41,11 +41,11 @@ user@local $ docker run -d --name sw-test -p 80:80 dockware/shopware:6.6-latest
 
 Create three fixture photos in `products/`. The filenames are deliberately misleading — `mug-001.jpg` is actually a plate — to prove the model looks at the pixels, not the filename:
 
-| File | Content | Known price |
-| ---- | ------- | ----------- |
-| `products/mug-001.jpg` | White dinner plate with a rim ornament | 14.90 EUR |
-| `products/backpack-001.jpg` | Embroidered leather backpack | 89.00 EUR |
-| `products/headphones-001.jpg` | DSLR camera set with lens and notebook | 249.00 EUR |
+| File                          | Content                                | Known price |
+| ----------------------------- | -------------------------------------- | ----------- |
+| `products/mug-001.jpg`        | White dinner plate with a rim ornament | 14.90 EUR   |
+| `products/backpack-001.jpg`   | Embroidered leather backpack           | 89.00 EUR   |
+| `products/headphones-001.jpg` | DSLR camera set with lens and notebook | 249.00 EUR  |
 
 That is all the input data: three JPEGs and a price each. Everything else comes out of stage 1.
 
@@ -53,7 +53,7 @@ That is all the input data: three JPEGs and a price each. Everything else comes 
 
 Send each photo to `Qwen3.8-27B-NVFP4` with a strict output contract. The prompt is in German on purpose: the model writes German product copy, and the measured output quality is better when the rules are stated in the target language (same pattern as the [BFSG accessibility pipeline](/docs/v2/platform/aihosting/examples/bfsg-accessibility#stage-alt-texts)).
 
-```python
+````python
 import base64
 import io
 import json
@@ -110,7 +110,7 @@ def generate_product_data(image_path: Path) -> dict:
         "tokens": resp.usage.total_tokens,
         "reasoning_tokens": resp.usage.completion_tokens_details.reasoning_tokens,
     }
-```
+````
 
 Images must be Base64 data URLs; see [Encoding and resizing images](/docs/v2/platform/aihosting/examples/python#vision-encoding) for the general pattern.
 
@@ -152,11 +152,11 @@ The sheet for the fixture:
 
 Bitte jeden Text pruefen, bevor er im Shop erscheint.
 
-| | SKU | Name | Beschreibung | Tags | Alt-Text | OK? |
-|---|-----|------|--------------|------|----------|-----|
-| [ ] | mug-001 | Weißer Teller mit dezentem Randmuster | Dieser weiße Teller überzeugt durch sein schlichtes, rundes Design. Ein dezent g… | Teller, Weiß, Randmuster, Essgeschirr, Rund | Weißer runder Teller mit dezentem grauem Wellenmus… | ☐ |
-| [ ] | backpack-001 | Ethnisch bestickter Leder-Rucksack mit Schultergurt | Dieser Rucksack aus dunklem Leder wird über einer Schulter getragen und besticht… | Rucksack, Leder, bestickt, ethno, Frauen | Person in lila T-Shirt und Jeans trägt einen dunkl… | ☐ |
-| [ ] | headphones-001 | Canon DSLR Kamera Set mit Objektiv und Notizbuch | Das Set enthält eine schwarze Canon-Spiegelreflexkamera mit aufgesetztem Objekti… | Kamera, Canon, Notizbuch, Fotografie, Zubehör | Schwarze Canon DSLR mit Objektiv, zweites Objektiv… | ☐ |
+|     | SKU            | Name                                                | Beschreibung                                                                      | Tags                                          | Alt-Text                                            | OK? |
+| --- | -------------- | --------------------------------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------- | --------------------------------------------------- | --- |
+| [ ] | mug-001        | Weißer Teller mit dezentem Randmuster               | Dieser weiße Teller überzeugt durch sein schlichtes, rundes Design. Ein dezent g… | Teller, Weiß, Randmuster, Essgeschirr, Rund   | Weißer runder Teller mit dezentem grauem Wellenmus… | ☐   |
+| [ ] | backpack-001   | Ethnisch bestickter Leder-Rucksack mit Schultergurt | Dieser Rucksack aus dunklem Leder wird über einer Schulter getragen und besticht… | Rucksack, Leder, bestickt, ethno, Frauen      | Person in lila T-Shirt und Jeans trägt einen dunkl… | ☐   |
+| [ ] | headphones-001 | Canon DSLR Kamera Set mit Objektiv und Notizbuch    | Das Set enthält eine schwarze Canon-Spiegelreflexkamera mit aufgesetztem Objekti… | Kamera, Canon, Notizbuch, Fotografie, Zubehör | Schwarze Canon DSLR mit Objektiv, zweites Objektiv… | ☐   |
 ```
 
 After sign-off, apply the accepted texts and run stage 3. Re-running the pipeline afterwards should produce an empty diff in the review sheet.
@@ -338,10 +338,10 @@ Products without a category do not appear in storefront listings — assign cate
 
 Measured on the playground with ~600 px JPEGs:
 
-| Call | Tokens | Time | Notes |
-| ---- | ------ | ---- | ----- |
+| Call                          | Tokens          | Time      | Notes                                 |
+| ----------------------------- | --------------- | --------- | ------------------------------------- |
 | One product (incl. reasoning) | 957–1,178 total | 6.4–9.0 s | 369–504 of those are reasoning tokens |
-| Three-product fixture | ~3,200 total | ~24 s | plus trivial Admin API traffic |
+| Three-product fixture         | ~3,200 total    | ~24 s     | plus trivial Admin API traffic        |
 
 A 50-photo catalog costs roughly 50,000–60,000 tokens of `Qwen3.8-27B-NVFP4` traffic — a few cents on the 5-million-token plans, which makes a full catalog import a billable automation instead of a week of copywriting. If you want cheaper drafts, `Ministral-3-14B-Instruct-2512` on the public gateway handles standard product photos well; the JSON contract and the rest of the pipeline stay identical.
 

@@ -8,12 +8,12 @@ Seit dem 28. Juni 2025 gelten die Anforderungen des [Barrierefreiheitsstärkungs
 
 Diese Anleitung baut eine Pipeline, die beide Lücken findet, mit mittwald AI Hosting-Modellen Vorschläge erstellt und das Ergebnis an einen menschlichen Prüfer übergibt — ein Workflow, den deine Agentur für jede Kundenwebsite durchlaufen kann:
 
-| Stufe | Modell | Was es macht |
-| ----- | ------ | ------------ |
-| 1 — Audit | keines (reines HTML-Parsing) | Findet `<img>`-Tags mit fehlendem, leerem oder Platzhalter-Alt-Text |
-| 2 — Alt-Texte | [Qwen3.5-0.8B](/docs/v2/platform/aihosting/models/qwen3-5-0-8b) | Schreibt pro Bild einen deutschen Alt-Text und markiert dekorative Bilder |
-| 3 — Audio | [Qwen3-TTS-12Hz-1.7B-CustomVoice](/docs/v2/platform/aihosting/models/qwen3-tts-customvoice) | liest wichtige Seiten als Opus-Dateien vor, die auf der Seite abgespielt werden können |
-| 4 — Review | Mensch | prüft jeden Vorschlag, bevor etwas live geht |
+| Stufe         | Modell                                                                                      | Was es macht                                                                           |
+| ------------- | ------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| 1 — Audit     | keines (reines HTML-Parsing)                                                                | Findet `<img>`-Tags mit fehlendem, leerem oder Platzhalter-Alt-Text                    |
+| 2 — Alt-Texte | [Qwen3.5-0.8B](/docs/v2/platform/aihosting/models/qwen3-5-0-8b)                             | Schreibt pro Bild einen deutschen Alt-Text und markiert dekorative Bilder              |
+| 3 — Audio     | [Qwen3-TTS-12Hz-1.7B-CustomVoice](/docs/v2/platform/aihosting/models/qwen3-tts-customvoice) | liest wichtige Seiten als Opus-Dateien vor, die auf der Seite abgespielt werden können |
+| 4 — Review    | Mensch                                                                                      | prüft jeden Vorschlag, bevor etwas live geht                                           |
 
 :::note[Anwendungsbereich]
 Der BFSG gilt für Unternehmen, die Waren oder Dienste an Verbraucher verkaufen; sehr kleine Unternehmen (weniger als 10 Mitarbeiter und unter 2 Millionen Euro Jahresumsatz) sind ausgenommen. Diese Anleitung ist technische Dokumentation, keine Rechtsberatung — kläre vor einem Compliance-Auftrag, ob der betroffene Kunde überhaupt im Anwendungsbereich liegt.
@@ -34,15 +34,18 @@ Lege eine kleine Beispiel-Website an. Zwei Seiten reichen, um alle Stufen zu üb
 <!-- site/index.html -->
 <!DOCTYPE html>
 <html lang="de">
-<head><meta charset="utf-8"><title>Garten &amp; Wohnen</title></head>
-<body>
-<h1>Ihr Shop fuer Garten und Wohnen</h1>
-<p>Willkommen bei uns! Entdecken Sie ueber 500 Produkte.</p>
-<img src="img/hund.jpg">
-<img src="img/kanu.jpg" alt="">
-<img src="img/robbe.jpg" alt="Bild1">
-<img src="logo.png" alt="Garten und Wohnen Logo">
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <title>Garten &amp; Wohnen</title>
+  </head>
+  <body>
+    <h1>Ihr Shop fuer Garten und Wohnen</h1>
+    <p>Willkommen bei uns! Entdecken Sie ueber 500 Produkte.</p>
+    <img src="img/hund.jpg" />
+    <img src="img/kanu.jpg" alt="" />
+    <img src="img/robbe.jpg" alt="Bild1" />
+    <img src="logo.png" alt="Garten und Wohnen Logo" />
+  </body>
 </html>
 ```
 
@@ -50,15 +53,20 @@ Lege eine kleine Beispiel-Website an. Zwei Seiten reichen, um alle Stufen zu üb
 <!-- site/kontakt.html -->
 <!DOCTYPE html>
 <html lang="de">
-<head><meta charset="utf-8"><title>Kontakt</title></head>
-<body>
-<h1>Kontakt</h1>
-<p>Sie erreichen uns moeglichst werktags zwischen neun und sechzehn Uhr unter der
-Telefonnummer 05772 293-100. Schreiben Sie uns auch gerne eine E-Mail an
-info@example-shop.de. Unser Team antwortet in der Regel innerhalb eines
-Werktages auf Ihre Anfrage.</p>
-<img src="img/team.jpg">
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <title>Kontakt</title>
+  </head>
+  <body>
+    <h1>Kontakt</h1>
+    <p>
+      Sie erreichen uns moeglichst werktags zwischen neun und sechzehn Uhr unter
+      der Telefonnummer 05772 293-100. Schreiben Sie uns auch gerne eine E-Mail
+      an info@example-shop.de. Unser Team antwortet in der Regel innerhalb eines
+      Werktages auf Ihre Anfrage.
+    </p>
+    <img src="img/team.jpg" />
+  </body>
 </html>
 ```
 
@@ -140,7 +148,7 @@ Für eine echte Kundenwebsite holst du die Seiten vorher mit `requests` und legs
 
 Sende jedes markierte Bild an `Qwen3.5-0.8B` mit einem strengen Ausgabeformat. Der Prompt ist bewusst auf Deutsch: Das Modell schreibt deutsche Alt-Texte, und die gemessene Qualität ist besser, wenn die Regeln in der Zielsprache formuliert sind.
 
-```python
+````python
 ALT_MODEL = "Qwen3.5-0.8B"
 
 ALT_PROMPT = (
@@ -178,7 +186,7 @@ def generate_alt(image_path: Path, context: str = "") -> dict:
         "alt": str(result.get("alt", ""))[:125],
         "usage": resp.usage.total_tokens,
     }
-```
+````
 
 :::warning[Mehrere Bilder nicht in einer Anfrage zusammenfassen]
 Wir haben getestet, drei Bilder in einer einzigen Nachricht zu senden und je einen Alt-Text zu verlangen. In jedem Lauf beschrieb das Modell nur das erste Bild und stoppte. Sende ein Bild pro Anfrage und iteriere — genau das macht der Treiber in Stufe 4.
@@ -190,10 +198,10 @@ Bilder müssen als Base64-Data-URL gesendet werden; externe Bild-URLs werden mit
 
 `Qwen3.5-0.8B` ist das günstigste Modell im Katalog und kommt mit üblichen Produkt- und Teambildern gut zurecht, aber es ist ein kleines Modell. Auf denselben Beispiel-Bildern im Vergleich:
 
-| Bild | `Qwen3.5-0.8B` | `Ministral-3-14B-Instruct-2512` |
-| ---- | -------------- | ------------------------------- |
-| Welpe auf Holzdielen | „Ein schwarzer Labrador-Pudel sitzt auf einer Holzplatte und blickt nach oben.“ | „Schwarzer Labradorwelpe mit aufmerksamen Augen sitzt auf Holzuntergrund.“ |
-| Walrosse am Strand | „Walder auf Sand“ | „Zwei Walrosse auf sandigem Untergrund mit typischen Stoßzähnen und faltiger Haut, ruhend am Strand.“ |
+| Bild                 | `Qwen3.5-0.8B`                                                                  | `Ministral-3-14B-Instruct-2512`                                                                       |
+| -------------------- | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Welpe auf Holzdielen | „Ein schwarzer Labrador-Pudel sitzt auf einer Holzplatte und blickt nach oben.“ | „Schwarzer Labradorwelpe mit aufmerksamen Augen sitzt auf Holzuntergrund.“                            |
+| Walrosse am Strand   | „Walder auf Sand“                                                               | „Zwei Walrosse auf sandigem Untergrund mit typischen Stoßzähnen und faltiger Haut, ruhend am Strand.“ |
 
 Trägt eine Seite Hero-Bilder, bei denen die Formulierung zählt, wechsle `ALT_MODEL` für diese Bilder auf `Ministral-3-14B-Instruct-2512`. In beiden Fällen geht nichts ohne die Review-Stufe live.
 
@@ -319,12 +327,12 @@ Das Dokument für die Beispiel-Website:
 
 Bitte jeden Vorschlag prüfen, bevor er live geht. AI-Alt-Texte können falsch sein.
 
-| | Seite | Datei | Aktueller Alt | Vorschlag | OK? |
-|---|-------|-------|---------------|-----------|-----|
-| [ ] | index.html | img/hund.jpg | `None` | "" (dekorativ) | ☐ |
-| [ ] | index.html | img/kanu.jpg | `` | (dekorativ — leer lassen) | ☐ |
-| [ ] | index.html | img/robbe.jpg | `Bild1` | "" (dekorativ) | ☐ |
-| [ ] | kontakt.html | img/team.jpg | `None` | (nicht generiert — Datei fehlt?) | ☐ |
+|     | Seite        | Datei         | Aktueller Alt | Vorschlag                        | OK? |
+| --- | ------------ | ------------- | ------------- | -------------------------------- | --- |
+| [ ] | index.html   | img/hund.jpg  | `None`        | "" (dekorativ)                   | ☐   |
+| [ ] | index.html   | img/kanu.jpg  | ``            | (dekorativ — leer lassen)        | ☐   |
+| [ ] | index.html   | img/robbe.jpg | `Bild1`       | "" (dekorativ)                   | ☐   |
+| [ ] | kontakt.html | img/team.jpg  | `None`        | (nicht generiert — Datei fehlt?) | ☐   |
 
 ## Audio-Versionen
 
@@ -380,11 +388,11 @@ if __name__ == "__main__":
 
 Gemessen am öffentlichen Gateway mit einem 800×600-JPEG:
 
-| Aufruf | Token / Größe | Anmerkung |
-| ------ | ------------- | --------- |
-| Ein Alt-Text (`Qwen3.5-0.8B`) | ~640 gesamt (~475 multimodal) | ~0,7 s Hin-und-Rückweg |
-| Ein Alt-Text (`Ministral-3-14B-Instruct-2512`) | ~725 gesamt | ~0,6 s Hin-und-Rückweg |
-| Ein Audio-Block (~260 Zeichen, `opus`) | 106-kB-Datei, 24,7 s Audio | ~2 s Generierung |
+| Aufruf                                         | Token / Größe                 | Anmerkung              |
+| ---------------------------------------------- | ----------------------------- | ---------------------- |
+| Ein Alt-Text (`Qwen3.5-0.8B`)                  | ~640 gesamt (~475 multimodal) | ~0,7 s Hin-und-Rückweg |
+| Ein Alt-Text (`Ministral-3-14B-Instruct-2512`) | ~725 gesamt                   | ~0,6 s Hin-und-Rückweg |
+| Ein Audio-Block (~260 Zeichen, `opus`)         | 106-kB-Datei, 24,7 s Audio    | ~2 s Generierung       |
 
 Eine Kundenwebsite mit 100 Bildern kostet grob 60.000 Token an `Qwen3.5-0.8B`-Verkehr plus einige TTS-Aufrufe für die wichtigen Seiten. `Qwen3.5-0.8B` ist das kosteneffizienteste Modell im Katalog — deshalb ist ein Audit pro Website ein abrechenbarer Posten statt eines manuellen Nachmittags.
 

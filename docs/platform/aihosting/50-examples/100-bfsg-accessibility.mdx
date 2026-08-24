@@ -8,12 +8,12 @@ Since 28 June 2025, the [Barrierefreiheitsstärkungsgesetz (BFSG)](https://www.g
 
 This guide builds a pipeline that finds both gaps, drafts fixes with mittwald AI Hosting models, and hands the result to a human reviewer — a workflow your agency can run for every client site:
 
-| Stage | Model | What it does |
-| ----- | ----- | ------------ |
-| 1 — Audit | none (plain HTML parsing) | Finds `<img>` tags with missing, empty, or placeholder alt texts |
-| 2 — Alt text | [Qwen3.5-0.8B](/docs/v2/platform/aihosting/models/qwen3-5-0-8b) | Writes a German alt text per image and flags decorative ones |
-| 3 — Audio | [Qwen3-TTS-12Hz-1.7B-CustomVoice](/docs/v2/platform/aihosting/models/qwen3-tts-customvoice) | Reads key pages aloud as Opus files for on-page playback |
-| 4 — Review | human | Signs off every suggestion before anything goes live |
+| Stage        | Model                                                                                       | What it does                                                     |
+| ------------ | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| 1 — Audit    | none (plain HTML parsing)                                                                   | Finds `<img>` tags with missing, empty, or placeholder alt texts |
+| 2 — Alt text | [Qwen3.5-0.8B](/docs/v2/platform/aihosting/models/qwen3-5-0-8b)                             | Writes a German alt text per image and flags decorative ones     |
+| 3 — Audio    | [Qwen3-TTS-12Hz-1.7B-CustomVoice](/docs/v2/platform/aihosting/models/qwen3-tts-customvoice) | Reads key pages aloud as Opus files for on-page playback         |
+| 4 — Review   | human                                                                                       | Signs off every suggestion before anything goes live             |
 
 :::note[Scope]
 The BFSG applies to businesses selling goods or services to consumers; very small companies (fewer than 10 employees and under 2 million euros annual turnover) are exempt. This guide is engineering documentation, not legal advice — check whether a given client is in scope before quoting a compliance project.
@@ -34,15 +34,18 @@ Create a small fixture site to work on. Two pages are enough to exercise every s
 <!-- site/index.html -->
 <!DOCTYPE html>
 <html lang="de">
-<head><meta charset="utf-8"><title>Garten &amp; Wohnen</title></head>
-<body>
-<h1>Ihr Shop fuer Garten und Wohnen</h1>
-<p>Willkommen bei uns! Entdecken Sie ueber 500 Produkte.</p>
-<img src="img/hund.jpg">
-<img src="img/kanu.jpg" alt="">
-<img src="img/robbe.jpg" alt="Bild1">
-<img src="logo.png" alt="Garten und Wohnen Logo">
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <title>Garten &amp; Wohnen</title>
+  </head>
+  <body>
+    <h1>Ihr Shop fuer Garten und Wohnen</h1>
+    <p>Willkommen bei uns! Entdecken Sie ueber 500 Produkte.</p>
+    <img src="img/hund.jpg" />
+    <img src="img/kanu.jpg" alt="" />
+    <img src="img/robbe.jpg" alt="Bild1" />
+    <img src="logo.png" alt="Garten und Wohnen Logo" />
+  </body>
 </html>
 ```
 
@@ -50,15 +53,20 @@ Create a small fixture site to work on. Two pages are enough to exercise every s
 <!-- site/kontakt.html -->
 <!DOCTYPE html>
 <html lang="de">
-<head><meta charset="utf-8"><title>Kontakt</title></head>
-<body>
-<h1>Kontakt</h1>
-<p>Sie erreichen uns moeglichst werktags zwischen neun und sechzehn Uhr unter der
-Telefonnummer 05772 293-100. Schreiben Sie uns auch gerne eine E-Mail an
-info@example-shop.de. Unser Team antwortet in der Regel innerhalb eines
-Werktages auf Ihre Anfrage.</p>
-<img src="img/team.jpg">
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <title>Kontakt</title>
+  </head>
+  <body>
+    <h1>Kontakt</h1>
+    <p>
+      Sie erreichen uns moeglichst werktags zwischen neun und sechzehn Uhr unter
+      der Telefonnummer 05772 293-100. Schreiben Sie uns auch gerne eine E-Mail
+      an info@example-shop.de. Unser Team antwortet in der Regel innerhalb eines
+      Werktages auf Ihre Anfrage.
+    </p>
+    <img src="img/team.jpg" />
+  </body>
 </html>
 ```
 
@@ -140,7 +148,7 @@ For a real client site, fetch the pages with `requests` first and store them und
 
 Send each flagged image to `Qwen3.5-0.8B` with a strict output contract. The prompt is in German on purpose: the model writes German alt texts, and the measured output quality is better when the rules are stated in the target language.
 
-```python
+````python
 ALT_MODEL = "Qwen3.5-0.8B"
 
 ALT_PROMPT = (
@@ -178,7 +186,7 @@ def generate_alt(image_path: Path, context: str = "") -> dict:
         "alt": str(result.get("alt", ""))[:125],
         "usage": resp.usage.total_tokens,
     }
-```
+````
 
 :::warning[Do not batch multiple images into one request]
 We tested sending three images in a single message and asking for one alt text each. In every run, the model described only the first image and stopped. Send one image per request and loop — that is what the stage-4 driver below does.
@@ -190,10 +198,10 @@ Images must be Base64 data URLs; remote image URLs are rejected with HTTP 400. S
 
 `Qwen3.5-0.8B` is the cheapest model in the catalogue and handles standard product and team photos well, but it is a small model. On the same fixture images, side by side:
 
-| Image | `Qwen3.5-0.8B` | `Ministral-3-14B-Instruct-2512` |
-| ----- | -------------- | ------------------------------- |
-| Puppy on wooden floor | "Ein schwarzer Labrador-Pudel sitzt auf einer Holzplatte und blickt nach oben." | "Schwarzer Labradorwelpe mit aufmerksamen Augen sitzt auf Holzuntergrund." |
-| Walruses on a beach | "Walder auf Sand" | "Zwei Walrosse auf sandigem Untergrund mit typischen Stoßzähnen und faltiger Haut, ruhend am Strand." |
+| Image                 | `Qwen3.5-0.8B`                                                                  | `Ministral-3-14B-Instruct-2512`                                                                       |
+| --------------------- | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Puppy on wooden floor | "Ein schwarzer Labrador-Pudel sitzt auf einer Holzplatte und blickt nach oben." | "Schwarzer Labradorwelpe mit aufmerksamen Augen sitzt auf Holzuntergrund."                            |
+| Walruses on a beach   | "Walder auf Sand"                                                               | "Zwei Walrosse auf sandigem Untergrund mit typischen Stoßzähnen und faltiger Haut, ruhend am Strand." |
 
 If a page carries hero imagery where wording matters, switch `ALT_MODEL` to `Ministral-3-14B-Instruct-2512` for those images. Either way, nothing ships without the review stage.
 
@@ -319,12 +327,12 @@ The sheet for the fixture:
 
 Bitte jeden Vorschlag prüfen, bevor er live geht. AI-Alt-Texte können falsch sein.
 
-| | Seite | Datei | Aktueller Alt | Vorschlag | OK? |
-|---|-------|-------|---------------|-----------|-----|
-| [ ] | index.html | img/hund.jpg | `None` | "" (dekorativ) | ☐ |
-| [ ] | index.html | img/kanu.jpg | `` | (dekorativ — leer lassen) | ☐ |
-| [ ] | index.html | img/robbe.jpg | `Bild1` | "" (dekorativ) | ☐ |
-| [ ] | kontakt.html | img/team.jpg | `None` | (nicht generiert — Datei fehlt?) | ☐ |
+|     | Seite        | Datei         | Aktueller Alt | Vorschlag                        | OK? |
+| --- | ------------ | ------------- | ------------- | -------------------------------- | --- |
+| [ ] | index.html   | img/hund.jpg  | `None`        | "" (dekorativ)                   | ☐   |
+| [ ] | index.html   | img/kanu.jpg  | ``            | (dekorativ — leer lassen)        | ☐   |
+| [ ] | index.html   | img/robbe.jpg | `Bild1`       | "" (dekorativ)                   | ☐   |
+| [ ] | kontakt.html | img/team.jpg  | `None`        | (nicht generiert — Datei fehlt?) | ☐   |
 
 ## Audio-Versionen
 
@@ -380,11 +388,11 @@ if __name__ == "__main__":
 
 Measured on the public gateway with an 800×600 JPEG:
 
-| Call | Tokens / size | Notes |
-| ---- | ------------- | ----- |
-| One alt text (`Qwen3.5-0.8B`) | ~640 total (~475 multimodal) | ~0.7 s round trip |
-| One alt text (`Ministral-3-14B-Instruct-2512`) | ~725 total | ~0.6 s round trip |
-| One audio chunk (~260 chars, `opus`) | 106 kB file, 24.7 s of audio | ~2 s generation |
+| Call                                           | Tokens / size                | Notes             |
+| ---------------------------------------------- | ---------------------------- | ----------------- |
+| One alt text (`Qwen3.5-0.8B`)                  | ~640 total (~475 multimodal) | ~0.7 s round trip |
+| One alt text (`Ministral-3-14B-Instruct-2512`) | ~725 total                   | ~0.6 s round trip |
+| One audio chunk (~260 chars, `opus`)           | 106 kB file, 24.7 s of audio | ~2 s generation   |
 
 A 100-image client site costs roughly 60,000 tokens of `Qwen3.5-0.8B` traffic plus a handful of TTS requests for the key pages. `Qwen3.5-0.8B` is the most cost-efficient model in the catalogue, which is what makes a per-site audit a billable line item instead of a manual afternoon.
 
