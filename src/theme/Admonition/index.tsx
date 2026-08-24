@@ -8,15 +8,16 @@ import { translate } from "@docusaurus/Translate";
 
 type Props = WrapperProps<typeof AdmonitionType>;
 
-export default function AdmonitionWrapper(props: Props): JSX.Element {
-  const status = {
-    note: "info",
-    caution: "warning",
-    warning: "warning",
-  };
+export default function AdmonitionWrapper(props: Props): React.JSX.Element {
+  const status =
+    props.type === "danger"
+      ? "danger"
+      : props.type === "warning" || props.type === "caution"
+        ? "warning"
+        : "info";
 
   return (
-    <Alert status={status[props.type]}>
+    <Alert status={status}>
       <Heading>
         {props.title ??
           translate({
@@ -27,10 +28,4 @@ export default function AdmonitionWrapper(props: Props): JSX.Element {
       <Content>{props.children}</Content>
     </Alert>
   );
-
-  // return (
-  //   <>
-  //     <Admonition {...props} />
-  //   </>
-  // );
 }

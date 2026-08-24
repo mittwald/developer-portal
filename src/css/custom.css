@@ -371,6 +371,24 @@ section.row {
   fill: var(--ifm-color-warning-dark) !important;
 }
 
+/* Keep custom Flow admonitions visually intact, but prevent nested code blocks
+   from escaping horizontally. */
+.markdown .flow--alert .flow--alert--content {
+  align-items: stretch;
+  min-width: 0;
+}
+
+.markdown .flow--alert .flow--alert--content .theme-code-block,
+.markdown .flow--alert .flow--alert--content pre {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.markdown .flow--alert .flow--alert--content pre {
+  overflow-x: auto;
+}
+
 /* dark mode. */
 
 [data-theme="dark"] {
