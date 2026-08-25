@@ -84,7 +84,7 @@ client = OpenAI(
 VOICES = ["aiden", "dylan", "eric", "ono_anna", "ryan",
           "serena", "sohee", "uncle_fu", "vivian"]
 
-SAMPLE = "Guten Tag. Dies ist eine Hoerprobe fuer die Sprachausgabe."
+SAMPLE = "Guten Tag. Dies ist eine Hörprobe für die Sprachausgabe."
 
 for voice in VOICES:
     response = client.audio.speech.create(
@@ -131,7 +131,7 @@ client = OpenAI(
 
 
 def split_sentences(text, max_chars=350):
-    """Fasst Saetze zu Bloecken von hoechstens max_chars zusammen."""
+    """Fasst Sätze zu Blöcken von höchstens max_chars zusammen."""
     sentences = re.split(r"(?<=[.!?])\s+", text.strip())
     chunks, current = [], ""
     for sentence in sentences:
@@ -146,9 +146,9 @@ def split_sentences(text, max_chars=350):
 
 
 LONG_TEXT = (
-    "Der erste Satz eroeffnet den Text. "
-    "Der zweite Satz fuehrt den Gedanken weiter und wird etwas laenger. "
-    "Ein dritter Satz schliesst den Absatz ab."
+    "Der erste Satz eröffnet den Text. "
+    "Der zweite Satz führt den Gedanken weiter und wird etwas länger. "
+    "Ein dritter Satz schließt den Absatz ab."
 )
 
 for index, chunk in enumerate(split_sentences(LONG_TEXT)):
@@ -197,11 +197,11 @@ response = client.audio.speech.create(
 )
 ```
 
-Diese Erkennung lässt sich nicht übersteuern. Der Parameter `language` wird angenommen und dann ignoriert. `German`, `de` oder gar nichts liefern also dasselbe Audio. Kommt eine Passage in der falschen Sprache heraus, schick sie als eigene Anfrage mit mehr Kontext in der Zielsprache drumherum. Das ist derselbe Trick, der auch kurze deutsche Zeilen repariert.
+Diese Erkennung lässt sich nicht überschreiben. Der Parameter `language` wird angenommen und dann ignoriert. `German`, `de` oder gar nichts liefern also dasselbe Audio. Kommt eine Passage in der falschen Sprache heraus, schick sie als eigene Anfrage mit mehr Kontext in der Zielsprache drumherum. Das ist derselbe Trick, der auch kurze deutsche Zeilen repariert.
 
 ## Eine Modellantwort vorlesen lassen {#chat-pipeline}
 
-Eine häufige Kette: Antwort mit einem Chat-Modell erzeugen, dann sprechen lassen.
+Eine häufige Pipeline: Antwort mit einem Chat-Modell erzeugen, dann sprechen lassen.
 
 ```python
 import os
@@ -215,7 +215,7 @@ client = OpenAI(
 completion = client.chat.completions.create(
     model="Qwen3.5-0.8B",
     messages=[
-        {"role": "system", "content": "Antworte in hoechstens drei Saetzen."},
+        {"role": "system", "content": "Antworte in höchstens drei Sätzen."},
         {"role": "user", "content": "Was ist ein Reverse Proxy?"},
     ],
 )

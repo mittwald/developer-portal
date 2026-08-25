@@ -201,15 +201,15 @@ Output length varies between runs even with identical input, because the model s
 
 There is no markup language on this endpoint. Square-bracket tags, angle-bracket tags, and SSML are not parsed. They are either read out loud or dropped, and which one you get is not predictable:
 
-| You send                                               | The model says                                          |
-| ------------------------------------------------------ | ------------------------------------------------------- |
-| `[angry] The delivery arrives on Tuesday morning.`     | "**Hey,** the delivery arrives on Tuesday morning."     |
-| `<laugh> The delivery arrives on Tuesday morning.`     | "The delivery arrives on Tuesday morning." (no laugh)   |
-| `(excited) The delivery arrives on Tuesday morning!`   | "The delivery arrives on Tuesday morning." (no emotion) |
-| `The delivery arrives … <break time="1s"/> Thank you.` | "The delivery arrives … **They** thank you."            |
-| `<speak><prosody rate="slow">…</prosody></speak>`      | "**Speaks to rate slow pitch,** the delivery arrives …" |
+| You send                                               | What we heard, two runs each                                                                                                      |
+| ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| `[angry] The delivery arrives on Tuesday morning.`     | "**And** the delivery arrives on Tuesday morning." / the sentence alone                                                           |
+| `<laugh> The delivery arrives on Tuesday morning.`     | the sentence alone both times, no laugh                                                                                           |
+| `(excited) The delivery arrives on Tuesday morning!`   | "**A** delivery arrives on Tuesday morning." / the sentence alone, no emotion either time                                         |
+| `The delivery arrives … <break time="1s"/> Thank you.` | "The delivery arrives **to thank you when number first to get, huh,** thank you." / "The delivery arrives. Thank you. Thank you." |
+| `<speak><prosody rate="slow">…</prosody></speak>`      | the sentence alone / "**Persody Ray Slow,** the delivery arrives on Tuesday morning."                                             |
 
-Strip any markup from your text and put the intent into the `instructions` parameter instead. It takes a plain sentence describing how the line should be delivered, up to 500 characters. Longer values return HTTP 400.
+Strip any markup from your text and put the intent into the `instructions` parameter instead. It takes a plain sentence describing how the line should be delivered, up to 500 characters. Longer values return HTTP 500.
 
 :::warning[`instructions` works on English, barely on German]
 Measured on our hardware, five runs per setting, English text on the `ryan` voice: pitch moves between 156 Hz without instructions and 222 Hz for "shout", and the speaking rate between 10.6 characters per second for "whisper" and 18.6 for "speak very fast and excitedly". Both move in the direction you asked for.

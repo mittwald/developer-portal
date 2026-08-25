@@ -84,7 +84,7 @@ client = OpenAI(
 VOICES = ["aiden", "dylan", "eric", "ono_anna", "ryan",
           "serena", "sohee", "uncle_fu", "vivian"]
 
-SAMPLE = "Guten Tag. Dies ist eine Hoerprobe fuer die Sprachausgabe."
+SAMPLE = "Guten Tag. Dies ist eine Hörprobe für die Sprachausgabe."
 
 for voice in VOICES:
     response = client.audio.speech.create(
@@ -146,9 +146,9 @@ def split_sentences(text, max_chars=350):
 
 
 LONG_TEXT = (
-    "Der erste Satz eroeffnet den Text. "
-    "Der zweite Satz fuehrt den Gedanken weiter und wird etwas laenger. "
-    "Ein dritter Satz schliesst den Absatz ab."
+    "Der erste Satz eröffnet den Text. "
+    "Der zweite Satz führt den Gedanken weiter und wird etwas länger. "
+    "Ein dritter Satz schließt den Absatz ab."
 )
 
 for index, chunk in enumerate(split_sentences(LONG_TEXT)):
@@ -215,7 +215,7 @@ client = OpenAI(
 completion = client.chat.completions.create(
     model="Qwen3.5-0.8B",
     messages=[
-        {"role": "system", "content": "Antworte in hoechstens drei Saetzen."},
+        {"role": "system", "content": "Antworte in höchstens drei Sätzen."},
         {"role": "user", "content": "Was ist ein Reverse Proxy?"},
     ],
 )

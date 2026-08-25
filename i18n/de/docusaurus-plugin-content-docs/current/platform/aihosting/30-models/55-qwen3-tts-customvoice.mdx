@@ -40,9 +40,9 @@ Diese Einschränkungen gelten:
 :::warning[`language` wird angenommen und ignoriert]
 Was du in `language` schickst, wertet die Route nicht aus. Jeder Wert liefert HTTP 200, auch einer, der nicht in der Liste weiter unten steht: `de`, `en` und `fr` werden genauso angenommen wie `German`, und keiner davon ändert die Ausgabe.
 
-Von der falschen Seite lässt sich das gut prüfen. Deutscher Text mit `language: "English"` kommt weiter als korrektes Deutsch zurück. Zurücktranskribiert: „Die Lieferung kommt am Dienstagmorgen an und die Rechnung wurde bereits an ihre Adresse geschickt."
+Von der falschen Seite lässt sich das gut prüfen. Deutscher Text mit `language: "English"` kommt trotzdem als korrektes Deutsch zurück. Zurücktranskribiert: „Die Lieferung kommt am Dienstagmorgen an und die Rechnung wurde bereits an ihre Adresse geschickt."
 
-Daraus folgen zwei Dinge. Die Spracherkennung liegt ganz beim Modell, und es hat Deutsch und Englisch in jedem unserer Durchläufe richtig erkannt. Den Parameter weglassen kostet dich also nichts. Und du kannst keine Sprache erzwingen: Wird ein Text in der falschen gelesen, hilft `language` nicht, sondern nur, den Text aufzuteilen.
+Daraus folgen zwei Dinge. Die Spracherkennung liegt ganz beim Modell, und es hat Deutsch und Englisch in jedem unserer Durchläufe richtig erkannt. Den Parameter weglassen kostet dich also nichts. Und du kannst keine Sprache erzwingen: Wird ein Text in der falschen Sprache gelesen, hilft `language` nicht, sondern nur, den Text aufzuteilen.
 
 Wenn du einen gemeinsamen Wrapper um beide Audio-Modelle baust, ist das trotzdem der Parameter, über den du stolperst. [Whisper](/docs/v2/platform/aihosting/models/whisper-large-v3-turbo) liest `de` und richtet sich danach, diese Route nimmt `de` und tut nichts damit. Derselbe Wert sieht also auf beiden Routen angenommen aus, obwohl ihn nur eine davon beachtet.
 :::
@@ -200,15 +200,16 @@ Die Länge schwankt auch bei identischer Eingabe, weil das Modell sampelt: Die f
 
 Diese Route kennt keine Auszeichnungssprache. Tags in eckigen oder spitzen Klammern und SSML werden nicht ausgewertet. Sie werden entweder vorgelesen oder verschluckt, und was davon passiert, ist nicht vorhersagbar:
 
-| Du schickst                                            | Das Modell sagt                                            |
-| ------------------------------------------------------ | ---------------------------------------------------------- |
-| `[wütend] Die Lieferung kommt am Dienstagmorgen an.`   | „**Wütend.** Die Lieferung kommt am Dienstagmorgen an."    |
-| `[angry] The delivery arrives on Tuesday morning.`     | „**Hey,** the delivery arrives on Tuesday morning."        |
-| `<laugh> The delivery arrives on Tuesday morning.`     | „The delivery arrives on Tuesday morning." (kein Lachen)   |
-| `(excited) The delivery arrives on Tuesday morning!`   | „The delivery arrives on Tuesday morning." (keine Emotion) |
-| `The delivery arrives … <break time="1s"/> Thank you.` | „The delivery arrives … **They** thank you."               |
+| Du schickst                                            | Das Modell sagt                                                                                                                   |
+| ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| `[wütend] Die Lieferung kommt am Dienstagmorgen an.`   | „**Für ihn,** die Lieferung kommt am Dienstagmorgen an." / „**Hey, wütend!** Die Lieferung kommt am Dienstagmorgen an."           |
+| `[angry] The delivery arrives on Tuesday morning.`     | „**And** the delivery arrives on Tuesday morning." / nur der Satz                                                                 |
+| `<laugh> The delivery arrives on Tuesday morning.`     | beide Male nur der Satz, kein Lachen                                                                                              |
+| `(excited) The delivery arrives on Tuesday morning!`   | „**A** delivery arrives on Tuesday morning." / nur der Satz, beide Male ohne Emotion                                              |
+| `The delivery arrives … <break time="1s"/> Thank you.` | „The delivery arrives **to thank you when number first to get, huh,** thank you." / „The delivery arrives. Thank you. Thank you." |
+| `<speak><prosody rate="slow">…</prosody></speak>`      | nur der Satz / „**Persody Ray Slow,** the delivery arrives on Tuesday morning."                                                   |
 
-Nimm die Auszeichnungen aus deinem Text heraus und schreib stattdessen in den Parameter `instructions`, wie die Zeile klingen soll. Ein normaler Satz reicht, höchstens 500 Zeichen. Längere Werte führen zu HTTP 400.
+Nimm die Auszeichnungen aus deinem Text heraus und schreib stattdessen in den Parameter `instructions`, wie die Zeile klingen soll. Ein normaler Satz reicht, höchstens 500 Zeichen. Längere Werte führen zu HTTP 500.
 
 :::warning[`instructions` wirkt auf Englisch, auf Deutsch kaum]
 Auf unserer Hardware gemessen, fünf Durchläufe je Einstellung, englischer Text auf der Stimme `ryan`: Die Tonhöhe bewegt sich zwischen 156 Hz ohne `instructions` und 222 Hz bei „shout", das Sprechtempo zwischen 10,6 Zeichen pro Sekunde bei „whisper" und 18,6 bei „speak very fast and excitedly". Beides geht in die Richtung, die du angibst.
@@ -222,7 +223,7 @@ Nimm für Deutsch eine andere `voice` und stell `speed` ein, statt eine Emotion 
 
 Eine Webagentur baut eine Landingpage für einen Kunden und will jeden Abschnitt vertont haben: Eine ruhige Produkteinleitung, einen freundlicheren Absatz zu den Funktionen und einen Call-to-Action mit etwas Druck. Eine Stimme über alle Abschnitte hält es als denselben Sprecher erkennbar, `instructions` ändert die Sprechweise, und `opus` hält die Dateien klein genug, um sie mit der Seite auszuliefern.
 
-`instructions` ist in den OpenAI-SDKs ein regulärer Parameter und braucht deshalb kein `extra_body`. `language` lässt du weg: Die Route ignoriert den Parameter, und englischen Text liest das Modell von selbst als Englisch.
+`instructions` ist in den OpenAI-SDKs ein regulärer Parameter und braucht deshalb kein `extra_body`. Lass `language` weg: Die Route ignoriert den Parameter, und englischen Text liest das Modell von selbst als Englisch.
 
 <Tabs groupId="language">
 <TabItem value="python" label="Python">
