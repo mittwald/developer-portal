@@ -271,11 +271,10 @@ curl -X POST https://llm.aihosting.mittwald.de/v1/audio/speech \
 
 The response body is the audio file itself, not JSON. Write it straight to a file or pass it to your audio player. Only errors come back as JSON. `Content-Type` is `audio/mpeg` no matter which format you asked for, so name the file after your `response_format` instead.
 
-The `input` parameter holds the text to speak and must not be empty. The `model` parameter selects the TTS model, and `voice` is required.
+The `input` parameter holds the text to speak and must not be empty. The `model` parameter selects the TTS model. `voice` is required and must be one of `aiden`, `dylan`, `eric`, `ono_anna`, `ryan`, `serena`, `sohee`, `uncle_fu`, `vivian`; an unknown name fails.
 
 The remaining parameters are optional:
 
-- `voice`: One of `aiden`, `dylan`, `eric`, `ono_anna`, `ryan`, `serena`, `sohee`, `uncle_fu`, `vivian`. Required, and an unknown name fails
 - `response_format`: One of `wav` (default), `pcm`, `flac`, `mp3`, `opus`. `aac` is **not** supported
 - `language`: Accepted and ignored, see [the model page](../../models/qwen3-tts-customvoice/#language)
 - `speed`: Speaking rate between 0.25 and 4.0, default 1.0
