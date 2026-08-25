@@ -11,6 +11,12 @@ The [Speech-to-text guide](../../examples/whisper/) has runnable examples for ba
 
 “Whisper-Large-V3-Turbo” is a multilingual automatic speech recognition model (ASR) developed by OpenAI, optimized for speed and efficiency. It is based on the architecture of the well-known “Whisper-Large-V3” model, but uses a lighter decoder structure to significantly reduce latency with only a minimal loss in accuracy. The model supports over 99 languages and is ideal for transcribing speech inputs.
 
+## Token usage
+
+Whisper processes audio in 20 ms steps, which corresponds to 50 base tokens per
+second of audio. The billed token count is calculated by multiplying this value
+by a token factor of `0.5x`, resulting in **25 billed tokens per second** of audio.
+
 The following limitations apply to this model on our platform:
 
 - Maximum file size: 25 MB per upload
