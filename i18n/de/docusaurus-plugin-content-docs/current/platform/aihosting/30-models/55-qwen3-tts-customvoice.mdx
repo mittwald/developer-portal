@@ -21,37 +21,30 @@ Das Modell eignet sich für:
 - Neun verschiedene eingebaute Stimmen, pro Anfrage wählbar
 - Fünf Ausgabeformate, darunter komprimierte für die direkte Auslieferung an den Browser
 - Ein Sprechtempo zwischen 0,25 und 4,0
-- Streaming, damit die Wiedergabe rund 25-mal früher starten kann als beim Warten auf die ganze Datei
+- Streaming, bei dem das Audio in Chunks statt in einer einzigen Antwort kommt
 
 Diese Einschränkungen gelten:
 
 - Voice-Cloning mit eigenem Referenz-Audio ist auf dieser Route nicht verfügbar
 - `response_format="aac"` wird nicht unterstützt, obwohl die OpenAI-API es vorsieht
-- Der Parameter `language` erwartet großgeschriebene Sprachnamen, nicht die ISO-639-1-Codes, die [Whisper](/docs/v2/platform/aihosting/models/whisper-large-v3-turbo) verwendet
+- Der Parameter `language` wirkt auf dieser Route nicht, siehe [`language` wird angenommen und ignoriert](#sprache)
+- `voice` ist Pflicht. Eine Anfrage ohne diesen Parameter schlägt fehl
+- Ungültige Parameterwerte kommen als HTTP 500 mit einer allgemeinen Meldung zurück, nicht als HTTP 400, siehe [Fehlerantworten](#fehlerantworten)
+- Der `Content-Type` der Antwort ist immer `audio/mpeg`, egal welches Format du angefordert hast, siehe [Ausgabeformate](#ausgabeformate)
+- Streaming lässt das Audio nicht früher anfangen, siehe [Streaming](#streaming)
 - Das Modell hat keine Chat-Route. `/v1/chat/completions` steht dafür nicht zur Verfügung
 - Es gibt keine Auszeichnungssprache. `[angry]`, `<laugh>` und SSML-Tags werden vorgelesen oder verschluckt, siehe [Sprechweise über `instructions` steuern](#stimmfuehrung)
 - Deutscher Text braucht eine Vorbereitung, bevor du ihn schickst, und kurze deutsche Zeilen sind unzuverlässig, siehe [Text für Deutsch aufbereiten](#deutscher-text)
 - `seed` wird angenommen, liefert aber kein reproduzierbares Ergebnis, siehe [Reproduzierbarkeit](#reproduzierbarkeit)
 
-:::warning[`language` nimmt hier keine ISO-Codes]
-Whisper akzeptiert `de`, `en`, `fr`. Dieses Modell weist sie ab und antwortet mit HTTP 400:
+:::warning[`language` wird angenommen und ignoriert]
+Was du in `language` schickst, wertet die Route nicht aus. Jeder Wert liefert HTTP 200, auch einer, der nicht in der Liste weiter unten steht: `de`, `en` und `fr` werden genauso angenommen wie `German`, und keiner davon ändert die Ausgabe.
 
-```text
-Invalid language 'De'. Supported: Auto, Beijing_Dialect, Chinese, English, French, German, Italian, Japanese, Korean, Portuguese, Russian, Sichuan_Dialect, Spanish
-```
+Von der falschen Seite lässt sich das gut prüfen. Deutscher Text mit `language: "English"` kommt weiter als korrektes Deutsch zurück. Zurücktranskribiert: „Die Lieferung kommt am Dienstagmorgen an und die Rechnung wurde bereits an ihre Adresse geschickt."
 
-Schreib `German` statt `de`. Wenn du einen gemeinsamen Wrapper um beide Audio-Modelle baust, ist das der Parameter, über den du stolperst: Derselbe Wert ist auf der einen Route gültig und wird auf der anderen abgelehnt.
+Daraus folgen zwei Dinge. Die Spracherkennung liegt ganz beim Modell, und es hat Deutsch und Englisch in jedem unserer Durchläufe richtig erkannt. Den Parameter weglassen kostet dich also nichts. Und du kannst keine Sprache erzwingen: Wird ein Text in der falschen gelesen, hilft `language` nicht, sondern nur, den Text aufzuteilen.
 
-Du kannst `language` auch ganz weglassen. Der Standard ist `Auto`, und der hat in unseren Tests Deutsch und Englisch zuverlässig erkannt.
-
-Ein falscher, aber gültiger Wert ist schlimmer als ein ungültiger, denn er liefert weiter HTTP 200. Deutscher Text mit `language: "English"` kommt als englisch klingender Unsinn zurück:
-
-```text
-Eingabe:    Die Lieferung kommt am Dienstagmorgen an, und die Rechnung wurde bereits an Ihre Adresse geschickt.
-Gesprochen: Deliver on camped on beanstalk market and keongty you were the brights and your addres
-```
-
-`German`, `Auto` und Weglassen liefern alle korrektes Deutsch. Gib also den richtigen Wert an oder gar keinen, und verdrahte in einem Wrapper, der auch deutsche Texte verarbeitet, kein `English` als Standard.
+Wenn du einen gemeinsamen Wrapper um beide Audio-Modelle baust, ist das trotzdem der Parameter, über den du stolperst. [Whisper](/docs/v2/platform/aihosting/models/whisper-large-v3-turbo) liest `de` und richtet sich danach, diese Route nimmt `de` und tut nichts damit. Derselbe Wert sieht also auf beiden Routen angenommen aus, obwohl ihn nur eine davon beachtet.
 :::
 
 ## Verfügbare Stimmen
@@ -76,33 +69,29 @@ Jede Stimme spricht jede unterstützte Sprache, und alle neun kamen in unseren T
 
 Zwei Dinge solltest du wissen, bevor du eine Stimme für Deutsch aussuchst. Die Stimmen mit einer anderen Muttersprache haben einen hörbaren Akzent, das ist Geschmackssache und kein Fehler. Und `instructions` wirkt praktisch nur auf englischem Text mit einer englischsprachigen Stimme, siehe [Sprechweise über `instructions` steuern](#stimmfuehrung). Auf Deutsch ist die Stimme selbst also der einzige Hebel, mit dem du den Charakter der Ausgabe steuerst.
 
-`voice` ist in der API selbst optional, das OpenAI-Python-SDK verlangt es aber als Keyword-Argument. Gib es also explizit mit. Ein unbekannter Wert führt zu HTTP 400, die Antwort nennt die gültigen Werte:
+`voice` ist hier Pflicht, obwohl die OpenAI-API den Parameter als optional vorsieht: Eine Anfrage ohne `voice` antwortet mit HTTP 500. Ein unbekannter Name führt ebenfalls zu HTTP 500, ohne die gültigen Werte zu nennen. Prüf die Schreibweise also gegen die Liste hier oben und nicht gegen die Fehlermeldung.
 
-```text
-Invalid voice 'bob'. Supported: aiden, dylan, eric, ono_anna, ryan, serena, sohee, uncle_fu, vivian
-```
-
-## Gültige Werte für den Parameter `language`
+## Gültige Werte für den Parameter `language` {#sprache}
 
 `Auto`, `Beijing_Dialect`, `Chinese`, `English`, `French`, `German`, `Italian`, `Japanese`, `Korean`, `Portuguese`, `Russian`, `Sichuan_Dialect`, `Spanish`
 
-## Ausgabeformate
+Das sind die dreizehn Sprachen und Dialekte, die das Modell spricht, und die Werte, die die Route für `language` vorsieht. An der Ausgabe ändert keiner davon etwas: Der Parameter wird angenommen und ignoriert, ein Wert außerhalb der Liste ebenso. Lass ihn weg und überlass die Erkennung dem Modell.
 
-| `response_format` | Content-Type | Größe für dieselben 4,5 s Sprache |
-| ----------------- | ------------ | --------------------------------- |
-| `wav`             | `audio/wav`  | 73 kB                             |
-| `pcm`             | `audio/pcm`  | 92 kB                             |
-| `flac`            | `audio/flac` | 50 kB                             |
-| `mp3`             | `audio/mpeg` | 15 kB                             |
-| `opus`            | `audio/ogg`  | 8,6 kB                            |
+## Ausgabeformate {#ausgabeformate}
+
+| `response_format` | Erste Bytes der Antwort | Größe für dieselben 4,5 s Sprache |
+| ----------------- | ----------------------- | --------------------------------- |
+| `wav`             | `RIFF` … `WAVE`         | 73 kB                             |
+| `pcm`             | Samples ohne Header     | 92 kB                             |
+| `flac`            | `fLaC`                  | 50 kB                             |
+| `mp3`             | mp3-Frame-Sync `FF F3`  | 15 kB                             |
+| `opus`            | `OggS`                  | 8,6 kB                            |
 
 `wav` ist der Standard und die richtige Wahl, wenn du das Audio weiterverarbeitest. Für die Auslieferung an Browser oder Telefon ist `opus` bei Sprachqualität rund ein Zehntel so groß.
 
-`aac` führt zu HTTP 400:
+Welches Format du bekommen hast, steht nicht im Header. Der `Content-Type` ist bei jedem Format `audio/mpeg`, auch bei `wav` und `opus`. Ein Player, der sich auf den Header verlässt, versucht also eine Ogg- oder RIFF-Datei als mp3 zu dekodieren. Schreib die Bytes in eine Datei mit der Endung, die du angefordert hast, oder sieh dir die ersten vier Bytes an, wie oben aufgeführt. Verzweige nicht über den `Content-Type`.
 
-```text
-Input should be 'wav', 'pcm', 'flac', 'mp3' or 'opus'
-```
+`aac` führt zu HTTP 500, und jeder andere ungültige Wert ebenso, siehe [Fehlerantworten](#fehlerantworten).
 
 Das Audio ist in jedem Format 24 kHz, 16 Bit, mono. Die Lautheit ist nicht normalisiert: Über unseren Testsatz lag der Spitzenpegel zwischen 0,23 und 0,89 der Vollaussteuerung, das sind rund 11 dB zwischen dem leisesten und dem lautesten Clip. Wenn du mehrere Clips hintereinander abspielst, schick sie vorher durch eine Lautheitsnormalisierung.
 
@@ -186,8 +175,8 @@ curl_close($ch);
 
 | Parameter         | Wert                               | Wirkung                                                                                       |
 | ----------------- | ---------------------------------- | --------------------------------------------------------------------------------------------- |
-| `voice`           | einer der neun Namen               | Optional. Ohne Angabe die Standardstimme                                                      |
-| `language`        | `Auto`                             | Optional. Setz ihn, wenn der Text Sprachen mischt                                             |
+| `voice`           | einer der neun Namen               | Pflicht. Eine Anfrage ohne diesen Parameter schlägt fehl                                      |
+| `language`        | weglassen                          | Wird ignoriert, siehe [`language` wird angenommen und ignoriert](#sprache)                    |
 | `response_format` | `wav` oder `opus`                  | `wav` zum Weiterverarbeiten, `opus` zum Ausliefern                                            |
 | `speed`           | `1.0`                              | Zwischen 0,25 und 4,0, siehe [Sprechtempo](#sprechtempo)                                      |
 | `instructions`    | freier Text, höchstens 500 Zeichen | Optional. Beschreibt, wie gesprochen werden soll, siehe [Sprechweise steuern](#stimmfuehrung) |
@@ -195,17 +184,17 @@ curl_close($ch);
 
 ### Sprechtempo {#sprechtempo}
 
-`speed` skaliert die Dauer annähernd umgekehrt proportional. Derselbe deutsche Satz, drei Durchläufe je Einstellung:
+`speed` skaliert die Dauer annähernd umgekehrt proportional. Derselbe deutsche Satz mit 99 Zeichen, fünf Durchläufe je Einstellung, über die API gemessen:
 
-| `speed` | Gemessene Dauer |
-| ------- | --------------- |
-| `0.5`   | 9,28 s          |
-| `1.0`   | 4,85 s          |
-| `2.0`   | 2,23 s          |
+| `speed` | Mittlere Dauer |
+| ------- | -------------- |
+| `0.5`   | 12,0 s         |
+| `1.0`   | 6,1 s          |
+| `2.0`   | 3,2 s          |
 
-Die Länge schwankt auch bei identischer Eingabe leicht, weil das Modell sampelt. Nimm die Zahlen als Verlauf, nicht als exakte Werte.
+Die Länge schwankt auch bei identischer Eingabe, weil das Modell sampelt: Die fünf Durchläufe bei `1.0` lagen zwischen 5,2 s und 6,6 s. Nimm die Zahlen als Verlauf, nicht als exakte Werte.
 
-Beim Streaming wirkt `speed` nicht. Wenn gestreamtes Audio langsamer oder schneller laufen soll, ändere die Abspielgeschwindigkeit auf deiner Seite.
+`speed` wirkt auch auf gestreamtes Audio. Beim Streaming kamen bei `0.5` 12,8 s und 16,5 s heraus, bei `2.0` 2,9 s. Du musst die Abspielgeschwindigkeit auf deiner Seite also nicht nachkorrigieren.
 
 ## Sprechweise über `instructions` steuern {#stimmfuehrung}
 
@@ -233,7 +222,7 @@ Nimm für Deutsch eine andere `voice` und stell `speed` ein, statt eine Emotion 
 
 Eine Webagentur baut eine Landingpage für einen Kunden und will jeden Abschnitt vertont haben: Eine ruhige Produkteinleitung, einen freundlicheren Absatz zu den Funktionen und einen Call-to-Action mit etwas Druck. Eine Stimme über alle Abschnitte hält es als denselben Sprecher erkennbar, `instructions` ändert die Sprechweise, und `opus` hält die Dateien klein genug, um sie mit der Seite auszuliefern.
 
-`language` und `instructions` gehen unterschiedlich raus: `instructions` ist in den OpenAI-SDKs ein regulärer Parameter, `language` gehört zu diesem Modell und geht deshalb in `extra_body`.
+`instructions` ist in den OpenAI-SDKs ein regulärer Parameter und braucht deshalb kein `extra_body`. `language` lässt du weg: Die Route ignoriert den Parameter, und englischen Text liest das Modell von selbst als Englisch.
 
 <Tabs groupId="language">
 <TabItem value="python" label="Python">
@@ -271,7 +260,6 @@ for name, text, instructions in sections:
         input=text,
         instructions=instructions,
         response_format="opus",
-        extra_body={"language": "English"},
     )
     response.write_to_file(f"{name}.opus")
 ```
@@ -313,8 +301,6 @@ for (const [name, input, instructions] of sections) {
     input,
     instructions,
     response_format: "opus",
-    // @ts-expect-error language gehört zu diesem Modell
-    language: "English",
   });
 
   await writeFile(`${name}.opus`, Buffer.from(await response.arrayBuffer()));
@@ -351,7 +337,6 @@ foreach ($sections as [$name, $input, $instructions]) {
         "voice" => "ryan",
         "input" => $input,
         "instructions" => $instructions,
-        "language" => "English",
         "response_format" => "opus",
     ];
 
@@ -374,13 +359,13 @@ foreach ($sections as [$name, $input, $instructions]) {
 </TabItem>
 </Tabs>
 
-Das ergab drei Dateien mit 26 kB, 25 kB und 18 kB, und die Sprechweise folgt den Anweisungen:
+Das ergab drei Dateien mit 28 kB, 23 kB und 21 kB, und die Sprechweise folgt den Anweisungen. Jede Zeile ist der Mittelwert aus zwei Durchläufen:
 
 | Abschnitt    | Anweisung               | Dauer  | Sprechtempo    |
 | ------------ | ----------------------- | ------ | -------------- |
-| `01-intro`   | ruhiger Produktsprecher | 5,76 s | 14,9 Zeichen/s |
-| `02-feature` | fröhlich, gut gelaunt   | 4,88 s | 16,4 Zeichen/s |
-| `03-cta`     | schnell und begeistert  | 4,24 s | 17,5 Zeichen/s |
+| `01-intro`   | ruhiger Produktsprecher | 6,20 s | 13,9 Zeichen/s |
+| `02-feature` | fröhlich, gut gelaunt   | 5,04 s | 15,9 Zeichen/s |
+| `03-cta`     | schnell und begeistert  | 4,36 s | 17,0 Zeichen/s |
 
 Für die deutsche Fassung derselben Seite lass `instructions` weg und variier stattdessen `voice` und `speed`:
 
@@ -398,17 +383,16 @@ for name, text, voice, speed in sections_de:
         input=text,
         speed=speed,
         response_format="opus",
-        extra_body={"language": "German"},
     )
     response.write_to_file(f"{name}.opus")
 ```
 
-Gemessen kamen dabei 12,9, 15,5 und 17,1 Zeichen pro Sekunde heraus, also derselbe Aufbau im Tempo, ohne `instructions`.
+Gemessen kamen dabei 12,6, 14,8 und 15,7 Zeichen pro Sekunde heraus, also derselbe Aufbau im Tempo, ohne `instructions`.
 
 ## Text für Deutsch aufbereiten {#deutscher-text}
 
 :::warning[Kurze deutsche Texte sind unzuverlässig]
-Unterhalb von etwa 80 Zeichen geht die deutsche Sprachausgabe oft genug daneben, dass es auffällt. Gleiche Stimme, `language: "German"`, sechs Durchläufe je Länge, bewertet durch Rücktranskription:
+Unterhalb von etwa 80 Zeichen geht die deutsche Sprachausgabe oft genug daneben, dass es auffällt. Gleiche Stimme, deutsche Eingabe, sechs Durchläufe je Länge, bewertet durch Rücktranskription:
 
 | Länge der Eingabe | Mittlere Wortfehlerrate | Deutlich falsche Durchläufe |
 | ----------------- | ----------------------- | --------------------------- |
@@ -462,25 +446,29 @@ Auf unserer Hardware gemessen, Deutsch und Englisch, eine Anfrage zur Zeit:
 
 | Länge der Eingabe | Zeit bis zum ersten Byte | Erzeugtes Audio |
 | ----------------- | ------------------------ | --------------- |
-| 51 Zeichen        | 443 ms                   | 3,5 s           |
-| 177 Zeichen       | 1497 ms                  | 12,2 s          |
-| 366 Zeichen       | 3206 ms                  | 26,6 s          |
+| 51 Zeichen        | 811 ms                   | 4,8 s           |
+| 99 Zeichen        | 1027 ms                  | 6,6 s           |
+| 270 Zeichen       | 2968 ms                  | 18,4 s          |
 
-Das Verhältnis von Rechenzeit zu Audiolänge bleibt über diesen Bereich flach bei etwa 0,12. Die Wartezeit kannst du also aus der Textlänge abschätzen: Rechne mit einem Achtel der Abspieldauer, die du anforderst, plus einem kleinen festen Anteil.
+Jede Zeile ist der Mittelwert aus zwei Durchläufen. Das Verhältnis von Wartezeit zu Audiolänge bleibt über diesen Bereich flach bei etwa 0,16. Die Wartezeit kannst du also aus der Textlänge abschätzen: Rechne mit einem Sechstel der Abspieldauer, die du anforderst, plus einem kleinen festen Anteil.
 
-Diese Zahlen gelten für eine gepufferte Anfrage, bei der die ganze Datei auf einmal ankommt. Wenn jemand auf das Audio wartet, streame es stattdessen.
+Streaming verkürzt diese Wartezeit nicht, siehe [Streaming](#streaming). Wenn jemand auf das Audio wartet, halt den Text kurz: Bei 270 Zeichen bist du schon drei Sekunden drin.
 
 ## Streaming {#streaming}
 
-Setz `stream` auf `true` und wähle dazu entweder `stream_format="audio"` oder `stream_format="sse"`. Dann kommt das erste Audio in deutlich unter einer Sekunde, egal wie lang der Text ist. Gemessen am selben Satz wie in der Tabelle darüber:
+Setz `stream` auf `true`, dann kommt das Audio als Chunked-Antwort statt in einem Körper. Was du nicht bekommst, ist ein früherer Start: Die Generierung läuft weiter komplett durch, bevor der erste Chunk rausgeht. Streaming spart dir also die Übertragung der Datei, nicht die Wartezeit auf das Modell.
 
-| Modus                   | Content-Type        | Erster Chunk |
-| ----------------------- | ------------------- | ------------ |
-| gepuffert (Standard)    | `audio/wav`         | 1497 ms      |
-| Streaming mit `"sse"`   | `text/event-stream` | 57 ms        |
-| Streaming mit `"audio"` | `audio/wav`         | 61 ms        |
+Gemessen am selben Satz mit 99 Zeichen wie in der Tabelle darüber:
 
-Der SSE-Modus schickt `speech.audio.delta`- und `speech.audio.done`-Events im OpenAI-Format, das Audio steckt Base64-kodiert in jedem Delta. `"stream_format": "audio"` lässt die Event-Hülle weg und liefert rohe Audio-Chunks im angeforderten Format. Das ist der einfachere Weg, wenn du direkt in einen Player schreibst.
+| Modus                   | Content-Type | Erster Chunk | Chunks | Letzter Chunk |
+| ----------------------- | ------------ | ------------ | ------ | ------------- |
+| gepuffert (Standard)    | `audio/mpeg` | 1027 ms      | 1      | 1027 ms       |
+| Streaming mit `"audio"` | `audio/mpeg` | 875 ms       | 74     | 950 ms        |
+| Streaming mit `"sse"`   | `audio/mpeg` | 981 ms       | 86     | 1072 ms       |
+
+Alle 74 Chunks kommen innerhalb von 75 ms nacheinander an, also genau an der Stelle, an der die gepufferte Anfrage ohnehin geantwortet hätte.
+
+`stream_format` wird ignoriert. Beide Werte liefern dasselbe: eine Chunked-Antwort mit rohem Audio im angeforderten Format, bei `wav` beginnend mit dem `RIFF`-Header. Es gibt keine `speech.audio.delta`- oder `speech.audio.done`-Events, und der Content-Type ist nie `text/event-stream`. Ein SSE-Parser findet hier also nichts zu parsen. Lies die Antwort als Bytes, so wie es das Beispiel unten macht.
 
 <Tabs groupId="language">
 <TabItem value="python" label="Python">
@@ -573,17 +561,32 @@ fclose($out);
 
 Bei sehr langen Texten lohnt sich das Aufteilen trotzdem, denn dann kannst du die nächste Anfrage schon stellen, während der aktuelle Teil abspielt. Ein ausgearbeitetes Beispiel steht im [Text-to-Speech-Guide](../../examples/text-to-speech/#lange-texte).
 
-## Fehlerantworten
+## Fehlerantworten {#fehlerantworten}
 
 | Situation                                                                    | Status | Meldung                                                            |
 | ---------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------ |
-| `input` ist ein leerer String                                                | 400    | `Input text cannot be empty`                                       |
-| Unbekannte `voice`                                                           | 400    | `Invalid voice '…'. Supported: …`                                  |
-| Unbekannte `language`                                                        | 400    | `Invalid language '…'. Supported: …`                               |
-| `response_format="aac"`                                                      | 400    | `Input should be 'wav', 'pcm', 'flac', 'mp3' or 'opus'`            |
-| `instructions` länger als 500 Zeichen                                        | 400    | `Instructions too long (max 500 characters)`                       |
+| `input` ist ein leerer String                                                | 500    | `Internal server error`                                            |
+| `voice` fehlt                                                                | 500    | `Internal server error`                                            |
+| Unbekannte `voice`                                                           | 500    | `Internal server error`                                            |
+| `response_format="aac"`                                                      | 500    | `Internal server error`                                            |
+| `instructions` länger als 500 Zeichen                                        | 500    | `Internal server error`                                            |
+| `speed` außerhalb von 0,25 bis 4,0                                           | 500    | `Internal server error`                                            |
+| Unbekannte `language`                                                        | 200    | Wird angenommen und ignoriert, siehe [`language`](#sprache)        |
 | `ref_audio`, `ref_text`, `speaker_embedding` oder `task_type` in der Anfrage | 400    | Voice-Cloning gibt es nicht, siehe [Voice-Cloning](#voice-cloning) |
-| Unbekannter Modellname                                                       | 404    | `The model '…' does not exist.`                                    |
+| Unbekannter Modellname                                                       | 404    | `Got unknown model name.`                                          |
+
+Jeder abgewiesene Wert aus der Tabelle liefert dieselbe Antwort, ohne Hinweis darauf, welcher Parameter falsch war:
+
+```json
+{
+  "error": {
+    "message": "Internal server error",
+    "type": "internal_server_error"
+  }
+}
+```
+
+Ein 500 von dieser Route ist also nicht zwangsläufig eine Störung. Prüf `voice`, `response_format` und `speed` gegen die Listen auf dieser Seite, bevor du sie schickst, und behandle einen 500, der einen erneuten Versuch übersteht, als fehlerhafte Anfrage und nicht als Grund, häufiger zu wiederholen.
 
 ## Voice-Cloning {#voice-cloning}
 

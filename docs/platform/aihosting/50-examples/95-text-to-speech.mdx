@@ -37,11 +37,11 @@ response.write_to_file("willkommen.mp3")
 print("written to willkommen.mp3")
 ```
 
-## Streaming, so playback starts sooner {#streaming}
+## Streaming {#streaming}
 
-Without streaming, nothing arrives until the whole file is generated. For a 26-second clip that is a 3-second wait. With streaming the first audio arrives in well under a second regardless of length, so use it whenever a person is waiting.
+Streaming gets you the audio as a chunked response rather than one body. It does not get you an earlier start: the model finishes generating before the first chunk leaves, so a 26-second clip still costs its roughly 3 seconds of generation either way. Use it to avoid holding the whole file in memory, and keep long texts short per request instead, see [Long texts](#long-texts).
 
-Set `stream` to `true` to enable streaming. Then choose `stream_format="audio"` for raw audio chunks in the requested format, which is the simplest option when you write to a file or pipe into a player.
+Set `stream` to `true` to enable it. `stream_format` is ignored, so both values give you the same thing: raw audio chunks in the format you asked for, which is what you want when you write to a file or pipe into a player.
 
 ```python
 import os
@@ -66,7 +66,7 @@ with client.audio.speech.with_streaming_response.create(
     response.stream_to_file("ausgabe.wav")
 ```
 
-If you want the OpenAI event framing instead, use `stream_format="sse"` and read `speech.audio.delta` events, each carrying Base64 audio, followed by one `speech.audio.done`.
+The OpenAI event framing is not available here. `stream_format="sse"` returns the same raw audio, not `speech.audio.delta` and `speech.audio.done` events, so read the body as bytes in both cases.
 
 ## Choosing a voice {#voices}
 
@@ -111,7 +111,9 @@ All five formats hold the same audio. They differ in size, which matters if you 
 | `mp3`             | 15 kB                    | Broad compatibility             |
 | `opus`            | 8.6 kB                   | Delivery to a browser or phone  |
 
-`aac` is not supported and returns HTTP 400.
+`aac` is not supported and returns HTTP 500, like every other invalid value on this endpoint.
+
+The response header does not identify the format: `Content-Type` is `audio/mpeg` on all five. Name your file after the `response_format` you asked for rather than after the header.
 
 ## Long texts {#long-texts}
 
@@ -184,7 +186,7 @@ response = client.audio.speech.create(
 
 ## Mixed-language text {#languages}
 
-The default `Auto` detects the language, and it handles German and English reliably. Set `language` explicitly when a text mixes languages and you want one of them to win.
+The model detects the language itself, and it handles German and English reliably, including a German sentence with English terms in it:
 
 ```python
 response = client.audio.speech.create(
@@ -192,11 +194,10 @@ response = client.audio.speech.create(
     voice="serena",
     input="Wir deployen das Feature heute, das Rollback-Skript liegt bereit.",
     response_format="mp3",
-    extra_body={"language": "German"},
 )
 ```
 
-Write `German`, not `de`. The transcription endpoint takes ISO-639-1 codes and this one takes capitalised names, which is the most common mistake when the same code calls both.
+There is no way to override that detection. The `language` parameter is accepted and then ignored, so sending `German`, `de`, or nothing at all produces the same audio. If a passage comes out in the wrong language, split it into its own request with more surrounding context in the target language, which is the same trick that fixes short German lines.
 
 ## Reading a model answer out loud {#chat-pipeline}
 

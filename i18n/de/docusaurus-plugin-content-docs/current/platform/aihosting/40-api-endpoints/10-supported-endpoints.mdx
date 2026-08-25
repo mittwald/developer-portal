@@ -269,20 +269,22 @@ curl -X POST https://llm.aihosting.mittwald.de/v1/audio/speech \
     --output willkommen.mp3
 ```
 
-Der Antwortkörper ist die Audiodatei selbst, kein JSON. Schreib ihn direkt in eine Datei oder gib ihn an deinen Player weiter. Nur Fehler kommen als JSON zurück.
+Der Antwortkörper ist die Audiodatei selbst, kein JSON. Schreib ihn direkt in eine Datei oder gib ihn an deinen Player weiter. Nur Fehler kommen als JSON zurück. Der `Content-Type` ist immer `audio/mpeg`, egal welches Format du angefordert hast. Benenn die Datei also nach deinem `response_format`.
 
-Der Parameter `input` enthält den zu sprechenden Text und darf nicht leer sein. `model` wählt das TTS-Modell.
+Der Parameter `input` enthält den zu sprechenden Text und darf nicht leer sein. `model` wählt das TTS-Modell, und `voice` ist Pflicht.
 
-Weitere optionale Parameter:
+Die übrigen Parameter sind optional:
 
-- `voice`: Einer von `aiden`, `dylan`, `eric`, `ono_anna`, `ryan`, `serena`, `sohee`, `uncle_fu`, `vivian`. Ohne Angabe nimmt das Modell seine Standardstimme
+- `voice`: Einer von `aiden`, `dylan`, `eric`, `ono_anna`, `ryan`, `serena`, `sohee`, `uncle_fu`, `vivian`. Pflicht, ein unbekannter Name schlägt fehl
 - `response_format`: Einer von `wav` (Standard), `pcm`, `flac`, `mp3`, `opus`. `aac` wird **nicht** unterstützt
-- `language`: Einer von `Auto` (Standard), `Beijing_Dialect`, `Chinese`, `English`, `French`, `German`, `Italian`, `Japanese`, `Korean`, `Portuguese`, `Russian`, `Sichuan_Dialect`, `Spanish`
+- `language`: Wird angenommen und ignoriert, siehe [Modellseite](../../models/qwen3-tts-customvoice/#sprache)
 - `speed`: Sprechtempo zwischen 0,25 und 4,0, Standard 1,0
-- `stream`: Auf `true` gesetzt kommt das Audio, während es erzeugt wird
-- `stream_format`: `sse` für OpenAI-`speech.audio.*`-Events, `audio` für rohe Audio-Chunks
+- `stream`: Auf `true` gesetzt kommt das Audio als Chunked-Antwort
+- `stream_format`: Wird ignoriert. `sse` und `audio` liefern beide rohe Audio-Chunks und nie `speech.audio.*`-Events
 
-Streaming senkt die Wartezeit auf das erste Audio von rund 1500 ms auf unter 200 ms. Nimm es immer, wenn jemand auf die Wiedergabe wartet:
+Ein ungültiger Wert für `voice`, `response_format`, `speed` oder `instructions` und ein leeres `input` antworten alle mit HTTP 500 und dem Antwortkörper `{"error":{"message":"Internal server error","type":"internal_server_error"}}`, nicht mit einem 400, der den Parameter nennt.
+
+Streaming liefert das Audio in Chunks, aber nicht früher: Die Generierung läuft zuerst komplett durch, der erste Chunk kommt also etwa dann, wann auch die gepufferte Antwort gekommen wäre:
 
 ```sh
 curl -N -X POST https://llm.aihosting.mittwald.de/v1/audio/speech \
@@ -293,14 +295,14 @@ curl -N -X POST https://llm.aihosting.mittwald.de/v1/audio/speech \
       "input": "Ein laengerer Text, bei dem die Wiedergabe sofort starten soll.",
       "voice": "ryan",
       "response_format": "wav",
-      "stream_format": "audio"
+      "stream": true
     }' \
     --output ausgabe.wav
 ```
 
 **Wichtige Hinweise:**
 
-- Die beiden Audio-Endpunkte erwarten den Parameter `language` in **unterschiedlichen Formaten**. `/v1/audio/transcriptions` will ISO-639-1-Codes wie `de`, `/v1/audio/speech` will großgeschriebene Namen wie `German` und weist `de` mit HTTP 400 ab. Lies die Warnung auf der [Modellseite](../../models/qwen3-tts-customvoice/), bevor du gemeinsamen Code für beide schreibst
+- Die beiden Audio-Endpunkte behandeln den Parameter `language` **unterschiedlich**. `/v1/audio/transcriptions` will ISO-639-1-Codes wie `de` und richtet sich danach, `/v1/audio/speech` nimmt jeden Wert an und ignoriert alle. Dort schlägt also nichts fehl, es ändert sich aber auch nichts. Lies die Warnung auf der [Modellseite](../../models/qwen3-tts-customvoice/#sprache), bevor du gemeinsamen Code für beide schreibst
 - Ohne Streaming braucht die Erzeugung etwa ein Achtel der angeforderten Abspieldauer, und vorher kommt nichts an
 - Voice-Cloning mit eigenem Referenz-Audio wird auf diesem Endpunkt nicht angeboten
 - Teil lange Texte auf und fordere die Teile einzeln an. Ein ausgearbeitetes Beispiel steht im [Text-to-Speech-Guide](../../examples/text-to-speech/#lange-texte)

@@ -37,11 +37,11 @@ response.write_to_file("willkommen.mp3")
 print("geschrieben nach willkommen.mp3")
 ```
 
-## Streaming, damit die Wiedergabe früher startet {#streaming}
+## Streaming {#streaming}
 
-Ohne Streaming kommt gar nichts an, bis die ganze Datei fertig ist. Bei einem Clip von 26 Sekunden sind das 3 Sekunden Wartezeit. Mit Streaming kommt das erste Audio in deutlich unter einer Sekunde, unabhängig von der Länge. Nimm es also immer, wenn jemand darauf wartet.
+Mit Streaming bekommst du das Audio als Chunked-Antwort statt in einem Körper. Was du nicht bekommst, ist ein früherer Start: Das Modell generiert komplett fertig, bevor der erste Chunk rausgeht. Ein Clip von 26 Sekunden kostet also so oder so seine rund 3 Sekunden Generierung. Nimm Streaming, um nicht die ganze Datei im Speicher zu halten, und teile lange Texte lieber pro Anfrage auf, siehe [Lange Texte](#lange-texte).
 
-Setz `stream` auf `true`, um Streaming einzuschalten. Wähle dann `stream_format="audio"` für rohe Audio-Chunks im angeforderten Format. Das ist der einfachste Weg, wenn du in eine Datei schreibst oder direkt in einen Player gibst.
+Setz `stream` auf `true`, um es einzuschalten. `stream_format` wird ignoriert, beide Werte liefern dasselbe: rohe Audio-Chunks im angeforderten Format. Genau das willst du, wenn du in eine Datei schreibst oder direkt in einen Player gibst.
 
 ```python
 import os
@@ -66,7 +66,7 @@ with client.audio.speech.with_streaming_response.create(
     response.stream_to_file("ausgabe.wav")
 ```
 
-Wenn du stattdessen die Event-Hülle von OpenAI willst, nimm `stream_format="sse"` und lies `speech.audio.delta`-Events, die jeweils Base64-Audio tragen, gefolgt von einem `speech.audio.done`.
+Die Event-Hülle von OpenAI gibt es hier nicht. `stream_format="sse"` liefert dasselbe rohe Audio und keine `speech.audio.delta`- und `speech.audio.done`-Events. Lies die Antwort also in beiden Fällen als Bytes.
 
 ## Die passende Stimme finden {#stimmen}
 
@@ -111,7 +111,9 @@ Alle fünf Formate enthalten dasselbe Audio. Sie unterscheiden sich in der Grö�
 | `mp3`             | 15 kB                   | Breite Kompatibilität                |
 | `opus`            | 8,6 kB                  | Auslieferung an Browser oder Telefon |
 
-`aac` wird nicht unterstützt und führt zu HTTP 400.
+`aac` wird nicht unterstützt und führt zu HTTP 500, wie jeder andere ungültige Wert auf dieser Route.
+
+Am Header erkennst du das Format nicht: Der `Content-Type` ist bei allen fünf `audio/mpeg`. Benenn deine Datei nach dem `response_format`, das du angefordert hast, und nicht nach dem Header.
 
 ## Lange Texte {#lange-texte}
 
@@ -184,7 +186,7 @@ response = client.audio.speech.create(
 
 ## Gemischtsprachige Texte {#sprachen}
 
-Der Standard `Auto` erkennt die Sprache und kommt mit Deutsch und Englisch zuverlässig zurecht. Setz `language` explizit, wenn ein Text Sprachen mischt und eine davon gewinnen soll.
+Das Modell erkennt die Sprache selbst und kommt mit Deutsch und Englisch zuverlässig zurecht, auch bei einem deutschen Satz mit englischen Begriffen darin:
 
 ```python
 response = client.audio.speech.create(
@@ -192,11 +194,10 @@ response = client.audio.speech.create(
     voice="serena",
     input="Wir deployen das Feature heute, das Rollback-Skript liegt bereit.",
     response_format="mp3",
-    extra_body={"language": "German"},
 )
 ```
 
-Schreib `German`, nicht `de`. Die Transkriptionsroute nimmt ISO-639-1-Codes und diese hier großgeschriebene Namen. Das ist der häufigste Fehler, wenn derselbe Code beide aufruft.
+Diese Erkennung lässt sich nicht übersteuern. Der Parameter `language` wird angenommen und dann ignoriert. `German`, `de` oder gar nichts liefern also dasselbe Audio. Kommt eine Passage in der falschen Sprache heraus, schick sie als eigene Anfrage mit mehr Kontext in der Zielsprache drumherum. Das ist derselbe Trick, der auch kurze deutsche Zeilen repariert.
 
 ## Eine Modellantwort vorlesen lassen {#chat-pipeline}
 
