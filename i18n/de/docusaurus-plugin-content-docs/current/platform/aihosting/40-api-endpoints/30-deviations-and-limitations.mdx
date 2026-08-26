@@ -11,6 +11,7 @@ Obwohl unsere API kompatibel zur OpenAI-API ist, gibt es einige Einschränkungen
 - Nur ausgewählte Endpunkte sind implementiert (siehe [Liste](../supported-endpoints/))
 - Einige Parameter wie `n`, `logprobs`, `functions` (je nach Modell) sind nicht verfügbar
 - Vision-Input erfolgt derzeit nur über Base64, nicht über URLs
+- Auf `/v1/audio/speech` antwortet ein ungültiger Parameterwert mit HTTP 500 und einer allgemeinen Meldung statt mit einem 400, der den Parameter nennt. `language` wird angenommen und ignoriert, `stream_format` ebenso, und der `Content-Type` ist bei jedem `response_format` `audio/mpeg`. Siehe [Modellseite zu Qwen3-TTS](../../models/qwen3-tts-customvoice/#fehlerantworten)
 - Der Parameter `response_format` akzeptiert ausschließlich den Wert `"text"`. Die OpenAI-Variante `{"type": "json_object"}` wird nicht unterstützt und stillschweigend ignoriert. Um zuverlässig JSON-Ausgaben zu erhalten, formuliere die Anforderung direkt im System-Prompt oder in der Nutzernachricht (z. B. „Antworte ausschließlich mit einem validen JSON-Objekt.").
 
 ## Limitierungen
@@ -31,4 +32,4 @@ Es gibt kein künstliches Limit für Output-Tokens unterhalb des Kontextfensters
 
 Alle Chat-Modelle unterstützen den Nachrichtentyp `role: "system"`. Ein System-Prompt kann als erstes Element im `messages`-Array mit `"role": "system"` übergeben werden.
 
-Gegenwärtig besteht **keine Möglichkeit, Bilder zu generieren**. Eine entsprechende API-Route existiert dementsprechend nicht.
+Gegenwärtig besteht **keine Möglichkeit, Bilder zu generieren**. Eine entsprechende API-Route existiert nicht.

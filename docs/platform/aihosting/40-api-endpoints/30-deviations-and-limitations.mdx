@@ -11,6 +11,7 @@ Although our API is compatible with the OpenAI API, there are some limitations:
 - Only selected endpoints are implemented (see [list](../supported-endpoints/))
 - Some parameters like `n`, `logprobs`, `functions` (depending on the model) are not available
 - Vision input is currently only supported via Base64, not via URLs
+- On `/v1/audio/speech`, an invalid parameter value returns HTTP 500 with a generic message instead of a 400 naming the parameter, `language` is accepted and ignored, `stream_format` is ignored, and `Content-Type` is `audio/mpeg` for every `response_format`. See the [Qwen3-TTS model page](../../models/qwen3-tts-customvoice/#error-responses)
 - The `response_format` parameter only accepts `"text"` as the value. The OpenAI-style `{"type": "json_object"}` variant is not supported and is silently ignored. To reliably obtain JSON output, instruct the model via the system prompt or user message (e.g. "Respond with a valid JSON object only.").
 
 ## Limitations

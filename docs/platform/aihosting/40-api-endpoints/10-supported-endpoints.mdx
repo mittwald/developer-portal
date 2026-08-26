@@ -269,20 +269,21 @@ curl -X POST https://llm.aihosting.mittwald.de/v1/audio/speech \
     --output willkommen.mp3
 ```
 
-The response body is the audio file itself, not JSON. Write it straight to a file or pass it to your audio player. Only errors come back as JSON.
+The response body is the audio file itself, not JSON. Write it straight to a file or pass it to your audio player. Only errors come back as JSON. `Content-Type` is `audio/mpeg` no matter which format you asked for, so name the file after your `response_format` instead.
 
-The `input` parameter holds the text to speak and must not be empty. The `model` parameter selects the TTS model.
+The `input` parameter holds the text to speak and must not be empty. The `model` parameter selects the TTS model. `voice` is required and must be one of `aiden`, `dylan`, `eric`, `ono_anna`, `ryan`, `serena`, `sohee`, `uncle_fu`, `vivian`; an unknown name fails.
 
-Additional optional parameters can be provided:
+The remaining parameters are optional:
 
-- `voice`: One of `aiden`, `dylan`, `eric`, `ono_anna`, `ryan`, `serena`, `sohee`, `uncle_fu`, `vivian`. Omitting it uses the model default
 - `response_format`: One of `wav` (default), `pcm`, `flac`, `mp3`, `opus`. `aac` is **not** supported
-- `language`: One of `Auto` (default), `Beijing_Dialect`, `Chinese`, `English`, `French`, `German`, `Italian`, `Japanese`, `Korean`, `Portuguese`, `Russian`, `Sichuan_Dialect`, `Spanish`
+- `language`: Accepted and ignored, see [the model page](../../models/qwen3-tts-customvoice/#language)
 - `speed`: Speaking rate between 0.25 and 4.0, default 1.0
-- `stream`: Set to `true` to receive audio as it is generated
-- `stream_format`: `sse` for OpenAI `speech.audio.*` events, or `audio` for raw audio chunks
+- `stream`: Set to `true` to receive the audio as a chunked response
+- `stream_format`: Ignored. Both `sse` and `audio` return raw audio chunks, never `speech.audio.*` events
 
-Streaming cuts the wait for the first audio from about 1500 ms to under 200 ms, so use it whenever someone is waiting for playback:
+An invalid value for `voice`, `response_format`, `speed` or `instructions`, and an empty `input`, all return HTTP 500 with the body `{"error":{"message":"Internal server error","type":"internal_server_error"}}` rather than a 400 naming the parameter.
+
+Streaming delivers the audio in chunks, but not sooner: generation finishes first, so the first chunk arrives at roughly the same time the buffered response would have:
 
 ```sh
 curl -N -X POST https://llm.aihosting.mittwald.de/v1/audio/speech \
@@ -290,17 +291,17 @@ curl -N -X POST https://llm.aihosting.mittwald.de/v1/audio/speech \
     -H "Content-Type: application/json" \
     -d '{
       "model": "Qwen3-TTS-12Hz-1.7B-CustomVoice",
-      "input": "Ein laengerer Text, bei dem die Wiedergabe sofort starten soll.",
+      "input": "Ein längerer Text, bei dem die Wiedergabe sofort starten soll.",
       "voice": "ryan",
       "response_format": "wav",
-      "stream_format": "audio"
+      "stream": true
     }' \
     --output ausgabe.wav
 ```
 
 **Important notes:**
 
-- The two audio endpoints take the `language` parameter in **different formats**. `/v1/audio/transcriptions` wants ISO-639-1 codes such as `de`; `/v1/audio/speech` wants capitalised names such as `German` and rejects `de` with HTTP 400. See [the warning on the model page](../../models/qwen3-tts-customvoice/) before you write shared code against both
+- The two audio endpoints treat the `language` parameter **differently**. `/v1/audio/transcriptions` wants ISO-639-1 codes such as `de` and acts on them; `/v1/audio/speech` accepts any value and ignores all of them, so nothing there fails and nothing changes either. See [the warning on the model page](../../models/qwen3-tts-customvoice/#language) before you write shared code against both
 - Without streaming, generation takes roughly an eighth of the playback time you request, and nothing arrives until it is finished
 - Voice cloning from your own reference audio is not offered on this endpoint
 - Split long texts and request the parts separately. See the [text-to-speech guide](../../examples/text-to-speech/#long-texts) for a worked example

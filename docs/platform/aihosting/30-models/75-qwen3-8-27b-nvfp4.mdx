@@ -10,7 +10,7 @@ import TabItem from "@theme/TabItem";
 
 ## Description
 
-"Qwen3.8-27B-NVFP4" is a dense language model by Alibaba with 27 billion parameters and a built-in vision encoder. Unlike the Mixture-of-Experts models in this list, every parameter takes part in every forward pass, which makes it steadier on multi-step work such as tool loops and long-running agent tasks. Its successor to Qwen3.6 brings clear gains in coding, professional tasks and long-horizon agentic workflows.
+"Qwen3.8-27B-NVFP4" is a dense language model by Alibaba with 27 billion parameters and a built-in vision encoder. In the Mixture-of-Experts models in this list only part of the network computes each token, while here every parameter takes part in every forward pass. That costs more compute time, but it holds up better on multi-step work such as tool loops and long-running agents. Compared with Qwen3.6 the model is stronger at coding, professional tasks, and long-horizon agentic workflows.
 
 It supports and is suitable for:
 
@@ -303,10 +303,10 @@ extra_body={"chat_template_kwargs": {"preserve_thinking": False}}
 
 When thinking mode is **enabled** (default), the model returns two separate fields:
 
-| Field                                  | Contents                                     |
-| -------------------------------------- | -------------------------------------------- |
-| `choices[0].message.reasoning`        | Internal chain-of-thought (may be very long) |
-| `choices[0].message.content`           | Final answer                                 |
+| Field                          | Contents                                     |
+| ------------------------------ | -------------------------------------------- |
+| `choices[0].message.reasoning` | Internal chain-of-thought (may be very long) |
+| `choices[0].message.content`   | Final answer                                 |
 
 If `content` is empty, check `finish_reason`: `length` means the token budget ran out during
 reasoning (see the warning above), while `stop` means the model placed its answer inside the
