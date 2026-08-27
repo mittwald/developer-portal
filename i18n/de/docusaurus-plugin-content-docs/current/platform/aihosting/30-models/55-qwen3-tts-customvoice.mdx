@@ -203,7 +203,7 @@ Die Länge schwankt auch bei identischer Eingabe, weil das Modell sampelt: Die f
 
 Diese Route kennt keine Auszeichnungssprache. Tags in eckigen oder spitzen Klammern und SSML werden nicht ausgewertet. Sie werden entweder vorgelesen oder verschluckt, und was davon passiert, ist nicht vorhersagbar:
 
-| Du schickst                                            | Das Modell sagt, zwei Durchläufe je Zeile                                                                                          |
+| Du schickst                                            | Das Modell sagt, je zwei Durchläufe                                                                                                |
 | ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
 | `[wütend] Die Lieferung kommt am Dienstagmorgen an.`   | „**Für ihn,** die Lieferung kommt am Dienstagmorgen an." / „**Hey, wütend!** Die Lieferung kommt am Dienstagmorgen an."            |
 | `[angry] The delivery arrives on Tuesday morning.`     | „**And** the delivery arrives on Tuesday morning." / nur der Satz                                                                  |
@@ -418,7 +418,7 @@ Ein Fehlschlag klingt englisch, nicht nach einem Versprecher: Aus „Willkommen 
 
 Ab etwa 100 Zeichen haben wir das nicht mehr reproduziert. Wenn du kurze deutsche Zeilen erzeugst, also Begrüßungen, Beschriftungen oder einzelne Hinweise, fass entweder mehrere davon in eine Anfrage zusammen und schneide das Audio hinterher, oder hör dir das Ergebnis an, bevor es live geht. Englisch ist bei diesen Längen nicht betroffen.
 
-Wie stark eine kurze Zeile danebengeht, ist selbst unbeständig. Nachgemessen mit anderen Sätzen, je vier Durchläufe: Eine Zeile mit 20 Zeichen kam vier von vier Mal sauber zurück, eine Zeile mit 60 Zeichen lag im Mittel bei einer Wortfehlerrate von 0,025, während eine Zeile mit 41 Zeichen im Mittel 0,375 erreichte und zweimal deutlich danebenlag. Nimm die Länge als Risikoindikator, nicht als Schwellwert, den du berechnen kannst.
+Wie stark eine kurze Zeile danebengeht, schwankt von Fall zu Fall. Nachgemessen mit anderen Sätzen, je vier Durchläufe: Ein Text mit 20 Zeichen kam in allen vier Durchläufen sauber zurück, ein Text mit 60 Zeichen lag im Mittel bei einer Wortfehlerrate von 0,025, ein Text mit 41 Zeichen dagegen bei 0,375, zweimal davon deutlich daneben. Nimm die Länge als Risikoindikator, nicht als Schwellwert, den du berechnen kannst.
 :::
 
 Deutsche Texte brauchen einen Durchgang, bevor du sie schickst. Gut geschriebene deutsche Prosa liest das Modell korrekt, aber drei Dinge aus ganz normalen Quelltexten kommen falsch heraus, und keines davon scheitert hörbar am Statuscode.
