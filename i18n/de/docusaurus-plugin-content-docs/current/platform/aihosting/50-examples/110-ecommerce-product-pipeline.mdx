@@ -20,16 +20,17 @@ Die Pipeline richtet sich an **Shopware 6.6 LTS** (getestet mit 6.6.10). Katalog
 
 ```shellsession
 user@local $ pip install openai pillow requests
+user@local $ export OPENAI_API_KEY="sk-…"
 ```
 
 Zwei Dinge werden benötigt: Zugriff auf das Vision-Modell und eine Shopware-Instanz mit Integrations-Zugangsdaten.
 
-Für das Modell bis zum GA auf dem öffentlichen Gateway das Playground-Gateway verwenden — die Base URL unten braucht keinen API-Key:
+Qwen3.8 läuft auf dem öffentlichen Gateway, der Client ist also der übliche:
 
 ```python
 from openai import OpenAI
 
-client = OpenAI(base_url="https://qwen3-8-27b-nvfp4.llm-1.m3.services/v1", api_key="x")
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
 VISION_MODEL = "Qwen3.8-27B-NVFP4"
 ```
 
@@ -336,7 +337,7 @@ Produkte ohne Kategorie erscheinen nicht in Storefront-Listen — Kategorien im 
 
 ## Kostenprofil {#kostenprofil}
 
-Gemessen im Playground mit ~600-px-JPEGs:
+Gemessen mit ~600-px-JPEGs:
 
 | Aufruf                        | Tokens           | Dauer     | Anmerkungen                               |
 | ----------------------------- | ---------------- | --------- | ----------------------------------------- |
