@@ -66,7 +66,7 @@ with client.audio.speech.with_streaming_response.create(
     response.stream_to_file("ausgabe.wav")
 ```
 
-`stream_format="sse"` liefert stattdessen die Event-Hülle von OpenAI: `speech.audio.delta`-Events mit dem Audio als Base64, abgeschlossen von einem `speech.audio.done`. Bei einem Text mit 100 Zeichen waren das 7 Delta-Events und 1 Done-Event. Nimm `sse`, wenn dein Client SSE schon spricht, und `audio`, wenn nicht.
+`stream_format="sse"` liefert stattdessen das Event-Format von OpenAI: `speech.audio.delta`-Events mit dem Audio als Base64, abgeschlossen von einem `speech.audio.done`. Bei einem Text mit 100 Zeichen waren das 7 Delta-Events und 1 Done-Event. Nimm `sse`, wenn dein Client SSE schon spricht, und `audio`, wenn nicht.
 
 ## Die passende Stimme finden {#stimmen}
 
@@ -101,7 +101,7 @@ Voice-Cloning mit einer eigenen Aufnahme gibt es auf dieser Route nicht. Die neu
 
 ## Das richtige Ausgabeformat {#formate}
 
-Alle fünf Formate enthalten dasselbe Audio. Sie unterscheiden sich in der Größe, und die zählt, sobald du das Ergebnis über das Netz schickst. Das Modell sampelt, zwei Durchläufe über denselben Text sind unterschiedlich lang, deshalb stehen die Größen pro Sekunde Audio:
+Alle fünf Formate enthalten dasselbe Audio. Sie unterscheiden sich in der Größe, und die zählt, sobald du das Ergebnis über das Netz schickst. Die Generierung ist nicht deterministisch, zwei Durchläufe über denselben Text sind unterschiedlich lang, deshalb stehen die Größen pro Sekunde Audio:
 
 | `response_format` | Größe pro Sekunde Audio | Wofür                                |
 | ----------------- | ----------------------- | ------------------------------------ |

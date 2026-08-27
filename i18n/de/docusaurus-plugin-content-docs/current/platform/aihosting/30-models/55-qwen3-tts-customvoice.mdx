@@ -21,7 +21,7 @@ Das Modell eignet sich für:
 - Neun verschiedene eingebaute Stimmen, pro Anfrage wählbar
 - Fünf Ausgabeformate, darunter komprimierte für die direkte Auslieferung an den Browser
 - Ein Sprechtempo zwischen 0,25 und 4,0
-- Streaming, entweder als rohe Audio-Chunks oder als `speech.audio.delta`-Events im OpenAI-Format, womit das Audio anfängt, bevor die Generierung durch ist
+- Streaming, entweder als rohe Audio-Chunks oder als `speech.audio.delta`-Events im OpenAI-Format, sodass das Audio beginnt, bevor die Generierung abgeschlossen ist
 
 Diese Einschränkungen gelten:
 
@@ -36,12 +36,12 @@ Diese Einschränkungen gelten:
 - Deutscher Text braucht eine Vorbereitung, bevor du ihn schickst, und kurze deutsche Zeilen sind unzuverlässig, siehe [Text für Deutsch aufbereiten](#deutscher-text)
 - `seed` wird angenommen, liefert aber kein reproduzierbares Ergebnis, siehe [Reproduzierbarkeit](#reproduzierbarkeit)
 
-:::warning[`language` will einen Sprachnamen, keinen ISO-Code]
+:::warning[`language` erwartet einen Sprachnamen, keinen ISO-Code]
 Der Parameter erreicht das Modell und wird gegen die dreizehn Werte aus [Gültige Werte für den Parameter `language`](#sprache) geprüft. `German` ist gültig, `de` nicht, und ein Wert außerhalb der Liste antwortet mit HTTP 400, statt stillschweigend zu verschwinden.
 
-Besseres Deutsch bekommst du damit nicht. Derselbe deutsche Satz, je drei Durchläufe, zurücktranskribiert: Mit `language: "German"` kamen zwei von drei Durchläufen wortgleich zurück, ohne den Parameter ebenfalls zwei von drei. Die Spracherkennung des Modells reicht also, lass `language` weg, solange du keinen Grund hast, die Sprache festzunageln.
+Besseres Deutsch bekommst du damit nicht. Derselbe deutsche Satz, je drei Durchläufe, zurücktranskribiert: Mit `language: "German"` kamen zwei von drei Durchläufen wortgleich zurück, ohne den Parameter ebenfalls zwei von drei. Die Spracherkennung des Modells reicht also aus. `language` kannst du ohne Weiteres weglassen, solange du die Sprache nicht aus anderen Gründen festlegen musst.
 
-Wenn du einen gemeinsamen Wrapper um beide Audio-Modelle baust, ist das der Parameter, über den du stolperst. [Whisper](/docs/v2/platform/aihosting/models/whisper-large-v3-turbo) will ISO-639-1-Codes wie `de`, diese Route weist sie ab und will `German`. Derselbe Wert funktioniert also auf einer Route und scheitert auf der anderen.
+Wenn du einen gemeinsamen Wrapper um beide Audio-Modelle baust, ist das der Parameter, an dem es scheitert. [Whisper](/docs/v2/platform/aihosting/models/whisper-large-v3-turbo) erwartet ISO-639-1-Codes wie `de`, diese Route weist sie ab und erwartet `German`. Derselbe Wert funktioniert also auf einer Route und scheitert auf der anderen.
 :::
 
 ## Verfügbare Stimmen
@@ -64,9 +64,9 @@ Jede Stimme spricht jede unterstützte Sprache, und alle neun kamen in unseren T
 | `vivian`   | Chinesisch           | 250 Hz  |
 | `ono_anna` | Japanisch            | 264 Hz  |
 
-Zwei Dinge solltest du wissen, bevor du eine Stimme für Deutsch aussuchst. Die Stimmen mit einer anderen Muttersprache haben einen hörbaren Akzent, das ist Geschmackssache und kein Fehler. Und `instructions` wirkt praktisch nur auf englischem Text mit einer englischsprachigen Stimme, siehe [Sprechweise über `instructions` steuern](#stimmfuehrung). Auf Deutsch ist die Stimme selbst also der einzige Hebel, mit dem du den Charakter der Ausgabe steuerst.
+Zwei Dinge solltest du wissen, bevor du eine Stimme für Deutsch aussuchst. Die Stimmen mit einer anderen Muttersprache haben einen hörbaren Akzent, das ist Geschmackssache und kein Fehler. Und `instructions` wirkt praktisch nur auf englischem Text mit einer englischsprachigen Stimme, siehe [Sprechweise über `instructions` steuern](#stimmfuehrung). Auf Deutsch ist die Stimme selbst also die einzige Stellschraube für den Charakter der Ausgabe.
 
-`voice` ist hier Pflicht, obwohl die OpenAI-API den Parameter als optional vorsieht: Eine Anfrage ohne `voice` antwortet mit HTTP 400. Ein unbekannter Name führt ebenfalls zu HTTP 400, mit einem allgemeinen `Got bad request.`, das die gültigen Werte nicht nennt. Prüf die Schreibweise also gegen die Liste hier oben und nicht gegen die Fehlermeldung.
+`voice` ist hier Pflicht, obwohl die OpenAI-API den Parameter als optional vorsieht: Eine Anfrage ohne `voice` antwortet mit HTTP 400. Ein unbekannter Name führt ebenfalls zu HTTP 400, mit einem allgemeinen `Got bad request.`, das die gültigen Werte nicht nennt. Prüf die Schreibweise also gegen die Liste der verfügbaren Stimmen und nicht gegen die Fehlermeldung.
 
 ## Gültige Werte für den Parameter `language` {#sprache}
 
@@ -86,7 +86,7 @@ Das sind die dreizehn Sprachen und Dialekte, die das Modell spricht, und die ein
 
 `wav` ist der Standard und die richtige Wahl, wenn du das Audio weiterverarbeitest. Für die Auslieferung an Browser oder Telefon ist `opus` bei Sprachqualität rund ein Neuntel so groß.
 
-Die Größen sind absichtlich auf eine Sekunde Audio normiert. Das Modell sampelt, zwei Durchläufe über denselben Text unterscheiden sich in der Länge um eine Sekunde oder mehr, und ein Vergleich der reinen Dateigrößen vergleicht dann die Längen und nicht die Formate. Normiert sind `pcm` und `wav` dasselbe: je 48,0 kB pro Sekunde, wobei `wav` einen Header von 44 Byte dazulegt.
+Die Größen sind absichtlich auf eine Sekunde Audio normiert. Die Generierung ist nicht deterministisch, zwei Durchläufe über denselben Text unterscheiden sich in der Länge um eine Sekunde oder mehr, und ein Vergleich der reinen Dateigrößen vergleicht dann die Längen und nicht die Formate. Normiert sind `pcm` und `wav` dasselbe: je 48,0 kB pro Sekunde, wobei `wav` einen Header von 44 Byte voranstellt.
 
 Der `Content-Type` nennt das Format, das du angefordert hast. Ein Player, der den Header liest, dekodiert also den richtigen Container. Die Bytes in eine Datei mit der passenden Endung zu schreiben, funktioniert weiterhin und braucht keinen Header.
 
@@ -195,7 +195,7 @@ curl_close($ch);
 | `1.0`   | 6,1 s          |
 | `2.0`   | 3,2 s          |
 
-Die Länge schwankt auch bei identischer Eingabe, weil das Modell sampelt: Die fünf Durchläufe bei `1.0` lagen zwischen 5,2 s und 6,6 s. Nimm die Zahlen als Verlauf, nicht als exakte Werte.
+Die Länge schwankt auch bei identischer Eingabe, weil die Generierung nicht deterministisch ist: Die fünf Durchläufe bei `1.0` lagen zwischen 5,2 s und 6,6 s. Nimm die Zahlen als Verlauf, nicht als exakte Werte.
 
 `speed` wirkt auch auf gestreamtes Audio. Beim Streaming kamen bei `0.5` 12,8 s und 16,5 s heraus, bei `2.0` 2,9 s. Du musst die Abspielgeschwindigkeit auf deiner Seite also nicht nachkorrigieren.
 
@@ -226,7 +226,7 @@ Auf unserer Hardware gemessen, Stimme `ryan`, je drei Durchläufe, fünf Einstel
 | Englisch | 127 Hz bis 207 Hz, Spanne 80 Hz     | 12,3 bis 17,4 Zeichen/s |
 | Deutsch  | 115 Hz bis 214 Hz, Spanne 99 Hz     | 12,4 bis 16,7 Zeichen/s |
 
-Deutsch reagiert also genauso deutlich wie Englisch. Eine Emotion ist damit auch auf deutschem Text ein brauchbarer Hebel.
+Deutsch reagiert also genauso deutlich wie Englisch. Eine Emotion ist damit auch auf deutschem Text eine brauchbare Stellschraube.
 
 Was nicht funktioniert, ist eine auf Deutsch formulierte Anweisung. „Sprich wütend und laut." ergab 129,7 Hz, „Flüstere sehr leise." 129,4 Hz auf demselben deutschen Satz, ein Unterschied von 0,3 Hz, wo das englische Paar rund 90 Hz auseinanderliegt. Lass den Text deutsch und schreib die Anweisung englisch.
 :::
@@ -418,7 +418,7 @@ Ein Fehlschlag klingt englisch, nicht nach einem Versprecher: Aus „Willkommen 
 
 Ab etwa 100 Zeichen haben wir das nicht mehr reproduziert. Wenn du kurze deutsche Zeilen erzeugst, also Begrüßungen, Beschriftungen oder einzelne Hinweise, fass entweder mehrere davon in eine Anfrage zusammen und schneide das Audio hinterher, oder hör dir das Ergebnis an, bevor es live geht. Englisch ist bei diesen Längen nicht betroffen.
 
-Wie stark eine kurze Zeile danebengeht, schwankt von Fall zu Fall. Nachgemessen mit anderen Sätzen, je vier Durchläufe: Ein Text mit 20 Zeichen kam in allen vier Durchläufen sauber zurück, ein Text mit 60 Zeichen lag im Mittel bei einer Wortfehlerrate von 0,025, ein Text mit 41 Zeichen dagegen bei 0,375, zweimal davon deutlich daneben. Nimm die Länge als Risikoindikator, nicht als Schwellwert, den du berechnen kannst.
+Wie stark eine kurze Zeile abweicht, schwankt von Fall zu Fall. Nachgemessen mit anderen Sätzen, je vier Durchläufe: Ein Text mit 20 Zeichen kam in allen vier Durchläufen sauber zurück, ein Text mit 60 Zeichen lag im Mittel bei einer Wortfehlerrate von 0,025, ein Text mit 41 Zeichen dagegen bei 0,375, zweimal davon mit deutlichen Abweichungen. Nimm die Länge als Risikoindikator, nicht als Schwellwert, den du berechnen kannst.
 :::
 
 Deutsche Texte brauchen einen Durchgang, bevor du sie schickst. Gut geschriebene deutsche Prosa liest das Modell korrekt, aber drei Dinge aus ganz normalen Quelltexten kommen falsch heraus, und keines davon scheitert hörbar am Statuscode.
@@ -433,7 +433,7 @@ Das ist der größte Qualitätsunterschied, den wir gemessen haben. Derselbe Sat
 
 Aus „Größere Änderungen" wurden in der umschriebenen Fassung „Gräser Erinnerungen", „Braceränderungen" und „Geißere Änderungen". Wenn dein CMS oder deine Exportstrecke Umlaute ersetzt, stell sie vor der Anfrage wieder her.
 
-Echte Umlaute sind die bessere Schreibweise, keine Garantie. Ein kürzerer Satz mit korrekten Umlauten, 38 Zeichen, fünf Durchläufe, lag bei einer mittleren Wortfehlerrate von 0,28 mit zwei sauberen Durchläufen. Das ist der Kurztext-Effekt von weiter oben und kein Umlaut-Problem. Behalt die Umlaute und gib dem Modell genug Text.
+Echte Umlaute sind die bessere Schreibweise, keine Garantie. Ein kürzerer Satz mit korrekten Umlauten, 38 Zeichen, fünf Durchläufe, lag bei einer mittleren Wortfehlerrate von 0,28 mit zwei sauberen Durchläufen. Das ist derselbe Kurztext-Effekt und kein Umlaut-Problem. Behalt die Umlaute und gib dem Modell genug Text.
 :::
 
 Zweitens: Schreib Abkürzungen und Zahlen aus. Die kurzen Formen, die ein CMS oder ein Sprachmodell liefert, werden falsch gelesen:
@@ -485,11 +485,11 @@ Gemessen am selben Satz mit 100 Zeichen wie in der Tabelle darüber, `response_f
 
 | Modus                   | Content-Type        | Erstes Audio | Was ankommt                                   |
 | ----------------------- | ------------------- | ------------ | --------------------------------------------- |
-| gepuffert (Standard)    | `audio/pcm`         | 870 ms       | ein Körper                                    |
+| gepuffert (Standard)    | `audio/pcm`         | 870 ms       | ein Antwortkörper                             |
 | Streaming mit `"audio"` | `audio/pcm`         | 91 ms        | 97 Chunks, verteilt über 123 bis 999 ms       |
 | Streaming mit `"sse"`   | `text/event-stream` | 95 ms        | 7 `speech.audio.delta`, 1 `speech.audio.done` |
 
-`stream_format` wählt die Hülle. `"audio"` liefert eine Chunked-Antwort mit rohem Audio im angeforderten Format, und das willst du, wenn du in eine Datei schreibst oder in einen Player pipest. `"sse"` liefert die Event-Hülle von OpenAI: `speech.audio.delta`-Events mit dem Audio als Base64, abgeschlossen von einem `speech.audio.done`.
+`stream_format` wählt das Transportformat. `"audio"` liefert eine Chunked-Antwort mit rohem Audio im angeforderten Format, und das willst du, wenn du in eine Datei schreibst oder an einen Player weitergibst. `"sse"` liefert das Event-Format von OpenAI: `speech.audio.delta`-Events mit dem Audio als Base64, abgeschlossen von einem `speech.audio.done`.
 
 ```text
 event: speech.audio.delta
@@ -628,7 +628,7 @@ Prüf `voice` und `language` also gegen die Listen auf dieser Seite, bevor du si
 
 ## Voice-Cloning {#voice-cloning}
 
-Eine Stimme aus eigenem Referenz-Audio zu klonen, gibt es hier nicht. Dieses Modell bringt die neun eingebauten Stimmen mit und keinen Speaker-Encoder, es fehlt also das Bauteil, das aus einer Aufnahme deiner Stimme eine sprechbare Stimme machen würde. Anfragen mit `ref_audio`, `ref_text`, `speaker_embedding` oder `task_type` scheitern mit HTTP 500 und `Internal error.`, statt ein unbrauchbares Ergebnis zu liefern.
+Eine Stimme aus eigenem Referenz-Audio zu klonen, gibt es hier nicht. Dieses Modell bringt die neun eingebauten Stimmen mit und keinen Speaker-Encoder, es fehlt also die Komponente, die aus einer Aufnahme deiner Stimme eine sprechbare Stimme machen würde. Anfragen mit `ref_audio`, `ref_text`, `speaker_embedding` oder `task_type` scheitern mit HTTP 500 und `Internal error.`, statt ein unbrauchbares Ergebnis zu liefern.
 
 Wenn du eine bestimmte Stimme brauchst, arbeite mit den neun vorhandenen: Wähl nach Tonhöhe wie unter [Verfügbare Stimmen](#verfügbare-stimmen) beschrieben, und form die Sprechweise über `instructions` und `speed`.
 
