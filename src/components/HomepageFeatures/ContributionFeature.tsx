@@ -1,12 +1,17 @@
-import Link from "@docusaurus/Link";
 import Translate from "@docusaurus/Translate";
-import { Icon } from "@mittwald/flow-react-components";
-import styles from "@site/src/components/HomepageFeatures/styles.module.css";
+import {
+  Heading,
+  Icon,
+  LayoutCard,
+  Section,
+  Text,
+} from "@mittwald/flow-react-components";
 import { IconHeartHandshake } from "@tabler/icons-react";
 import clsx from "clsx";
 import FeatureRow from "../FeatureRow";
 import Intro, { IntroHeader } from "../Intro";
 import { NewBadge } from "@site/src/components/NewBadge";
+import Link from "@site/src/components/Link";
 
 function ContributionIntro() {
   return (
@@ -36,50 +41,56 @@ function ContributionIntro() {
 function ExtensionsFeature() {
   return (
     <>
-      <h3>
-        <Translate id="index.contribution.extensions.title">
-          Integrating extensions
-        </Translate>
-      </h3>
-      <p>
-        <Translate id={"index.contribution.extensions.body"}>
-          These guides will help you get started with building extensions for
-          the mStudio marketplace.
-        </Translate>
-      </p>
-      <ul>
-        <li>
-          <Link to="/docs/v2/contribution">
-            <Translate id="index.contribution.extensions.link-overview">
-              Introduction and overview
-            </Translate>
-          </Link>
-        </li>
-        <li>
-          <Link to="/docs/v2/contribution/overview/concepts/authentication/">
-            <Translate id="index.contribution.extensions.link-auth">
-              Integrating with mStudio access controls
-            </Translate>
-          </Link>
-        </li>
-        <li>
-          <Link to="/docs/v2/category/reference/">
-            <Translate id="index.contribution.extensions.link-api">
-              API and webhook specifications
-            </Translate>
-          </Link>
-        </li>
-      </ul>
-      <p>
-        <Translate id="index.contribution.extensions.more">
-          Check the complete documentation.
-        </Translate>{" "}
-        <Link to="/docs/v2/contribution">
-          <Translate id="index.contribution.extensions.more.link">
-            Read more!
+      <Section>
+        <Heading>
+          <Translate id="index.contribution.extensions.title">
+            Integrating extensions
           </Translate>
-        </Link>
-      </p>
+        </Heading>
+        <Text elementType="p">
+          <Translate id={"index.contribution.extensions.body"}>
+            These guides will help you get started with building extensions for
+            the mStudio marketplace.
+          </Translate>
+        </Text>
+        <Text>
+          <ul>
+            <li>
+              <Link to="/docs/v2/contribution">
+                <Translate id="index.contribution.extensions.link-overview">
+                  Introduction and overview
+                </Translate>
+              </Link>
+            </li>
+            <li>
+              <Link to="/docs/v2/contribution/overview/concepts/authentication/">
+                <Translate id="index.contribution.extensions.link-auth">
+                  Integrating with mStudio access controls
+                </Translate>
+              </Link>
+            </li>
+            <li>
+              <Link to="/docs/v2/category/reference/">
+                <Translate id="index.contribution.extensions.link-api">
+                  API and webhook specifications
+                </Translate>
+              </Link>
+            </li>
+          </ul>
+        </Text>
+      </Section>
+      <Section>
+        <Text elementType="p">
+          <Translate id="index.contribution.extensions.more">
+            Check the complete documentation.
+          </Translate>{" "}
+          <Link to="/docs/v2/contribution">
+            <Translate id="index.contribution.extensions.more.link">
+              Read more!
+            </Translate>
+          </Link>
+        </Text>
+      </Section>
     </>
   );
 }
@@ -87,49 +98,57 @@ function ExtensionsFeature() {
 function ToolsFeature() {
   return (
     <>
-      <h3>
-        <Translate id="index.contribution.tools.title">
-          Contributor tools
-        </Translate>
-      </h3>
-      <p>
-        <Translate id={"index.contribution.tools.body"}>
-          These guides will help you get started with building extensions for
-          the mStudio marketplace.
-        </Translate>
-      </p>
-      <ul>
-        <li>
-          <strong>Flow</strong>:{" "}
-          <Translate id="index.contribution.tools.flow">
-            The mittwald design system and React component library.
+      <Section>
+        <Heading>
+          <Translate id="index.contribution.tools.title">
+            Contributor tools
           </Translate>
-          <br />
-          <Link href="https://github.com/mittwald/flow">GitHub</Link> |{" "}
-          <Link href="https://flow.mittwald.de">Documentation</Link>
-        </li>
-      </ul>
-      <p>
-        <strong>
-          <Translate id="index.contribution.tools.community-title">
-            Community Contributions
+        </Heading>
+        <Text elementType="p">
+          <Translate id={"index.contribution.tools.body"}>
+            These guides will help you get started with building extensions for
+            the mStudio marketplace.
           </Translate>
-        </strong>
-      </p>
-      <ul>
-        <li>
-          <Link href="https://github.com/nuonic-digital/mittwald-flow-mcp">
-            <Translate id="index.contribution.tools.community-mcp-flow">
-              mittwald Flow MCP
+        </Text>
+        <Text>
+          <ul>
+            <li>
+              <strong>Flow</strong>:{" "}
+              <Translate id="index.contribution.tools.flow">
+                The mittwald design system and React component library.
+              </Translate>
+              <br />
+              <Link href="https://github.com/mittwald/flow">GitHub</Link> |{" "}
+              <Link href="https://flow.mittwald.de">Documentation</Link>
+            </li>
+          </ul>
+        </Text>
+      </Section>
+      <Section>
+        <Text elementType="p">
+          <strong>
+            <Translate id="index.contribution.tools.community-title">
+              Community Contributions
             </Translate>
-          </Link>{" "}
-          <NewBadge />
-          <br />
-          <Translate id="index.contribution.tools.community-mcp-flow-desc">
-            MCP server to work with mittwald flow frontend
-          </Translate>
-        </li>
-      </ul>
+          </strong>
+        </Text>
+        <Text>
+          <ul>
+            <li>
+              <Link href="https://github.com/nuonic-digital/mittwald-flow-mcp">
+                <Translate id="index.contribution.tools.community-mcp-flow">
+                  mittwald Flow MCP
+                </Translate>
+              </Link>{" "}
+              <NewBadge />
+              <br />
+              <Translate id="index.contribution.tools.community-mcp-flow-desc">
+                MCP server to work with mittwald flow frontend
+              </Translate>
+            </li>
+          </ul>
+        </Text>
+      </Section>
     </>
   );
 }
@@ -143,14 +162,14 @@ export default function ContributionFeature() {
             <ContributionIntro />
           </div>
           <div className={clsx("col col--4")}>
-            <div className={clsx("padding--md", styles.feature)}>
+            <LayoutCard>
               <ExtensionsFeature />
-            </div>
+            </LayoutCard>
           </div>
           <div className={clsx("col col--4")}>
-            <div className={clsx("padding--md", styles.feature)}>
+            <LayoutCard>
               <ToolsFeature />
-            </div>
+            </LayoutCard>
           </div>
         </div>
       </div>
