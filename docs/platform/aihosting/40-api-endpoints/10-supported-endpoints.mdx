@@ -276,14 +276,14 @@ The `input` parameter holds the text to speak and must not be empty. The `model`
 The remaining parameters are optional:
 
 - `response_format`: One of `wav` (default), `pcm`, `flac`, `mp3`, `opus`. `aac` is **not** supported
-- `language`: Accepted and ignored, see [the model page](../../models/qwen3-tts-customvoice/#language)
+- `language`: One of the thirteen language names the model speaks, `German` for example. ISO codes such as `de` return HTTP 400, and a valid value changes little, see [the model page](../../models/qwen3-tts-customvoice/#language)
 - `speed`: Speaking rate between 0.25 and 4.0, default 1.0
-- `stream`: Set to `true` to receive the audio as a chunked response
-- `stream_format`: Ignored. Both `sse` and `audio` return raw audio chunks, never `speech.audio.*` events
+- `stream`: Set to `true` to get the audio while it is still being generated. Works with `response_format` `wav` and `pcm` only
+- `stream_format`: `audio` for raw audio chunks, `sse` for OpenAI `speech.audio.delta` events with base64 audio
 
-An invalid value for `voice`, `response_format`, `speed` or `instructions`, and an empty `input`, all return HTTP 500 with the body `{"error":{"message":"Internal server error","type":"internal_server_error"}}` rather than a 400 naming the parameter.
+An invalid value for `voice`, `response_format`, `speed`, `language` or `instructions`, and an empty `input`, all return HTTP 400. `response_format` and `speed` name the field in the message; `voice`, `language`, `instructions` and the empty `input` come back as `{"error":{"message":"Got bad request.","code":"400"}}`.
 
-Streaming delivers the audio in chunks, but not sooner: generation finishes first, so the first chunk arrives at roughly the same time the buffered response would have:
+Streaming starts the audio before generation has finished: the first chunk arrives in under 150 ms where the buffered response takes around a second for the same text.
 
 ```sh
 curl -N -X POST https://llm.aihosting.mittwald.de/v1/audio/speech \
@@ -301,7 +301,7 @@ curl -N -X POST https://llm.aihosting.mittwald.de/v1/audio/speech \
 
 **Important notes:**
 
-- The two audio endpoints treat the `language` parameter **differently**. `/v1/audio/transcriptions` wants ISO-639-1 codes such as `de` and acts on them; `/v1/audio/speech` accepts any value and ignores all of them, so nothing there fails and nothing changes either. See [the warning on the model page](../../models/qwen3-tts-customvoice/#language) before you write shared code against both
-- Without streaming, generation takes roughly an eighth of the playback time you request, and nothing arrives until it is finished
+- The two audio endpoints treat the `language` parameter **differently**. `/v1/audio/transcriptions` wants ISO-639-1 codes such as `de`; `/v1/audio/speech` rejects those with HTTP 400 and wants the language name, `German` for example. See [the warning on the model page](../../models/qwen3-tts-customvoice/#language) before you write shared code against both
+- Without streaming, generation takes roughly a fifth of the playback time you request, and nothing arrives until it is finished
 - Voice cloning from your own reference audio is not offered on this endpoint
 - Split long texts and request the parts separately. See the [text-to-speech guide](../../examples/text-to-speech/#long-texts) for a worked example

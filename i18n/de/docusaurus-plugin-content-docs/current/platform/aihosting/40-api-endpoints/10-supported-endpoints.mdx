@@ -276,14 +276,14 @@ Der Parameter `input` enthält den zu sprechenden Text und darf nicht leer sein.
 Die übrigen Parameter sind optional:
 
 - `response_format`: Einer von `wav` (Standard), `pcm`, `flac`, `mp3`, `opus`. `aac` wird **nicht** unterstützt
-- `language`: Wird angenommen und ignoriert, siehe [Modellseite](../../models/qwen3-tts-customvoice/#sprache)
+- `language`: Einer der dreizehn Sprachnamen, die das Modell spricht, zum Beispiel `German`. ISO-Codes wie `de` antworten mit HTTP 400, und ein gültiger Wert ändert wenig, siehe [Modellseite](../../models/qwen3-tts-customvoice/#sprache)
 - `speed`: Sprechtempo zwischen 0,25 und 4,0, Standard 1,0
-- `stream`: Auf `true` gesetzt kommt das Audio als Chunked-Antwort
-- `stream_format`: Wird ignoriert. `sse` und `audio` liefern beide rohe Audio-Chunks und nie `speech.audio.*`-Events
+- `stream`: Auf `true` gesetzt bekommst du das Audio, während es noch entsteht. Das geht nur mit `response_format` `wav` und `pcm`
+- `stream_format`: `audio` für rohe Audio-Chunks, `sse` für `speech.audio.delta`-Events im OpenAI-Format mit Base64-Audio
 
-Ein ungültiger Wert für `voice`, `response_format`, `speed` oder `instructions` und ein leeres `input` antworten alle mit HTTP 500 und dem Antwortkörper `{"error":{"message":"Internal server error","type":"internal_server_error"}}`, nicht mit einem 400, der den Parameter nennt.
+Ein ungültiger Wert für `voice`, `response_format`, `speed`, `language` oder `instructions` und ein leeres `input` antworten alle mit HTTP 400. Bei `response_format` und `speed` nennt die Meldung das Feld, bei `voice`, `language`, `instructions` und leerem `input` kommt `{"error":{"message":"Got bad request.","code":"400"}}` zurück.
 
-Streaming liefert das Audio in Chunks, aber nicht früher: Die Generierung läuft zuerst komplett durch, der erste Chunk kommt also etwa dann, wann auch die gepufferte Antwort gekommen wäre:
+Streaming lässt das Audio anfangen, bevor die Generierung durch ist: Der erste Chunk kommt in weniger als 150 ms, wo die gepufferte Antwort für denselben Text rund eine Sekunde braucht:
 
 ```sh
 curl -N -X POST https://llm.aihosting.mittwald.de/v1/audio/speech \
@@ -301,7 +301,7 @@ curl -N -X POST https://llm.aihosting.mittwald.de/v1/audio/speech \
 
 **Wichtige Hinweise:**
 
-- Die beiden Audio-Endpunkte behandeln den Parameter `language` **unterschiedlich**. `/v1/audio/transcriptions` will ISO-639-1-Codes wie `de` und richtet sich danach, `/v1/audio/speech` nimmt jeden Wert an und ignoriert alle. Dort schlägt also nichts fehl, es ändert sich aber auch nichts. Lies die Warnung auf der [Modellseite](../../models/qwen3-tts-customvoice/#sprache), bevor du gemeinsamen Code für beide schreibst
-- Ohne Streaming braucht die Erzeugung etwa ein Achtel der angeforderten Abspieldauer, und vorher kommt nichts an
+- Die beiden Audio-Endpunkte behandeln den Parameter `language` **unterschiedlich**. `/v1/audio/transcriptions` will ISO-639-1-Codes wie `de`, `/v1/audio/speech` weist die mit HTTP 400 ab und will den Sprachnamen, zum Beispiel `German`. Lies die Warnung auf der [Modellseite](../../models/qwen3-tts-customvoice/#sprache), bevor du gemeinsamen Code für beide schreibst
+- Ohne Streaming braucht die Erzeugung etwa ein Fünftel der angeforderten Abspieldauer, und vorher kommt nichts an
 - Voice-Cloning mit eigenem Referenz-Audio wird auf diesem Endpunkt nicht angeboten
 - Teile lange Texte auf und fordere die Teile einzeln an. Ein ausgearbeitetes Beispiel steht im [Text-to-Speech-Guide](../../examples/text-to-speech/#lange-texte)

@@ -14,7 +14,7 @@ The [Text-to-speech guide](../../examples/text-to-speech/) has runnable examples
 
 "Qwen3-TTS-12Hz-1.7B-CustomVoice" is a text-to-speech model by Alibaba with 1.7 billion parameters. You send text, you get back an audio file. It is the counterpart to [Whisper-Large-V3-Turbo](/docs/v2/platform/aihosting/models/whisper-large-v3-turbo), which goes the other way and turns audio into text.
 
-The model serves the `/v1/audio/speech` endpoint and ships nine built-in voices across thirteen languages and dialects. Speech is generated faster than real time: producing one second of audio takes roughly an eighth of a second on our hardware.
+The model serves the `/v1/audio/speech` endpoint and ships nine built-in voices across thirteen languages and dialects. Speech is generated faster than real time: producing one second of audio takes roughly a fifth of a second on our hardware, and with streaming the first audio arrives in under 150 ms.
 
 It supports and is suitable for:
 
@@ -22,30 +22,27 @@ It supports and is suitable for:
 - Nine distinct built-in voices, selected per request
 - Five output formats, including compressed ones for direct delivery to a browser
 - Adjusting the speaking rate between 0.25 and 4.0
-- Streaming, which delivers the audio in chunks instead of one response body
+- Streaming, either as raw audio chunks or as OpenAI `speech.audio.delta` events, which starts the audio before generation has finished
 
 The following limitations apply:
 
 - Voice cloning from your own reference audio is not available on this endpoint
 - `response_format="aac"` is not supported, although the OpenAI API defines it
-- The `language` parameter has no effect on this endpoint, see [`language` is accepted and ignored](#language)
-- `voice` is required. A request without it fails
-- Invalid parameter values come back as HTTP 500 with a generic message instead of HTTP 400, see [Error responses](#error-responses)
-- The `Content-Type` of the response is always `audio/mpeg`, whatever format you asked for, see [Supported output formats](#output-formats)
-- Streaming does not make the audio start earlier, see [Streaming](#streaming)
+- The `language` parameter is validated, but a supported value changes little in practice, see [Supported values for parameter `language`](#language)
+- `voice` is required. A request without it returns HTTP 400
+- Invalid parameter values return HTTP 400. Some responses name the parameter, others carry a generic message, see [Error responses](#error-responses)
+- Streaming needs `response_format="wav"` or `"pcm"`. Every other format combined with `stream` returns HTTP 400, see [Streaming](#streaming)
 - The model has no chat endpoint. `/v1/chat/completions` is not available for it
 - There is no markup language. `[angry]`, `<laugh>`, and SSML tags are read out loud or dropped, see [Controlling delivery with instructions](#instructions)
 - German text needs preparation before you send it, and short German lines are unreliable, see [Writing text for German](#german-text)
 - `seed` is accepted but does not reproduce a previous result, see [Reproducibility](#reproducibility)
 
-:::warning[`language` is accepted and ignored]
-Whatever you pass in `language`, the endpoint ignores it. Every value returns HTTP 200, including ones that are not on the list below: `de`, `en` and `fr` are accepted the same way `German` is, and none of them changes the output.
+:::warning[`language` wants a language name, not an ISO code]
+The parameter reaches the model and is checked against the thirteen values listed in [Supported values for parameter `language`](#language). `German` is valid, `de` is not, and an unsupported value returns HTTP 400 instead of being swallowed.
 
-You can check this from the wrong direction: German text sent with `language: "English"` still comes back as correct German. Transcribing the audio back gives "Die Lieferung kommt am Dienstagmorgen an und die Rechnung wurde bereits an ihre Adresse geschickt."
+What it does not buy you is better German. The same German sentence, three runs each, transcribed back: two of three runs came back word for word with `language: "German"`, and two of three did without the parameter. Language detection is good enough on its own, so leave `language` out unless you have a reason to pin it.
 
-Two consequences. Language detection is entirely up to the model, and it identified German and English correctly in every run of our testing, so leaving the parameter out costs you nothing. And you cannot force a language: if a text is read in the wrong one, `language` is not the fix, splitting the text is.
-
-If you build one wrapper around both audio models, this is still the parameter that will bite you. [Whisper](/docs/v2/platform/aihosting/models/whisper-large-v3-turbo) reads `de` and acts on it, this endpoint takes `de` and does nothing with it, so the same value looks accepted on both routes while only one of them honours it.
+If you build one wrapper around both audio models, this is the parameter that will bite you. [Whisper](/docs/v2/platform/aihosting/models/whisper-large-v3-turbo) wants ISO-639-1 codes such as `de`, this endpoint rejects them and wants `German`, so the same value works on one route and fails on the other.
 :::
 
 ## Supported voices
@@ -70,29 +67,35 @@ Every voice speaks every supported language, and all nine transcribe back cleanl
 
 Two things to know before you pick one for German. The voices whose native language is not German carry an audible accent, which is a matter of taste rather than a defect. And `instructions` only shapes the delivery of voices with an English-native voice on English text, see [Controlling delivery with instructions](#instructions), so on German the voice itself is the only lever you have over the character of the output.
 
-`voice` is required here, even though the OpenAI API defines it as optional: a request without it returns HTTP 500. An unknown name returns HTTP 500 as well, without naming the valid values, so check your spelling against the list above rather than against the error.
+`voice` is required here, even though the OpenAI API defines it as optional: a request without it returns HTTP 400. An unknown name returns HTTP 400 as well, with a generic `Got bad request.` that does not name the valid values, so check your spelling against the list above rather than against the error.
 
 ## Supported values for parameter `language` {#language}
 
 `Auto`, `Beijing_Dialect`, `Chinese`, `English`, `French`, `German`, `Italian`, `Japanese`, `Korean`, `Portuguese`, `Russian`, `Sichuan_Dialect`, `Spanish`
 
-These are the thirteen languages and dialects the model speaks, and they are the values the endpoint documents for `language`. None of them changes what you get back: the parameter is accepted and ignored, and so is a value that is not on the list. Leave it out and let the model detect the language.
+These are the thirteen languages and dialects the model speaks, and they are the only values `language` accepts. Anything else, an ISO code such as `de` included, returns HTTP 400. Passing a supported value is allowed but rarely worth it: in our runs German text came back equally accurate with and without the parameter, so leaving it out is the simpler default.
 
 ## Supported output formats {#output-formats}
 
-| `response_format` | First bytes of the body | Size for the same 4.5 s of speech |
-| ----------------- | ----------------------- | --------------------------------- |
-| `wav`             | `RIFF` … `WAVE`         | 73 kB                             |
-| `pcm`             | headerless samples      | 92 kB                             |
-| `flac`            | `fLaC`                  | 50 kB                             |
-| `mp3`             | mp3 frame sync `FF F3`  | 15 kB                             |
-| `opus`            | `OggS`                  | 8.6 kB                            |
+| `response_format` | `Content-Type` | First bytes of the body | Size per second of audio |
+| ----------------- | -------------- | ----------------------- | ------------------------ |
+| `wav`             | `audio/wav`    | `RIFF` … `WAVE`         | 48.0 kB                  |
+| `pcm`             | `audio/pcm`    | headerless samples      | 48.0 kB                  |
+| `flac`            | `audio/flac`   | `fLaC`                  | about 23 kB              |
+| `mp3`             | `audio/mpeg`   | mp3 frame sync `FF F3`  | 7.0 kB                   |
+| `opus`            | `audio/ogg`    | `OggS`                  | 4.6 kB                   |
 
-`wav` is the default and the right choice when you process the audio further. For delivery to a browser or a phone, `opus` is roughly a tenth of the size at speech quality.
+`wav` is the default and the right choice when you process the audio further. For delivery to a browser or a phone, `opus` is roughly a ninth of the size at speech quality.
 
-The response header does not tell you which of these you got. `Content-Type` is `audio/mpeg` on every format, including `wav` and `opus`, so a player that trusts the header will try to decode an Ogg or RIFF file as mp3. Write the bytes to a file with the extension you asked for, or sniff the first four bytes as listed above, and don't branch on `Content-Type`.
+The sizes are normalised to one second of audio on purpose. The model samples, so two runs on the same text differ in length by a second or more, and comparing raw file sizes across formats compares the lengths rather than the formats. Normalised, `pcm` and `wav` are the same thing: 48.0 kB per second each, with `wav` adding a 44-byte header.
 
-`aac` returns HTTP 500. Every other invalid value does too, see [Error responses](#error-responses).
+`Content-Type` names the format you asked for, so a player that reads the header decodes the right container. Writing the bytes to a file with the extension you asked for still works and needs no header parsing.
+
+`aac` returns HTTP 400 and names the values that are allowed:
+
+```text
+Input should be 'wav', 'pcm', 'flac', 'mp3' or 'opus'
+```
 
 Audio is 24 kHz, 16-bit, mono in every format. The loudness is not normalised: across our test set the peak level ranged from 0.23 to 0.89 of full scale, about 11 dB between the quietest and the loudest clip. If you play several clips one after another, run them through a loudness normaliser first.
 
@@ -177,7 +180,7 @@ curl_close($ch);
 | Parameter         | Value                       | Effect                                                                      |
 | ----------------- | --------------------------- | --------------------------------------------------------------------------- |
 | `voice`           | one of the nine names       | Required. A request without it fails                                        |
-| `language`        | leave it out                | Ignored, see [`language` is accepted and ignored](#language)                |
+| `language`        | leave it out                | Validated, little effect, see [Supported values](#language)                 |
 | `response_format` | `wav` or `opus`             | `wav` to process further, `opus` to deliver                                 |
 | `speed`           | `1.0`                       | Between 0.25 and 4.0, see [Speaking rate](#speaking-rate)                   |
 | `instructions`    | free text, ≤ 500 characters | Optional. Describes how to speak, see [Controlling delivery](#instructions) |
@@ -203,27 +206,37 @@ There is no markup language on this endpoint. Square-bracket tags, angle-bracket
 
 | You send                                               | What we heard, two runs each                                                                                                      |
 | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| `[wütend] Die Lieferung kommt am Dienstagmorgen an.`   | "**Für ihn,** die Lieferung kommt am Dienstagmorgen an." / "**Hey, wütend!** Die Lieferung kommt am Dienstagmorgen an."           |
 | `[angry] The delivery arrives on Tuesday morning.`     | "**And** the delivery arrives on Tuesday morning." / the sentence alone                                                           |
-| `<laugh> The delivery arrives on Tuesday morning.`     | the sentence alone both times, no laugh                                                                                           |
+| `<laugh> The delivery arrives on Tuesday morning.`     | the sentence, plus 1 to 5 seconds of extra audio the tag turned into; two earlier runs produced continuous noise instead          |
 | `(excited) The delivery arrives on Tuesday morning!`   | "**A** delivery arrives on Tuesday morning." / the sentence alone, no emotion either time                                         |
 | `The delivery arrives … <break time="1s"/> Thank you.` | "The delivery arrives **to thank you when number first to get, huh,** thank you." / "The delivery arrives. Thank you. Thank you." |
 | `<speak><prosody rate="slow">…</prosody></speak>`      | the sentence alone / "**Persody Ray Slow,** the delivery arrives on Tuesday morning."                                             |
 
-Strip any markup from your text and put the intent into the `instructions` parameter instead. It takes a plain sentence describing how the line should be delivered, up to 500 characters. Longer values return HTTP 500.
+Strip any markup from your text and put the intent into the `instructions` parameter instead. It takes a plain sentence describing how the line should be delivered, up to 500 characters. Longer values return HTTP 400.
 
-:::warning[`instructions` works on English, barely on German]
-Measured on our hardware, five runs per setting, English text on the `ryan` voice: pitch moves between 156 Hz without instructions and 222 Hz for "shout", and the speaking rate between 10.6 characters per second for "whisper" and 18.6 for "speak very fast and excitedly". Both move in the direction you asked for.
+`<laugh>` is the clearest case for stripping it. Four runs of the same sentence with the tag in front produced 4.2 s to 8.7 s of audio where the same sentence without it took 3.1 s to 3.8 s, so the tag turns into extra sound rather than into a laugh you asked for, and two runs on an earlier day produced continuous noise with no sentence in it at all.
 
-On German text the same instructions barely register. The pitch range across all emotions collapses to 17 Hz and the rate range to 1.1 characters per second, which is inside the run-to-run noise. Writing the instruction in German instead of English does not change that.
+:::warning[Write `instructions` in English, whatever language the text is in]
+The instruction has to be English. The text does not.
 
-For German, choose a different `voice` and adjust `speed` instead of describing an emotion.
+Measured on our hardware, `ryan`, three runs per setting, five settings from none through happy, angry, sad and calm, with the pitch taken by autocorrelation:
+
+| Text    | Pitch across the five settings | Speaking rate        |
+| ------- | ------------------------------ | -------------------- |
+| English | 127 Hz to 207 Hz, spread 80 Hz | 12.3 to 17.4 chars/s |
+| German  | 115 Hz to 214 Hz, spread 99 Hz | 12.4 to 16.7 chars/s |
+
+German responds as clearly as English, so an emotion is a usable lever on German copy too.
+
+What does not work is an instruction written in German. "Sprich wütend und laut." produced 129.7 Hz and "Flüstere sehr leise." produced 129.4 Hz on the same German sentence, a difference of 0.3 Hz where the English pair moves by around 90 Hz. Keep the text in German and write the instruction in English.
 :::
 
 ### Example: section-by-section voiceover for a client site
 
 A web agency builds a landing page for a client and wants a spoken version of each section: a calm product intro, a friendlier feature paragraph, and a call to action with some drive. One voice throughout keeps it recognisable as the same narrator, `instructions` change the delivery, and `opus` keeps the files small enough to ship with the page.
 
-`instructions` is a first-class parameter in the OpenAI SDKs, so it needs no `extra_body`. Leave `language` out: the endpoint ignores it, and the model reads English copy as English on its own.
+`instructions` is a first-class parameter in the OpenAI SDKs, so it needs no `extra_body`. Leave `language` out: the model reads English copy as English on its own.
 
 <Tabs groupId="language">
 <TabItem value="python" label="Python">
@@ -405,6 +418,8 @@ Below roughly 80 characters, German synthesis fails often enough to matter. Same
 A failure sounds like English, not like a mistake: "Willkommen bei uns. Wie können wir dir heute weiterhelfen?" came back as "We come in by uns, we come with your heart and vital health." The response is still HTTP 200 and the audio is still well-formed, so nothing downstream catches it.
 
 From about 100 characters upwards we did not reproduce it. If you generate short German lines, such as greetings, button labels, or one-sentence notifications, either batch several of them into one request and cut the audio afterwards, or check the result before you ship it. English is not affected at these lengths.
+
+How badly a given short line fails is itself unstable. Re-measuring with different sentences, four runs each, a 20-character line came back clean four times out of four and a 60-character line averaged a word error rate of 0.025, while a 41-character line averaged 0.375 with two runs badly wrong. Treat the length as a risk indicator, not as a threshold you can compute with.
 :::
 
 German copy needs a pass before you send it. The model reads well-formed German prose correctly, but three things in ordinary source text come out wrong, and none of them fail loudly.
@@ -418,6 +433,8 @@ This is the single biggest quality difference we measured. The same sentence, te
 | `Groessere Aenderungen an der Uebersicht …` | 0 of 10                         | 0.215                   |
 
 The transliterated version produced "Gräser Erinnerungen", "Braceränderungen", and "Geißere Änderungen" for "Größere Änderungen". If your CMS or export pipeline strips umlauts, restore them before the request.
+
+Real umlauts are the better spelling, not a guarantee. A shorter sentence with correct umlauts, 38 characters, five runs, averaged a word error rate of 0.28 with two runs clean, which is the short-text effect above rather than an umlaut problem. Keep the umlauts and give the model enough text.
 :::
 
 Second, expand abbreviations and write numbers out. The compact forms a CMS or a language model produces are read incorrectly:
@@ -445,31 +462,40 @@ If you need a clip to stay identical across deploys, generate it once and cache 
 
 Measured on our hardware, German and English, one request at a time:
 
-| Input length   | Time to first byte | Audio produced |
-| -------------- | ------------------ | -------------- |
-| 51 characters  | 811 ms             | 4.8 s          |
-| 99 characters  | 1027 ms            | 6.6 s          |
-| 270 characters | 2968 ms            | 18.4 s         |
+| Input length   | Wait for the full body | Audio produced |
+| -------------- | ---------------------- | -------------- |
+| 41 characters  | 619 ms (390 to 877)    | 2.5 s          |
+| 100 characters | 1343 ms (986 to 1677)  | 6.7 s          |
+| 272 characters | 3242 ms (2047 to 4278) | 17.8 s         |
 
-Each row is the mean of two runs. The ratio of wall-clock time to audio length stays flat at roughly 0.16 across that range, so you can estimate the wait from the length of your text: expect about a sixth of the playback time you are asking for, plus a small constant.
+Each row is the median of four runs with the range in brackets, buffered, `mp3`. The ratio of wall-clock time to audio length falls from 0.235 at 41 characters to 0.170 at 272, so the constant part of the request weighs more on short texts than on long ones. Estimate a fifth of the playback time you are asking for and treat the spread as real: the same 272-character text took 2.0 s in one run and 4.3 s in another.
 
-Streaming does not shorten this wait, see [Streaming](#streaming). If someone is waiting for the audio, keep the text short: at 270 characters you are already three seconds in.
+Streaming cuts the wait for the first audio to under 150 ms, see [Streaming](#streaming). Use it whenever somebody is waiting.
 
 ## Streaming {#streaming}
 
-Set `stream` to `true` to get the audio as a chunked response instead of one body. What you cannot get is an earlier start: generation still finishes before the first chunk leaves, so streaming saves you the transfer of the file, not the wait for the model.
+Set `stream` to `true` to get the audio while it is still being generated. The first audio then arrives in under 150 ms instead of after the full generation, so this is the setting that matters for anything a person waits for.
 
-Measured on the same 99-character sentence as the table above:
+Streaming works with `response_format="wav"` and `"pcm"` only. Any other format together with `stream` returns HTTP 400:
 
-| Mode                     | Content type | First chunk | Chunks | Last chunk |
-| ------------------------ | ------------ | ----------- | ------ | ---------- |
-| buffered (default)       | `audio/mpeg` | 1027 ms     | 1      | 1027 ms    |
-| streaming with `"audio"` | `audio/mpeg` | 875 ms      | 74     | 950 ms     |
-| streaming with `"sse"`   | `audio/mpeg` | 981 ms      | 86     | 1072 ms    |
+```text
+Streaming (stream=true, stream_format='audio', or stream_format='sse') requires response_format='pcm' or 'wav'. Got response_format='mp3'.
+```
 
-All 74 chunks arrive inside 75 ms of each other, at the point where the buffered request would have answered anyway.
+Measured on the same 100-character sentence as the table above, `response_format="pcm"`:
 
-`stream_format` is ignored. Both values return the same thing: a chunked body of raw audio in the format you asked for, starting with the `RIFF` header for `wav`. There are no `speech.audio.delta` or `speech.audio.done` events and the content type is never `text/event-stream`, so an SSE parser will find nothing to parse. Read the body as bytes, the way the example below does.
+| Mode                     | Content type        | First audio | What arrives                                  |
+| ------------------------ | ------------------- | ----------- | --------------------------------------------- |
+| buffered (default)       | `audio/pcm`         | 870 ms      | one body                                      |
+| streaming with `"audio"` | `audio/pcm`         | 91 ms       | 97 chunks, spread over 123 to 999 ms          |
+| streaming with `"sse"`   | `text/event-stream` | 95 ms       | 7 `speech.audio.delta`, 1 `speech.audio.done` |
+
+`stream_format` picks the framing. `"audio"` gives you a chunked body of raw audio in the format you asked for, which is what you want when you write to a file or pipe into a player. `"sse"` gives you the OpenAI event framing: `speech.audio.delta` events carrying the audio base64-encoded, closed by one `speech.audio.done`.
+
+```text
+event: speech.audio.delta
+data: {"type":"speech.audio.delta","audio":"UklGRv////9XQVZF…"}
+```
 
 <Tabs groupId="language">
 <TabItem value="python" label="Python">
@@ -564,34 +590,46 @@ For very long texts, splitting still helps even with streaming, because it lets 
 
 ## Error responses {#error-responses}
 
-| Situation                                                                  | Status | Message                                                             |
-| -------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------- |
-| `input` is an empty string                                                 | 500    | `Internal server error`                                             |
-| `voice` missing                                                            | 500    | `Internal server error`                                             |
-| Unknown `voice`                                                            | 500    | `Internal server error`                                             |
-| `response_format="aac"`                                                    | 500    | `Internal server error`                                             |
-| `instructions` over 500 characters                                         | 500    | `Internal server error`                                             |
-| `speed` outside 0.25 to 4.0                                                | 500    | `Internal server error`                                             |
-| Unknown `language`                                                         | 200    | Accepted and ignored, see [`language`](#language)                   |
-| `ref_audio`, `ref_text`, `speaker_embedding` or `task_type` in the request | 400    | Voice cloning is not available, see [Voice cloning](#voice-cloning) |
-| Unknown model name                                                         | 404    | `Got unknown model name.`                                           |
+| Situation                                                                  | Status | Message                                                 |
+| -------------------------------------------------------------------------- | ------ | ------------------------------------------------------- |
+| `input` is an empty string                                                 | 400    | `Got bad request.`                                      |
+| `voice` missing                                                            | 400    | `Got bad request.`                                      |
+| Unknown `voice`                                                            | 400    | `Got bad request.`                                      |
+| Unknown `language`                                                         | 400    | `Got bad request.`                                      |
+| `instructions` over 500 characters                                         | 400    | `Got bad request.`                                      |
+| `response_format="aac"` or any other unknown format                        | 400    | `Input should be 'wav', 'pcm', 'flac', 'mp3' or 'opus'` |
+| `speed` outside 0.25 to 4.0                                                | 400    | `Input should be less than or equal to 4`               |
+| `stream` with a format other than `wav` or `pcm`                           | 400    | `… requires response_format='pcm' or 'wav'`             |
+| `ref_audio`, `ref_text`, `speaker_embedding` or `task_type` in the request | 500    | `Internal error.`, see [Voice cloning](#voice-cloning)  |
+| Unknown model name                                                         | 404    | `Got unknown model name.`                               |
 
-Every rejected value in the table above returns the same body, with no hint as to which parameter was wrong:
+Rejected values come back in two shapes. `response_format`, `speed` and the streaming constraint are validated with a message that names the field:
 
 ```json
 {
   "error": {
-    "message": "Internal server error",
-    "type": "internal_server_error"
+    "message": "litellm.BadRequestError: Hosted_vllmException - 1 validation error:\n  {'type': 'literal_error', 'loc': ('body', 'response_format'), 'msg': \"Input should be 'wav', 'pcm', 'flac', 'mp3' or 'opus'\"}",
+    "code": "400"
   }
 }
 ```
 
-So a 500 from this endpoint is not necessarily an outage. Validate `voice`, `response_format` and `speed` against the lists on this page before you send them, and treat a 500 that survives a retry as a bad request rather than something to retry harder.
+`voice`, `language`, `instructions` and an empty `input` come back generic, with no hint as to which parameter was wrong:
+
+```json
+{
+  "error": {
+    "message": "Got bad request.",
+    "code": "400"
+  }
+}
+```
+
+So validate `voice` and `language` against the lists on this page before you send them: on those two the status code tells you that something is wrong, and nothing tells you what.
 
 ## Voice cloning {#voice-cloning}
 
-Cloning a voice from your own reference audio is not available. This model ships the nine built-in voices and no speaker encoder, so there is nothing that could turn a sample of your voice into one it can speak with. Requests carrying `ref_audio`, `ref_text`, `speaker_embedding` or `task_type` are rejected with HTTP 400 rather than producing an unusable result.
+Cloning a voice from your own reference audio is not available. This model ships the nine built-in voices and no speaker encoder, so there is nothing that could turn a sample of your voice into one it can speak with. Requests carrying `ref_audio`, `ref_text`, `speaker_embedding` or `task_type` fail with HTTP 500 and `Internal error.` rather than producing an unusable result.
 
 If you need a specific voice, work with the nine you have: pick by pitch as described in [Supported voices](#supported-voices), and use `instructions` and `speed` to shape the delivery.
 
