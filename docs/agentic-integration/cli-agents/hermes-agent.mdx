@@ -1,0 +1,221 @@
+---
+title: Hermes Agent
+sidebar_label: Hermes Agent
+sidebar_position: 1
+---
+
+import PlanCompatibility from "@site/src/components/PlanCompatibility";
+
+# Hermes Agent with mittwald AI Hosting
+
+<PlanCompatibility features={["ai"]} />
+
+[Hermes Agent](https://github.com/NousResearch/hermes-agent) is a command-line agent
+with file, shell and web tools, a built-in skill library, and MCP support. It reaches
+mittwald AI Hosting through a custom provider entry.
+
+## Installation {#installation}
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash
+```
+
+Check the install:
+
+```bash
+hermes --version
+```
+
+## Pointing Hermes at mittwald AI Hosting {#configuration}
+
+Hermes reads `~/.hermes/config.yaml`. Add a `custom_providers` entry and make it the
+default:
+
+```yaml
+model:
+  default: Qwen3.5-122B-A10B-FP8
+  provider: mittwald
+  base_url: https://llm.aihosting.mittwald.de/v1
+custom_providers:
+  - name: mittwald
+    base_url: https://llm.aihosting.mittwald.de/v1
+    api_key: sk-...
+    models:
+      - Qwen3.5-122B-A10B-FP8
+      - Qwen3.8-27B-NVFP4
+      - Qwen3.6-35B-A3B-FP8
+    context_length: 245760
+```
+
+Replace `sk-...` with your API key from
+[mStudio profile settings](https://studio.mittwald.de/profile/api-token).
+
+A `custom_providers` entry accepts only these keys: `name`, `base_url`, `api_key`,
+`api_mode`, `models`, `context_length` and `rate_limit_delay`. Any other key is a
+config error — `hermes doctor` reports it.
+
+:::note
+`context_length` applies to the whole entry. Set it to the smallest window among the
+models you list — 245,760 for the set above — or split models with different windows
+into separate entries.
+:::
+
+## Verifying the connection {#verify}
+
+First check that the config parses:
+
+```bash
+hermes doctor
+```
+
+`custom_providers` is validated against a fixed field list, so a rejected key shows up
+here as a config issue rather than as a confusing "unknown provider" later. With the
+config above, `doctor`'s issue list is unrelated housekeeping (missing `~/.hermes/.env`,
+npm audit warnings) — nothing about `custom_providers`, which means it parsed cleanly.
+
+Then run one turn that forces a tool call, because a plain chat reply would succeed
+even if tool calling were broken:
+
+```bash
+hermes chat --model Qwen3.5-122B-A10B-FP8 \
+  -q "Create a file called hello.txt containing the word hello, then read it back."
+```
+
+Two things about this command differ from what you might expect:
+
+- There is no `-p` flag. The non-interactive flag is `-q`/`--query`.
+- Don't pass `--provider mittwald`. Hermes' `--provider` flag only accepts its
+  built-in provider names (`auto`, `openrouter`, `nous`, `anthropic`, and so on) — a
+  custom provider name is rejected with `error: argument --provider: invalid choice`.
+  Leave it unset; Hermes picks up `mittwald` from `model.provider` in `config.yaml`
+  automatically, so `-m`/`--model` is all you need to add.
+
+A successful run shows the agent preparing a `write_file` call, printing a diff of
+what it's about to write, then preparing a `read_file` call, then a final message
+confirming the round trip:
+
+````
+  ┊ ✍️ preparing write_file…
+  ┊ review diff
+a/hello.txt → b/hello.txt
+@@ -0,0 +1 @@
++hello
+  ┊ 📖 preparing read_file…
+
+╭─ ⚕ Hermes ──────────────────────────────────────────────────╮
+Done! Created `hello.txt` with the word "hello" and read it back:
+
+```
+hello
+```
+
+The file contains 5 bytes (the word "hello" with a newline).
+╰─────────────────────────────────────────────────────────────╯
+````
+
+Two separate tool calls, `write_file` then `read_file`, both against the mittwald
+endpoint — that is tool calling working end to end.
+
+## Recommended skills, plugins and MCP servers {#recommendations}
+
+### Skills
+
+Hermes ships a skill library — nothing to install. List what is available:
+
+```bash
+hermes skills list
+```
+
+Useful for development work:
+
+- `codebase-inspection` — structured exploration of an unfamiliar repository
+- `github-pr-workflow`, `github-code-review`, `github-issues` — GitHub workflows
+- `native-mcp`, `mcporter` — working with MCP servers from inside a session
+
+More skills come from registries:
+
+```bash
+hermes skills search <term>
+hermes skills inspect <name>    # preview before installing
+hermes skills install <name>
+hermes skills audit             # re-scan installed skills
+```
+
+:::warning[Review third-party skills before installing them]
+A skill is a set of instructions the agent will follow. Installing one from a registry
+means running someone else's instructions against your code. Use
+`hermes skills inspect` to read a skill first, and `hermes skills audit` to re-check
+what is already installed.
+:::
+
+### Plugins
+
+Plugins install from Git repositories:
+
+```bash
+hermes plugins install owner/repo
+hermes plugins list
+```
+
+Nothing is required for mittwald AI Hosting to work — the provider config above is
+sufficient.
+
+### MCP servers
+
+MCP servers give the agent tools beyond files and shell. Add one, then test it:
+
+```bash
+hermes mcp add context7 --command npx --args -y @upstash/context7-mcp
+hermes mcp test context7
+hermes mcp list
+```
+
+A useful starting set:
+
+| Server                | Command                                                 |
+| --------------------- | ------------------------------------------------------- |
+| Library documentation | `npx -y @upstash/context7-mcp`                          |
+| URL fetching          | `uvx mcp-server-fetch`                                  |
+| Browser automation    | `npx -y @playwright/mcp`                                |
+| Filesystem access     | `npx -y @modelcontextprotocol/server-filesystem <path>` |
+
+mittwald's own MCP server exposes your infrastructure to the agent. See
+[MCP Integration](/docs/v2/agentic-integration/mcp/) for setup and authentication.
+
+## Troubleshooting {#troubleshooting}
+
+### `error: argument --provider: invalid choice: 'mittwald'` {#provider-invalid-choice}
+
+`hermes chat --provider` only accepts Hermes' built-in provider names — `auto`,
+`openrouter`, `nous`, `openai-codex`, `copilot-acp`, `copilot`, `anthropic`, `gemini`,
+`huggingface`, `zai`, `kimi-coding`, `minimax`, `minimax-cn`, `kilocode` — not the name
+of a `custom_providers` entry. Passing `--provider mittwald` fails with this error
+before the agent even starts. Omit `--provider`; with `model.provider: mittwald` set
+in `config.yaml`, Hermes uses it as the default and `-m Qwen3.5-122B-A10B-FP8` is
+enough to select the model.
+
+### Checking the config and the endpoint separately {#checking-separately}
+
+`hermes doctor` and a forced tool call cover two different failure modes, and it's
+worth knowing which one you're diagnosing:
+
+- If `custom_providers` has a bad or misspelled key, `hermes doctor` reports it as a
+  config issue at parse time — you never get as far as a chat session.
+- If the config parses but the endpoint, key or model is wrong, `doctor` won't catch
+  it, because it doesn't call the endpoint. A forced tool call (as in
+  [Verifying the connection](#verify)) is what confirms the mittwald endpoint is
+  actually reachable and returning tool calls.
+
+## Next steps
+
+- [Pi](./pi) — a second CLI agent
+- [opencode](./opencode) — a third
+- [MCP Integration](/docs/v2/agentic-integration/mcp/) — manage mittwald infrastructure from the agent
+- [AI models](/docs/v2/platform/aihosting/models) — the full model list
+
+## Disclaimer
+
+Third-party tools, MCP servers and external links are provided for convenience without
+endorsement or warranty. Use them at your own risk, review licenses and privacy
+policies, and scope access conservatively (least privilege). Avoid sending sensitive
+data to external services unless required and permitted.
