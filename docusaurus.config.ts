@@ -87,6 +87,22 @@ const config: Config = {
             from: "/docs/v2/agentic-integration/ide-integration/opencode",
             to: "/docs/v2/agentic-integration/cli-agents/opencode",
           },
+          {
+            from: "/docs/v2/platform/aihosting/examples/document-qa-pipeline",
+            to: "/docs/v2/platform/aihosting/examples/glm-ocr#full-pipeline",
+          },
+          {
+            from: "/docs/v2/technologies/aihosting/examples/document-qa-pipeline",
+            to: "/docs/v2/platform/aihosting/examples/glm-ocr#full-pipeline",
+          },
+          {
+            from: "/docs/v2/platform/aihosting/examples/multimodal-search",
+            to: "/docs/v2/platform/aihosting/examples/glm-ocr#multimodal",
+          },
+          {
+            from: "/docs/v2/technologies/aihosting/examples/multimodal-search",
+            to: "/docs/v2/platform/aihosting/examples/glm-ocr#multimodal",
+          },
         ],
         createRedirects(path) {
           let newPath = path;
