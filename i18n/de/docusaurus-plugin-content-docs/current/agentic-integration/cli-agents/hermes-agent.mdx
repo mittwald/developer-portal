@@ -51,10 +51,21 @@ custom_providers:
 Ersetze `sk-...` durch deinen API-Key aus den
 [mStudio Profileinstellungen](https://studio.mittwald.de/profile/api-token).
 
-Ein `custom_providers`-Eintrag akzeptiert ausschließlich diese Schlüssel:
-`name`, `base_url`, `api_key`, `api_mode`, `models`, `context_length` und
-`rate_limit_delay`. Jeder andere Schlüssel ist ein Konfigurationsfehler, den
-`hermes doctor` meldet.
+Ein `custom_providers`-Eintrag akzeptiert diese Schlüssel: `name`, `base_url`,
+`api_key`, `api_mode`, `model`, `models`, `context_length`, `rate_limit_delay`,
+`extra_body`, `ssl_ca_cert`, `ssl_verify` und `key_env`. Ein nicht erkannter
+Schlüssel wird nicht zuverlässig abgefangen, bevor du bis zu einer
+Chat-Session kommst – siehe
+[Konfiguration und Endpoint getrennt prüfen](#checking-separately) –, prüfe
+also im Zweifel die Schreibweise gegen diese Liste.
+
+Statt den Key als `api_key` in `config.yaml` einzufügen, kannst du ihn
+komplett aus der Datei heraushalten und mit `key_env` aus einer
+Umgebungsvariable lesen:
+
+```yaml
+key_env: MITTWALD_LLM_API_KEY
+```
 
 :::note
 `context_length` gilt für den gesamten Eintrag. Setze ihn auf das kleinste
@@ -65,18 +76,19 @@ Einträge.
 
 ## Verbindung prüfen {#verify}
 
-Zuerst prüfen, ob die Konfiguration sauber geparst wird:
+Führe `hermes doctor` als ersten Check aus:
 
 ```bash
 hermes doctor
 ```
 
-`custom_providers` wird gegen eine feste Liste erlaubter Felder validiert, ein
-abgelehnter Schlüssel taucht hier also als Konfigurationsproblem auf statt
-später als verwirrender „unknown provider"-Fehler. Mit der Konfiguration
-oben besteht die restliche Fehlerliste von `doctor` nur aus unabhängigem
-Housekeeping (fehlende `~/.hermes/.env`, npm-audit-Warnungen) – nichts zu
-`custom_providers`, was bedeutet, dass er sauber geparst wurde.
+`doctor` deckt gängige Umgebungs- und Setup-Probleme auf, aber seine Ausgabe
+unterscheidet sich je nach Installation, und er validiert die Feldnamen von
+`custom_providers` nicht zuverlässig – ein nicht erkannter Schlüssel wird
+womöglich einfach ignoriert statt gemeldet. Verhält sich der Provider nicht
+wie erwartet, prüfe die Schreibweise gegen die Schlüsselliste unter
+[Hermes auf mittwald AI Hosting zeigen lassen](#configuration), statt dich
+darauf zu verlassen, dass `doctor` das abfängt.
 
 Führe dann einen Turn aus, der einen Tool Call erzwingt, denn eine reine
 Chat-Antwort würde auch bei kaputtem Tool Calling gelingen:
@@ -116,8 +128,6 @@ Done! Created `hello.txt` with the word "hello" and read it back:
 ```
 hello
 ```
-
-The file contains 5 bytes (the word "hello" with a newline).
 ╰─────────────────────────────────────────────────────────────╯
 ````
 
@@ -213,11 +223,14 @@ reicht, um das Modell zu wählen.
 `hermes doctor` und ein erzwungener Tool Call decken zwei unterschiedliche
 Fehlerarten ab, und es lohnt sich zu wissen, welche man gerade diagnostiziert:
 
-- Hat `custom_providers` einen falschen oder falsch geschriebenen Schlüssel,
-  meldet `hermes doctor` das bereits beim Parsen als Konfigurationsproblem –
-  du kommst gar nicht erst bis zu einer Chat-Session.
+- `hermes doctor` deckt gängige Setup-Probleme auf, validiert aber die
+  Feldnamen von `custom_providers` nicht zuverlässig – ein falsch
+  geschriebener oder nicht unterstützter Schlüssel wird womöglich einfach
+  ignoriert statt gemeldet. Prüfe die Schreibweise gegen die Schlüsselliste
+  unter [Hermes auf mittwald AI Hosting zeigen lassen](#configuration),
+  statt dich darauf zu verlassen, dass `doctor` das abfängt.
 - Parst die Konfiguration sauber, aber Endpoint, Key oder Modell sind falsch,
-  fängt `doctor` das nicht ab, weil er den Endpoint nicht aufruft. Ein
+  fängt `doctor` das ebenfalls nicht ab, weil er den Endpoint nicht aufruft. Ein
   erzwungener Tool Call (wie unter
   [Verbindung prüfen](#verify)) bestätigt, dass der mittwald-Endpoint
   tatsächlich erreichbar ist und Tool Calls zurückliefert.

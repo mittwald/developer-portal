@@ -285,7 +285,7 @@ def grosses_pdf_ocr(pfad: str, batch_groesse: int = 30) -> str:
 text = grosses_pdf_ocr("jahresbericht.pdf")
 ```
 
-## Vollständige Pipeline: OCR → Einbettung → Suche → Antwort {#vollstaendige-pipeline}
+## Vollständige Pipeline: OCR → Einbettung → Suche → Antwort {#full-pipeline}
 
 Kombiniere vier mittwald AI-Hosting-Modelle zu einer vollständigen Dokumenten-Frage-Antwort-Pipeline:
 
@@ -468,13 +468,18 @@ fragen = [
 for frage in fragen:
     [anfrage_vektor] = einbetten([frage])
     kandidaten = abrufen(anfrage_vektor, index, top_k=10)
-    kontext_abschnitte = neu_sortieren(frage, kandidaten, top_k=3)
+    kontext_abschnitte = neu_sortieren(
+        frage,
+        kandidaten,
+        top_k=3,
+        anweisung="Given a question, find the document passage that best answers it.",
+    )
     print(f"\nF: {frage}")
     print(f"A: {antworten(frage, kontext_abschnitte)}")
 ```
 
 :::tip Skalierung
-Für den Produktionseinsatz empfiehlt es sich, die In-Memory-Kosinus-Suche durch **pgvector** zu ersetzen – eine PostgreSQL-Erweiterung für Vektorsimilarität, die auf mittwald Container Hosting zusammen mit n8n läuft. Den kompletten Stack zeigt der [mittwald n8n-Guide](/docs/v2/guides/apps/n8n/).
+Für den Produktionseinsatz empfiehlt es sich, die In-Memory-Kosinus-Suche durch **pgvector** zu ersetzen – eine PostgreSQL-Erweiterung für Vektorsimilarität, die auf mittwald Container Hosting zusammen mit n8n läuft. Siehe den [Abschnitt zum vollständigen RAG mit n8n](#n8n) weiter unten oder den [mittwald n8n-Guide](/docs/v2/guides/apps/n8n/) für einen startbereiten Docker-Compose-Stack.
 :::
 
 ## Mehrere Dokumente indizieren {#multiple-documents}
@@ -570,7 +575,7 @@ top_abschnitte = neu_sortieren_multimodal("Was zeigt die Grafik?", abschnitte, b
 
 ### Nur Text als Fallback {#text-only}
 
-Die meisten Dokumente brauchen das Bild nicht – reiner OCR-Text sortiert genauso gut und ist günstiger zu senden. Ohne `image_url`-Content auszukommen und stattdessen reine Strings als `documents` zu übergeben, ist genau das, was `neu_sortieren()` in der [vollständigen Pipeline](#vollstaendige-pipeline) oben bereits tut. Greife nur dann zu `neu_sortieren_multimodal()`, wenn das visuelle Layout – ein Stempel, ein Diagramm, eine markierte Zahl – für die Antwort wirklich eine Rolle spielt.
+Die meisten Dokumente brauchen das Bild nicht – reiner OCR-Text sortiert genauso gut und ist günstiger zu senden. Ohne `image_url`-Content auszukommen und stattdessen reine Strings als `documents` zu übergeben, ist genau das, was `neu_sortieren()` in der [vollständigen Pipeline](#full-pipeline) oben bereits tut. Greife nur dann zu `neu_sortieren_multimodal()`, wenn das visuelle Layout – ein Stempel, ein Diagramm, eine markierte Zahl – für die Antwort wirklich eine Rolle spielt.
 
 :::tip
 Schreibe den `instruction`-Wert immer auf **Englisch**, auch wenn die Anfrage in einer anderen Sprache formuliert ist. Details zu Anweisungsformat und Bildgrößen-Limits stehen auf der [Qwen3-VL-Reranker-2B Modellseite](/docs/v2/platform/aihosting/models/qwen3-vl-reranker-2b).

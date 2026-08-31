@@ -98,7 +98,7 @@ auf dessen Seite in der
 ## Verbindung prüfen {#verify}
 
 ```bash
-opencode run "Create a file called hello.txt containing the word hello, then read it back."
+opencode run --auto "Create a file called hello.txt containing the word hello, then read it back."
 ```
 
 Erwartet: opencode schreibt die Datei, liest sie zurück und gibt den Inhalt
@@ -106,10 +106,11 @@ aus. Führe das in einem Scratch-Verzeichnis aus – der Agent schreibt Dateien
 dort, wo du ihn startest. Eine reine Frage würde auch bei fehlendem
 `tool_call` gelingen, deshalb prüft der Test über eine Dateischreibung.
 
-`opencode run` muss den Dateischreibzugriff erst genehmigen lassen, bevor er
-passiert. Übergib `--auto`, um Berechtigungen automatisch zu genehmigen, die
-nicht explizit verweigert sind, und `--standalone`, um gegen einen privaten
-Server statt gegen den gemeinsamen Hintergrunddienst zu laufen.
+Ohne `--auto` musst du den Dateischreibzugriff erst genehmigen, bevor er
+passiert. `--auto` genehmigt automatisch Berechtigungen, die nicht explizit
+verweigert sind. `--standalone` läuft gegen einen privaten Server statt gegen
+den gemeinsamen Hintergrunddienst – nützlich, wenn `opencode run` keine
+Ausgabe liefert (siehe [Troubleshooting](#no-output) weiter unten).
 
 ## Nutzung {#usage}
 
@@ -225,6 +226,18 @@ Sessions reaktionsfähig, da Subagenten-Arbeit meist aus Suchen und
 Zusammenfassen besteht.
 
 ## Troubleshooting {#troubleshooting}
+
+### `opencode run` liefert keine Ausgabe und schreibt keine Datei {#no-output}
+
+`opencode run` ist nicht interaktiv, und je nach Build liefert es unter
+Umständen gar nichts zurück – keine Ausgabe, keine Datei, keine Fehlermeldung
+– statt zu melden, was schiefgelaufen ist. `--standalone` führt den Befehl
+gegen einen privaten Server statt gegen den gemeinsamen Hintergrunddienst
+aus – einen Versuch wert, wenn ein Lauf nichts liefert; das ist die
+dokumentierte Funktion des Flags, keine Garantie, dass es das Problem für
+jede Installation löst. Bestätigt `opencode run` die Verbindung weiterhin
+nicht, weiche auf die interaktive TUI aus (`opencode` ohne Subcommand
+ausführen) und schicke denselben Prompt dort ab.
 
 ### Der Agent antwortet, bearbeitet aber nie eine Datei oder führt einen Befehl aus {#no-tool-calls}
 

@@ -470,7 +470,12 @@ questions = [
 for q in questions:
     [q_vec] = embed([q])
     candidates = retrieve(q_vec, index, top_k=10)
-    context_chunks = rerank(q, candidates, top_k=3)
+    context_chunks = rerank(
+        q,
+        candidates,
+        top_k=3,
+        instruction="Given a question, find the document passage that best answers it.",
+    )
     print(f"\nQ: {q}")
     print(f"A: {answer(q, context_chunks)}")
 ```

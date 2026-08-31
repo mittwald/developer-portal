@@ -96,16 +96,17 @@ the agent's model rotation. Check each model's limits on its page in the
 ## Verifying the connection {#verify}
 
 ```bash
-opencode run "Create a file called hello.txt containing the word hello, then read it back."
+opencode run --auto "Create a file called hello.txt containing the word hello, then read it back."
 ```
 
 Expected: opencode writes the file, reads it back, and reports the contents. Run this in
 a scratch directory — the agent writes files where you start it. A plain question would
 succeed even with `tool_call` missing, which is why the check writes a file.
 
-`opencode run` needs to approve the file write before it happens. Pass `--auto` to
-auto-approve permissions that are not explicitly denied, and `--standalone` to run
-against a private server instead of the shared background service.
+Without `--auto`, you need to approve the file write before it happens. `--auto`
+auto-approves permissions that are not explicitly denied. `--standalone` runs against a
+private server instead of the shared background service — useful if `opencode run`
+produces no output (see [troubleshooting](#no-output) below).
 
 ## Usage {#usage}
 
@@ -219,6 +220,16 @@ Routing subagents to `Qwen3.6-35B-A3B-FP8` while the main agent stays on
 search and summarising.
 
 ## Troubleshooting {#troubleshooting}
+
+### `opencode run` produces no output and writes no file {#no-output}
+
+`opencode run` is non-interactive, and depending on the build it may return nothing —
+no output, no file, no error — rather than reporting what went wrong. `--standalone`
+runs the command against a private server instead of the shared background service,
+which is worth trying if a run produces nothing; this is the documented purpose of the
+flag, not a guarantee it resolves the issue for every installation. If `opencode run`
+still doesn't confirm the connection, fall back to the interactive TUI (run `opencode`
+with no subcommand) and send the same prompt there.
 
 ### The agent answers but never edits a file or runs a command {#no-tool-calls}
 

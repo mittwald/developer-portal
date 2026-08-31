@@ -50,9 +50,19 @@ custom_providers:
 Replace `sk-...` with your API key from
 [mStudio profile settings](https://studio.mittwald.de/profile/api-token).
 
-A `custom_providers` entry accepts only these keys: `name`, `base_url`, `api_key`,
-`api_mode`, `models`, `context_length` and `rate_limit_delay`. Any other key is a
-config error — `hermes doctor` reports it.
+A `custom_providers` entry accepts these keys: `name`, `base_url`, `api_key`,
+`api_mode`, `model`, `models`, `context_length`, `rate_limit_delay`, `extra_body`,
+`ssl_ca_cert`, `ssl_verify` and `key_env`. An unrecognised key isn't reliably caught
+before you reach a chat session — see
+[Checking the config and the endpoint separately](#checking-separately) — so check
+spelling against this list if the provider misbehaves.
+
+Instead of pasting the key into `config.yaml` as `api_key`, you can keep it out of
+the file entirely with `key_env` and read it from an environment variable:
+
+```yaml
+key_env: MITTWALD_LLM_API_KEY
+```
 
 :::note
 `context_length` applies to the whole entry. Set it to the smallest window among the
@@ -62,16 +72,18 @@ into separate entries.
 
 ## Verifying the connection {#verify}
 
-First check that the config parses:
+Run `hermes doctor` as a first check:
 
 ```bash
 hermes doctor
 ```
 
-`custom_providers` is validated against a fixed field list, so a rejected key shows up
-here as a config issue rather than as a confusing "unknown provider" later. With the
-config above, `doctor`'s issue list is unrelated housekeeping (missing `~/.hermes/.env`,
-npm audit warnings) — nothing about `custom_providers`, which means it parsed cleanly.
+`doctor` surfaces common environment and setup problems, but its output varies by
+installation, and it does not reliably validate `custom_providers` field names — an
+unrecognised key may simply be ignored rather than reported. If the provider doesn't
+behave as expected, check spelling against the key list in
+[Pointing Hermes at mittwald AI Hosting](#configuration) rather than trusting `doctor`
+to catch it.
 
 Then run one turn that forces a tool call, because a plain chat reply would succeed
 even if tool calling were broken:
@@ -108,8 +120,6 @@ Done! Created `hello.txt` with the word "hello" and read it back:
 ```
 hello
 ```
-
-The file contains 5 bytes (the word "hello" with a newline).
 ╰─────────────────────────────────────────────────────────────╯
 ````
 
@@ -199,10 +209,13 @@ enough to select the model.
 `hermes doctor` and a forced tool call cover two different failure modes, and it's
 worth knowing which one you're diagnosing:
 
-- If `custom_providers` has a bad or misspelled key, `hermes doctor` reports it as a
-  config issue at parse time — you never get as far as a chat session.
+- `hermes doctor` surfaces common setup problems, but it does not reliably validate
+  `custom_providers` field names — a misspelled or unsupported key may simply be
+  ignored instead of reported. Check spelling against the key list in
+  [Pointing Hermes at mittwald AI Hosting](#configuration) rather than relying on
+  `doctor` to catch it.
 - If the config parses but the endpoint, key or model is wrong, `doctor` won't catch
-  it, because it doesn't call the endpoint. A forced tool call (as in
+  it either, because it doesn't call the endpoint. A forced tool call (as in
   [Verifying the connection](#verify)) is what confirms the mittwald endpoint is
   actually reachable and returning tool calls.
 
