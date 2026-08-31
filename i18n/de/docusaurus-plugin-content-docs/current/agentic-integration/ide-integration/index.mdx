@@ -18,8 +18,14 @@ Der Service bietet mehrere Modelle für unterschiedliche Entwicklungsaufgaben. E
 
 **Empfohlene Modelle:**
 
-- **Ministral-3-14B-Instruct-2512**: Chat, Vision, General Assistants, multimodale UX, agentic coding, Tool Use
-- **gpt-oss-120b**: Komplexe textzentrierte Aufgaben und präzise Automatisierungen
+- **Qwen3.5-122B-A10B-FP8**: Standardwahl für Coding – stärkstes Tool Calling,
+  245.760 Token Kontext
+- **Qwen3.8-27B-NVFP4**: schneller als das 122B-Modell, 256.000 Token Kontext
+- **Qwen3.6-35B-A3B-FP8**: das schnellste der drei, 256.000 Token Kontext, gut für
+  Completion und schnelle Edits
+- **gpt-oss-120b**: reasoning-lastige Aufgaben, 131.072 Token Kontext
+- **Ministral-3-14B-Instruct-2512**: klein und schnell, 262.144 Token Kontext, für
+  leichtgewichtige Assistenten
 
 ## Unterstützte IDEs und Tools
 
@@ -36,16 +42,22 @@ Der Service bietet mehrere Modelle für unterschiedliche Entwicklungsaufgaben. E
 1. **API-Key holen**: In den [mStudio Profileinstellungen](https://studio.mittwald.de/profile/api-token)
 2. **IDE wählen**: Eine der Integrationen oben nutzen
 3. **Endpoint konfigurieren**: `https://llm.aihosting.mittwald.de/v1`
-4. **Modell wählen**: `Ministral-3-14B-Instruct-2512`
+4. **Modell wählen**: `Qwen3.5-122B-A10B-FP8`
 
 ## Best Practices
 
 ### Modellwahl
 
-- **Ministral-3-14B-Instruct-2512**: Für die meisten Coding-Aufgaben, inkl. Tool Use und Vision
-- **gpt-oss-120b**: Für komplexes Reasoning, präzise Dokumentation und anspruchsvolle Automatisierung
+- **Qwen3.5-122B-A10B-FP8**: Startpunkt für agentic Coding, Refactoring und Tool Use
+- **Qwen3.8-27B-NVFP4**: schnellere Antworten als das 122B-Modell, bei etwas
+  geringerer Qualität
+- **Qwen3.6-35B-A3B-FP8**: Inline-Completion und schnelle Edits, wo Latenz mehr
+  zählt als Tiefe
+- **gpt-oss-120b**: komplexes Reasoning, präzise Dokumentation, anspruchsvolle
+  Automatisierungen
+- **Ministral-3-14B-Instruct-2512**: leichtgewichtige Assistenten und einfacher Chat
 
-### Tipps für Long Context (256k)
+### Tipps für Long Context {#tipps-fuer-long-context}
 
 - Nicht das ganze Repo senden, nur relevante Dateien/Funktionskörper
 - Vorherige Schritte zusammenfassen und IDs/Anker für Rehydration nutzen
@@ -60,10 +72,8 @@ Viele IDEs unterstützen [Model Context Protocol (MCP)](/docs/v2/agentic-integra
 
 - **Context7**: Aktuelle Library-Dokumentation
 - **Brave Search**: Websuche mit Privacy-Fokus
-- **PostgreSQL**: Datenbankabfragen und Schema-Inspektion
 - **Directus**: Headless-CMS-Management
 - **OpenSearch**: Suche, Index-Inspektion, Mappings und Cluster-Diagnostik
-- **Apache Solr**: Hybride Keyword-/Vektorsuche für Enterprise-Such-Workflows
 - **TYPO3**: TYPO3-CMS-Content und Backend-Automatisierung per MCP
 - **mittwald**: Infrastruktur-Management in natürlicher Sprache
 

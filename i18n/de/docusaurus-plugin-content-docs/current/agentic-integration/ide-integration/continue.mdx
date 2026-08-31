@@ -26,9 +26,9 @@ name: mittwald
 version: 1.0.0
 schema: v1
 models:
-  - name: Ministral-3-14B-Instruct-2512
+  - name: Qwen3.5-122B-A10B-FP8
     provider: openai
-    model: Ministral-3-14B-Instruct-2512
+    model: Qwen3.5-122B-A10B-FP8
     apiBase: https://llm.aihosting.mittwald.de/v1
     apiKey: <INSERT-API-KEY>
     roles:
@@ -51,29 +51,25 @@ Ersetze `<INSERT-API-KEY>` durch deinen mittwald LLM API-Key aus den [mStudio Pr
 
 ## MCP Server Integration {#mcp}
 
-Continue unterstützt MCP-Server. Ergänze in deiner `config.yaml` z. B.:
+Continue unterstützt Model Context Protocol Server. Ergänze MCP-Server in deiner `config.yaml`:
 
 ```yaml
 mcpServers:
+  # Context7: Up-to-date library documentation
   context7:
     name: Context7
     command: npx
-    args: ["-y", "@context7/mcp-server", "--stdio"]
+    args: ["-y", "@upstash/context7-mcp"]
     env: { CONTEXT7_API_KEY: "your-context7-api-key" }
 
+  # Brave Search: Web search with privacy focus
   brave-search:
     name: Brave
     command: npx
-    args: ["-y", "@modelcontextprotocol/server-brave-search", "--stdio"]
+    args: ["-y", "@brave/brave-search-mcp-server"]
     env: { BRAVE_API_KEY: "your-brave-api-key" }
 
-  postgres:
-    name: PostgreSQL
-    command: npx
-    args: ["-y", "@modelcontextprotocol/server-postgres", "--stdio"]
-    env:
-      POSTGRES_CONNECTION_STRING: "postgresql://user:pass@localhost:5432/dbname"
-
+  # Directus: Headless CMS data management
   directus:
     name: Directus
     command: npx
@@ -82,22 +78,17 @@ mcpServers:
       DIRECTUS_URL: "https://your-directus-instance.com"
       DIRECTUS_TOKEN: "your-directus-token"
 
+  # OpenSearch: Search and analytics engine
   opensearch:
     name: OpenSearch
-    command: npx
-    args: ["-y", "@opensearch-project/mcp-server", "--stdio"]
+    command: uvx
+    args: ["opensearch-mcp-server-py"]
     env:
       OPENSEARCH_URL: "https://localhost:9200"
       OPENSEARCH_USERNAME: "your-opensearch-username"
       OPENSEARCH_PASSWORD: "your-opensearch-password"
 
-  solr:
-    name: Solr
-    command: uvx
-    args: ["solr-mcp"]
-    env:
-      SOLR_URL: "http://localhost:8983/solr"
-
+  # TYPO3: CMS content and backend management (requires mittwald CLI)
   typo3:
     name: TYPO3
     command: mw
@@ -110,6 +101,7 @@ mcpServers:
         "vendor/bin/typo3 mcp:server",
       ]
 
+  # mittwald MCP: Infrastructure management
   mittwald:
     name: mittwald
     transport:
@@ -117,12 +109,20 @@ mcpServers:
       url: https://mcp.mittwald.de/mcp
 ```
 
+:::note[Für Postgres gibt es keinen empfohlenen MCP-Server]
+Das offizielle Paket `@modelcontextprotocol/server-postgres` ist auf npm als deprecated
+markiert, ohne offiziellen Nachfolger. Brauchst du Postgres-Zugriff aus Continue heraus,
+wähle selbst einen Community-Server aus der
+[MCP-Server-Registry](https://github.com/modelcontextprotocol/servers), statt dich auf
+einen von mittwald hier empfohlenen Namen zu verlassen.
+:::
+
 ### MCP-Tools nutzen
 
 Bitte den Assistenten explizit um Tool-Nutzung, z. B.:
 
 - "Use Brave Search to find recent information about React 19..."
-- "Query the PostgreSQL database to show all users..."
+- "Query OpenSearch for recent error logs..."
 - "Use mittwald MCP to list my projects"
 
 ## Best Practices

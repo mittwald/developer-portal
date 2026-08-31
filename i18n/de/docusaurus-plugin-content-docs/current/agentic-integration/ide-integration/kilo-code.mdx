@@ -18,7 +18,7 @@ Installiere Kilo Code über den [VS Code Marketplace](https://marketplace.visual
 2. **Provider**: OpenAI Compatible
 3. **Base URL**: `https://llm.aihosting.mittwald.de/v1`
 4. **API Key**: Dein mittwald LLM API-Key aus [mStudio](https://studio.mittwald.de/profile/api-token)
-5. **Model**: `Ministral-3-14B-Instruct-2512`
+5. **Model**: `Qwen3.5-122B-A10B-FP8`
 
 ### Umgebungsvariablen
 
@@ -38,18 +38,13 @@ Kilo Code unterstützt MCP-Server per UI (Tools → Add MCP Server) oder Konfigu
   "mcpServers": {
     "context7": {
       "command": "npx",
-      "args": ["-y", "@context7/mcp-server", "--stdio"],
+      "args": ["-y", "@upstash/context7-mcp"],
       "env": { "CONTEXT7_API_KEY": "your-key" }
     },
     "brave-search": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-brave-search", "--stdio"],
+      "args": ["-y", "@brave/brave-search-mcp-server"],
       "env": { "BRAVE_API_KEY": "your-key" }
-    },
-    "postgres": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-postgres", "--stdio"],
-      "env": { "POSTGRES_CONNECTION_STRING": "postgresql://..." }
     },
     "directus": {
       "command": "npx",
@@ -60,19 +55,12 @@ Kilo Code unterstützt MCP-Server per UI (Tools → Add MCP Server) oder Konfigu
       }
     },
     "opensearch": {
-      "command": "npx",
-      "args": ["-y", "@opensearch-project/mcp-server", "--stdio"],
+      "command": "uvx",
+      "args": ["opensearch-mcp-server-py"],
       "env": {
         "OPENSEARCH_URL": "https://localhost:9200",
         "OPENSEARCH_USERNAME": "your-opensearch-username",
         "OPENSEARCH_PASSWORD": "your-opensearch-password"
-      }
-    },
-    "solr": {
-      "command": "uvx",
-      "args": ["solr-mcp"],
-      "env": {
-        "SOLR_URL": "http://localhost:8983/solr"
       }
     },
     "typo3": {
@@ -94,6 +82,14 @@ Kilo Code unterstützt MCP-Server per UI (Tools → Add MCP Server) oder Konfigu
   }
 }
 ```
+
+:::note[Für Postgres gibt es keinen empfohlenen MCP-Server]
+Das offizielle Paket `@modelcontextprotocol/server-postgres` ist auf npm als deprecated
+markiert, ohne offiziellen Nachfolger. Brauchst du Postgres-Zugriff aus Kilo Code heraus,
+wähle selbst einen Community-Server aus der
+[MCP-Server-Registry](https://github.com/modelcontextprotocol/servers), statt dich auf
+einen von mittwald hier empfohlenen Namen zu verlassen.
+:::
 
 ## Nächste Schritte
 
