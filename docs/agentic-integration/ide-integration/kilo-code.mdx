@@ -42,18 +42,13 @@ Kilo Code supports MCP servers. Add them via settings (Tools → Add MCP Server)
   "mcpServers": {
     "context7": {
       "command": "npx",
-      "args": ["-y", "@context7/mcp-server", "--stdio"],
+      "args": ["-y", "@upstash/context7-mcp"],
       "env": { "CONTEXT7_API_KEY": "your-key" }
     },
     "brave-search": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-brave-search", "--stdio"],
+      "args": ["-y", "@brave/brave-search-mcp-server"],
       "env": { "BRAVE_API_KEY": "your-key" }
-    },
-    "postgres": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-postgres", "--stdio"],
-      "env": { "POSTGRES_CONNECTION_STRING": "postgresql://..." }
     },
     "directus": {
       "command": "npx",
@@ -64,19 +59,12 @@ Kilo Code supports MCP servers. Add them via settings (Tools → Add MCP Server)
       }
     },
     "opensearch": {
-      "command": "npx",
-      "args": ["-y", "@opensearch-project/mcp-server", "--stdio"],
+      "command": "uvx",
+      "args": ["opensearch-mcp-server-py"],
       "env": {
         "OPENSEARCH_URL": "https://localhost:9200",
         "OPENSEARCH_USERNAME": "your-opensearch-username",
         "OPENSEARCH_PASSWORD": "your-opensearch-password"
-      }
-    },
-    "solr": {
-      "command": "uvx",
-      "args": ["solr-mcp"],
-      "env": {
-        "SOLR_URL": "http://localhost:8983/solr"
       }
     },
     "typo3": {
@@ -98,6 +86,13 @@ Kilo Code supports MCP servers. Add them via settings (Tools → Add MCP Server)
   }
 }
 ```
+
+:::note[Postgres has no recommended MCP server]
+The official `@modelcontextprotocol/server-postgres` package is deprecated on npm with
+no official successor. If you need Postgres access from Kilo Code, pick a community
+server from the [MCP server registry](https://github.com/modelcontextprotocol/servers)
+yourself rather than relying on a name mittwald recommends here.
+:::
 
 ### Web Fetching
 
