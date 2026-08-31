@@ -18,8 +18,14 @@ The service offers several AI models optimized for different development tasks. 
 
 **Recommended models:**
 
-- **Ministral-3-14B-Instruct-2512**: Chat, vision, general assistants, multimodal UX, agentic coding, tool use
-- **gpt-oss-120b**: Complex text-centric workloads and advanced automations requiring precision
+- **Qwen3.5-122B-A10B-FP8**: the default choice for coding — strongest tool calling,
+  245,760-token context
+- **Qwen3.8-27B-NVFP4**: faster, vision-capable, 256,000-token context
+- **Qwen3.6-35B-A3B-FP8**: fastest of the three, 256,000-token context, good for
+  completion and quick edits
+- **gpt-oss-120b**: reasoning-heavy work, 131,072-token context
+- **Ministral-3-14B-Instruct-2512**: small and fast, 262,144-token context, for
+  lightweight assistants
 
 ## Supported IDEs and Tools
 
@@ -39,16 +45,21 @@ Running an agent in the terminal instead of an editor? See
 1. **Get your API key**: Visit [mStudio profile settings](https://studio.mittwald.de/profile/api-token)
 2. **Choose your IDE**: Select from the integrations above
 3. **Configure endpoint**: `https://llm.aihosting.mittwald.de/v1`
-4. **Select model**: `Ministral-3-14B-Instruct-2512`
+4. **Select model**: `Qwen3.5-122B-A10B-FP8`
 
 ## Best Practices
 
 ### Model Selection
 
-- **Ministral-3-14B-Instruct-2512**: Best for most coding tasks, supports tool use and vision
-- **gpt-oss-120b**: Use for complex reasoning, precise documentation, or advanced automations
+- **Qwen3.5-122B-A10B-FP8**: start here for agentic coding, refactoring and tool use
+- **Qwen3.8-27B-NVFP4**: when you need vision, or want faster replies at a small
+  quality cost
+- **Qwen3.6-35B-A3B-FP8**: inline completion and quick edits, where latency matters
+  more than depth
+- **gpt-oss-120b**: complex reasoning, precise documentation, advanced automations
+- **Ministral-3-14B-Instruct-2512**: lightweight assistants and simple chat
 
-### Long-Context Tips (256k)
+### Long-Context Tips {#long-context-tips}
 
 - Avoid sending entire repositories; retrieve relevant files/function bodies only
 - Summarize prior steps and include IDs/anchors to rehydrate context on demand
