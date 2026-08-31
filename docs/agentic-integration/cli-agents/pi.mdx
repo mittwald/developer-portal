@@ -1,0 +1,209 @@
+---
+title: Pi
+sidebar_label: Pi
+sidebar_position: 2
+---
+
+import PlanCompatibility from "@site/src/components/PlanCompatibility";
+
+# Pi with mittwald AI Hosting
+
+<PlanCompatibility features={["ai"]} />
+
+[Pi](https://pi.dev/) is a command-line coding agent with read, bash, edit and write
+tools, an extension system, and a terminal UI. Providers are declared in a JSON file,
+which makes an OpenAI-compatible endpoint like mittwald AI Hosting straightforward to
+add.
+
+## Installation {#installation}
+
+```bash
+npm install -g @earendil-works/pi-coding-agent
+```
+
+Or with Homebrew:
+
+```bash
+brew install pi-coding-agent
+```
+
+Check the install:
+
+```bash
+pi --version
+```
+
+## Pointing Pi at mittwald AI Hosting {#configuration}
+
+Pi reads providers from `~/.pi/agent/models.json`. Add a provider block:
+
+```json
+{
+  "providers": {
+    "mittwald": {
+      "name": "mittwald AI Hosting",
+      "baseUrl": "https://llm.aihosting.mittwald.de/v1/",
+      "api": "openai-completions",
+      "apiKey": "sk-...",
+      "models": [
+        {
+          "id": "Qwen3.5-122B-A10B-FP8",
+          "name": "Qwen3.5-122B-A10B-FP8",
+          "reasoning": true,
+          "input": ["text", "image"],
+          "contextWindow": 245760,
+          "maxTokens": 32768
+        },
+        {
+          "id": "Qwen3.8-27B-NVFP4",
+          "name": "Qwen3.8-27B-NVFP4",
+          "reasoning": true,
+          "input": ["text", "image"],
+          "contextWindow": 256000,
+          "maxTokens": 32768,
+          "samplingParams": {
+            "temperature": 0.7,
+            "top_p": 0.8,
+            "top_k": 20
+          }
+        },
+        {
+          "id": "Qwen3.6-35B-A3B-FP8",
+          "name": "Qwen3.6-35B-A3B-FP8",
+          "reasoning": true,
+          "input": ["text"],
+          "contextWindow": 256000,
+          "maxTokens": 32768
+        }
+      ]
+    }
+  }
+}
+```
+
+Replace `sk-...` with your API key from
+[mStudio profile settings](https://studio.mittwald.de/profile/api-token).
+The `api` value must be `openai-completions` — that is what selects the
+OpenAI-compatible request format.
+
+Make it the default in `~/.pi/agent/settings.json`:
+
+```json
+{
+  "defaultProvider": "mittwald",
+  "defaultModel": "Qwen3.5-122B-A10B-FP8"
+}
+```
+
+Per-model `samplingParams` are optional. The recommended values for each model are on
+its page in the [AI models documentation](/docs/v2/platform/aihosting/models).
+
+## Verifying the connection {#verify}
+
+The models you declared should now be listed:
+
+```bash
+pi --list-models
+```
+
+Then force a tool call, since a plain chat reply would succeed even with tool calling
+broken:
+
+```bash
+pi --provider mittwald --model Qwen3.5-122B-A10B-FP8 \
+  -p "Create a file called hello.txt containing the word hello, then read it back."
+```
+
+Expected: Pi writes the file, reads it back, and reports the contents. Run this in a
+scratch directory — the agent writes files where you start it.
+
+## Recommended extensions and MCP servers {#recommendations}
+
+### Extensions
+
+Extensions install from npm and are recorded in `settings.json` under `packages`:
+
+```bash
+pi install npm:pi-mcp-adapter
+pi list
+```
+
+| Extension                | What it does                                           |
+| ------------------------ | ------------------------------------------------------ |
+| `pi-mcp-adapter`         | **Required for MCP.** Pi has no MCP support without it |
+| `pi-safe-compact`        | Safer context compaction on long sessions              |
+| `@narumitw/pi-plan-mode` | A plan-then-execute mode                               |
+| `pi-background-tasks`    | Long-running commands without blocking the session     |
+| `@juicesharp/rpiv-todo`  | Task tracking inside a session                         |
+
+Toggle what is enabled with `pi config`.
+
+### MCP servers
+
+Install `pi-mcp-adapter` first, then declare servers in `~/.pi/agent/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"],
+      "lifecycle": "lazy"
+    },
+    "fetch": {
+      "command": "uvx",
+      "args": ["mcp-server-fetch"],
+      "lifecycle": "lazy"
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp"],
+      "lifecycle": "lazy"
+    }
+  }
+}
+```
+
+`lifecycle: "lazy"` starts a server on first use instead of at launch. Prefer it —
+several eagerly started servers noticeably slow down startup.
+
+For mittwald infrastructure access, see
+[MCP Integration](/docs/v2/agentic-integration/mcp/).
+
+### Skills
+
+Pi discovers skills automatically, or you can load one explicitly:
+
+```bash
+pi --skill ./path/to/skill
+```
+
+Disable discovery for a run with `--no-skills`.
+
+## Troubleshooting {#troubleshooting}
+
+**A model you declared is missing from `pi --list-models`.** The provider block has a
+JSON syntax error, or `api` is not `openai-completions`. Validate the file:
+`python3 -m json.tool ~/.pi/agent/models.json`.
+
+**MCP servers are ignored.** `pi-mcp-adapter` is not installed. Check with `pi list`.
+
+**A `.pi/` directory shows up in your working directory even with `--no-session`.**
+That's expected if the `pi-background-tasks` extension is installed — it writes
+per-run task state under `.pi/tasks/` regardless of the session flag, because
+`--no-session` only disables the conversation transcript, not extension-local state.
+Safe to delete; run agents in a scratch directory if you don't want it left behind.
+
+## Next steps
+
+- [Hermes Agent](../hermes-agent) — another CLI agent
+- [opencode](../opencode) — a third
+- [MCP Integration](/docs/v2/agentic-integration/mcp/) — manage mittwald infrastructure from the agent
+- [AI models](/docs/v2/platform/aihosting/models) — the full model list
+
+## Disclaimer
+
+Third-party tools, MCP servers and external links are provided for convenience without
+endorsement or warranty. Use them at your own risk, review licenses and privacy
+policies, and scope access conservatively (least privilege). Avoid sending sensitive
+data to external services unless required and permitted.
