@@ -103,10 +103,9 @@ Expected: opencode writes the file, reads it back, and reports the contents. Run
 a scratch directory — the agent writes files where you start it. A plain question would
 succeed even with `tool_call` missing, which is why the check writes a file.
 
-Against a config with a placeholder key, opencode still resolves the provider and model
-and sends the request — it fails with `HTTP 401: Authentication error`, not a connection
-or schema error. That confirms the endpoint and model resolve correctly; swap in a real
-key from mStudio to see the file actually get written and read back.
+`opencode run` needs to approve the file write before it happens. Pass `--auto` to
+auto-approve permissions that are not explicitly denied, and `--standalone` to run
+against a private server instead of the shared background service.
 
 ## Usage {#usage}
 
@@ -198,8 +197,9 @@ shapes:
 }
 ```
 
-For the mittwald, TYPO3, Directus and OpenSearch servers' authentication and token
-lifecycle, see [MCP Integration](/docs/v2/agentic-integration/mcp/).
+For the mittwald server's authentication and token lifecycle, see
+[MCP Integration](/docs/v2/agentic-integration/mcp/). The TYPO3, Directus and
+OpenSearch servers authenticate through the environment variables shown above.
 
 :::note[Postgres has no recommended MCP server]
 The official `@modelcontextprotocol/server-postgres` package is deprecated on npm with
