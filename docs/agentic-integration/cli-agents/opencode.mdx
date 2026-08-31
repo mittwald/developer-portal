@@ -1,0 +1,259 @@
+---
+title: opencode
+sidebar_label: opencode
+sidebar_position: 3
+---
+
+import PlanCompatibility from "@site/src/components/PlanCompatibility";
+
+# opencode with mittwald AI Hosting
+
+<PlanCompatibility features={["ai"]} />
+
+[opencode](https://opencode.ai) is a command-line coding agent that supports
+OpenAI-compatible providers through the `@ai-sdk/openai-compatible` adapter, so
+mittwald AI Hosting needs no special handling.
+
+## Installation {#installation}
+
+```bash
+npm install -g opencode-ai
+```
+
+Check the install:
+
+```bash
+opencode --version
+```
+
+## Pointing opencode at mittwald AI Hosting {#configuration}
+
+opencode reads configuration from either location:
+
+- **Global:** `~/.config/opencode/opencode.json`
+- **Per project:** `opencode.json` in the project root
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "mittwald/Qwen3.5-122B-A10B-FP8",
+  "provider": {
+    "mittwald": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "mittwald AI Hosting",
+      "options": {
+        "baseURL": "https://llm.aihosting.mittwald.de/v1",
+        "apiKey": "sk-..."
+      },
+      "models": {
+        "Qwen3.5-122B-A10B-FP8": {
+          "name": "Qwen3.5-122B-A10B-FP8",
+          "reasoning": true,
+          "tool_call": true,
+          "limit": { "context": 245760, "output": 32768 }
+        },
+        "Qwen3.8-27B-NVFP4": {
+          "name": "Qwen3.8-27B-NVFP4",
+          "reasoning": true,
+          "tool_call": true,
+          "limit": { "context": 256000, "output": 32768 }
+        },
+        "Qwen3.6-35B-A3B-FP8": {
+          "name": "Qwen3.6-35B-A3B-FP8",
+          "reasoning": true,
+          "tool_call": true,
+          "limit": { "context": 256000, "output": 32768 }
+        },
+        "gpt-oss-120b": {
+          "name": "gpt-oss-120b",
+          "reasoning": true,
+          "tool_call": true,
+          "limit": { "context": 131072, "output": 32768 }
+        },
+        "GLM-OCR": {
+          "name": "GLM-OCR",
+          "tool_call": false,
+          "limit": { "context": 131072, "output": 4096 }
+        }
+      }
+    }
+  }
+}
+```
+
+Replace `sk-...` with your API key from
+[mStudio profile settings](https://studio.mittwald.de/profile/api-token).
+
+:::note[Declare `tool_call` explicitly]
+Without `"tool_call": true`, opencode will not offer the model its tools, and the agent
+can only produce text — it cannot edit files or run commands. Set it on every model you
+intend to drive the agent with. `GLM-OCR` above is the counter-example: it has no
+tool-calling support at all, so it is declared with `"tool_call": false` and kept out of
+the agent's model rotation. Check each model's limits on its page in the
+[AI models documentation](/docs/v2/platform/aihosting/models).
+:::
+
+## Verifying the connection {#verify}
+
+```bash
+opencode run "Create a file called hello.txt containing the word hello, then read it back."
+```
+
+Expected: opencode writes the file, reads it back, and reports the contents. Run this in
+a scratch directory — the agent writes files where you start it. A plain question would
+succeed even with `tool_call` missing, which is why the check writes a file.
+
+Against a config with a placeholder key, opencode still resolves the provider and model
+and sends the request — it fails with `HTTP 401: Authentication error`, not a connection
+or schema error. That confirms the endpoint and model resolve correctly; swap in a real
+key from mStudio to see the file actually get written and read back.
+
+## Usage {#usage}
+
+```bash
+# Explain unfamiliar code
+opencode run "explain how session handling works in this project"
+
+# Make a change
+opencode run "add email validation to the registration form"
+
+# Optimise
+opencode run "optimize the database queries in user_service.py"
+```
+
+## MCP servers {#mcp}
+
+MCP servers are declared in the top-level `mcp` object. Each entry is one of two
+shapes:
+
+- `"type": "local"` — `command` is an **array**: the executable followed by its
+  arguments. `env` is optional.
+- `"type": "remote"` — `url` points at an MCP endpoint.
+
+```json
+{
+  "mcp": {
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "enabled": true
+    },
+    "fetch": {
+      "type": "local",
+      "command": ["uvx", "mcp-server-fetch"],
+      "enabled": true
+    },
+    "playwright": {
+      "type": "local",
+      "command": ["npx", "-y", "@playwright/mcp"],
+      "enabled": true
+    },
+    "sequential-thinking": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
+      "enabled": true
+    },
+    "directus": {
+      "type": "local",
+      "command": ["npx", "-y", "@directus/content-mcp"],
+      "env": {
+        "DIRECTUS_URL": "https://your-directus-instance.com",
+        "DIRECTUS_TOKEN": "your-directus-token"
+      },
+      "enabled": true
+    },
+    "opensearch": {
+      "type": "local",
+      "command": ["uvx", "opensearch-mcp-server-py"],
+      "env": {
+        "OPENSEARCH_URL": "https://localhost:9200",
+        "OPENSEARCH_USERNAME": "your-opensearch-username",
+        "OPENSEARCH_PASSWORD": "your-opensearch-password"
+      },
+      "enabled": true
+    },
+    "typo3": {
+      "type": "local",
+      "command": [
+        "mw",
+        "app",
+        "exec",
+        "--quiet",
+        "--installation-id=a-XXXXX",
+        "vendor/bin/typo3",
+        "mcp:server"
+      ],
+      "enabled": true
+    },
+    "mittwald": {
+      "type": "remote",
+      "url": "https://mcp.mittwald.de/mcp",
+      "enabled": true
+    }
+  }
+}
+```
+
+For the mittwald, TYPO3, Directus and OpenSearch servers' authentication and token
+lifecycle, see [MCP Integration](/docs/v2/agentic-integration/mcp/).
+
+:::note[Postgres has no recommended MCP server]
+The official `@modelcontextprotocol/server-postgres` package is deprecated on npm with
+no official successor. If you need Postgres access from opencode, pick a community
+server from the [MCP server registry](https://github.com/modelcontextprotocol/servers)
+yourself rather than relying on a name mittwald recommends here.
+:::
+
+## Plugins and skills {#plugins-skills}
+
+Plugins are listed in the `plugin` array:
+
+```json
+{
+  "plugin": ["opencode-scheduler"]
+}
+```
+
+Skills go in `~/.config/opencode/skills/`, one directory per skill.
+
+Agent packs add preconfigured subagents, each of which can point at its own model.
+Routing subagents to `Qwen3.6-35B-A3B-FP8` while the main agent stays on
+`Qwen3.5-122B-A10B-FP8` keeps long sessions responsive, since subagent work is mostly
+search and summarising.
+
+## Troubleshooting {#troubleshooting}
+
+### The agent answers but never edits a file or runs a command {#no-tool-calls}
+
+The model is missing `"tool_call": true` in its `models` entry.
+
+### An MCP server never starts {#mcp-server-fails}
+
+Check the entry shape. A `local` server needs `command` as an array, not a string with
+a separate `args` field — a string `command` with `args` is Claude Desktop's format,
+and opencode ignores it silently rather than erroring.
+
+### `npx` reports a 404 for an MCP package {#package-404}
+
+Verify the package name. The context7 server is published as
+`@upstash/context7-mcp` — the similarly named `@context7/mcp-server` does not exist
+on npm.
+
+## Next steps {#next-steps}
+
+- [Hermes Agent](../hermes-agent) — another CLI agent
+- [Pi](../pi) — a third
+- [IDE Integration](../ide-integration/) — agents inside an editor
+- [MCP Integration](/docs/v2/agentic-integration/mcp/) — manage mittwald infrastructure from the agent
+- [Agent skills](/docs/v2/agentic-integration/agent-skills/) — add workflow guidance
+
+## Disclaimer
+
+Third-party tools, MCP servers and external links are provided for convenience without
+endorsement or warranty. Use them at your own risk, review licenses and privacy
+policies, and scope access conservatively (least privilege). Avoid sending sensitive
+data to external services unless required and permitted.
