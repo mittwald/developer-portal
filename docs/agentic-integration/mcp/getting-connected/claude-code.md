@@ -210,13 +210,6 @@ Use `mcpServers` to define additional servers alongside mittwald:
 }
 ```
 
-:::note[Postgres has no recommended MCP server]
-The official `@modelcontextprotocol/server-postgres` package is deprecated on npm with
-no official successor. If you need Postgres access from Claude Code, pick a community
-server from the [MCP server registry](https://github.com/modelcontextprotocol/servers)
-yourself rather than relying on a name mittwald recommends here.
-:::
-
 ## WebFetch Configuration {#webfetch-configuration}
 
 Claude Code supports built-in web fetching. Configure it in `settings.json`:
