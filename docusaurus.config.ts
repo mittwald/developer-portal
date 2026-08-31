@@ -82,6 +82,12 @@ const config: Config = {
     [
       "@docusaurus/plugin-client-redirects",
       {
+        redirects: [
+          {
+            from: "/docs/v2/agentic-integration/ide-integration/opencode",
+            to: "/docs/v2/agentic-integration/cli-agents/opencode",
+          },
+        ],
         createRedirects(path) {
           let newPath = path;
           if (newPath.includes("/platform")) {
