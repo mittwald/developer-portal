@@ -33,6 +33,25 @@ Check the install:
 pi --version
 ```
 
+## Choosing between Pi and opencode {#vs-opencode}
+
+Both are CLI coding agents that work with mittwald AI Hosting; the difference is how
+much they load before your own work starts. Measured directly against the mittwald
+gateway, Pi's first request sends a 2,640-character system prompt (as a
+`developer`-role message) plus JSON schemas for its 4 built-in tools — `read`, `bash`,
+`edit`, `write` — totaling 3,024 characters, for a full first request body of about
+6 KB. That's a small, fixed toolset and a compact prompt, so less of the model's
+context window is spent before you start working.
+
+opencode ships more capability out of the box — a plugin array, an MCP config block,
+agent packs — and correspondingly more prompt overhead on its first request. On disk,
+Pi installs to about 142 MB and opencode to about 160 MB, a modest difference either
+way.
+
+If you want a small, scriptable agent and prefer to add MCP servers and extensions
+only as you need them, start with Pi. If you'd rather have a fuller, batteries-included
+setup from the first run, see [opencode](../opencode).
+
 ## Pointing Pi at mittwald AI Hosting {#configuration}
 
 Pi reads providers from `~/.pi/agent/models.json`. Add a provider block:
@@ -42,7 +61,7 @@ Pi reads providers from `~/.pi/agent/models.json`. Add a provider block:
   "providers": {
     "mittwald": {
       "name": "mittwald AI Hosting",
-      "baseUrl": "https://llm.aihosting.mittwald.de/v1/",
+      "baseUrl": "https://llm.aihosting.mittwald.de/v1",
       "api": "openai-completions",
       "apiKey": "sk-...",
       "models": [
@@ -110,16 +129,17 @@ Then force a tool call, since a plain chat reply would succeed even with tool ca
 broken:
 
 ```bash
-pi --provider mittwald --model Qwen3.5-122B-A10B-FP8 \
+pi --provider mittwald --model Qwen3.5-122B-A10B-FP8 --no-session \
   -p "Create a file called hello.txt containing the word hello, then read it back."
 ```
 
 Expected: Pi writes the file, reads it back, and reports the contents. Run this in a
-scratch directory — the agent writes files where you start it.
+scratch directory — the agent writes files where you start it. `--no-session` keeps
+the run ephemeral, so it doesn't leave a saved conversation behind.
 
 ## Recommended extensions and MCP servers {#recommendations}
 
-### Extensions
+### Extensions {#extensions}
 
 Extensions install from npm and are recorded in `settings.json` under `packages`:
 
@@ -138,7 +158,7 @@ pi list
 
 Toggle what is enabled with `pi config`.
 
-### MCP servers
+### MCP servers {#mcp-servers}
 
 Install `pi-mcp-adapter` first, then declare servers in `~/.pi/agent/mcp.json`:
 
@@ -170,7 +190,7 @@ several eagerly started servers noticeably slow down startup.
 For mittwald infrastructure access, see
 [MCP Integration](/docs/v2/agentic-integration/mcp/).
 
-### Skills
+### Skills {#skills}
 
 Pi discovers skills automatically, or you can load one explicitly:
 
@@ -182,19 +202,23 @@ Disable discovery for a run with `--no-skills`.
 
 ## Troubleshooting {#troubleshooting}
 
-**A model you declared is missing from `pi --list-models`.** The provider block has a
-JSON syntax error, or `api` is not `openai-completions`. Validate the file:
-`python3 -m json.tool ~/.pi/agent/models.json`.
+### A declared model is missing from `pi --list-models` {#model-missing}
 
-**MCP servers are ignored.** `pi-mcp-adapter` is not installed. Check with `pi list`.
+The provider block has a JSON syntax error, or `api` is not `openai-completions`.
+Validate the file: `python3 -m json.tool ~/.pi/agent/models.json`.
 
-**A `.pi/` directory shows up in your working directory even with `--no-session`.**
+### MCP servers are ignored {#mcp-ignored}
+
+`pi-mcp-adapter` is not installed. Check with `pi list`.
+
+### A `.pi/` directory appears even with `--no-session` {#pi-directory-appears}
+
 That's expected if the `pi-background-tasks` extension is installed — it writes
 per-run task state under `.pi/tasks/` regardless of the session flag, because
 `--no-session` only disables the conversation transcript, not extension-local state.
 Safe to delete; run agents in a scratch directory if you don't want it left behind.
 
-## Next steps
+## Next steps {#next-steps}
 
 - [Hermes Agent](../hermes-agent) — another CLI agent
 - [opencode](../opencode) — a third
