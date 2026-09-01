@@ -47,8 +47,10 @@ custom_providers:
     context_length: 245760
 ```
 
-Replace `sk-...` with your API key from
-[mStudio profile settings](https://studio.mittwald.de/profile/api-token).
+Replace `sk-...` with your AI Hosting API key. You create it in the **AI-Hosting**
+section of your mStudio project — see
+[Gaining access](/docs/v2/platform/aihosting/access-and-usage/access). An mStudio API
+token from your profile settings is a different credential and will not work here.
 
 A `custom_providers` entry accepts these keys: `name`, `base_url`, `api_key`,
 `api_mode`, `model`, `models`, `context_length`, `rate_limit_delay`, `extra_body`,
@@ -189,8 +191,15 @@ A useful starting set:
 | Browser automation    | `npx -y @playwright/mcp`                                |
 | Filesystem access     | `npx -y @modelcontextprotocol/server-filesystem <path>` |
 
-mittwald's own MCP server exposes your infrastructure to the agent. See
-[MCP Integration](/docs/v2/agentic-integration/mcp/) for setup and authentication.
+mittwald's own MCP server exposes your infrastructure to the agent:
+
+```bash
+hermes mcp add mittwald --url https://mcp.mittwald.de/mcp --auth oauth
+hermes mcp test mittwald
+```
+
+For the API-token alternative and troubleshooting, see
+[Getting Connected with Hermes Agent](/docs/v2/agentic-integration/mcp/getting-connected/hermes-agent).
 
 ## Troubleshooting {#troubleshooting}
 
@@ -223,7 +232,7 @@ worth knowing which one you're diagnosing:
 
 - [Pi](../pi) — a second CLI agent
 - [opencode](../opencode) — a third
-- [MCP Integration](/docs/v2/agentic-integration/mcp/) — manage mittwald infrastructure from the agent
+- [Getting Connected with Hermes Agent](/docs/v2/agentic-integration/mcp/getting-connected/hermes-agent) — manage mittwald infrastructure from the agent
 - [AI models](/docs/v2/platform/aihosting/models) — the full model list
 
 ## Disclaimer

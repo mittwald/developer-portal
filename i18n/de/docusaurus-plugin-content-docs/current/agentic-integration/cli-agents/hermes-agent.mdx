@@ -48,8 +48,11 @@ custom_providers:
     context_length: 245760
 ```
 
-Ersetze `sk-...` durch deinen API-Key aus den
-[mStudio Profileinstellungen](https://studio.mittwald.de/profile/api-token).
+Ersetze `sk-...` durch deinen AI-Hosting-API-Key. Den legst du im Bereich
+**AI-Hosting** deines mStudio-Projekts an — siehe
+[API-Key einrichten](/docs/v2/platform/aihosting/access-and-usage/access). Ein
+mStudio-API-Token aus den Profileinstellungen ist ein anderes Zugangsmittel und
+funktioniert hier nicht.
 
 Ein `custom_providers`-Eintrag akzeptiert diese Schlüssel: `name`, `base_url`,
 `api_key`, `api_mode`, `model`, `models`, `context_length`, `rate_limit_delay`,
@@ -202,8 +205,15 @@ Eine sinnvolle Startauswahl:
 | Dateisystemzugriff      | `npx -y @modelcontextprotocol/server-filesystem <path>` |
 
 mittwalds eigener MCP-Server macht deine Infrastruktur für den Agenten
-zugänglich. Setup und Authentifizierung stehen in der
-[MCP-Integration](/docs/v2/agentic-integration/mcp/).
+zugänglich:
+
+```bash
+hermes mcp add mittwald --url https://mcp.mittwald.de/mcp --auth oauth
+hermes mcp test mittwald
+```
+
+Die Variante mit API-Token und die Fehlerbehebung stehen unter
+[Verbindung mit Hermes Agent herstellen](/docs/v2/agentic-integration/mcp/getting-connected/hermes-agent).
 
 ## Troubleshooting {#troubleshooting}
 
@@ -239,7 +249,7 @@ Fehlerarten ab, und es lohnt sich zu wissen, welche man gerade diagnostiziert:
 
 - [Pi](../pi) – ein zweiter CLI-Agent
 - [opencode](../opencode) – ein dritter
-- [MCP-Integration](/docs/v2/agentic-integration/mcp/) – mittwald-Infrastruktur aus dem Agenten heraus verwalten
+- [Verbindung mit Hermes Agent herstellen](/docs/v2/agentic-integration/mcp/getting-connected/hermes-agent) – mittwald-Infrastruktur aus dem Agenten heraus verwalten
 - [KI-Modelle](/docs/v2/platform/aihosting/models) – die vollständige Modellliste
 
 ## Disclaimer
