@@ -191,7 +191,7 @@ Key Information Extraction (KIE) ermöglicht es, bestimmte Felder aus einem Doku
 
 Das Modell **umschließt die JSON-Ausgabe immer mit Markdown-Code-Blöcken**, unabhängig vom Prompt – diese müssen vor dem Parsen entfernt werden:
 
-```python
+````python
 import base64
 import json
 import re
@@ -230,7 +230,7 @@ clean = re.sub(r"^```[a-z]*\n?", "", raw.strip())
 clean = re.sub(r"\n?```$", "", clean)
 data = json.loads(clean)
 print(data)
-```
+````
 
 Dasselbe funktioniert für beliebige Dokumenttypen – Schema einfach anpassen:
 
@@ -285,24 +285,27 @@ def grosses_pdf_ocr(pfad: str, batch_groesse: int = 30) -> str:
 text = grosses_pdf_ocr("jahresbericht.pdf")
 ```
 
-## Vollständige Pipeline: OCR → Einbettung → Suche → Antwort {#vollstaendige-pipeline}
+## Vollständige Pipeline: OCR → Einbettung → Suche → Antwort {#full-pipeline}
 
-Kombiniere drei mittwald AI-Hosting-Modelle zu einer vollständigen Dokumenten-Frage-Antwort-Pipeline:
+Kombiniere vier mittwald AI-Hosting-Modelle zu einer vollständigen Dokumenten-Frage-Antwort-Pipeline:
 
 1. **GLM-OCR** digitalisiert die Dokumente – im **Markdown-Ausgabemodus**, damit Struktur und Überschriften erhalten bleiben, was sauberere Abschnitte und bessere Suchergebnisse liefert als reiner Fließtext
-2. **[Qwen3-Embedding-8B](/docs/v2/platform/aihosting/models/qwen3-embedding-8b)** wandelt Textabschnitte in Vektoren um
-3. **[Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8)** beantwortet Fragen anhand des abgerufenen Kontexts
+2. **[Qwen3-Embedding-8B](/docs/v2/platform/aihosting/models/qwen3-embedding-8b)** wandelt Textabschnitte in Vektoren für einen schnellen ersten Retrieval-Durchgang um
+3. **[Qwen3-VL-Reranker-2B](/docs/v2/platform/aihosting/models/qwen3-vl-reranker-2b)** bewertet die gefundenen Kandidaten erneut anhand der vollständigen Frage und grenzt sie auf die relevantesten wenigen ein
+4. **[Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8)** beantwortet Fragen in natürlicher Sprache anhand des neu sortierten Kontexts
 
 ```shellsession
-user@local $ pip install openai pypdf
+user@local $ pip install openai pypdf requests
 ```
 
 ```python
 import base64
 import math
+import os
 import re
 from io import BytesIO
 from pypdf import PdfReader, PdfWriter
+import requests
 from openai import OpenAI
 
 client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
@@ -376,8 +379,43 @@ def kosinus(a: list[float], b: list[float]) -> float:
 def abrufen(anfrage_vektor: list[float], index: list, top_k: int = 3) -> list[str]:
     bewertet = [(kosinus(anfrage_vektor, vektor), abschnitt) for vektor, abschnitt in index]
     return [abschnitt for _, abschnitt in sorted(bewertet, reverse=True)[:top_k]]
+```
 
+### Retrieval-Ergebnisse neu sortieren {#reranking}
 
+Embedding-Ähnlichkeit ist schnell – ein Skalarprodukt pro Kandidat – aber ungenau: Sie bewertet Frage und Abschnitt unabhängig voneinander und kann deshalb einen Abschnitt übersehen, der die Frage mit anderen Worten beantwortet, als die Frage selbst verwendet. Ein **Reranker** betrachtet Frage und einen Abschnitt gemeinsam, als Paar, und bewertet, wie gut genau dieses Paar zusammenpasst – anschließend sortiert er die engere Auswahl nach diesem Wert neu. Pro Kandidat ist das langsamer als die Vektorsuche, deshalb läuft der Reranker nur über die Handvoll Abschnitte, die `abrufen()` bereits vorausgewählt hat, nie über den gesamten Index.
+
+`Qwen3-VL-Reranker-2B` läuft über den `/v1/rerank`-Endpunkt statt über `/v1/chat/completions`:
+
+```python
+# ── Reranking: Präzisionsdurchgang über die abgerufenen Kandidaten ────────────
+
+def neu_sortieren(
+    frage: str,
+    abschnitte: list[str],
+    top_k: int = 3,
+    anweisung: str | None = None,
+) -> list[str]:
+    payload = {"model": "Qwen3-VL-Reranker-2B", "query": frage, "documents": abschnitte}
+    if anweisung:
+        payload["instruction"] = anweisung
+    resp = requests.post(
+        "https://llm.aihosting.mittwald.de/v1/rerank",
+        headers={"Authorization": f"Bearer {os.environ['OPENAI_API_KEY']}"},
+        json=payload,
+        timeout=30,
+    )
+    resp.raise_for_status()
+    ergebnisse = resp.json()["results"]
+    sortiert = sorted(ergebnisse, key=lambda r: r["relevance_score"], reverse=True)
+    return [abschnitte[r["index"]] for r in sortiert[:top_k]]
+```
+
+Die `/v1/rerank`-Antwort enthält eine `results`-Liste mit einem `index` (Position im ursprünglichen `documents`-Array) und einem `relevance_score` (höher ist besser) für jeden Eintrag. Der optionale `instruction`-Parameter teilt dem Reranker mit, für welche Retrievalaufgabe er optimieren soll – ohne Angabe wird ein generischer Standard verwendet.
+
+Rufe zunächst einen größeren Kandidatenpool aus dem Vektorindex ab und lass den Reranker ihn anschließend vor der Antwort eingrenzen:
+
+```python
 # ── Schritt 5: Antworten ──────────────────────────────────────────────────────
 # Qwen3.5 hat den Thinking-Modus standardmäßig aktiviert – für Q&A deaktivieren,
 # damit die Antwort in message.content zurückkommt, nicht in reasoning_content.
@@ -429,36 +467,90 @@ fragen = [
 
 for frage in fragen:
     [anfrage_vektor] = einbetten([frage])
-    kontext_abschnitte = abrufen(anfrage_vektor, index)
+    kandidaten = abrufen(anfrage_vektor, index, top_k=10)
+    kontext_abschnitte = neu_sortieren(
+        frage,
+        kandidaten,
+        top_k=3,
+        anweisung="Given a question, find the document passage that best answers it.",
+    )
     print(f"\nF: {frage}")
     print(f"A: {antworten(frage, kontext_abschnitte)}")
 ```
 
 :::tip Skalierung
-Für den Produktionseinsatz empfiehlt es sich, die In-Memory-Kosinus-Suche durch **pgvector** zu ersetzen – eine PostgreSQL-Erweiterung für Vektorsimilarität, die auf mittwald Container Hosting zusammen mit n8n läuft. Den kompletten Stack zeigt der [mittwald n8n-Guide](/docs/v2/guides/apps/n8n/).
+Für den Produktionseinsatz empfiehlt es sich, die In-Memory-Kosinus-Suche durch **pgvector** zu ersetzen – eine PostgreSQL-Erweiterung für Vektorsimilarität, die auf mittwald Container Hosting zusammen mit n8n läuft. Siehe den [Abschnitt zum vollständigen RAG mit n8n](#n8n) weiter unten oder den [mittwald n8n-Guide](/docs/v2/guides/apps/n8n/) für einen startbereiten Docker-Compose-Stack.
 :::
 
-## Optional: Reranking mit Qwen3-VL-Reranker-2B {#reranking}
+## Mehrere Dokumente indizieren {#multiple-documents}
 
-Die Vektorsuche ruft Kandidaten anhand von Embedding-Ähnlichkeit ab – eine schnelle Näherung. Ein Cross-Encoder-Reranker bewertet jeden Kandidaten anhand des vollständigen Fragetexts und sortiert die Ergebnisse nach semantischer Relevanz neu. Der Unterschied ist vor allem bei großen Indizes spürbar, wo viele Abschnitte ähnliche Embeddings haben.
-
-`Qwen3-VL-Reranker-2B` ist über den `/v1/rerank`-Endpunkt verfügbar. Er lässt sich zwischen `abrufen()` und `antworten()` in der [obigen Pipeline](#vollstaendige-pipeline) einfügen:
+Dokumente unterschiedlichen Typs lassen sich frei in einem Index mischen – der Aufbau bleibt gleich, egal wie viele Dateien es sind:
 
 ```python
-import os
-import requests
+dokumente = ["vertrag_a.pdf", "vertrag_b.docx", "anhang.xlsx"]
 
-def neu_sortieren(
+index: list[tuple[list[float], str]] = []
+for pfad in dokumente:
+    text = dokument_ocr(pfad)
+    abschnitte = text_aufteilen(text)
+    vektoren = einbetten(abschnitte)
+    index.extend(zip(vektoren, abschnitte))
+
+print(f"{len(index)} Abschnitte aus {len(dokumente)} Dokumenten indiziert.")
+
+# Über alle Dokumente hinweg abfragen
+frage = "Welche Vertragsstrafen gelten?"
+[anfrage_vektor] = einbetten([frage])
+kandidaten = abrufen(anfrage_vektor, index, top_k=10)
+top_abschnitte = neu_sortieren(frage, kandidaten, top_k=3)
+print(antworten(frage, top_abschnitte))
+```
+
+Das nutzt `dokument_ocr`, `text_aufteilen`, `einbetten`, `abrufen`, `neu_sortieren` und `antworten` genau so, wie sie oben in der Pipeline definiert sind – mehr Dokumente zu indizieren ändert nur die Größe von `dokumente`, nicht die Pipeline selbst.
+
+## Multimodale Variante: Reranking mit Bildern {#multimodal}
+
+Bei Dokumenten, die ursprünglich gescannte Bilder waren – `scan.jpg`, `diagramm.png` und Ähnliches aus [Text aus Bildern extrahieren](#text-aus-bildern-extrahieren) oben – trägt das Originalbild oft noch Informationen, die im OCR-Text verloren gehen: ein Stempel, ein Logo, eine markierte Summe, das Layout eines Diagramms. `Qwen3-VL-Reranker-2B` akzeptiert Dokumente, die Text und Bildinhalt kombinieren – du kannst dem Reranker also sowohl den OCR-Abschnitt als auch die Seite geben, von der er stammt.
+
+Das funktioniert nur sauber, wenn ein Abschnitt genau einem Quellbild entspricht – ein einseitiger Scan, kein mehrseitiges PDF, das in viele Abschnitte aufgeteilt wurde. Verfolge den Quellpfad zusammen mit jedem Abschnitt beim Indizieren:
+
+```python
+def bild_kodieren(pfad: str) -> str:
+    ext = pfad.rsplit(".", 1)[-1].lower()
+    with open(pfad, "rb") as f:
+        b64 = base64.b64encode(f.read()).decode()
+    return f"data:{MIME.get(ext, 'image/jpeg')};base64,{b64}"
+
+
+bild_dokumente = ["scan.jpg", "diagramm.png", "grafik.webp"]
+
+bild_index: list[tuple[str, str]] = []  # (abschnitt_text, quellbild_pfad)
+for pfad in bild_dokumente:
+    text = dokument_ocr(pfad)
+    for abschnitt in text_aufteilen(text):
+        bild_index.append((abschnitt, pfad))
+```
+
+Erweitere `neu_sortieren()` so, dass ein Bild neben dem Text jedes Abschnitts bewertet wird – jedes Dokument wird dazu als Liste von Content-Elementen statt als reiner String übergeben:
+
+```python
+def neu_sortieren_multimodal(
     frage: str,
     abschnitte: list[str],
+    bilder: list[str],
     top_k: int = 3,
     anweisung: str | None = None,
 ) -> list[str]:
-    payload = {
-        "model": "Qwen3-VL-Reranker-2B",
-        "query": frage,
-        "documents": abschnitte,
-    }
+    dokumente = [
+        {
+            "content": [
+                {"type": "text", "text": abschnitt},
+                {"type": "image_url", "image_url": {"url": bild_kodieren(bild_pfad)}},
+            ]
+        }
+        for abschnitt, bild_pfad in zip(abschnitte, bilder)
+    ]
+    payload: dict = {"model": "Qwen3-VL-Reranker-2B", "query": frage, "documents": dokumente}
     if anweisung:
         payload["instruction"] = anweisung
     resp = requests.post(
@@ -473,20 +565,21 @@ def neu_sortieren(
     return [abschnitte[r["index"]] for r in sortiert[:top_k]]
 ```
 
-Erst einen größeren Kandidatenpool aus dem Vektorindex abrufen, dann durch den Reranker auf die besten Ergebnisse einschränken:
+Rufe die Funktion mit den oben aufgebauten parallelen Abschnitts- und Bildlisten auf, anstelle von `neu_sortieren()`:
 
 ```python
-# 10 Kandidaten abrufen, auf Top 3 einschränken
-kandidaten = abrufen(anfrage_vektor, index, top_k=10)
-kontext_abschnitte = neu_sortieren(
-    frage,
-    kandidaten,
-    top_k=3,
-    anweisung="Gegeben OCR-extrahierte Dokumente, finde die Abschnitte, die am relevantesten für die Anfrage sind.",
-)
+abschnitte = [a for a, _ in bild_index]
+bilder = [p for _, p in bild_index]
+top_abschnitte = neu_sortieren_multimodal("Was zeigt die Grafik?", abschnitte, bilder, top_k=3)
 ```
 
-Die `/v1/rerank`-Antwort enthält eine `results`-Liste mit einem `index` (Position im ursprünglichen `documents`-Array) und einem `relevance_score` (höher ist besser) für jeden Eintrag. Der optionale `instruction`-Parameter teilt dem Reranker mit, für welche Retrievalaufgabe er optimieren soll – ohne Angabe wird ein generischer Standard verwendet.
+### Nur Text als Fallback {#text-only}
+
+Die meisten Dokumente brauchen das Bild nicht – reiner OCR-Text sortiert genauso gut und ist günstiger zu senden. Ohne `image_url`-Content auszukommen und stattdessen reine Strings als `documents` zu übergeben, ist genau das, was `neu_sortieren()` in der [vollständigen Pipeline](#full-pipeline) oben bereits tut. Greife nur dann zu `neu_sortieren_multimodal()`, wenn das visuelle Layout – ein Stempel, ein Diagramm, eine markierte Zahl – für die Antwort wirklich eine Rolle spielt.
+
+:::tip
+Schreibe den `instruction`-Wert immer auf **Englisch**, auch wenn die Anfrage in einer anderen Sprache formuliert ist. Details zu Anweisungsformat und Bildgrößen-Limits stehen auf der [Qwen3-VL-Reranker-2B Modellseite](/docs/v2/platform/aihosting/models/qwen3-vl-reranker-2b).
+:::
 
 ## Vollständige Pipeline mit n8n und pgvector {#n8n}
 
@@ -497,11 +590,12 @@ Die `/v1/rerank`-Antwort enthält eine `results`-Liste mit einem `index` (Positi
 
 Drei Vektordatenbanken sind als mittwald Container-Templates verfügbar:
 
-| Datenbank | Docker-Image | Geeignet für |
-|-----------|-------------|--------------|
-| **pgvector** | `ankane/pgvector:latest` | PostgreSQL-basiert; native n8n-Unterstützung |
-| **Qdrant** | `qdrant/qdrant:latest` | Leistungsstarke dedizierte Vektorsuche; REST + gRPC API |
-| **ChromaDB** | `chromadb/chroma:latest` | Einfache HTTP-API; schneller Einstieg |
+| Datenbank    | Docker-Image             | Geeignet für                                            |
+| ------------ | ------------------------ | ------------------------------------------------------- |
+| **pgvector** | `ankane/pgvector:latest` | PostgreSQL-basiert; native n8n-Unterstützung            |
+| **Qdrant**   | `qdrant/qdrant:latest`   | Leistungsstarke dedizierte Vektorsuche; REST + gRPC API |
+| **ChromaDB** | `chromadb/chroma:latest` | Einfache HTTP-API; schneller Einstieg                   |
+
 :::
 
 Da mittwald AI Hosting eine OpenAI-kompatible API bereitstellt, funktionieren die eingebauten OpenAI-Nodes von n8n sofort mit einer eigenen Base-URL.
@@ -550,8 +644,8 @@ services:
   qdrant:
     image: qdrant/qdrant:latest
     ports:
-      - "6333:6333"   # REST API
-      - "6334:6334"   # gRPC
+      - "6333:6333" # REST API
+      - "6334:6334" # gRPC
     volumes:
       - qdrant_data:/qdrant/storage
 
@@ -647,9 +741,9 @@ def suchen(frage: str, top_k: int = 3) -> list[str]:
 
 Eine neue **OpenAI-API**-Zugangsdaten-Konfiguration in n8n erstellen und die Base-URL überschreiben:
 
-| Feld | Wert |
-|------|------|
-| API-Key | dein mStudio AI-Hosting-Key (`sk-…`) |
+| Feld     | Wert                                   |
+| -------- | -------------------------------------- |
+| API-Key  | dein mStudio AI-Hosting-Key (`sk-…`)   |
 | Base-URL | `https://llm.aihosting.mittwald.de/v1` |
 
 GLM-OCR, [Qwen3-Embedding-8B](/docs/v2/platform/aihosting/models/qwen3-embedding-8b) und [Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8) teilen sich diese eine Zugangsdaten-Konfiguration.
@@ -681,8 +775,8 @@ Der GLM-OCR-Aufruf erfolgt über einen **HTTP-Request**-Node, da die Datei zuers
 ```javascript
 // n8n Code-Node — Binärdaten als Base64-Data-URI kodieren
 const binaryData = $input.first().binary.data;
-const b64 = binaryData.data;       // n8n kodiert Binär-Items bereits in Base64
-const mime = binaryData.mimeType;  // z. B. "application/pdf"
+const b64 = binaryData.data; // n8n kodiert Binär-Items bereits in Base64
+const mime = binaryData.mimeType; // z. B. "application/pdf"
 return [{ json: { dataUri: `data:${mime};base64,${b64}` } }];
 ```
 

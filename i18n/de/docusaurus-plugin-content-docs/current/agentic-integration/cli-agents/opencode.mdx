@@ -1,0 +1,275 @@
+---
+title: opencode
+sidebar_label: opencode
+sidebar_position: 3
+---
+
+import PlanCompatibility from "@site/src/components/PlanCompatibility";
+
+# opencode mit mittwald AI Hosting
+
+<PlanCompatibility features={["ai"]} />
+
+[opencode](https://opencode.ai) ist ein CLI-Coding-Agent, der
+OpenAI-kompatible Provider über den Adapter `@ai-sdk/openai-compatible`
+unterstützt, mittwald AI Hosting braucht also keine Sonderbehandlung.
+
+## Installation {#installation}
+
+```bash
+npm install -g opencode-ai
+```
+
+Installation prüfen:
+
+```bash
+opencode --version
+```
+
+## opencode auf mittwald AI Hosting zeigen lassen {#configuration}
+
+opencode liest die Konfiguration aus einem der beiden Orte:
+
+- **Global:** `~/.config/opencode/opencode.json`
+- **Pro Projekt:** `opencode.json` im Projekt-Root
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "mittwald/Qwen3.5-122B-A10B-FP8",
+  "provider": {
+    "mittwald": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "mittwald AI Hosting",
+      "options": {
+        "baseURL": "https://llm.aihosting.mittwald.de/v1",
+        "apiKey": "sk-..."
+      },
+      "models": {
+        "Qwen3.5-122B-A10B-FP8": {
+          "name": "Qwen3.5-122B-A10B-FP8",
+          "reasoning": true,
+          "tool_call": true,
+          "limit": { "context": 245760, "output": 32768 }
+        },
+        "Qwen3.8-27B-NVFP4": {
+          "name": "Qwen3.8-27B-NVFP4",
+          "reasoning": true,
+          "tool_call": true,
+          "limit": { "context": 256000, "output": 32768 }
+        },
+        "Qwen3.6-35B-A3B-FP8": {
+          "name": "Qwen3.6-35B-A3B-FP8",
+          "reasoning": true,
+          "tool_call": true,
+          "limit": { "context": 256000, "output": 32768 }
+        },
+        "gpt-oss-120b": {
+          "name": "gpt-oss-120b",
+          "reasoning": true,
+          "tool_call": true,
+          "limit": { "context": 131072, "output": 32768 }
+        },
+        "GLM-OCR": {
+          "name": "GLM-OCR",
+          "tool_call": false,
+          "limit": { "context": 131072, "output": 4096 }
+        }
+      }
+    }
+  }
+}
+```
+
+Ersetze `sk-...` durch deinen AI-Hosting-API-Key. Den legst du im Bereich
+**AI-Hosting** deines mStudio-Projekts an — siehe
+[API-Key einrichten](/docs/v2/platform/aihosting/access-and-usage/access). Ein
+mStudio-API-Token aus den Profileinstellungen ist ein anderes Zugangsmittel und
+funktioniert hier nicht.
+
+:::note[`tool_call` explizit deklarieren]
+Ohne `"tool_call": true` bietet opencode dem Modell seine Tools gar nicht
+erst an, der Agent kann dann nur noch Text erzeugen – er kann keine Dateien
+bearbeiten und keine Befehle ausführen. Setze es bei jedem Modell, mit dem
+der Agent arbeiten soll. `GLM-OCR` oben ist das Gegenbeispiel: Es hat gar
+kein Tool Calling, ist deshalb mit `"tool_call": false` deklariert und bleibt
+aus der Modellrotation des Agenten draußen. Die Limits jedes Modells stehen
+auf dessen Seite in der
+[Dokumentation zu KI-Modellen](/docs/v2/platform/aihosting/models).
+:::
+
+## Verbindung prüfen {#verify}
+
+```bash
+opencode run --auto "Create a file called hello.txt containing the word hello, then read it back."
+```
+
+Erwartet: opencode schreibt die Datei, liest sie zurück und gibt den Inhalt
+aus. Führe das in einem Scratch-Verzeichnis aus – der Agent schreibt Dateien
+dort, wo du ihn startest. Eine reine Frage würde auch bei fehlendem
+`tool_call` gelingen, deshalb prüft der Test über eine Dateischreibung.
+
+Ohne `--auto` musst du den Dateischreibzugriff erst genehmigen, bevor er
+passiert. `--auto` genehmigt automatisch Berechtigungen, die nicht explizit
+verweigert sind. `--standalone` läuft gegen einen privaten Server statt gegen
+den gemeinsamen Hintergrunddienst – nützlich, wenn `opencode run` keine
+Ausgabe liefert (siehe [Troubleshooting](#no-output) weiter unten).
+
+## Nutzung {#usage}
+
+```bash
+# Explain unfamiliar code
+opencode run "explain how session handling works in this project"
+
+# Make a change
+opencode run "add email validation to the registration form"
+
+# Optimise
+opencode run "optimize the database queries in user_service.py"
+```
+
+## MCP-Server {#mcp}
+
+MCP-Server werden im Top-Level-Objekt `mcp` deklariert. Jeder Eintrag hat
+eine von zwei Formen:
+
+- `"type": "local"` – `command` ist ein **Array**: das ausführbare Programm
+  gefolgt von seinen Argumenten. `env` ist optional.
+- `"type": "remote"` – `url` zeigt auf einen MCP-Endpoint.
+
+```json
+{
+  "mcp": {
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "enabled": true
+    },
+    "fetch": {
+      "type": "local",
+      "command": ["uvx", "mcp-server-fetch"],
+      "enabled": true
+    },
+    "playwright": {
+      "type": "local",
+      "command": ["npx", "-y", "@playwright/mcp"],
+      "enabled": true
+    },
+    "sequential-thinking": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
+      "enabled": true
+    },
+    "directus": {
+      "type": "local",
+      "command": ["npx", "-y", "@directus/content-mcp"],
+      "env": {
+        "DIRECTUS_URL": "https://your-directus-instance.com",
+        "DIRECTUS_TOKEN": "your-directus-token"
+      },
+      "enabled": true
+    },
+    "opensearch": {
+      "type": "local",
+      "command": ["uvx", "opensearch-mcp-server-py"],
+      "env": {
+        "OPENSEARCH_URL": "https://localhost:9200",
+        "OPENSEARCH_USERNAME": "your-opensearch-username",
+        "OPENSEARCH_PASSWORD": "your-opensearch-password"
+      },
+      "enabled": true
+    },
+    "typo3": {
+      "type": "local",
+      "command": [
+        "mw",
+        "app",
+        "exec",
+        "--quiet",
+        "--installation-id=a-XXXXX",
+        "vendor/bin/typo3",
+        "mcp:server"
+      ],
+      "enabled": true
+    },
+    "mittwald": {
+      "type": "remote",
+      "url": "https://mcp.mittwald.de/mcp",
+      "enabled": true
+    }
+  }
+}
+```
+
+Authentifizierung und Token-Lebenszyklus des mittwald-Servers stehen in der
+[MCP-Integration](/docs/v2/agentic-integration/mcp/). Die Server für TYPO3,
+Directus und OpenSearch authentifizieren sich über die oben gezeigten
+Umgebungsvariablen.
+
+## Plugins und Skills {#plugins-skills}
+
+Plugins stehen im Array `plugin`:
+
+```json
+{
+  "plugin": ["opencode-scheduler"]
+}
+```
+
+Skills liegen unter `~/.config/opencode/skills/`, ein Verzeichnis pro Skill.
+
+Agent Packs fügen vorkonfigurierte Subagenten hinzu, jeder davon kann auf ein
+eigenes Modell zeigen. Subagenten auf `Qwen3.6-35B-A3B-FP8` zu routen,
+während der Hauptagent bei `Qwen3.5-122B-A10B-FP8` bleibt, hält lange
+Sessions reaktionsfähig, da Subagenten-Arbeit meist aus Suchen und
+Zusammenfassen besteht.
+
+## Troubleshooting {#troubleshooting}
+
+### `opencode run` liefert keine Ausgabe und schreibt keine Datei {#no-output}
+
+`opencode run` ist nicht interaktiv, und je nach Build liefert es unter
+Umständen gar nichts zurück – keine Ausgabe, keine Datei, keine Fehlermeldung
+– statt zu melden, was schiefgelaufen ist. `--standalone` führt den Befehl
+gegen einen privaten Server statt gegen den gemeinsamen Hintergrunddienst
+aus – einen Versuch wert, wenn ein Lauf nichts liefert; das ist die
+dokumentierte Funktion des Flags, keine Garantie, dass es das Problem für
+jede Installation löst. Bestätigt `opencode run` die Verbindung weiterhin
+nicht, weiche auf die interaktive TUI aus (`opencode` ohne Subcommand
+ausführen) und schicke denselben Prompt dort ab.
+
+### Der Agent antwortet, bearbeitet aber nie eine Datei oder führt einen Befehl aus {#no-tool-calls}
+
+Dem Modell fehlt `"tool_call": true` in seinem `models`-Eintrag.
+
+### Ein MCP-Server startet nie {#mcp-server-fails}
+
+Prüfe die Form des Eintrags. Ein `local`-Server braucht `command` als Array,
+nicht als String mit separatem `args`-Feld – ein String-`command` mit `args`
+ist das Format von Claude Desktop, und opencode ignoriert es stillschweigend
+statt einen Fehler zu werfen.
+
+### `npx` meldet einen 404 für ein MCP-Paket {#package-404}
+
+Paketname prüfen. Der context7-Server ist als `@upstash/context7-mcp`
+veröffentlicht – das ähnlich klingende `@context7/mcp-server` existiert nicht
+auf npm.
+
+## Nächste Schritte {#next-steps}
+
+- [Hermes Agent](../hermes-agent) – ein weiterer CLI-Agent
+- [Pi](../pi) – ein dritter
+- [IDE Integration](../../ide-integration/) – Agenten innerhalb eines Editors
+- [MCP-Integration](/docs/v2/agentic-integration/mcp/) – mittwald-Infrastruktur aus dem Agenten heraus verwalten
+- [Agent Skills](/docs/v2/agentic-integration/agent-skills/) – Workflow-Anleitungen ergänzen
+
+## Disclaimer
+
+Drittanbieter-Tools, MCP-Server und externe Links werden zur Vereinfachung bereitgestellt,
+ohne Gewährleistung oder Empfehlung. Nutze sie auf eigenes Risiko, prüfe Lizenzen und
+Datenschutzrichtlinien und vergib nur die nötigen Berechtigungen (Least Privilege). Sende
+keine sensiblen Daten an externe Services, sofern nicht nötig und erlaubt.

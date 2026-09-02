@@ -167,23 +167,16 @@ Use `mcpServers` to define additional servers alongside mittwald:
   "mcpServers": {
     "context7": {
       "command": "npx",
-      "args": ["-y", "@context7/mcp-server", "--stdio"],
+      "args": ["-y", "@upstash/context7-mcp"],
       "env": {
         "CONTEXT7_API_KEY": "your-context7-api-key"
       }
     },
     "brave-search": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-brave-search", "--stdio"],
+      "args": ["-y", "@brave/brave-search-mcp-server"],
       "env": {
         "BRAVE_API_KEY": "your-brave-api-key"
-      }
-    },
-    "postgres": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-postgres", "--stdio"],
-      "env": {
-        "POSTGRES_CONNECTION_STRING": "postgresql://user:password@localhost:5432/dbname"
       }
     },
     "directus": {
@@ -195,19 +188,12 @@ Use `mcpServers` to define additional servers alongside mittwald:
       }
     },
     "opensearch": {
-      "command": "npx",
-      "args": ["-y", "@opensearch-project/mcp-server", "--stdio"],
+      "command": "uvx",
+      "args": ["opensearch-mcp-server-py"],
       "env": {
         "OPENSEARCH_URL": "https://localhost:9200",
         "OPENSEARCH_USERNAME": "your-opensearch-username",
         "OPENSEARCH_PASSWORD": "your-opensearch-password"
-      }
-    },
-    "solr": {
-      "command": "uvx",
-      "args": ["solr-mcp"],
-      "env": {
-        "SOLR_URL": "http://localhost:8983/solr"
       }
     },
     "typo3": {

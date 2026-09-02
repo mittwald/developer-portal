@@ -29,7 +29,7 @@ An agentic assistant will:
 
 You describe the outcome; the agent handles the execution.
 
-## Three Ways to Use Agentic Integration at mittwald
+## Four Ways to Use Agentic Integration at mittwald
 
 ### 1. IDE Integration
 
@@ -43,11 +43,24 @@ Use mittwald's [GDPR-compliant AI models](/docs/v2/platform/aihosting) hosted in
 - Visual Studio Code
 - Cursor & Windsurf
 - Zed
-- CLI tools (OpenCode)
 
 [Learn more about IDE Integration →](./ide-integration/)
 
-### 2. MCP (Model Context Protocol)
+### 2. CLI Agents
+
+Run a coding agent in your terminal against the same [GDPR-compliant AI models](/docs/v2/platform/aihosting). The agent reads and writes files, runs commands, and calls tools on its own — your code and prompts stay on infrastructure in Germany.
+
+**Best for:** Multi-file changes, repo-wide refactoring, scripted and headless workflows
+
+**Available integrations:**
+
+- Hermes Agent
+- Pi
+- opencode
+
+[Learn more about CLI Agents →](./cli-agents/)
+
+### 3. MCP (Model Context Protocol)
 
 Connect AI assistants to mittwald's infrastructure API through the Model Context Protocol. Manage projects, databases, containers, domains, and more through natural language.
 
@@ -63,7 +76,7 @@ Connect AI assistants to mittwald's infrastructure API through the Model Context
 
 [Learn more about MCP →](./mcp/)
 
-### 3. Agent Skills
+### 4. Agent Skills
 
 Pre-built workflow guidance for complex tasks like migrations and zero-config deployments. Skills provide structured, step-by-step assistance without custom prompts.
 
@@ -80,10 +93,17 @@ Pre-built workflow guidance for complex tasks like migrations and zero-config de
 
 ### Quick Start: IDE Integration
 
-1. Get your API key from [mStudio](https://studio.mittwald.de/profile/api-token)
+1. Get your AI Hosting API key ([how to get one](/docs/v2/platform/aihosting/access-and-usage/access))
 2. Choose your [IDE integration](./ide-integration/)
 3. Configure with endpoint: `https://llm.aihosting.mittwald.de/v1`
-4. Select model: `Ministral-3-14B-Instruct-2512`
+4. Select model: `Qwen3.5-122B-A10B-FP8`
+
+### Quick Start: CLI Agents
+
+1. Get your AI Hosting API key ([how to get one](/docs/v2/platform/aihosting/access-and-usage/access))
+2. Install one of the [supported agents](./cli-agents/)
+3. Point it at endpoint: `https://llm.aihosting.mittwald.de/v1`
+4. Verify tool calling works before relying on the agent — each guide has a check for this
 
 ### Quick Start: MCP
 
@@ -121,6 +141,12 @@ Usage limits are enforced by your mStudio tariff. Check your [plan details](http
       href: "./ide-integration/",
       description:
         "Configure your development environment with mittwald AI models",
+    },
+    {
+      type: "link",
+      label: "CLI Agents",
+      href: "./cli-agents/",
+      description: "Run terminal coding agents against mittwald AI Hosting",
     },
     {
       type: "link",

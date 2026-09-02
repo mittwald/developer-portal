@@ -17,35 +17,49 @@ Use mittwald's [GDPR-compliant AI models](/docs/v2/platform/aihosting) directly 
 The service offers several AI models optimized for different development tasks. For a complete list of available models and their specifications, see the [AI models documentation](/docs/v2/platform/aihosting/models).
 
 **Recommended models:**
-- **Ministral-3-14B-Instruct-2512**: Chat, vision, general assistants, multimodal UX, agentic coding, tool use
-- **gpt-oss-120b**: Complex text-centric workloads and advanced automations requiring precision
+
+- **Qwen3.5-122B-A10B-FP8**: the default choice for coding — strongest tool calling,
+  245,760-token context
+- **Qwen3.8-27B-NVFP4**: faster than the 122B model, 256,000-token context
+- **Qwen3.6-35B-A3B-FP8**: fastest of the three, 256,000-token context, good for
+  completion and quick edits
+- **gpt-oss-120b**: reasoning-heavy work, 131,072-token context
+- **Ministral-3-14B-Instruct-2512**: small and fast, 262,144-token context, for
+  lightweight assistants
 
 ## Supported IDEs and Tools
 
-| IDE/Tool                                 | Integrations                                                                         |
-| ---------------------------------------- | ------------------------------------------------------------------------------------ |
-| Jetbrains IDEs (IntelliJ, PHPStorm, ...) | [JetBrains AI](./jetbrains-ai), [Continue](./continue)                               |
-| Visual Studio Code                       | [Continue](./continue), [Cline](./cline), [Kilo Code](./kilo-code)                   |
-| Cursor                                   | [Cline](./cline)                                                                     |
-| Windsurf                                 | [Cline](./cline)                                                                     |
-| Zed                                      | [Zed](./zed)                                                                         |
-| CLI                                      | [OpenCode](./opencode)                                                               |
+| IDE/Tool                                 | Integrations                                                       |
+| ---------------------------------------- | ------------------------------------------------------------------ |
+| Jetbrains IDEs (IntelliJ, PHPStorm, ...) | [JetBrains AI](./jetbrains-ai), [Continue](./continue)             |
+| Visual Studio Code                       | [Continue](./continue), [Cline](./cline), [Kilo Code](./kilo-code) |
+| Cursor                                   | [Cline](./cline)                                                   |
+| Windsurf                                 | [Cline](./cline)                                                   |
+| Zed                                      | [Zed](./zed)                                                       |
+
+Running an agent in the terminal instead of an editor? See
+[CLI Agents](../cli-agents/) for Hermes Agent, Pi and opencode.
 
 ## Quick Start
 
-1. **Get your API key**: Visit [mStudio profile settings](https://studio.mittwald.de/profile/api-token)
+1. **Get your AI Hosting API key**: See [Gaining access](/docs/v2/platform/aihosting/access-and-usage/access)
 2. **Choose your IDE**: Select from the integrations above
 3. **Configure endpoint**: `https://llm.aihosting.mittwald.de/v1`
-4. **Select model**: `Ministral-3-14B-Instruct-2512`
+4. **Select model**: `Qwen3.5-122B-A10B-FP8`
 
 ## Best Practices
 
 ### Model Selection
 
-- **Ministral-3-14B-Instruct-2512**: Best for most coding tasks, supports tool use and vision
-- **gpt-oss-120b**: Use for complex reasoning, precise documentation, or advanced automations
+- **Qwen3.5-122B-A10B-FP8**: start here for agentic coding, refactoring and tool use
+- **Qwen3.8-27B-NVFP4**: want faster replies than the 122B model, at a small quality
+  cost
+- **Qwen3.6-35B-A3B-FP8**: inline completion and quick edits, where latency matters
+  more than depth
+- **gpt-oss-120b**: complex reasoning, precise documentation, advanced automations
+- **Ministral-3-14B-Instruct-2512**: lightweight assistants and simple chat
 
-### Long-Context Tips (256k)
+### Long-Context Tips {#long-context-tips}
 
 - Avoid sending entire repositories; retrieve relevant files/function bodies only
 - Summarize prior steps and include IDs/anchors to rehydrate context on demand
@@ -60,10 +74,8 @@ Many IDEs support [Model Context Protocol (MCP)](/docs/v2/agentic-integration/mc
 
 - **Context7**: Up-to-date library documentation
 - **Brave Search**: Web search with privacy
-- **PostgreSQL**: Database queries and schema inspection
 - **Directus**: Headless CMS management
 - **OpenSearch**: Search, index inspection, mappings, and cluster diagnostics
-- **Apache Solr**: Hybrid keyword/vector search for enterprise search workflows
 - **TYPO3**: TYPO3 CMS content and backend automation through MCP
 - **mittwald**: Infrastructure management through natural language
 
@@ -80,7 +92,7 @@ Choose your IDE or tool to get started:
 - [Cline](./cline) - VS Code, Cursor, Windsurf
 - [Zed](./zed) - Zed editor
 - [Kilo Code](./kilo-code) - VS Code extension
-- [OpenCode](./opencode) - CLI agent
+- [CLI Agents](../cli-agents/) - Hermes Agent, Pi and opencode in the terminal
 
 ## Disclaimer
 

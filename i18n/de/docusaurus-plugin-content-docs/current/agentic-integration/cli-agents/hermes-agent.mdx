@@ -1,0 +1,260 @@
+---
+title: Hermes Agent
+sidebar_label: Hermes Agent
+sidebar_position: 1
+---
+
+import PlanCompatibility from "@site/src/components/PlanCompatibility";
+
+# Hermes Agent mit mittwald AI Hosting
+
+<PlanCompatibility features={["ai"]} />
+
+[Hermes Agent](https://github.com/NousResearch/hermes-agent) ist ein
+CLI-Agent mit Datei-, Shell- und Web-Tools, einer eingebauten Skill-Bibliothek
+und MCP-Unterstützung. Er erreicht mittwald AI Hosting über einen eigenen
+Provider-Eintrag.
+
+## Installation {#installation}
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash
+```
+
+Installation prüfen:
+
+```bash
+hermes --version
+```
+
+## Hermes auf mittwald AI Hosting zeigen lassen {#configuration}
+
+Hermes liest `~/.hermes/config.yaml`. Füge einen `custom_providers`-Eintrag
+hinzu und mach ihn zum Standard:
+
+```yaml
+model:
+  default: Qwen3.5-122B-A10B-FP8
+  provider: mittwald
+  base_url: https://llm.aihosting.mittwald.de/v1
+custom_providers:
+  - name: mittwald
+    base_url: https://llm.aihosting.mittwald.de/v1
+    api_key: sk-...
+    models:
+      - Qwen3.5-122B-A10B-FP8
+      - Qwen3.8-27B-NVFP4
+      - Qwen3.6-35B-A3B-FP8
+    context_length: 245760
+```
+
+Ersetze `sk-...` durch deinen AI-Hosting-API-Key. Den legst du im Bereich
+**AI-Hosting** deines mStudio-Projekts an — siehe
+[API-Key einrichten](/docs/v2/platform/aihosting/access-and-usage/access). Ein
+mStudio-API-Token aus den Profileinstellungen ist ein anderes Zugangsmittel und
+funktioniert hier nicht.
+
+Ein `custom_providers`-Eintrag akzeptiert diese Schlüssel: `name`, `base_url`,
+`api_key`, `api_mode`, `model`, `models`, `context_length`, `rate_limit_delay`,
+`extra_body`, `ssl_ca_cert`, `ssl_verify` und `key_env`. Ein nicht erkannter
+Schlüssel wird nicht zuverlässig abgefangen, bevor du bis zu einer
+Chat-Session kommst – siehe
+[Konfiguration und Endpoint getrennt prüfen](#checking-separately) –, prüfe
+also im Zweifel die Schreibweise gegen diese Liste.
+
+Statt den Key als `api_key` in `config.yaml` einzufügen, kannst du ihn
+komplett aus der Datei heraushalten und mit `key_env` aus einer
+Umgebungsvariable lesen:
+
+```yaml
+key_env: MITTWALD_LLM_API_KEY
+```
+
+:::note
+`context_length` gilt für den gesamten Eintrag. Setze ihn auf das kleinste
+Kontextfenster unter den aufgeführten Modellen – für die Auswahl oben also
+245.760 – oder trenne Modelle mit unterschiedlichen Fenstern in eigene
+Einträge.
+:::
+
+## Verbindung prüfen {#verify}
+
+Führe `hermes doctor` als ersten Check aus:
+
+```bash
+hermes doctor
+```
+
+`doctor` deckt gängige Umgebungs- und Setup-Probleme auf, aber seine Ausgabe
+unterscheidet sich je nach Installation, und er validiert die Feldnamen von
+`custom_providers` nicht zuverlässig – ein nicht erkannter Schlüssel wird
+womöglich einfach ignoriert statt gemeldet. Verhält sich der Provider nicht
+wie erwartet, prüfe die Schreibweise gegen die Schlüsselliste unter
+[Hermes auf mittwald AI Hosting zeigen lassen](#configuration), statt dich
+darauf zu verlassen, dass `doctor` das abfängt.
+
+Führe dann einen Turn aus, der einen Tool Call erzwingt, denn eine reine
+Chat-Antwort würde auch bei kaputtem Tool Calling gelingen:
+
+```bash
+hermes chat --model Qwen3.5-122B-A10B-FP8 \
+  -q "Create a file called hello.txt containing the word hello, then read it back."
+```
+
+Zwei Dinge an diesem Befehl weichen vom Erwarteten ab:
+
+- Es gibt kein `-p`-Flag. Das Flag für den nicht-interaktiven Modus heißt
+  `-q`/`--query`.
+- Übergib nicht `--provider mittwald`. Hermes' `--provider`-Flag akzeptiert
+  nur seine eingebauten Provider-Namen (`auto`, `openrouter`, `nous`,
+  `anthropic` und so weiter) – ein eigener Provider-Name wird mit
+  `error: argument --provider: invalid choice` abgelehnt. Lass es weg;
+  Hermes übernimmt `mittwald` automatisch aus `model.provider` in
+  `config.yaml`, du musst also nur `-m`/`--model` angeben.
+
+Ein erfolgreicher Lauf zeigt, wie der Agent einen `write_file`-Call vorbereitet,
+ein Diff dessen ausgibt, was geschrieben werden soll, dann einen
+`read_file`-Call vorbereitet und abschließend eine Nachricht ausgibt, die den
+Round-Trip bestätigt:
+
+````
+  ┊ ✍️ preparing write_file…
+  ┊ review diff
+a/hello.txt → b/hello.txt
+@@ -0,0 +1 @@
++hello
+  ┊ 📖 preparing read_file…
+
+╭─ ⚕ Hermes ──────────────────────────────────────────────────╮
+Done! Created `hello.txt` with the word "hello" and read it back:
+
+```
+hello
+```
+╰─────────────────────────────────────────────────────────────╯
+````
+
+Zwei getrennte Tool Calls, erst `write_file`, dann `read_file`, beide gegen
+den mittwald-Endpoint – das ist Tool Calling, das End-to-End funktioniert.
+
+## Empfohlene Skills, Plugins und MCP-Server {#recommendations}
+
+### Skills {#skills}
+
+Hermes bringt eine Skill-Bibliothek mit, ohne dass etwas installiert werden
+muss. Verfügbares auflisten:
+
+```bash
+hermes skills list
+```
+
+Nützlich für Entwicklungsarbeit:
+
+- `codebase-inspection` – strukturierte Exploration eines unbekannten
+  Repositorys
+- `github-pr-workflow`, `github-code-review`, `github-issues` – GitHub-Workflows
+- `native-mcp`, `mcporter` – Arbeiten mit MCP-Servern innerhalb einer Session
+
+Weitere Skills kommen aus Registries:
+
+```bash
+hermes skills search <term>
+hermes skills inspect <name>    # preview before installing
+hermes skills install <name>
+hermes skills audit             # re-scan installed skills
+```
+
+:::warning[Skills von Drittanbietern vor der Installation prüfen]
+Ein Skill ist eine Anweisungssammlung, der der Agent folgt. Einen Skill aus
+einer Registry zu installieren bedeutet, fremde Anweisungen gegen deinen Code
+laufen zu lassen. Nutze `hermes skills inspect`, um einen Skill vorab zu
+lesen, und `hermes skills audit`, um bereits installierte Skills erneut zu
+prüfen.
+:::
+
+### Plugins {#plugins}
+
+Plugins werden aus Git-Repositories installiert:
+
+```bash
+hermes plugins install owner/repo
+hermes plugins list
+```
+
+Für mittwald AI Hosting ist nichts davon nötig – die Provider-Konfiguration
+oben reicht.
+
+### MCP-Server {#mcp-servers}
+
+MCP-Server geben dem Agenten Tools über Dateien und Shell hinaus. Einen
+hinzufügen und testen:
+
+```bash
+hermes mcp add context7 --command npx --args -y @upstash/context7-mcp
+hermes mcp test context7
+hermes mcp list
+```
+
+Eine sinnvolle Startauswahl:
+
+| Server                  | Befehl                                                  |
+| ----------------------- | ------------------------------------------------------- |
+| Library-Dokumentation   | `npx -y @upstash/context7-mcp`                          |
+| URL-Abruf               | `uvx mcp-server-fetch`                                  |
+| Browser-Automatisierung | `npx -y @playwright/mcp`                                |
+| Dateisystemzugriff      | `npx -y @modelcontextprotocol/server-filesystem <path>` |
+
+mittwalds eigener MCP-Server macht deine Infrastruktur für den Agenten
+zugänglich:
+
+```bash
+hermes mcp add mittwald --url https://mcp.mittwald.de/mcp --auth oauth
+hermes mcp test mittwald
+```
+
+Die Variante mit API-Token und die Fehlerbehebung stehen unter
+[Verbindung mit Hermes Agent herstellen](/docs/v2/agentic-integration/mcp/getting-connected/hermes-agent).
+
+## Troubleshooting {#troubleshooting}
+
+### `error: argument --provider: invalid choice: 'mittwald'` {#provider-invalid-choice}
+
+`hermes chat --provider` akzeptiert nur Hermes' eingebaute Provider-Namen –
+`auto`, `openrouter`, `nous`, `openai-codex`, `copilot-acp`, `copilot`,
+`anthropic`, `gemini`, `huggingface`, `zai`, `kimi-coding`, `minimax`,
+`minimax-cn`, `kilocode` – nicht den Namen eines `custom_providers`-Eintrags.
+`--provider mittwald` schlägt mit genau diesem Fehler fehl, noch bevor der
+Agent startet. Lass `--provider` weg; mit `model.provider: mittwald` in
+`config.yaml` nutzt Hermes ihn als Standard, und `-m Qwen3.5-122B-A10B-FP8`
+reicht, um das Modell zu wählen.
+
+### Konfiguration und Endpoint getrennt prüfen {#checking-separately}
+
+`hermes doctor` und ein erzwungener Tool Call decken zwei unterschiedliche
+Fehlerarten ab, und es lohnt sich zu wissen, welche man gerade diagnostiziert:
+
+- `hermes doctor` deckt gängige Setup-Probleme auf, validiert aber die
+  Feldnamen von `custom_providers` nicht zuverlässig – ein falsch
+  geschriebener oder nicht unterstützter Schlüssel wird womöglich einfach
+  ignoriert statt gemeldet. Prüfe die Schreibweise gegen die Schlüsselliste
+  unter [Hermes auf mittwald AI Hosting zeigen lassen](#configuration),
+  statt dich darauf zu verlassen, dass `doctor` das abfängt.
+- Parst die Konfiguration sauber, aber Endpoint, Key oder Modell sind falsch,
+  fängt `doctor` das ebenfalls nicht ab, weil er den Endpoint nicht aufruft. Ein
+  erzwungener Tool Call (wie unter
+  [Verbindung prüfen](#verify)) bestätigt, dass der mittwald-Endpoint
+  tatsächlich erreichbar ist und Tool Calls zurückliefert.
+
+## Nächste Schritte {#next-steps}
+
+- [Pi](../pi) – ein zweiter CLI-Agent
+- [opencode](../opencode) – ein dritter
+- [Verbindung mit Hermes Agent herstellen](/docs/v2/agentic-integration/mcp/getting-connected/hermes-agent) – mittwald-Infrastruktur aus dem Agenten heraus verwalten
+- [KI-Modelle](/docs/v2/platform/aihosting/models) – die vollständige Modellliste
+
+## Disclaimer
+
+Drittanbieter-Tools, MCP-Server und externe Links werden zur Vereinfachung bereitgestellt,
+ohne Gewährleistung oder Empfehlung. Nutze sie auf eigenes Risiko, prüfe Lizenzen und
+Datenschutzrichtlinien und vergib nur die nötigen Berechtigungen (Least Privilege). Sende
+keine sensiblen Daten an externe Services, sofern nicht nötig und erlaubt.
