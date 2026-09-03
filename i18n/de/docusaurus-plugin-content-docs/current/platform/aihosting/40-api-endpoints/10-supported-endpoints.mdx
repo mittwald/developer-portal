@@ -195,11 +195,47 @@ curl -i -N -X POST https://llm.aihosting.mittwald.de/v1/responses \
         "stream": true,
         "temperature": 0.2,
         "top_p": 0.5,
-        "top_k": 20
+        "top_k": 20,
+        "allowed_openai_params": ["top_k"]
     }'
 ```
 
 Streaming wird unterstützt, kann jedoch je nach Funktion oder Parameter leicht eingeschränkt sein.
+
+Zum Feld `allowed_openai_params` im Beispiel oben: `temperature` und `top_p` gehören zur Responses-API, `top_k` nicht. Parameter, die die Responses-API nicht kennt, werden entfernt, bevor die Anfrage geprüft wird. Ohne diese Freigabe antwortet die Anfrage also weiterhin mit `200`, und `top_k` bleibt wirkungslos. Dasselbe gilt für `presence_penalty`, `frequency_penalty` und `chat_template_kwargs`. Das Token-Budget heißt an diesem Endpunkt `max_output_tokens`; ein Feld `max_tokens` wird auf demselben Weg entfernt.
+
+### Die Denkphase abschalten {#responses-thinking}
+
+Am einfachsten über das Feld `reasoning` der Responses-API, das keine Freigabe braucht:
+
+```sh
+curl -i -X POST https://llm.aihosting.mittwald.de/v1/responses \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $APIKEY" \
+    -d '{
+        "model": "Qwen3.6-35B-A3B-FP8",
+        "input": "Nenne die Hauptstadt von Portugal.",
+        "reasoning": {"effort": "none"}
+    }'
+```
+
+`"effort": "none"` schaltet die Denkphase bei Qwen3.5-122B-A10B-FP8, Qwen3.6-35B-A3B-FP8, Qwen3.8-27B-NVFP4 und Qwen3.5-0.8B ab. Jeder andere Wert lässt sie an, und genau so wird sie bei Qwen3.5-0.8B eingeschaltet, wo sie standardmäßig aus ist. gpt-oss-120b akzeptiert `"none"` nicht und antwortet mit `400`; dort ist `"low"` die kürzeste Denkkette.
+
+Wer eine Anfrage von `/v1/chat/completions` übernimmt: `chat_template_kwargs` funktioniert hier ebenfalls, gehört aber nicht zur Responses-API und muss deshalb in `allowed_openai_params` genannt werden:
+
+```sh
+curl -i -X POST https://llm.aihosting.mittwald.de/v1/responses \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $APIKEY" \
+    -d '{
+        "model": "Qwen3.6-35B-A3B-FP8",
+        "input": "Nenne die Hauptstadt von Portugal.",
+        "chat_template_kwargs": {"enable_thinking": false},
+        "allowed_openai_params": ["chat_template_kwargs"]
+    }'
+```
+
+Ohne `allowed_openai_params` wird das Feld entfernt, die Anfrage antwortet mit `200` und das Modell denkt weiter. Ob eine der beiden Formen gewirkt hat, steht in der Antwort unter `usage.output_tokens_details.reasoning_tokens`: eine `0` bedeutet, dass keine Denkphase gelaufen ist.
 
 ## /v1/embeddings
 
