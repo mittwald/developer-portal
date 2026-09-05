@@ -195,11 +195,47 @@ curl -i -N -X POST https://llm.aihosting.mittwald.de/v1/responses \
         "stream": true,
         "temperature": 0.2,
         "top_p": 0.5,
-        "top_k": 20
+        "top_k": 20,
+        "allowed_openai_params": ["top_k"]
     }'
 ```
 
 Streaming is supported, but certain functions or parameters may be limited due to the experimental status of the endpoint.
+
+Note the `allowed_openai_params` field in the example above: `temperature` and `top_p` are part of the Responses API, `top_k` is not. Parameters the Responses API doesn't define are dropped before the request is validated, so without that opt-in the request still returns `200` and `top_k` simply has no effect. The same applies to `presence_penalty`, `frequency_penalty` and `chat_template_kwargs`. The output budget on this endpoint is `max_output_tokens`; a `max_tokens` field is dropped in the same way.
+
+### Turning the thinking phase off {#responses-thinking}
+
+Use the Responses API's own `reasoning` field, which needs no opt-in:
+
+```sh
+curl -i -X POST https://llm.aihosting.mittwald.de/v1/responses \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $APIKEY" \
+    -d '{
+        "model": "Qwen3.6-35B-A3B-FP8",
+        "input": "Name the capital of Portugal.",
+        "reasoning": {"effort": "none"}
+    }'
+```
+
+`"effort": "none"` turns the thinking phase off on Qwen3.5-122B-A10B-FP8, Qwen3.6-35B-A3B-FP8, Qwen3.8-27B-NVFP4 and Qwen3.5-0.8B. Any other value keeps it on, which is how you switch it on for Qwen3.5-0.8B, where it is off by default. gpt-oss-120b doesn't accept `"none"` and answers `400`; use `"low"` there for the shortest reasoning chain.
+
+If you are porting a payload from `/v1/chat/completions`, `chat_template_kwargs` works here too, but it is not part of the Responses API, so it needs to be named in `allowed_openai_params`:
+
+```sh
+curl -i -X POST https://llm.aihosting.mittwald.de/v1/responses \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $APIKEY" \
+    -d '{
+        "model": "Qwen3.6-35B-A3B-FP8",
+        "input": "Name the capital of Portugal.",
+        "chat_template_kwargs": {"enable_thinking": false},
+        "allowed_openai_params": ["chat_template_kwargs"]
+    }'
+```
+
+Without `allowed_openai_params` the field is dropped, the request returns `200` and the model keeps thinking. To check which of the two forms took effect, read `usage.output_tokens_details.reasoning_tokens` in the response: `0` means no thinking phase ran.
 
 ## /v1/embeddings
 
