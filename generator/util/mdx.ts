@@ -1,6 +1,12 @@
-// Matches inline code spans (including those delimited by multiple backticks),
-// so that their contents can be left untouched when escaping.
-const codeSpan = /(`+[^`]*`+)/;
+// Matches an inline code span: an opening run of backticks, its content, and a
+// closing run of the same length. Spans delimited by a longer run may contain
+// backticks themselves, so the closing run has to be matched via backreference
+// rather than by simply looking for the next backtick.
+const codeSpan = /(`+)[\s\S]*?\1(?!`)/g;
+
+function escapeOutsideCode(text: string): string {
+  return text.replace(/[{}<>]/g, "\\$&");
+}
 
 /**
  * Escapes characters that MDX would otherwise interpret as an expression or as
@@ -18,8 +24,14 @@ export function escapeMdx(text: string | undefined): string | undefined {
     return text;
   }
 
-  return text
-    .split(codeSpan)
-    .map((part, i) => (i % 2 === 1 ? part : part.replace(/[{}<>]/g, "\\$&")))
-    .join("");
+  let escaped = "";
+  let offset = 0;
+
+  for (const match of text.matchAll(codeSpan)) {
+    escaped += escapeOutsideCode(text.slice(offset, match.index));
+    escaped += match[0];
+    offset = match.index + match[0].length;
+  }
+
+  return escaped + escapeOutsideCode(text.slice(offset));
 }
