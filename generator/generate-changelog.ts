@@ -7,6 +7,7 @@ import * as yaml from "yaml";
 import * as fs from "fs/promises";
 import * as fs2 from "fs";
 import { canonicalizeTitle } from "@site/generator/util/title";
+import { escapeMdx } from "@site/generator/util/mdx";
 import OpenAI from "openai";
 import { GithubRelease } from "@site/generator/util/github";
 
@@ -178,6 +179,7 @@ async function generateAPIChangelog(apiVersion: APIVersion) {
         spec,
         getOperationById,
         canonicalizeTitle,
+        escapeMdx,
         summary,
         clientChangelogs,
         introduction,
