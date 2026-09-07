@@ -2,6 +2,22 @@
 
 This file contains guidelines for agentic coding assistants working on the mittwald Developer Portal codebase. Follow these conventions to maintain consistency with the existing codebase.
 
+## Skills
+
+Content-specific guidelines live as agent skills in `.agents/skills/` (also reachable as
+`.claude/skills/`, which is a symlink). Read the relevant `SKILL.md` before writing or reviewing
+documentation:
+
+- [`writing-documentation`](.agents/skills/writing-documentation/SKILL.md) — baseline rules for
+  everything under `docs/` and `i18n/de/docusaurus-plugin-content-docs/`
+- [`writing-api-guides`](.agents/skills/writing-api-guides/SKILL.md) — API how-to guides in
+  `docs/api/howtos`
+- [`writing-app-guides`](.agents/skills/writing-app-guides/SKILL.md) — app and database deployment
+  guides in `docs/guides/apps` and `docs/platform/databases`
+
+The files in `.github/instructions/` map these skills onto GitHub Copilot's path-based `applyTo`
+mechanism; the skills themselves are the single source of truth.
+
 ## Build, Lint, and Test Commands
 
 ### Development Setup
