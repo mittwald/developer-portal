@@ -6,13 +6,18 @@ import * as yaml from "yaml";
 import compareOperation from "../src/openapi/compareOperation";
 import * as ejs from "ejs";
 import {
-  applyOverlayToSpec,
+  AI_OVERLAY_NAME,
+  applyOverlaysToSpec,
   dereferenceSpec,
   loadSpec,
   loadSpecPreview,
   SpecLoader,
   versionedOutputPath,
 } from "./util/spec";
+import {
+  aiGenerationEnabled,
+  generateOperationDocs,
+} from "./util/ai_descriptions";
 import { canonicalizeTitle } from "./util/title";
 import { slugFromTagName } from "@site/src/openapi/slugFromTagName";
 import {
@@ -33,7 +38,7 @@ function determineServerURLAndBasePath(
     spec.servers?.[0].url ?? `https://api.mittwald.de/${apiVersion}`;
   if (serverURL) {
     const parsedServerURL = url.parse(serverURL);
-    basePath = parsedServerURL.pathname;
+    basePath = parsedServerURL.pathname ?? "";
   }
 
   return [serverURL, basePath];
@@ -90,7 +95,11 @@ async function renderAPISpecToFile(
   apiVersion: APIVersion,
 ) {
   const withSDKExamples = apiVersion !== "v1";
-  const summary: string = canonicalizeTitle(spec.summary);
+  const summary = canonicalizeTitle(spec.summary);
+
+  if (!spec.operationId) {
+    return;
+  }
 
   const descriptionOverridePre = loadDescriptionOverride(
     apiVersion,
@@ -152,7 +161,7 @@ function exportSpecToSource(
 async function renderTagIndexPage(
   apiVersion: APIVersion,
   name: string,
-  description: string,
+  description: string | undefined,
   outputPath: string,
 ): Promise<void> {
   const indexFile = path.join(outputPath, "index.mdx");
@@ -219,11 +228,12 @@ class APIDocRenderer {
   ) {
     const sidebar = [];
     const originalSpec = await this.specLoader(apiVersion);
-    const overlayedSpec = await applyOverlayToSpec(
-      originalSpec,
-      apiVersion,
-      outputPathInDocs === "preview" ? "preview" : undefined,
-    );
+    // The AI overlay is applied first, so that the manually maintained overlay
+    // takes precedence over the generated summaries and descriptions.
+    const overlayedSpec = await applyOverlaysToSpec(originalSpec, apiVersion, [
+      AI_OVERLAY_NAME,
+      outputPathInDocs === "preview" ? "overlay-preview" : "overlay",
+    ]);
     const spec = await dereferenceSpec(overlayedSpec);
     const outputPath = this.outputPath(apiVersion, outputPathInDocs);
     const [serverURL, basePath] = determineServerURLAndBasePath(
@@ -252,14 +262,14 @@ class APIDocRenderer {
       fs.mkdirSync(operationsDir, { recursive: true });
 
       for (const urlPath of Object.keys(spec.paths)) {
-        const operations = spec.paths[urlPath];
+        const operations = spec.paths[urlPath]!;
         const urlPathWithBase =
           basePath + urlPath.replace(new RegExp(`${basePath}/`), "/");
         for (const method of Object.keys(operations) as HttpMethods[]) {
-          const operation = operations[method];
-          if (operation.tags.includes(name)) {
+          const operation = operations[method]!;
+          if (operation.tags?.includes(name)) {
             // Strip trailing dot from summary because they are annoying in the sidebar
-            const summary: string = canonicalizeTitle(operation.summary);
+            const summary = canonicalizeTitle(operation.summary);
             const operationFile = path.join(
               operationsDir,
               operation.operationId + ".mdx",
@@ -316,6 +326,10 @@ class APIDocRenderer {
 }
 
 (async () => {
+  if (aiGenerationEnabled()) {
+    await generateOperationDocs("v2", await loadSpec("v2"));
+  }
+
   const prodRenderer = new APIDocRenderer(versionedOutputPath("v2"));
   const previewRenderer = prodRenderer
     .withSpecLoader(loadSpecPreview)
