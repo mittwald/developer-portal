@@ -1,0 +1,255 @@
+---
+sidebar_label: Sprachausgabe mit Qwen3-TTS
+description: Sprache aus Text erzeugen mit Qwen3-TTS-12Hz-1.7B-CustomVoice über die OpenAI-kompatible API
+title: Sprachausgabe mit Qwen3-TTS
+---
+
+`Qwen3-TTS-12Hz-1.7B-CustomVoice` erreichst du über dieselbe Route `/v1/audio/speech` wie die OpenAI-Speech-API. Code, der für OpenAI geschrieben wurde, funktioniert, wenn du `base_url` änderst. Alle Stimmen, Sprachen, Formate und gemessenen Latenzen stehen auf der [Modellseite zu Qwen3-TTS](/docs/v2/platform/aihosting/models/qwen3-tts-customvoice).
+
+Das ist die Gegenrichtung zur [Spracherkennung mit Whisper](/docs/v2/platform/aihosting/examples/whisper/): Text rein, Audio raus.
+
+## Vorbereitung {#vorbereitung}
+
+```shellsession
+user@local $ pip install openai
+user@local $ export OPENAI_API_KEY="sk-…"
+```
+
+## Einfache Sprachausgabe {#einfach}
+
+```python
+import os
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1",
+    api_key=os.environ["OPENAI_API_KEY"],
+)
+
+response = client.audio.speech.create(
+    model="Qwen3-TTS-12Hz-1.7B-CustomVoice",
+    voice="ryan",
+    input="Hallo und herzlich willkommen bei mittwald.",
+    response_format="mp3",
+)
+
+response.write_to_file("willkommen.mp3")
+print("geschrieben nach willkommen.mp3")
+```
+
+## Streaming {#streaming}
+
+Mit Streaming bekommst du das Audio, während das Modell noch generiert. Der erste Chunk kommt in weniger als 150 ms, wo die gepufferte Anfrage bei 100 Zeichen rund eine Sekunde und bei 270 Zeichen über drei Sekunden braucht. Nimm Streaming, sobald jemand auf das Audio wartet, und teile lange Texte trotzdem auf, siehe [Lange Texte](#lange-texte).
+
+Setz `stream` auf `true`, um es einzuschalten, und nimm `stream_format="audio"` für rohe Audio-Chunks im angeforderten Format. Genau das willst du, wenn du in eine Datei schreibst oder direkt in einen Player gibst. Streaming funktioniert nur mit `response_format="wav"` und `"pcm"`, jedes andere Format antwortet mit HTTP 400.
+
+```python
+import os
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1",
+    api_key=os.environ["OPENAI_API_KEY"],
+)
+
+with client.audio.speech.with_streaming_response.create(
+    model="Qwen3-TTS-12Hz-1.7B-CustomVoice",
+    voice="ryan",
+    input=(
+        "Dieser Text ist lang genug, dass sich das Warten auf die vollständige "
+        "Datei bemerkbar machen würde. Mit Streaming beginnt die Wiedergabe sofort."
+    ),
+    response_format="wav",
+    stream_format="audio",
+    extra_body={"stream": True},
+) as response:
+    response.stream_to_file("ausgabe.wav")
+```
+
+`stream_format="sse"` liefert stattdessen das Event-Format von OpenAI: `speech.audio.delta`-Events mit dem Audio als Base64, abgeschlossen von einem `speech.audio.done`. Bei einem Text mit 100 Zeichen waren das 7 Delta-Events und 1 Done-Event. Nimm `sse`, wenn dein Client SSE schon spricht, und `audio`, wenn nicht.
+
+## Die passende Stimme finden {#stimmen}
+
+Neun Stimmen kommen mit dem Modell. Erzeug von jeder eine Hörprobe und hör sie dir an, denn die passende hängt von deinen Inhalten ab:
+
+```python
+import os
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1",
+    api_key=os.environ["OPENAI_API_KEY"],
+)
+
+VOICES = ["aiden", "dylan", "eric", "ono_anna", "ryan",
+          "serena", "sohee", "uncle_fu", "vivian"]
+
+SAMPLE = "Guten Tag. Dies ist eine Hörprobe für die Sprachausgabe."
+
+for voice in VOICES:
+    response = client.audio.speech.create(
+        model="Qwen3-TTS-12Hz-1.7B-CustomVoice",
+        voice=voice,
+        input=SAMPLE,
+        response_format="mp3",
+    )
+    response.write_to_file(f"sample_{voice}.mp3")
+    print(f"sample_{voice}.mp3")
+```
+
+Voice-Cloning mit einer eigenen Aufnahme gibt es auf dieser Route nicht. Die neun eingebauten Stimmen sind die vollständige Auswahl.
+
+## Das richtige Ausgabeformat {#formate}
+
+Alle fünf Formate enthalten dasselbe Audio. Sie unterscheiden sich in der Größe, und die zählt, sobald du das Ergebnis über das Netz schickst. Die Generierung ist nicht deterministisch, zwei Durchläufe über denselben Text sind unterschiedlich lang, deshalb stehen die Größen pro Sekunde Audio:
+
+| `response_format` | Größe pro Sekunde Audio | Wofür                                |
+| ----------------- | ----------------------- | ------------------------------------ |
+| `wav`             | 48,0 kB                 | Weiterverarbeitung, der Standard     |
+| `pcm`             | 48,0 kB                 | Rohe Audio-Pipeline                  |
+| `flac`            | etwa 23 kB              | Verlustfreie Archivierung            |
+| `mp3`             | 7,0 kB                  | Breite Kompatibilität                |
+| `opus`            | 4,6 kB                  | Auslieferung an Browser oder Telefon |
+
+`aac` wird nicht unterstützt. Es antwortet mit HTTP 400 und `Input should be 'wav', 'pcm', 'flac', 'mp3' or 'opus'`.
+
+Am Header erkennst du das Format: `audio/wav`, `audio/pcm`, `audio/flac`, `audio/mpeg` und `audio/ogg` in dieser Reihenfolge.
+
+## Lange Texte {#lange-texte}
+
+Die Erzeugungsdauer wächst mit der Textlänge, ein sehr langer Text wird also eine einzelne lange Anfrage. Wenn du an Satzgrenzen aufteilst, kannst du den ersten Teil schon abspielen, während der Rest noch entsteht, und ein einzelner Fehlschlag bleibt klein.
+
+```python
+import os
+import re
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1",
+    api_key=os.environ["OPENAI_API_KEY"],
+)
+
+
+def split_sentences(text, max_chars=350):
+    """Fasst Sätze zu Blöcken von höchstens max_chars zusammen."""
+    sentences = re.split(r"(?<=[.!?])\s+", text.strip())
+    chunks, current = [], ""
+    for sentence in sentences:
+        if current and len(current) + len(sentence) + 1 > max_chars:
+            chunks.append(current)
+            current = sentence
+        else:
+            current = f"{current} {sentence}".strip()
+    if current:
+        chunks.append(current)
+    return chunks
+
+
+LONG_TEXT = (
+    "Der erste Satz eröffnet den Text. "
+    "Der zweite Satz führt den Gedanken weiter und wird etwas länger. "
+    "Ein dritter Satz schließt den Absatz ab."
+)
+
+for index, chunk in enumerate(split_sentences(LONG_TEXT)):
+    response = client.audio.speech.create(
+        model="Qwen3-TTS-12Hz-1.7B-CustomVoice",
+        voice="ryan",
+        input=chunk,
+        response_format="mp3",
+    )
+    response.write_to_file(f"part_{index:03d}.mp3")
+    print(f"part_{index:03d}.mp3  ({len(chunk)} Zeichen)")
+```
+
+Teilst du mitten im Satz, hört man die Naht, weil das Modell die Betonung pro Anfrage neu wählt. Schneide an Satzgrenzen, wie oben.
+
+## Sprechtempo anpassen {#sprechtempo}
+
+`speed` skaliert die Dauer annähernd umgekehrt proportional. Am selben deutschen Satz gemessen:
+
+| `speed` | Dauer  |
+| ------- | ------ |
+| `0.5`   | 9,28 s |
+| `1.0`   | 4,85 s |
+| `2.0`   | 2,23 s |
+
+```python
+response = client.audio.speech.create(
+    model="Qwen3-TTS-12Hz-1.7B-CustomVoice",
+    voice="ryan",
+    input="Langsam und deutlich gesprochen.",
+    response_format="mp3",
+    speed=0.8,
+)
+```
+
+## Gemischtsprachige Texte {#sprachen}
+
+Das Modell erkennt die Sprache selbst und kommt mit Deutsch und Englisch zuverlässig zurecht, auch bei einem deutschen Satz mit englischen Begriffen darin:
+
+```python
+response = client.audio.speech.create(
+    model="Qwen3-TTS-12Hz-1.7B-CustomVoice",
+    voice="serena",
+    input="Wir deployen das Feature heute, das Rollback-Skript liegt bereit.",
+    response_format="mp3",
+)
+```
+
+Der Parameter `language` nimmt den Sprachnamen, zum Beispiel `German`, und weist ISO-Codes wie `de` mit HTTP 400 ab. Viel bringt er nicht: Deutscher Text kam in unseren Durchläufen mit und ohne den Parameter gleich genau zurück. Kommt eine Passage in der falschen Sprache heraus, schick sie als eigene Anfrage mit mehr Kontext in der Zielsprache drumherum. Das ist derselbe Trick, der auch kurze deutsche Zeilen repariert.
+
+## Eine Modellantwort vorlesen lassen {#chat-pipeline}
+
+Eine häufige Pipeline: Antwort mit einem Chat-Modell erzeugen, dann sprechen lassen.
+
+```python
+import os
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1",
+    api_key=os.environ["OPENAI_API_KEY"],
+)
+
+completion = client.chat.completions.create(
+    model="Qwen3.5-0.8B",
+    messages=[
+        {"role": "system", "content": "Antworte in höchstens drei Sätzen."},
+        {"role": "user", "content": "Was ist ein Reverse Proxy?"},
+    ],
+)
+
+answer = completion.choices[0].message.content
+print(answer)
+
+with client.audio.speech.with_streaming_response.create(
+    model="Qwen3-TTS-12Hz-1.7B-CustomVoice",
+    voice="serena",
+    input=answer,
+    response_format="wav",
+    stream_format="audio",
+    extra_body={"stream": True},
+) as speech:
+    speech.stream_to_file("antwort.wav")
+```
+
+Begrenz die Antwortlänge im System-Prompt. Die Erzeugungsdauer folgt der Textlänge, und eine unbegrenzte Modellantwort wird zu einer unbegrenzten Wartezeit.
+
+## Ersatz für OpenAI {#openai-ersatz}
+
+Es ändern sich nur `base_url`, `api_key` und der Modellname:
+
+```python
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1",   # statt api.openai.com
+    api_key=os.environ["OPENAI_API_KEY"],
+)
+
+response = client.audio.speech.create(
+    model="Qwen3-TTS-12Hz-1.7B-CustomVoice",           # statt tts-1 oder gpt-4o-mini-tts
+    voice="ryan",                                       # andere Stimmennamen
+    input="Hallo und willkommen.",
+    response_format="mp3",
+)
+```

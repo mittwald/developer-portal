@@ -1,0 +1,246 @@
+---
+title: Pi
+sidebar_label: Pi
+sidebar_position: 2
+---
+
+import PlanCompatibility from "@site/src/components/PlanCompatibility";
+
+# Pi mit mittwald AI Hosting
+
+<PlanCompatibility features={["ai"]} />
+
+[Pi](https://pi.dev/) ist ein CLI-Coding-Agent mit Read-, Bash-, Edit- und
+Write-Tools, einem Erweiterungssystem und einer Terminal-UI. Provider werden
+in einer JSON-Datei deklariert, was einen OpenAI-kompatiblen Endpoint wie
+mittwald AI Hosting unkompliziert einzubinden macht.
+
+## Installation {#installation}
+
+```bash
+npm install -g @earendil-works/pi-coding-agent
+```
+
+Oder mit Homebrew:
+
+```bash
+brew install pi-coding-agent
+```
+
+Installation prüfen:
+
+```bash
+pi --version
+```
+
+## Pi oder opencode {#vs-opencode}
+
+Beide sind CLI-Coding-Agenten, die mit mittwald AI Hosting funktionieren; der
+Unterschied liegt darin, wie viel vor der eigentlichen Arbeit geladen wird.
+Direkt gegen das mittwald-Gateway gemessen sendet Pis erste Anfrage einen
+2.640 Zeichen langen System-Prompt (als Nachricht mit der Rolle `developer`)
+plus JSON-Schemas für seine 4 eingebauten Tools – `read`, `bash`, `edit`,
+`write` – zusammen 3.024 Zeichen, macht insgesamt rund 6 KB für den ersten
+Request-Body. Dank des kleinen, festen Toolsets und des kompakten Prompts geht
+weniger vom Kontextfenster des Modells drauf, bevor die eigentliche Arbeit
+beginnt.
+
+opencode bringt von Haus aus mehr Funktionsumfang mit – ein Plugin-Array,
+einen MCP-Konfigurationsblock und Agent Packs mit Modell-Overrides pro Agent.
+Auf der Platte belegt Pi rund 142 MB, opencode rund 160 MB, ein moderater
+Unterschied so oder so.
+
+Wer einen kleinen, skriptbaren Agenten will und MCP-Server sowie Erweiterungen
+lieber erst bei Bedarf hinzufügt, startet mit Pi. Wer von Anfang an ein
+volleres, batteries-included Setup will, siehe [opencode](../opencode).
+
+## Pi auf mittwald AI Hosting zeigen lassen {#configuration}
+
+Pi liest Provider aus `~/.pi/agent/models.json`. Füge einen Provider-Block
+hinzu:
+
+```json
+{
+  "providers": {
+    "mittwald": {
+      "name": "mittwald AI Hosting",
+      "baseUrl": "https://llm.aihosting.mittwald.de/v1",
+      "api": "openai-completions",
+      "apiKey": "sk-...",
+      "models": [
+        {
+          "id": "Qwen3.5-122B-A10B-FP8",
+          "name": "Qwen3.5-122B-A10B-FP8",
+          "reasoning": true,
+          "input": ["text", "image"],
+          "contextWindow": 245760,
+          "maxTokens": 32768
+        },
+        {
+          "id": "Qwen3.8-27B-NVFP4",
+          "name": "Qwen3.8-27B-NVFP4",
+          "reasoning": true,
+          "input": ["text", "image"],
+          "contextWindow": 256000,
+          "maxTokens": 32768,
+          "samplingParams": {
+            "temperature": 0.7,
+            "top_p": 0.8,
+            "top_k": 20
+          }
+        },
+        {
+          "id": "Qwen3.6-35B-A3B-FP8",
+          "name": "Qwen3.6-35B-A3B-FP8",
+          "reasoning": true,
+          "input": ["text", "image"],
+          "contextWindow": 256000,
+          "maxTokens": 32768
+        }
+      ]
+    }
+  }
+}
+```
+
+Ersetze `sk-...` durch deinen AI-Hosting-API-Key. Den legst du im Bereich
+**AI-Hosting** deines mStudio-Projekts an — siehe
+[API-Key einrichten](/docs/v2/platform/aihosting/access-and-usage/access). Ein
+mStudio-API-Token aus den Profileinstellungen ist ein anderes Zugangsmittel und
+funktioniert hier nicht.
+Der Wert von `api` muss `openai-completions` sein – das wählt das
+OpenAI-kompatible Request-Format.
+
+Mach ihn in `~/.pi/agent/settings.json` zum Standard:
+
+```json
+{
+  "defaultProvider": "mittwald",
+  "defaultModel": "Qwen3.5-122B-A10B-FP8"
+}
+```
+
+`samplingParams` pro Modell sind optional. Die empfohlenen Werte für jedes
+Modell stehen auf dessen Seite in der
+[Dokumentation zu KI-Modellen](/docs/v2/platform/aihosting/models).
+
+## Verbindung prüfen {#verify}
+
+Die deklarierten Modelle sollten jetzt aufgelistet sein:
+
+```bash
+pi --list-models
+```
+
+Erzwinge dann einen Tool Call, denn eine reine Chat-Antwort würde auch bei
+kaputtem Tool Calling gelingen:
+
+```bash
+pi --provider mittwald --model Qwen3.5-122B-A10B-FP8 --no-session \
+  -p "Create a file called hello.txt containing the word hello, then read it back."
+```
+
+Erwartet: Pi schreibt die Datei, liest sie zurück und gibt den Inhalt aus.
+Führe das in einem Scratch-Verzeichnis aus – der Agent schreibt Dateien dort,
+wo du ihn startest. `--no-session` hält den Lauf flüchtig, es bleibt also
+kein gespeicherter Chatverlauf zurück.
+
+## Empfohlene Erweiterungen und MCP-Server {#recommendations}
+
+### Erweiterungen {#extensions}
+
+Erweiterungen werden aus npm installiert und in `settings.json` unter
+`packages` festgehalten:
+
+```bash
+pi install npm:pi-mcp-adapter
+pi list
+```
+
+| Erweiterung              | Was sie macht                                                     |
+| ------------------------ | ----------------------------------------------------------------- |
+| `pi-mcp-adapter`         | **Für MCP erforderlich.** Ohne sie hat Pi keine MCP-Unterstützung |
+| `pi-safe-compact`        | Sichere Context-Compaction in langen Sessions                     |
+| `@narumitw/pi-plan-mode` | Ein Plan-dann-Ausführen-Modus                                     |
+| `pi-background-tasks`    | Langlaufende Befehle, ohne die Session zu blockieren              |
+| `@juicesharp/rpiv-todo`  | Aufgaben-Tracking innerhalb einer Session                         |
+
+Aktiviertes lässt sich mit `pi config` umschalten.
+
+### MCP-Server {#mcp-servers}
+
+Installiere zuerst `pi-mcp-adapter`, dann deklariere Server in
+`~/.pi/agent/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"],
+      "lifecycle": "lazy"
+    },
+    "fetch": {
+      "command": "uvx",
+      "args": ["mcp-server-fetch"],
+      "lifecycle": "lazy"
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp"],
+      "lifecycle": "lazy"
+    }
+  }
+}
+```
+
+`lifecycle: "lazy"` startet einen Server beim ersten Gebrauch statt beim
+Programmstart. Bevorzuge das – mehrere eifrig gestartete Server verlangsamen
+den Start spürbar.
+
+Für den Zugriff auf mittwald-Infrastruktur siehe
+[MCP-Integration](/docs/v2/agentic-integration/mcp/).
+
+### Skills {#skills}
+
+Pi entdeckt Skills automatisch, oder du lädst einen explizit:
+
+```bash
+pi --skill ./path/to/skill
+```
+
+Discovery für einen Lauf deaktivieren mit `--no-skills`.
+
+## Troubleshooting {#troubleshooting}
+
+### Ein deklariertes Modell fehlt in `pi --list-models` {#model-missing}
+
+Der Provider-Block hat einen JSON-Syntaxfehler, oder `api` ist nicht
+`openai-completions`. Datei validieren:
+`python3 -m json.tool ~/.pi/agent/models.json`.
+
+### MCP-Server werden ignoriert {#mcp-ignored}
+
+`pi-mcp-adapter` ist nicht installiert. Mit `pi list` prüfen.
+
+### Ein `.pi/`-Verzeichnis erscheint trotz `--no-session` {#pi-directory-appears}
+
+Das ist erwartbar, wenn die Erweiterung `pi-background-tasks` installiert
+ist – sie schreibt Task-Status pro Lauf unter `.pi/tasks/`, unabhängig vom
+Session-Flag, denn `--no-session` deaktiviert nur den Konversationsverlauf,
+nicht erweiterungslokalen Zustand. Gefahrlos löschbar; führe Agenten in einem
+Scratch-Verzeichnis aus, wenn nichts zurückbleiben soll.
+
+## Nächste Schritte {#next-steps}
+
+- [Hermes Agent](../hermes-agent) – ein weiterer CLI-Agent
+- [opencode](../opencode) – ein dritter
+- [MCP-Integration](/docs/v2/agentic-integration/mcp/) – mittwald-Infrastruktur aus dem Agenten heraus verwalten
+- [KI-Modelle](/docs/v2/platform/aihosting/models) – die vollständige Modellliste
+
+## Disclaimer
+
+Drittanbieter-Tools, MCP-Server und externe Links werden zur Vereinfachung bereitgestellt,
+ohne Gewährleistung oder Empfehlung. Nutze sie auf eigenes Risiko, prüfe Lizenzen und
+Datenschutzrichtlinien und vergib nur die nötigen Berechtigungen (Least Privilege). Sende
+keine sensiblen Daten an externe Services, sofern nicht nötig und erlaubt.

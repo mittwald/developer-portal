@@ -1,0 +1,581 @@
+---
+title: Breaking (!) API changes for v2 API, August 28 to September 4
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - App
+  - Marketplace
+  - AI hosting
+  - Backup
+  - Cronjob
+  - Customer
+  - Contract
+  - Notification
+  - Project File System
+  - Container
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week's changelog for the mittwald API includes the addition of new endpoints, required properties, and optional request parameters, as well as the removal of certain success responses and media types, enhancing the overall functionality and usability of the API.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The success response with the status `200` has been removed for the `POST` operations at the following endpoints: 
+  - `POST /v2/app-installations/{appInstallationId}/actions/detach-staging`
+  - `POST /v2/app-installations/{appInstallationId}/actions/promote-staging`
+  This is a breaking change.
+
+- The media type `application/json` for the response with the status `204` has been removed for the `POST` operation at the endpoint `POST /v2/contributors/{contributorId}/extensions/{extensionId}/verification-process`. This is a breaking change.
+
+- A new required request property `planId` has been added for the `POST` operations at the following endpoints:
+  - `POST /v2/customers/{customerId}/ai-hosting-keys`
+  - `POST /v2/projects/{projectId}/ai-hosting-keys`
+
+- The `databaseRestores` request property's `minItems` has been increased to `1` for the `POST` operation at the endpoint `POST /v2/project-backups/{projectBackupId}/restore`.
+
+- The `pathRestore/sourcePaths` request property's `minItems` has been increased to `1` for the `POST` operation at the endpoint `POST /v2/project-backups/{projectBackupId}/restore`.
+
+- The following optional properties have been added to the responses with the `200` status:
+  - `autoUpdatesActivated` for the `GET` operations at:
+    - `GET /v2/app-installations`
+    - `GET /v2/app-installations/{appInstallationId}`
+  - `recommendation` for the `GET` operation at `GET /v2/cronjobs/{cronjobId}/executions/{executionId}/analysis`.
+  
+- The following required properties have been added to the responses with the `200` status:
+  - `summary` for the `GET` operation at `GET /v2/cronjobs/{cronjobId}/executions/{executionId}/analysis`.
+  - `description` and `planId` for the `GET` operation at `GET /v2/customers/{customerId}/ai-hosting`.
+  - `/items/planId` and `/items/profileId` for the `GET` operation at `GET /v2/customers/{customerId}/ai-hosting-keys`.
+  - `planId` and `profileId` for the `POST` operation at `POST /v2/customers/{customerId}/ai-hosting-keys`.
+  - `planId` and `profileId` for the `GET` operation at `GET /v2/customers/{customerId}/ai-hosting-keys/{keyId}`.
+  - `planId` and `profileId` for the `PUT` operation at `PUT /v2/customers/{customerId}/ai-hosting-keys/{keyId}`.
+  
+- New optional request parameters have been added for the following `GET` operations:
+  - `limit`, `page`, `planId`, and `skip` for `GET /v2/projects/{projectId}/ai-hosting-keys`.
+  - `baseArticleNames`, `order`, `search`, and `sort` for `GET /v2/customers/{customerId}/contracts`.
+  - `referenceAggregate`, `referenceDomain`, and `referenceId` for `GET /v2/notifications`.
+
+- The following endpoints have been added:
+  - `GET /v2/app-installations/{appInstallationId}/error-analysis`
+  - `GET /v2/customers/{customerId}/ai-hostings`
+  - `POST /v2/customers/{customerId}/ai-hostings`
+  - `GET /v2/customers/{customerId}/ai-hostings/{planId}`
+  - `PUT /v2/customers/{customerId}/ai-hostings/{planId}`
+  - `GET /v2/stacks/{stackId}/services/{serviceId}/log-analysis`
+  - `GET /v2/projects/{projectId}/ai-hostings`
+  - `GET /v2/projects/{projectId}/ai-hostings/{planId}`
+  
+- The non-success response with the status `500` has been removed for the `POST` operation at the endpoint `POST /v2/customers/{customerId}/avatar`.
+
+- The following optional request parameters have been added for the `GET` operation at `GET /v2/projects/{projectId}/filesystem-file-content`:
+  - `If-Range`
+  - `Range`
+  
+- The success response with the status `206` and the non-success response with the status `416` have been added for the `GET` operation at `GET /v2/projects/{projectId}/filesystem-file-content`.
+
+- The following optional request parameters have been added for the `GET` operation at `GET /v2/stacks/{stackId}/services/{serviceId}/logs`:
+  - `If-Range`
+  - `Range`
+  
+- The non-success response with the status `416` and the success response with the status `206` have been added for the `GET` operation at `GET /v2/stacks/{stackId}/services/{serviceId}/logs`.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Detach a staging app installation from its source"
+
+
+- ⚠️ **Breaking:** removed the success response with the status '200'
+
+- added the success response with the status '204'
+
+
+For details, refer to the <OperationLink operation="app-detach-appinstallation-staging" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Promote a staging app installation"
+
+
+- ⚠️ **Breaking:** removed the success response with the status '200'
+
+- added the success response with the status '204'
+
+
+For details, refer to the <OperationLink operation="app-promote-appinstallation-staging" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Start the verification process of an Extension"
+
+
+- ⚠️ **Breaking:** removed the media type 'application/json' for the response with the status '204'
+
+
+For details, refer to the <OperationLink operation="extension-request-extension-verification" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Creates a new key"
+
+
+- ⚠️ **Breaking:** added the new required request property 'planId'
+
+- added the required property 'planId' to the response with the '201' status
+
+- added the required property 'profileId' to the response with the '201' status
+
+
+For details, refer to the <OperationLink operation="ai-hosting-customer-create-key" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Restore a project backup"
+
+
+- ⚠️ **Breaking:** the 'databaseRestores' request property's minItems was increased to '1'
+
+- ⚠️ **Breaking:** the 'pathRestore/sourcePaths' request property's minItems was increased to '1'
+
+
+For details, refer to the <OperationLink operation="backup-request-project-backup-restore" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Creates a new key for a project"
+
+
+- ⚠️ **Breaking:** added the new required request property 'planId'
+
+- added the required property 'planId' to the response with the '201' status
+
+- added the required property 'profileId' to the response with the '201' status
+
+
+For details, refer to the <OperationLink operation="ai-hosting-project-create-key" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app installations that a user has access to"
+
+
+- added the optional property '/items/autoUpdatesActivated' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations-for-user" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an app installation"
+
+
+- added the optional property 'autoUpdatesActivated' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-get-appinstallation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an analysis of the error of an app installation"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="app-get-appinstallation-error-analysis" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a cronjob execution analysis for failed executions"
+
+
+- added the optional property 'recommendation' to the response with the '200' status
+
+- added the required property 'summary' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="cronjob-get-execution-analysis" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get ai hosting plan and usages of a customer. Deprecated: use /v2/customers/{customerId}/ai-hostings instead"
+
+
+- added the required property 'description' to the response with the '200' status
+
+- added the required property 'planId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ai-hosting-customer-get-usage" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a list of already created keys"
+
+
+- added the new optional 'query' request parameter 'limit'
+
+- added the new optional 'query' request parameter 'page'
+
+- added the new optional 'query' request parameter 'planId'
+
+- added the new optional 'query' request parameter 'skip'
+
+- added the required property '/items/planId' to the response with the '200' status
+
+- added the required property '/items/profileId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ai-hosting-customer-get-keys" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a key of a customer"
+
+
+- added the required property 'planId' to the response with the '200' status
+
+- added the required property 'profileId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ai-hosting-customer-get-key" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a key for a customer"
+
+
+- added the required property 'planId' to the response with the '200' status
+
+- added the required property 'profileId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ai-hosting-customer-update-key" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all ai hosting plans of a customer"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ai-hosting-customer-get-plans" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Creates an AI hosting profile and accepts the current model terms"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ai-hosting-customer-declare-profile" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get ai hosting plan and usages of a customer by planId"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ai-hosting-customer-get-plan" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Renames an AI hosting plan"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ai-hosting-customer-update-plan" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Request a new avatar upload for the customer profile"
+
+
+- removed the non-success response with the status '500'
+
+
+For details, refer to the <OperationLink operation="customer-request-avatar-upload" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return a list of Contracts for the given Customer"
+
+
+- added the new optional 'query' request parameter 'baseArticleNames'
+
+- added the new optional 'query' request parameter 'order'
+
+- added the new optional 'query' request parameter 'search'
+
+- added the new optional 'query' request parameter 'sort'
+
+
+For details, refer to the <OperationLink operation="contract-list-contracts" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Set how the customer became aware of mittwald"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="customer-set-customer-referral-source" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List all unread notifications"
+
+
+- added the new optional 'query' request parameter 'referenceAggregate'
+
+- added the new optional 'query' request parameter 'referenceDomain'
+
+- added the new optional 'query' request parameter 'referenceId'
+
+
+For details, refer to the <OperationLink operation="notifications-list-notifications" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create an Order"
+
+
+- added the new optional request property 'orderData/oneOf[#/components/schemas/de.mittwald.v1.order.AIHostingOrder]/name'
+
+
+For details, refer to the <OperationLink operation="order-create-order" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get ai hosting plan and usages of a project. Deprecated: use /v2/projects/{projectId}/ai-hostings/{planId} instead"
+
+
+- added the new optional 'query' request parameter 'planId'
+
+- added the optional property 'description' to the response with the '200' status
+
+- added the required property 'planId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ai-hosting-project-get-usage" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a list of keys of a project"
+
+
+- added the new optional 'query' request parameter 'limit'
+
+- added the new optional 'query' request parameter 'page'
+
+- added the new optional 'query' request parameter 'planId'
+
+- added the new optional 'query' request parameter 'skip'
+
+- added the required property '/items/planId' to the response with the '200' status
+
+- added the required property '/items/profileId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ai-hosting-project-get-keys" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a key of a project"
+
+
+- added the required property 'planId' to the response with the '200' status
+
+- added the required property 'profileId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ai-hosting-project-get-key" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a key for a project"
+
+
+- added the required property 'planId' to the response with the '200' status
+
+- added the required property 'profileId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ai-hosting-project-update-key" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all ai hosting plans and usages of a project"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ai-hosting-project-get-plans" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get ai hosting plan and usages of a project by planId"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ai-hosting-project-get-plan" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app installations belonging to a Project"
+
+
+- added the optional property '/items/autoUpdatesActivated' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Project file's content"
+
+
+- added the new optional 'header' request parameter 'If-Range'
+
+- added the new optional 'header' request parameter 'Range'
+
+- added the non-success response with the status '416'
+
+- added the success response with the status '206'
+
+
+For details, refer to the <OperationLink operation="project-file-system-get-file-content" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an analysis of the logs belonging to a Service"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="container-get-service-logs-analysis" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get logs belonging to a Service"
+
+
+- added the new optional 'header' request parameter 'If-Range'
+
+- added the new optional 'header' request parameter 'Range'
+
+- added the non-success response with the status '416'
+
+- added the success response with the status '206'
+
+
+For details, refer to the <OperationLink operation="container-get-service-logs" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK Release v2.1.216
+
+The mittwald PHP SDK has been updated to version v2.1.216. This release introduces several enhancements and new features across various components of the SDK. For detailed information, please visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.216).
+
+#### Key Updates:
+
+- **App Installation Staging & System Software**: 
+  - New methods for managing App Installation staging environments.
+  - A dedicated endpoint for retrieving installed system software.
+  - Deprecated the legacy method for system software retrieval.
+
+- **Container & Service Management**: 
+  - Enhanced service discovery with a new method to list accessible services.
+  - Improved documentation for service-related methods.
+
+- **Domain & Mail Configuration**: 
+  - Added domain transferability checks and clarified mail quota configurations.
+
+- **Marketplace & Extension Management**: 
+  - Improved filtering and sorting for extensions.
+  - Standardized API response types for extension management actions.
+
+- **Notifications & User Access Control**: 
+  - Enhanced notification filtering.
+  - Standardized pagination defaults for SSH/SFTP user lists.
+
+- **Schema Robustness & Cleanup**: 
+  - Improved error handling for unmapped enum values.
+  - Removed deprecated schema fields and implemented safer enum parsing.
+
+This release focuses on improving workflow management, service discovery, and API response consistency, while also enhancing error handling and documentation clarity.
+
+### mittwald JavaScript SDK Release 4.456.0
+
+The mittwald JavaScript SDK has been updated to version 4.456.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.456.0](https://github.com/mittwald/api-client-js/releases/tag/4.456.0).
+
+### mittwald JavaScript SDK Release 4.455.0
+
+The mittwald JavaScript SDK has been updated to version 4.455.0. This release includes an update to the generated client, enhancing its functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.455.0).
+
+### mittwald JavaScript SDK Release 4.454.0
+
+The mittwald JavaScript SDK has been updated to version 4.454.0. This release includes the following feature:
+
+- Updated the generated client to enhance functionality and performance ([commit 0cf5b97](https://github.com/mittwald/api-client-js/commit/0cf5b97052f0982c3fb041334828cf7f84b97171)).
+
+For more details, please visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.454.0).
+
+### mittwald JavaScript SDK Release 4.453.0
+
+The mittwald JavaScript SDK has been updated to version 4.453.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.453.0).
+
+### mittwald JavaScript SDK Release 4.452.0
+
+The mittwald JavaScript SDK has been updated to version 4.452.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.452.0).
+
+### mittwald JavaScript SDK Release 4.451.0
+
+The mittwald JavaScript SDK has been updated to version 4.451.0. This release includes an update to the generated client, enhancing its functionality. For more details, you can view the release on GitHub: [mittwald/api-client-js 4.451.0](https://github.com/mittwald/api-client-js/releases/tag/4.451.0).
+
+### mittwald JavaScript SDK Release 4.450.0
+
+The mittwald JavaScript SDK has been updated to version 4.450.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.450.0).
+
+### mittwald JavaScript SDK Release 4.449.0
+
+The mittwald JavaScript SDK has been updated to version 4.449.0. This release includes a feature update where the generated client has been updated. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.449.0).
+

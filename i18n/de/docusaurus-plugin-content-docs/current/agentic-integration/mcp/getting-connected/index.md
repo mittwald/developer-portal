@@ -12,7 +12,7 @@ Willkommen! Diese Anleitung hilft dir, die Authentifizierung für mittwald MCP m
 
 ## Wähle dein Tool {#choose-your-tool}
 
-mittwald MCP funktioniert mit 6 beliebten KI-Tools. Wähle dasjenige, das du verwendest:
+mittwald MCP funktioniert mit 7 beliebten KI-Tools. Wähle dasjenige, das du verwendest:
 
 ### Claude Desktop {#claude-desktop}
 
@@ -80,6 +80,17 @@ mittwald MCP funktioniert mit 6 beliebten KI-Tools. Wähle dasjenige, das du ver
 
 → **[Codex CLI einrichten](./codex-cli)**
 
+### Hermes Agent {#hermes-agent}
+
+**Am besten für**: Entwickler, die Hermes Agent im Terminal betreiben, oft zusammen mit Modellen aus dem mittwald AI Hosting
+
+- **Typ**: Command-line Interface
+- **OAuth-Muster**: Browser-basiert, gestartet mit `hermes mcp add --auth oauth`
+- **Setup-Zeit**: ~10 Minuten
+- **Komplexität**: ⭐⭐ (Einfach - ein CLI-Befehl plus Browser-Anmeldung)
+
+→ **[Hermes Agent einrichten](./hermes-agent)**
+
 ## Zwei Authentifizierungsoptionen {#two-authentication-options}
 
 ### Option 1: OAuth 2.1 (Empfohlen) {#option-1-oauth}
@@ -113,6 +124,7 @@ mittwald MCP funktioniert mit 6 beliebten KI-Tools. Wähle dasjenige, das du ver
 | GitHub Copilot | Dynamic Client Registration (DCR)   |
 | Cursor         | Settings UI oder JSON-Konfiguration |
 | Codex CLI      | RFC 8252 Loopback Flow              |
+| Hermes Agent   | Browser-Flow über `hermes mcp add`  |
 
 ### Option 2: API Token {#option-2-api-token}
 
@@ -153,6 +165,7 @@ Speichere API-Tokens niemals in Konfigurationsdateien, die in die Versionskontro
 | GitHub Copilot | Ja (über Terraform-Variablen) |
 | Cursor         | Ja (über JSON-Konfiguration)  |
 | Codex CLI      | Ja (über Konfigurationsdatei) |
+| Hermes Agent   | Ja (über Umgebungsvariable)   |
 
 ## Schrittweise Setup-Anleitungen {#step-by-step-guides}
 

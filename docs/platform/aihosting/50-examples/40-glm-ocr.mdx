@@ -191,7 +191,7 @@ Key Information Extraction (KIE) lets you pull specific fields out of a document
 
 The model **always wraps its JSON output in markdown code fences** regardless of how the prompt is worded — strip them before parsing:
 
-```python
+````python
 import base64
 import json
 import re
@@ -230,7 +230,7 @@ clean = re.sub(r"^```[a-z]*\n?", "", raw.strip())
 clean = re.sub(r"\n?```$", "", clean)
 data = json.loads(clean)
 print(data)
-```
+````
 
 The same approach works for any document type — just adapt the schema to the fields you need:
 
@@ -287,22 +287,25 @@ text = ocr_large_pdf("annual_report.pdf")
 
 ## Full pipeline: OCR → embedding → search → answer {#full-pipeline}
 
-Combine three mittwald AI Hosting models into a complete document question-answering pipeline:
+Combine four mittwald AI Hosting models into a complete document question-answering pipeline:
 
 1. **GLM-OCR** digitises your documents — using **Markdown output mode** so headings and structure are preserved, which produces cleaner chunks and better retrieval quality than flat text
-2. **[Qwen3-Embedding-8B](/docs/v2/platform/aihosting/models/qwen3-embedding-8b)** turns text chunks into vectors
-3. **[Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8)** answers questions in natural language based on the retrieved context
+2. **[Qwen3-Embedding-8B](/docs/v2/platform/aihosting/models/qwen3-embedding-8b)** turns text chunks into vectors for a fast first retrieval pass
+3. **[Qwen3-VL-Reranker-2B](/docs/v2/platform/aihosting/models/qwen3-vl-reranker-2b)** re-scores the retrieved candidates against the full question and narrows them down to the most relevant few
+4. **[Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8)** answers questions in natural language based on the reranked context
 
 ```shellsession
-user@local $ pip install openai pypdf
+user@local $ pip install openai pypdf requests
 ```
 
 ```python
 import base64
 import math
+import os
 import re
 from io import BytesIO
 from pypdf import PdfReader, PdfWriter
+import requests
 from openai import OpenAI
 
 client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
@@ -378,8 +381,43 @@ def cosine(a: list[float], b: list[float]) -> float:
 def retrieve(query_vec: list[float], index: list, top_k: int = 3) -> list[str]:
     scored = [(cosine(query_vec, vec), chunk) for vec, chunk in index]
     return [chunk for _, chunk in sorted(scored, reverse=True)[:top_k]]
+```
 
+### Reranking retrieved chunks {#reranking}
 
+Embedding similarity is fast — one dot product per candidate — but imprecise: it scores the query and each chunk independently, so it can miss a chunk that answers the question in different words than the question itself uses. A **reranker** looks at the query and one chunk together, as a pair, and scores how well that specific pair matches — then reorders the shortlist by that score. It's slower per candidate than vector search, so run it only on the handful of chunks `retrieve()` already narrowed things down to, never on the whole index.
+
+`Qwen3-VL-Reranker-2B` is served via the `/v1/rerank` endpoint rather than `/v1/chat/completions`:
+
+```python
+# ── Reranking: precision pass over the retrieved candidates ───────────────────
+
+def rerank(
+    query: str,
+    chunks: list[str],
+    top_k: int = 3,
+    instruction: str | None = None,
+) -> list[str]:
+    payload = {"model": "Qwen3-VL-Reranker-2B", "query": query, "documents": chunks}
+    if instruction:
+        payload["instruction"] = instruction
+    resp = requests.post(
+        "https://llm.aihosting.mittwald.de/v1/rerank",
+        headers={"Authorization": f"Bearer {os.environ['OPENAI_API_KEY']}"},
+        json=payload,
+        timeout=30,
+    )
+    resp.raise_for_status()
+    results = resp.json()["results"]
+    ranked = sorted(results, key=lambda r: r["relevance_score"], reverse=True)
+    return [chunks[r["index"]] for r in ranked[:top_k]]
+```
+
+The response's `results` list gives an `index` (position in the `documents` array you sent) and a `relevance_score` (higher is better) for each candidate. The optional `instruction` parameter tells the reranker what retrieval task to optimise for — omit it to fall back to a generic default.
+
+Retrieve a wider candidate set from the vector index, then let the reranker narrow it down before answering:
+
+```python
 # ── Step 5: Answer with Qwen3.5-122B-A10B-FP8 ────────────────────────────────
 # Qwen3.5 has thinking mode enabled by default — disable it for Q&A tasks so
 # the answer is returned in message.content rather than reasoning_content.
@@ -431,7 +469,13 @@ questions = [
 
 for q in questions:
     [q_vec] = embed([q])
-    context_chunks = retrieve(q_vec, index)
+    candidates = retrieve(q_vec, index, top_k=10)
+    context_chunks = rerank(
+        q,
+        candidates,
+        top_k=3,
+        instruction="Given a question, find the document passage that best answers it.",
+    )
     print(f"\nQ: {q}")
     print(f"A: {answer(q, context_chunks)}")
 ```
@@ -440,27 +484,75 @@ for q in questions:
 For production use, replace the in-memory cosine search with **pgvector** — a PostgreSQL extension for vector similarity search that runs on mittwald Container Hosting alongside n8n. See the [full RAG with n8n section](#n8n) below, or the [mittwald n8n guide](/docs/v2/guides/apps/n8n/) for a ready-to-deploy Docker Compose stack.
 :::
 
-## Optional: reranking with Qwen3-VL-Reranker-2B {#reranking}
+## Indexing multiple documents {#multiple-documents}
 
-Vector search retrieves candidates by embedding similarity — a fast approximation. A cross-encoder reranker scores each candidate against the full question text and reorders them by semantic relevance. The improvement is most noticeable on large indexes where many chunks share similar embeddings.
-
-`Qwen3-VL-Reranker-2B` is served via the `/v1/rerank` endpoint. Drop it in between the `retrieve()` and `answer()` steps in the [pipeline above](#full-pipeline):
+Documents of different types mix freely in one index — build it the same way regardless of how many files you have:
 
 ```python
-import os
-import requests
+documents = ["contract_a.pdf", "contract_b.docx", "appendix.xlsx"]
 
-def rerank(
+index: list[tuple[list[float], str]] = []
+for path in documents:
+    text = ocr_document(path)
+    chunks = chunk_text(text)
+    vectors = embed(chunks)
+    index.extend(zip(vectors, chunks))
+
+print(f"Indexed {len(index)} chunks from {len(documents)} documents.")
+
+# Query across all documents
+question = "What are the penalty clauses?"
+[q_vec] = embed([question])
+candidates = retrieve(q_vec, index, top_k=10)
+top_chunks = rerank(question, candidates, top_k=3)
+print(answer(question, top_chunks))
+```
+
+This reuses `ocr_document`, `chunk_text`, `embed`, `retrieve`, `rerank`, and `answer` exactly as defined in the pipeline above — indexing more documents only changes the size of `documents`, not the pipeline itself.
+
+## Multimodal variant: reranking with images {#multimodal}
+
+For documents that started out as scanned images — `scan.jpg`, `diagram.png`, and the like from [Extracting text from images](#extracting-text-from-images) above — the original image still carries signal the OCR'd text can lose: a stamp, a logo, a highlighted total, the layout of a chart. `Qwen3-VL-Reranker-2B` accepts documents that combine text and image content, so you can hand the reranker both the OCR'd chunk and the page it came from.
+
+This only works cleanly when a chunk maps to exactly one source image — a single-page scan, not a multi-page PDF split into many chunks. Track the source path alongside each chunk when indexing:
+
+```python
+def encode_image(path: str) -> str:
+    ext = path.rsplit(".", 1)[-1].lower()
+    with open(path, "rb") as f:
+        b64 = base64.b64encode(f.read()).decode()
+    return f"data:{MIME.get(ext, 'image/jpeg')};base64,{b64}"
+
+
+image_documents = ["scan.jpg", "diagram.png", "chart.webp"]
+
+image_index: list[tuple[str, str]] = []  # (chunk_text, source_image_path)
+for path in image_documents:
+    text = ocr_document(path)
+    for chunk in chunk_text(text):
+        image_index.append((chunk, path))
+```
+
+Extend `rerank()` to score an image alongside each chunk's text — pass each document as a content list instead of a plain string:
+
+```python
+def rerank_multimodal(
     query: str,
     chunks: list[str],
+    images: list[str],
     top_k: int = 3,
     instruction: str | None = None,
 ) -> list[str]:
-    payload = {
-        "model": "Qwen3-VL-Reranker-2B",
-        "query": query,
-        "documents": chunks,
-    }
+    documents = [
+        {
+            "content": [
+                {"type": "text", "text": chunk},
+                {"type": "image_url", "image_url": {"url": encode_image(image_path)}},
+            ]
+        }
+        for chunk, image_path in zip(chunks, images)
+    ]
+    payload: dict = {"model": "Qwen3-VL-Reranker-2B", "query": query, "documents": documents}
     if instruction:
         payload["instruction"] = instruction
     resp = requests.post(
@@ -475,20 +567,21 @@ def rerank(
     return [chunks[r["index"]] for r in ranked[:top_k]]
 ```
 
-Retrieve a wider candidate set from the vector index first, then let the reranker narrow it down:
+Call it with the parallel chunk and image lists built above, instead of `rerank()`:
 
 ```python
-# Retrieve 10 candidates, rerank to top 3
-candidates = retrieve(q_vec, index, top_k=10)
-context_chunks = rerank(
-    q,
-    candidates,
-    top_k=3,
-    instruction="Given OCR-extracted documents, find the sections most relevant to the query.",
-)
+chunks = [c for c, _ in image_index]
+images = [p for _, p in image_index]
+top_chunks = rerank_multimodal("What does the chart show?", chunks, images, top_k=3)
 ```
 
-The `/v1/rerank` response contains a `results` list with an `index` (position in the original `documents` array) and a `relevance_score` (higher is better) for each entry. The optional `instruction` parameter tells the reranker what retrieval task to optimise for — omitting it uses a generic default.
+### Text-only fallback {#text-only}
+
+Most documents don't need the image — plain OCR text reranks just as well and costs less to send. Omitting the `image_url` content and passing plain strings as `documents` is exactly what `rerank()` in the [full pipeline](#full-pipeline) above already does. Reach for `rerank_multimodal()` only when the visual layout — a stamp, a chart, a highlighted figure — actually matters to the answer.
+
+:::tip
+Always write the `instruction` value in **English**, even when the query is in another language. See the [Qwen3-VL-Reranker-2B model page](/docs/v2/platform/aihosting/models/qwen3-vl-reranker-2b) for details on instruction format and image size limits.
+:::
 
 ## Full pipeline with n8n and pgvector {#n8n}
 
@@ -499,11 +592,12 @@ The `/v1/rerank` response contains a `results` list with an `index` (position in
 
 Three vector databases are available as mittwald container templates:
 
-| Database | Docker image | Best for |
-|----------|-------------|---------|
-| **pgvector** | `ankane/pgvector:latest` | PostgreSQL-based; built-in n8n support |
-| **Qdrant** | `qdrant/qdrant:latest` | High-performance dedicated vector search; REST + gRPC API |
-| **ChromaDB** | `chromadb/chroma:latest` | Simple HTTP API; easy to get started |
+| Database     | Docker image             | Best for                                                  |
+| ------------ | ------------------------ | --------------------------------------------------------- |
+| **pgvector** | `ankane/pgvector:latest` | PostgreSQL-based; built-in n8n support                    |
+| **Qdrant**   | `qdrant/qdrant:latest`   | High-performance dedicated vector search; REST + gRPC API |
+| **ChromaDB** | `chromadb/chroma:latest` | Simple HTTP API; easy to get started                      |
+
 :::
 
 Because mittwald AI Hosting exposes an OpenAI-compatible API, n8n's built-in OpenAI nodes work out of the box with a custom base URL.
@@ -552,8 +646,8 @@ services:
   qdrant:
     image: qdrant/qdrant:latest
     ports:
-      - "6333:6333"   # REST API
-      - "6334:6334"   # gRPC
+      - "6333:6333" # REST API
+      - "6334:6334" # gRPC
     volumes:
       - qdrant_data:/qdrant/storage
 
@@ -649,9 +743,9 @@ def search(question: str, top_k: int = 3) -> list[str]:
 
 Create a new **OpenAI API** credential in n8n and override the base URL:
 
-| Field | Value |
-|-------|-------|
-| API Key | your mStudio AI Hosting key (`sk-…`) |
+| Field    | Value                                  |
+| -------- | -------------------------------------- |
+| API Key  | your mStudio AI Hosting key (`sk-…`)   |
 | Base URL | `https://llm.aihosting.mittwald.de/v1` |
 
 GLM-OCR, [Qwen3-Embedding-8B](/docs/v2/platform/aihosting/models/qwen3-embedding-8b), and [Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8) all share this single credential.
@@ -683,8 +777,8 @@ The GLM-OCR call uses an **HTTP Request** node because the file must be base64-e
 ```javascript
 // n8n Code node — encode binary to base64 data URI
 const binaryData = $input.first().binary.data;
-const b64 = binaryData.data;       // n8n already base64-encodes binary items
-const mime = binaryData.mimeType;  // e.g. "application/pdf"
+const b64 = binaryData.data; // n8n already base64-encodes binary items
+const mime = binaryData.mimeType; // e.g. "application/pdf"
 return [{ json: { dataUri: `data:${mime};base64,${b64}` } }];
 ```
 

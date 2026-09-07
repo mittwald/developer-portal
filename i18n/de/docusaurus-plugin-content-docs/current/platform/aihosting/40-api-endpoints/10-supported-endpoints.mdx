@@ -154,7 +154,7 @@ Da die Route noch **experimentell** ist, sind nicht alle Funktionen vollständig
 
 Bei allen Modellen unterstützt: Single-Turn- und Multi-Turn-Texterzeugung (vollständiger Verlauf in `input`), Streaming.
 
-Function/Tool Calling und `reasoning.effort` sind bei gpt-oss-120b, Qwen3.5-122B-A10B-FP8, Qwen3.6-35B-A3B-FP8 und Qwen3.5-0.8B unterstützt. Ministral-3-14B-Instruct-2512 unterstützt kein Tool Calling auf diesem Endpunkt; für dieses Modell stattdessen `/v1/chat/completions` verwenden. Die vollständige Modell-Tabelle steht unter [Responses-API-Support](../../dedicated/openai-compatibility#responses-api).
+Function/Tool Calling und `reasoning.effort` werden bei gpt-oss-120b, Qwen3.5-122B-A10B-FP8, Qwen3.6-35B-A3B-FP8, Qwen3.8-27B-NVFP4 und Qwen3.5-0.8B unterstützt. Ministral-3-14B-Instruct-2512 unterstützt kein Tool Calling auf diesem Endpunkt; für dieses Modell stattdessen `/v1/chat/completions` verwenden. Die vollständige Modell-Tabelle steht unter [Responses-API-Support](../../dedicated/openai-compatibility#responses-api).
 
 Bei keinem Modell unterstützt:
 
@@ -168,7 +168,7 @@ Ein Bild an ein Modell ohne Vision-Support zu senden, führt nicht zu einem Fehl
 :::
 
 Strukturierte Ausgaben wie schema-basiertes JSON können über diesen Endpunkt derzeit nicht erzwungen werden.
-Falls ein festes Ausgabeformat benötigt wird, sollte stattdessen der Endpunkt /v1/chat/completions verwendet werden
+Falls ein festes Ausgabeformat benötigt wird, sollte stattdessen der Endpunkt `/v1/chat/completions` verwendet werden.
 
 ```sh
 curl -i -X POST https://llm.aihosting.mittwald.de/v1/responses \
@@ -228,7 +228,7 @@ curl -X POST https://llm.aihosting.mittwald.de/v1/audio/transcriptions \
     -F "model=whisper-large-v3-turbo"
 ```
 
-Der `file`-Parameter sollte die zu transkribierende Audiodatei enthalten. Unterstützte Formate sind MP3, OGG, WAV und FLAC. Die maximale Dateigröße beträgt 25 MB. Der `model`-Parameter gibt an, welches Whisper-Modell für die Transkription verwendet werden soll.
+Der `file`-Parameter sollte die zu transkribierende Audiodatei enthalten. Unterstützte Formate sind MP3, OGG, WAV und FLAC. Die maximale Dateigröße beträgt 25 MB, die maximale Audiolänge 10 Minuten (600 Sekunden). Beide Limits gelten unabhängig voneinander. Der `model`-Parameter gibt an, welches Whisper-Modell für die Transkription verwendet werden soll.
 
 Zusätzlich können folgende optionale Parameter übermittelt werden:
 
@@ -250,4 +250,58 @@ curl -X POST https://llm.aihosting.mittwald.de/v1/audio/transcriptions \
 
 - Übersetzungsfunktion (`to_language`-Parameter) wird nicht unterstützt
 - Für beste Ergebnisse sollte der `language`-Parameter immer explizit angegeben werden
-- Segmentiere große Audiodateien bei Bedarf in Teile kleiner als 25 MB
+- Segmentiere Audiodateien bei Bedarf in Teile kleiner als 25 MB und kürzer als 10 Minuten. Wird die Länge überschritten, kommt HTTP 400 mit `Audio exceeds maximum allowed duration of 600s` zurück. Ein Beispiel dazu im [Spracherkennungs-Guide](../../examples/whisper/#grosse-dateien)
+
+## /v1/audio/speech
+
+Dieser Endpunkt wandelt Text in Sprache um, mit [Qwen3-TTS-12Hz-1.7B-CustomVoice](../../models/qwen3-tts-customvoice/). Er ist das Gegenstück zu `/v1/audio/transcriptions` darüber: Text rein, Audiodatei raus.
+
+```sh
+curl -X POST https://llm.aihosting.mittwald.de/v1/audio/speech \
+    -H "Authorization: Bearer $APIKEY" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "model": "Qwen3-TTS-12Hz-1.7B-CustomVoice",
+      "input": "Hallo und herzlich willkommen bei mittwald.",
+      "voice": "ryan",
+      "response_format": "mp3"
+    }' \
+    --output willkommen.mp3
+```
+
+Der Antwortkörper ist die Audiodatei selbst, kein JSON. Schreib ihn direkt in eine Datei oder gib ihn an deinen Player weiter. Nur Fehler kommen als JSON zurück. Der `Content-Type` ist immer `audio/mpeg`, egal welches Format du angefordert hast. Benenn die Datei also nach deinem `response_format`.
+
+Der Parameter `input` enthält den zu sprechenden Text und darf nicht leer sein. `model` wählt das TTS-Modell. `voice` ist Pflicht und muss einer von `aiden`, `dylan`, `eric`, `ono_anna`, `ryan`, `serena`, `sohee`, `uncle_fu`, `vivian` sein; ein unbekannter Name schlägt fehl.
+
+Die übrigen Parameter sind optional:
+
+- `response_format`: Einer von `wav` (Standard), `pcm`, `flac`, `mp3`, `opus`. `aac` wird **nicht** unterstützt
+- `language`: Einer der dreizehn Sprachnamen, die das Modell spricht, zum Beispiel `German`. ISO-Codes wie `de` antworten mit HTTP 400, und ein gültiger Wert ändert wenig, siehe [Modellseite](../../models/qwen3-tts-customvoice/#sprache)
+- `speed`: Sprechtempo zwischen 0,25 und 4,0, Standard 1,0
+- `stream`: Auf `true` gesetzt bekommst du das Audio, während es noch entsteht. Das geht nur mit `response_format` `wav` und `pcm`
+- `stream_format`: `audio` für rohe Audio-Chunks, `sse` für `speech.audio.delta`-Events im OpenAI-Format mit Base64-Audio
+
+Ein ungültiger Wert für `voice`, `response_format`, `speed`, `language` oder `instructions` und ein leeres `input` antworten alle mit HTTP 400. Bei `response_format` und `speed` nennt die Meldung das Feld, bei `voice`, `language`, `instructions` und leerem `input` kommt `{"error":{"message":"Got bad request.","code":"400"}}` zurück.
+
+Streaming lässt das Audio anfangen, bevor die Generierung durch ist: Der erste Chunk kommt in weniger als 150 ms, wo die gepufferte Antwort für denselben Text rund eine Sekunde braucht:
+
+```sh
+curl -N -X POST https://llm.aihosting.mittwald.de/v1/audio/speech \
+    -H "Authorization: Bearer $APIKEY" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "model": "Qwen3-TTS-12Hz-1.7B-CustomVoice",
+      "input": "Ein längerer Text, bei dem die Wiedergabe sofort starten soll.",
+      "voice": "ryan",
+      "response_format": "wav",
+      "stream": true
+    }' \
+    --output ausgabe.wav
+```
+
+**Wichtige Hinweise:**
+
+- Die beiden Audio-Endpunkte behandeln den Parameter `language` **unterschiedlich**. `/v1/audio/transcriptions` will ISO-639-1-Codes wie `de`, `/v1/audio/speech` weist die mit HTTP 400 ab und will den Sprachnamen, zum Beispiel `German`. Lies die Warnung auf der [Modellseite](../../models/qwen3-tts-customvoice/#sprache), bevor du gemeinsamen Code für beide schreibst
+- Ohne Streaming braucht die Erzeugung etwa ein Fünftel der angeforderten Abspieldauer, und vorher kommt nichts an
+- Voice-Cloning mit eigenem Referenz-Audio wird auf diesem Endpunkt nicht angeboten
+- Teile lange Texte auf und fordere die Teile einzeln an. Ein ausgearbeitetes Beispiel steht im [Text-to-Speech-Guide](../../examples/text-to-speech/#lange-texte)

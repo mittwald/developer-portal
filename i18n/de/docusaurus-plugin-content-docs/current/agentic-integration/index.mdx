@@ -29,7 +29,7 @@ Ein agentischer Assistent wird:
 
 Du beschreibst das Ergebnis, der Agent erledigt die Umsetzung.
 
-## Drei Wege für Agentic Integration bei mittwald
+## Vier Wege für Agentic Integration bei mittwald
 
 ### 1. IDE Integration
 
@@ -43,11 +43,24 @@ Nutze mittwalds [DSGVO-konforme KI-Modelle](/docs/v2/platform/aihosting) aus deu
 - Visual Studio Code
 - Cursor und Windsurf
 - Zed
-- CLI-Tools (OpenCode)
 
 [Mehr zu IDE Integration →](./ide-integration/)
 
-### 2. MCP (Model Context Protocol)
+### 2. CLI-Agenten
+
+Betreibe einen Coding-Agenten im Terminal gegen dieselben [DSGVO-konformen KI-Modelle](/docs/v2/platform/aihosting). Der Agent liest und schreibt Dateien, führt Kommandos aus und ruft eigenständig Tools auf — dein Code und deine Prompts bleiben auf Infrastruktur in Deutschland.
+
+**Am besten für:** Änderungen über mehrere Dateien, Refactoring im ganzen Repo, Skript- und Headless-Workflows
+
+**Verfügbare Integrationen:**
+
+- Hermes Agent
+- Pi
+- opencode
+
+[Mehr zu CLI-Agenten →](./cli-agents/)
+
+### 3. MCP (Model Context Protocol)
 
 Verbinde KI-Assistenten über das Model Context Protocol mit der mittwald Infrastruktur-API. Verwalte Projekte, Datenbanken, Container, Domains und mehr in natürlicher Sprache.
 
@@ -63,7 +76,7 @@ Verbinde KI-Assistenten über das Model Context Protocol mit der mittwald Infras
 
 [Mehr zu MCP →](./mcp/)
 
-### 3. Agent Skills
+### 4. Agent Skills
 
 Vorgefertigte Workflow-Hilfen für komplexe Aufgaben wie Migrationen und Zero-Config-Deployments. Skills liefern strukturierte Schritt-für-Schritt-Unterstützung ohne individuelle Mega-Prompts.
 
@@ -80,10 +93,17 @@ Vorgefertigte Workflow-Hilfen für komplexe Aufgaben wie Migrationen und Zero-Co
 
 ### Schnellstart: IDE Integration
 
-1. Hole dir deinen API-Key in [mStudio](https://studio.mittwald.de/profile/api-token)
+1. Hole dir deinen AI-Hosting-API-Key ([so bekommst du einen](/docs/v2/platform/aihosting/access-and-usage/access))
 2. Wähle deine [IDE-Integration](./ide-integration/)
 3. Konfiguriere den Endpoint: `https://llm.aihosting.mittwald.de/v1`
-4. Wähle das Modell: `Ministral-3-14B-Instruct-2512`
+4. Wähle das Modell: `Qwen3.5-122B-A10B-FP8`
+
+### Schnellstart: CLI-Agenten
+
+1. Hole dir deinen AI-Hosting-API-Key ([so bekommst du einen](/docs/v2/platform/aihosting/access-and-usage/access))
+2. Installiere einen der [unterstützten Agenten](./cli-agents/)
+3. Zeige ihn auf den Endpoint: `https://llm.aihosting.mittwald.de/v1`
+4. Prüfe Tool-Calling, bevor du dich auf den Agenten verlässt — jede Anleitung enthält dafür einen Test
 
 ### Schnellstart: MCP
 
@@ -121,6 +141,13 @@ Nutzungsgrenzen richten sich nach deinem mStudio-Tarif. Prüfe deine [Plan-Detai
       href: "./ide-integration/",
       description:
         "Richte deine Entwicklungsumgebung mit mittwald KI-Modellen ein",
+    },
+    {
+      type: "link",
+      label: "CLI-Agenten",
+      href: "./cli-agents/",
+      description:
+        "Terminal-Coding-Agenten gegen mittwald AI Hosting betreiben",
     },
     {
       type: "link",

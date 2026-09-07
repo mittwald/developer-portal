@@ -1,0 +1,637 @@
+---
+sidebar_label: Qwen3-TTS-CustomVoice
+description: Detaillierte Informationen zu Qwen3-TTS-12Hz-1.7B-CustomVoice
+title: Qwen3-TTS-12Hz-1.7B-CustomVoice
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+Im [Text-to-Speech-Guide](../../examples/text-to-speech/) findest du lauffähige Beispiele für die neun Stimmen, die Ausgabeformate, das Sprechtempo und das Aufteilen langer Texte.
+
+## Beschreibung
+
+„Qwen3-TTS-12Hz-1.7B-CustomVoice" ist ein Text-to-Speech-Modell von Alibaba mit 1,7 Milliarden Parametern. Du schickst Text hin und bekommst eine Audiodatei zurück. Es ist das Gegenstück zu [Whisper-Large-V3-Turbo](/docs/v2/platform/aihosting/models/whisper-large-v3-turbo), das den umgekehrten Weg geht und aus Audio Text macht.
+
+Das Modell bedient die Route `/v1/audio/speech` und bringt neun eingebaute Stimmen für dreizehn Sprachen und Dialekte mit. Die Sprachausgabe entsteht schneller als in Echtzeit: Für eine Sekunde Audio braucht das Modell auf unserer Hardware etwa eine fünftel Sekunde, und mit Streaming kommt das erste Audio in weniger als 150 ms.
+
+Das Modell eignet sich für:
+
+- Sprachausgabe in dreizehn Sprachen und Dialekten
+- Neun verschiedene eingebaute Stimmen, pro Anfrage wählbar
+- Fünf Ausgabeformate, darunter komprimierte für die direkte Auslieferung an den Browser
+- Ein Sprechtempo zwischen 0,25 und 4,0
+- Streaming, entweder als rohe Audio-Chunks oder als `speech.audio.delta`-Events im OpenAI-Format, sodass das Audio beginnt, bevor die Generierung abgeschlossen ist
+
+Diese Einschränkungen gelten:
+
+- Voice-Cloning mit eigenem Referenz-Audio ist auf dieser Route nicht verfügbar
+- `response_format="aac"` wird nicht unterstützt, obwohl die OpenAI-API es vorsieht
+- Der Parameter `language` wird geprüft, ein gültiger Wert ändert in der Praxis aber wenig, siehe [Gültige Werte für den Parameter `language`](#sprache)
+- `voice` ist Pflicht. Eine Anfrage ohne diesen Parameter antwortet mit HTTP 400
+- Ungültige Parameterwerte kommen als HTTP 400 zurück. Manche Antworten nennen den Parameter, andere bleiben allgemein, siehe [Fehlerantworten](#fehlerantworten)
+- Streaming braucht `response_format="wav"` oder `"pcm"`. Jedes andere Format zusammen mit `stream` antwortet mit HTTP 400, siehe [Streaming](#streaming)
+- Das Modell hat keine Chat-Route. `/v1/chat/completions` steht dafür nicht zur Verfügung
+- Es gibt keine Auszeichnungssprache. `[angry]`, `<laugh>` und SSML-Tags werden vorgelesen oder verschluckt, siehe [Sprechweise über `instructions` steuern](#stimmfuehrung)
+- Deutscher Text braucht eine Vorbereitung, bevor du ihn schickst, und kurze deutsche Zeilen sind unzuverlässig, siehe [Text für Deutsch aufbereiten](#deutscher-text)
+- `seed` wird angenommen, liefert aber kein reproduzierbares Ergebnis, siehe [Reproduzierbarkeit](#reproduzierbarkeit)
+
+:::warning[`language` erwartet einen Sprachnamen, keinen ISO-Code]
+Der Parameter erreicht das Modell und wird gegen die dreizehn Werte aus [Gültige Werte für den Parameter `language`](#sprache) geprüft. `German` ist gültig, `de` nicht, und ein Wert außerhalb der Liste antwortet mit HTTP 400, statt stillschweigend zu verschwinden.
+
+Besseres Deutsch bekommst du damit nicht. Derselbe deutsche Satz, je drei Durchläufe, zurücktranskribiert: Mit `language: "German"` kamen zwei von drei Durchläufen wortgleich zurück, ohne den Parameter ebenfalls zwei von drei. Die Spracherkennung des Modells reicht also aus. `language` kannst du ohne Weiteres weglassen, solange du die Sprache nicht aus anderen Gründen festlegen musst.
+
+Wenn du einen gemeinsamen Wrapper um beide Audio-Modelle baust, ist das der Parameter, an dem es scheitert. [Whisper](/docs/v2/platform/aihosting/models/whisper-large-v3-turbo) erwartet ISO-639-1-Codes wie `de`, diese Route weist sie ab und erwartet `German`. Derselbe Wert funktioniert also auf einer Route und scheitert auf der anderen.
+:::
+
+## Verfügbare Stimmen
+
+Alle neun funktionieren auf dieser Route. Es gibt keine getrennte Liste für „Custom Voices", die du erst freischalten müsstest.
+
+`aiden`, `dylan`, `eric`, `ono_anna`, `ryan`, `serena`, `sohee`, `uncle_fu`, `vivian`
+
+Jede Stimme spricht jede unterstützte Sprache, und alle neun kamen in unseren Tests auf Deutsch und Englisch verständlich zurück. Wähl also nach dem Klang, nicht nach der Muttersprache der Stimme. Gemessene mittlere Tonhöhe auf englischem Text:
+
+| Stimme     | Muttersprache        | Tonhöhe |
+| ---------- | -------------------- | ------- |
+| `aiden`    | Englisch             | 147 Hz  |
+| `dylan`    | Chinesisch (Peking)  | 164 Hz  |
+| `ryan`     | Englisch             | 171 Hz  |
+| `eric`     | Chinesisch (Sichuan) | 177 Hz  |
+| `uncle_fu` | Chinesisch           | 218 Hz  |
+| `sohee`    | Koreanisch           | 220 Hz  |
+| `serena`   | Chinesisch           | 246 Hz  |
+| `vivian`   | Chinesisch           | 250 Hz  |
+| `ono_anna` | Japanisch            | 264 Hz  |
+
+Zwei Dinge solltest du wissen, bevor du eine Stimme für Deutsch aussuchst. Die Stimmen mit einer anderen Muttersprache haben einen hörbaren Akzent, das ist Geschmackssache und kein Fehler. Und `instructions` wirkt praktisch nur auf englischem Text mit einer englischsprachigen Stimme, siehe [Sprechweise über `instructions` steuern](#stimmfuehrung). Auf Deutsch ist die Stimme selbst also die einzige Stellschraube für den Charakter der Ausgabe.
+
+`voice` ist hier Pflicht, obwohl die OpenAI-API den Parameter als optional vorsieht: Eine Anfrage ohne `voice` antwortet mit HTTP 400. Ein unbekannter Name führt ebenfalls zu HTTP 400, mit einem allgemeinen `Got bad request.`, das die gültigen Werte nicht nennt. Prüf die Schreibweise also gegen die Liste der verfügbaren Stimmen und nicht gegen die Fehlermeldung.
+
+## Gültige Werte für den Parameter `language` {#sprache}
+
+`Auto`, `Beijing_Dialect`, `Chinese`, `English`, `French`, `German`, `Italian`, `Japanese`, `Korean`, `Portuguese`, `Russian`, `Sichuan_Dialect`, `Spanish`
+
+Das sind die dreizehn Sprachen und Dialekte, die das Modell spricht, und die einzigen Werte, die `language` annimmt. Alles andere, auch ein ISO-Code wie `de`, antwortet mit HTTP 400. Einen gültigen Wert mitzuschicken ist erlaubt, lohnt aber selten: In unseren Durchläufen kam deutscher Text mit und ohne Parameter gleich genau zurück. Lass ihn also weg, das ist der einfachere Standard.
+
+## Ausgabeformate {#ausgabeformate}
+
+| `response_format` | `Content-Type` | Erste Bytes der Antwort | Größe pro Sekunde Audio |
+| ----------------- | -------------- | ----------------------- | ----------------------- |
+| `wav`             | `audio/wav`    | `RIFF` … `WAVE`         | 48,0 kB                 |
+| `pcm`             | `audio/pcm`    | Samples ohne Header     | 48,0 kB                 |
+| `flac`            | `audio/flac`   | `fLaC`                  | etwa 23 kB              |
+| `mp3`             | `audio/mpeg`   | mp3-Frame-Sync `FF F3`  | 7,0 kB                  |
+| `opus`            | `audio/ogg`    | `OggS`                  | 4,6 kB                  |
+
+`wav` ist der Standard und die richtige Wahl, wenn du das Audio weiterverarbeitest. Für die Auslieferung an Browser oder Telefon ist `opus` bei Sprachqualität rund ein Neuntel so groß.
+
+Die Größen sind absichtlich auf eine Sekunde Audio normiert. Die Generierung ist nicht deterministisch, zwei Durchläufe über denselben Text unterscheiden sich in der Länge um eine Sekunde oder mehr, und ein Vergleich der reinen Dateigrößen vergleicht dann die Längen und nicht die Formate. Normiert sind `pcm` und `wav` dasselbe: je 48,0 kB pro Sekunde, wobei `wav` einen Header von 44 Byte voranstellt.
+
+Der `Content-Type` nennt das Format, das du angefordert hast. Ein Player, der den Header liest, dekodiert also den richtigen Container. Die Bytes in eine Datei mit der passenden Endung zu schreiben, funktioniert weiterhin und braucht keinen Header.
+
+`aac` antwortet mit HTTP 400 und nennt die erlaubten Werte:
+
+```text
+Input should be 'wav', 'pcm', 'flac', 'mp3' or 'opus'
+```
+
+Das Audio ist in jedem Format 24 kHz, 16 Bit, mono. Die Lautheit ist nicht normalisiert: Über unseren Testsatz lag der Spitzenpegel zwischen 0,23 und 0,89 der Vollaussteuerung, das sind rund 11 dB zwischen dem leisesten und dem lautesten Clip. Wenn du mehrere Clips hintereinander abspielst, schick sie vorher durch eine Lautheitsnormalisierung.
+
+## Erste Schritte
+
+<Tabs groupId="language">
+<TabItem value="python" label="Python">
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1",
+    api_key="sk-your-api-key-here",
+)
+
+response = client.audio.speech.create(
+    model="Qwen3-TTS-12Hz-1.7B-CustomVoice",
+    voice="ryan",
+    input="Hallo und herzlich willkommen bei mittwald.",
+    response_format="mp3",
+)
+
+response.write_to_file("willkommen.mp3")
+```
+
+</TabItem>
+<TabItem value="javascript" label="JavaScript">
+
+```javascript
+import OpenAI from "openai";
+import { writeFile } from "node:fs/promises";
+
+const client = new OpenAI({
+  baseURL: "https://llm.aihosting.mittwald.de/v1",
+  apiKey: "sk-your-api-key-here",
+});
+
+const response = await client.audio.speech.create({
+  model: "Qwen3-TTS-12Hz-1.7B-CustomVoice",
+  voice: "ryan",
+  input: "Hallo und herzlich willkommen bei mittwald.",
+  response_format: "mp3",
+});
+
+await writeFile("willkommen.mp3", Buffer.from(await response.arrayBuffer()));
+```
+
+</TabItem>
+<TabItem value="php" label="PHP">
+
+```php
+<?php
+
+$payload = [
+    "model" => "Qwen3-TTS-12Hz-1.7B-CustomVoice",
+    "voice" => "ryan",
+    "input" => "Hallo und herzlich willkommen bei mittwald.",
+    "response_format" => "mp3",
+];
+
+$ch = curl_init("https://llm.aihosting.mittwald.de/v1/audio/speech");
+curl_setopt_array($ch, [
+    CURLOPT_POST => true,
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_HTTPHEADER => [
+        "Authorization: Bearer sk-your-api-key-here",
+        "Content-Type: application/json",
+    ],
+    CURLOPT_POSTFIELDS => json_encode($payload),
+]);
+
+file_put_contents("willkommen.mp3", curl_exec($ch));
+curl_close($ch);
+```
+
+</TabItem>
+</Tabs>
+
+## Empfohlene Parameter
+
+| Parameter         | Wert                               | Wirkung                                                                                       |
+| ----------------- | ---------------------------------- | --------------------------------------------------------------------------------------------- |
+| `voice`           | einer der neun Namen               | Pflicht. Eine Anfrage ohne diesen Parameter schlägt fehl                                      |
+| `language`        | weglassen                          | Wird geprüft, wirkt aber kaum, siehe [Gültige Werte](#sprache)                                |
+| `response_format` | `wav` oder `opus`                  | `wav` zum Weiterverarbeiten, `opus` zum Ausliefern                                            |
+| `speed`           | `1.0`                              | Zwischen 0,25 und 4,0, siehe [Sprechtempo](#sprechtempo)                                      |
+| `instructions`    | freier Text, höchstens 500 Zeichen | Optional. Beschreibt, wie gesprochen werden soll, siehe [Sprechweise steuern](#stimmfuehrung) |
+| `seed`            | eine ganze Zahl                    | Wird angenommen, reproduziert aber nicht, siehe [Reproduzierbarkeit](#reproduzierbarkeit)     |
+
+### Sprechtempo {#sprechtempo}
+
+`speed` skaliert die Dauer annähernd umgekehrt proportional. Derselbe deutsche Satz mit 99 Zeichen, fünf Durchläufe je Einstellung, über die API gemessen:
+
+| `speed` | Mittlere Dauer |
+| ------- | -------------- |
+| `0.5`   | 12,0 s         |
+| `1.0`   | 6,1 s          |
+| `2.0`   | 3,2 s          |
+
+Die Länge schwankt auch bei identischer Eingabe, weil die Generierung nicht deterministisch ist: Die fünf Durchläufe bei `1.0` lagen zwischen 5,2 s und 6,6 s. Nimm die Zahlen als Verlauf, nicht als exakte Werte.
+
+`speed` wirkt auch auf gestreamtes Audio. Beim Streaming kamen bei `0.5` 12,8 s und 16,5 s heraus, bei `2.0` 2,9 s. Du musst die Abspielgeschwindigkeit auf deiner Seite also nicht nachkorrigieren.
+
+## Sprechweise über `instructions` steuern {#stimmfuehrung}
+
+Diese Route kennt keine Auszeichnungssprache. Tags in eckigen oder spitzen Klammern und SSML werden nicht ausgewertet. Sie werden entweder vorgelesen oder verschluckt, und was davon passiert, ist nicht vorhersagbar:
+
+| Du schickst                                            | Das Modell sagt, je zwei Durchläufe                                                                                                |
+| ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `[wütend] Die Lieferung kommt am Dienstagmorgen an.`   | „**Für ihn,** die Lieferung kommt am Dienstagmorgen an." / „**Hey, wütend!** Die Lieferung kommt am Dienstagmorgen an."            |
+| `[angry] The delivery arrives on Tuesday morning.`     | „**And** the delivery arrives on Tuesday morning." / nur der Satz                                                                  |
+| `<laugh> The delivery arrives on Tuesday morning.`     | der Satz, dazu 1 bis 5 Sekunden Audio, das aus dem Tag entstanden ist; zwei frühere Durchläufe lieferten stattdessen Dauergeräusch |
+| `(excited) The delivery arrives on Tuesday morning!`   | „**A** delivery arrives on Tuesday morning." / nur der Satz, beide Male ohne Emotion                                               |
+| `The delivery arrives … <break time="1s"/> Thank you.` | „The delivery arrives **to thank you when number first to get, huh,** thank you." / „The delivery arrives. Thank you. Thank you."  |
+| `<speak><prosody rate="slow">…</prosody></speak>`      | nur der Satz / „**Persody Ray Slow,** the delivery arrives on Tuesday morning."                                                    |
+
+Nimm die Auszeichnungen aus deinem Text heraus und schreib stattdessen in den Parameter `instructions`, wie die Zeile klingen soll. Ein normaler Satz reicht, höchstens 500 Zeichen. Längere Werte führen zu HTTP 400.
+
+`<laugh>` ist der deutlichste Grund, Auszeichnungen herauszunehmen. Vier Durchläufe mit dem Tag vor demselben Satz ergaben 4,2 s bis 8,7 s Audio, wo derselbe Satz ohne Tag 3,1 s bis 3,8 s brauchte. Aus dem Tag wird also zusätzlicher Klang und nicht das Lachen, das du wolltest, und an einem früheren Tag kam bei zwei Durchläufen Dauergeräusch ohne den Satz heraus.
+
+:::warning[Formulier `instructions` auf Englisch, egal in welcher Sprache der Text ist]
+Die Anweisung muss englisch sein. Der Text nicht.
+
+Auf unserer Hardware gemessen, Stimme `ryan`, je drei Durchläufe, fünf Einstellungen von keiner Anweisung über happy, angry und sad bis calm, Tonhöhe per Autokorrelation:
+
+| Text     | Tonhöhe über die fünf Einstellungen | Sprechtempo             |
+| -------- | ----------------------------------- | ----------------------- |
+| Englisch | 127 Hz bis 207 Hz, Spanne 80 Hz     | 12,3 bis 17,4 Zeichen/s |
+| Deutsch  | 115 Hz bis 214 Hz, Spanne 99 Hz     | 12,4 bis 16,7 Zeichen/s |
+
+Deutsch reagiert also genauso deutlich wie Englisch. Eine Emotion ist damit auch auf deutschem Text eine brauchbare Stellschraube.
+
+Was nicht funktioniert, ist eine auf Deutsch formulierte Anweisung. „Sprich wütend und laut." ergab 129,7 Hz, „Flüstere sehr leise." 129,4 Hz auf demselben deutschen Satz, ein Unterschied von 0,3 Hz, wo das englische Paar rund 90 Hz auseinanderliegt. Lass den Text deutsch und schreib die Anweisung englisch.
+:::
+
+### Beispiel: Vertonung einer Kundenseite, Abschnitt für Abschnitt
+
+Eine Webagentur baut eine Landingpage für einen Kunden und will jeden Abschnitt vertont haben: Eine ruhige Produkteinleitung, einen freundlicheren Absatz zu den Funktionen und einen Call-to-Action mit etwas Druck. Eine Stimme über alle Abschnitte hält es als denselben Sprecher erkennbar, `instructions` ändert die Sprechweise, und `opus` hält die Dateien klein genug, um sie mit der Seite auszuliefern.
+
+`instructions` ist in den OpenAI-SDKs ein regulärer Parameter und braucht deshalb kein `extra_body`. Lass `language` weg: Englischen Text liest das Modell von selbst als Englisch.
+
+<Tabs groupId="language">
+<TabItem value="python" label="Python">
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1",
+    api_key="sk-your-api-key-here",
+)
+
+sections = [
+    (
+        "01-intro",
+        "Your hosting, fully managed. No servers to patch and no pager at three in the morning.",
+        "Speak calmly and clearly, like a product narrator.",
+    ),
+    (
+        "02-feature",
+        "Every deploy ships in seconds, and any change is one click away from a rollback.",
+        "Speak in a cheerful, upbeat tone.",
+    ),
+    (
+        "03-cta",
+        "Start your free trial today and put your first site online in ten minutes.",
+        "Speak fast and excitedly, like a short radio advert.",
+    ),
+]
+
+for name, text, instructions in sections:
+    response = client.audio.speech.create(
+        model="Qwen3-TTS-12Hz-1.7B-CustomVoice",
+        voice="ryan",
+        input=text,
+        instructions=instructions,
+        response_format="opus",
+    )
+    response.write_to_file(f"{name}.opus")
+```
+
+</TabItem>
+<TabItem value="javascript" label="JavaScript">
+
+```javascript
+import OpenAI from "openai";
+import { writeFile } from "node:fs/promises";
+
+const client = new OpenAI({
+  baseURL: "https://llm.aihosting.mittwald.de/v1",
+  apiKey: "sk-your-api-key-here",
+});
+
+const sections = [
+  [
+    "01-intro",
+    "Your hosting, fully managed. No servers to patch and no pager at three in the morning.",
+    "Speak calmly and clearly, like a product narrator.",
+  ],
+  [
+    "02-feature",
+    "Every deploy ships in seconds, and any change is one click away from a rollback.",
+    "Speak in a cheerful, upbeat tone.",
+  ],
+  [
+    "03-cta",
+    "Start your free trial today and put your first site online in ten minutes.",
+    "Speak fast and excitedly, like a short radio advert.",
+  ],
+];
+
+for (const [name, input, instructions] of sections) {
+  const response = await client.audio.speech.create({
+    model: "Qwen3-TTS-12Hz-1.7B-CustomVoice",
+    voice: "ryan",
+    input,
+    instructions,
+    response_format: "opus",
+  });
+
+  await writeFile(`${name}.opus`, Buffer.from(await response.arrayBuffer()));
+}
+```
+
+</TabItem>
+<TabItem value="php" label="PHP">
+
+```php
+<?php
+
+$sections = [
+    [
+        "01-intro",
+        "Your hosting, fully managed. No servers to patch and no pager at three in the morning.",
+        "Speak calmly and clearly, like a product narrator.",
+    ],
+    [
+        "02-feature",
+        "Every deploy ships in seconds, and any change is one click away from a rollback.",
+        "Speak in a cheerful, upbeat tone.",
+    ],
+    [
+        "03-cta",
+        "Start your free trial today and put your first site online in ten minutes.",
+        "Speak fast and excitedly, like a short radio advert.",
+    ],
+];
+
+foreach ($sections as [$name, $input, $instructions]) {
+    $payload = [
+        "model" => "Qwen3-TTS-12Hz-1.7B-CustomVoice",
+        "voice" => "ryan",
+        "input" => $input,
+        "instructions" => $instructions,
+        "response_format" => "opus",
+    ];
+
+    $ch = curl_init("https://llm.aihosting.mittwald.de/v1/audio/speech");
+    curl_setopt_array($ch, [
+        CURLOPT_POST => true,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER => [
+            "Authorization: Bearer sk-your-api-key-here",
+            "Content-Type: application/json",
+        ],
+        CURLOPT_POSTFIELDS => json_encode($payload),
+    ]);
+
+    file_put_contents("{$name}.opus", curl_exec($ch));
+    curl_close($ch);
+}
+```
+
+</TabItem>
+</Tabs>
+
+Das ergab drei Dateien mit 28 kB, 23 kB und 21 kB, und die Sprechweise folgt den Anweisungen. Jede Zeile ist der Mittelwert aus zwei Durchläufen:
+
+| Abschnitt    | Anweisung               | Dauer  | Sprechtempo    |
+| ------------ | ----------------------- | ------ | -------------- |
+| `01-intro`   | ruhiger Produktsprecher | 6,20 s | 13,9 Zeichen/s |
+| `02-feature` | fröhlich, gut gelaunt   | 5,04 s | 15,9 Zeichen/s |
+| `03-cta`     | schnell und begeistert  | 4,36 s | 17,0 Zeichen/s |
+
+Für die deutsche Fassung derselben Seite lass `instructions` weg und variier stattdessen `voice` und `speed`:
+
+```python
+sections_de = [
+    ("de-01-intro", "Dein Hosting, vollständig verwaltet. Keine Server zum Patchen und kein Pager um drei Uhr nachts.", "serena", 0.95),
+    ("de-02-feature", "Jedes Deployment ist in Sekunden ausgerollt, und jede Änderung lässt sich mit einem Klick zurücknehmen.", "serena", 1.0),
+    ("de-03-cta", "Starte heute deine kostenlose Testphase und bring deine erste Website in zehn Minuten online.", "vivian", 1.15),
+]
+
+for name, text, voice, speed in sections_de:
+    response = client.audio.speech.create(
+        model="Qwen3-TTS-12Hz-1.7B-CustomVoice",
+        voice=voice,
+        input=text,
+        speed=speed,
+        response_format="opus",
+    )
+    response.write_to_file(f"{name}.opus")
+```
+
+Gemessen kamen dabei 12,6, 14,8 und 15,7 Zeichen pro Sekunde heraus, also derselbe Aufbau im Tempo, ohne `instructions`.
+
+## Text für Deutsch aufbereiten {#deutscher-text}
+
+:::warning[Kurze deutsche Texte sind unzuverlässig]
+Unterhalb von etwa 80 Zeichen geht die deutsche Sprachausgabe oft genug daneben, dass es auffällt. Gleiche Stimme, deutsche Eingabe, sechs Durchläufe je Länge, bewertet durch Rücktranskription:
+
+| Länge der Eingabe | Mittlere Wortfehlerrate | Deutlich falsche Durchläufe |
+| ----------------- | ----------------------- | --------------------------- |
+| 19 Zeichen        | 0,167                   | 2 von 6                     |
+| 58 Zeichen        | 0,259                   | 3 von 6                     |
+| 99 Zeichen        | 0,022                   | 0 von 6                     |
+| 187 Zeichen       | 0,007                   | 0 von 6                     |
+
+Ein Fehlschlag klingt englisch, nicht nach einem Versprecher: Aus „Willkommen bei uns. Wie können wir dir heute weiterhelfen?" wurde „We come in by uns, we come with your heart and vital health." Die Antwort bleibt HTTP 200 und das Audio bleibt technisch einwandfrei, es fällt also nirgends automatisch auf.
+
+Ab etwa 100 Zeichen haben wir das nicht mehr reproduziert. Wenn du kurze deutsche Zeilen erzeugst, also Begrüßungen, Beschriftungen oder einzelne Hinweise, fass entweder mehrere davon in eine Anfrage zusammen und schneide das Audio hinterher, oder hör dir das Ergebnis an, bevor es live geht. Englisch ist bei diesen Längen nicht betroffen.
+
+Wie stark eine kurze Zeile abweicht, schwankt von Fall zu Fall. Nachgemessen mit anderen Sätzen, je vier Durchläufe: Ein Text mit 20 Zeichen kam in allen vier Durchläufen sauber zurück, ein Text mit 60 Zeichen lag im Mittel bei einer Wortfehlerrate von 0,025, ein Text mit 41 Zeichen dagegen bei 0,375, zweimal davon mit deutlichen Abweichungen. Nimm die Länge als Risikoindikator, nicht als Schwellwert, den du berechnen kannst.
+:::
+
+Deutsche Texte brauchen einen Durchgang, bevor du sie schickst. Gut geschriebene deutsche Prosa liest das Modell korrekt, aber drei Dinge aus ganz normalen Quelltexten kommen falsch heraus, und keines davon scheitert hörbar am Statuscode.
+
+:::warning[Schick echte Umlaute, kein `ae`, `oe`, `ue`]
+Das ist der größte Qualitätsunterschied, den wir gemessen haben. Derselbe Satz, je zehn Durchläufe, bewertet durch Rücktranskription des Audios und Vergleich mit der Eingabe:
+
+| Schreibweise in der Eingabe                 | Korrekt zurücktranskribiert | Mittlere Wortfehlerrate |
+| ------------------------------------------- | --------------------------- | ----------------------- |
+| `Größere Änderungen an der Übersicht …`     | 10 von 10                   | 0,000                   |
+| `Groessere Aenderungen an der Uebersicht …` | 0 von 10                    | 0,215                   |
+
+Aus „Größere Änderungen" wurden in der umschriebenen Fassung „Gräser Erinnerungen", „Braceränderungen" und „Geißere Änderungen". Wenn dein CMS oder deine Exportstrecke Umlaute ersetzt, stell sie vor der Anfrage wieder her.
+
+Echte Umlaute sind die bessere Schreibweise, keine Garantie. Ein kürzerer Satz mit korrekten Umlauten, 38 Zeichen, fünf Durchläufe, lag bei einer mittleren Wortfehlerrate von 0,28 mit zwei sauberen Durchläufen. Das ist derselbe Kurztext-Effekt und kein Umlaut-Problem. Behalt die Umlaute und gib dem Modell genug Text.
+:::
+
+Zweitens: Schreib Abkürzungen und Zahlen aus. Die kurzen Formen, die ein CMS oder ein Sprachmodell liefert, werden falsch gelesen:
+
+| Du schickst                  | Das Modell sagt                       | Schreib stattdessen                                                |
+| ---------------------------- | ------------------------------------- | ------------------------------------------------------------------ |
+| `Bestellung 45312`           | „Bestellung 4FOR 5002"                | `fünfundvierzigtausenddreihundertzwölf`                            |
+| `1.299,99 Euro`              | „1.29,999", „Euro" fällt weg          | `eintausendzweihundertneunundneunzig Euro und neunundneunzig Cent` |
+| `u. a. … z. B. … ggf. inkl.` | „O.A. … setz bei … die geben English" | `unter anderem … zum Beispiel … gegebenenfalls inklusive`          |
+| `GmbH & Co. KG`              | „GmbH & Co, Kagi"                     | `GmbH und Co. KG`                                                  |
+
+Datumsangaben wie `20.05.2026`, Prozentwerte wie `19 %` und Telefonnummern wie `05772 293-100` werden so gelesen, wie sie dastehen. Telefonnummern spricht das Modell Ziffer für Ziffer, das ist richtig, dauert aber: Rechne bei gleicher Zeichenzahl mit etwa der vierfachen Audiolänge gegenüber normaler Prosa.
+
+Englisch ist davon nicht betroffen. `Order 45312 shipped on May 20th, 2026. The total is 1,299.99 euros including 19 percent VAT.` kommt praktisch wortwörtlich zurück.
+
+Drittens: Englische Fachbegriffe mitten im deutschen Satz sind der schwächste Fall, den wir gefunden haben. `Kubernetes-Cluster`, `Continuous Deployment` und `Zero-Downtime-Updates` in einem deutschen Satz kamen teilweise verstümmelt zurück. Eigennamen sind auf dieselbe Weise unzuverlässig, und keine Schreibweise repariert das: Wir haben einen Markennamen normal, umgeschrieben, mit Bindestrich und mit Leerzeichen probiert, dazu `instructions` mit der Bitte um deutsche Aussprache, und 1 von 21 Versuchen kam richtig heraus. Ein Aussprachelexikon gibt es auf dieser Route nicht. Muss ein Name jedes Mal sitzen, lass ihn aus dem vertonten Text heraus oder schneide eine Aufnahme davon ein.
+
+## Reproduzierbarkeit {#reproduzierbarkeit}
+
+`seed` wird angenommen und liefert HTTP 200, aber nicht zweimal dasselbe Audio. Drei identische Anfragen mit `seed: 42` ergaben drei verschiedene Dateien mit 6,64 s, 6,48 s und 6,32 s Länge. Alle drei waren einwandfrei verständlich, das ist also eine Grenze der Reproduzierbarkeit und kein Qualitätsproblem.
+
+Wenn ein Clip über mehrere Deployments hinweg identisch bleiben soll, erzeug ihn einmal und leg die Datei ab.
+
+## Latenz
+
+Auf unserer Hardware gemessen, Deutsch und Englisch, eine Anfrage zur Zeit:
+
+| Länge der Eingabe | Wartezeit auf die ganze Antwort | Erzeugtes Audio |
+| ----------------- | ------------------------------- | --------------- |
+| 41 Zeichen        | 619 ms (390 bis 877)            | 2,5 s           |
+| 100 Zeichen       | 1343 ms (986 bis 1677)          | 6,7 s           |
+| 272 Zeichen       | 3242 ms (2047 bis 4278)         | 17,8 s          |
+
+Jede Zeile ist der Median aus vier Durchläufen, die Spanne steht in Klammern, gepuffert, `mp3`. Das Verhältnis von Wartezeit zu Audiolänge fällt von 0,235 bei 41 Zeichen auf 0,170 bei 272. Der feste Anteil einer Anfrage wiegt bei kurzem Text also schwerer als bei langem. Rechne mit einem Fünftel der Abspieldauer, die du anforderst, und nimm die Streuung ernst: Derselbe Text mit 272 Zeichen brauchte in einem Durchlauf 2,0 s und in einem anderen 4,3 s.
+
+Streaming drückt die Wartezeit auf das erste Audio unter 150 ms, siehe [Streaming](#streaming). Nutz es, sobald jemand darauf wartet.
+
+## Streaming {#streaming}
+
+Setz `stream` auf `true`, dann bekommst du das Audio, während es noch entsteht. Das erste Audio kommt dann in weniger als 150 ms statt erst nach der kompletten Generierung. Für alles, worauf ein Mensch wartet, ist das die entscheidende Einstellung.
+
+Streaming funktioniert nur mit `response_format="wav"` und `"pcm"`. Jedes andere Format zusammen mit `stream` antwortet mit HTTP 400:
+
+```text
+Streaming (stream=true, stream_format='audio', or stream_format='sse') requires response_format='pcm' or 'wav'. Got response_format='mp3'.
+```
+
+Gemessen am selben Satz mit 100 Zeichen wie in der Tabelle darüber, `response_format="pcm"`:
+
+| Modus                   | Content-Type        | Erstes Audio | Was ankommt                                   |
+| ----------------------- | ------------------- | ------------ | --------------------------------------------- |
+| gepuffert (Standard)    | `audio/pcm`         | 870 ms       | ein Antwortkörper                             |
+| Streaming mit `"audio"` | `audio/pcm`         | 91 ms        | 97 Chunks, verteilt über 123 bis 999 ms       |
+| Streaming mit `"sse"`   | `text/event-stream` | 95 ms        | 7 `speech.audio.delta`, 1 `speech.audio.done` |
+
+`stream_format` wählt das Transportformat. `"audio"` liefert eine Chunked-Antwort mit rohem Audio im angeforderten Format, und das willst du, wenn du in eine Datei schreibst oder an einen Player weitergibst. `"sse"` liefert das Event-Format von OpenAI: `speech.audio.delta`-Events mit dem Audio als Base64, abgeschlossen von einem `speech.audio.done`.
+
+```text
+event: speech.audio.delta
+data: {"type":"speech.audio.delta","audio":"UklGRv////9XQVZF…"}
+```
+
+<Tabs groupId="language">
+<TabItem value="python" label="Python">
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1",
+    api_key="sk-your-api-key-here",
+)
+
+with client.audio.speech.with_streaming_response.create(
+    model="Qwen3-TTS-12Hz-1.7B-CustomVoice",
+    voice="ryan",
+    input="Ein längerer Text, bei dem die Wiedergabe sofort starten soll.",
+    response_format="wav",
+    stream_format="audio",
+    extra_body={"stream": True},
+) as response:
+    response.stream_to_file("ausgabe.wav")
+```
+
+</TabItem>
+<TabItem value="javascript" label="JavaScript">
+
+```javascript
+import OpenAI from "openai";
+import { createWriteStream } from "node:fs";
+import { Readable } from "node:stream";
+import { finished } from "node:stream/promises";
+
+const client = new OpenAI({
+  baseURL: "https://llm.aihosting.mittwald.de/v1",
+  apiKey: "sk-your-api-key-here",
+});
+
+const response = await client.audio.speech.create({
+  model: "Qwen3-TTS-12Hz-1.7B-CustomVoice",
+  voice: "ryan",
+  input: "Ein längerer Text, bei dem die Wiedergabe sofort starten soll.",
+  response_format: "wav",
+  // @ts-expect-error stream wird vom gehosteten Endpunkt unterstützt
+  stream: true,
+  stream_format: "audio",
+});
+
+await finished(
+  Readable.fromWeb(response.body).pipe(createWriteStream("ausgabe.wav")),
+);
+```
+
+</TabItem>
+<TabItem value="php" label="PHP">
+
+```php
+<?php
+
+$payload = [
+    "model" => "Qwen3-TTS-12Hz-1.7B-CustomVoice",
+    "voice" => "ryan",
+    "input" => "Ein längerer Text, bei dem die Wiedergabe sofort starten soll.",
+    "response_format" => "wav",
+    "stream" => true,
+    "stream_format" => "audio",
+];
+
+$out = fopen("ausgabe.wav", "w");
+
+$ch = curl_init("https://llm.aihosting.mittwald.de/v1/audio/speech");
+curl_setopt_array($ch, [
+    CURLOPT_POST => true,
+    CURLOPT_HTTPHEADER => [
+        "Authorization: Bearer sk-your-api-key-here",
+        "Content-Type: application/json",
+    ],
+    CURLOPT_POSTFIELDS => json_encode($payload),
+    CURLOPT_WRITEFUNCTION => function ($ch, $chunk) use ($out) {
+        fwrite($out, $chunk);
+        return strlen($chunk);
+    },
+]);
+
+curl_exec($ch);
+fclose($out);
+```
+
+</TabItem>
+</Tabs>
+
+Bei sehr langen Texten lohnt sich das Aufteilen trotzdem, denn dann kannst du die nächste Anfrage schon stellen, während der aktuelle Teil abspielt. Ein ausgearbeitetes Beispiel steht im [Text-to-Speech-Guide](../../examples/text-to-speech/#lange-texte).
+
+## Fehlerantworten {#fehlerantworten}
+
+| Situation                                                                    | Status | Meldung                                                  |
+| ---------------------------------------------------------------------------- | ------ | -------------------------------------------------------- |
+| `input` ist ein leerer String                                                | 400    | `Got bad request.`                                       |
+| `voice` fehlt                                                                | 400    | `Got bad request.`                                       |
+| Unbekannte `voice`                                                           | 400    | `Got bad request.`                                       |
+| Unbekannte `language`                                                        | 400    | `Got bad request.`                                       |
+| `instructions` länger als 500 Zeichen                                        | 400    | `Got bad request.`                                       |
+| `response_format="aac"` oder ein anderes unbekanntes Format                  | 400    | `Input should be 'wav', 'pcm', 'flac', 'mp3' or 'opus'`  |
+| `speed` außerhalb von 0,25 bis 4,0                                           | 400    | `Input should be less than or equal to 4`                |
+| `stream` mit einem anderen Format als `wav` oder `pcm`                       | 400    | `… requires response_format='pcm' or 'wav'`              |
+| `ref_audio`, `ref_text`, `speaker_embedding` oder `task_type` in der Anfrage | 500    | `Internal error.`, siehe [Voice-Cloning](#voice-cloning) |
+| Unbekannter Modellname                                                       | 404    | `Got unknown model name.`                                |
+
+Abgewiesene Werte kommen in zwei Formen zurück. `response_format`, `speed` und die Streaming-Bedingung werden mit einer Meldung geprüft, die das Feld nennt:
+
+```json
+{
+  "error": {
+    "message": "litellm.BadRequestError: Hosted_vllmException - 1 validation error:\n  {'type': 'literal_error', 'loc': ('body', 'response_format'), 'msg': \"Input should be 'wav', 'pcm', 'flac', 'mp3' or 'opus'\"}",
+    "code": "400"
+  }
+}
+```
+
+`voice`, `language`, `instructions` und ein leerer `input` kommen allgemein zurück, ohne Hinweis darauf, welcher Parameter falsch war:
+
+```json
+{
+  "error": {
+    "message": "Got bad request.",
+    "code": "400"
+  }
+}
+```
+
+Prüf `voice` und `language` also gegen die Listen auf dieser Seite, bevor du sie schickst: Bei diesen beiden sagt dir der Statuscode, dass etwas falsch ist, und nichts sagt dir, was.
+
+## Voice-Cloning {#voice-cloning}
+
+Eine Stimme aus eigenem Referenz-Audio zu klonen, gibt es hier nicht. Dieses Modell bringt die neun eingebauten Stimmen mit und keinen Speaker-Encoder, es fehlt also die Komponente, die aus einer Aufnahme deiner Stimme eine sprechbare Stimme machen würde. Anfragen mit `ref_audio`, `ref_text`, `speaker_embedding` oder `task_type` scheitern mit HTTP 500 und `Internal error.`, statt ein unbrauchbares Ergebnis zu liefern.
+
+Wenn du eine bestimmte Stimme brauchst, arbeite mit den neun vorhandenen: Wähl nach Tonhöhe wie unter [Verfügbare Stimmen](#verfügbare-stimmen) beschrieben, und form die Sprechweise über `instructions` und `speed`.
+
+## Lizenz und Nutzungsbedingungen
+
+Alibaba veröffentlicht das Modell unter der Apache-2.0-Lizenz. Bevor du es nutzen kannst, musst du die Nutzungsbedingungen im mStudio annehmen. Siehe [Nutzungsbedingungen](../../access-and-usage/terms-of-use/).

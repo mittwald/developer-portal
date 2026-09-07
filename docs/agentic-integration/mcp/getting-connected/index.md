@@ -12,7 +12,7 @@ Welcome! This guide helps you set up authentication for mittwald MCP with your p
 
 ## Choose Your Tool {#choose-your-tool}
 
-mittwald MCP works with 6 popular AI tools. Choose the one you use:
+mittwald MCP works with 7 popular AI tools. Choose the one you use:
 
 ### Claude Desktop {#claude-desktop}
 
@@ -80,16 +80,27 @@ mittwald MCP works with 6 popular AI tools. Choose the one you use:
 
 → **[Set up Codex CLI](./codex-cli)**
 
+### Hermes Agent {#hermes-agent}
+
+**Best for**: Developers running Hermes Agent in the terminal, often alongside mittwald AI Hosting models
+
+- **Type**: Command-line interface
+- **OAuth Pattern**: Browser-based, started by `hermes mcp add --auth oauth`
+- **Setup Time**: ~10 minutes
+- **Complexity**: ⭐⭐ (Simple - one CLI command, browser for auth)
+
+→ **[Set up Hermes Agent](./hermes-agent)**
+
 ## Quick Comparison {#quick-comparison}
 
-| Feature               | Claude Desktop | ChatGPT        | Claude Code                           | GitHub Copilot                           | Cursor                                                  | Codex CLI                           |
-| --------------------- | -------------- | -------------- | ------------------------------------- | ---------------------------------------- | ------------------------------------------------------- | ----------------------------------- |
-| **Type**              | Desktop/Web    | Web/Mobile     | CLI                                   | IDE Extension                            | IDE                                                     | CLI                                 |
-| **Platform**          | All            | All            | macOS, Linux, Windows                 | VS Code, Visual Studio, JetBrains, Xcode | macOS, Linux, Windows                                   | macOS, Linux, Windows               |
-| **Configuration**     | Settings UI    | Settings UI    | CLI command                           | IDE settings                             | IDE settings or JSON file                               | CLI command                         |
-| **Browser Required**  | Yes (for auth) | Yes (for auth) | Yes (for auth)                        | Yes (for auth)                           | Yes (for auth)                                          | Yes (for auth)                      |
-| **PKCE**              | Automatic      | Automatic      | Automatic                             | Automatic                                | Automatic                                               | Automatic                           |
-| **Redirect Handling** | Managed by app | Managed by app | Local callback managed by Claude Code | Managed by IDE                           | Managed by Cursor (or static redirect for static OAuth) | Local callback managed by Codex CLI |
+| Feature               | Claude Desktop | ChatGPT        | Claude Code                           | GitHub Copilot                           | Cursor                                                  | Codex CLI                           | Hermes Agent                     |
+| --------------------- | -------------- | -------------- | ------------------------------------- | ---------------------------------------- | ------------------------------------------------------- | ----------------------------------- | -------------------------------- |
+| **Type**              | Desktop/Web    | Web/Mobile     | CLI                                   | IDE Extension                            | IDE                                                     | CLI                                 | CLI                              |
+| **Platform**          | All            | All            | macOS, Linux, Windows                 | VS Code, Visual Studio, JetBrains, Xcode | macOS, Linux, Windows                                   | macOS, Linux, Windows               | macOS, Linux, Windows            |
+| **Configuration**     | Settings UI    | Settings UI    | CLI command                           | IDE settings                             | IDE settings or JSON file                               | CLI command                         | CLI command or `config.yaml`     |
+| **Browser Required**  | Yes (for auth) | Yes (for auth) | Yes (for auth)                        | Yes (for auth)                           | Yes (for auth)                                          | Yes (for auth)                      | Yes (for OAuth)                  |
+| **PKCE**              | Automatic      | Automatic      | Automatic                             | Automatic                                | Automatic                                               | Automatic                           | Automatic                        |
+| **Redirect Handling** | Managed by app | Managed by app | Local callback managed by Claude Code | Managed by IDE                           | Managed by Cursor (or static redirect for static OAuth) | Local callback managed by Codex CLI | Local callback managed by Hermes |
 
 ## Two Ways to Authenticate {#two-ways-to-authenticate}
 
@@ -119,7 +130,7 @@ mittwald MCP supports two authentication methods. Choose based on your use case:
 - ❌ Requires browser (not suitable for headless servers)
 - ❌ More complex initial setup
 
-**Supported by**: All 6 tools (Claude Desktop, ChatGPT, Claude Code, GitHub Copilot, Cursor, Codex CLI)
+**Supported by**: All 7 tools (Claude Desktop, ChatGPT, Claude Code, GitHub Copilot, Cursor, Codex CLI, Hermes Agent)
 
 ### Option 2: API Token (Direct Authentication) {#option-2-api-token}
 
@@ -144,7 +155,7 @@ mittwald MCP supports two authentication methods. Choose based on your use case:
 - ❌ Token is long-lived (security risk if leaked)
 - ❌ Must rotate manually
 
-**Supported by**: Claude Code, GitHub Copilot, Cursor, Codex CLI (different configuration methods per tool)
+**Supported by**: Claude Code, GitHub Copilot, Cursor, Codex CLI, Hermes Agent (different configuration methods per tool)
 
 ### Which Should I Choose? {#which-should-i-choose}
 
@@ -169,7 +180,7 @@ mittwald MCP supports two authentication methods. Choose based on your use case:
 
 ### How OAuth Works (Step-by-Step) {#how-oauth-works}
 
-1. **You choose a tool** (Claude Code, Copilot, Cursor, or Codex CLI)
+1. **You choose a tool** (Claude Code, Copilot, Cursor, Codex CLI, or Hermes Agent)
 2. **The tool requests access** to mittwald on your behalf
 3. **You log in to mittwald** through your browser (your password stays secure)
 4. **You see what the tool can access** (transparency - you approve the scopes)
@@ -209,7 +220,7 @@ mittwald MCP supports two authentication methods. Choose based on your use case:
 
 The callback URL where mittwald OAuth sends you after authentication. Each tool uses a different pattern:
 
-- **CLI tools** (Claude Code, Codex CLI): `http://127.0.0.1/callback` (loopback)
+- **CLI tools** (Claude Code, Codex CLI, Hermes Agent): `http://127.0.0.1/callback` (loopback)
 - **IDE tools** (Copilot, Cursor): IDE-specific callback (handled automatically)
 
 ### Client ID {#client-id}
@@ -258,6 +269,7 @@ Each tool is best suited to different workflows:
 - **GitHub Copilot**: Already using Copilot in your IDE
 - **Cursor IDE**: Want an IDE specifically designed for AI-assisted coding
 - **Codex CLI**: Prefer OpenAI's tools and terminal-based development
+- **Hermes Agent**: Run a terminal agent that can also use mittwald AI Hosting models
 
 All have simple OAuth setup (~5-10 min each). You can always set up multiple tools if you want.
 
@@ -342,7 +354,7 @@ A: Register separate OAuth clients for each account (give them different names).
 
 **Q: Can I use an API token instead of OAuth?**
 
-A: Yes! The CLI and IDE tools (Claude Code, GitHub Copilot, Cursor, Codex CLI) support API token authentication as an alternative to OAuth. API tokens are best for headless environments (CI/CD, SSH servers) where browser-based OAuth isn't practical. See your tool's setup guide for instructions.
+A: Yes! The CLI and IDE tools (Claude Code, GitHub Copilot, Cursor, Codex CLI, Hermes Agent) support API token authentication as an alternative to OAuth. API tokens are best for headless environments (CI/CD, SSH servers) where browser-based OAuth isn't practical. See your tool's setup guide for instructions.
 
 **Q: Where do I get an API token?**
 
@@ -374,6 +386,7 @@ Choose your tool from the list above and follow the step-by-step guide. OAuth se
 - **[GitHub Copilot Setup](./github-copilot)** - For Copilot IDE users
 - **[Cursor Setup](./cursor)** - For Cursor IDE users
 - **[Codex CLI Setup](./codex-cli)** - For Codex CLI users
+- **[Hermes Agent Setup](./hermes-agent)** - For Hermes Agent users
 
 ## Need Help? {#need-help}
 
