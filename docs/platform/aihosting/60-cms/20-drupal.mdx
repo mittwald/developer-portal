@@ -6,13 +6,9 @@ title: Drupal CMS
 
 ## Using the mittwald AI provider for Drupal {#using-mittwald-ai-provider}
 
-The mittwald AI provider integration brings AI capabilities directly into your Drupal CMS. This module registers mittwald AI Hosting as a provider for the [Drupal AI module](https://www.drupal.org/project/ai), which makes mittwald's models available for chat, embeddings, reranking, speech-to-text and text-to-speech operations. You can find the official module on the [Drupal project page](https://www.drupal.org/project/ai_provider_mittwald).
+The mittwald AI provider integration brings AI capabilities directly into your Drupal CMS. The module registers mittwald AI Hosting as a provider for the [Drupal AI module](https://www.drupal.org/project/ai), which makes mittwald's models available for chat, embeddings, reranking, speech-to-text and text-to-speech operations.
 
-The module is a fork of the [`ai_provider_openai`](https://www.drupal.org/project/ai_provider_openai) module, adapted for mittwald AI Hosting's OpenAI-compatible API.
-
-:::warning
-The module is still experimental and is not (yet) recommended for production use.
-:::
+This guide covers installation and setup. For the module's individual settings and their defaults, refer to the [Drupal project page](https://www.drupal.org/project/ai_provider_mittwald).
 
 ### Prerequisites {#prerequisites}
 
@@ -64,59 +60,21 @@ Finally, configure which AI capabilities should use the mittwald provider by def
 
 By setting mittwald as the default provider, all AI-powered features in your Drupal installation will automatically use mittwald's AI models unless you specify otherwise for specific use cases.
 
-### Supported operations and models {#supported-operations}
+### Supported operations {#supported-operations}
 
 The module exposes the following mittwald AI Hosting operations to the Drupal AI module:
 
-| Operation        | Supported | Default model                      |
-| ---------------- | --------- | ---------------------------------- |
-| Chat completions | ✅        | `Ministral-3-14B-Instruct-2512`    |
-| Embeddings       | ✅        | `Qwen3-Embedding-8B`               |
-| Reranking        | ✅        | `Qwen3-VL-Reranker-2B`             |
-| Speech-to-text   | ✅        | `whisper-large-v3-turbo`           |
-| Text-to-speech   | ✅        | `Qwen3-TTS-12Hz-1.7B-CustomVoice`  |
-| Text-to-image    | ⏸️        | not offered by mittwald AI Hosting |
-| Moderation       | ⏸️        | not offered by mittwald AI Hosting |
+| Operation        | Supported                             |
+| ---------------- | ------------------------------------- |
+| Chat completions | ✅                                    |
+| Embeddings       | ✅                                    |
+| Reranking        | ✅                                    |
+| Speech-to-text   | ✅                                    |
+| Text-to-speech   | ✅                                    |
+| Text-to-image    | ⏸️ not offered by mittwald AI Hosting |
+| Moderation       | ⏸️ not offered by mittwald AI Hosting |
 
-#### Chat models {#chat-models}
-
-The provider offers the GPT-OSS, Ministral, Qwen3.5, Qwen3.6, Qwen3.8 and GLM-OCR model families for chat. Their capabilities differ:
-
-- **Image vision**: `Ministral-3-14B-Instruct-2512`, `Qwen3.5-122B-A10B-FP8`, `Qwen3.6-35B-A3B-FP8`, `Qwen3.8-27B-NVFP4` and `GLM-OCR`. `Qwen3.5-0.8B` is text-only and is not offered for image input.
-- **Reasoning** with configurable effort: the GPT-OSS, Qwen3.5, Qwen3.6 and Qwen3.8 models.
-- **JSON output, tool calling and streaming** are available across the chat models.
-
-`GLM-OCR` is a document OCR model that accepts PDF, DOCX, PPTX, XLSX, HTML, SVG and image input.
-
-For a complete list of available models and their capabilities, see the [available models](../../models/) documentation.
-
-#### Embeddings {#embeddings}
-
-`Qwen3-Embedding-8B` produces 4096-dimensional vectors. Leave the dimension setting untouched unless you know your vector store requires something else — the model does not support arbitrary dimension reduction.
-
-#### Text-to-speech {#text-to-speech}
-
-`Qwen3-TTS-12Hz-1.7B-CustomVoice` supports the voices `aiden`, `dylan`, `eric`, `ono_anna`, `ryan`, `serena`, `sohee`, `uncle_fu` and `vivian`. Despite the model name, voice cloning is not available.
-
-Available response formats are `mp3` (the module default), `opus`, `flac`, `wav` and `pcm`. `aac` is not supported by mittwald AI Hosting.
-
-The **Language** setting expects a full language name such as `German`; ISO codes such as `de` are rejected. Leave it empty to let the model decide. An invalid voice or language is answered with a generic `Got bad request.` message that does not name the offending parameter, so check those two settings first when a request fails.
-
-Long texts should be split up and requested in parts.
-
-### Configuration options {#configuration-options}
-
-The chat operation exposes the usual sampling parameters through the AI module's provider settings:
-
-| Option            | Range  | Default |
-| ----------------- | ------ | ------- |
-| Temperature       | 0–2    | 1       |
-| Max tokens        | 0–4096 | 4096    |
-| Top P             | 0–1    | 1       |
-| Frequency penalty | -2–2   | 0       |
-| Presence penalty  | -2–2   | 0       |
-
-Text-to-speech additionally accepts a **Speed** setting between 0.25 and 4 (default 1).
+For chat, the module offers the GPT-OSS, Ministral, Qwen3.5, Qwen3.6, Qwen3.8 and GLM-OCR model families. Support for image input and reasoning differs between them — see the [available models](../../models/) documentation for the capabilities of each model, and the [Drupal project page](https://www.drupal.org/project/ai_provider_mittwald) for the default model of each operation.
 
 If you use [dedicated AI Hosting](../../dedicated/getting-started) or a proxy, you can point the module at a different endpoint by setting the `host` value in the `ai_provider_mittwald.settings` configuration.
 

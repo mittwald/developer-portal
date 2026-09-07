@@ -6,13 +6,9 @@ title: Drupal CMS
 
 ## Den mittwald AI Provider für Drupal verwenden {#using-mittwald-ai-provider}
 
-Die mittwald AI Provider-Integration bringt KI-Funktionen direkt in dein Drupal CMS. Das Modul registriert mittwald AI Hosting als Provider für das [Drupal AI-Modul](https://www.drupal.org/project/ai) und stellt damit die Modelle von mittwald für Chat, Embeddings, Reranking, Speech-to-Text und Text-to-Speech bereit. Das offizielle Modul findest du auf der [Drupal-Projektseite](https://www.drupal.org/project/ai_provider_mittwald).
+Die mittwald AI Provider-Integration bringt KI-Funktionen direkt in dein Drupal CMS. Das Modul registriert mittwald AI Hosting als Provider für das [Drupal AI-Modul](https://www.drupal.org/project/ai) und stellt damit die Modelle von mittwald für Chat, Embeddings, Reranking, Speech-to-Text und Text-to-Speech bereit.
 
-Das Modul ist ein Fork des Moduls [`ai_provider_openai`](https://www.drupal.org/project/ai_provider_openai), angepasst an die OpenAI-kompatible API von mittwald AI Hosting.
-
-:::warning
-Das Modul ist noch experimentell und wird (noch) nicht für den Produktivbetrieb empfohlen.
-:::
+Diese Anleitung beschreibt Installation und Einrichtung. Die einzelnen Einstellungen des Moduls und ihre Standardwerte findest du auf der [Drupal-Projektseite](https://www.drupal.org/project/ai_provider_mittwald).
 
 ### Voraussetzungen {#prerequisites}
 
@@ -64,59 +60,21 @@ Konfiguriere abschließend, welche KI-Funktionen standardmäßig den mittwald-Pr
 
 Durch die Festlegung von mittwald als Standard-Provider werden alle KI-gestützten Funktionen in deiner Drupal-Installation automatisch die KI-Modelle von mittwald verwenden, sofern du für bestimmte Anwendungsfälle nichts anderes festlegst.
 
-### Unterstützte Operationen und Modelle {#supported-operations}
+### Unterstützte Operationen {#supported-operations}
 
 Das Modul stellt dem Drupal AI-Modul die folgenden Operationen von mittwald AI Hosting zur Verfügung:
 
-| Operation        | Unterstützt | Standardmodell                          |
-| ---------------- | ----------- | --------------------------------------- |
-| Chat Completions | ✅          | `Ministral-3-14B-Instruct-2512`         |
-| Embeddings       | ✅          | `Qwen3-Embedding-8B`                    |
-| Reranking        | ✅          | `Qwen3-VL-Reranker-2B`                  |
-| Speech-to-Text   | ✅          | `whisper-large-v3-turbo`                |
-| Text-to-Speech   | ✅          | `Qwen3-TTS-12Hz-1.7B-CustomVoice`       |
-| Text-to-Image    | ⏸️          | von mittwald AI Hosting nicht angeboten |
-| Moderation       | ⏸️          | von mittwald AI Hosting nicht angeboten |
+| Operation        | Unterstützt                                |
+| ---------------- | ------------------------------------------ |
+| Chat Completions | ✅                                         |
+| Embeddings       | ✅                                         |
+| Reranking        | ✅                                         |
+| Speech-to-Text   | ✅                                         |
+| Text-to-Speech   | ✅                                         |
+| Text-to-Image    | ⏸️ von mittwald AI Hosting nicht angeboten |
+| Moderation       | ⏸️ von mittwald AI Hosting nicht angeboten |
 
-#### Chat-Modelle {#chat-models}
-
-Der Provider bietet für Chat die Modellfamilien GPT-OSS, Ministral, Qwen3.5, Qwen3.6, Qwen3.8 und GLM-OCR an. Ihre Fähigkeiten unterscheiden sich:
-
-- **Image Vision**: `Ministral-3-14B-Instruct-2512`, `Qwen3.5-122B-A10B-FP8`, `Qwen3.6-35B-A3B-FP8`, `Qwen3.8-27B-NVFP4` und `GLM-OCR`. `Qwen3.5-0.8B` ist reines Textmodell und wird für Bildeingaben nicht angeboten.
-- **Reasoning** mit konfigurierbarem Aufwand: die Modelle GPT-OSS, Qwen3.5, Qwen3.6 und Qwen3.8.
-- **JSON-Ausgabe, Tool Calling und Streaming** stehen bei den Chat-Modellen zur Verfügung.
-
-`GLM-OCR` ist ein Modell für Dokumenten-OCR und verarbeitet PDF, DOCX, PPTX, XLSX, HTML, SVG sowie Bilddateien.
-
-Eine vollständige Liste der verfügbaren Modelle und ihrer Fähigkeiten findest du in der [Modellübersicht](../../models/).
-
-#### Embeddings {#embeddings}
-
-`Qwen3-Embedding-8B` erzeugt Vektoren mit 4096 Dimensionen. Ändere die Dimensionseinstellung nur, wenn dein Vektorspeicher etwas anderes erfordert — das Modell unterstützt keine beliebige Dimensionsreduktion.
-
-#### Text-to-Speech {#text-to-speech}
-
-`Qwen3-TTS-12Hz-1.7B-CustomVoice` unterstützt die Stimmen `aiden`, `dylan`, `eric`, `ono_anna`, `ryan`, `serena`, `sohee`, `uncle_fu` und `vivian`. Trotz des Modellnamens ist Voice Cloning nicht verfügbar.
-
-Verfügbare Ausgabeformate sind `mp3` (Standard des Moduls), `opus`, `flac`, `wav` und `pcm`. `aac` wird von mittwald AI Hosting nicht unterstützt.
-
-Die Einstellung **Sprache** erwartet einen ausgeschriebenen Sprachnamen wie `German`; ISO-Codes wie `de` werden abgelehnt. Lasse das Feld leer, damit das Modell selbst entscheidet. Eine ungültige Stimme oder Sprache wird mit einer generischen Meldung `Got bad request.` beantwortet, die den betroffenen Parameter nicht benennt — prüfe bei fehlschlagenden Anfragen also zuerst diese beiden Einstellungen.
-
-Lange Texte solltest du aufteilen und in Teilen anfragen.
-
-### Konfigurationsoptionen {#configuration-options}
-
-Die Chat-Operation stellt die üblichen Sampling-Parameter über die Provider-Einstellungen des AI-Moduls bereit:
-
-| Option            | Wertebereich | Standard |
-| ----------------- | ------------ | -------- |
-| Temperature       | 0–2          | 1        |
-| Max Tokens        | 0–4096       | 4096     |
-| Top P             | 0–1          | 1        |
-| Frequency Penalty | -2–2         | 0        |
-| Presence Penalty  | -2–2         | 0        |
-
-Text-to-Speech akzeptiert zusätzlich eine Einstellung **Speed** zwischen 0,25 und 4 (Standard 1).
+Für Chat bietet das Modul die Modellfamilien GPT-OSS, Ministral, Qwen3.5, Qwen3.6, Qwen3.8 und GLM-OCR an. Die Unterstützung für Bildeingaben und Reasoning unterscheidet sich zwischen ihnen — die Fähigkeiten der einzelnen Modelle findest du in der [Modellübersicht](../../models/), die Standardmodelle der jeweiligen Operation auf der [Drupal-Projektseite](https://www.drupal.org/project/ai_provider_mittwald).
 
 Wenn du [Dedicated AI Hosting](../../dedicated/getting-started) oder einen Proxy verwendest, kannst du das Modul über den Wert `host` in der Konfiguration `ai_provider_mittwald.settings` auf einen anderen Endpunkt richten.
 
