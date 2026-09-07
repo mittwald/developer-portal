@@ -21,12 +21,12 @@ import PlanCompatibility from "@site/src/components/PlanCompatibility";
 
 Wenn du eine Datenbank als [Container](/docs/v2/platform/workloads/containers)
 betreibst, wird deren Volume vom regulären mittwald Projekt-Backup mitgesichert.
-Das schützt dich davor, das Volume zu verlieren – es garantiert aber **nicht**,
+Das schützt dich davor, das Volume zu verlieren — es garantiert aber **nicht**,
 dass die Datenbankdateien darin wiederherstellbar sind.
 
 Ein Projekt-Backup kopiert das Volume im laufenden Betrieb. Die Datenbank hält
 Daten im Arbeitsspeicher, in Write-Ahead-Logs und in nur teilweise geschriebenen
-Pages – eine Kopie zu einem beliebigen Zeitpunkt kann also einen zerrissenen
+Pages — eine Kopie zu einem beliebigen Zeitpunkt kann also einen zerrissenen
 Zustand erwischen. Die Wiederherstellung kann funktionieren, eine Crash Recovery
 erfordern oder fehlschlagen. Du merkst es erst im Ernstfall.
 
@@ -51,7 +51,7 @@ der Dump darin stellt die Datenbank wieder her.
 :::tip Am einfachsten mit einem Container-Template
 
 Die offiziellen [mittwald Container-Templates](https://github.com/mittwald/container-templates)
-für PostgreSQL und MariaDB bringen ihren Backup-Cronjob bereits mit – dort musst du
+für PostgreSQL und MariaDB bringen ihren Backup-Cronjob bereits mit — dort musst du
 nichts einrichten. Wenn du eine neue Datenbank aufsetzt, ist ein Template deshalb
 der empfohlene Weg.
 
@@ -76,7 +76,7 @@ Für diese Anleitung benötigst du:
 
 Der Dump landet in einem Unterverzeichnis des Volumes, das bereits deine
 Datenbankdaten enthält. Dieses Volume wird vom Projekt-Backup erfasst, der Dump
-wird also mitgesichert – ein zusätzliches Volume und eine Änderung am Stack sind
+wird also mitgesichert — ein zusätzliches Volume und eine Änderung am Stack sind
 nicht nötig.
 
 Genau so machen es auch die Container-Templates:
@@ -103,7 +103,7 @@ in deiner Stack-Definition, bevor du weitermachst.
 
 Die folgenden Befehle schreiben einen mit Zeitstempel versehenen, gzip-komprimierten
 Dump und löschen Dumps, die älter als sieben Tage sind. Schlägt der Dump fehl,
-brechen sie ab, ohne eine abgeschnittene Datei zu hinterlassen – ein fehlgeschlagener
+brechen sie ab, ohne eine abgeschnittene Datei zu hinterlassen — ein fehlgeschlagener
 Lauf überschreibt also nie dein letztes funktionierendes Backup mit einem kaputten.
 
 Passe den Pfad hinter `d=` an, falls dein Volume an einer anderen Stelle gemountet
@@ -140,7 +140,7 @@ find "$d" -name "backup_*.sql.gz" -type f -mtime +7 -delete'
 ```
 
 `--single-transaction` erstellt den Dump innerhalb einer Transaktion. Das ergibt
-einen konsistenten Abzug der InnoDB-Tabellen, ohne sie zu sperren – deine Anwendung
+einen konsistenten Abzug der InnoDB-Tabellen, ohne sie zu sperren — deine Anwendung
 kann währenddessen weiter schreiben. Ohne diese Option sperrt `mariadb-dump`
 sämtliche Tabellen für die Dauer des Dumps.
 
@@ -175,7 +175,7 @@ find "$d" -name "backup_*.sql.gz" -type f -mtime +7 -delete'
 ```
 
 `--single-transaction` erstellt den Dump innerhalb einer Transaktion. Das ergibt
-einen konsistenten Abzug der InnoDB-Tabellen, ohne sie zu sperren – deine Anwendung
+einen konsistenten Abzug der InnoDB-Tabellen, ohne sie zu sperren — deine Anwendung
 kann währenddessen weiter schreiben.
 
   </TabItem>
@@ -228,7 +228,7 @@ zulässig; der Befehl läuft direkt im Container.
 Der Dump-Befehl enthält bereits einfache Anführungszeichen und lässt sich deshalb
 nicht einfach erneut in einfache Anführungszeichen setzen. Die Sequenzen `'\''`
 oben schließen den Ausdruck, fügen ein einzelnes Anführungszeichen ein und öffnen
-ihn wieder – nur so kommt der Befehl unversehrt an. Setze den Befehl nicht in
+ihn wieder — nur so kommt der Befehl unversehrt an. Setze den Befehl nicht in
 doppelte Anführungszeichen: Deine lokale Shell würde dann `$d`, `$f` und
 `$POSTGRES_USER` schon vor dem Anlegen des Cronjobs ersetzen.
 
@@ -280,7 +280,7 @@ Zwei Einstellungen verdienen besondere Aufmerksamkeit:
 </TabItem>
 </Tabs>
 
-Lege den Dump zeitlich so, dass er vor deinem Projekt-Backup abgeschlossen ist –
+Lege den Dump zeitlich so, dass er vor deinem Projekt-Backup abgeschlossen ist —
 und außerhalb der Hauptlastzeiten.
 
 ## Schritt 4: Das Backup überprüfen {#verify}
@@ -294,12 +294,12 @@ Cronjob einmal manuell aus und prüfe das Ergebnis.
 1. Öffne den Cronjob und klicke im Abschnitt "Intervall" auf "Jetzt ausführen".
 2. Wechsle auf den Tab "Historie". Dort erscheint der Lauf mit Datum und Laufzeit.
 3. Ein fehlgeschlagener Lauf ist mit "Ausführung fehlgeschlagen" markiert. Öffne
-   bei diesem Eintrag das Menü "..." und wähle "Log anzeigen" – dort stehen
+   bei diesem Eintrag das Menü "..." und wähle "Log anzeigen" — dort stehen
    Exit-Code und Fehlerausgabe.
 
 Auch die Cronjob-Übersicht kennzeichnet fehlschlagende Cronjobs mit "Ausführung
 fehlgeschlagen". Ein Blick in diese Liste zeigt dir also, ob deine Backups noch
-laufen. Mach dir das zur Gewohnheit – ein Backup-Cronjob kann wochenlang
+laufen. Mach dir das zur Gewohnheit — ein Backup-Cronjob kann wochenlang
 fehlschlagen, ohne dass sonst etwas auffällt.
 
 Eine Laufzeit von 0 Sekunden zusammen mit einem Fehlschlag bedeutet meist, dass
@@ -346,22 +346,22 @@ Stelle zuerst das Volume aus dem Projekt-Backup wieder her, falls der Container
 selbst nicht mehr existiert, und spiele anschließend den Dump in die laufende
 Datenbank ein.
 
-Ein Restore führt einen Befehl im Container aus – das bietet das mStudio UI von
+Ein Restore führt einen Befehl im Container aus — das bietet das mStudio UI von
 sich aus nicht. Dafür gibt es zwei Wege:
 
-- **Web-SSH** – installiere die kostenlose Extension
+- **Web-SSH** — installiere die kostenlose Extension
   [1-Click Web-SSH für Apps & Container](https://studio.mittwald.de/marketplace/extensions)
   aus dem Marktplatz. Sie gibt dir ein Terminal für Apps und Container direkt im
   mStudio, ohne lokale CLI und ohne SSH-Schlüssel. Im selben Terminal kannst du
   auch die Dump-Dateien im Volume ansehen.
-- **CLI** – `mw container ssh <container-id>` öffnet eine Shell im Container.
+- **CLI** — `mw container ssh <container-id>` öffnet eine Shell im Container.
 
 Beide Wege bringen dich _in_ den Container. Sieh dir dort zuerst an, welche Dumps
-vorliegen – bei MariaDB und MySQL liegt das Verzeichnis unter
+vorliegen — bei MariaDB und MySQL liegt das Verzeichnis unter
 `/var/lib/mysql/backups` (siehe [Schritt 1](#dump-location)):
 
 ```shellsession
-$ ls -la /var/lib/postgresql/backups
+user@container $ ls -la /var/lib/postgresql/backups
 ```
 
 Anschließend spielst du den gewünschten Dump ein:
@@ -370,12 +370,12 @@ Anschließend spielst du den gewünschten Dump ein:
   <TabItem value="postgresql" label="PostgreSQL">
 
 ```shellsession
-$ gunzip -c /var/lib/postgresql/backups/backup_2026-09-07_030000.sql.gz | psql -h localhost -U "$POSTGRES_USER" -d postgres
+user@container $ gunzip -c /var/lib/postgresql/backups/backup_2026-09-07_030000.sql.gz | psql -h localhost -U "$POSTGRES_USER" -d postgres
 ```
 
 Ein `pg_dumpall`-Dump legt Rollen und Datenbanken neu an. Spielst du ihn in einen
 Cluster ein, in dem diese bereits existieren, meldet `psql` dafür
-`already exists`-Fehler und fährt fort – die Tabellendaten werden trotzdem
+`already exists`-Fehler und fährt fort — die Tabellendaten werden trotzdem
 wiederhergestellt. Für einen sauberen Restore löschst du die Zieldatenbank vorher
 und legst sie neu an, oder du spielst den Dump in einen leeren Container ein.
 
@@ -383,7 +383,7 @@ und legst sie neu an, oder du spielst den Dump in einen leeren Container ein.
   <TabItem value="mariadb" label="MariaDB">
 
 ```shellsession
-$ gunzip -c /var/lib/mysql/backups/backup_2026-09-07_030000.sql.gz | MYSQL_PWD="$BACKUP_PASSWORD" mariadb -u root
+user@container $ gunzip -c /var/lib/mysql/backups/backup_2026-09-07_030000.sql.gz | MYSQL_PWD="$BACKUP_PASSWORD" mariadb -u root
 ```
 
 Der Dump enthält `CREATE DATABASE ... IF NOT EXISTS`- und
@@ -394,7 +394,7 @@ Tabellen, die erst nach dem Dump angelegt wurden, werden nicht entfernt.
   <TabItem value="mysql" label="MySQL">
 
 ```shellsession
-$ gunzip -c /var/lib/mysql/backups/backup_2026-09-07_030000.sql.gz | MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -u root
+user@container $ gunzip -c /var/lib/mysql/backups/backup_2026-09-07_030000.sql.gz | MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -u root
 ```
 
 Der Dump enthält `CREATE DATABASE ... IF NOT EXISTS`- und
@@ -410,7 +410,7 @@ deren Passwörter zusammen mit den Daten wiederhergestellt.
 
 :::note Von außerhalb des Containers ausführen
 
-Du kannst denselben Befehl auch absetzen, ohne eine Shell zu öffnen – mit
+Du kannst denselben Befehl auch absetzen, ohne eine Shell zu öffnen — mit
 `mw container exec`. Achte auf die Backslashes: Sie verhindern, dass deine lokale
 Shell die Variablen ersetzt, bevor der Befehl im Container ankommt.
 
@@ -423,5 +423,5 @@ user@local $ mw container exec <container-id> \
 
 ## Weiterführende Ressourcen {#further-resources}
 
-- [Container](/docs/v2/platform/workloads/containers) – Volumes, Stacks und Projekt-Backups
+- [Container](/docs/v2/platform/workloads/containers) — Volumes, Stacks und Projekt-Backups
 - [mittwald Container-Templates](https://github.com/mittwald/container-templates)

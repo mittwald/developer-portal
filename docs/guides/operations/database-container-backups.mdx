@@ -345,7 +345,7 @@ Both drop you _inside_ the container. List the available dumps first — for Mar
 and MySQL, the directory is `/var/lib/mysql/backups` (see [step 1](#dump-location)):
 
 ```shellsession
-$ ls -la /var/lib/postgresql/backups
+user@container $ ls -la /var/lib/postgresql/backups
 ```
 
 Then replay the one you want:
@@ -354,7 +354,7 @@ Then replay the one you want:
   <TabItem value="postgresql" label="PostgreSQL">
 
 ```shellsession
-$ gunzip -c /var/lib/postgresql/backups/backup_2026-09-07_030000.sql.gz | psql -h localhost -U "$POSTGRES_USER" -d postgres
+user@container $ gunzip -c /var/lib/postgresql/backups/backup_2026-09-07_030000.sql.gz | psql -h localhost -U "$POSTGRES_USER" -d postgres
 ```
 
 A `pg_dumpall` dump recreates roles and databases. When you replay it into a
@@ -366,7 +366,7 @@ recreate the target database first, or restore into an empty container.
   <TabItem value="mariadb" label="MariaDB">
 
 ```shellsession
-$ gunzip -c /var/lib/mysql/backups/backup_2026-09-07_030000.sql.gz | MYSQL_PWD="$BACKUP_PASSWORD" mariadb -u root
+user@container $ gunzip -c /var/lib/mysql/backups/backup_2026-09-07_030000.sql.gz | MYSQL_PWD="$BACKUP_PASSWORD" mariadb -u root
 ```
 
 The dump contains `CREATE DATABASE ... IF NOT EXISTS` and `DROP TABLE IF EXISTS`
@@ -377,7 +377,7 @@ the dump was taken are not removed.
   <TabItem value="mysql" label="MySQL">
 
 ```shellsession
-$ gunzip -c /var/lib/mysql/backups/backup_2026-09-07_030000.sql.gz | MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -u root
+user@container $ gunzip -c /var/lib/mysql/backups/backup_2026-09-07_030000.sql.gz | MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -u root
 ```
 
 The dump contains `CREATE DATABASE ... IF NOT EXISTS` and `DROP TABLE IF EXISTS`
