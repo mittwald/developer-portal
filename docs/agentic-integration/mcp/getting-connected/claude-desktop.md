@@ -1,39 +1,28 @@
 ---
-title: Getting Started with Claude Desktop
-description: Set up OAuth and mittwald MCP in Claude Desktop with step-by-step instructions
+title: Getting Started with Claude
+description: Connect the official mittwald connector in Claude Desktop and Claude.ai with step-by-step instructions
 ---
 
-# Getting Started with Claude Desktop
+# Getting Started with Claude
 
-Claude Desktop and Claude.ai support remote MCP servers through custom connectors. This guide shows you how to connect mittwald MCP to Claude using OAuth authentication.
+mittwald publishes an official connector in the Claude Connectors Directory, backed by mittwald MCP. This guide shows you how to connect it to Claude Desktop or Claude.ai using OAuth authentication.
 
 ## Prerequisites {#prerequisites}
 
-- **Claude Pro, Max, Team, or Enterprise plan** (required for custom connectors)
+- **Claude Pro, Max, Team, or Enterprise plan** (required for connectors)
 - **A mittwald mStudio account** (to authenticate)
-- **5 minutes** to complete setup
+- **2 minutes** to complete setup
 
-:::note
+## Step 1: Open the mittwald Connector {#step-1-open-the-connector}
 
-Custom connectors with remote MCP servers are currently in beta. The feature is available in Claude Desktop and Claude.ai.
+1. Open the [mittwald connector](https://claude.ai/directory/mittwald) in the Claude Connectors Directory, or in Claude Desktop / Claude.ai go to **Settings → Connectors → Browse connectors** and search for "mittwald"
+2. Click **Connect**
 
-:::
+Because this is an official, published connector, Claude already knows its endpoint and available tools — there is no server URL to enter.
 
-## Step 1: Open Connector Settings {#step-1-open-connector-settings}
+## Step 2: Authenticate {#step-2-authenticate}
 
-1. Open Claude Desktop or go to [claude.ai](https://claude.ai)
-2. Click on your profile icon or navigate to **Settings**
-3. Select **Connectors** from the menu
-
-## Step 2: Add mittwald MCP {#step-2-add-mittwald-mcp}
-
-1. Click **Add custom connector**
-2. Enter the mittwald MCP server URL: `https://mcp.mittwald.de/mcp`
-3. Click **Add** to save the connector
-
-## Step 3: Authenticate {#step-3-authenticate}
-
-When you first use the connector, Claude prompts you to authenticate:
+When you connect the mittwald connector, Claude prompts you to authenticate:
 
 1. A browser window opens for mittwald authorization
 2. Sign in with your mittwald account
@@ -42,7 +31,7 @@ When you first use the connector, Claude prompts you to authenticate:
 
 Claude securely stores your OAuth tokens and refreshes them automatically.
 
-## Step 4: Verify Your Connection {#step-4-verify-your-connection}
+## Step 3: Verify Your Connection {#step-3-verify-your-connection}
 
 Start a new conversation and test the connection:
 
@@ -92,9 +81,9 @@ List open support conversations for my account
 
 ### Error: "Connector Not Available" {#error-connector-not-available}
 
-**Symptom**: The Connectors option does not appear in Settings.
+**Symptom**: The Connectors option does not appear in Settings, or the mittwald connector is missing from the directory.
 
-**Cause**: Your Claude plan does not include custom connectors.
+**Cause**: Your Claude plan does not include connectors.
 
 **Fix**:
 
@@ -127,39 +116,39 @@ List open support conversations for my account
 
 ### Error: "Server Connection Failed" {#error-server-connection-failed}
 
-**Symptom**: Claude cannot reach the MCP server.
+**Symptom**: Claude cannot reach the mittwald MCP server.
 
 **Cause**: Network issues or firewall rules.
 
 **Fix**:
 
-1. Confirm the URL is `https://mcp.mittwald.de/mcp`
-2. Check outbound network access
-3. Try from another network
+1. Check outbound network access
+2. Try from another network
+3. Try removing and reconnecting the mittwald connector
 
 ## Team and Enterprise {#team-and-enterprise}
 
 For Team and Enterprise plans:
 
-- **Owners** can add connectors that are available to all workspace members
+- **Owners** can enable the mittwald connector from the directory for all workspace members
 - Members can use shared connectors without individual setup
 - Admins can manage connector permissions in workspace settings
 
 ## FAQ {#faq}
 
-### Q: Which Claude plans support MCP connectors? {#faq-supported-plans}
+### Q: Which Claude plans support the mittwald connector? {#faq-supported-plans}
 
-**A**: Claude Pro, Max, Team, and Enterprise plans support custom connectors.
+**A**: Claude Pro, Max, Team, and Enterprise plans support connectors.
 
 ### Q: Is my authentication secure? {#faq-authentication-security}
 
 **A**: Yes. Claude uses OAuth 2.1 with PKCE. Tokens are stored securely and refreshed automatically.
 
-### Q: Can I use multiple MCP connectors? {#faq-multiple-connectors}
+### Q: Can I use multiple connectors? {#faq-multiple-connectors}
 
-**A**: Yes. You can add multiple custom connectors and use them in the same conversation.
+**A**: Yes. You can connect multiple directory connectors and use them in the same conversation.
 
-### Q: How do I remove a connector? {#faq-remove-connector}
+### Q: How do I remove the connector? {#faq-remove-connector}
 
 **A**: Go to **Settings → Connectors**, find the mittwald connector, and click **Remove**.
 
@@ -176,4 +165,4 @@ For Team and Enterprise plans:
 
 This guide is based on official Anthropic documentation:
 
-- [Get started with custom connectors using remote MCP](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp) - Claude MCP connector setup
+- [Get started with custom connectors using remote MCP](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp) - Claude connector setup

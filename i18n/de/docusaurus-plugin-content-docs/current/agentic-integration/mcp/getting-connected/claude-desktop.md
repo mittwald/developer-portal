@@ -1,39 +1,28 @@
 ---
-title: Erste Schritte mit Claude Desktop
-description: Richte OAuth und mittwald MCP in Claude Desktop mit Schritt-für-Schritt-Anweisungen ein
+title: Erste Schritte mit Claude
+description: Verbinde den offiziellen mittwald Connector in Claude Desktop und Claude.ai mit Schritt-für-Schritt-Anweisungen
 ---
 
-# Erste Schritte mit Claude Desktop
+# Erste Schritte mit Claude
 
-Claude Desktop und Claude.ai unterstützen Remote-MCP-Server über Custom Connectors. Diese Anleitung zeigt dir, wie du mittwald MCP mit Claude über OAuth-Authentifizierung verbindest.
+mittwald veröffentlicht einen offiziellen Connector im Claude Connectors Directory, der auf mittwald MCP basiert. Diese Anleitung zeigt dir, wie du ihn mit Claude Desktop oder Claude.ai über OAuth-Authentifizierung verbindest.
 
 ## Voraussetzungen {#prerequisites}
 
-- **Claude Pro, Max, Team oder Enterprise Plan** (erforderlich für Custom Connectors)
+- **Claude Pro, Max, Team oder Enterprise Plan** (erforderlich für Connectors)
 - **Ein mittwald mStudio Account** (zur Authentifizierung)
-- **5 Minuten** zum Abschluss des Setups
+- **2 Minuten** zum Abschluss des Setups
 
-:::note
+## Schritt 1: mittwald Connector öffnen {#step-1-open-the-connector}
 
-Custom Connectors mit Remote-MCP-Servern befinden sich derzeit in der Beta. Das Feature ist in Claude Desktop und Claude.ai verfügbar.
+1. Öffne den [mittwald Connector](https://claude.ai/directory/mittwald) im Claude Connectors Directory, oder gehe in Claude Desktop / Claude.ai zu **Settings → Connectors → Browse connectors** und suche nach "mittwald"
+2. Klicke auf **Connect**
 
-:::
+Da es sich um einen offiziellen, veröffentlichten Connector handelt, kennt Claude bereits seinen Endpoint und die verfügbaren Tools — es gibt keine Server-URL einzutragen.
 
-## Schritt 1: Connector-Einstellungen öffnen {#step-1-open-connector-settings}
+## Schritt 2: Authentifizieren {#step-2-authenticate}
 
-1. Öffne Claude Desktop oder gehe zu [claude.ai](https://claude.ai)
-2. Klicke auf dein Profilsymbol oder navigiere zu **Settings**
-3. Wähle **Connectors** aus dem Menü
-
-## Schritt 2: mittwald MCP hinzufügen {#step-2-add-mittwald-mcp}
-
-1. Klicke auf **Add custom connector**
-2. Gib die mittwald MCP-Server-URL ein: `https://mcp.mittwald.de/mcp`
-3. Klicke auf **Add**, um den Connector zu speichern
-
-## Schritt 3: Authentifizieren {#step-3-authenticate}
-
-Wenn du den Connector zum ersten Mal verwendest, fordert Claude dich zur Authentifizierung auf:
+Wenn du den mittwald Connector verbindest, fordert Claude dich zur Authentifizierung auf:
 
 1. Ein Browserfenster öffnet sich für die mittwald-Autorisierung
 2. Melde dich mit deinem mittwald-Account an
@@ -42,7 +31,7 @@ Wenn du den Connector zum ersten Mal verwendest, fordert Claude dich zur Authent
 
 Claude speichert deine OAuth-Tokens sicher und erneuert sie automatisch.
 
-## Schritt 4: Verbindung verifizieren {#step-4-verify-your-connection}
+## Schritt 3: Verbindung verifizieren {#step-3-verify-your-connection}
 
 Starte eine neue Konversation und teste die Verbindung:
 
@@ -92,9 +81,9 @@ List open support conversations for my account
 
 ### Fehler: "Connector Not Available" {#error-connector-not-available}
 
-**Symptom**: Die Option "Connectors" erscheint nicht in den Einstellungen.
+**Symptom**: Die Option "Connectors" erscheint nicht in den Einstellungen, oder der mittwald Connector fehlt im Directory.
 
-**Ursache**: Dein Claude-Plan enthält keine Custom Connectors.
+**Ursache**: Dein Claude-Plan enthält keine Connectors.
 
 **Lösung**:
 
@@ -127,39 +116,39 @@ List open support conversations for my account
 
 ### Fehler: "Server Connection Failed" {#error-server-connection-failed}
 
-**Symptom**: Claude kann den MCP-Server nicht erreichen.
+**Symptom**: Claude kann den mittwald MCP-Server nicht erreichen.
 
 **Ursache**: Netzwerkprobleme oder Firewall-Regeln.
 
 **Lösung**:
 
-1. Bestätige, dass die URL `https://mcp.mittwald.de/mcp` ist
-2. Überprüfe ausgehenden Netzwerkzugriff
-3. Versuche es von einem anderen Netzwerk
+1. Überprüfe ausgehenden Netzwerkzugriff
+2. Versuche es von einem anderen Netzwerk
+3. Entferne den mittwald Connector und verbinde ihn erneut
 
 ## Team und Enterprise {#team-and-enterprise}
 
 Für Team- und Enterprise-Pläne:
 
-- **Owners** können Connectors hinzufügen, die für alle Workspace-Mitglieder verfügbar sind
+- **Owners** können den mittwald Connector aus dem Directory für alle Workspace-Mitglieder aktivieren
 - Mitglieder können gemeinsame Connectors ohne individuelles Setup verwenden
 - Admins können Connector-Berechtigungen in den Workspace-Einstellungen verwalten
 
 ## FAQ {#faq}
 
-### F: Welche Claude-Pläne unterstützen MCP-Connectors? {#faq-supported-plans}
+### F: Welche Claude-Pläne unterstützen den mittwald Connector? {#faq-supported-plans}
 
-**A**: Claude Pro, Max, Team und Enterprise-Pläne unterstützen Custom Connectors.
+**A**: Claude Pro, Max, Team und Enterprise-Pläne unterstützen Connectors.
 
 ### F: Ist meine Authentifizierung sicher? {#faq-authentication-security}
 
 **A**: Ja. Claude verwendet OAuth 2.1 mit PKCE. Tokens werden sicher gespeichert und automatisch erneuert.
 
-### F: Kann ich mehrere MCP-Connectors verwenden? {#faq-multiple-connectors}
+### F: Kann ich mehrere Connectors verwenden? {#faq-multiple-connectors}
 
-**A**: Ja. Du kannst mehrere Custom Connectors hinzufügen und sie in derselben Konversation verwenden.
+**A**: Ja. Du kannst mehrere Connectors aus dem Directory verbinden und sie in derselben Konversation verwenden.
 
-### F: Wie entferne ich einen Connector? {#faq-remove-connector}
+### F: Wie entferne ich den Connector? {#faq-remove-connector}
 
 **A**: Gehe zu **Settings → Connectors**, finde den mittwald-Connector und klicke auf **Remove**.
 
@@ -176,4 +165,4 @@ Für Team- und Enterprise-Pläne:
 
 Diese Anleitung basiert auf der offiziellen Anthropic-Dokumentation:
 
-- [Get started with custom connectors using remote MCP](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp) - Claude MCP Connector Setup
+- [Get started with custom connectors using remote MCP](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp) - Claude Connector-Setup

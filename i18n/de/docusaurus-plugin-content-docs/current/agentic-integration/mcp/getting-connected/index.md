@@ -14,25 +14,25 @@ Willkommen! Diese Anleitung hilft dir, die Authentifizierung für mittwald MCP m
 
 mittwald MCP funktioniert mit 7 beliebten KI-Tools. Wähle dasjenige, das du verwendest:
 
-### Claude Desktop {#claude-desktop}
+### Claude {#claude-desktop}
 
 **Am besten für**: Nutzer der Claude Desktop App oder des Claude.ai Web-Interface
 
 - **Typ**: Desktop App / Web App
-- **OAuth-Muster**: Browser-basiert (Connector-Einstellungen UI)
-- **Setup-Zeit**: ~5 Minuten
-- **Komplexität**: ⭐ (Sehr einfach - nur über die Einstellungen)
+- **OAuth-Muster**: Browser-basiert (offizieller Connector, Installation aus dem Claude Connectors Directory)
+- **Setup-Zeit**: ~2 Minuten
+- **Komplexität**: ⭐ (Sehr einfach - Installation mit einem Klick)
 
-→ **[Claude Desktop einrichten](./claude-desktop)**
+→ **[Claude einrichten](./claude-desktop)**
 
 ### ChatGPT {#chatgpt}
 
 **Am besten für**: Nutzer von ChatGPT Plus, Team, Enterprise oder Education
 
 - **Typ**: Web App / Mobile App
-- **OAuth-Muster**: Browser-basiert (Connector-Einstellungen UI)
-- **Setup-Zeit**: ~5 Minuten
-- **Komplexität**: ⭐ (Sehr einfach - nur über die Einstellungen)
+- **OAuth-Muster**: Browser-basiert (offizielle App, Installation aus dem ChatGPT App-Verzeichnis)
+- **Setup-Zeit**: ~2 Minuten
+- **Komplexität**: ⭐ (Sehr einfach - Installation mit einem Klick)
 
 → **[ChatGPT einrichten](./chatgpt)**
 
@@ -118,8 +118,8 @@ mittwald MCP funktioniert mit 7 beliebten KI-Tools. Wähle dasjenige, das du ver
 
 | Tool           | OAuth-Implementierung               |
 | -------------- | ----------------------------------- |
-| Claude Desktop | Settings UI (Beta-Feature)          |
-| ChatGPT        | Settings UI                         |
+| Claude         | Offizieller Connector (Directory)   |
+| ChatGPT        | Offizielle App (App-Verzeichnis)    |
 | Claude Code    | Standard Web Flow                   |
 | GitHub Copilot | Dynamic Client Registration (DCR)   |
 | Cursor         | Settings UI oder JSON-Konfiguration |
@@ -159,7 +159,7 @@ Speichere API-Tokens niemals in Konfigurationsdateien, die in die Versionskontro
 
 | Tool           | Unterstützt API Token         |
 | -------------- | ----------------------------- |
-| Claude Desktop | Nein (nur OAuth)              |
+| Claude         | Nein (nur OAuth)              |
 | ChatGPT        | Nein (nur OAuth)              |
 | Claude Code    | Ja (über Umgebungsvariable)   |
 | GitHub Copilot | Ja (über Terraform-Variablen) |
@@ -261,7 +261,7 @@ A: Ja. mittwald MCP verwendet branchenübliche OAuth 2.1 mit PKCE. Tokens sind v
 
 ### F: Welche Pläne unterstützen mittwald MCP? {#faq-supported-plans}
 
-A: mittwald MCP ist für alle mittwald-Pläne verfügbar. Einige Tools (z. B. Claude Desktop) erfordern einen kostenpflichtigen Plan des Tool-Anbieters.
+A: mittwald MCP ist für alle mittwald-Pläne verfügbar. Einige Tools (z. B. Claude) erfordern einen kostenpflichtigen Plan des Tool-Anbieters.
 
 ## Weitere Ressourcen {#further-resources}
 

@@ -1,45 +1,28 @@
 ---
 title: Getting Started with ChatGPT
-description: Set up mittwald MCP as a connector in ChatGPT with step-by-step instructions
+description: Install the official mittwald app in ChatGPT with step-by-step instructions
 ---
 
 # Getting Started with ChatGPT
 
-ChatGPT supports MCP servers through its connector feature. This guide shows you how to connect mittwald MCP to ChatGPT using OAuth authentication.
+mittwald publishes an official app in the ChatGPT app directory, backed by mittwald MCP. This guide shows you how to install the mittwald app and connect it to your mittwald account using OAuth authentication.
 
 ## Prerequisites {#prerequisites}
 
 - **ChatGPT Plus, Team, Enterprise, or Education plan**
-- **Developer Mode enabled** in ChatGPT settings
 - **A mittwald account** (to authenticate)
-- **5 minutes** to complete setup
+- **2 minutes** to complete setup
 
-## Step 1: Enable Developer Mode {#step-1-enable-developer-mode}
+## Step 1: Install the mittwald App {#step-1-install-the-app}
 
-1. Open [ChatGPT](https://chat.openai.com)
-2. Click your profile icon and select **Settings**
-3. Go to **Apps & Connectors → Advanced settings**
-4. Enable **Developer Mode**
+1. Open the [mittwald app listing](https://chatgpt.com/plugins/plugin_asdk_app_6a68b368b8588191afee9a7e2b327d63) in ChatGPT, or go to **Settings → Apps & Connectors**, search for "mittwald", and open the listing
+2. Click **Install**
 
-## Step 2: Create a Connector {#step-2-create-connector}
+Because this is an official, published app, ChatGPT already knows its endpoint and available tools — there is no server URL to enter and no Developer Mode to enable.
 
-1. In Settings, go to **Connectors**
-2. Click **Create**
-3. Fill in the connector details:
+## Step 2: Authenticate {#step-2-authenticate}
 
-   | Field              | Value                                                                 |
-   | ------------------ | --------------------------------------------------------------------- |
-   | **Connector name** | mittwald                                                              |
-   | **Description**    | Manage mittwald hosting: projects, apps, databases, domains, and more |
-   | **Connector URL**  | `https://mcp.mittwald.de/mcp`                                         |
-
-4. Click **Create** to save
-
-ChatGPT validates the endpoint and displays the available tools from mittwald MCP.
-
-## Step 3: Authenticate {#step-3-authenticate}
-
-When you first use the connector in a chat:
+When you first use the mittwald app in a chat:
 
 1. ChatGPT prompts you to authorize the connection
 2. A browser window opens for mittwald authorization
@@ -47,11 +30,11 @@ When you first use the connector in a chat:
 4. Review the requested permissions
 5. Click **Authorize**
 
-## Step 4: Verify Your Connection {#step-4-verify-your-connection}
+## Step 3: Verify Your Connection {#step-3-verify-your-connection}
 
 1. Start a new chat in ChatGPT
 2. Click **+** next to the message input
-3. Select **More** and choose the **mittwald** connector
+3. Select **More** and choose the **mittwald** app
 4. Test the connection:
 
 ```
@@ -107,28 +90,16 @@ List open support conversations for my account
 
 ## Troubleshooting {#troubleshooting}
 
-### Error: "Developer Mode Not Available" {#error-developer-mode-not-available}
+### Error: "App Not Available" {#error-app-not-available}
 
-**Symptom**: Developer Mode toggle does not appear in settings.
+**Symptom**: The mittwald app does not appear in **Apps & Connectors** or in search results.
 
-**Cause**: Your ChatGPT plan does not include this feature.
+**Cause**: Your ChatGPT plan does not support apps, or the app listing has not loaded yet.
 
 **Fix**:
 
 1. Upgrade to ChatGPT Plus, Team, Enterprise, or Education
-2. Wait for feature rollout if you recently upgraded
-
-### Error: "Connector Validation Failed" {#error-connector-validation-failed}
-
-**Symptom**: ChatGPT cannot validate the MCP endpoint.
-
-**Cause**: Network issues or incorrect URL.
-
-**Fix**:
-
-1. Confirm the URL is exactly `https://mcp.mittwald.de/mcp`
-2. Check your network connection
-3. Try creating the connector again
+2. Reload the [mittwald app listing](https://chatgpt.com/plugins/plugin_asdk_app_6a68b368b8588191afee9a7e2b327d63) directly
 
 ### Error: "Authentication Failed" {#error-authentication-failed}
 
@@ -144,15 +115,15 @@ List open support conversations for my account
 
 ### Error: "Tool Not Found" {#error-tool-not-found}
 
-**Symptom**: ChatGPT cannot find mittwald tools.
+**Symptom**: ChatGPT cannot find mittwald tools after installing the app.
 
-**Cause**: Connector metadata is stale.
+**Cause**: The installed app metadata has not refreshed yet.
 
 **Fix**:
 
-1. Go to **Settings → Connectors**
-2. Find the mittwald connector
-3. Click **Refresh** to update the tool list
+1. Go to **Settings → Apps & Connectors**
+2. Find the mittwald app
+3. Click **Refresh** to update the tool list, or remove and reinstall the app
 
 ### Error: "Permission Denied" {#error-permission-denied}
 
@@ -162,40 +133,30 @@ List open support conversations for my account
 
 **Fix**:
 
-1. Delete the connector in Settings
-2. Create it again and re-authenticate
-
-## Refresh Tool Metadata {#refresh-tool-metadata}
-
-If mittwald adds new MCP tools:
-
-1. Go to **Settings → Connectors**
-2. Find the mittwald connector
-3. Click **Refresh**
-
-ChatGPT fetches the updated tool list from the MCP server.
+1. Uninstall the mittwald app in Settings
+2. Install it again and re-authenticate
 
 ## FAQ {#faq}
 
-### Q: Which ChatGPT plans support MCP connectors? {#faq-supported-plans}
+### Q: Which ChatGPT plans support the mittwald app? {#faq-supported-plans}
 
-**A**: ChatGPT Plus, Team, Enterprise, and Education plans support connectors with Developer Mode.
+**A**: ChatGPT Plus, Team, Enterprise, and Education plans support installing apps.
 
 ### Q: Does this work on mobile? {#faq-mobile}
 
-**A**: Yes. Connectors work on ChatGPT web and mobile apps.
+**A**: Yes. Installed apps work on ChatGPT web and mobile apps.
 
 ### Q: Is my authentication secure? {#faq-authentication-security}
 
-**A**: Yes. ChatGPT uses OAuth for connector authentication. Tokens are stored securely by OpenAI.
+**A**: Yes. ChatGPT uses OAuth for app authentication. Tokens are stored securely by OpenAI.
 
-### Q: Can I use multiple MCP connectors? {#faq-multiple-connectors}
+### Q: Can I use multiple apps at once? {#faq-multiple-connectors}
 
-**A**: Yes. You can add multiple connectors and use them in the same conversation.
+**A**: Yes. You can install multiple apps and use them in the same conversation.
 
-### Q: How do I remove the connector? {#faq-remove-connector}
+### Q: How do I remove the app? {#faq-remove-connector}
 
-**A**: Go to **Settings → Connectors**, find the mittwald connector, and delete it.
+**A**: Go to **Settings → Apps & Connectors**, find the mittwald app, and uninstall it.
 
 ### Q: Why does ChatGPT ask for confirmation? {#faq-confirmation}
 
@@ -204,10 +165,10 @@ ChatGPT fetches the updated tool list from the MCP server.
 ## Next Steps {#next-steps}
 
 - **[Tutorials](../../tutorials/)**: See real-world examples
-- **[Other Tools](./)**: Set up Claude Desktop, GitHub Copilot, or Cursor
+- **[Other Tools](./)**: Set up Claude, GitHub Copilot, or Cursor
 
 ## Official Documentation {#official-documentation}
 
 This guide is based on official OpenAI documentation:
 
-- [Connect ChatGPT](https://developers.openai.com/apps-sdk/deploy/connect-chatgpt/) - ChatGPT MCP connector setup
+- [Connect ChatGPT](https://developers.openai.com/apps-sdk/deploy/connect-chatgpt/) - ChatGPT app and connector setup
