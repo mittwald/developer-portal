@@ -308,7 +308,9 @@ der Dump gar nicht erst eine Verbindung zur Datenbank bekommen hat.
   </TabItem>
   <TabItem value="cli" label="CLI">
 
-Prüfe, ob tatsächlich ein Dump geschrieben wurde:
+Prüfe, ob tatsächlich ein Dump geschrieben wurde. Die Beispiele nutzen den
+PostgreSQL-Pfad; bei MariaDB und MySQL lautet er `/var/lib/mysql/backups` (siehe
+[Schritt 1](#dump-location)).
 
 ```shellsession
 user@local $ mw container exec <container-id> "ls -la /var/lib/postgresql/backups"
@@ -355,7 +357,8 @@ sich aus nicht. Dafür gibt es zwei Wege:
 - **CLI** – `mw container ssh <container-id>` öffnet eine Shell im Container.
 
 Beide Wege bringen dich _in_ den Container. Sieh dir dort zuerst an, welche Dumps
-vorliegen:
+vorliegen – bei MariaDB und MySQL liegt das Verzeichnis unter
+`/var/lib/mysql/backups` (siehe [Schritt 1](#dump-location)):
 
 ```shellsession
 $ ls -la /var/lib/postgresql/backups

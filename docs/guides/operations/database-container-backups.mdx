@@ -296,7 +296,8 @@ connected to the database.
   </TabItem>
   <TabItem value="cli" label="CLI">
 
-Confirm that a dump was actually written:
+Confirm that a dump was actually written. The examples use the PostgreSQL path;
+for MariaDB and MySQL it is `/var/lib/mysql/backups` (see [step 1](#dump-location)).
 
 ```shellsession
 user@local $ mw container exec <container-id> "ls -la /var/lib/postgresql/backups"
@@ -340,7 +341,8 @@ on its own. You have two ways in:
   inspect the dump files in the volume.
 - **CLI** — `mw container ssh <container-id>` opens a shell in the container.
 
-Both drop you _inside_ the container. List the available dumps first:
+Both drop you _inside_ the container. List the available dumps first — for MariaDB
+and MySQL, the directory is `/var/lib/mysql/backups` (see [step 1](#dump-location)):
 
 ```shellsession
 $ ls -la /var/lib/postgresql/backups
