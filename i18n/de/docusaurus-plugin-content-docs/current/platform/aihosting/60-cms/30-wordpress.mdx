@@ -52,15 +52,23 @@ Navigiere zu **Einstellungen** -> **Connectors** in deiner WordPress-Administrat
 
 Alternativ kannst du den API-Schlüssel über `wp-config.php` konfigurieren, indem du die Konstante `MITTWALD_API_KEY` definierst, oder über die Umgebungsvariable `MITTWALD_API_KEY`. WordPress [löst API-Schlüssel](https://make.wordpress.org/core/2026/03/18/introducing-the-connectors-api-in-wordpress-7-0/) in dieser Reihenfolge auf: Umgebungsvariable, dann PHP-Konstante, dann Datenbank (Admin-Oberfläche).
 
+Mit der WP-CLI kannst du die Konstante direkt in die `wp-config.php` schreiben:
+
+```shellsession
+user@ssh $ wp config set MITTWALD_API_KEY your-api-key
+```
+
+Um stattdessen eine Umgebungsvariable zu setzen, hinterlege sie in der Konfiguration deines Webservers, beispielsweise mit `SetEnv MITTWALD_API_KEY your-api-key` in einer Apache-Konfiguration.
+
 #### Schritt 3: KI-Funktionen aktivieren (bei Verwendung des AI-Plugins) {#step-3-enable-features}
 
-Falls du das AI-Plugin installiert hast, navigiere zu **Einstellungen** -> **AI** und aktiviere die gewünschten Funktionen. Verfügbare Funktionen umfassen:
+Falls du das AI-Plugin installiert hast, navigiere zu **Einstellungen** -> **AI**. Aktiviere dort zunächst die KI-Funktionalität global und anschließend die einzelnen Funktionen, die du nutzen möchtest — das Plugin liefert sie als optionale Experimente aus, es ist also nichts aktiv, bevor du es einschaltest. Verfügbare Funktionen umfassen:
 
 - **Titelgenerierung**: Generiere Titelvorschläge mit einem einzigen Klick im Beitragseditor
 - **Auszugsgenerierung**: Erstelle automatisch prägnante Zusammenfassungen für deine Beiträge
 - **Inhaltszusammenfassung**: Fasse lange Inhalte in übersichtliche Übersichten zusammen
 - **Alt-Text-Generierung**: Generiere beschreibende Alt-Texte für Bilder zur Verbesserung der Barrierefreiheit
-- **Bildgenerierung**: Erstelle und bearbeite Bilder aus Beitragsinhalten
+- **Bildgenerierung**: Erstelle und bearbeite Bilder aus Beitragsinhalten (erfordert einen Connector mit Unterstützung für Bildgenerierung; der mittwald-Connector unterstützt sie nicht)
 - **Kommentarmoderation**: Moderiere Kommentare automatisch basierend auf Toxizitätserkennung
 
 Eine vollständige Liste aller aktuell verfügbaren Funktionen findest du auf der [offiziellen Plugin-Seite](https://wordpress.org/plugins/ai/).
@@ -75,14 +83,19 @@ Beim Bearbeiten eines Beitrags findest du KI-gestützte Schaltflächen an releva
 
 ### Unterstützte Modelle und Funktionen {#supported-models}
 
-Der mittwald AI Provider unterstützt Chat-Completions mit mehreren für unterschiedliche Aufgaben optimierten Modellen:
+Der mittwald-Connector für WordPress implementiert Chat-Completions (Textgenerierung). Embeddings, Speech-to-Text, Text-to-Speech und Bildgenerierung stellt der mittwald-Connector **nicht** bereit — Funktionen des AI-Plugins, die darauf aufbauen (etwa die Bildgenerierung), benötigen einen anderen Connector.
+
+Chat-Completions stehen mit mehreren für unterschiedliche Aufgaben optimierten Modellen zur Verfügung:
 
 - **gpt-oss-120b**: Open-Source GPT-kompatibles Modell für allgemeine Content-Generierung und fortgeschrittenes Reasoning
 - **Qwen3.5-122B-A10B-FP8** und **Qwen3.6-35B-A3B-FP8**: Große Modelle mit Reasoning- und Vision-Funktionen
-- **Qwen3.5-0.8B**: Leichtgewichtiges Modell für kostensensitive Aufgaben
+- **Qwen3.5-0.8B**: Leichtgewichtiges Modell für kostensensitive Aufgaben; reines Textmodell, es verarbeitet keine Bildeingaben
 - **Ministral-3-14B-Instruct-2512**: Chat-Modell mit Vision- und Bildeingabe-Funktionen
+- **GLM-OCR**: OCR-Modell zur Texterkennung in Bildern und Dokumenten
 
-Diese Modelle unterstützen Standard-Textgenerierung, JSON-Ausgabeformatierung, Tool Calling und Streaming-Antworten. Die Ministral- und Qwen-Modelle unterstützen zusätzlich Bildverarbeitungsfunktionen zur Analyse und Beschreibung von Bildern.
+Diese Modelle unterstützen Standard-Textgenerierung, JSON-Ausgabeformatierung, Tool Calling und Streaming-Antworten. Die Modelle Ministral, Qwen3.5-122B, Qwen3.6 und GLM-OCR verarbeiten zusätzlich Bildeingaben.
+
+Das Plugin deklariert die Fähigkeiten jedes Modells explizit. Modelle, die mittwald AI Hosting nach einem Plugin-Release hinzufügt, können daher auf dem Connectors-Bildschirm zunächst ohne deklarierte Fähigkeiten erscheinen, bis das Plugin nachzieht.
 
 Eine vollständige Liste der verfügbaren Modelle und deren Funktionen findest du in der [Modellübersicht](../../models/).
 
