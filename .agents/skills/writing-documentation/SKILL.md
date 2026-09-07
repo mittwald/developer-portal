@@ -1,6 +1,6 @@
 ---
 name: writing-documentation
-description: Baseline style, structure and language rules for the mittwald Developer Portal documentation. Use whenever authoring, translating or reviewing content under docs/, versioned_docs/ or i18n/de/docusaurus-plugin-content-docs/ (.md/.mdx) — covers English/German parity, explicit anchor IDs, Docusaurus callouts, dash usage, shell command prefixes and linking to API operations.
+description: Baseline style, structure and language rules for the mittwald Developer Portal documentation. Use whenever authoring, translating or reviewing content under docs/ or i18n/de/docusaurus-plugin-content-docs/ (.md/.mdx) — covers English/German parity, explicit anchor IDs, Docusaurus callouts, dash usage, shell command prefixes and linking to API operations.
 ---
 
 # Writing documentation for the mittwald Developer Portal
