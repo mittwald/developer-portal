@@ -1,0 +1,408 @@
+---
+title: Backing up databases running in containers
+sidebar_label: Database container backups
+tags:
+  - Backups
+  - Containers
+  - Databases
+description: |
+  Learn how to schedule consistent SQL dumps for PostgreSQL, MariaDB and MySQL
+  containers, so that your database is recoverable from the regular mittwald
+  project backup.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import OperationLink from "@site/src/components/OperationLink";
+import OperationExample from "@site/src/components/OperationExample";
+import PlanCompatibility from "@site/src/components/PlanCompatibility";
+
+<PlanCompatibility features={["container"]} />
+
+When you run a database as a [container](/docs/v2/platform/workloads/containers),
+its volume is included in the regular mittwald project backup. That protects you
+against losing the volume — but it does **not** guarantee that the database files
+inside it are restorable.
+
+A project backup copies the volume while the database is running. The database
+keeps data in memory, in write-ahead logs and in partially written pages, so a
+copy taken at an arbitrary moment can capture a torn state. Restoring it may work,
+may require crash recovery, or may fail outright — and you will only find out
+during an incident.
+
+A **SQL dump** avoids this. The database itself writes out a consistent snapshot
+of its contents. This guide shows how to schedule such a dump with a cronjob, so
+that a restorable copy always sits in your volume when the project backup runs.
+
+## How this works {#how-it-works}
+
+The setup consists of three pieces that build on each other:
+
+1. A **cronjob** runs a dump command inside your database container on a schedule.
+2. The dump is written to a **volume** as a compressed `.sql.gz` file. Old dumps
+   are deleted after a retention period.
+3. The **mittwald project backup** picks up that volume as part of its regular run,
+   so the dump is retained off-site along with everything else in the project.
+
+You therefore end up with two layers: the project backup restores the volume, and
+the dump inside it restores the database.
+
+:::tip The easiest way is a container template
+
+The official [mittwald container templates](https://github.com/mittwald/container-templates)
+for PostgreSQL and MariaDB already bring their own backup cronjob — there is
+nothing to set up. When you create a new database, a template is therefore the
+recommended way.
+
+This guide is for containers that were set up without a template, or that do not
+have a backup cronjob yet.
+
+:::
+
+## Prerequisites {#prerequisites}
+
+To follow this guide, you will need:
+
+- A mittwald project on a plan that supports [containerized workloads](/docs/v2/platform/workloads/containers)
+- A running PostgreSQL, MariaDB or MySQL container
+- For the CLI and API paths: the **mittwald CLI** (`mw`) installed and logged in
+  (see the [CLI documentation](/docs/v2/cli/)), plus the stack ID and service name of
+  the container (`mw stack list` and `mw container list` show both). Everything up to
+  and including verification also works entirely in the mStudio UI.
+
+## Step 1: Where the dump is stored {#dump-location}
+
+The dump goes into a subdirectory of the volume that already holds your database
+data. That volume is picked up by the project backup, so the dump is carried
+off-site with it — no additional volume and no stack change required.
+
+This is also what the container templates do:
+
+- PostgreSQL: `/var/lib/postgresql/backups`
+- MariaDB and MySQL: `/var/lib/mysql/backups`
+
+:::caution Check where your volume is actually mounted
+
+The dump directory has to lie **inside** the mounted volume. Anything written
+outside of it lives in the writable container layer, is lost the next time the
+container is recreated, and is not covered by the project backup.
+
+The paths above assume the mount points used by the container templates
+(`/var/lib/postgresql` and `/var/lib/mysql`). If your PostgreSQL container mounts
+its volume at `/var/lib/postgresql/data` instead, the dump directory has to be
+`/var/lib/postgresql/data/backups`. Check the mount point in your stack definition
+before you continue.
+
+:::
+
+## Step 2: Choose the dump command {#dump-command}
+
+The commands below write a timestamped, gzipped dump and delete dumps older than
+seven days. They abort without leaving a truncated file behind if the dump fails,
+so a failed run never overwrites your last good backup with a broken one.
+
+Adjust the `d=` path if your volume is mounted somewhere else (see step 1).
+
+<Tabs groupId="database">
+  <TabItem value="postgresql" label="PostgreSQL">
+
+```shell
+sh -lc 'set -e; d=/var/lib/postgresql/backups; mkdir -p "$d";
+f=$d/backup_$(date +%F_%H%M%S).sql;
+{ pg_dumpall -h localhost -U "$POSTGRES_USER" -f "$f"; } || { rm -f "$f"; exit 1; };
+gzip "$f";
+find "$d" -name "backup_*.sql.gz" -type f -mtime +7 -delete'
+```
+
+`pg_dumpall` dumps the entire cluster, including all databases and roles. It
+authenticates over `localhost` without a password, because the official images
+grant `trust` for local TCP connections in their generated `pg_hba.conf`.
+
+To dump a single database instead, replace `pg_dumpall` with
+`pg_dump -h localhost -U "$POSTGRES_USER" -d "$POSTGRES_DB"`.
+
+  </TabItem>
+  <TabItem value="mariadb" label="MariaDB">
+
+```shell
+sh -lc 'set -e; d=/var/lib/mysql/backups; mkdir -p "$d";
+f=$d/backup_$(date +%F_%H%M%S).sql;
+{ MYSQL_PWD="$BACKUP_PASSWORD" mariadb-dump -u root --all-databases --routines --events --single-transaction --result-file="$f"; } || { rm -f "$f"; exit 1; };
+gzip "$f";
+find "$d" -name "backup_*.sql.gz" -type f -mtime +7 -delete'
+```
+
+`--single-transaction` takes the dump inside one transaction, which gives a
+consistent snapshot of InnoDB tables without locking them — your application keeps
+writing while the dump runs. Without it, `mariadb-dump` falls back to locking every
+table for the duration of the dump.
+
+:::caution MariaDB needs its own backup password variable
+
+The command above deliberately uses `$BACKUP_PASSWORD` and **not**
+`$MARIADB_ROOT_PASSWORD`. The MariaDB image removes its own password variables
+from the environment once the database has been initialised, so a cronjob started
+later sees `MARIADB_ROOT_PASSWORD` as empty and the dump fails with
+`Access denied for user 'root'@'localhost' (using password: NO)`.
+
+Add a separate variable to the container that MariaDB does not touch, holding the
+same value as the root password.
+
+In the mStudio UI, open the container, switch to the "Environment variables" tab
+and click "Edit". Add `BACKUP_PASSWORD` there with the same value as
+`MARIADB_ROOT_PASSWORD`, and leave the existing variables untouched.
+
+:::
+
+  </TabItem>
+  <TabItem value="mysql" label="MySQL">
+
+```shell
+sh -lc 'set -e; d=/var/lib/mysql/backups; mkdir -p "$d";
+f=$d/backup_$(date +%F_%H%M%S).sql;
+{ MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysqldump -u root --all-databases --routines --events --single-transaction --result-file="$f"; } || { rm -f "$f"; exit 1; };
+gzip "$f";
+find "$d" -name "backup_*.sql.gz" -type f -mtime +7 -delete'
+```
+
+`--single-transaction` takes the dump inside one transaction, which gives a
+consistent snapshot of InnoDB tables without locking them — your application keeps
+writing while the dump runs.
+
+  </TabItem>
+</Tabs>
+
+## Step 3: Create the cronjob {#create-cronjob}
+
+<Tabs groupId="access-mode">
+  <TabItem value="gui" label="mStudio UI">
+
+1. Navigate to the project that your database container runs in.
+2. Select "Cronjobs" from the "Components" section of the sidebar.
+3. Click "Create".
+4. Enter a name and switch the target from "App" to "Container".
+5. Pick your database container under "Linked container".
+6. Paste the dump command from step 2 into "Command to execute".
+7. Leave the interval on "Cron syntax" and enter a schedule, for example
+   `0 3 * * *` for a daily run at 03:00. Set the time zone to `Europe/Berlin`.
+8. Click "Create".
+
+The dialog has no field for failure notifications. Configure them afterwards:
+open the cronjob, and use "Edit" in the "Error handling" section to set the
+timeout and the email address. By default, mittwald notifies you from the first
+failed run onwards.
+
+  </TabItem>
+  <TabItem value="cli" label="CLI">
+
+Use the `mw cronjob create` command with the `--container-id` flag, which targets
+a container service instead of an app installation:
+
+```shellsession
+user@local $ mw cronjob create \
+  --container-id postgres \
+  --description "PostgreSQL dump" \
+  --interval "0 3 * * *" \
+  --timezone "Europe/Berlin" \
+  --timeout 1h \
+  --email ops@example.com \
+  --command 'sh -lc '\''set -e; d=/var/lib/postgresql/backups; mkdir -p "$d"; f=$d/backup_$(date +%F_%H%M%S).sql; { pg_dumpall -h localhost -U "$POSTGRES_USER" -f "$f"; } || { rm -f "$f"; exit 1; }; gzip "$f"; find "$d" -name "backup_*.sql.gz" -type f -mtime +7 -delete'\'''
+```
+
+`--container-id` accepts the container ID, its short ID or the service name.
+`--interpreter` and `--url` are not accepted for container cronjobs; the command
+runs directly inside the container.
+
+:::caution Quoting the command
+
+The dump command already contains single quotes, so it cannot simply be wrapped in
+single quotes again. The `'\''` sequences above close the quoted string, insert a
+literal single quote and reopen it — that is what makes the command arrive intact.
+Do not use double quotes around the whole command: your local shell would then
+expand `$d`, `$f` and `$POSTGRES_USER` before the cronjob is created.
+
+After creating the cronjob, verify what was actually stored:
+
+```shellsession
+user@local $ mw cronjob get <cronjob-id> -o json
+```
+
+:::
+
+  </TabItem>
+  <TabItem value="api" label="API">
+
+Use the <OperationLink operation="cronjob-create-cronjob" apiVersion="v2" />
+operation with a `ServiceTarget`, which addresses a container service by stack ID
+and service name:
+
+<OperationExample
+  operation="cronjob-create-cronjob"
+  pathParameters={{ projectId: "<project-id>" }}
+  example={{
+    description: "PostgreSQL dump",
+    interval: "0 3 * * *",
+    timeZone: "Europe/Berlin",
+    active: true,
+    timeout: 3600,
+    concurrencyPolicy: "forbid",
+    email: "ops@example.com",
+    failedExecutionAlertThreshold: 1,
+    target: {
+      stackId: "11111111-2222-3333-4444-555555555555",
+      serviceIdentifier: "postgres",
+      command:
+        'sh -lc \'set -e; d=/var/lib/postgresql/backups; mkdir -p "$d"; f=$d/backup_$(date +%F_%H%M%S).sql; { pg_dumpall -h localhost -U "$POSTGRES_USER" -f "$f"; } || { rm -f "$f"; exit 1; }; gzip "$f"; find "$d" -name "backup_*.sql.gz" -type f -mtime +7 -delete\'',
+    },
+  }}
+/>
+
+Two settings deserve attention:
+
+- `concurrencyPolicy: "forbid"` prevents a second dump from starting while the
+  previous one is still running. Overlapping dumps compete for the same database
+  and can fill the volume.
+- `timeout` is given in seconds and defaults to one hour. Large databases need a
+  higher value; the dump is killed when the timeout expires, and the command then
+  removes the partial file.
+
+</TabItem>
+</Tabs>
+
+Schedule the dump so that it finishes before your project backup runs, and outside
+of peak traffic hours.
+
+## Step 4: Verify the backup {#verify}
+
+A backup you have never tested is an assumption, not a backup. Trigger the cronjob
+once manually and check the result.
+
+<Tabs groupId="access-mode">
+  <TabItem value="gui" label="mStudio UI">
+
+1. Open the cronjob and click "Run now" in the "Interval" section.
+2. Switch to the "History" tab. The run appears with its date and runtime.
+3. A failed run is marked "Execution failed". Open the "..." menu on that entry
+   and choose "Show log" to see the exit code and the error output.
+
+The cronjob overview marks failing cronjobs with the same "Execution failed"
+badge, so a glance at that list tells you whether your backups are still running.
+Make it a habit to look — a backup cronjob can fail for weeks without anything
+else going wrong.
+
+A runtime of 0 seconds together with a failed status usually means the dump never
+connected to the database.
+
+  </TabItem>
+  <TabItem value="cli" label="CLI">
+
+Confirm that a dump was actually written:
+
+```shellsession
+user@local $ mw container exec <container-id> "ls -la /var/lib/postgresql/backups"
+```
+
+Check three things:
+
+1. **The file exists** and carries the current timestamp.
+2. **The size is plausible.** A dump of a few hundred bytes usually means the
+   command connected but found no data.
+3. **The content is readable.** Decompress it and look at the beginning:
+
+   ```shellsession
+   user@local $ mw container exec <container-id> "gunzip -c /var/lib/postgresql/backups/backup_*.sql.gz | head -20"
+   ```
+
+To keep a copy outside the platform, download the dump with `mw container cp`:
+
+```shellsession
+user@local $ mw container cp <container-id>:/var/lib/postgresql/backups/backup_2026-09-07_030000.sql.gz ./
+```
+
+  </TabItem>
+</Tabs>
+
+Repeat this check after any change to the database version, the volume layout or
+the dump command.
+
+## Restoring a dump {#restore}
+
+Restore the volume from the project backup first if the container itself is gone,
+then replay the dump into the running database.
+
+A restore runs a command inside the container, which the mStudio UI does not offer
+on its own. You have two ways in:
+
+- **Web-SSH** — install the free
+  [1-Click Web-SSH for Apps & Containers](https://studio.mittwald.de/marketplace/extensions)
+  extension from the marketplace. It gives you a terminal for apps and containers
+  directly in mStudio, without a local CLI or SSH keys. The same terminal lets you
+  inspect the dump files in the volume.
+- **CLI** — `mw container ssh <container-id>` opens a shell in the container.
+
+Both drop you _inside_ the container. List the available dumps first:
+
+```shellsession
+$ ls -la /var/lib/postgresql/backups
+```
+
+Then replay the one you want:
+
+<Tabs groupId="database">
+  <TabItem value="postgresql" label="PostgreSQL">
+
+```shellsession
+$ gunzip -c /var/lib/postgresql/backups/backup_2026-09-07_030000.sql.gz | psql -h localhost -U "$POSTGRES_USER" -d postgres
+```
+
+A `pg_dumpall` dump recreates roles and databases. When you replay it into a
+cluster where those already exist, `psql` reports `already exists` errors for them
+and continues — the table data is still restored. For a clean restore, drop and
+recreate the target database first, or restore into an empty container.
+
+  </TabItem>
+  <TabItem value="mariadb" label="MariaDB">
+
+```shellsession
+$ gunzip -c /var/lib/mysql/backups/backup_2026-09-07_030000.sql.gz | MYSQL_PWD="$BACKUP_PASSWORD" mariadb -u root
+```
+
+The dump contains `CREATE DATABASE ... IF NOT EXISTS` and `DROP TABLE IF EXISTS`
+statements, so it replaces the tables it contains. Tables that were created after
+the dump was taken are not removed.
+
+  </TabItem>
+  <TabItem value="mysql" label="MySQL">
+
+```shellsession
+$ gunzip -c /var/lib/mysql/backups/backup_2026-09-07_030000.sql.gz | MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -u root
+```
+
+The dump contains `CREATE DATABASE ... IF NOT EXISTS` and `DROP TABLE IF EXISTS`
+statements, so it replaces the tables it contains. Tables that were created after
+the dump was taken are not removed.
+
+  </TabItem>
+</Tabs>
+
+Because these dumps include the role definitions (PostgreSQL) and the `mysql`
+system database (MariaDB and MySQL), database users and their passwords are
+restored along with the data.
+
+:::note Running it from outside the container
+
+You can also fire the same command off without opening a shell, using
+`mw container exec`. Note the backslashes: they stop your local shell from
+expanding the variables before the command reaches the container.
+
+```shellsession
+user@local $ mw container exec <container-id> \
+  "gunzip -c /var/lib/mysql/backups/backup_2026-09-07_030000.sql.gz | MYSQL_PWD=\$BACKUP_PASSWORD mariadb -u root"
+```
+
+:::
+
+## Further resources {#further-resources}
+
+- [Containers](/docs/v2/platform/workloads/containers) — volumes, stacks and project backups
+- [mittwald container templates](https://github.com/mittwald/container-templates)
