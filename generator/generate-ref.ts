@@ -6,13 +6,18 @@ import * as yaml from "yaml";
 import compareOperation from "../src/openapi/compareOperation";
 import * as ejs from "ejs";
 import {
-  applyOverlayToSpec,
+  AI_OVERLAY_NAME,
+  applyOverlaysToSpec,
   dereferenceSpec,
   loadSpec,
   loadSpecPreview,
   SpecLoader,
   versionedOutputPath,
 } from "./util/spec";
+import {
+  aiGenerationEnabled,
+  generateOperationDocs,
+} from "./util/ai_descriptions";
 import { canonicalizeTitle } from "./util/title";
 import { slugFromTagName } from "@site/src/openapi/slugFromTagName";
 import {
@@ -223,11 +228,12 @@ class APIDocRenderer {
   ) {
     const sidebar = [];
     const originalSpec = await this.specLoader(apiVersion);
-    const overlayedSpec = await applyOverlayToSpec(
-      originalSpec,
-      apiVersion,
-      outputPathInDocs === "preview" ? "preview" : undefined,
-    );
+    // The AI overlay is applied first, so that the manually maintained overlay
+    // takes precedence over the generated summaries and descriptions.
+    const overlayedSpec = await applyOverlaysToSpec(originalSpec, apiVersion, [
+      AI_OVERLAY_NAME,
+      outputPathInDocs === "preview" ? "overlay-preview" : "overlay",
+    ]);
     const spec = await dereferenceSpec(overlayedSpec);
     const outputPath = this.outputPath(apiVersion, outputPathInDocs);
     const [serverURL, basePath] = determineServerURLAndBasePath(
@@ -320,6 +326,10 @@ class APIDocRenderer {
 }
 
 (async () => {
+  if (aiGenerationEnabled()) {
+    await generateOperationDocs("v2", await loadSpec("v2"));
+  }
+
   const prodRenderer = new APIDocRenderer(versionedOutputPath("v2"));
   const previewRenderer = prodRenderer
     .withSpecLoader(loadSpecPreview)

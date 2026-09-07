@@ -22,6 +22,17 @@ npm run generate:cli           # Generate CLI documentation
 npm run generate:translations  # Generate translation files (requires OPENAI_API_KEY)
 ```
 
+`npm run generate` also generates summaries and descriptions for API operations
+that do not have them yet, and persists them in `generator/overlays/v2/overlay-ai.yaml`.
+This step requires `OPENAI_API_KEY` and is skipped without it (or with `--no-ai`),
+in which case the overlay is used as checked into the repository. Values that are
+already present in the overlay are never regenerated, and the manually maintained
+`overlay.yaml` takes precedence over the generated one.
+
+The generation uses mittwald's AI hosting (`https://llm.aihosting.mittwald.de/v1`)
+by default; override it with `OPENAI_BASE_URL`. The model (`OPENAI_MODEL`) and the
+number of parallel requests (`OPENAI_CONCURRENCY`) are configurable as well.
+
 ### Code Quality
 
 ```bash
