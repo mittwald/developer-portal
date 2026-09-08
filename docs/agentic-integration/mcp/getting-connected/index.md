@@ -27,7 +27,7 @@ mittwald MCP works with 7 popular AI tools. Choose the one you use:
 
 ### ChatGPT {#chatgpt}
 
-**Best for**: Users of ChatGPT Plus, Team, Enterprise, or Education
+**Best for**: Users of ChatGPT (any plan, including Free)
 
 - **Type**: Web app / Mobile app
 - **OAuth Pattern**: Browser-based (official app, install from the ChatGPT app directory)

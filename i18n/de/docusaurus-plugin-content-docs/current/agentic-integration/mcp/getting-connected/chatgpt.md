@@ -9,7 +9,7 @@ mittwald veröffentlicht eine offizielle App im ChatGPT App-Verzeichnis, die auf
 
 ## Voraussetzungen {#prerequisites}
 
-- **ChatGPT Plus, Team, Enterprise oder Education Plan**
+- **Ein ChatGPT-Account** (Plugins stehen in allen Plänen zur Verfügung, auch im kostenlosen Plan)
 - **Ein mittwald-Account** (zur Authentifizierung)
 - **2 Minuten** zum Abschluss des Setups
 
@@ -94,11 +94,11 @@ List open support conversations for my account
 
 **Symptom**: Die mittwald App erscheint nicht unter **Plugins** oder in den Suchergebnissen.
 
-**Ursache**: Dein ChatGPT-Plan unterstützt keine Apps, oder der App-Eintrag ist noch nicht geladen.
+**Ursache**: Du bist nicht bei ChatGPT angemeldet, oder der App-Eintrag ist noch nicht geladen.
 
 **Lösung**:
 
-1. Upgrade auf ChatGPT Plus, Team, Enterprise oder Education
+1. Stelle sicher, dass du bei ChatGPT angemeldet bist
 2. Lade den [mittwald App-Eintrag](https://chatgpt.com/plugins/plugin_asdk_app_6a68b368b8588191afee9a7e2b327d63) direkt neu
 
 ### Fehler: "Authentication Failed" {#error-authentication-failed}
@@ -140,7 +140,7 @@ List open support conversations for my account
 
 ### F: Welche ChatGPT-Pläne unterstützen die mittwald App? {#faq-supported-plans}
 
-**A**: ChatGPT Plus, Team, Enterprise und Education-Pläne unterstützen die Installation von Apps.
+**A**: Alle ChatGPT-Pläne unterstützen Plugins, auch der kostenlose Plan.
 
 ### F: Funktioniert das auf Mobilgeräten? {#faq-mobile}
 

@@ -9,7 +9,7 @@ mittwald publishes an official app in the ChatGPT app directory, backed by mittw
 
 ## Prerequisites {#prerequisites}
 
-- **ChatGPT Plus, Team, Enterprise, or Education plan**
+- **A ChatGPT account** (Plugins are available on all plans, including Free)
 - **A mittwald account** (to authenticate)
 - **2 minutes** to complete setup
 
@@ -94,11 +94,11 @@ List open support conversations for my account
 
 **Symptom**: The mittwald app does not appear under **Plugins** or in search results.
 
-**Cause**: Your ChatGPT plan does not support apps, or the app listing has not loaded yet.
+**Cause**: You're not signed in to ChatGPT, or the app listing has not loaded yet.
 
 **Fix**:
 
-1. Upgrade to ChatGPT Plus, Team, Enterprise, or Education
+1. Make sure you're signed in to ChatGPT
 2. Reload the [mittwald app listing](https://chatgpt.com/plugins/plugin_asdk_app_6a68b368b8588191afee9a7e2b327d63) directly
 
 ### Error: "Authentication Failed" {#error-authentication-failed}
@@ -140,7 +140,7 @@ List open support conversations for my account
 
 ### Q: Which ChatGPT plans support the mittwald app? {#faq-supported-plans}
 
-**A**: ChatGPT Plus, Team, Enterprise, and Education plans support installing apps.
+**A**: All ChatGPT plans support Plugins, including the Free tier.
 
 ### Q: Does this work on mobile? {#faq-mobile}
 

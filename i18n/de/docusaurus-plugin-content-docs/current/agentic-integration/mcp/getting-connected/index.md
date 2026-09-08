@@ -27,7 +27,7 @@ mittwald MCP funktioniert mit 7 beliebten KI-Tools. Wähle dasjenige, das du ver
 
 ### ChatGPT {#chatgpt}
 
-**Am besten für**: Nutzer von ChatGPT Plus, Team, Enterprise oder Education
+**Am besten für**: Nutzer von ChatGPT (jeder Plan, auch der kostenlose)
 
 - **Typ**: Web App / Mobile App
 - **OAuth-Muster**: Browser-basiert (offizielle App, Installation aus dem ChatGPT App-Verzeichnis)
