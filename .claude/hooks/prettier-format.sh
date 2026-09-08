@@ -8,6 +8,14 @@
 
 set -uo pipefail
 
+# Without jq the payload cannot be parsed, and exiting 0 here would silently
+# skip formatting — exactly the failure this hook exists to prevent. Exit code 2
+# is a blocking error whose stderr is reported back to the agent.
+if ! command -v jq >/dev/null 2>&1; then
+  echo "prettier-format hook: jq is not installed, so the edited file could not be formatted. Install jq, then format the file with ./node_modules/.bin/prettier --write <file>." >&2
+  exit 2
+fi
+
 payload=$(cat)
 
 file=$(jq -r '.tool_input.file_path // .tool_response.filePath // empty' <<<"$payload")
@@ -31,13 +39,13 @@ block() {
 # Fresh clone without `npm install`. Deliberately no `npx` fallback — that would
 # fetch an unpinned Prettier and format against the wrong version.
 if [ ! -x "$prettier" ]; then
-  block "$file was edited but NOT formatted: Prettier is not installed at $prettier. Run \`npm install\` in the project root, then \`npm run format\` (or \`npx prettier --write $file\`) before continuing. Do not leave the file unformatted."
+  block "$file was edited but NOT formatted: Prettier is not installed at $prettier. Run \`npm install\` in the project root, then format the file with \`./node_modules/.bin/prettier --write $file\` (or \`npm run format\` for a bulk run over docs, i18n and src). Do not use \`npx prettier\` — it fetches an unpinned version. Do not leave the file unformatted."
 fi
 
 cd "$root" || block "$file was edited but NOT formatted: could not enter the project root $root."
 
 if ! output=$("$prettier" --write --ignore-unknown "$file" 2>&1); then
-  block "Prettier failed on $file, so it is NOT formatted — this usually means the edit left the file syntactically invalid. Fix it and re-run \`npx prettier --write $file\`. Prettier said: $output"
+  block "Prettier failed on $file, so it is NOT formatted — this usually means the edit left the file syntactically invalid. Fix it and re-run \`./node_modules/.bin/prettier --write $file\`. Prettier said: $output"
 fi
 
 exit 0

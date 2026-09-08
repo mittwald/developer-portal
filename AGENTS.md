@@ -171,8 +171,9 @@ Claude Code hooks (configured in `.claude/settings.json`) enforce this for you:
 
 - After every `Write`/`Edit` of a `.md`, `.mdx`, `.ts` or `.tsx` file,
   `.claude/hooks/prettier-format.sh` runs the repository's Prettier over that file.
-  Do not follow up an edit with a manual `npm run format` or `npx prettier --write`
-  on the same file — it is already formatted.
+  Do not follow up an edit with a manual `npm run format` or
+  `./node_modules/.bin/prettier --write` on the same file — it is already
+  formatted. Never use `npx prettier`: it fetches an unpinned version.
 - If the hook reports that a file was **not** formatted — Prettier missing
   (`npm install` was never run) or Prettier failing to parse the file — fix that
   before continuing. An unformatted file is not an acceptable end state.
