@@ -100,7 +100,7 @@ function PlatformCoreFeatures() {
               </Link>,
               <Link to="/docs/v2/platform/aihosting/cms">
                 <Translate id="index.deploy.platform.aihosting.cms">
-                  CMS integrations
+                  CMS and framework integrations
                 </Translate>
               </Link>,
             ]}
