@@ -1,0 +1,224 @@
+---
+sidebar_label: Symfony
+description: Learn how to use mittwald AI Hosting with Symfony AI
+title: Symfony
+---
+
+## Using mittwald AI Hosting with Symfony AI {#using-mittwald-ai-hosting}
+
+[Symfony AI](https://symfony.com/doc/current/ai/index.html) is a set of PHP components that add AI capabilities to your application. Its Platform component gives you one vendor-neutral API for talking to AI models: you assemble a `MessageBag`, call `$platform->invoke(...)` and read the answer off a result object — no matter who actually runs the model. On top of that, the Agent, Chat and Store components cover agents, conversation history and vector stores, and the AI Bundle wires everything into a Symfony application.
+
+The adapter that plugs one concrete provider into the Platform API is called a _bridge_. [`mittwald/symfony-ai-platform`](https://github.com/mittwald/symfony-ai-platform) is the official bridge for mittwald AI Hosting. Once installed, mittwald-hosted models are available through the standard Symfony AI interfaces — for chat and embeddings, the same code that talks to the OpenAI or Anthropic bridges works here; only the factory call and the model ID change.
+
+This guide covers installation and usage of the bridge. For everything about Symfony AI itself — agents, tool calling, RAG stores and the AI Bundle — refer to the [official Symfony AI documentation](https://symfony.com/doc/current/ai/index.html).
+
+:::note
+
+Unlike the other integrations in this section, this one is not a plugin for a ready-made CMS. It is a library you use from your own PHP code, so there is no admin interface to configure — everything happens in your application.
+
+:::
+
+### Prerequisites {#prerequisites}
+
+Before installing the bridge, make sure your environment meets these requirements:
+
+- PHP 8.2 or later
+- Composer
+- A mittwald AI Hosting API key
+
+The bridge depends on `symfony/ai-platform` (`^0.13`), `symfony/http-client` and `symfony/mime`; Composer installs them for you. You do **not** need a full Symfony application — the package works in any PHP project with Composer autoloading.
+
+If you don't have an API key yet, follow the [mittwald AI Hosting access guide](../../access-and-usage/access) to generate one through your mStudio dashboard.
+
+### Installation {#installation}
+
+Add the bridge to your project:
+
+```shellsession
+user@local $ composer require mittwald/symfony-ai-platform
+```
+
+That single command installs the bridge and its dependencies. There is no bundle to enable and no configuration file to create.
+
+### Configuration {#configuration}
+
+The bridge reads nothing from the environment on its own — you pass the API key to the factory. Keep the key out of version control and read it from an environment variable or a secrets store.
+
+#### Standalone PHP {#configuration-standalone}
+
+In a plain PHP project, create the platform directly:
+
+```php
+use Mittwald\Symfony\AI\Platform\Bridge\Factory;
+use Symfony\AI\Platform\Message\Message;
+use Symfony\AI\Platform\Message\MessageBag;
+
+$platform = Factory::createPlatform(getenv('MITTWALD_AI_API_KEY'));
+
+$result = $platform->invoke('gpt-oss-120b', new MessageBag(
+    Message::ofUser('Explain what a Symfony AI platform bridge is, in one sentence.'),
+));
+
+echo $result->asText();
+```
+
+#### Symfony application {#configuration-symfony}
+
+In a Symfony application, register the platform as a service and inject `PlatformInterface` wherever you need it:
+
+```yaml
+# config/services.yaml
+services:
+  Symfony\AI\Platform\PlatformInterface:
+    factory:
+      - 'Mittwald\Symfony\AI\Platform\Bridge\Factory'
+      - createPlatform
+    arguments:
+      $apiKey: "%env(MITTWALD_AI_API_KEY)%"
+```
+
+Then set `MITTWALD_AI_API_KEY` in your environment, for example through a [Symfony secret](https://symfony.com/doc/current/configuration/secrets.html) or an environment variable on your hosting.
+
+#### Factory options {#configuration-factory-options}
+
+`Factory::createPlatform()` accepts the same optional overrides as the other Symfony AI bridges, in this order after `$apiKey`: `$httpClient`, `$modelCatalog`, `$dispatcher`, `$contract`, `$name` (default `mittwald`), `$modelRouter` and `$baseUrl`. Pass them as named arguments, as the examples below do.
+
+`Factory::createProvider()` returns the bare `ProviderInterface` instead, for callers that compose their own `Platform` — or that discover bridges by the Symfony AI factory convention, as TYPO3's `b13/aim` does. It accepts the same overrides except `$modelRouter`.
+
+:::note
+
+`PlatformFactory::create()` still works but is deprecated: Symfony AI renamed `PlatformFactory` to `Factory` in bridge release 0.8. Use `Factory::createPlatform()` in new code.
+
+:::
+
+### Supported operations {#supported-operations}
+
+You never pick an endpoint yourself. The model ID you pass to `invoke()` is looked up in the bridge's model catalog, which decides whether the call becomes a chat completion, an embedding, a transcription, a reranking or a speech synthesis request — and therefore which `as*()` method the result understands.
+
+| Operation        | Supported                             |
+| ---------------- | ------------------------------------- |
+| Chat completions | ✅                                    |
+| Embeddings       | ✅                                    |
+| Speech-to-text   | ✅                                    |
+| Text-to-speech   | ✅                                    |
+| Reranking        | ✅                                    |
+| Text-to-image    | ⏸️ not offered by mittwald AI Hosting |
+| Moderation       | ⏸️ not offered by mittwald AI Hosting |
+
+All examples below assume a `$platform` created as shown under [Configuration](#configuration).
+
+#### Chat {#operations-chat}
+
+```php
+use Symfony\AI\Platform\Message\Message;
+use Symfony\AI\Platform\Message\MessageBag;
+
+$result = $platform->invoke('gpt-oss-120b', new MessageBag(Message::ofUser('Hello!')));
+echo $result->asText();
+```
+
+Chat supports streaming, tool calling, vision and reasoning models. To stream the response, pass the `stream` option and iterate over the result:
+
+```php
+$result = $platform->invoke('gpt-oss-120b', new MessageBag(Message::ofUser('Hello!')), ['stream' => true]);
+foreach ($result->asStream() as $chunk) {
+    echo $chunk;
+}
+```
+
+#### Embeddings {#operations-embeddings}
+
+```php
+$result = $platform->invoke('Qwen3-Embedding-8B', 'text to embed');
+$vectors = $result->asVectors();
+```
+
+Combine these with the [Symfony AI Store component](https://symfony.com/doc/current/ai/components/store.html) to build semantic search or RAG features. mittwald AI Hosting provides the embedding model, but not a managed vector database; you can run one yourself in your mStudio project using [container hosting](/docs/v2/platform/workloads/containers/), where pgvector, Qdrant and ChromaDB are available as container templates.
+
+#### Speech-to-text {#operations-speech-to-text}
+
+```php
+$result = $platform->invoke('whisper-large-v3-turbo', '/path/to/audio.mp3');
+echo $result->asText();
+```
+
+#### Reranking {#operations-reranking}
+
+```php
+$result = $platform->invoke('Qwen3-VL-Reranker-2B', [
+    'query' => 'What is the capital of France?',
+    'documents' => ['Paris is the capital of France.', 'Berlin is the capital of Germany.'],
+]);
+
+foreach ($result->asReranking() as $entry) {
+    echo $entry->getIndex() . ': ' . $entry->getScore() . PHP_EOL;
+}
+```
+
+#### Text-to-speech {#operations-text-to-speech}
+
+```php
+$result = $platform->invoke('Qwen3-TTS-12Hz-1.7B-CustomVoice', 'Hello and welcome!', ['voice' => 'ryan']);
+$result->asFile('/path/to/output.mp3');
+```
+
+:::note
+
+Chat and embeddings are portable across Symfony AI bridges. Reranking and text-to-speech take provider-shaped payloads and options, so switching providers will require changes to those call sites.
+
+:::
+
+### Available models {#available-models}
+
+The bridge ships a catalog of the model IDs it knows about, among them `gpt-oss-120b`, the Ministral and Qwen3.x chat models, `GLM-OCR`, `Qwen3-Embedding-8B`, `whisper-large-v3-turbo`, `Qwen3-VL-Reranker-2B` and `Qwen3-TTS-12Hz-1.7B-CustomVoice`.
+
+The [available models](../../models/) documentation is the authoritative list of what the API currently serves, including each model's capabilities and context size. Models that mittwald AI Hosting adds after a bridge release may not be in the catalog yet. In that case, update the package — or register the model yourself by passing an extended catalog as `$modelCatalog`:
+
+```php
+use Mittwald\Symfony\AI\Platform\Bridge\ChatModel;
+use Mittwald\Symfony\AI\Platform\Bridge\ModelCatalog;
+use Symfony\AI\Platform\Capability;
+
+$catalog = new ModelCatalog([
+    'some-new-model' => [
+        'class' => ChatModel::class,
+        'capabilities' => [
+            Capability::INPUT_MESSAGES,
+            Capability::INPUT_TEXT,
+            Capability::OUTPUT_TEXT,
+            Capability::OUTPUT_STREAMING,
+        ],
+    ],
+]);
+
+$platform = Factory::createPlatform(getenv('MITTWALD_AI_API_KEY'), modelCatalog: $catalog);
+```
+
+The models you pass are merged over the ones the bridge already knows.
+
+### Dedicated AI Hosting {#dedicated-ai-hosting}
+
+By default, the bridge talks to `https://llm.aihosting.mittwald.de`. If you use [dedicated AI Hosting](../../dedicated/getting-started), your reserved capacity is served from a customer-specific subdomain — pass it as `$baseUrl`:
+
+```php
+$platform = Factory::createPlatform(getenv('MITTWALD_AI_API_KEY'), baseUrl: 'https://your-company.llm.aihosting.mittwald.de');
+```
+
+Give the base URL without the `/v1` suffix; the bridge appends the API version and path itself.
+
+### Error handling {#error-handling}
+
+API errors are translated into the shared Symfony AI platform exceptions, following the same convention as the other bridges:
+
+| HTTP status | Exception                    |
+| ----------- | ---------------------------- |
+| 400         | `BadRequestException`        |
+| 401         | `AuthenticationException`    |
+| 429         | `RateLimitExceededException` |
+| 5xx         | `ServerException`            |
+
+For the meaning of the individual error responses, see the [error reference](../../api-endpoints/errors).
+
+## Usage limits {#usage-limits}
+
+The mittwald AI Hosting service has usage limits based on your account tier. For details on rate limits and quotas, refer to the [terms of use](../../access-and-usage/terms-of-use).
