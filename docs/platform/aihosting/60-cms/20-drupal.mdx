@@ -6,7 +6,20 @@ title: Drupal CMS
 
 ## Using the mittwald AI provider for Drupal {#using-mittwald-ai-provider}
 
-The mittwald AI provider integration brings powerful AI capabilities directly into your Drupal CMS. This module allows you to leverage mittwald's AI models for various tasks including text translation, chat interfaces, image vision processing, and embeddings generation. You can find the official module on the [Drupal project page](https://www.drupal.org/project/ai_provider_mittwald).
+The mittwald AI provider integration brings AI capabilities directly into your Drupal CMS. The module registers mittwald AI Hosting as a provider for the [Drupal AI module](https://www.drupal.org/project/ai), which makes mittwald's models available for chat, embeddings, reranking, speech-to-text and text-to-speech operations.
+
+This guide covers installation and setup. For the module's individual settings and their defaults, refer to the [Drupal project page](https://www.drupal.org/project/ai_provider_mittwald).
+
+### Prerequisites {#prerequisites}
+
+Before installing the module, make sure your environment meets these requirements:
+
+- Drupal 10.3 or later, or Drupal 11
+- The [AI module](https://www.drupal.org/project/ai) (`^1.3.0`)
+- The [Key module](https://www.drupal.org/project/key) (`^1.18`)
+- A mittwald AI Hosting API key
+
+If you don't have an API key yet, follow the [mittwald AI Hosting access guide](../../access-and-usage/access) to generate one through your mStudio dashboard.
 
 ### Installation {#installation}
 
@@ -27,24 +40,50 @@ Once the module is installed, you'll need to configure it with your mittwald AI 
 
 #### Step 1: Store your API key securely {#step-1-store-api-key}
 
-Navigate to **Configuration** -> **System** -> **Keys** in your Drupal admin interface. Click on **Add key** to create a new key entry. Give your key a descriptive name (such as "mittwald AI API Key") and paste your mittwald AI Hosting API key into the key value field. This approach ensures your API credentials are stored securely and can be managed centrally.
-
-If you don't have an API key yet, you can generate one through your mittwald account dashboard in the AI Hosting section.
+Navigate to **Configuration** -> **System** -> **Keys** (`/admin/config/system/keys/add`) in your Drupal admin interface. Click on **Add key** to create a new key entry. Give your key a descriptive name (such as "mittwald AI API Key"), pick an appropriate key type such as **Authentication**, and paste your mittwald AI Hosting API key into the key value field. This approach ensures your API credentials are stored securely and can be managed centrally.
 
 #### Step 2: Configure provider authentication {#step-2-configure-authentication}
 
-Next, you'll connect the stored API key to the mittwald AI provider. Go to **Configuration** -> **AI** -> **Provider Settings** and locate the **mittwald Authentication** section. In the **mittwald API key** dropdown field, select the key you created in the previous step. Save the configuration to establish the connection between your Drupal site and the mittwald AI services.
+Next, you'll connect the stored API key to the mittwald AI provider. Go to **Configuration** -> **AI** -> **Providers** -> **mittwald Authentication** (`/admin/config/ai/providers/mittwald`). In the **mittwald API key** dropdown field, select the key you created in the previous step. Save the configuration to establish the connection between your Drupal site and the mittwald AI services.
+
+When you save, the module validates the API key against mittwald AI Hosting and checks your rate limits. If your account is on a tier with restricted quota, the module displays a warning at this point.
 
 #### Step 3: Set mittwald as default provider {#step-3-set-default-provider}
 
-Finally, configure which AI capabilities should use the mittwald provider by default. Navigate to **Configuration** -> **AI** -> **AI default settings**. Here you can select **mittwald** as the default provider for multiple AI functionalities:
+Finally, configure which AI capabilities should use the mittwald provider by default. Navigate to **Configuration** -> **AI** -> **AI default settings**. Here you can select **mittwald** as the default provider for the operation types it supports, among them:
 
-- **Translate text**: Enable AI-powered translation capabilities across your Drupal content
-- **Chat**: Set up conversational AI interfaces, including advanced features like Image Vision and Tool Calling support
+- **Chat**: Conversational AI interfaces, including advanced features like image vision and tool calling support. Chat also backs higher-level AI module features such as text translation and summarization.
 - **Embeddings**: Generate vector embeddings for semantic search and content recommendations
+- **Speech-to-text**: Transcribe audio files
+- **Text-to-speech**: Generate spoken audio from text
+- **Rerank**: Reorder search results to improve retrieval precision in RAG setups
 
 By setting mittwald as the default provider, all AI-powered features in your Drupal installation will automatically use mittwald's AI models unless you specify otherwise for specific use cases.
 
+### Supported operations {#supported-operations}
+
+The module exposes the following mittwald AI Hosting operations to the Drupal AI module:
+
+| Operation        | Supported                             |
+| ---------------- | ------------------------------------- |
+| Chat completions | ✅                                    |
+| Embeddings       | ✅                                    |
+| Reranking        | ✅                                    |
+| Speech-to-text   | ✅                                    |
+| Text-to-speech   | ✅                                    |
+| Text-to-image    | ⏸️ not offered by mittwald AI Hosting |
+| Moderation       | ⏸️ not offered by mittwald AI Hosting |
+
+For chat, the module offers the GPT-OSS, Ministral, Qwen3.5, Qwen3.6, Qwen3.8 and GLM-OCR model families. Support for image input and reasoning differs between them — see the [available models](../../models/) documentation for the capabilities of each model, and the [Drupal project page](https://www.drupal.org/project/ai_provider_mittwald) for the default model of each operation.
+
+If you use [dedicated AI Hosting](../../dedicated/getting-started) or a proxy, you can point the module at a different endpoint by setting the `host` value in the `ai_provider_mittwald.settings` configuration.
+
 ## Using vector databases {#vector-databases}
 
-Support for vector databases is currently in development and will be available at a later time. Vector databases enable advanced semantic search capabilities and content recommendations by storing and querying AI-generated embeddings efficiently.
+mittwald AI Hosting provides the embedding model, but not a managed vector database. To build semantic search or RAG features on top of the embeddings generated by `Qwen3-Embedding-8B`, combine the Drupal AI module's vector database providers with a vector database of your own.
+
+You can run one directly in your mStudio project using [container hosting](/docs/v2/platform/workloads/containers/); pgvector, Qdrant and ChromaDB are available as container templates. The [GLM-OCR guide](../../examples/glm-ocr/) walks through a complete ingestion and retrieval pipeline using these components.
+
+## Usage limits {#usage-limits}
+
+The mittwald AI Hosting service has usage limits based on your account tier. For details on rate limits and quotas, refer to the [terms of use](../../access-and-usage/terms-of-use).

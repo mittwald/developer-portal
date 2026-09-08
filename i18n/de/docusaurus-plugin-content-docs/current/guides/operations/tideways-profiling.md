@@ -56,9 +56,28 @@ Der Daemon benötigt deinen API-Key **nicht**. Der Key wird auf PHP-Seite konfig
 
 :::
 
-### Über das mStudio UI {#daemon-ui}
+### Über die Container-Vorlage {#daemon-template}
 
-Gehe in mStudio zu deinem Projekt, wähle **„Container"** und klicke auf **„Container erstellen"**. Ein geführter Dialog öffnet sich, um dir beim Container-Setup zu helfen.
+Der schnellste Weg dorthin führt über die Container-Vorlage **„Tideways"**: Öffne in mStudio dein Projekt, gehe zu **„Container"**, wähle den Reiter **„Vorlagen"** und suche nach **„Tideways"**. Die Installation der Vorlage erstellt und startet den Daemon-Container für dich, bereits mit sinnvollen Standardeinstellungen.
+
+Dasselbe steht auch über die CLI zur Verfügung:
+
+```shellsession title="Lokale Shell-Sitzung"
+user@local $ mw stack template install tideways \
+  --input ENVIRONMENT=production
+```
+
+Die `--input`-Option ist optional, aber empfehlenswert. `ENVIRONMENT` bestimmt, unter welcher Umgebung die Daten in der Tideways-Oberfläche einsortiert werden, zum Beispiel `production` oder `staging`. Der Standardwert ist `production`.
+
+:::note
+
+Merke dir den internen DNS-Namen des Containers, der nach der Installation in mStudio angezeigt wird. Er leitet sich vom Container-Namen ab — ein Container namens `Tideways-Daemon` erhält den DNS-Namen `tideways-daemon`. Du benötigst diesen Namen in [Schritt 2](#php-config).
+
+:::
+
+### Alternative: Manuelles Setup über das mStudio UI {#daemon-ui}
+
+Falls dein Hosting-Produkt keine Container-Vorlagen unterstützt, oder du von den Standardeinstellungen der Vorlage abweichen musst, kannst du den Daemon-Container auch manuell einrichten. Gehe dazu in mStudio zu deinem Projekt, wähle **„Container"** und klicke auf **„Container erstellen"**. Ein geführter Dialog öffnet sich, um dir beim Container-Setup zu helfen.
 
 Gib zunächst eine Beschreibung ein — dies ist ein Freitextfeld zur Identifizierung des Containers. Gib zum Beispiel **„Tideways-Daemon"** ein und klicke auf **„Weiter"**.
 
@@ -79,11 +98,7 @@ Es sind keine Umgebungsvariablen erforderlich.
 
 Am Ende des Dialogs wirst du nach dem **Port** gefragt. Gib `9135` ein, damit der Daemon für die übrigen Workloads in deinem Projekt erreichbar wird. Klicke auf **„Container erstellen"**, um den Container zu erstellen und zu starten.
 
-:::note
-
-Merke dir den internen DNS-Namen des Containers, der nach der Erstellung in mStudio angezeigt wird. Er leitet sich vom Container-Namen ab — ein Container namens `Tideways-Daemon` erhält den DNS-Namen `tideways-daemon`. Du benötigst diesen Namen in [Schritt 2](#php-config).
-
-:::
+Merke dir auch hier den internen DNS-Namen des Containers, der nach der Erstellung in mStudio angezeigt wird. Du benötigst ihn in [Schritt 2](#php-config).
 
 ### Alternative: Verwendung des `mw container run`-Befehls {#daemon-cli-run}
 
@@ -134,7 +149,7 @@ Dieser Befehl liest die `docker-compose.yml`-Datei aus dem aktuellen Verzeichnis
 
 Der Daemon läuft mit seinen Standardeinstellungen problemlos, zwei Optionen solltest du aber explizit setzen:
 
-- `--env=<name>` legt den Namen der Umgebung fest, unter der Traces gemeldet werden, zum Beispiel `production` oder `staging`. Der Standardwert ist `production`.
+- `--env=<name>` legt den Namen der Umgebung fest, unter der Traces gemeldet werden, zum Beispiel `production` oder `staging`. Der Standardwert ist `production`. Bei Verwendung der [Container-Vorlage](#daemon-template) entspricht das dem Input `ENVIRONMENT`.
 - `--hostname=<name>` legt den Servernamen fest, unter dem sich der Daemon in der Tideways-Oberfläche registriert. In Containern hängt der Daemon standardmäßig die Container-ID an den ermittelten Hostnamen an — dadurch erscheint jede Neuerstellung des Containers als neuer Server. Ein fester Hostname vermeidet das.
 
 Alle verfügbaren Optionen sind in der [Konfigurationsreferenz des Daemons](https://support.tideways.com/documentation/reference/daemon/configuration-reference.html) dokumentiert.

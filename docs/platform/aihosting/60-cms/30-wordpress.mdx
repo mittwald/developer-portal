@@ -52,15 +52,23 @@ Navigate to **Settings** -> **Connectors** in your WordPress admin interface. En
 
 Alternatively, you can configure the API key via `wp-config.php` by defining the `MITTWALD_API_KEY` constant, or by setting the `MITTWALD_API_KEY` environment variable. WordPress [resolves API keys](https://make.wordpress.org/core/2026/03/18/introducing-the-connectors-api-in-wordpress-7-0/) in this order: environment variable, then PHP constant, then database (admin UI).
 
+Using WP-CLI, you can write the constant to `wp-config.php` directly:
+
+```shellsession
+user@ssh $ wp config set MITTWALD_API_KEY your-api-key
+```
+
+To set it as an environment variable instead, export it in your web server configuration, for example `SetEnv MITTWALD_API_KEY your-api-key` in an Apache configuration.
+
 #### Step 3: Enable AI features (if using the AI plugin) {#step-3-enable-features}
 
-If you installed the AI plugin, navigate to **Settings** -> **AI** and enable the features you want to use. Available features include:
+If you installed the AI plugin, navigate to **Settings** -> **AI**. First enable the AI functionality globally, then enable the individual features you want to use — the plugin ships them as opt-in experiments, so nothing is active until you switch it on. Available features include:
 
 - **Title Generation**: Generate title suggestions with a single click in the post editor
 - **Excerpt Generation**: Automatically create concise summaries for your posts
 - **Content Summarization**: Summarize long-form content into digestible overviews
 - **Alt Text Generation**: Generate descriptive alt text for images to improve accessibility
-- **Image Generation**: Create and edit images from post content
+- **Image Generation**: Create and edit images from post content (requires a connector that supports image generation; the mittwald connector does not)
 - **Comment Moderation**: Automatically moderate comments based on toxicity detection
 
 For a complete list of all features currently available, refer to the [official plugin page](https://wordpress.org/plugins/ai/).
@@ -75,14 +83,19 @@ When editing a post, you'll find AI-powered buttons in relevant locations throug
 
 ### Supported models and capabilities {#supported-models}
 
-The mittwald AI provider supports chat completions with several models optimized for different tasks:
+The mittwald connector for WordPress implements chat completions (text generation). Embeddings, speech-to-text, text-to-speech and image generation are **not** provided by the mittwald connector — AI plugin features that rely on them, such as image generation, need a different connector.
+
+Chat completions are available with several models optimized for different tasks:
 
 - **gpt-oss-120b**: Open-source GPT-compatible model for general content generation and advanced reasoning
 - **Qwen3.5-122B-A10B-FP8** and **Qwen3.6-35B-A3B-FP8**: Large models with reasoning and vision capabilities
-- **Qwen3.5-0.8B**: Lightweight model for cost-sensitive tasks
+- **Qwen3.5-0.8B**: Lightweight model for cost-sensitive tasks; text-only, it does not accept image input
 - **Ministral-3-14B-Instruct-2512**: Chat model with vision and image input capabilities
+- **GLM-OCR**: Document OCR model for extracting text from images and documents
 
-These models support standard text generation, JSON output formatting, tool calling, and streaming responses. The Ministral and Qwen models additionally support image vision capabilities for analyzing and describing images.
+These models support standard text generation, JSON output formatting, tool calling, and streaming responses. The Ministral, Qwen3.5-122B, Qwen3.6 and GLM-OCR models additionally accept image input.
+
+The plugin declares the capabilities of each model explicitly. Models that mittwald AI Hosting adds after a plugin release may therefore show up on the connectors screen without any declared capabilities until the plugin catches up.
 
 For a complete list of available models and their capabilities, see the [available models](../../models/) documentation.
 

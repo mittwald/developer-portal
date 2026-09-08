@@ -59,10 +59,10 @@ The following API endpoints have changed:
 
 <% for ([operationId, changes] of groupedChangelog.entries()) { %>
 
-### Changes in "<%- canonicalizeTitle(getOperationById(spec, operationId)?.operation.summary) ?? operationId %>"
+### Changes in "<%- escapeMdx(canonicalizeTitle(getOperationById(spec, operationId)?.operation.summary)) ?? operationId %>"
 
 <% for (change of changes) { %>
-- <% if (change.level === 3) { %>⚠️ **Breaking:** <% } %><%- change.text %>
+- <% if (change.level === 3) { %>⚠️ **Breaking:** <% } %><%- escapeMdx(change.text) %>
 <% } %>
 
 For details, refer to the <OperationLink operation="<%= operationId %>" apiVersion="<%= apiVersion %>" /> endpoint.

@@ -6,7 +6,20 @@ title: Drupal CMS
 
 ## Den mittwald AI Provider für Drupal verwenden {#using-mittwald-ai-provider}
 
-Die mittwald AI Provider-Integration bringt leistungsstarke KI-Funktionen direkt in dein Drupal CMS. Dieses Modul ermöglicht es dir, die KI-Modelle von mittwald für verschiedene Aufgaben wie Textübersetzung, Chat-Schnittstellen, Bildverarbeitung und Embedding-Generierung zu nutzen. Das offizielle Modul findest du auf der [Drupal-Projektseite](https://www.drupal.org/project/ai_provider_mittwald).
+Die mittwald AI Provider-Integration bringt KI-Funktionen direkt in dein Drupal CMS. Das Modul registriert mittwald AI Hosting als Provider für das [Drupal AI-Modul](https://www.drupal.org/project/ai) und stellt damit die Modelle von mittwald für Chat, Embeddings, Reranking, Speech-to-Text und Text-to-Speech bereit.
+
+Diese Anleitung beschreibt Installation und Einrichtung. Die einzelnen Einstellungen des Moduls und ihre Standardwerte findest du auf der [Drupal-Projektseite](https://www.drupal.org/project/ai_provider_mittwald).
+
+### Voraussetzungen {#prerequisites}
+
+Bevor du das Modul installierst, stelle sicher, dass deine Umgebung diese Anforderungen erfüllt:
+
+- Drupal 10.3 oder neuer, oder Drupal 11
+- Das [AI-Modul](https://www.drupal.org/project/ai) (`^1.3.0`)
+- Das [Key-Modul](https://www.drupal.org/project/key) (`^1.18`)
+- Ein API-Schlüssel für mittwald AI Hosting
+
+Falls du noch keinen API-Schlüssel hast, folge der [Anleitung zum Zugang zu mittwald AI Hosting](../../access-and-usage/access), um einen über dein mStudio-Dashboard zu erzeugen.
 
 ### Installation {#installation}
 
@@ -27,24 +40,50 @@ Nach der Installation des Moduls musst du es mit deinem mittwald AI Hosting API-
 
 #### Schritt 1: API-Schlüssel sicher speichern {#step-1-store-api-key}
 
-Navigiere zu **Konfiguration** -> **System** -> **Schlüssel** in deiner Drupal-Administrationsoberfläche. Klicke auf **Schlüssel hinzufügen**, um einen neuen Schlüsseleintrag zu erstellen. Gib deinem Schlüssel einen beschreibenden Namen (z.B. „mittwald AI API-Schlüssel") und füge deinen mittwald AI Hosting API-Schlüssel in das Schlüsselwert-Feld ein. Dieser Ansatz stellt sicher, dass deine API-Zugangsdaten sicher gespeichert und zentral verwaltet werden können.
-
-Falls du noch keinen API-Schlüssel hast, kannst du einen über dein mittwald-Konto-Dashboard im Bereich AI Hosting generieren.
+Navigiere zu **Konfiguration** -> **System** -> **Schlüssel** (`/admin/config/system/keys/add`) in deiner Drupal-Administrationsoberfläche. Klicke auf **Schlüssel hinzufügen**, um einen neuen Schlüsseleintrag zu erstellen. Gib deinem Schlüssel einen beschreibenden Namen (z.B. „mittwald AI API-Schlüssel"), wähle einen passenden Schlüsseltyp wie **Authentifizierung** und füge deinen mittwald AI Hosting API-Schlüssel in das Schlüsselwert-Feld ein. Dieser Ansatz stellt sicher, dass deine API-Zugangsdaten sicher gespeichert und zentral verwaltet werden können.
 
 #### Schritt 2: Provider-Authentifizierung konfigurieren {#step-2-configure-authentication}
 
-Als Nächstes verbindest du den gespeicherten API-Schlüssel mit dem mittwald AI Provider. Gehe zu **Konfiguration** -> **AI** -> **Provider-Einstellungen** und suche den Bereich **mittwald-Authentifizierung**. Wähle im Dropdown-Feld **mittwald API-Schlüssel** den Schlüssel aus, den du im vorherigen Schritt erstellt hast. Speichere die Konfiguration, um die Verbindung zwischen deiner Drupal-Website und den mittwald AI-Diensten herzustellen.
+Als Nächstes verbindest du den gespeicherten API-Schlüssel mit dem mittwald AI Provider. Gehe zu **Konfiguration** -> **AI** -> **Provider** -> **mittwald-Authentifizierung** (`/admin/config/ai/providers/mittwald`). Wähle im Dropdown-Feld **mittwald API-Schlüssel** den Schlüssel aus, den du im vorherigen Schritt erstellt hast. Speichere die Konfiguration, um die Verbindung zwischen deiner Drupal-Website und den mittwald AI-Diensten herzustellen.
+
+Beim Speichern prüft das Modul den API-Schlüssel gegen mittwald AI Hosting und ermittelt deine Rate Limits. Wenn dein Account in einem Tarif mit eingeschränktem Kontingent liegt, zeigt das Modul an dieser Stelle eine Warnung an.
 
 #### Schritt 3: mittwald als Standard-Provider festlegen {#step-3-set-default-provider}
 
-Konfiguriere abschließend, welche KI-Funktionen standardmäßig den mittwald-Provider verwenden sollen. Navigiere zu **Konfiguration** -> **AI** -> **AI-Standardeinstellungen**. Hier kannst du **mittwald** als Standard-Provider für mehrere KI-Funktionen auswählen:
+Konfiguriere abschließend, welche KI-Funktionen standardmäßig den mittwald-Provider verwenden sollen. Navigiere zu **Konfiguration** -> **AI** -> **AI-Standardeinstellungen**. Hier kannst du **mittwald** als Standard-Provider für die unterstützten Operationstypen auswählen, unter anderem:
 
-- **Text übersetzen**: Aktiviere KI-gestützte Übersetzungsfunktionen für deine Drupal-Inhalte
-- **Chat**: Richte konversationelle KI-Schnittstellen ein, einschließlich erweiterter Funktionen wie Image Vision und Tool Calling-Unterstützung
+- **Chat**: Konversationelle KI-Schnittstellen, einschließlich erweiterter Funktionen wie Image Vision und Tool Calling. Chat ist außerdem die Grundlage für übergeordnete Funktionen des AI-Moduls wie Textübersetzung und Zusammenfassung.
 - **Embeddings**: Generiere Vektor-Embeddings für semantische Suche und Inhaltsempfehlungen
+- **Speech-to-Text**: Transkribiere Audiodateien
+- **Text-to-Speech**: Erzeuge gesprochene Audioausgabe aus Text
+- **Rerank**: Sortiere Suchergebnisse neu, um die Trefferqualität in RAG-Szenarien zu verbessern
 
 Durch die Festlegung von mittwald als Standard-Provider werden alle KI-gestützten Funktionen in deiner Drupal-Installation automatisch die KI-Modelle von mittwald verwenden, sofern du für bestimmte Anwendungsfälle nichts anderes festlegst.
 
+### Unterstützte Operationen {#supported-operations}
+
+Das Modul stellt dem Drupal AI-Modul die folgenden Operationen von mittwald AI Hosting zur Verfügung:
+
+| Operation        | Unterstützt                                |
+| ---------------- | ------------------------------------------ |
+| Chat Completions | ✅                                         |
+| Embeddings       | ✅                                         |
+| Reranking        | ✅                                         |
+| Speech-to-Text   | ✅                                         |
+| Text-to-Speech   | ✅                                         |
+| Text-to-Image    | ⏸️ von mittwald AI Hosting nicht angeboten |
+| Moderation       | ⏸️ von mittwald AI Hosting nicht angeboten |
+
+Für Chat bietet das Modul die Modellfamilien GPT-OSS, Ministral, Qwen3.5, Qwen3.6, Qwen3.8 und GLM-OCR an. Die Unterstützung für Bildeingaben und Reasoning unterscheidet sich zwischen ihnen — die Fähigkeiten der einzelnen Modelle findest du in der [Modellübersicht](../../models/), die Standardmodelle der jeweiligen Operation auf der [Drupal-Projektseite](https://www.drupal.org/project/ai_provider_mittwald).
+
+Wenn du [Dedicated AI Hosting](../../dedicated/getting-started) oder einen Proxy verwendest, kannst du das Modul über den Wert `host` in der Konfiguration `ai_provider_mittwald.settings` auf einen anderen Endpunkt richten.
+
 ## Vektordatenbanken verwenden {#vector-databases}
 
-Die Unterstützung für Vektordatenbanken befindet sich derzeit in der Entwicklung und wird zu einem späteren Zeitpunkt verfügbar sein. Vektordatenbanken ermöglichen erweiterte semantische Suchfunktionen und Inhaltsempfehlungen durch effizientes Speichern und Abfragen von KI-generierten Embeddings.
+mittwald AI Hosting stellt das Embedding-Modell bereit, aber keine gemanagte Vektordatenbank. Um semantische Suche oder RAG-Funktionen auf Basis der mit `Qwen3-Embedding-8B` erzeugten Embeddings zu bauen, kombinierst du die Vektordatenbank-Provider des Drupal AI-Moduls mit einer eigenen Vektordatenbank.
+
+Du kannst eine solche direkt in deinem mStudio-Projekt über [Container Hosting](/docs/v2/platform/workloads/containers/) betreiben; pgvector, Qdrant und ChromaDB stehen als Container-Templates bereit. Der [GLM-OCR-Guide](../../examples/glm-ocr/) beschreibt eine vollständige Pipeline für Ingest und Retrieval mit diesen Komponenten.
+
+## Nutzungsgrenzen {#usage-limits}
+
+Der Dienst mittwald AI Hosting unterliegt Nutzungsgrenzen, die von deinem Tarif abhängen. Details zu Rate Limits und Kontingenten findest du in den [Nutzungsbedingungen](../../access-and-usage/terms-of-use).
