@@ -15,7 +15,7 @@ mittwald veröffentlicht eine offizielle App im ChatGPT App-Verzeichnis, die auf
 
 ## Schritt 1: mittwald App installieren {#step-1-install-the-app}
 
-1. Öffne den [mittwald App-Eintrag](https://chatgpt.com/plugins/plugin_asdk_app_6a68b368b8588191afee9a7e2b327d63) in ChatGPT, oder gehe zu **Settings → Apps & Connectors**, suche nach "mittwald" und öffne den Eintrag
+1. Öffne den [mittwald App-Eintrag](https://chatgpt.com/plugins/plugin_asdk_app_6a68b368b8588191afee9a7e2b327d63) in ChatGPT, oder klicke auf **Plugins** in der ChatGPT-Menüleiste (oder gehe zu **Settings → Plugins → Browse Plugins**) und suche nach "mittwald"
 2. Klicke auf **Install plugin**
 
 Da es sich um eine offizielle, veröffentlichte App handelt, kennt ChatGPT bereits ihren Endpoint und die verfügbaren Tools — es gibt keine Server-URL einzutragen.
@@ -92,7 +92,7 @@ List open support conversations for my account
 
 ### Fehler: "App Not Available" {#error-app-not-available}
 
-**Symptom**: Die mittwald App erscheint nicht unter **Apps & Connectors** oder in den Suchergebnissen.
+**Symptom**: Die mittwald App erscheint nicht unter **Plugins** oder in den Suchergebnissen.
 
 **Ursache**: Dein ChatGPT-Plan unterstützt keine Apps, oder der App-Eintrag ist noch nicht geladen.
 
@@ -121,7 +121,7 @@ List open support conversations for my account
 
 **Lösung**:
 
-1. Gehe zu **Settings → Apps & Connectors**
+1. Gehe zu **Settings → Plugins**
 2. Finde die mittwald App
 3. Klicke auf **Refresh**, um die Tool-Liste zu aktualisieren, oder entferne die App und installiere sie erneut
 
@@ -156,7 +156,7 @@ List open support conversations for my account
 
 ### F: Wie entferne ich die App? {#faq-remove-connector}
 
-**A**: Gehe zu **Settings → Apps & Connectors**, finde die mittwald App und deinstalliere sie.
+**A**: Gehe zu **Settings → Plugins**, finde die mittwald App und deinstalliere sie.
 
 ### F: Warum fragt ChatGPT um Bestätigung? {#faq-confirmation}
 

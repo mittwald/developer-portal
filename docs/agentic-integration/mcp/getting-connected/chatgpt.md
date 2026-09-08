@@ -15,7 +15,7 @@ mittwald publishes an official app in the ChatGPT app directory, backed by mittw
 
 ## Step 1: Install the mittwald App {#step-1-install-the-app}
 
-1. Open the [mittwald app listing](https://chatgpt.com/plugins/plugin_asdk_app_6a68b368b8588191afee9a7e2b327d63) in ChatGPT, or go to **Settings → Apps & Connectors**, search for "mittwald", and open the listing
+1. Open the [mittwald app listing](https://chatgpt.com/plugins/plugin_asdk_app_6a68b368b8588191afee9a7e2b327d63) in ChatGPT, or click **Plugins** in the ChatGPT menu bar (or go to **Settings → Plugins → Browse Plugins**) and search for "mittwald"
 2. Click **Install plugin**
 
 Because this is an official, published app, ChatGPT already knows its endpoint and available tools — there is no server URL to enter.
@@ -92,7 +92,7 @@ List open support conversations for my account
 
 ### Error: "App Not Available" {#error-app-not-available}
 
-**Symptom**: The mittwald app does not appear in **Apps & Connectors** or in search results.
+**Symptom**: The mittwald app does not appear under **Plugins** or in search results.
 
 **Cause**: Your ChatGPT plan does not support apps, or the app listing has not loaded yet.
 
@@ -121,7 +121,7 @@ List open support conversations for my account
 
 **Fix**:
 
-1. Go to **Settings → Apps & Connectors**
+1. Go to **Settings → Plugins**
 2. Find the mittwald app
 3. Click **Refresh** to update the tool list, or remove and reinstall the app
 
@@ -156,7 +156,7 @@ List open support conversations for my account
 
 ### Q: How do I remove the app? {#faq-remove-connector}
 
-**A**: Go to **Settings → Apps & Connectors**, find the mittwald app, and uninstall it.
+**A**: Go to **Settings → Plugins**, find the mittwald app, and uninstall it.
 
 ### Q: Why does ChatGPT ask for confirmation? {#faq-confirmation}
 
