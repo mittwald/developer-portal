@@ -102,7 +102,10 @@ const client = new OpenAI({
 const response = await client.chat.completions.create({
   model: "YOUR_MODEL_ID",
   messages: [
-    { role: "user", content: "Explain retrieval-augmented generation in two sentences." }
+    {
+      role: "user",
+      content: "Explain retrieval-augmented generation in two sentences.",
+    },
   ],
 });
 
@@ -163,7 +166,12 @@ const client = new OpenAI({
 const stream = await client.chat.completions.create({
   model: "YOUR_MODEL_ID",
   stream: true,
-  messages: [{ role: "user", content: "Explain retrieval-augmented generation in two sentences." }],
+  messages: [
+    {
+      role: "user",
+      content: "Explain retrieval-augmented generation in two sentences.",
+    },
+  ],
 });
 
 for await (const chunk of stream) {

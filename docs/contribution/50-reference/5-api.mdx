@@ -60,12 +60,12 @@ Here's how you can work around this limitation:
 ```typescript
 // Using the deprecated project-scoped endpoint via the underlying axios client
 const listResp = await apiClient.axios.get(
-  `/v2/projects/${projectId}/ingresses`
+  `/v2/projects/${projectId}/ingresses`,
 );
 
 if (listResp.status !== 200) {
   throw new Error(
-    `Failed to fetch ingresses for project ${projectId}. Status: ${listResp.status}`
+    `Failed to fetch ingresses for project ${projectId}. Status: ${listResp.status}`,
   );
 }
 

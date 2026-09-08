@@ -40,21 +40,21 @@ The following limitations apply:
 
 All content is delivered as a base64-encoded data URI in the `image_url` field. The proxy automatically detects the format and converts it to per-page PNG images before passing them to the model.
 
-| Format | MIME type for data URI | Notes |
-| ------ | ---------------------- | ----- |
-| PDF | `application/pdf` | Up to 30 pages per request |
-| JPEG | `image/jpeg` | Handled natively |
-| PNG | `image/png` | Handled natively |
-| TIFF | `image/tiff` | Multi-frame → one page per frame |
-| GIF | `image/gif` | Animated → one page per frame |
-| WebP | `image/webp` | Animated → one page per frame |
-| BMP | `image/bmp` | |
-| SVG | `image/svg+xml` | Rasterised via cairosvg |
-| HTML | `text/html` | Rendered via WeasyPrint |
-| DOCX | `application/vnd.openxmlformats-officedocument.wordprocessingml.document` | Converted via mammoth + WeasyPrint |
-| PPTX | `application/vnd.openxmlformats-officedocument.presentationml.presentation` | One page per slide |
-| XLSX | `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet` | One page per sheet, max 2,000 rows |
-| XLS | `application/vnd.ms-excel` | Legacy Excel format |
+| Format | MIME type for data URI                                                      | Notes                              |
+| ------ | --------------------------------------------------------------------------- | ---------------------------------- |
+| PDF    | `application/pdf`                                                           | Up to 30 pages per request         |
+| JPEG   | `image/jpeg`                                                                | Handled natively                   |
+| PNG    | `image/png`                                                                 | Handled natively                   |
+| TIFF   | `image/tiff`                                                                | Multi-frame → one page per frame   |
+| GIF    | `image/gif`                                                                 | Animated → one page per frame      |
+| WebP   | `image/webp`                                                                | Animated → one page per frame      |
+| BMP    | `image/bmp`                                                                 |                                    |
+| SVG    | `image/svg+xml`                                                             | Rasterised via cairosvg            |
+| HTML   | `text/html`                                                                 | Rendered via WeasyPrint            |
+| DOCX   | `application/vnd.openxmlformats-officedocument.wordprocessingml.document`   | Converted via mammoth + WeasyPrint |
+| PPTX   | `application/vnd.openxmlformats-officedocument.presentationml.presentation` | One page per slide                 |
+| XLSX   | `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`         | One page per sheet, max 2,000 rows |
+| XLS    | `application/vnd.ms-excel`                                                  | Legacy Excel format                |
 
 ## API usage {#api-usage}
 
@@ -288,30 +288,31 @@ echo $response->choices[0]->message->content;
 
 GLM-OCR is a deterministic extraction model. Use low temperature for accurate, faithful text extraction:
 
-| Parameter     | Value |
-| ------------- | ----- |
-| `temperature` | 0.1   |
-| `top_p`       | 1.0   |
+| Parameter     | Value                                 |
+| ------------- | ------------------------------------- |
+| `temperature` | 0.1                                   |
+| `top_p`       | 1.0                                   |
 | `max_tokens`  | 4096 per page (scale with page count) |
 
 ## Output modes {#output-modes}
 
 The model's output format is controlled entirely through your prompt — there is no separate API parameter for it.
 
-| Mode | How to activate | Behaviour |
-| ---- | --------------- | --------- |
-| **Plain text** | `"Extract all text from this document."` | Raw text, no formatting |
-| **Markdown** | `"Extract the text and format it as Markdown. Use # for headings and - for lists."` | Preserves headings, lists, emphasis — good for RAG |
-| **JSON (KIE)** | `"Extract these fields and return them as a JSON object: {…}"` | Structured extraction; output always wrapped in ` ```json ``` ` fences — strip before parsing |
-| **HTML table** | `"Return the table as an HTML <table> element."` | Useful for spreadsheet-like data |
+| Mode           | How to activate                                                                     | Behaviour                                                                                     |
+| -------------- | ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| **Plain text** | `"Extract all text from this document."`                                            | Raw text, no formatting                                                                       |
+| **Markdown**   | `"Extract the text and format it as Markdown. Use # for headings and - for lists."` | Preserves headings, lists, emphasis — good for RAG                                            |
+| **JSON (KIE)** | `"Extract these fields and return them as a JSON object: {…}"`                      | Structured extraction; output always wrapped in ` ```json ``` ` fences — strip before parsing |
+| **HTML table** | `"Return the table as an HTML <table> element."`                                    | Useful for spreadsheet-like data                                                              |
 
 :::note[Observed model behaviours]
+
 - **JSON is always fence-wrapped.** The model wraps JSON responses in markdown code fences regardless of the prompt. Strip with `re.sub(r"^```[a-z]*\n?", "", raw.strip())` before calling `json.loads()`.
 - **Markdown mode needs explicit instructions.** A generic "convert to Markdown" prompt does not reliably produce heading syntax — always specify `# for main headings, ## for subheadings, - for lists`.
 - **HTML input → HTML table output.** When the input is an HTML file containing a `<table>`, the model reproduces it as HTML even when markdown tables are requested. Use a PDF or image source for clean markdown table output.
 - **XLSX output includes the sheet name.** For Excel files, the model prepends the worksheet name as the first line of output. Strip or handle that line in post-processing if needed.
 - **PPTX and XLSX require valid Open XML.** Corrupted or programmatically generated invalid Office ZIP structures return HTTP 400.
-:::
+  :::
 
 ## Terms of Use and Licensing {#terms-of-use-and-licensing}
 

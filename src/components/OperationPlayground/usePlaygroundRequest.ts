@@ -109,8 +109,7 @@ export function usePlaygroundRequest({
       setRequestState(res.ok ? "success" : "error");
       setResponse(res);
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Request failed";
+      const message = error instanceof Error ? error.message : "Request failed";
       setResponseText(message);
       setRequestState("error");
       setResponse(null);

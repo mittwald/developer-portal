@@ -1,8 +1,4 @@
-import {
-  Action,
-  ActionGroup,
-  Button,
-} from "@mittwald/flow-react-components";
+import { Action, ActionGroup, Button } from "@mittwald/flow-react-components";
 import Translate from "@docusaurus/Translate";
 import React from "react";
 import { RequestState } from "./usePlaygroundRequest";

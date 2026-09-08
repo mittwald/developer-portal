@@ -88,10 +88,10 @@ console.log(response.choices[0].message.content);
 
 When thinking is enabled the model returns two fields:
 
-| Field | Contents |
-| ----- | -------- |
+| Field                                  | Contents                  |
+| -------------------------------------- | ------------------------- |
 | `choices[0].message.reasoning_content` | Internal chain-of-thought |
-| `choices[0].message.content` | Final answer |
+| `choices[0].message.content`           | Final answer              |
 
 ## Recommended inference parameters
 
@@ -130,10 +130,10 @@ Do not use greedy decoding (`temperature: 0`) — it causes repetitions. `presen
 
 ### Output length
 
-| Task type                              | Recommended `max_tokens` |
-| -------------------------------------- | ------------------------ |
-| Standard queries                       | 32,768                   |
-| Complex problems (math, step-by-step)  | 81,920                   |
+| Task type                             | Recommended `max_tokens` |
+| ------------------------------------- | ------------------------ |
+| Standard queries                      | 32,768                   |
+| Complex problems (math, step-by-step) | 81,920                   |
 
 ## Tips for specific tasks
 
@@ -188,6 +188,7 @@ category = response.choices[0].message.content.strip()
 ```
 
 :::tip Guide ideas
+
 - **Cascade routing**: Use `Qwen3.5-0.8B` to classify query complexity (simple / code / math / vision), then route to the appropriate tier:
   - Simple text → `Qwen3.5-0.8B` handles it directly
   - Moderate → `Qwen3.6-35B-A3B-FP8` (reasoning + vision, mid cost)
@@ -195,8 +196,9 @@ category = response.choices[0].message.content.strip()
   - Vision only → `Ministral-3-14B-Instruct-2512` (cheapest vision model)
 
   A well-tuned cascade can cut costs by 40–80% while maintaining quality on 95% of queries.
+
 - **Batch pre-processing**: Summarise, extract entities, or tag documents at scale before passing a curated subset to a heavier model.
-:::
+  :::
 
 ## Terms of use and licensing {#terms-of-use-and-licensing}
 
