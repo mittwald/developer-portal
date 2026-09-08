@@ -18,7 +18,7 @@ mittwald veröffentlicht eine offizielle App im ChatGPT App-Verzeichnis, die auf
 1. Öffne den [mittwald App-Eintrag](https://chatgpt.com/plugins/plugin_asdk_app_6a68b368b8588191afee9a7e2b327d63) in ChatGPT, oder gehe zu **Settings → Apps & Connectors**, suche nach "mittwald" und öffne den Eintrag
 2. Klicke auf **Install plugin**
 
-Da es sich um eine offizielle, veröffentlichte App handelt, kennt ChatGPT bereits ihren Endpoint und die verfügbaren Tools — es gibt keine Server-URL einzutragen und keinen Developer Mode zu aktivieren.
+Da es sich um eine offizielle, veröffentlichte App handelt, kennt ChatGPT bereits ihren Endpoint und die verfügbaren Tools — es gibt keine Server-URL einzutragen.
 
 ## Schritt 2: Authentifizieren {#step-2-authenticate}
 
