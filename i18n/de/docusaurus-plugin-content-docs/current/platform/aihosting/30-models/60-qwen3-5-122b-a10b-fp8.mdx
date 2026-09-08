@@ -34,6 +34,8 @@ Das Modell generiert vor jeder Antwort eine interne Gedankenkette. Bei komplexen
 
 Nutzt du dieses Modell aus n8n heraus? Der eingebaute OpenAI Chat Model-Node kann `chat_template_kwargs` nicht setzen — siehe [Reasoning-Modelle und Thinking-Modus](../../../../guides/apps/n8n#reasoning-models-and-thinking-mode) für einen Workaround per Community-Node.
 
+Schickst du das an `/v1/responses` statt an `/v1/chat/completions`? `chat_template_kwargs` gehört nicht zur Responses-API und wird dort entfernt, solange es nicht in `allowed_openai_params` genannt ist — siehe [Die Denkphase abschalten](../../api-endpoints/supported-endpoints#responses-thinking), dort steht auch das Feld `reasoning.effort` des Endpunkts.
+
 ### Thinking-Modus deaktivieren {#thinking-modus-deaktivieren}
 
 <Tabs groupId="language">
