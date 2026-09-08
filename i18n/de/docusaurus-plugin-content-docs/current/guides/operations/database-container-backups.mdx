@@ -277,6 +277,9 @@ Zwei Einstellungen verdienen besondere Aufmerksamkeit:
   Datenbanken brauchen einen höheren Wert; nach Ablauf des Timeouts wird der Dump
   abgebrochen, und der Befehl entfernt die unvollständige Datei.
 
+`mw cronjob create` deckt das Timeout mit dem Flag `--timeout` ab, kennt aber keine
+Entsprechung für `concurrencyPolicy` — die setzt du über die API.
+
 </TabItem>
 </Tabs>
 
@@ -347,7 +350,7 @@ selbst nicht mehr existiert, und spiele anschließend den Dump in die laufende
 Datenbank ein.
 
 Ein Restore führt einen Befehl im Container aus — das bietet das mStudio UI von
-sich aus nicht. Dafür gibt es zwei Wege:
+sich aus nicht. Dafür gibt es drei Wege:
 
 - **Web-SSH** — installiere die kostenlose Extension
   [1-Click Web-SSH für Apps & Container](https://studio.mittwald.de/marketplace/extensions)
@@ -355,8 +358,11 @@ sich aus nicht. Dafür gibt es zwei Wege:
   mStudio, ohne lokale CLI und ohne SSH-Schlüssel. Im selben Terminal kannst du
   auch die Dump-Dateien im Volume ansehen.
 - **CLI** — `mw container ssh <container-id>` öffnet eine Shell im Container.
+- **Beliebiger SSH-Client** — `mw container ssh <container-id> --info` gibt Hostname
+  und Benutzernamen aus, ohne sich zu verbinden. Damit kannst du OpenSSH oder jeden
+  anderen Client nutzen: `ssh <benutzername>@<hostname>`.
 
-Beide Wege bringen dich _in_ den Container. Sieh dir dort zuerst an, welche Dumps
+Alle drei Wege bringen dich _in_ den Container. Sieh dir dort zuerst an, welche Dumps
 vorliegen — bei MariaDB und MySQL liegt das Verzeichnis unter
 `/var/lib/mysql/backups` (siehe [Schritt 1](#dump-location)):
 

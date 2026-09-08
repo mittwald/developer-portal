@@ -266,6 +266,9 @@ Two settings deserve attention:
   higher value; the dump is killed when the timeout expires, and the command then
   removes the partial file.
 
+`mw cronjob create` covers the timeout with its `--timeout` flag, but has no
+equivalent for `concurrencyPolicy` — set that one via the API.
+
 </TabItem>
 </Tabs>
 
@@ -332,7 +335,7 @@ Restore the volume from the project backup first if the container itself is gone
 then replay the dump into the running database.
 
 A restore runs a command inside the container, which the mStudio UI does not offer
-on its own. You have two ways in:
+on its own. You have three ways in:
 
 - **Web-SSH** — install the free
   [1-Click Web-SSH for Apps & Containers](https://studio.mittwald.de/marketplace/extensions)
@@ -340,8 +343,11 @@ on its own. You have two ways in:
   directly in mStudio, without a local CLI or SSH keys. The same terminal lets you
   inspect the dump files in the volume.
 - **CLI** — `mw container ssh <container-id>` opens a shell in the container.
+- **Any SSH client** — `mw container ssh <container-id> --info` prints the hostname
+  and username without connecting, so you can use OpenSSH or any other client:
+  `ssh <username>@<hostname>`.
 
-Both drop you _inside_ the container. List the available dumps first — for MariaDB
+All three drop you _inside_ the container. List the available dumps first — for MariaDB
 and MySQL, the directory is `/var/lib/mysql/backups` (see [step 1](#dump-location)):
 
 ```shellsession
