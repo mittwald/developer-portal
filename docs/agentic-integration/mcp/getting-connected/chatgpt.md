@@ -16,7 +16,7 @@ mittwald publishes an official app in the ChatGPT app directory, backed by mittw
 ## Step 1: Install the mittwald App {#step-1-install-the-app}
 
 1. Open the [mittwald app listing](https://chatgpt.com/plugins/plugin_asdk_app_6a68b368b8588191afee9a7e2b327d63) in ChatGPT, or go to **Settings → Apps & Connectors**, search for "mittwald", and open the listing
-2. Click **Install**
+2. Click **Install plugin**
 
 Because this is an official, published app, ChatGPT already knows its endpoint and available tools — there is no server URL to enter and no Developer Mode to enable.
 

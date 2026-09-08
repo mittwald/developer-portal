@@ -16,7 +16,7 @@ mittwald veröffentlicht einen offiziellen Connector im Claude Connectors Direct
 ## Schritt 1: mittwald Connector öffnen {#step-1-open-the-connector}
 
 1. Öffne den [mittwald Connector](https://claude.ai/directory/mittwald) im Claude Connectors Directory, oder gehe in Claude Desktop / Claude.ai zu **Settings → Connectors → Browse connectors** und suche nach "mittwald"
-2. Klicke auf **Connect**
+2. Klicke auf **Connect to Claude** (bei einem persönlichen Plan) oder **Connect for your team** (bei einem Team- oder Enterprise-Plan)
 
 Da es sich um einen offiziellen, veröffentlichten Connector handelt, kennt Claude bereits seinen Endpoint und die verfügbaren Tools — es gibt keine Server-URL einzutragen.
 
