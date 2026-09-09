@@ -9,11 +9,11 @@ slug: /platform/aihosting/models/qwen3-embedding-8b
 
 The Qwen3 Embedding model by Alibaba is designed for creating embeddings, which are essential for a retrieval-augmented generation (RAG) system. This model does not support chat interaction. It is used to convert documents and texts into individual vectors, which are stored in a vector database by the application, enabling semantic search. The strength of this model lies in its support of over 100 languages with high performance.
 
-The following limitations apply:
+The following limits and defaults apply:
 
 - Maximum context length: 32,768 tokens
-- Embedding dimension: 4,096
-- The `dimensions` parameter for dynamically projecting to a lower dimension is not supported
+- Default embedding dimension: 4,096
+- Supported values for `dimensions`: 256, 512, 768, 1,024, 1,536, 2,048, 3,072, and 4,096
 
 It is recommended to format embeddings for search queries using the following template:
 
@@ -24,54 +24,32 @@ Query: {query}
 
 Here, `{query}` should express the individual search query in _one_ sentence, and `{task_description}` should describe the task, for example:
 
-## Truncating and normalizing embeddings
+## Reducing embedding dimensions
 
-If you require smaller vector dimensions, you can truncate the embedding vector to the desired dimensions and normalize it afterwards.
-This is possible because the model was trained using [Matryoshka Representation Learning](https://arxiv.org/abs/2205.13147).
-To normalize the vector use code like this:
+Qwen3-Embedding-8B supports server-side dimension reduction through the OpenAI-compatible `dimensions` parameter. This is a supported model capability based on [Matryoshka Representation Learning](https://arxiv.org/abs/2205.13147).
 
-Install the required libraries and set up the token first:
+Set `dimensions` to 256, 512, 768, 1,024, 1,536, 2,048, 3,072, or 4,096. The endpoint returns a vector with exactly the requested number of values and L2-normalizes it after reducing its dimensions. Values below 256 are not supported because retrieval quality degrades at smaller dimensions.
 
-```sh
-pip install python-dotenv openai langchain-openai
-echo 'OPENAI_API_KEY="sk-…"' > .env
-```
-
-Use the model and truncate to 256 dimensions + normalize the embedding:
+For example, request an embedding with 256 dimensions:
 
 ```python
 from openai import OpenAI
-import numpy as np
-from dotenv import load_dotenv
-
-# Load .env file
-load_dotenv()
 
 client = OpenAI(
     base_url="https://llm.aihosting.mittwald.de/v1"
 )
 
-def normalize_l2(x):
-    x = np.array(x)
-    if x.ndim == 1:
-        norm = np.linalg.norm(x)
-        if norm == 0:
-            return x
-        return x / norm
-    else:
-        norm = np.linalg.norm(x, 2, axis=1, keepdims=True)
-        return np.where(norm == 0, x, x / norm)
-
-
 response = client.embeddings.create(
-    model="Qwen3-Embedding-8B", input="Testing 123", encoding_format="float"
+    model="Qwen3-Embedding-8B",
+    input="Testing 123",
+    encoding_format="float",
+    dimensions=256,
 )
 
-cut_dim = response.data[0].embedding[:256]
-norm_dim = normalize_l2(cut_dim)
-
-print(norm_dim)
+print(len(response.data[0].embedding))  # 256
 ```
+
+Smaller embeddings reduce transfer and storage requirements but can also affect retrieval quality. Evaluate the chosen dimension with data representative of your use case.
 
 :::tip Document RAG pipeline
 For a complete end-to-end example — combining Qwen3-Embedding-8B with [GLM-OCR](/docs/v2/platform/aihosting/models/glm-ocr) for document ingestion and [Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8) for answering — see the [GLM-OCR guide](../../examples/glm-ocr/). It also covers vector database options (pgvector, Qdrant, ChromaDB) on mittwald Container Hosting.
