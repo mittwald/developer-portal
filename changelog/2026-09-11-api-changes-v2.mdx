@@ -1,0 +1,212 @@
+---
+title: Breaking (!) API changes for v2 API, September 4 to September 11
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - User
+  - Customer
+  - AI hosting
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week's update to the mittwald API includes changes to the response structure for the `/v2/authenticate-mfa` endpoint, the addition of new endpoints for AI hosting plan billing periods and usage statistics, and the introduction of a new enum value for VAT ID validation states.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The `POST /v2/authenticate-mfa` operation has undergone several breaking changes: 
+  - The response's body type/format has changed from 'object' to an empty format for status '400'.
+  - The required property 'type' has been removed from the response for status '400'.
+  - The required property 'validationErrors' has also been removed from the response for status '400'.
+  - The optional property 'message' has been removed from the response for status '400'.
+  - Additionally, the response body now includes `#/components/schemas/de.mittwald.v1.commons.ValidationErrors` and `#/components/schemas/de.mittwald.v1.commons.Error` in the 'anyOf' list for status '400'.
+
+- The `GET /v2/customers` operation has a new enum value 'unsupported' added to the `vatIdValidationState` response property for status '200'. 
+
+- The `GET /v2/customers/{customerId}` operation has a new enum value 'unsupported' added to the `vatIdValidationState` response property for status '200'.
+
+- Two new endpoints have been added:
+  - `GET /v2/customers/{customerId}/ai-hostings/{planId}/billing-periods` to list the contract months of an AI hosting plan.
+  - `GET /v2/customers/{customerId}/ai-hostings/{planId}/usage` to get aggregated token usage statistics for an AI hosting plan of a customer.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Validate your second factor"
+
+
+- ⚠️ **Breaking:** the response's body type/format changed from 'object'/'' to ''/'' for status '400'
+
+- ⚠️ **Breaking:** removed the required property 'type' from the response with the '400' status
+
+- ⚠️ **Breaking:** removed the required property 'validationErrors' from the response with the '400' status
+
+- removed the optional property 'message' from the response with the '400' status
+
+- added '#/components/schemas/de.mittwald.v1.commons.ValidationErrors, #/components/schemas/de.mittwald.v1.commons.Error' to the response body 'anyOf' list for the response status '400'
+
+
+For details, refer to the <OperationLink operation="user-authenticate-mfa" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all customer profiles the authenticated user has access to"
+
+
+- added the new 'unsupported' enum value to the '/items/vatIdValidationState' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="customer-list-customers" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a customer profile"
+
+
+- added the new 'unsupported' enum value to the 'vatIdValidationState' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="customer-get-customer" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List the contract months of an ai hosting plan"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ai-hosting-plan-get-billing-periods" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get aggregated token usage statistics for an ai hosting plan of a customer"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ai-hosting-plan-get-usage-stats" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK Release v2.1.220
+
+The latest release of the mittwald PHP SDK, version v2.1.220, introduces improvements in the API client, specifically in the handling of MFA authentication errors. The `AuthenticateMfaBadRequestResponse` class has been removed, and now HTTP status codes `400` and `408` during MFA authentication consistently return `UntypedResponse`. This update aims to streamline error handling and remove unused generated classes, ensuring a more standardized authentication process.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.220).
+
+### mittwald PHP SDK v2.1.219 Release Summary
+
+The latest release of the mittwald PHP SDK, version 2.1.219, introduces significant enhancements and bug fixes. This update focuses on improving the AI Hosting API and clarifying database API documentation.
+
+#### New Features
+
+- **AI Hosting API Enhancements**: 
+  - **Billing Periods Tracking**: A new method, `planGetBillingPeriods`, allows users to retrieve contract months for a given plan, including token limits and period status.
+  - **Usage Statistics**: The `planGetUsageStats` method provides aggregated token usage data, offering insights into daily token breakdowns and usage per API key.
+  - **Expanded Schema Support**: New request/response classes and data models have been added to handle typed, validated responses for the new endpoints.
+
+#### Bug Fixes & Improvements
+
+- **Database API Documentation Clarification**: The description for the `accessIpMask` field has been updated across several classes to clarify that it currently has no effect, reducing potential confusion during implementation.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.219).
+
+### mittwald PHP SDK Release v2.1.218
+
+The mittwald PHP SDK has been updated to version v2.1.218. This release introduces enhancements to the customer VAT ID validation process. The SDK now supports the new `unsupported` validation state, which allows for accurate handling of API responses when VAT ID validation cannot be processed, is outside supported regions, or requires alternative verification methods.
+
+**Key Changes:**
+- Added `unsupported` to the validation state options in the `Customer` schema.
+- Introduced `unsupported` case to the `CustomerVatIdValidationState` enum.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.218).
+
+### mittwald PHP SDK Release v2.1.217
+
+The latest release of the mittwald PHP SDK, version [v2.1.217](https://github.com/mittwald/api-client-php/releases/tag/v2.1.217), introduces significant enhancements to the AI Hosting client capabilities. This update includes comprehensive plan lifecycle management, improved key filtering, and pagination support.
+
+#### Key Updates:
+
+- **AI Hosting Plan Management**: Customers and projects can now declare hosting profiles, retrieve specific plans, list all plans with usage statistics, and rename existing plans.
+- **Key Management Enhancements**: Operations now require plan association and support advanced querying.
+
+#### New Endpoints:
+
+- **Profile Declaration**: `customerDeclareProfile` for creating AI hosting profiles.
+- **Plan Retrieval**: `customerGetPlan` and `customerGetPlans` for customer-specific plans; `projectGetPlan` and `projectGetPlans` for project-specific plans.
+- **Plan Updates**: `customerUpdatePlan` for renaming or updating plan descriptions.
+
+#### API Enhancements:
+
+- **Mandatory Plan Association**: `planId` is now required for key creation operations.
+- **Targeted Key Retrieval**: Enhanced filtering by `planId`.
+- **Pagination Support**: Improved data handling with `limit`, `skip`, and `page` parameters.
+- **Schema Alignment**: Updated response schema for usage data.
+
+#### Deprecations:
+
+- The endpoints `customerGetUsage` and `projectGetUsage` are deprecated in favor of new plan-specific routes. Existing integrations will continue to function but will emit deprecation notices.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.1.217).
+
+### mittwald JavaScript SDK Release 4.461.0
+
+The mittwald JavaScript SDK has been updated to version 4.461.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.461.0](https://github.com/mittwald/api-client-js/releases/tag/4.461.0).
+
+### mittwald JavaScript SDK Release 4.460.0
+
+The mittwald JavaScript SDK has been updated to version 4.460.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.460.0).
+
+### mittwald JavaScript SDK Release 4.459.0
+
+The mittwald JavaScript SDK has been updated to version 4.459.0. This release includes the following feature:
+
+- Updated the generated client to enhance functionality ([commit bb6a3dd](https://github.com/mittwald/api-client-js/commit/bb6a3dd79699f15bf1176f968179a09205f8c3eb)).
+
+For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.459.0).
+
+### mittwald JavaScript SDK Release 4.458.0
+
+The mittwald JavaScript SDK has been updated to version 4.458.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald/api-client-js/releases/tag/4.458.0](https://github.com/mittwald/api-client-js/releases/tag/4.458.0).
+
+### mittwald JavaScript SDK Release 4.457.1
+
+The mittwald JavaScript SDK version 4.457.1 has been released. This update includes a bug fix that widens the peer dependency range for `@mittwald/react-use-promise` to include versions 3.x and 4.x. This change addresses issue [#293](https://github.com/mittwald/api-client-js/issues/293) and is documented in pull request [#294](https://github.com/mittwald/api-client-js/issues/294). For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.457.1).
+
+### mittwald JavaScript SDK Release 4.457.0
+
+The mittwald JavaScript SDK has been updated to version 4.457.0. This release includes the following feature:
+
+- Updated the generated client to improve functionality ([commit f76b301](https://github.com/mittwald/api-client-js/commit/f76b301300a57c2dd66cc73d93aa8bca56c24061)).
+
+For more details, you can view the full release notes on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.457.0).
+
