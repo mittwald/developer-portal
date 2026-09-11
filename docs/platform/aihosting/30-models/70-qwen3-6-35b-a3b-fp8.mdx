@@ -127,10 +127,10 @@ echo $response->choices[0]->message->content;
 
 When thinking mode is **enabled** (default), the model returns two separate fields:
 
-| Field | Contents |
-| ----- | -------- |
+| Field                                  | Contents                                     |
+| -------------------------------------- | -------------------------------------------- |
 | `choices[0].message.reasoning_content` | Internal chain-of-thought (may be very long) |
-| `choices[0].message.content` | Final answer |
+| `choices[0].message.content`           | Final answer                                 |
 
 If `content` is empty, the model placed its answer inside the reasoning block — disable thinking mode to ensure `content` is always populated.
 
@@ -187,10 +187,10 @@ The model has different recommended settings depending on the use case. Do not u
 
 Set `max_tokens` according to task complexity to control cost and latency:
 
-| Task type                                      | Recommended `max_tokens` |
-| ---------------------------------------------- | ------------------------ |
-| Standard queries                               | 32,768                   |
-| Complex problems (math, programming contests)  | 81,920                   |
+| Task type                                     | Recommended `max_tokens` |
+| --------------------------------------------- | ------------------------ |
+| Standard queries                              | 32,768                   |
+| Complex problems (math, programming contests) | 81,920                   |
 
 ## Tips for specific tasks
 
@@ -204,11 +204,11 @@ extra_body={"chat_template_kwargs": {"enable_thinking": False}}
 
 Recommended parameters for vision:
 
-| Parameter     | Value |
-| ------------- | ----- |
-| `temperature` | 0.7   |
-| `top_p`       | 0.8   |
-| `top_k`       | 20    |
+| Parameter     | Value                      |
+| ------------- | -------------------------- |
+| `temperature` | 0.7                        |
+| `top_p`       | 0.8                        |
+| `top_k`       | 20                         |
 | `max_tokens`  | 512–2048 depending on task |
 
 For accurate text extraction (OCR) or data reading, use `temperature=0.1` instead.

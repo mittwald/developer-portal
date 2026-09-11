@@ -40,6 +40,9 @@ npm run generate:translations  # Generate translation files (requires OPENAI_API
 
 ### Code Quality
 
+Formatting is enforced automatically — see [Automated formatting](#automated-formatting).
+You only need this command for bulk runs, e.g. after `npm run generate`:
+
 ```bash
 npm run format                 # Format code with Prettier (docs, i18n, src directories)
 ```
@@ -161,6 +164,26 @@ type HttpMethods = OpenAPIV3.HttpMethods;
 - **Markdown/MDX**: `printWidth: 80`, `proseWrap: "preserve"`
 - **Default**: Standard Prettier defaults
 - **Run**: `npm run format` to format docs, i18n, and src directories
+
+#### Automated formatting
+
+Claude Code hooks (configured in `.claude/settings.json`) enforce this for you:
+
+- After every `Write`/`Edit` of a `.md`, `.mdx`, `.ts` or `.tsx` file,
+  `.claude/hooks/prettier-format.sh` runs the repository's Prettier over that file.
+  Do not follow up an edit with a manual `npm run format` or
+  `./node_modules/.bin/prettier --write` on the same file — it is already
+  formatted. Never use `npx prettier`: it fetches an unpinned version.
+- If the hook reports that a file was **not** formatted — Prettier missing
+  (`npm install` was never run) or Prettier failing to parse the file — fix that
+  before continuing. An unformatted file is not an acceptable end state.
+- `sed` is blocked for file edits (`sed -i`, `sed … > file`, `sed … | tee file`)
+  by `.claude/hooks/block-sed-edits.sh`, because such edits bypass the formatting
+  hook. Use the `Edit`/`Write` tools instead. Read-only `sed` in a pipeline is
+  still fine.
+
+Agents other than Claude Code do not get these hooks and must run
+`npm run format` themselves.
 
 #### Code Structure
 
@@ -334,7 +357,9 @@ const title = translate({ id: "component.title" });
 
 1. **Setup**: `npm install && npm run generate`
 2. **Development**: `npm start` for live development
-3. **Code Quality**: `npm run format` before committing
+3. **Code Quality**: edited files are formatted automatically by the Prettier hook;
+   run `npm run format` before committing only for files you did not edit through
+   the `Write`/`Edit` tools (e.g. generated output)
 4. **Testing**: Manual testing + `npm run build` to catch issues
 5. **Documentation**: Update both English and German versions
 6. **OpenAPI Changes**: Run `npm run generate` after spec updates
@@ -346,5 +371,4 @@ const title = translate({ id: "component.title" });
 - **Content**: Multi-language documentation (English + German)
 - **APIs**: OpenAPI v1 and v2 specification documentation
 - **Build**: Static site generation with client-side routing
-- **Deployment**: GitHub Pages with internationalization support</content>
-  <parameter name="filePath">/Users/dfischer/workdir/developer-portal/AGENTS.md
+- **Deployment**: GitHub Pages with internationalization support

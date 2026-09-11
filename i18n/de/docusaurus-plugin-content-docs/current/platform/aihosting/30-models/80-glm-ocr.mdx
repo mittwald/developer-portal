@@ -40,21 +40,21 @@ Folgende Einschränkungen gelten:
 
 Alle Inhalte werden als Base64-kodierte Data-URI im Feld `image_url` übermittelt. Der Proxy erkennt das Format automatisch und wandelt es in seitenweise PNG-Bilder um, bevor sie an das Modell weitergeleitet werden.
 
-| Format | MIME-Typ für Data-URI | Hinweise |
-| ------ | --------------------- | -------- |
-| PDF | `application/pdf` | Bis zu 30 Seiten pro Anfrage |
-| JPEG | `image/jpeg` | Wird nativ verarbeitet |
-| PNG | `image/png` | Wird nativ verarbeitet |
-| TIFF | `image/tiff` | Mehrere Frames → eine Seite pro Frame |
-| GIF | `image/gif` | Animiert → eine Seite pro Frame |
-| WebP | `image/webp` | Animiert → eine Seite pro Frame |
-| BMP | `image/bmp` | |
-| SVG | `image/svg+xml` | Rasterisierung via cairosvg |
-| HTML | `text/html` | Rendering via WeasyPrint |
-| DOCX | `application/vnd.openxmlformats-officedocument.wordprocessingml.document` | Konvertierung via mammoth + WeasyPrint |
-| PPTX | `application/vnd.openxmlformats-officedocument.presentationml.presentation` | Eine Seite pro Folie |
-| XLSX | `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet` | Eine Seite pro Tabellenblatt, max. 2.000 Zeilen |
-| XLS | `application/vnd.ms-excel` | Älteres Excel-Format |
+| Format | MIME-Typ für Data-URI                                                       | Hinweise                                        |
+| ------ | --------------------------------------------------------------------------- | ----------------------------------------------- |
+| PDF    | `application/pdf`                                                           | Bis zu 30 Seiten pro Anfrage                    |
+| JPEG   | `image/jpeg`                                                                | Wird nativ verarbeitet                          |
+| PNG    | `image/png`                                                                 | Wird nativ verarbeitet                          |
+| TIFF   | `image/tiff`                                                                | Mehrere Frames → eine Seite pro Frame           |
+| GIF    | `image/gif`                                                                 | Animiert → eine Seite pro Frame                 |
+| WebP   | `image/webp`                                                                | Animiert → eine Seite pro Frame                 |
+| BMP    | `image/bmp`                                                                 |                                                 |
+| SVG    | `image/svg+xml`                                                             | Rasterisierung via cairosvg                     |
+| HTML   | `text/html`                                                                 | Rendering via WeasyPrint                        |
+| DOCX   | `application/vnd.openxmlformats-officedocument.wordprocessingml.document`   | Konvertierung via mammoth + WeasyPrint          |
+| PPTX   | `application/vnd.openxmlformats-officedocument.presentationml.presentation` | Eine Seite pro Folie                            |
+| XLSX   | `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`         | Eine Seite pro Tabellenblatt, max. 2.000 Zeilen |
+| XLS    | `application/vnd.ms-excel`                                                  | Älteres Excel-Format                            |
 
 ## API-Nutzung
 
@@ -126,7 +126,10 @@ const response = await client.chat.completions.create({
           type: "image_url",
           image_url: { url: `data:application/pdf;base64,${pdfB64}` },
         },
-        { type: "text", text: "Extrahiere den gesamten Text aus diesem Dokument." },
+        {
+          type: "text",
+          text: "Extrahiere den gesamten Text aus diesem Dokument.",
+        },
       ],
     },
   ],
@@ -288,30 +291,31 @@ echo $response->choices[0]->message->content;
 
 GLM-OCR ist ein deterministisches Extraktionsmodell. Verwende niedrige Temperaturen für eine genaue, quellengetreue Textextraktion:
 
-| Parameter     | Wert |
-| ------------- | ---- |
-| `temperature` | 0.1  |
-| `top_p`       | 1.0  |
+| Parameter     | Wert                                                     |
+| ------------- | -------------------------------------------------------- |
+| `temperature` | 0.1                                                      |
+| `top_p`       | 1.0                                                      |
 | `max_tokens`  | 4096 pro Seite (entsprechend der Seitenanzahl skalieren) |
 
 ## Ausgabemodi
 
 Das Ausgabeformat des Modells wird ausschließlich über den Prompt gesteuert – es gibt keinen separaten API-Parameter dafür.
 
-| Modus | Aktivierung | Verhalten |
-| ----- | ----------- | --------- |
-| **Klartext** | `"Extrahiere den gesamten Text aus diesem Dokument."` | Roher Text ohne Formatierung |
-| **Markdown** | `"Extrahiere den Text und formatiere ihn als Markdown. Verwende # für Überschriften und - für Listen."` | Erhält Überschriften, Listen, Hervorhebungen – gut für RAG |
-| **JSON (KIE)** | `"Extrahiere diese Felder und gib sie als JSON zurück: {…}"` | Strukturierte Extraktion; Ausgabe immer in ` ```json ``` `-Blöcken – vor dem Parsen entfernen |
-| **HTML-Tabelle** | `"Gib die Tabelle als HTML-<table>-Element zurück."` | Nützlich für tabellenartige Daten |
+| Modus            | Aktivierung                                                                                             | Verhalten                                                                                     |
+| ---------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| **Klartext**     | `"Extrahiere den gesamten Text aus diesem Dokument."`                                                   | Roher Text ohne Formatierung                                                                  |
+| **Markdown**     | `"Extrahiere den Text und formatiere ihn als Markdown. Verwende # für Überschriften und - für Listen."` | Erhält Überschriften, Listen, Hervorhebungen – gut für RAG                                    |
+| **JSON (KIE)**   | `"Extrahiere diese Felder und gib sie als JSON zurück: {…}"`                                            | Strukturierte Extraktion; Ausgabe immer in ` ```json ``` `-Blöcken – vor dem Parsen entfernen |
+| **HTML-Tabelle** | `"Gib die Tabelle als HTML-<table>-Element zurück."`                                                    | Nützlich für tabellenartige Daten                                                             |
 
 :::note[Beobachtetes Modellverhalten]
+
 - **JSON ist immer mit Code-Blöcken umschlossen.** Das Modell umschließt JSON-Antworten unabhängig vom Prompt mit Markdown-Code-Blöcken. Vor dem Aufruf von `json.loads()` mit `re.sub(r"^```[a-z]*\n?", "", raw.strip())` entfernen.
 - **Markdown-Modus benötigt konkrete Anweisungen.** Ein allgemeines „Wandle in Markdown um" erzeugt keine zuverlässige Überschriften-Syntax – immer `# für Hauptüberschriften, ## für Unterüberschriften, - für Listen` angeben.
 - **HTML-Eingabe → HTML-Tabellenausgabe.** Enthält die Eingabe eine HTML-Datei mit einer `<table>`, gibt das Modell diese als HTML aus – auch wenn Markdown-Tabellen angefordert werden. Für saubere Markdown-Tabellenausgabe eine PDF- oder Bildquelle verwenden.
 - **XLSX-Ausgabe enthält den Tabellenblatt-Namen.** Bei Excel-Dateien gibt das Modell den Tabellenblatt-Namen als erste Zeile aus. Diese Zeile beim programmatischen Weiterverarbeiten herausfiltern.
 - **PPTX und XLSX benötigen gültiges Open XML.** Beschädigte oder programmatisch erzeugte ungültige Office-ZIP-Strukturen führen zu HTTP 400.
-:::
+  :::
 
 ## Nutzungsbedingungen und Lizenzierung {#nutzungsbedingungen-und-lizenzierung}
 

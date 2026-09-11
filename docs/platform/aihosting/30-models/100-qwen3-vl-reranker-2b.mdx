@@ -68,25 +68,22 @@ for result in sorted(response.json()["results"], key=lambda r: r["relevance_scor
   <TabItem value="javascript" label="JavaScript">
 
 ```ts
-const response = await fetch(
-  "https://llm.aihosting.mittwald.de/v1/rerank",
-  {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: "Qwen3-VL-Reranker-2B",
-      query: "What are the payment terms?",
-      documents: [
-        "Payment is due within 30 days of invoice.",
-        "The vendor must deliver goods within 14 business days.",
-        "Late payments incur a 2% monthly surcharge.",
-      ],
-    }),
-  }
-);
+const response = await fetch("https://llm.aihosting.mittwald.de/v1/rerank", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+  },
+  body: JSON.stringify({
+    model: "Qwen3-VL-Reranker-2B",
+    query: "What are the payment terms?",
+    documents: [
+      "Payment is due within 30 days of invoice.",
+      "The vendor must deliver goods within 14 business days.",
+      "Late payments incur a 2% monthly surcharge.",
+    ],
+  }),
+});
 
 const { results } = await response.json();
 const ranked = results.sort((a, b) => b.relevance_score - a.relevance_score);
@@ -161,10 +158,11 @@ top_chunks = [candidate_texts[r["index"]] for r in ranked[:3]]
 Combining GLM-OCR for text extraction, Qwen3-Embedding-8B for indexing, Qwen3-VL-Reranker-2B for reranking, and a chat model for answering gives a complete document Q&A pipeline.
 
 :::tip Guide ideas
+
 - **Two-stage text RAG**: embed → top-10 candidates → rerank to top-3. The reranker's cross-attention over the full (query, document) pair catches relevance signals that pure embedding similarity misses.
 - **Multimodal product search**: index product images alongside their descriptions; rerank results for queries like "dark wooden desk suitable for a small home office" using both text and image content.
 - **Document Q&A precision**: combine with GLM-OCR (text extraction), Qwen3-Embedding-8B (indexing), and a chat model (answering) for a four-stage pipeline where the reranker maximises context quality before the expensive generation step.
-:::
+  :::
 
 ## Terms of use and licensing {#terms-of-use-and-licensing}
 

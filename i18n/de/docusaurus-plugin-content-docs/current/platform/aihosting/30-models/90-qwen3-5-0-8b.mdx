@@ -88,10 +88,10 @@ console.log(response.choices[0].message.content);
 
 Bei aktiviertem Thinking gibt das Modell zwei Felder zurück:
 
-| Feld | Inhalt |
-| ---- | ------ |
+| Feld                                   | Inhalt                    |
+| -------------------------------------- | ------------------------- |
 | `choices[0].message.reasoning_content` | Interner Chain-of-Thought |
-| `choices[0].message.content` | Endantwort |
+| `choices[0].message.content`           | Endantwort                |
 
 ## Empfohlene Inferenzparameter
 
@@ -130,10 +130,10 @@ Greedy Decoding (`temperature: 0`) vermeiden – führt zu Wiederholungen. `pres
 
 ### Ausgabelänge
 
-| Aufgabentyp                              | Empfohlene `max_tokens` |
-| ---------------------------------------- | ----------------------- |
-| Standardanfragen                         | 32.768                  |
-| Komplexe Probleme (Mathe, Schritt-für-Schritt) | 81.920            |
+| Aufgabentyp                                    | Empfohlene `max_tokens` |
+| ---------------------------------------------- | ----------------------- |
+| Standardanfragen                               | 32.768                  |
+| Komplexe Probleme (Mathe, Schritt-für-Schritt) | 81.920                  |
 
 ## Tipps für spezifische Aufgaben
 
@@ -188,6 +188,7 @@ category = response.choices[0].message.content.strip()
 ```
 
 :::tip Guide-Ideen
+
 - **Cascade-Routing**: `Qwen3.5-0.8B` klassifiziert die Anfragekomplexität und leitet an die passende Stufe weiter:
   - Einfacher Text → `Qwen3.5-0.8B` beantwortet direkt
   - Mittelstufe → `Qwen3.6-35B-A3B-FP8` (Reasoning + Vision, mittlere Kosten)
@@ -195,8 +196,9 @@ category = response.choices[0].message.content.strip()
   - Nur Vision → `Ministral-3-14B-Instruct-2512` (günstigstes Vision-Modell)
 
   Eine gut abgestimmte Kaskade kann Kosten um 40–80 % senken und gleichzeitig bei 95 % der Anfragen die Qualität erhalten.
+
 - **Batch-Vorverarbeitung**: Dokumente in großem Umfang zusammenfassen, Entitäten extrahieren oder taggen, bevor eine kuratierte Teilmenge an ein leistungsstärkeres Modell übergeben wird.
-:::
+  :::
 
 ## Nutzungsbedingungen und Lizenzhinweise {#nutzungsbedingungen-und-lizenzhinweise}
 

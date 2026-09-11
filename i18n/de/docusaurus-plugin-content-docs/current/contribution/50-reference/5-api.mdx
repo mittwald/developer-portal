@@ -63,12 +63,12 @@ So kannst du diese Einschränkung umgehen:
 ```typescript
 // Verwendung des veralteten projektgebundenen Endpunkts über den zugrunde liegenden axios-Client
 const listResp = await apiClient.axios.get(
-  `/v2/projects/${projectId}/ingresses`
+  `/v2/projects/${projectId}/ingresses`,
 );
 
 if (listResp.status !== 200) {
   throw new Error(
-    `Failed to fetch ingresses for project ${projectId}. Status: ${listResp.status}`
+    `Failed to fetch ingresses for project ${projectId}. Status: ${listResp.status}`,
   );
 }
 

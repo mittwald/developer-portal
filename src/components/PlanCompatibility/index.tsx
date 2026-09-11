@@ -23,15 +23,14 @@ export default function PlanCompatibility({
   features,
 }: PlanCompatibilityProps) {
   const names: ReactNode = features
-    .map(
-      (feature): ReactNode =>
-        featureDefinitions[feature].url ? (
-          <Link to={featureDefinitions[feature].url} target="_blank">
-            <Translate id={`compat.${feature}`} />
-          </Link>
-        ) : (
+    .map((feature): ReactNode =>
+      featureDefinitions[feature].url ? (
+        <Link to={featureDefinitions[feature].url} target="_blank">
           <Translate id={`compat.${feature}`} />
-        ),
+        </Link>
+      ) : (
+        <Translate id={`compat.${feature}`} />
+      ),
     )
     .map((n): ReactNode => <span className={styles.compatName}>{n}</span>)
     .reduce((prev, curr) => [prev, ", ", curr]);

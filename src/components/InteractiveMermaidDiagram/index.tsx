@@ -1,4 +1,10 @@
-import React, { ReactNode, useRef, useState, useEffect, useCallback } from "react";
+import React, {
+  ReactNode,
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import { Button } from "@mittwald/flow-react-components";
 import { IconZoomIn, IconZoomOut, IconRefresh } from "@tabler/icons-react";
 import styles from "./index.module.css";
@@ -40,18 +46,21 @@ function InteractiveMermaidDiagram({
   const [isPanning, setIsPanning] = useState(false);
   const panStartRef = useRef({ mouseX: 0, mouseY: 0, panX: 0, panY: 0 });
   const currentPanRef = useRef({ x: 0, y: 0 });
-  
+
   // Touch tracking refs
   const touchStartRef = useRef({ touchX: 0, touchY: 0, panX: 0, panY: 0 });
   const currentPinchDistanceRef = useRef<number | null>(null);
   const pinchStartZoomRef = useRef<number>(defaultZoom);
 
   // Helper: Calculate distance between two touch points
-  const getTouchDistance = useCallback((touch1: React.Touch, touch2: React.Touch): number => {
-    const dx = touch1.clientX - touch2.clientX;
-    const dy = touch1.clientY - touch2.clientY;
-    return Math.sqrt(dx * dx + dy * dy);
-  }, []);
+  const getTouchDistance = useCallback(
+    (touch1: React.Touch, touch2: React.Touch): number => {
+      const dx = touch1.clientX - touch2.clientX;
+      const dy = touch1.clientY - touch2.clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    },
+    [],
+  );
 
   // Handle window wheel zoom - listen on window level to capture wheel before diagram
   useEffect(() => {
@@ -64,17 +73,19 @@ function InteractiveMermaidDiagram({
         e.clientX <= rect.right &&
         e.clientY >= rect.top &&
         e.clientY <= rect.bottom;
-      
+
       if (!isOverDiagram) return;
-      
+
       // Only handle zoom if ctrl/cmd is held
       if (!e.ctrlKey && !e.metaKey) return;
-      
+
       e.preventDefault();
       e.stopPropagation();
-      
+
       const delta = e.deltaY > 0 ? -zoomStep : zoomStep;
-      setZoom((currentZoom) => Math.max(minZoom, Math.min(maxZoom, currentZoom + delta)));
+      setZoom((currentZoom) =>
+        Math.max(minZoom, Math.min(maxZoom, currentZoom + delta)),
+      );
     };
 
     window.addEventListener("wheel", handleWindowWheel, { passive: false });
@@ -103,7 +114,7 @@ function InteractiveMermaidDiagram({
     const target = e.target as HTMLElement;
     // Check if click is on a button or control
     if (target.tagName === "BUTTON" || target.closest("button")) return;
-    
+
     setIsPanning(true);
     // Store starting mouse position AND current actual pan values (from ref, not stale state)
     panStartRef.current = {
@@ -116,25 +127,25 @@ function InteractiveMermaidDiagram({
 
   const handleDiagramMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!isPanning) return;
-    
+
     e.preventDefault();
-    
+
     // Calculate mouse movement in viewport space
     const zoomFactor = zoom / 100;
     const mouseDeltaX = e.clientX - panStartRef.current.mouseX;
     const mouseDeltaY = e.clientY - panStartRef.current.mouseY;
-    
+
     // Convert mouse movement to pan space by dividing by zoom
     const panDeltaX = mouseDeltaX / zoomFactor;
     const panDeltaY = mouseDeltaY / zoomFactor;
-    
+
     // Calculate new pan: starting pan + movement delta (in pan space)
     const newPanX = panStartRef.current.panX + panDeltaX;
     const newPanY = panStartRef.current.panY + panDeltaY;
-    
+
     // Track latest pan values
     currentPanRef.current = { x: newPanX, y: newPanY };
-    
+
     // Update inline style directly without setState - no re-render, no flicker
     if (diagramRef.current) {
       const newTransform = `scale(${zoomFactor}) translate(${newPanX}px, ${newPanY}px)`;
@@ -144,9 +155,9 @@ function InteractiveMermaidDiagram({
 
   const handleDiagramMouseUp = () => {
     if (!isPanning) return;
-    
+
     setIsPanning(false);
-    
+
     // Sync final pan values back to state for persistence
     setPanX(currentPanRef.current.x);
     setPanY(currentPanRef.current.y);
@@ -155,7 +166,7 @@ function InteractiveMermaidDiagram({
   // Touch event handlers for mobile support
   const handleDiagramTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     // Prevent default touch behaviors (pinch-to-zoom, double-tap zoom)
-    
+
     if (e.touches.length === 1) {
       // Single finger - treat as pan start
       const touch = e.touches[0];
@@ -172,28 +183,27 @@ function InteractiveMermaidDiagram({
       pinchStartZoomRef.current = zoom;
       currentPinchDistanceRef.current = getTouchDistance(
         e.touches[0],
-        e.touches[1]
+        e.touches[1],
       );
     }
   };
 
   const handleDiagramTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
-    
     if (e.touches.length === 1 && isPanning) {
       // Single finger pan
       const touch = e.touches[0];
       const zoomFactor = zoom / 100;
       const touchDeltaX = touch.clientX - touchStartRef.current.touchX;
       const touchDeltaY = touch.clientY - touchStartRef.current.touchY;
-      
+
       const panDeltaX = touchDeltaX / zoomFactor;
       const panDeltaY = touchDeltaY / zoomFactor;
-      
+
       const newPanX = touchStartRef.current.panX + panDeltaX;
       const newPanY = touchStartRef.current.panY + panDeltaY;
-      
+
       currentPanRef.current = { x: newPanX, y: newPanY };
-      
+
       if (diagramRef.current) {
         const newTransform = `scale(${zoomFactor}) translate(${newPanX}px, ${newPanY}px)`;
         diagramRef.current.style.transform = newTransform;
@@ -201,21 +211,22 @@ function InteractiveMermaidDiagram({
     } else if (e.touches.length === 2) {
       // Two finger pinch zoom
       setIsPanning(false);
-      
+
       const currentDistance = getTouchDistance(e.touches[0], e.touches[1]);
-      const previousDistance = currentPinchDistanceRef.current || currentDistance;
-      
+      const previousDistance =
+        currentPinchDistanceRef.current || currentDistance;
+
       if (previousDistance > 0) {
         const distanceRatio = currentDistance / previousDistance;
         const zoomDelta = (distanceRatio - 1) * 100; // Scale sensitivity
         const newZoom = Math.max(
           minZoom,
-          Math.min(maxZoom, pinchStartZoomRef.current + zoomDelta)
+          Math.min(maxZoom, pinchStartZoomRef.current + zoomDelta),
         );
-        
+
         setZoom(newZoom);
       }
-      
+
       currentPinchDistanceRef.current = currentDistance;
     }
   };
@@ -229,7 +240,7 @@ function InteractiveMermaidDiagram({
     } else if (e.touches.length < 2) {
       // Pinch ended or transitioned to single/no touch
       currentPinchDistanceRef.current = null;
-      
+
       if (e.touches.length === 1) {
         // Transitioned from two fingers to one - restart pan
         const touch = e.touches[0];
@@ -288,7 +299,7 @@ function InteractiveMermaidDiagram({
           </Button>
         </div>
       </div>
-      
+
       <div
         ref={diagramRef}
         className={styles.diagram}
@@ -308,9 +319,12 @@ function InteractiveMermaidDiagram({
           {children}
         </div>
       </div>
-      
+
       <div className={styles.hint}>
-        <small>💡 Desktop: Ctrl/Cmd + Scroll to zoom • Drag to pan • Mobile: Pinch to zoom • Drag to pan</small>
+        <small>
+          💡 Desktop: Ctrl/Cmd + Scroll to zoom • Drag to pan • Mobile: Pinch to
+          zoom • Drag to pan
+        </small>
       </div>
     </div>
   );
