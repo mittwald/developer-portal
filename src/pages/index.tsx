@@ -19,6 +19,18 @@ function HomepageHeader() {
         <div className={styles.buttons}>
           <Link
             className="button button--success button--lg"
+            to="/docs/v2/guides/deployment"
+          >
+            <Translate id={"index.cta.deploy"}>Deploy your first app</Translate>
+          </Link>
+          <Link
+            className="button button--secondary button--lg"
+            to="/docs/v2/agentic-integration"
+          >
+            <Translate id={"index.cta.agents"}>Connect your AI agent</Translate>
+          </Link>
+          <Link
+            className="button button--secondary button--lg"
             to="/docs/v2/api/intro"
           >
             <Translate id={"index.cta"}>Get started with our API</Translate>

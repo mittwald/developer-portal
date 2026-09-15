@@ -15,11 +15,20 @@ interface OverlayInfo {
   version: string;
 }
 
-interface OverlayAction {
+export interface OverlayAction {
   target: string;
   description?: string;
   update: any;
   remove?: boolean;
+}
+
+export interface ApplyOverlayOptions {
+  /**
+   * Silently skip update actions whose target does not match anything, instead
+   * of failing. Useful for generated overlays, which may contain stale entries
+   * for operations that have been removed from the spec in the meantime.
+   */
+  ignoreMissingTargets?: boolean;
 }
 
 /**
@@ -31,10 +40,12 @@ interface OverlayAction {
  * @author @lornajane <https://github.com/lornajane>
  * @param spec
  * @param overlay
+ * @param options
  */
 export function applyOverlay(
   spec: OpenAPIV3.Document,
   overlay: OverlaySpec,
+  options: ApplyOverlayOptions = {},
 ): OpenAPIV3.Document {
   let overlayedSpec = structuredClone(spec);
 
@@ -58,6 +69,9 @@ export function applyOverlay(
     } else {
       const path = jsonpath.paths(overlayedSpec, action.target);
       if (path.length === 0) {
+        if (options.ignoreMissingTargets) {
+          continue;
+        }
         throw new Error(`target ${action.target} did not match anything`);
       }
 

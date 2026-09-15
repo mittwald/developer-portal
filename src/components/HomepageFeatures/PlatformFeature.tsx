@@ -173,8 +173,9 @@ function PlatformTools() {
               </Translate>
             }
             links={[
-              <Link to="/mcp">
-                MCP <NewBadge />
+              <Link to="/mcp">MCP</Link>,
+              <Link to="/docs/v2/agentic-integration/agent-skills/">
+                Skills <NewBadge />
               </Link>,
             ]}
           />

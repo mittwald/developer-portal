@@ -41,10 +41,8 @@ const sidebars = {
       type: "category",
       label: "Deployment guides",
       link: {
-        type: "generated-index",
-        title: "Deployment guides",
-        slug: "/category/guides/deployment",
-        keywords: [],
+        type: "doc",
+        id: "guides/deployment/index",
       },
       items: [
         {

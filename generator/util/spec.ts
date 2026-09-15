@@ -10,37 +10,74 @@ export type SpecLoader = (
   apiVersion: APIVersion,
 ) => Promise<OpenAPIV3.Document>;
 
+/** Name of the overlay holding the AI-generated summaries and descriptions */
+export const AI_OVERLAY_NAME = "overlay-ai";
+
+const specCache = new Map<APIVersion, Promise<OpenAPIV3.Document>>();
+
 export async function loadSpec(
   apiVersion: APIVersion,
 ): Promise<OpenAPIV3.Document> {
-  const spec = await fetch(
-    `https://api.mittwald.de/${apiVersion}/openapi.json?withRedirects=false`,
-  );
-  return await spec.json();
+  // Cached, because a single generator run loads the same spec multiple times
+  let spec = specCache.get(apiVersion);
+  if (!spec) {
+    spec = fetch(
+      `https://api.mittwald.de/${apiVersion}/openapi.json?withRedirects=false`,
+    ).then((response) => response.json());
+    specCache.set(apiVersion, spec);
+  }
+  return await spec;
 }
 
-export async function applyOverlayToSpec(
-  spec: OpenAPIV3.Document,
+export function overlayPath(
   apiVersion: APIVersion,
-  overlaySuffix?: string,
-): Promise<OpenAPIV3.Document> {
-  const overlayPath = path.join(
-    "generator",
-    "overlays",
-    apiVersion,
-    overlaySuffix ? `overlay-${overlaySuffix}.yaml` : "overlay.yaml",
-  );
-  try {
-    const overlayYaml = await readFile(overlayPath, { encoding: "utf-8" });
-    const overlay = yaml.parse(overlayYaml, { merge: true });
+  overlayName: string,
+): string {
+  return path.join("generator", "overlays", apiVersion, `${overlayName}.yaml`);
+}
 
-    return applyOverlay(spec, overlay as unknown as OverlaySpec);
+export async function loadOverlay(
+  apiVersion: APIVersion,
+  overlayName: string,
+): Promise<OverlaySpec | undefined> {
+  try {
+    const overlayYaml = await readFile(overlayPath(apiVersion, overlayName), {
+      encoding: "utf-8",
+    });
+    return yaml.parse(overlayYaml, { merge: true }) as unknown as OverlaySpec;
   } catch (err) {
-    if (err.code === "ENOENT") {
-      return spec;
+    if ((err as NodeJS.ErrnoException).code === "ENOENT") {
+      return undefined;
     }
     throw err;
   }
+}
+
+/**
+ * Applies a list of overlays to a spec, in order; later overlays take
+ * precedence over earlier ones. Overlays that do not exist are skipped.
+ */
+export async function applyOverlaysToSpec(
+  spec: OpenAPIV3.Document,
+  apiVersion: APIVersion,
+  overlayNames: string[],
+): Promise<OpenAPIV3.Document> {
+  let overlayedSpec = spec;
+
+  for (const overlayName of overlayNames) {
+    const overlay = await loadOverlay(apiVersion, overlayName);
+    if (!overlay) {
+      continue;
+    }
+
+    overlayedSpec = applyOverlay(overlayedSpec, overlay, {
+      // Generated overlays may lag behind the spec; do not fail the build for
+      // operations that have been removed in the meantime.
+      ignoreMissingTargets: overlayName === AI_OVERLAY_NAME,
+    });
+  }
+
+  return overlayedSpec;
 }
 
 export async function loadSpecPreview(
