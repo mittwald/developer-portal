@@ -132,7 +132,7 @@ mittwald MCP unterstützt zwei Authentifizierungsmethoden. Wähle nach deinem An
 
 **Unterstützt von**: allen 7 Tools (Claude, ChatGPT, Claude Code, GitHub Copilot, Cursor, Codex CLI, Hermes Agent)
 
-### Option 2: API Token (direkte Authentifizierung) {#option-2-api-token}
+### Option 2: API-Token (direkte Authentifizierung) {#option-2-api-token}
 
 **Am besten für**: CI/CD-Pipelines, nicht-interaktive Server, automatisierte Skripte, einfaches Testen
 
@@ -271,7 +271,7 @@ Jedes Tool passt zu anderen Workflows:
 - **Codex CLI**: du bevorzugst OpenAIs Tools und terminalbasierte Entwicklung
 - **Hermes Agent**: du betreibst einen Terminal-Agenten, der auch Modelle aus dem mittwald AI Hosting nutzen kann
 
-Alle lassen sich unkompliziert per OAuth einrichten (jeweils ~5-10 Minuten). Du kannst jederzeit auch mehrere Tools einrichten.
+Alle lassen sich unkompliziert per OAuth einrichten (jeweils ~5–10 Minuten). Du kannst jederzeit auch mehrere Tools einrichten.
 
 ### „Ich komme beim OAuth-Setup nicht weiter“ {#stuck-during-oauth-setup}
 
