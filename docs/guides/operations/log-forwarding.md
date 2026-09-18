@@ -64,7 +64,7 @@ Grafana Cloud authenticates writes with an **access policy token**. Access polic
 2. Click **"New access policy"**.
 3. Give the policy a name (for example `mittwald-log-forwarding`), select the stack it should apply to and grant it the following scopes:
    - `logs:write` — required, this is what Alloy needs to push logs into Loki
-   - `metrics:write` — only required if you want Alloy's [self-monitoring metrics](#config) as well
+   - `metrics:write` — only required if you want Alloy's [own metrics](#config-self-monitoring) as well
 4. Click **"Create access policy"**.
 5. The new policy now appears in the list. Click **"Add token"** on it, give the token a name, optionally set an expiration date, and confirm.
 6. Copy the token — it starts with `glc_` and is displayed only once.
@@ -221,10 +221,21 @@ loki.write "default" {
 		}
 	}
 }
+```
 
-// Self-monitoring (optional, but recommended)
-// ===========================================
+The pipeline reads from top to bottom: `local.file_match` turns the glob into one target per log file, `discovery.relabel` attaches labels to those targets, `loki.source.file` tails them, `loki.process` cleans up the label set, and `loki.write` ships the result to Loki.
 
+:::note Keep your label set small
+
+Loki creates a separate stream for every combination of label values, and a large number of streams makes queries slower and, in Grafana Cloud, your bill higher. Labels that are stable and low in cardinality — `job`, `stack`, `container`, `host` — are a good fit. Never turn per-request values such as request IDs, URLs or user IDs into labels; query them with a [LogQL filter expression](https://grafana.com/docs/loki/latest/query/log_queries/) instead.
+
+:::
+
+### Monitoring Alloy itself {#config-self-monitoring}
+
+This part is optional, but recommended — it is what you will want to look at when logs stop arriving. Append it to the same `config.alloy` file to send Alloy's own log output to Loki, and its internal metrics (sent and dropped bytes, per-file read offsets, write errors) to Prometheus:
+
+```hcl title="config.alloy (continued)"
 // Alloy's own logs, so that shipping problems can be debugged from Grafana.
 logging {
 	level    = "info"
@@ -269,15 +280,7 @@ prometheus.remote_write "default" {
 }
 ```
 
-The pipeline reads from top to bottom: `local.file_match` turns the glob into one target per log file, `discovery.relabel` attaches labels to those targets, `loki.source.file` tails them, `loki.process` cleans up the label set, and `loki.write` ships the result to Loki.
-
-The second half is optional. It forwards Alloy's own log output to Loki and its internal metrics — sent and dropped bytes, per-file read offsets, write errors — to Prometheus, which is what you will want to look at when logs stop arriving. If you have no Prometheus-compatible endpoint, delete the three `prometheus.*` blocks and keep the rest.
-
-:::note Keep your label set small
-
-Loki creates a separate stream for every combination of label values, and a large number of streams makes queries slower and, in Grafana Cloud, your bill higher. Labels that are stable and low in cardinality — `job`, `stack`, `container`, `host` — are a good fit. Never turn per-request values such as request IDs, URLs or user IDs into labels; query them with a [LogQL filter expression](https://grafana.com/docs/loki/latest/query/log_queries/) instead.
-
-:::
+The first two blocks only need the Loki endpoint you have already configured. If you have no Prometheus-compatible endpoint, leave the three `prometheus.*` blocks out and keep the rest — and remember to drop the `PROM_*` variables from the container setup as well.
 
 ### Writing to a self-hosted Loki {#config-self-hosted}
 
@@ -308,7 +311,7 @@ The [`loki.write` reference](https://grafana.com/docs/alloy/latest/reference/com
 
 The container reads its configuration from the project filesystem, so the file has to be there before the container starts. This guide uses the directory `/files/alloy`, which is mounted into the container at `/etc/alloy`.
 
-You do not need a dedicated SFTP user for this: your own mStudio account can connect to the project filesystem directly. The user name for such a connection combines your mStudio email address with the short ID of the resource you want to connect to:
+Your own mStudio account can connect to the project filesystem over SSH and SFTP. The user name for such a connection combines your mStudio email address with the short ID of the resource you want to connect to:
 
 - `<your-email>@<project-short-id>@<ssh-host>` connects to the **project** — this is the one you need for `/files`
 - `<your-email>@<container-short-id>@<ssh-host>` connects into a **container**
@@ -425,7 +428,7 @@ PROM_PASSWORD=glc_XXX
 
 In Grafana Cloud, `LOKI_PASSWORD` and `PROM_PASSWORD` both hold the same access policy token; the user names differ, because each instance has its own numeric ID.
 
-Whenever you leave a variable out of the `.env` file, remove the matching line from the `environment` section of the compose file as well — otherwise it is passed into the container as an empty string, and Alloy fails against an endpoint it thinks is configured. This applies to `LOKI_USER` and `LOKI_PASSWORD` for a self-hosted Loki without authentication (see [Writing to a self-hosted Loki](#config-self-hosted)), and to all three `PROM_*` variables if you drop the self-monitoring part of the configuration.
+Whenever you leave a variable out of the `.env` file, remove the matching line from the `environment` section of the compose file as well — otherwise it is passed into the container as an empty string, and Alloy fails against an endpoint it thinks is configured. This applies to `LOKI_USER` and `LOKI_PASSWORD` for a self-hosted Loki without authentication (see [Writing to a self-hosted Loki](#config-self-hosted)), and to all three `PROM_*` variables if you leave out the `prometheus.*` blocks from [Monitoring Alloy itself](#config-self-monitoring).
 
 Then deploy the stack:
 
