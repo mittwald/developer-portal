@@ -1,0 +1,108 @@
+---
+title: API changes for v2 API, September 11 to September 18
+authors:
+  - machine
+tags:
+  - apiv2
+  - Marketplace
+  - User
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+During the week of September 11 to September 18, 2026, the mittwald API introduced several new endpoints, including the ability to resume webhook execution for extension instances, retrieve spotlight information, and submit spotlight usage and feedback, along with a new optional request parameter for listing extension instances.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- A new endpoint has been added to resume the webhook execution of an ExtensionInstance with the operation `POST` at the path `/v2/contributors/{contributorId}/extensions/{extensionId}/extension-instances/{extensionInstanceId}/actions/resume-webhook-execution`.
+- An optional request parameter `contract.interactionRequired` has been added to the `GET` operation for listing ExtensionInstances at the path `/v2/extension-instances`.
+- A new endpoint has been added to retrieve spotlight information for the user with the operation `GET` at the path `/v2/users/self/spotlights/{spotlightId}`.
+- A new endpoint has been added to submit user usage of the spotlight with the operation `POST` at the path `/v2/users/self/spotlights/{spotlightId}`.
+- A new endpoint has been added to submit feedback for the user's spotlight usage with the operation `POST` at the path `/v2/users/self/spotlights/{spotlightId}/feedback`.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Resume the webhook execution of an extension instance"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="extension-resume-webhook-execution-for-extension-instance" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List extension instances"
+
+
+- added the new optional 'query' request parameter 'contract.interactionRequired'
+
+
+For details, refer to the <OperationLink operation="extension-list-extension-instances" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Submitted feedback of the given user"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="user-get-spotlight-info" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Submit your usage of the spotlight"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="user-spotlight-usage" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Submit your spotlight usage"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="user-spotlight-feedback" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald JavaScript SDK Release 4.465.0
+
+The mittwald JavaScript SDK has been updated to version 4.465.0. This release includes a feature update with an updated generated client. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.465.0).
+
+### mittwald JavaScript SDK Release 4.464.0
+
+The mittwald JavaScript SDK has been updated to version 4.464.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.464.0).
+
+### mittwald JavaScript SDK Release 4.463.0
+
+The mittwald JavaScript SDK has been updated to version 4.463.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.463.0](https://github.com/mittwald/api-client-js/releases/tag/4.463.0).
+
+### mittwald JavaScript SDK Release 4.462.0
+
+The mittwald JavaScript SDK has been updated to version 4.462.0. This release introduces a new feature in the generator, adding support for the JSON Schema `const` keyword. This enhancement addresses issues raised in [#283](https://github.com/mittwald/api-client-js/issues/283) and is detailed in commit [56ae2db](https://github.com/mittwald/api-client-js/commit/56ae2db0b0d8217c0ab1075135b656391fc560a5). 
+
+For more information, visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.462.0).
+
