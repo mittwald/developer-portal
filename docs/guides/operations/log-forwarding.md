@@ -105,7 +105,7 @@ The access policy token allows writing into your Grafana Cloud stack. Keep it ou
 
 ### Option B: A self-hosted Loki {#destination-self-hosted}
 
-If you already run Loki yourself — on your own infrastructure, or as a container in a mittwald project — you only need its push endpoint, which is the base URL of the instance plus `/loki/api/v1/push`:
+If you already run Loki on your own infrastructure, you only need its push endpoint, which is the base URL of the instance plus `/loki/api/v1/push`:
 
 ```shell
 # Loki (logs)
@@ -121,48 +121,13 @@ Two things are worth checking before you continue:
 - **Authentication.** A bare Loki has no authentication of its own and is usually protected by a reverse proxy in front of it. Never expose an unauthenticated Loki to the internet — anyone who finds it can write into it and read everything it holds.
 - **Multi-tenancy.** If your Loki runs with `auth_enabled: true`, every write has to carry a tenant ID. Alloy sends it for you if you set `tenant_id` in the configuration (see [Writing to a self-hosted Loki](#config-self-hosted)).
 
-#### Running Loki in the same project {#self-hosted-in-project}
+:::note Host your Loki elsewhere
 
-Loki and Grafana are both available as container images, so you can also run them next to your applications in the same mittwald project. A minimal stack looks like this:
+Loki is available as a container image, so it is technically possible to run it in the same mittwald project as the containers whose logs you are collecting. We recommend against it: log storage that shares the fate of the system it observes is of little use during exactly the incidents you keep logs for. When the project is unavailable, so are the logs that would explain why.
 
-```yaml title="docker-compose.yml (Loki and Grafana)"
-services:
-  loki:
-    image: grafana/loki:3.7.0
-    restart: unless-stopped
-    command:
-      - -config.file=/etc/loki/local-config.yaml
-    ports:
-      - "3100:3100/tcp"
-    volumes:
-      - loki-data:/loki
-  grafana:
-    image: grafana/grafana:13.2.2
-    restart: unless-stopped
-    ports:
-      - "3000:3000/tcp"
-    environment:
-      GF_SECURITY_ADMIN_PASSWORD: your_secret_password
-    volumes:
-      - grafana-data:/var/lib/grafana
-volumes:
-  loki-data: {}
-  grafana-data: {}
-```
-
-The image ships a working default configuration that stores everything on the local filesystem, which is what the `loki-data` volume is for. Both volumes are covered by the [project backup](/docs/v2/platform/workloads/containers#backup).
-
-Alloy then reaches Loki under its internal DNS name, so the push URL becomes `http://loki:3100/loki/api/v1/push`, and no credentials are needed — the port is only published within your project.
-
-:::caution
-
-Connect a domain to the Grafana container (port `3000`), not to Loki. Grafana asks for a login; Loki does not, and publishing it to the internet would expose your logs.
-
-Also change the `GF_SECURITY_ADMIN_PASSWORD` in the example to a password of your own before you deploy the stack.
+Run Loki somewhere separate from the workloads it observes — a different project, a different provider, or your own infrastructure.
 
 :::
-
-Running the log storage in the same project is convenient, but keep in mind that it shares the fate of the project it is meant to observe. For an audit trail, or for logs that have to survive a compromised or deleted project, use a destination outside of the project.
 
 ## Step 2: Writing the Alloy configuration {#config}
 
