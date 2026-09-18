@@ -1,0 +1,346 @@
+---
+title: Breaking (!) API changes for v1 API, September 11 to September 18
+authors:
+  - machine
+tags:
+  - apiv1
+  - breaking
+  - Domains
+  - Authentifizierung
+  - DSGVO-Verträge
+  - navigation
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+During the week of September 11 to September 18, 2026, the mittwald API introduced several significant changes, including the addition of new endpoints for managing GDPR contracts and authentication, the removal of deprecated paths, updates to response properties, and the requirement of certain request parameters.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The `domainIdentifier` request parameter in the `DELETE` operation for deleting a certificate has become required, which is a breaking change. The endpoint is `DELETE /accounts/{accountIdentifier}/domains/{domainIdentifier}/certificate`.
+- The response body for the `GET` operation to list application tokens has become nullable, and the property type for `/items/crdate` has changed from `string`/`date-time` to `integer` for status `200`. The endpoint is `GET /authentication/tokens`.
+- The `crdate` response property type has changed from `string`/`date-time` to `integer` for status `201` in the `POST` operation for creating an application token. The endpoint is `POST /authentication/tokens`.
+- Several API paths related to GDPR contracts have been removed without deprecation: 
+  - `POST /gdpr/contracts/{contractIdentifier}/actions/accept`
+  - `POST /gdpr/contracts/{contractIdentifier}/actions/mail`
+  - `POST /gdpr/contracts/{contractIdentifier}/actions/pdf`
+  - `POST /gdpr/pdfs/{pdfIdentifier}/actions/download`
+- The response property `contract/items/payload/statusFields/editLock` has become nullable for status `200` in the `GET` operation for menu generation, along with similar changes for `left`, `support`, and `top` properties. The endpoint is `GET /menu`.
+- A new `POST` operation for authenticating with a token has been added at the endpoint `POST /authenticate/token`.
+- A non-success response with status `401` has been added for the `GET` operation to list application tokens, the `POST` operation to create an application token, and the `DELETE` operation to delete an application token. The endpoints are `GET /authentication/tokens`, `POST /authentication/tokens`, and `DELETE /authentication/tokens/{uuid}` respectively.
+- Several optional properties have been added to the response with status `200` for the `GET` operation to retrieve GDPR contracts, including `client/creationDate`, `client/type`, `recipient/creationDate`, `recipient/type`, `tom/content`, and `tom/creationDate`. The endpoint is `GET /gdpr/contracts`.
+- Required properties have been added to the response with status `200` for the `GET` operation to retrieve GDPR contracts, including `client/city`, `client/houseNumber`, `client/mail`, `client/name`, `client/street`, `client/zipCode`, `recipient/city`, `recipient/houseNumber`, `recipient/mail`, `recipient/name`, `recipient/street`, and `recipient/zipCode`. The endpoint is `GET /gdpr/contracts`.
+- New endpoints have been added for various operations related to GDPR contracts:
+  - `POST /gdpr/contracts/{contractIdentifier}/actions/accept`
+  - `POST /gdpr/contracts/{contractIdentifier}/actions/mail`
+  - `POST /gdpr/contracts/{contractIdentifier}/actions/pdf`
+  - `POST /gdpr/pdfs/{pdfIdentifier}/actions/download`
+- The `GET` operation for retrieving navigation meta has a new endpoint at `GET /menu-meta`.
+- The `oneOf` list for the response properties `contract/items/payload/statusFields/editLock`, `left/items/payload/statusFields/editLock`, `support/items/payload/statusFields/editLock`, and `top/items/payload/statusFields/editLock` has had certain subschemas removed for the response status `200`. The endpoint is `GET /menu`.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Let's Encrypt Zertifikat einer Domain löschen"
+
+
+- ⚠️ **Breaking:** the 'path' request parameter 'domainIdentifier' became required
+
+
+For details, refer to the <OperationLink operation="deleteCertificateByDomain" apiVersion="v1" /> endpoint.
+
+
+
+### Changes in "Auslesen von erstellten application-Tokens"
+
+
+- ⚠️ **Breaking:** the response's body became nullable
+
+- ⚠️ **Breaking:** the '/items/crdate' response's property type/format changed from 'string'/'date-time' to 'integer'/'' for status '200'
+
+- added the non-success response with the status '401'
+
+
+For details, refer to the <OperationLink operation="listApplicationTokens" apiVersion="v1" /> endpoint.
+
+
+
+### Changes in "Neues Access-Token erstellen"
+
+
+- ⚠️ **Breaking:** the 'crdate' response's property type/format changed from 'string'/'date-time' to 'integer'/'' for status '201'
+
+- added the new optional request property 'token'
+
+- added the non-success response with the status '401'
+
+
+For details, refer to the <OperationLink operation="createApplicationToken" apiVersion="v1" /> endpoint.
+
+
+
+### Changes in "Vertrag - Akzeptiert den Vertrag"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="acceptGDPRContract" apiVersion="v1" /> endpoint.
+
+
+
+### Changes in "Vertrag - Verschickt eine E-Mail mit PDF an den Empfänger des Vertrags"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="sendGDPRContractMail" apiVersion="v1" /> endpoint.
+
+
+
+### Changes in "Vertrag - Liefert ein PDF zu einem bestimmten Vertrag"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="createGDPRContractPDF" apiVersion="v1" /> endpoint.
+
+
+
+### Changes in "PDF - Stellt ein Vertrags-PDF zum Download bereit"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="downloadGDPRPDF" apiVersion="v1" /> endpoint.
+
+
+
+### Changes in "Menu generation"
+
+
+- ⚠️ **Breaking:** the response property 'contract/items/payload/statusFields/editLock' became nullable for the status '200'
+
+- ⚠️ **Breaking:** the response property 'left/items/payload/statusFields/editLock' became nullable for the status '200'
+
+- ⚠️ **Breaking:** the response property 'support/items/payload/statusFields/editLock' became nullable for the status '200'
+
+- ⚠️ **Breaking:** the response property 'top/items/payload/statusFields/editLock' became nullable for the status '200'
+
+- ⚠️ **Breaking:** the 'contract/items/payload/statusFields/editLock' response's property type/format changed from ''/'' to 'string'/'' for status '200'
+
+- ⚠️ **Breaking:** the 'left/items/payload/statusFields/editLock' response's property type/format changed from ''/'' to 'string'/'' for status '200'
+
+- ⚠️ **Breaking:** the 'support/items/payload/statusFields/editLock' response's property type/format changed from ''/'' to 'string'/'' for status '200'
+
+- ⚠️ **Breaking:** the 'top/items/payload/statusFields/editLock' response's property type/format changed from ''/'' to 'string'/'' for status '200'
+
+- removed 'subschema #1, subschema #2' from the 'contract/items/payload/statusFields/editLock' response property 'oneOf' list for the response status '200'
+
+- removed 'subschema #1, subschema #2' from the 'left/items/payload/statusFields/editLock' response property 'oneOf' list for the response status '200'
+
+- removed 'subschema #1, subschema #2' from the 'support/items/payload/statusFields/editLock' response property 'oneOf' list for the response status '200'
+
+- removed 'subschema #1, subschema #2' from the 'top/items/payload/statusFields/editLock' response property 'oneOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="getNavigation" apiVersion="v1" /> endpoint.
+
+
+
+### Changes in "Get meta menu items"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="getNavigationMeta" apiVersion="v1" /> endpoint.
+
+
+
+### Changes in "Anmeldung mit einem Transfer-Token"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="authenticateWithToken" apiVersion="v1" /> endpoint.
+
+
+
+### Changes in "Löschen von application-Tokens"
+
+
+- added the non-success response with the status '401'
+
+
+For details, refer to the <OperationLink operation="deleteApplicationToken" apiVersion="v1" /> endpoint.
+
+
+
+### Changes in "Vertrag - Liefert alle hinterlegten Verträge"
+
+
+- added the optional property '/items/client/creationDate' to the response with the '200' status
+
+- added the optional property '/items/client/type' to the response with the '200' status
+
+- added the optional property '/items/recipient/creationDate' to the response with the '200' status
+
+- added the optional property '/items/recipient/type' to the response with the '200' status
+
+- added the optional property '/items/tom/content' to the response with the '200' status
+
+- added the optional property '/items/tom/creationDate' to the response with the '200' status
+
+- added the required property '/items/client/city' to the response with the '200' status
+
+- added the required property '/items/client/houseNumber' to the response with the '200' status
+
+- added the required property '/items/client/mail' to the response with the '200' status
+
+- added the required property '/items/client/name' to the response with the '200' status
+
+- added the required property '/items/client/street' to the response with the '200' status
+
+- added the required property '/items/client/zipCode' to the response with the '200' status
+
+- added the required property '/items/recipient/city' to the response with the '200' status
+
+- added the required property '/items/recipient/houseNumber' to the response with the '200' status
+
+- added the required property '/items/recipient/mail' to the response with the '200' status
+
+- added the required property '/items/recipient/name' to the response with the '200' status
+
+- added the required property '/items/recipient/street' to the response with the '200' status
+
+- added the required property '/items/recipient/zipCode' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="getGDPRContracts" apiVersion="v1" /> endpoint.
+
+
+
+### Changes in "Vertrag - Vertrag anlegen"
+
+
+- added the optional property 'client/creationDate' to the response with the '201' status
+
+- added the optional property 'client/type' to the response with the '201' status
+
+- added the optional property 'recipient/creationDate' to the response with the '201' status
+
+- added the optional property 'recipient/type' to the response with the '201' status
+
+- added the optional property 'tom/content' to the response with the '201' status
+
+- added the optional property 'tom/creationDate' to the response with the '201' status
+
+- added the required property 'client/city' to the response with the '201' status
+
+- added the required property 'client/houseNumber' to the response with the '201' status
+
+- added the required property 'client/mail' to the response with the '201' status
+
+- added the required property 'client/name' to the response with the '201' status
+
+- added the required property 'client/street' to the response with the '201' status
+
+- added the required property 'client/zipCode' to the response with the '201' status
+
+- added the required property 'recipient/city' to the response with the '201' status
+
+- added the required property 'recipient/houseNumber' to the response with the '201' status
+
+- added the required property 'recipient/mail' to the response with the '201' status
+
+- added the required property 'recipient/name' to the response with the '201' status
+
+- added the required property 'recipient/street' to the response with the '201' status
+
+- added the required property 'recipient/zipCode' to the response with the '201' status
+
+
+For details, refer to the <OperationLink operation="createGDPRContract" apiVersion="v1" /> endpoint.
+
+
+
+### Changes in "Vertrag - Liefert einen bestimmten Vertrag"
+
+
+- added the optional property 'client/creationDate' to the response with the '200' status
+
+- added the optional property 'client/type' to the response with the '200' status
+
+- added the optional property 'recipient/creationDate' to the response with the '200' status
+
+- added the optional property 'recipient/type' to the response with the '200' status
+
+- added the optional property 'tom/content' to the response with the '200' status
+
+- added the optional property 'tom/creationDate' to the response with the '200' status
+
+- added the required property 'client/city' to the response with the '200' status
+
+- added the required property 'client/houseNumber' to the response with the '200' status
+
+- added the required property 'client/mail' to the response with the '200' status
+
+- added the required property 'client/name' to the response with the '200' status
+
+- added the required property 'client/street' to the response with the '200' status
+
+- added the required property 'client/zipCode' to the response with the '200' status
+
+- added the required property 'recipient/city' to the response with the '200' status
+
+- added the required property 'recipient/houseNumber' to the response with the '200' status
+
+- added the required property 'recipient/mail' to the response with the '200' status
+
+- added the required property 'recipient/name' to the response with the '200' status
+
+- added the required property 'recipient/street' to the response with the '200' status
+
+- added the required property 'recipient/zipCode' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="getGDPRContract" apiVersion="v1" /> endpoint.
+
+
+
