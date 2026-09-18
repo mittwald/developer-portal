@@ -76,24 +76,23 @@ Next, look up the endpoints and user IDs that go with the token:
 3. Do the same for the **Prometheus** instance, if you want the self-monitoring metrics.
 4. The **Grafana** instance on the same page is where you will query the logs later on.
 
-You should end up with these five values:
+You should end up with these five values — the token serves as the password for both endpoints, the user names differ because each instance has its own numeric ID:
 
 ```shell
 # Loki (logs)
 LOKI_URL=https://logs-prod-XXX.grafana.net/loki/api/v1/push
 LOKI_USER=XXXXXXX
+LOKI_PASSWORD=glc_XXX
 
 # Prometheus (metrics, optional)
 PROM_URL=https://prometheus-prod-XX-prod-REGION.grafana.net/api/prom/push
 PROM_USER=XXXXXXX
-
-# The access policy token, used as the password for both endpoints
-GRAFANA_TOKEN=glc_XXX
+PROM_PASSWORD=glc_XXX
 ```
 
 :::note
 
-The portal displays the base URLs of the instances. Alloy needs the full push endpoints, so append `/loki/api/v1/push` to the Loki URL and `/api/prom/push` to the Prometheus URL, as shown above.
+Alloy needs the complete push endpoints, as shown above. Depending on where in the portal you read them, you may get the base URL of an instance instead — in that case, append `/loki/api/v1/push` to the Loki URL and `/api/prom/push` to the Prometheus URL yourself.
 
 :::
 
@@ -131,9 +130,9 @@ Run Loki somewhere separate from the workloads it observes — a different proje
 
 ## Step 2: Writing the Alloy configuration {#config}
 
-Alloy is configured with a `config.alloy` file. Create it locally first; you will upload it to the project filesystem in the [next step](#config-upload).
+Alloy is configured with a `config.alloy` file. Create it locally first; you will upload it to the project filesystem [further down](#config-upload).
 
-```alloy title="config.alloy"
+```hcl title="config.alloy"
 // Grafana Alloy — container log shipping
 //
 // Watches: /mnt/logs/container/<stack-id>/<service-name>.log
@@ -284,7 +283,7 @@ Loki creates a separate stream for every combination of label values, and a larg
 
 For a Loki of your own, only the `loki.write` block changes. Without authentication, drop the `basic_auth` block entirely:
 
-```alloy title="config.alloy (excerpt)"
+```hcl title="config.alloy (excerpt)"
 loki.write "default" {
 	endpoint {
 		url = sys.env("LOKI_URL")
@@ -294,7 +293,7 @@ loki.write "default" {
 
 If your Loki runs in multi-tenant mode (`auth_enabled: true`), name the tenant that the logs should be written to. Alloy sends it as the `X-Scope-OrgID` header:
 
-```alloy title="config.alloy (excerpt)"
+```hcl title="config.alloy (excerpt)"
 loki.write "default" {
 	endpoint {
 		url       = sys.env("LOKI_URL")
@@ -314,7 +313,7 @@ You do not need a dedicated SFTP user for this: your own mStudio account can con
 - `<your-email>@<project-short-id>@<ssh-host>` connects to the **project** — this is the one you need for `/files`
 - `<your-email>@<container-short-id>@<ssh-host>` connects into a **container**
 
-The SSH host and the short ID of your project are shown by `mw project get`; `mw container list` lists the short IDs of your containers. Authentication uses the SSH key or password that you have deposited in your mStudio account.
+The SSH host and the short ID of your project are shown by `mw project get`; `mw container list` lists the short IDs of your containers. Authentication uses the SSH key or password that you have deposited in your mStudio account. For an interactive shell, [`mw project ssh`](/docs/v2/cli/reference/project/) assembles the connection for you.
 
 Create the directory and upload the file:
 
@@ -339,11 +338,13 @@ Alloy does not pick up configuration changes automatically. After you have repla
 
 ### Checking where your log files actually are {#log-paths}
 
-Before you deploy, it is worth confirming that the glob in the configuration matches. Connect to the project over SSH and list the log directory:
+Before you deploy, it is worth confirming that the glob in the configuration matches. Open a shell in the project — the CLI assembles the connection for you:
 
 ```shellsession title="Local shell session"
-user@local $ ssh jane.doe@example.com@p-XXXXXX@ssh.example.project.host
+user@local $ mw project ssh
 ```
+
+Then list the log directory:
 
 ```shellsession title="SSH shell session"
 user@ssh $ ls -l /var/log/container/
@@ -422,7 +423,9 @@ PROM_USER=XXXXXXX
 PROM_PASSWORD=glc_XXX
 ```
 
-In Grafana Cloud, `LOKI_PASSWORD` and `PROM_PASSWORD` both hold the same access policy token; the user names differ, because each instance has its own numeric ID. For a self-hosted Loki without authentication, leave `LOKI_USER` and `LOKI_PASSWORD` out — together with the `basic_auth` block in the configuration, as described in [Writing to a self-hosted Loki](#config-self-hosted).
+In Grafana Cloud, `LOKI_PASSWORD` and `PROM_PASSWORD` both hold the same access policy token; the user names differ, because each instance has its own numeric ID.
+
+Whenever you leave a variable out of the `.env` file, remove the matching line from the `environment` section of the compose file as well — otherwise it is passed into the container as an empty string, and Alloy fails against an endpoint it thinks is configured. This applies to `LOKI_USER` and `LOKI_PASSWORD` for a self-hosted Loki without authentication (see [Writing to a self-hosted Loki](#config-self-hosted)), and to all three `PROM_*` variables if you drop the self-monitoring part of the configuration.
 
 Then deploy the stack:
 
@@ -440,13 +443,13 @@ This command reads `docker-compose.yml` from the current directory, resolves the
 
 :::note Pinning the image version
 
-The example pins the image to a specific version. If you prefer to track the `latest` tag instead, remember that mutable tags are not re-pulled automatically: use `mw container recreate --pull`, or set up a [recurring update schedule](/docs/v2/platform/workloads/containers#update-schedule) for the stack.
+The example pins the image to a specific version. If you prefer to track the `latest` tag instead, remember that mutable tags are not re-pulled automatically: use `mw container recreate --pull alloy`, or set up a [recurring update schedule](/docs/v2/platform/workloads/containers#update-schedule) for the stack.
 
 :::
 
 ### Other ways to create the container {#deploy-alternatives}
 
-The stack above can be created just as well in the mStudio UI (**"Containers"** → **"Create container"**) or with a single [`mw container run`](/docs/v2/cli/reference/container/) command. Both need the same ingredients: the image `grafana/alloy:v1.19.2`, the command `run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy`, the three volumes from the table above, the environment variables from the `.env` file, and port `12345` if you want to reach the [Alloy UI](#alloy-ui).
+The stack above can be created just as well in the mStudio UI (**"Containers"** → **"Create container"**) or with a single [`mw container run`](/docs/v2/cli/reference/container/) command. Both need the same ingredients: the image `grafana/alloy:v1.19.2`, the command `run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy`, the three volumes from the table above, the environment variables from the `.env` file, and port `12345` if you want to reach the [Alloy UI](#alloy-ui). With `mw container run`, add `--create-volumes` so that the named `alloy-data` volume is created along with the container.
 
 For this setup, the compose file is usually the better choice: it keeps the credentials out of your shell history, and re-deploying it after a configuration change is a single command.
 
@@ -492,12 +495,18 @@ Alloy's web UI has no authentication of its own. Do not connect a domain to port
 
 ## Forwarding other log files {#other-logs}
 
-The same container can pick up any other log file in the project filesystem. Managed apps, for example, write their access and error logs to the `/logs` directory of the project. Mount that directory into the container as well — for example at `/mnt/app-logs` — and add a second pipeline to `config.alloy`:
+The same container can pick up other log files, too. The `/var/log` mount already contains more than the container logs — PHP apps, for example, write their errors to `/var/log/php_errors.log`. Have a look at what your project keeps there:
 
-```alloy title="config.alloy (excerpt)"
+```shellsession title="SSH shell session"
+user@ssh $ ls -l /var/log/
+```
+
+To ship those files as well, add a second pipeline to `config.alloy`:
+
+```hcl title="config.alloy (excerpt)"
 local.file_match "app_logs" {
 	path_targets = [{
-		"__path__" = "/mnt/app-logs/*.log",
+		"__path__" = "/mnt/logs/*.log",
 		"job"      = "app-logs",
 		"host"     = sys.env("ALLOY_HOSTNAME"),
 	}]
@@ -510,6 +519,8 @@ loki.source.file "app_logs" {
 	forward_to = [loki.write.default.receiver]
 }
 ```
+
+In this pipeline, the `filename` label is worth keeping — unlike in the container pipeline, it is what tells the individual files apart, and there are only a handful of them. For log files that live somewhere else in the project filesystem, mount that directory into the container as well and point another `__path__` at it.
 
 If your containers emit structured logs, it is worth parsing them in `loki.process`: a [`stage.json`](https://grafana.com/docs/alloy/latest/reference/components/loki/loki.process/#stagejson) block extracts fields from JSON lines, and [`stage.timestamp`](https://grafana.com/docs/alloy/latest/reference/components/loki/loki.process/#stagetimestamp) makes Loki use the application's own timestamp instead of the time the line was read.
 
