@@ -13,11 +13,11 @@ against upstream and correcting them.
 
 ## Scope
 
-| Guide | Upstream source of truth |
-| --- | --- |
-| `20-drupal.mdx` | `https://git.drupalcode.org/project/ai_provider_mittwald.git` |
-| `30-wordpress.mdx` | `https://github.com/mittwald/wordpress-ai-provider` |
-| `40-directus.mdx` | Directus core (no mittwald plugin — it uses the built-in OpenAI-compatible provider) |
+| Guide              | Upstream source of truth                                                             |
+| ------------------ | ------------------------------------------------------------------------------------ |
+| `20-drupal.mdx`    | `https://git.drupalcode.org/project/ai_provider_mittwald.git`                        |
+| `30-wordpress.mdx` | `https://github.com/mittwald/wordpress-ai-provider`                                  |
+| `40-directus.mdx`  | Directus core (no mittwald plugin — it uses the built-in OpenAI-compatible provider) |
 
 Every guide has a German mirror at
 `i18n/de/docusaurus-plugin-content-docs/current/platform/aihosting/60-cms/`.
@@ -42,22 +42,22 @@ that actually define behaviour:
 
 **Drupal module**
 
-| File | Tells you |
-| --- | --- |
-| `composer.json` | AI and Key module version constraints |
-| `ai_provider_mittwald.info.yml` | Drupal core requirement |
-| `ai_provider_mittwald.routing.yml` | the real admin path (`/admin/config/ai/providers/mittwald`) |
-| `ai_provider_mittwald.links.menu.yml` | where the settings link appears in the menu tree |
-| `definitions/api_defaults.yml` | every configurable option, its range and default |
+| File                                         | Tells you                                                                                  |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `composer.json`                              | AI and Key module version constraints                                                      |
+| `ai_provider_mittwald.info.yml`              | Drupal core requirement                                                                    |
+| `ai_provider_mittwald.routing.yml`           | the real admin path (`/admin/config/ai/providers/mittwald`)                                |
+| `ai_provider_mittwald.links.menu.yml`        | where the settings link appears in the menu tree                                           |
+| `definitions/api_defaults.yml`               | every configurable option, its range and default                                           |
 | `src/Plugin/AiProvider/MittwaldProvider.php` | `default_models` per operation, and the regexes deciding which models get which capability |
 
 **WordPress plugin**
 
-| File | Tells you |
-| --- | --- |
-| `readme.txt` | `Requires at least`, the wordpress.org-facing description |
-| `README.md` | supported and unsupported operations |
-| `includes/MittwaldModelMetadataDirectory.php` | the hardcoded model → capability switch |
+| File                                          | Tells you                                                 |
+| --------------------------------------------- | --------------------------------------------------------- |
+| `readme.txt`                                  | `Requires at least`, the wordpress.org-facing description |
+| `README.md`                                   | supported and unsupported operations                      |
+| `includes/MittwaldModelMetadataDirectory.php` | the hardcoded model → capability switch                   |
 
 ## Step 3: What to check
 
@@ -67,7 +67,7 @@ that actually define behaviour:
   operation without any doc-visible signal.
 - **Admin paths.** Route and menu files change without a README update.
 - **Model lineup, in both directions.** An integration can hardcode models the
-  platform has removed *and* lag models the platform has added. Cross-check
+  platform has removed _and_ lag models the platform has added. Cross-check
   every model name against `docs/platform/aihosting/30-models/`.
 - **Capabilities are per-model, not per-family.** `Qwen3.5-0.8B` is text-only
   while `Qwen3.5-122B-A10B-FP8` accepts images, so "the Qwen models support
@@ -98,9 +98,9 @@ that actually define behaviour:
 - **Explicit anchors.** Headings carry `{#kebab-id}` so anchors survive
   translation and renaming. Keep the same anchor ids in the German file.
 - Relative links resolve against the doc URL: `../../models/`,
-  `../../access-and-usage/access`, `../../access-and-usage/terms-of-use`,
-  `../../dedicated/getting-started`, `../../examples/glm-ocr/`. Absolute form
-  for other sections: `/docs/v2/platform/workloads/containers/`.
+  `../../access-and-usage/access`, `../../dedicated/getting-started`,
+  `../../examples/glm-ocr/`. Absolute form for other sections:
+  `/docs/v2/platform/workloads/containers/`.
 
 ## Step 5: Verify
 
@@ -119,7 +119,7 @@ expression, Prettier passing means nothing. `npm run build` is the only real
 check; it is slow and needs `npm run generate` first, so reserve it for
 structural changes.
 
-If you reach for an ad-hoc MDX compile check, run it against an *unmodified*
+If you reach for an ad-hoc MDX compile check, run it against an _unmodified_
 file first. Docusaurus parses `{#anchor}` with its own remark plugin, so a
 plain `@mdx-js/mdx` compile fails on every file in this repo. A checker that
 flags the baseline is broken, not the doc.
