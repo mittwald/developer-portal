@@ -14,9 +14,9 @@ description: |
 
 Containers running on the mittwald platform write their output to `stdout` and `stderr`. The platform captures that output and makes it available in mStudio and through the [`mw container logs`](/docs/v2/cli/reference/container/) command. This is convenient for ad-hoc debugging, but it does not cover everything you might need telemetry for: searching across several containers at once, keeping data for weeks or months, building dashboards, or getting alerted when errors start piling up or a queue runs full.
 
-For that you need your own observability stack. This guide shows how to ship both **logs** and **metrics** there with a single collector — [Grafana Alloy](https://grafana.com/docs/alloy/latest/), Grafana's OpenTelemetry-based collector, running as a regular container in your project. The destination can be [Grafana Cloud](https://grafana.com/products/cloud/), the hosted version of the Grafana stack, or a [Loki](https://grafana.com/oss/loki/) and [Prometheus](https://prometheus.io/) you run yourself. Grafana Cloud offers a free tier that is sufficient for small setups; see the [Grafana Cloud pricing page](https://grafana.com/pricing/) for the current limits.
+For that you need your own observability stack. This guide shows how to ship both **logs** and **metrics** there with a single collector: [Grafana Alloy](https://grafana.com/docs/alloy/latest/), Grafana's OpenTelemetry-based collector, which runs as a regular container in your project. The destination can be [Grafana Cloud](https://grafana.com/products/cloud/), the hosted version of the Grafana stack, or a [Loki](https://grafana.com/oss/loki/) and [Prometheus](https://prometheus.io/) you run yourself. Grafana Cloud offers a free tier that is sufficient for small setups; see the [Grafana Cloud pricing page](https://grafana.com/pricing/) for the current limits.
 
-This is about the telemetry your own workloads produce. CPU and memory usage of your apps is already collected by the platform and can be queried through the [metrics API](/docs/v2/api/howtos/query-usage-metrics) — you do not need a collector for that. For request-level profiling of PHP applications, see [Profiling PHP applications with Tideways](/docs/v2/guides/operations/tideways-profiling).
+This is about the telemetry your own workloads produce. CPU and memory usage of your apps is already collected by the platform and can be queried through the [metrics API](/docs/v2/api/howtos/query-usage-metrics); you do not need a collector for that. For request-level profiling of PHP applications, see [Profiling PHP applications with Tideways](/docs/v2/guides/operations/tideways-profiling).
 
 :::caution Logs are personal data
 
@@ -29,22 +29,31 @@ Application and access logs regularly contain personal data, such as IP addresse
 One Alloy container collects both signals, each in its own way:
 
 1. **Logs** come from the project filesystem. The platform writes the output of every container in your project to a log file below `/var/log/container/`. Alloy mounts that directory, tails the files, attaches labels derived from the file paths and pushes the lines to Loki.
-2. **Metrics** are scraped over the network. Alloy calls the `/metrics` endpoints of the workloads in your project on an interval, and pushes the result to Prometheus with remote write. For workloads that do not speak Prometheus — databases, for example — Alloy runs the matching exporter itself.
+2. **Metrics** are scraped over the network. Alloy calls the `/metrics` endpoints of the workloads in your project on an interval, and pushes the result to Prometheus with remote write. For workloads that do not speak Prometheus, such as databases, Alloy runs the matching exporter itself.
 
-```
-Your containers ──── stdout/stderr ────▶ /var/log/container/<stack-id>/<service>.log
-                                                     │ mounted into
-Your containers ◀─── scraped /metrics ────┐          ▼
-                                          └── Grafana Alloy container
-                                                     │ HTTPS
-                                          ┌──────────┴──────────┐
-                                          ▼                     ▼
-                                    Loki (logs)        Prometheus (metrics)
+```mermaid
+graph LR
+    subgraph project["Your mittwald project"]
+        WORKLOADS["Containers and apps"]
+        LOGFILES[("/var/log/container/")]
+        ALLOY["Grafana Alloy"]
+    end
+
+    subgraph backend["Grafana Cloud, or your own stack"]
+        LOKI["Loki"]
+        PROM["Prometheus"]
+    end
+
+    WORKLOADS -->|"stdout/stderr"| LOGFILES
+    LOGFILES -->|"tailed"| ALLOY
+    ALLOY -->|"scrapes /metrics"| WORKLOADS
+    ALLOY -->|"logs"| LOKI
+    ALLOY -->|"metrics"| PROM
 ```
 
 Because Alloy reads logs from the project filesystem rather than from the containers themselves, a single Alloy container covers every container in the project, including ones you add later. Scraping is the part you extend as you add workloads.
 
-The steps below build the setup up in that order: destinations first, then a configuration skeleton, then one step per signal. If you only care about one of the two signals, skip the other step — nothing later depends on it.
+The steps below build the setup up in that order: destinations first, then a configuration skeleton, then one step per signal. If you only care about one of the two signals, skip the other step; nothing later depends on it.
 
 ## Prerequisites {#prerequisites}
 
@@ -57,7 +66,7 @@ To follow this guide, you will need:
 
 ## Step 1: Preparing the destinations {#destinations}
 
-Alloy writes logs to any Loki-compatible endpoint and metrics to any endpoint that accepts Prometheus remote write. Whichever option you choose, you end up with the same set of values — a push URL per signal, and credentials if the endpoint requires them — which you will pass into the container as environment variables in [step 5](#deploy).
+Alloy writes logs to any Loki-compatible endpoint and metrics to any endpoint that accepts Prometheus remote write. Whichever option you choose, you end up with the same set of values: a push URL per signal, and credentials if the endpoint requires them. You will pass them into the container as environment variables in [step 5](#deploy).
 
 The two destinations are independent. Sending logs to Grafana Cloud while keeping metrics in a Prometheus of your own is a perfectly valid combination.
 
@@ -68,11 +77,11 @@ Grafana Cloud authenticates writes with an **access policy token**. Access polic
 1. Open `https://grafana.com/orgs/<your-org>/access-policies` in your browser, where `<your-org>` is the name of your Grafana Cloud organization.
 2. Click **"New access policy"**.
 3. Give the policy a name (for example `mittwald-telemetry`), select the stack it should apply to and grant it the following scopes:
-   - `logs:write` — to push logs into Loki
-   - `metrics:write` — to push metrics into Prometheus
+   - `logs:write` for pushing logs into Loki
+   - `metrics:write` for pushing metrics into Prometheus
 4. Click **"Create access policy"**.
 5. The new policy now appears in the list. Click **"Add token"** on it, give the token a name, optionally set an expiration date, and confirm.
-6. Copy the token — it starts with `glc_` and is displayed only once.
+6. Copy the token. It starts with `glc_` and is displayed only once.
 
 Next, look up the endpoints and user IDs that go with the token:
 
@@ -81,7 +90,7 @@ Next, look up the endpoints and user IDs that go with the token:
 3. Do the same for the **Prometheus** instance.
 4. The **Grafana** instance on the same page is where you will query both signals later on.
 
-You should end up with these six values — the token serves as the password for both endpoints, the user names differ because each instance has its own numeric ID:
+You should end up with these six values. The token serves as the password for both endpoints; the user names differ, because each instance has its own numeric ID:
 
 ```shell
 # Loki (logs)
@@ -97,7 +106,7 @@ PROM_PASSWORD=glc_XXX
 
 :::note
 
-Alloy needs the complete push endpoints, as shown above. Depending on where in the portal you read them, you may get the base URL of an instance instead — in that case, append `/loki/api/v1/push` to the Loki URL and `/api/prom/push` to the Prometheus URL yourself.
+Alloy needs the complete push endpoints, as shown above. Depending on where in the portal you read them, you may get the base URL of an instance instead. In that case, append `/loki/api/v1/push` to the Loki URL and `/api/prom/push` to the Prometheus URL yourself.
 
 :::
 
@@ -124,7 +133,7 @@ LOKI_PASSWORD=your_secret_password
 
 Two things are worth checking before you continue:
 
-- **Authentication.** A bare Loki has no authentication of its own and is usually protected by a reverse proxy in front of it. Never expose an unauthenticated Loki to the internet — anyone who finds it can write into it and read everything it holds.
+- **Authentication.** A bare Loki has no authentication of its own and is usually protected by a reverse proxy in front of it. Never expose an unauthenticated Loki to the internet: anyone who finds it can write into it and read everything it holds.
 - **Multi-tenancy.** If your Loki runs with `auth_enabled: true`, every write has to carry a tenant ID. Alloy sends it for you if you set `tenant_id` in the configuration (see [Writing to your own endpoints](#config-self-hosted)).
 
 **Prometheus** accepts remote write at `/api/v1/write`, but only if it was started with the `--web.enable-remote-write-receiver` flag:
@@ -140,19 +149,19 @@ PROM_PASSWORD=your_secret_password
 
 :::caution Prometheus rejects remote write by default
 
-A stock Prometheus answers remote write requests with `404 remote write receiver needs to be enabled` until it is started with `--web.enable-remote-write-receiver`. This is a command-line flag, not a setting in `prometheus.yml`, so a configuration reload is not enough — the process has to be restarted.
+A stock Prometheus answers remote write requests with `404 remote write receiver needs to be enabled` until it is started with `--web.enable-remote-write-receiver`. This is a command-line flag, not a setting in `prometheus.yml`, so a configuration reload is not enough; the process has to be restarted.
 
 Note also that the path differs from Grafana Cloud's: `/api/v1/write` for Prometheus, `/api/prom/push` for Grafana Cloud.
 
 :::
 
-Receivers built for ingest — [Mimir](https://grafana.com/oss/mimir/), [Thanos](https://thanos.io/) or [VictoriaMetrics](https://victoriametrics.com/) — accept remote write without that flag and are the better choice if you collect from more than a handful of projects.
+Receivers built for ingest, such as [Mimir](https://grafana.com/oss/mimir/), [Thanos](https://thanos.io/) or [VictoriaMetrics](https://victoriametrics.com/), accept remote write without that flag and are the better choice if you collect from more than a handful of projects.
 
 :::note Host your stack elsewhere
 
 Loki and Prometheus are both available as container images, so it is technically possible to run them in the same mittwald project as the workloads they observe. We recommend against it: telemetry storage that shares the fate of the system it observes is of little use during exactly the incidents you keep it for. When the project is unavailable, so is the data that would explain why.
 
-Run them somewhere separate — a different project, a different provider, or your own infrastructure.
+Run them somewhere separate: a different project, a different provider, or your own infrastructure.
 
 :::
 
@@ -169,37 +178,37 @@ Start with the two endpoints. Everything you add in the following steps forwards
 
 // Where logs go
 loki.write "default" {
-	endpoint {
-		url = sys.env("LOKI_URL")
+  endpoint {
+    url = sys.env("LOKI_URL")
 
-		basic_auth {
-			username = sys.env("LOKI_USER")
-			password = sys.env("LOKI_PASSWORD")
-		}
-	}
+    basic_auth {
+      username = sys.env("LOKI_USER")
+      password = sys.env("LOKI_PASSWORD")
+    }
+  }
 }
 
 // Where metrics go
 prometheus.remote_write "default" {
-	// Attached to every metric, so you can tell projects apart. This is the
-	// same `host` label the log pipeline sets, which makes it possible to
-	// line logs and metrics up in one dashboard.
-	external_labels = {
-		host = sys.env("ALLOY_HOSTNAME"),
-	}
+  // Attached to every metric, so you can tell projects apart. This is the
+  // same `host` label the log pipeline sets, which makes it possible to
+  // line logs and metrics up in one dashboard.
+  external_labels = {
+    host = sys.env("ALLOY_HOSTNAME"),
+  }
 
-	endpoint {
-		url = sys.env("PROM_URL")
+  endpoint {
+    url = sys.env("PROM_URL")
 
-		basic_auth {
-			username = sys.env("PROM_USER")
-			password = sys.env("PROM_PASSWORD")
-		}
-	}
+    basic_auth {
+      username = sys.env("PROM_USER")
+      password = sys.env("PROM_PASSWORD")
+    }
+  }
 }
 ```
 
-If you only collect one of the two signals, leave the other component out — and remember to drop its environment variables from the container setup as well, as described in [step 5](#deploy-stack).
+If you only collect one of the two signals, leave the other component out, and remember to drop its environment variables from the container setup as well, as described in [step 5](#deploy-stack).
 
 ### Writing to your own endpoints {#config-self-hosted}
 
@@ -207,9 +216,9 @@ For endpoints of your own, only the two `endpoint` blocks change. Without authen
 
 ```hcl title="config.alloy (excerpt)"
 loki.write "default" {
-	endpoint {
-		url = sys.env("LOKI_URL")
-	}
+  endpoint {
+    url = sys.env("LOKI_URL")
+  }
 }
 ```
 
@@ -217,10 +226,10 @@ If your Loki runs in multi-tenant mode (`auth_enabled: true`), name the tenant t
 
 ```hcl title="config.alloy (excerpt)"
 loki.write "default" {
-	endpoint {
-		url       = sys.env("LOKI_URL")
-		tenant_id = "my-tenant"
-	}
+  endpoint {
+    url       = sys.env("LOKI_URL")
+    tenant_id = "my-tenant"
+  }
 }
 ```
 
@@ -232,7 +241,7 @@ The container reads its configuration from the project filesystem, so the file h
 
 Your own mStudio account can connect to the project filesystem over SSH and SFTP. The user name for such a connection combines your mStudio email address with the short ID of the resource you want to connect to:
 
-- `<your-email>@<project-short-id>@<ssh-host>` connects to the **project** — this is the one you need for `/files`
+- `<your-email>@<project-short-id>@<ssh-host>` connects to the **project**, which is the one you need for `/files`
 - `<your-email>@<container-short-id>@<ssh-host>` connects into a **container**
 
 The SSH host and the short ID of your project are shown by `mw project get`; `mw container list` lists the short IDs of your containers. Authentication uses the SSH key or password that you have deposited in your mStudio account. For an interactive shell, [`mw project ssh`](/docs/v2/cli/reference/project/) assembles the connection for you.
@@ -271,71 +280,71 @@ This pipeline tails the log files that the platform writes for every container i
 
 // 1. Discovery — expand the glob into one target per log file
 local.file_match "container_logs" {
-	path_targets = [{
-		"__path__" = "/mnt/logs/container/*/*.log",
-	}]
+  path_targets = [{
+    "__path__" = "/mnt/logs/container/*/*.log",
+  }]
 
-	// How often the filesystem is re-scanned for new and removed files.
-	sync_period = "15s"
+  // How often the filesystem is re-scanned for new and removed files.
+  sync_period = "15s"
 }
 
 // 2. Labels — derive the stack ID and the service name from the file path.
 //    Relabel regexes are fully anchored, so they have to match the whole path.
 discovery.relabel "container_logs" {
-	targets = local.file_match.container_logs.targets
+  targets = local.file_match.container_logs.targets
 
-	// /mnt/logs/container/<stack-id>/whatever.log -> stack="<stack-id>"
-	rule {
-		action        = "replace"
-		source_labels = ["__path__"]
-		regex         = "/mnt/logs/container/([^/]+)/[^/]+\\.log"
-		target_label  = "stack"
-		replacement   = "$1"
-	}
+  // /mnt/logs/container/<stack-id>/whatever.log -> stack="<stack-id>"
+  rule {
+    action        = "replace"
+    source_labels = ["__path__"]
+    regex         = "/mnt/logs/container/([^/]+)/[^/]+\\.log"
+    target_label  = "stack"
+    replacement   = "$1"
+  }
 
-	// /mnt/logs/container/whatever/<service-name>.log -> container="<service-name>"
-	rule {
-		action        = "replace"
-		source_labels = ["__path__"]
-		regex         = "/mnt/logs/container/[^/]+/(.+)\\.log"
-		target_label  = "container"
-		replacement   = "$1"
-	}
+  // /mnt/logs/container/whatever/<service-name>.log -> container="<service-name>"
+  rule {
+    action        = "replace"
+    source_labels = ["__path__"]
+    regex         = "/mnt/logs/container/[^/]+/(.+)\\.log"
+    target_label  = "container"
+    replacement   = "$1"
+  }
 
-	rule {
-		action       = "replace"
-		target_label = "job"
-		replacement  = "container-logs"
-	}
+  rule {
+    action       = "replace"
+    target_label = "job"
+    replacement  = "container-logs"
+  }
 
-	// constants.hostname is the container ID inside Docker, so pass the real
-	// host name in via the environment instead.
-	rule {
-		action       = "replace"
-		target_label = "host"
-		replacement  = sys.env("ALLOY_HOSTNAME")
-	}
+  // constants.hostname is the container ID inside Docker, so pass the real
+  // host name in via the environment instead.
+  rule {
+    action       = "replace"
+    target_label = "host"
+    replacement  = sys.env("ALLOY_HOSTNAME")
+  }
 }
 
 // 3. Tailing — read offsets are kept in --storage.path (persist that volume!)
 loki.source.file "container_logs" {
-	targets    = discovery.relabel.container_logs.output
-	forward_to = [loki.process.container_logs.receiver]
+  targets    = discovery.relabel.container_logs.output
+  forward_to = [loki.process.container_logs.receiver]
 
-	// false = read existing files from the beginning when they are first seen.
-	// Set this to true if you only care about new lines and want to avoid a
-	// large initial backfill.
-	tail_from_end = false
+  // false = read existing files from the beginning when they are first seen.
+  // Set this to true if you only care about new lines and want to avoid a
+  // large initial backfill.
+  tail_from_end = false
 }
 
 // 4. Processing
 loki.process "container_logs" {
-	forward_to = [loki.write.default.receiver]
+  forward_to = [loki.write.default.receiver]
 
-	// `filename` is 1:1 with `container`, so it only adds label cardinality.
-	stage.label_drop {
-		values = ["filename"]
-	}
+  // `filename` is 1:1 with `container`, so it only adds label cardinality.
+  stage.label_drop {
+    values = ["filename"]
+  }
 }
 ```
 
@@ -343,13 +352,13 @@ The pipeline reads from top to bottom: `local.file_match` turns the glob into on
 
 :::note Keep your label set small
 
-Loki creates a separate stream for every combination of label values, and a large number of streams makes queries slower and, in Grafana Cloud, your bill higher. Labels that are stable and low in cardinality — `job`, `stack`, `container`, `host` — are a good fit. Never turn per-request values such as request IDs, URLs or user IDs into labels; query them with a [LogQL filter expression](https://grafana.com/docs/loki/latest/query/log_queries/) instead.
+Loki creates a separate stream for every combination of label values, and a large number of streams makes queries slower and, in Grafana Cloud, your bill higher. Labels that are stable and low in cardinality (`job`, `stack`, `container`, `host`) are a good fit. Never turn per-request values such as request IDs, URLs or user IDs into labels; query them with a [LogQL filter expression](https://grafana.com/docs/loki/latest/query/log_queries/) instead.
 
 :::
 
 ### Checking where your log files actually are {#log-paths}
 
-Before you deploy, it is worth confirming that the glob in the configuration matches. Open a shell in the project — the CLI assembles the connection for you:
+Before you deploy, it is worth confirming that the glob in the configuration matches. Open a shell in the project; the CLI assembles the connection for you:
 
 ```shellsession title="Local shell session"
 user@local $ mw project ssh
@@ -371,29 +380,29 @@ Metrics work the other way around: instead of reading files, Alloy calls your wo
 
 Anything in your project that exposes a Prometheus endpoint can be scraped directly. Two properties of the platform decide how the target is spelled:
 
-- The **internal DNS name** of a container is its service key in the compose file, or the slugified name if you created it in the UI — a container named `My app` is reachable as `my-app`. See [network connectivity between containers and apps](/docs/v2/platform/workloads/containers#stack-network-connectivity).
+- The **internal DNS name** of a container is its service key in the compose file, or the slugified name if you created it in the UI. A container named `My app` is reachable as `my-app`. See [network connectivity between containers and apps](/docs/v2/platform/workloads/containers#stack-network-connectivity).
 - The **port has to be published** in the container's `ports` declaration. An unpublished port is not reachable from another container, not even inside the same project. Publishing it does not expose anything to the internet: the platform's network policies keep it within the project.
 
 With that, a scrape target is simply `<service-name>:<port>`:
 
 ```hcl title="config.alloy (continued)"
 prometheus.scrape "workloads" {
-	targets = [
-		{
-			"__address__" = "my-app:8080",
-			"container"   = "my-app",
-		},
-		{
-			// Non-default metrics path, if your app uses one
-			"__address__"      = "worker:9100",
-			"__metrics_path__" = "/internal/metrics",
-			"container"        = "worker",
-		},
-	]
+  targets = [
+    {
+      "__address__" = "my-app:8080",
+      "container"   = "my-app",
+    },
+    {
+      // Non-default metrics path, if your app uses one
+      "__address__"      = "worker:9100",
+      "__metrics_path__" = "/internal/metrics",
+      "container"        = "worker",
+    },
+  ]
 
-	forward_to      = [prometheus.remote_write.default.receiver]
-	job_name        = "workloads"
-	scrape_interval = "60s"
+  forward_to      = [prometheus.remote_write.default.receiver]
+  job_name        = "workloads"
+  scrape_interval = "60s"
 }
 ```
 
@@ -407,9 +416,9 @@ Every scrape of every series is a data point. Halving the interval doubles the i
 
 :::caution Managed apps are a special case
 
-PHP, Node.js and Python apps are reachable from a container at `<app-short-id>:8080`, but the request is only routed to the app if its `Host` header matches one of the app's virtual hosts — the same detail that makes the [caching proxy setup](/docs/v2/platform/workloads/varnish) rewrite that header. Scraping a managed app directly is therefore brittle.
+PHP, Node.js and Python apps are reachable from a container at `<app-short-id>:8080`, but the request is only routed to the app if its `Host` header matches one of the app's virtual hosts, the same detail that makes the [caching proxy setup](/docs/v2/platform/workloads/varnish) rewrite that header. Scraping a managed app directly is therefore brittle.
 
-If your app exposes metrics, the more reliable route is to scrape it through a virtual host of its own, as `https://<hostname>/metrics`. Keep in mind that a managed app serves only one port, so that path is publicly reachable — protect it with authentication and pass the credentials to Alloy with a `basic_auth` block in `prometheus.scrape`.
+If your app exposes metrics, the more reliable route is to scrape it through a virtual host of its own, as `https://<hostname>/metrics`. Keep in mind that a managed app serves only one port, so that path is publicly reachable: protect it with authentication and pass the credentials to Alloy with a `basic_auth` block in `prometheus.scrape`.
 
 :::
 
@@ -417,18 +426,18 @@ If your app exposes metrics, the more reliable route is to scrape it through a v
 
 Databases and similar services have no `/metrics` endpoint of their own. Alloy bundles the common Prometheus exporters, so you do not need a sidecar container for them: the exporter runs inside Alloy, and exposes its targets to `prometheus.scrape`.
 
-A MariaDB or MySQL container — reachable inside the project as `mysql://mariadb:3306`, see the [MariaDB guide](/docs/v2/platform/databases/mariadb) — looks like this:
+A MariaDB or MySQL container is reachable inside the project as `mysql://mariadb:3306` (see the [MariaDB guide](/docs/v2/platform/databases/mariadb)). Wiring an exporter to it looks like this:
 
 ```hcl title="config.alloy (continued)"
 prometheus.exporter.mysql "mariadb" {
-	data_source_name = sys.env("MYSQL_EXPORTER_DSN")
+  data_source_name = sys.env("MYSQL_EXPORTER_DSN")
 }
 
 prometheus.scrape "mariadb" {
-	targets         = prometheus.exporter.mysql.mariadb.targets
-	forward_to      = [prometheus.remote_write.default.receiver]
-	job_name        = "mariadb"
-	scrape_interval = "60s"
+  targets         = prometheus.exporter.mysql.mariadb.targets
+  forward_to      = [prometheus.remote_write.default.receiver]
+  job_name        = "mariadb"
+  scrape_interval = "60s"
 }
 ```
 
@@ -438,11 +447,11 @@ with the data source name in the `.env` file rather than in the configuration:
 MYSQL_EXPORTER_DSN=exporter:your_secret_password@(mariadb:3306)/
 ```
 
-The other exporters follow the same shape — [`prometheus.exporter.postgres`](https://grafana.com/docs/alloy/latest/reference/components/prometheus/prometheus.exporter.postgres/) takes a list in `data_source_names` (`postgresql://exporter:password@postgresql:5432/mydb?sslmode=disable`), and [`prometheus.exporter.redis`](https://grafana.com/docs/alloy/latest/reference/components/prometheus/prometheus.exporter.redis/) takes `redis_addr` plus optional `redis_user` and `redis_password`. The full list is in the [Alloy component reference](https://grafana.com/docs/alloy/latest/reference/components/).
+The other exporters follow the same shape. [`prometheus.exporter.postgres`](https://grafana.com/docs/alloy/latest/reference/components/prometheus/prometheus.exporter.postgres/) takes a list in `data_source_names` (`postgresql://exporter:password@postgresql:5432/mydb?sslmode=disable`), and [`prometheus.exporter.redis`](https://grafana.com/docs/alloy/latest/reference/components/prometheus/prometheus.exporter.redis/) takes `redis_addr` plus optional `redis_user` and `redis_password`. The full list is in the [Alloy component reference](https://grafana.com/docs/alloy/latest/reference/components/).
 
 :::caution Give the exporter its own database user
 
-Do not reuse the root or application credentials. Create a dedicated user with the least privileges the exporter needs — for MySQL and MariaDB, that is `PROCESS`, `REPLICATION CLIENT` and `SELECT`:
+Do not reuse the root or application credentials. Create a dedicated user with the least privileges the exporter needs. For MySQL and MariaDB, that is `PROCESS`, `REPLICATION CLIENT` and `SELECT`:
 
 ```sql
 CREATE USER 'exporter'@'%' IDENTIFIED BY 'your_secret_password' WITH MAX_USER_CONNECTIONS 3;
@@ -453,41 +462,41 @@ GRANT PROCESS, REPLICATION CLIENT, SELECT ON *.* TO 'exporter'@'%';
 
 :::note Managed Redis is not a container
 
-The [Redis documentation](/docs/v2/platform/databases/redis) describes the _managed_ Redis database, which is not part of your container stack. Its host name and port come from mStudio or the API, not from a service name — use those in `redis_addr`.
+The [Redis documentation](/docs/v2/platform/databases/redis) describes the _managed_ Redis database, which is not part of your container stack. Its host name and port come from mStudio or the API, not from a service name; use those in `redis_addr`.
 
 :::
 
 ### Alloy's own logs and metrics {#metrics-self}
 
-The collector is a workload too, and it is the one you will want to look at when data stops arriving. This block sends Alloy's own log output to Loki and its internal metrics — sent and dropped bytes, per-file read offsets, write errors — to Prometheus:
+The collector is a workload too, and it is the one you will want to look at when data stops arriving. This block sends Alloy's own log output to Loki and its internal metrics (sent and dropped bytes, per-file read offsets, write errors) to Prometheus:
 
 ```hcl title="config.alloy (continued)"
 // Alloy's own logs, so that shipping problems can be debugged from Grafana.
 logging {
-	level    = "info"
-	format   = "logfmt"
-	write_to = [loki.process.alloy_logs.receiver]
+  level    = "info"
+  format   = "logfmt"
+  write_to = [loki.process.alloy_logs.receiver]
 }
 
 loki.process "alloy_logs" {
-	forward_to = [loki.write.default.receiver]
+  forward_to = [loki.write.default.receiver]
 
-	stage.static_labels {
-		values = {
-			job  = "alloy",
-			host = sys.env("ALLOY_HOSTNAME"),
-		}
-	}
+  stage.static_labels {
+    values = {
+      job  = "alloy",
+      host = sys.env("ALLOY_HOSTNAME"),
+    }
+  }
 }
 
 // Alloy's own metrics
 prometheus.exporter.self "alloy" {}
 
 prometheus.scrape "alloy" {
-	targets         = prometheus.exporter.self.alloy.targets
-	forward_to      = [prometheus.remote_write.default.receiver]
-	job_name        = "integrations/alloy"
-	scrape_interval = "60s"
+  targets         = prometheus.exporter.self.alloy.targets
+  forward_to      = [prometheus.remote_write.default.receiver]
+  job_name        = "integrations/alloy"
+  scrape_interval = "60s"
 }
 ```
 
@@ -503,7 +512,7 @@ The container uses the [`grafana/alloy`](https://hub.docker.com/r/grafana/alloy)
 
 :::caution Persist the data volume
 
-Without the `alloy-data` volume, Alloy loses track of how far it has read into each log file. After every restart it would start from the beginning again, which duplicates log lines in Loki and can produce a sizeable — and, in Grafana Cloud, expensive — backfill.
+Without the `alloy-data` volume, Alloy loses track of how far it has read into each log file. After every restart it would start from the beginning again, which duplicates log lines in Loki and can produce a sizeable backfill that, in Grafana Cloud, is expensive.
 
 :::
 
@@ -568,7 +577,7 @@ MYSQL_EXPORTER_DSN=exporter:your_secret_password@(mariadb:3306)/
 
 In Grafana Cloud, `LOKI_PASSWORD` and `PROM_PASSWORD` both hold the same access policy token; the user names differ, because each instance has its own numeric ID.
 
-Whenever you leave a variable out of the `.env` file, remove the matching line from the `environment` section of the compose file as well — otherwise it is passed into the container as an empty string, and Alloy fails against an endpoint it thinks is configured. This applies to `LOKI_USER` and `LOKI_PASSWORD` for endpoints without authentication (see [Writing to your own endpoints](#config-self-hosted)), to the `PROM_*` variables if you collect no metrics, and to `MYSQL_EXPORTER_DSN` if you run no exporter.
+Whenever you leave a variable out of the `.env` file, remove the matching line from the `environment` section of the compose file as well. Otherwise it is passed into the container as an empty string, and Alloy fails against an endpoint it thinks is configured. This applies to `LOKI_USER` and `LOKI_PASSWORD` for endpoints without authentication (see [Writing to your own endpoints](#config-self-hosted)), to the `PROM_*` variables if you collect no metrics, and to `MYSQL_EXPORTER_DSN` if you run no exporter.
 
 Then deploy the stack:
 
@@ -618,7 +627,7 @@ You should see the output of your containers, labelled with `stack`, `container`
 {job="container-logs", container="my-app"}
 ```
 
-Switch to the Prometheus data source for the metrics. The `up` metric is the quickest check, because Alloy generates it for every scrape target — `1` means the last scrape succeeded, `0` means the target was unreachable:
+Switch to the Prometheus data source for the metrics. The `up` metric is the quickest check, because Alloy generates it for every scrape target: `1` means the last scrape succeeded, `0` that the target was unreachable:
 
 ```promql
 up{host="my-project"}
@@ -634,7 +643,7 @@ The first data usually appears within a minute. If nothing shows up, see [Troubl
 
 ### Inspecting the Alloy UI {#alloy-ui}
 
-Alloy ships a web UI that shows every component in the pipeline, its health and the targets it has discovered — which makes it the fastest way to tell whether your glob matches any files and whether a scrape target answers at all. Publishing port `12345` only makes it reachable from within your project, so forward it to your local machine to have a look:
+Alloy ships a web UI that shows every component in the pipeline, its health and the targets it has discovered, which makes it the fastest way to tell whether your glob matches any files and whether a scrape target answers at all. Publishing port `12345` only makes it reachable from within your project, so forward it to your local machine to have a look:
 
 ```shellsession title="Local shell session"
 user@local $ mw container port-forward alloy 12345
@@ -644,7 +653,7 @@ The UI is then available at `http://localhost:12345`.
 
 :::caution
 
-Alloy's web UI has no authentication of its own. Do not connect a domain to port `12345` — use port forwarding when you need access. Publishing the port within the project is not a problem: the platform's network policies prevent access from other projects or from the internet.
+Alloy's web UI has no authentication of its own. Do not connect a domain to port `12345`; use port forwarding when you need access. Publishing the port within the project is not a problem: the platform's network policies prevent access from other projects or from the internet.
 
 :::
 
@@ -652,7 +661,7 @@ Alloy's web UI has no authentication of its own. Do not connect a domain to port
 
 ### Other log files {#other-logs}
 
-The `/var/log` mount contains more than the container logs — PHP apps, for example, write their errors to `/var/log/php_errors.log`. Have a look at what your project keeps there:
+The `/var/log` mount contains more than the container logs. PHP apps, for example, write their errors to `/var/log/php_errors.log`. Have a look at what your project keeps there:
 
 ```shellsession title="SSH shell session"
 user@ssh $ ls -l /var/log/
@@ -662,22 +671,22 @@ To ship those files as well, add a second log pipeline to `config.alloy`:
 
 ```hcl title="config.alloy (excerpt)"
 local.file_match "app_logs" {
-	path_targets = [{
-		"__path__" = "/mnt/logs/*.log",
-		"job"      = "app-logs",
-		"host"     = sys.env("ALLOY_HOSTNAME"),
-	}]
+  path_targets = [{
+    "__path__" = "/mnt/logs/*.log",
+    "job"      = "app-logs",
+    "host"     = sys.env("ALLOY_HOSTNAME"),
+  }]
 
-	sync_period = "15s"
+  sync_period = "15s"
 }
 
 loki.source.file "app_logs" {
-	targets    = local.file_match.app_logs.targets
-	forward_to = [loki.write.default.receiver]
+  targets    = local.file_match.app_logs.targets
+  forward_to = [loki.write.default.receiver]
 }
 ```
 
-In this pipeline, the `filename` label is worth keeping — unlike in the container pipeline, it is what tells the individual files apart, and there are only a handful of them. For log files that live somewhere else in the project filesystem, mount that directory into the container as well and point another `__path__` at it.
+In this pipeline, the `filename` label is worth keeping: unlike in the container pipeline, it is what tells the individual files apart, and there are only a handful of them. For log files that live somewhere else in the project filesystem, mount that directory into the container as well and point another `__path__` at it.
 
 If your containers emit structured logs, it is worth parsing them in `loki.process`: a [`stage.json`](https://grafana.com/docs/alloy/latest/reference/components/loki/loki.process/#stagejson) block extracts fields from JSON lines, and [`stage.timestamp`](https://grafana.com/docs/alloy/latest/reference/components/loki/loki.process/#stagetimestamp) makes Loki use the application's own timestamp instead of the time the line was read.
 
@@ -693,11 +702,11 @@ Instrumenting your applications is the larger part of that job and out of scope 
 
 - Check `mw container logs alloy` for the exact error. A message about a missing or unreadable configuration file means that either the upload in [step 2](#config-upload) did not end up at `/files/alloy/config.alloy`, or the volume is not mounted at `/etc/alloy`.
 - Syntax errors in `config.alloy` also abort the start and are reported with a line number.
-- A component that references another one that does not exist — a `forward_to` pointing at a receiver you left out — is reported the same way. Every pipeline in this guide forwards into `loki.write.default` or `prometheus.remote_write.default`, so both have to be present in the file.
+- A component that references one that does not exist, such as a `forward_to` pointing at a receiver you left out, is reported the same way. Every pipeline in this guide forwards into `loki.write.default` or `prometheus.remote_write.default`, so both have to be present in the file.
 
 ### No logs arrive in Loki {#troubleshooting-no-logs}
 
-- Open the [Alloy UI](#alloy-ui) and check the `local.file_match.container_logs` component. If it lists no targets, the glob does not match anything — verify the actual log paths as described in [Checking where your log files actually are](#log-paths).
+- Open the [Alloy UI](#alloy-ui) and check the `local.file_match.container_logs` component. If it lists no targets, the glob does not match anything; verify the actual log paths as described in [Checking where your log files actually are](#log-paths).
 - `401` or `403` responses point at the credentials: in Grafana Cloud, make sure `LOKI_PASSWORD` is the token itself (starting with `glc_`), not the name of the access policy, and that `LOKI_USER` is the numeric user ID of the Loki instance.
 - A `404` usually means the URL is missing the `/loki/api/v1/push` suffix.
 - On a self-hosted Loki, a `401` with the message `no org id` means that the instance runs in multi-tenant mode and expects a `tenant_id` (see [Writing to your own endpoints](#config-self-hosted)).
@@ -710,7 +719,7 @@ Instrumenting your applications is the larger part of that job and out of scope 
 ### No metrics arrive, or a target stays down {#troubleshooting-no-metrics}
 
 - Query `up` in Grafana. A target with value `0` was unreachable; a target that does not appear at all was never configured, or its component failed to load.
-- The most common cause of an unreachable target is a port that is not published. Check the `ports` declaration of the container you are scraping — inside the project, only published ports are reachable.
+- The most common cause of an unreachable target is a port that is not published. Check the `ports` declaration of the container you are scraping: inside the project, only published ports are reachable.
 - Check the spelling of the internal DNS name. It is the compose service key, or the slugified container name from the UI, not the description you typed.
 - If the scrape succeeds but nothing is stored, look at the remote write side: a `404` from a self-hosted Prometheus usually means `--web.enable-remote-write-receiver` is missing or the URL uses the wrong push path (`/api/v1/write` rather than Grafana Cloud's `/api/prom/push`).
 - For an exporter, the Alloy UI shows the component's health with the connection error attached. A failing MySQL exporter is almost always a wrong data source name, a missing grant, or a database that is not reachable under that service name.
