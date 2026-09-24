@@ -274,9 +274,9 @@ You will do this a few times while working through the next two steps, so it is 
 This pipeline tails the log files that the platform writes for every container in your project, and forwards them into the `loki.write` component from [step 2](#config). Append it to `config.alloy`:
 
 ```hcl title="config.alloy (continued)"
-// Watches: /mnt/logs/container/<stack-id>/<container-id>.log
-// Labels:  job="container-logs", stack=<stack-id>, container_id=<container-id>,
-//          host=$ALLOY_HOSTNAME
+// Watches: /mnt/logs/container/<stack-id>/<container-name>-<container-id>.log
+// Labels:  job="container-logs", stack=<stack-id>, container=<container-name>,
+//          container_id=<container-id>, host=$ALLOY_HOSTNAME
 
 // 1. Discovery — expand the glob into one target per log file
 local.file_match "container_logs" {
@@ -288,7 +288,7 @@ local.file_match "container_logs" {
   sync_period = "15s"
 }
 
-// 2. Labels — derive the stack ID and the service name from the file path.
+// 2. Labels — derive stack, container name and container ID from the path.
 //    Relabel regexes are fully anchored, so they have to match the whole path.
 discovery.relabel "container_logs" {
   targets = local.file_match.container_logs.targets
@@ -302,14 +302,22 @@ discovery.relabel "container_logs" {
     replacement   = "$1"
   }
 
-  // The file name is the container's ID, not its name.
-  // /mnt/logs/container/whatever/<container-id>.log -> container_id="<container-id>"
+  // The file name combines both identifiers, for example my-app-c-XXXXXX.log,
+  // so the same regex yields the name in $1 and the ID in $2.
   rule {
     action        = "replace"
     source_labels = ["__path__"]
-    regex         = "/mnt/logs/container/[^/]+/(.+)\\.log"
-    target_label  = "container_id"
+    regex         = "/mnt/logs/container/[^/]+/(.+)-(c-[^/-]+)\\.log"
+    target_label  = "container"
     replacement   = "$1"
+  }
+
+  rule {
+    action        = "replace"
+    source_labels = ["__path__"]
+    regex         = "/mnt/logs/container/[^/]+/(.+)-(c-[^/-]+)\\.log"
+    target_label  = "container_id"
+    replacement   = "$2"
   }
 
   rule {
@@ -342,7 +350,7 @@ loki.source.file "container_logs" {
 loki.process "container_logs" {
   forward_to = [loki.write.default.receiver]
 
-  // `filename` is 1:1 with `container_id`, so it only adds label cardinality.
+  // `filename` is 1:1 with `container`, so it only adds label cardinality.
   stage.label_drop {
     values = ["filename"]
   }
@@ -353,7 +361,7 @@ The pipeline reads from top to bottom: `local.file_match` turns the glob into on
 
 :::note Keep your label set small
 
-Loki creates a separate stream for every combination of label values, and a large number of streams makes queries slower and, in Grafana Cloud, your bill higher. Labels that are stable and low in cardinality (`job`, `stack`, `container_id`, `host`) are a good fit. Never turn per-request values such as request IDs, URLs or user IDs into labels; query them with a [LogQL filter expression](https://grafana.com/docs/loki/latest/query/log_queries/) instead.
+Loki creates a separate stream for every combination of label values, and a large number of streams makes queries slower and, in Grafana Cloud, your bill higher. Labels that are stable and low in cardinality (`job`, `stack`, `container`, `container_id`, `host`) are a good fit; the last two are 1:1 with each other, so carrying both costs nothing extra. Never turn per-request values such as request IDs, URLs or user IDs into labels; query them with a [LogQL filter expression](https://grafana.com/docs/loki/latest/query/log_queries/) instead.
 
 :::
 
@@ -391,25 +399,7 @@ prometheus.scrape "workloads" {
 }
 ```
 
-The extra `container` label is worth setting, because the scrape target itself only carries the address. `metrics_path` defaults to `/metrics`, and `scrape_interval` to `60s`.
-
-:::note Logs and metrics identify containers differently
-
-The label the log pipeline attaches is `container_id`, because the log file is named after the container's ID. Scrape targets, on the other hand, are addressed by the internal DNS name. The two are separate identifiers, so a query cannot join the signals on one label out of the box.
-
-If you want them to line up in a dashboard, add the ID to the scrape target as well, next to the name:
-
-```hcl
-{
-  "__address__"  = "my-app:8080",
-  "container"    = "my-app",
-  "container_id" = "XXXXXXXX",
-}
-```
-
-`mw container list` shows both values. The alternative is to correlate on `host`, the one label both signals carry without any extra work.
-
-:::
+The extra `container` label is worth setting: it is the same label the log pipeline derives from the log file name, so a dashboard can put the logs and the metrics of one workload side by side. `metrics_path` defaults to `/metrics`, and `scrape_interval` to `60s`.
 
 :::note Scrape interval and cost
 
@@ -624,10 +614,10 @@ Then query both signals in Grafana. Go to **Explore**, select the Loki data sour
 {job="container-logs"}
 ```
 
-You should see the output of your containers, labelled with `stack`, `container_id` and `host`. To narrow it down to a single container, use its ID, which `mw container list` shows next to the container's name:
+You should see the output of your containers, labelled with `stack`, `container`, `container_id` and `host`. To narrow it down to a single container, filter by its name:
 
 ```logql
-{job="container-logs", container_id="XXXXXXXX"}
+{job="container-logs", container="my-app"}
 ```
 
 Switch to the Prometheus data source for the metrics. The `up` metric is the quickest check, because Alloy generates it for every scrape target: `1` means the last scrape succeeded, `0` that the target was unreachable:
