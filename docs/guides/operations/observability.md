@@ -356,22 +356,6 @@ Loki creates a separate stream for every combination of label values, and a larg
 
 :::
 
-### Checking where your log files actually are {#log-paths}
-
-Before you deploy, it is worth confirming that the glob in the configuration matches. Open a shell in the project; the CLI assembles the connection for you:
-
-```shellsession title="Local shell session"
-user@local $ mw project ssh
-```
-
-Then list the log directory:
-
-```shellsession title="SSH shell session"
-user@ssh $ ls -l /var/log/container/
-```
-
-You should see one directory per container stack, each containing one `.log` file per service. If your layout differs, adjust the `__path__` glob and the two relabel regexes in `config.alloy` accordingly.
-
 ## Step 4: Collecting metrics {#metrics}
 
 Metrics work the other way around: instead of reading files, Alloy calls your workloads over the network and forwards what it gets to the `prometheus.remote_write` component from [step 2](#config).
@@ -661,7 +645,7 @@ Alloy's web UI has no authentication of its own. Do not connect a domain to port
 
 ### Other log files {#other-logs}
 
-The `/var/log` mount contains more than the container logs. PHP apps, for example, write their errors to `/var/log/php_errors.log`. Have a look at what your project keeps there:
+The `/var/log` mount contains more than the container logs. PHP apps, for example, write their errors to `/var/log/php_errors.log`. Open a shell in the project with `mw project ssh` and have a look at what yours keeps there:
 
 ```shellsession title="SSH shell session"
 user@ssh $ ls -l /var/log/
@@ -706,7 +690,7 @@ Instrumenting your applications is the larger part of that job and out of scope 
 
 ### No logs arrive in Loki {#troubleshooting-no-logs}
 
-- Open the [Alloy UI](#alloy-ui) and check the `local.file_match.container_logs` component. If it lists no targets, the glob does not match anything; verify the actual log paths as described in [Checking where your log files actually are](#log-paths).
+- Open the [Alloy UI](#alloy-ui) and check the `local.file_match.container_logs` component. If it lists no targets, the `/var/log` volume is not mounted at `/mnt/logs`, or the project has no running containers yet.
 - `401` or `403` responses point at the credentials: in Grafana Cloud, make sure `LOKI_PASSWORD` is the token itself (starting with `glc_`), not the name of the access policy, and that `LOKI_USER` is the numeric user ID of the Loki instance.
 - A `404` usually means the URL is missing the `/loki/api/v1/push` suffix.
 - On a self-hosted Loki, a `401` with the message `no org id` means that the instance runs in multi-tenant mode and expects a `tenant_id` (see [Writing to your own endpoints](#config-self-hosted)).
