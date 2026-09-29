@@ -1,7 +1,51 @@
 ---
 sidebar_label: Lifecycle
-description: Information about the product lifecycle
+description: Lifecycle phases of AI Hosting models and how we announce shutdowns and replacements
 title: Lifecycle
 ---
 
-As with many other products, the models offered are subject to a lifecycle. Since the models are evolving, we may upgrade them to newer versions or replace them entirely. Older versions will then no longer be offered or accessible. As a result, newer models may behave differently and may also have different names. This is outside our control.
+import LifecycleDiagram from "@site/src/components/LifecycleDiagram";
+
+# Lifecycle {#lifecycle}
+
+Language models evolve quickly. New generations appear every few months, and we replace models when a better one is available for the same hardware. Every model in AI Hosting therefore has a lifecycle status. The status tells you how long you can rely on a model and how much notice you get before it goes away.
+
+You find the current status of each model in the model table in mStudio (**AI Hosting** > **Models**) and in the [list of available models](../30-models/index.mdx).
+
+<LifecycleDiagram />
+
+## Phases {#phases}
+
+| Status    | Meaning                                                      | Notice before shutdown or replacement |
+| --------- | ------------------------------------------------------------ | ------------------------------------- |
+| Testphase | New model, behavior and feature set can still change         | none                                  |
+| Stable    | Recommended for production use                               | at least 3 months                     |
+| LTS       | Long-term support for applications you want to change rarely | at least 6 months                     |
+
+### Testphase {#testphase}
+
+New models start in the Testphase and stay there for at least one month. During this time we run the model under real conditions and collect feedback. Behavior and feature set can still change. For production use, we recommend models with the status Stable or LTS.
+
+### Stable {#stable}
+
+If we shut down or replace a Stable model, we announce it at least 3 months in advance and show the shutdown date in the model table in mStudio.
+
+### Long-term support (LTS) {#lts}
+
+You can rely on an LTS model for the long term. If we shut down or replace it, we announce it at least 6 months in advance and show the shutdown date in the model table in mStudio.
+
+## Deprecation and replacement {#deprecation}
+
+Once we announce a shutdown, mStudio shows the shutdown date next to the model. If we offer a successor, mStudio also names it and the date from which it is available.
+
+The notice period starts with this announcement. Use it to switch the model name in your applications and to test the replacement. A replacement can behave differently and can have a different name, because that is up to the model's author.
+
+### Automatic proxying after shutdown {#proxying}
+
+When a model has been shut down, we don't reject requests that still use its model ID. Instead, we proxy them automatically to a comparable model. Your applications keep working, but the responses come from the replacement and can differ from what you got before. Switch to the new model ID as soon as you can, so you know which model answers your requests.
+
+:::tip
+
+Start with the replacement as soon as it becomes available. Both models run side by side until the shutdown date, so you can compare results before you switch.
+
+:::
