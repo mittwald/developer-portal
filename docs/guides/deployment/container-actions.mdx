@@ -22,10 +22,10 @@ Using GitHub Actions you can build and publish your container image right from y
 
 You now have two different deployment styles:
 
-| Use case | Recommended action | Why |
-| --- | --- | --- |
-| You want to deploy quickly from source code without creating Dockerfiles or stack files first | **`mittwald/zerodeploy-action`** | Uses Railpack to infer build steps and deploys directly to mittwald container hosting with near-zero config. |
-| You already have a Dockerfile and/or explicit stack definition (`stack.yaml`) and want full control over services, ports, and rollout behavior | **`mittwald/deploy-container-action`** | Best when you want an explicit, infrastructure-focused deployment model. |
+| Use case                                                                                                                                       | Recommended action                     | Why                                                                                                          |
+| ---------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| You want to deploy quickly from source code without creating Dockerfiles or stack files first                                                  | **`mittwald/zerodeploy-action`**       | Uses Railpack to infer build steps and deploys directly to mittwald container hosting with near-zero config. |
+| You already have a Dockerfile and/or explicit stack definition (`stack.yaml`) and want full control over services, ports, and rollout behavior | **`mittwald/deploy-container-action`** | Best when you want an explicit, infrastructure-focused deployment model.                                     |
 
 If you want the fastest path from repository to running service, use `zerodeploy-action`. If your team already maintains container build and runtime definitions, stay with `deploy-container-action`.
 
@@ -86,12 +86,12 @@ The official **`mittwald/deploy-container-action`** takes care of the API calls,
 
 ### Prerequisites for `mittwald/deploy-container-action` {#prerequisites-deploy-container-action}
 
-- **Stack ID**; see the docs on [identifying the default stack](/docs/v2/api/howtos/create-container/#identify-default-stack)
+- **Stack ID**; see the docs on [creating a container stack](/docs/v2/api/howtos/create-container/#create-stack)
 - **(Optional) Private registry**; see [_Using private registries_](/docs/v2/platform/workloads/containers/#private-registries)
 
 ### Identify your stack {#identify-your-stack}
 
-Follow the documentation on [identifying the default stack](/docs/v2/api/howtos/create-container/#identify-default-stack) of your project. For convenience, we recommend storing the stack ID in a GitHub [variable](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables) or (when you're deploying into multiple environments) using a GitHub [environment secret](https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments), e.g. **`STACK_ID`**.
+Create a stack or look up the ID of an existing one as described in [creating a container stack](/docs/v2/api/howtos/create-container/#create-stack). For convenience, we recommend storing the stack ID in a GitHub [variable](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables) or (when you're deploying into multiple environments) using a GitHub [environment secret](https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments), e.g. **`STACK_ID`**.
 
 ### Write your `stack.yaml` {#write-your-stack-yaml}
 

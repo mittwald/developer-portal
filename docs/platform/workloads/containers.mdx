@@ -20,6 +20,38 @@ import OperationExample from "@site/src/components/OperationExample";
 
 <PlanCompatibility features={["container"]} />
 
+## Creating a container stack {#create-stack}
+
+Containers and volumes always belong to a container stack. A stack groups containers and volumes that are deployed and managed together. A project can contain any number of stacks. Create a stack before starting your first container.
+
+<Tabs groupId="access-mode">
+  <TabItem value="cli" label="CLI">
+    To create a stack via the CLI, use the `mw stack create` command:
+
+    ```shellsession
+    user@local $ mw stack create --description "My application" --update-context
+    ```
+
+    The `--update-context` flag stores the ID of the new stack in your CLI context. Subsequent commands like `mw container run`, `mw stack deploy` or `mw volume create` will then use this stack automatically.
+
+    To use an existing stack instead, look up its ID with `mw stack list` and store it in your CLI context with `mw context set --stack-id <stack-id>`. Alternatively, you can pass the stack ID to each command using the `--stack-id` flag.
+
+    See the documentation on the [`mw stack create` command](/docs/v2/cli/reference/stack#mw-stack-create) for more information.
+
+  </TabItem>
+  <TabItem value="api" label="API">
+    To create a stack via the API, use the <OperationLink operation="container-create-stack" apiVersion="v2" /> operation:
+
+    <OperationExample
+      operation="container-create-stack"
+      example={{
+        description: "My application",
+      }}
+    />
+
+  </TabItem>
+</Tabs>
+
 ## Starting a containerized application
 
 <Tabs groupId="access-mode">
@@ -35,7 +67,7 @@ import OperationExample from "@site/src/components/OperationExample";
 
   </TabItem>
   <TabItem value="cli" label="CLI">
-    To start a container via the CLI, you can use the `mw container run` command:
+    To start a container via the CLI, you can use the `mw container run` command. It starts the container in the stack stored in your CLI context (see [Creating a container stack](#create-stack)):
 
     ```shellsession
     $ mw container run \

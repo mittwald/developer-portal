@@ -20,6 +20,38 @@ import OperationExample from "@site/src/components/OperationExample";
 
 <PlanCompatibility features={["container"]} />
 
+## Einen Container-Stack anlegen {#create-stack}
+
+Container und Volumes gehören immer zu einem Container-Stack. Ein Stack fasst Container und Volumes zusammen, die gemeinsam bereitgestellt und verwaltet werden. Ein Projekt kann beliebig viele Stacks enthalten. Lege einen Stack an, bevor du deinen ersten Container startest.
+
+<Tabs groupId="access-mode">
+  <TabItem value="cli" label="CLI">
+    Um einen Stack über die CLI anzulegen, verwende den Befehl `mw stack create`:
+
+    ```shellsession
+    user@local $ mw stack create --description "Meine Anwendung" --update-context
+    ```
+
+    Mit dem Flag `--update-context` wird die ID des neuen Stacks in deinem CLI-Kontext gespeichert. Nachfolgende Befehle wie `mw container run`, `mw stack deploy` oder `mw volume create` verwenden dann automatisch diesen Stack.
+
+    Um stattdessen einen bestehenden Stack zu verwenden, ermittle seine ID mit `mw stack list` und speichere sie mit `mw context set --stack-id <stack-id>` in deinem CLI-Kontext. Alternativ kannst du die Stack-ID bei jedem Befehl mit dem Flag `--stack-id` angeben.
+
+    Weitere Informationen findest du in der Dokumentation zum [`mw stack create` Befehl](/docs/v2/cli/reference/stack#mw-stack-create).
+
+  </TabItem>
+  <TabItem value="api" label="API">
+    Um einen Stack über die API anzulegen, verwende die Operation <OperationLink operation="container-create-stack" apiVersion="v2" />:
+
+    <OperationExample
+      operation="container-create-stack"
+      example={{
+        description: "Meine Anwendung",
+      }}
+    />
+
+  </TabItem>
+</Tabs>
+
 ## Starten einer containerisierten Anwendung
 
 <Tabs groupId="access-mode">
@@ -35,7 +67,7 @@ import OperationExample from "@site/src/components/OperationExample";
 
   </TabItem>
   <TabItem value="cli" label="CLI">
-    Um einen Container über die CLI zu starten, kannst du den Befehl `mw container run` verwenden:
+    Um einen Container über die CLI zu starten, kannst du den Befehl `mw container run` verwenden. Er startet den Container in dem Stack, der in deinem CLI-Kontext gespeichert ist (siehe [Einen Container-Stack anlegen](#create-stack)):
 
     ```shellsession
     $ mw container run \

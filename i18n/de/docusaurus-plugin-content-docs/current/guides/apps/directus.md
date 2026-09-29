@@ -112,6 +112,18 @@ Sobald du alle Umgebungsvariablen eingegeben hast, klicke auf **"Weiter"**. Im l
 
 ### Alternative: Verwendung des `mw container run` Befehls
 
+:::note
+
+Die CLI stellt den Container in dem Stack bereit, der in deinem CLI-Kontext gespeichert ist. Falls du noch keinen Stack angelegt hast, lege zuerst einen an:
+
+```shellsession
+user@local $ mw stack create --description "Directus" --update-context
+```
+
+Alternativ kannst du die ID eines bestehenden Stacks mit `--stack-id` angeben. Details findest du unter [Einen Container-Stack anlegen](/docs/v2/platform/workloads/containers#create-stack).
+
+:::
+
 Du kannst auch den `mw container run`-Befehl verwenden, um direkt einen Directus-Container über die Befehlszeile zu erstellen und zu starten. Dieser Ansatz ähnelt der Verwendung der Docker CLI und ermöglicht es dir, alle Containerparameter in einem einzigen Befehl anzugeben.
 
 ```bash
@@ -178,7 +190,7 @@ Stelle sicher, dass du die Platzhalterwerte durch deine tatsächlichen Konfigura
 mw stack deploy
 ```
 
-Dieser Befehl liest die `docker-compose.yml` Datei aus dem aktuellen Verzeichnis und stellt sie in deinem Standard-Stack bereit.
+Dieser Befehl liest die `docker-compose.yml` Datei aus dem aktuellen Verzeichnis und stellt sie in dem Stack bereit, der in deinem CLI-Kontext gespeichert ist.
 
 ## Betrieb
 

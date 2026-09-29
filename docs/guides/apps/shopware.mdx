@@ -169,6 +169,18 @@ user@local $ docker push docker.p-XXXXXX.project.space/shopware/shopware-app:8.3
 
 Create the container from your pushed image, publish the HTTP port, mount volumes for Shopware's persistent data, and route a domain to it. Because the runtime filesystem is read-only and containers are recreated on every deploy, the directories that receive user-generated or generated content must live on [persistent volumes](#persistent-volumes) — otherwise media, generated themes, thumbnails, and sitemaps are lost. The examples below mount all of them.
 
+:::note
+
+The CLI deploys the container into the stack stored in your CLI context. If you have not created a stack yet, create one first:
+
+```shellsession
+user@local $ mw stack create --description "Shopware" --update-context
+```
+
+Alternatively, pass the ID of an existing stack with `--stack-id`. See [Creating a container stack](/docs/v2/platform/workloads/containers#create-stack) for details.
+
+:::
+
 <Tabs groupId="access-mode">
   <TabItem value="mstudio" label="mStudio">
     1. Open your project in mStudio and select "Containers".

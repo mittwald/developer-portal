@@ -52,6 +52,18 @@ Use the suggested default port `5678`.
 
 ### Using the CLI with `mw container run`
 
+:::note
+
+The CLI deploys the container into the stack stored in your CLI context. If you have not created a stack yet, create one first:
+
+```shellsession
+user@local $ mw stack create --description "n8n" --update-context
+```
+
+Alternatively, pass the ID of an existing stack with `--stack-id`. See [Creating a container stack](/docs/v2/platform/workloads/containers#create-stack) for details.
+
+:::
+
 You can also deploy an n8n container with the mittwald CLI and the command `mw container run`:
 
 ```shellsession
@@ -293,6 +305,7 @@ Always check **before** running a workflow whether all involved nodes are presen
 Besides being present, some nodes must be configured correctly.
 
 You will need:
+
 - Access to mittwald AI Hosting (or a comparable, OpenAI-compatible host) with API key
 - Access to the database; user and password have already been prepared in the container stack
 
@@ -384,6 +397,7 @@ user@local $ curl -X POST -d '{
 With the system set up up to this point, you have a solid foundation to further develop your RAG system into a production-ready solution.
 
 In addition to the already mentioned security aspects, there are other considerations:
+
 - Data sources for documents: other sources such as external databases, network drives, etc.
 - Refinement of the agent: model settings, prompt, document filters
 - Integration of additional tools with the AI agent: web search, image recognition, etc.

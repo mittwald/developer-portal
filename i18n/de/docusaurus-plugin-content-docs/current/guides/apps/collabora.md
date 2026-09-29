@@ -80,6 +80,18 @@ Sobald du den gewünschten Wert eingegeben hast, klicke auf **„Speichern“**.
 
 ### Alternative: Mit dem Befehl `mw container run`
 
+:::note
+
+Die CLI stellt den Container in dem Stack bereit, der in deinem CLI-Kontext gespeichert ist. Falls du noch keinen Stack angelegt hast, lege zuerst einen an:
+
+```shellsession
+user@local $ mw stack create --description "Collabora" --update-context
+```
+
+Alternativ kannst du die ID eines bestehenden Stacks mit `--stack-id` angeben. Details findest du unter [Einen Container-Stack anlegen](/docs/v2/platform/workloads/containers#create-stack).
+
+:::
+
 Du kannst auch den Befehl `mw container run` verwenden, um direkt einen Collabora-Container über die Kommandozeile zu erstellen und zu starten. Dieser Ansatz ähnelt der Verwendung der Docker CLI und ermöglicht es dir, alle Containerparameter in einem einzigen Befehl anzugeben.
 
 Für eine einzelne Nextcloud-Instanz im selben Projekt:
@@ -137,7 +149,7 @@ Dann stelle den Container mit dem Befehl `mw stack deploy` bereit:
 mw stack deploy
 ```
 
-Dieser Befehl liest die `docker-compose.yml`-Datei aus dem aktuellen Verzeichnis und stellt sie in deinem Standard-Stack bereit. Wenn du eine andere Datei oder einen anderen Stack angeben möchtest, kannst du die folgenden Optionen verwenden:
+Dieser Befehl liest die `docker-compose.yml`-Datei aus dem aktuellen Verzeichnis und stellt sie in dem Stack bereit, der in deinem CLI-Kontext gespeichert ist. Wenn du eine andere Datei oder einen anderen Stack angeben möchtest, kannst du die folgenden Optionen verwenden:
 
 ```bash
 mw stack deploy --compose-file=/path/to/docker-compose.yml --stack-id=dein-stack-id

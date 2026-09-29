@@ -337,7 +337,10 @@ Upload the VCL file to `/files/varnish/default.vcl` in your app.
 
 #### Step 4: Deploy the Varnish container
 
+Create a stack for Varnish, store it in your CLI context and start the container in it:
+
 ```shellsession
+$ mw stack create --description "Varnish" --update-context
 $ mw container run \
   --name varnish \
   --publish-all \

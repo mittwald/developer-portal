@@ -102,6 +102,18 @@ Merke dir auch hier den internen DNS-Namen des Containers, der nach der Erstellu
 
 ### Alternative: Verwendung des `mw container run`-Befehls {#daemon-cli-run}
 
+:::note
+
+Die CLI stellt den Container in dem Stack bereit, der in deinem CLI-Kontext gespeichert ist. Falls du noch keinen Stack angelegt hast, lege zuerst einen an:
+
+```shellsession
+user@local $ mw stack create --description "Tideways" --update-context
+```
+
+Alternativ kannst du die ID eines bestehenden Stacks mit `--stack-id` angeben. Details findest du unter [Einen Container-Stack anlegen](/docs/v2/platform/workloads/containers#create-stack).
+
+:::
+
 Du kannst den Daemon-Container auch direkt über die Kommandozeile erstellen und starten:
 
 ```shellsession title="Lokale Shell-Sitzung"
@@ -143,7 +155,7 @@ Deploye sie anschließend:
 user@local $ mw stack deploy
 ```
 
-Dieser Befehl liest die `docker-compose.yml`-Datei aus dem aktuellen Verzeichnis und deployt sie in deinen Standard-Stack.
+Dieser Befehl liest die `docker-compose.yml`-Datei aus dem aktuellen Verzeichnis und deployt sie in den Stack, der in deinem CLI-Kontext gespeichert ist.
 
 ### Daemon-Optionen {#daemon-options}
 

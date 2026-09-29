@@ -194,6 +194,18 @@ Nachdem du alle Umgebungsvariablen eingegeben hast, klicke auf **"Weiter"**. Im 
 
 ### Alternative: Über den Befehl `mw container run` {#mw-container-run}
 
+:::note
+
+Die CLI stellt den Container in dem Stack bereit, der in deinem CLI-Kontext gespeichert ist. Falls du noch keinen Stack angelegt hast, lege zuerst einen an:
+
+```shellsession
+user@local $ mw stack create --description "Listmonk" --update-context
+```
+
+Alternativ kannst du die ID eines bestehenden Stacks mit `--stack-id` angeben. Details findest du unter [Einen Container-Stack anlegen](/docs/v2/platform/workloads/containers#create-stack).
+
+:::
+
 Du kannst auch den Befehl `mw container run` verwenden, um direkt von der Kommandozeile aus einen Listmonk-Container zu erstellen und zu starten. Dieser Ansatz ist ähnlich wie die Verwendung der Docker-CLI und ermöglicht es dir, alle Container-Parameter in einem einzigen Befehl anzugeben.
 
 ```shellsession
@@ -258,7 +270,7 @@ Dann stelle den Container mit dem Befehl `mw stack deploy` bereit:
 user@local $ mw stack deploy
 ```
 
-Dieser Befehl liest die `docker-compose.yml`-Datei aus dem aktuellen Verzeichnis und stellt sie auf deinem Standard-Stack bereit.
+Dieser Befehl liest die `docker-compose.yml`-Datei aus dem aktuellen Verzeichnis und stellt sie in dem Stack bereit, der in deinem CLI-Kontext gespeichert ist.
 
 ## Domain zuweisen {#assign-domain}
 
