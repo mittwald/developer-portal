@@ -134,7 +134,7 @@ Diese Konfiguration verwendet das `--install --idempotent`-Flag, das sicherstell
 
 ### Über die mStudio-Oberfläche {#mstudio-ui}
 
-In mStudio gehst du zu deinem Projekt und wählst **"Container erstellen"** aus. Ein geführter Dialog öffnet sich, um dich bei der Container-Einrichtung zu unterstützen.
+Gehe im mStudio zu deinem Projekt, wähle **"Container"** und lege einen neuen Stack an oder öffne einen bestehenden. Klicke dann im Container-Bereich des Stacks auf **"Anlegen"**. Ein geführter Dialog öffnet sich, um dich bei der Container-Einrichtung zu unterstützen.
 
 Gib zuerst eine Beschreibung ein – dies ist ein Freitextfeld, das zur Identifizierung des Containers verwendet wird. Gib zum Beispiel **"Listmonk"** ein und klicke auf **"Weiter"**.
 

@@ -77,7 +77,7 @@ Merke dir den internen DNS-Namen des Containers, der nach der Installation in mS
 
 ### Alternative: Manuelles Setup über das mStudio UI {#daemon-ui}
 
-Falls dein Hosting-Produkt keine Container-Vorlagen unterstützt, oder du von den Standardeinstellungen der Vorlage abweichen musst, kannst du den Daemon-Container auch manuell einrichten. Gehe dazu in mStudio zu deinem Projekt, wähle **„Container"** und klicke auf **„Container erstellen"**. Ein geführter Dialog öffnet sich, um dir beim Container-Setup zu helfen.
+Falls dein Hosting-Produkt keine Container-Vorlagen unterstützt, oder du von den Standardeinstellungen der Vorlage abweichen musst, kannst du den Daemon-Container auch manuell einrichten. Gehe dazu im mStudio zu deinem Projekt, wähle **„Container“** und lege einen neuen Stack an oder öffne einen bestehenden. Klicke dann im Container-Bereich des Stacks auf **„Anlegen“**. Ein geführter Dialog öffnet sich, um dir beim Container-Setup zu helfen.
 
 Gib zunächst eine Beschreibung ein — dies ist ein Freitextfeld zur Identifizierung des Containers. Gib zum Beispiel **„Tideways-Daemon"** ein und klicke auf **„Weiter"**.
 

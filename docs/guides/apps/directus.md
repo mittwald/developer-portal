@@ -63,7 +63,7 @@ In this example, the container is also connected to a domain, using the `mittwal
 
 ### Using the mStudio UI
 
-In mStudio, go to your project and select **"Create container"**. A guided dialog will open to assist you with the container setup.
+In mStudio, go to your project, select **"Containers"** and create a new stack or open an existing one. Then click **"Create"** in the containers section of the stack. A guided dialog will open to assist you with the container setup.
 
 First, enter a description – this is a free text field used to identify the container. For example, enter **"Directus"** and click **"Next"**.
 

@@ -77,7 +77,7 @@ Take note of the container's internal DNS name, which is displayed in mStudio af
 
 ### Alternative: Using the mStudio UI for a manual setup {#daemon-ui}
 
-If your plan does not support container templates, or you need to deviate from the template's defaults, you can set up the daemon container manually instead. In mStudio, go to your project, select **"Containers"** and click **"Create container"**. A guided dialog will open to assist you with the container setup.
+If your plan does not support container templates, or you need to deviate from the template's defaults, you can set up the daemon container manually instead. In mStudio, go to your project, select **"Containers"** and create a new stack or open an existing one. Then click **"Create"** in the containers section of the stack. A guided dialog will open to assist you with the container setup.
 
 First, enter a description — this is a free text field used to identify the container. For example, enter **"Tideways daemon"** and click **"Next"**.
 

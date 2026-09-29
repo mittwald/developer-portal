@@ -24,7 +24,7 @@ Wir verwenden das Image `ghcr.io/open-webui/open-webui:main` aus der [GitHub Con
 
 ### Über das mStudio UI
 
-Gehe in mStudio zu deinem Projekt und wähle **„Container erstellen"**. Ein geführter Dialog öffnet sich, um dir beim Container-Setup zu helfen.
+Gehe im mStudio zu deinem Projekt, wähle **„Container“** und lege einen neuen Stack an oder öffne einen bestehenden. Klicke dann im Container-Bereich des Stacks auf **„Anlegen“**. Ein geführter Dialog öffnet sich, um dir beim Container-Setup zu helfen.
 
 Gib zunächst eine Beschreibung ein – dies ist ein Freitextfeld zur Identifizierung des Containers. Gib zum Beispiel **„Open WebUI"** ein und klicke auf **„Weiter"**.
 

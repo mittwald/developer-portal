@@ -37,7 +37,7 @@ Collabora/CODE kann entweder als separate Instanz in einem eigenen Projekt oder 
 
 ### Mit der mStudio UI
 
-Gehe im mStudio zu deinem Projekt und wähle **„Container erstellen“**. Ein geführter Dialog öffnet sich, um dir bei der Container-Einrichtung zu helfen.
+Gehe im mStudio zu deinem Projekt, wähle **„Container“** und lege einen neuen Stack an oder öffne einen bestehenden. Klicke dann im Container-Bereich des Stacks auf **„Anlegen“**. Ein geführter Dialog öffnet sich, um dir bei der Container-Einrichtung zu helfen.
 
 Zuerst gib eine Beschreibung ein – dies ist ein Freitextfeld, das zur Identifizierung des Containers verwendet wird. Gib zum Beispiel **„collabora/code“** ein.
 
