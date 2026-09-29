@@ -1,7 +1,51 @@
 ---
 sidebar_label: Lebenszyklus
-description: Information zum Produktlebenszyklus
+description: Lebenszyklus-Phasen der AI-Hosting-Modelle und wie wir Abschaltungen und Ersatzmodelle ankündigen
 title: Lebenszyklus
 ---
 
-Die angebotenen Modelle unterliegen, wie viele andere Produkte auch, einem Lebenszyklus. Da sich die Modelle weiterentwickeln, werden wir diese gegebenenfalls auf eine neue Version heben oder auch austauschen. Die ältere Version wird unsererseits dann nicht mehr angeboten und auch nicht mehr ansprechbar sein. Damit einher geht, dass sich das neuere Modell dann leicht anders verhalten kann und ggf. eine andere Bezeichnung erhält. Hierauf haben wir keinen Einfluss.
+import LifecycleDiagram from "@site/src/components/LifecycleDiagram";
+
+# Lebenszyklus {#lifecycle}
+
+Sprachmodelle entwickeln sich schnell. Alle paar Monate erscheinen neue Generationen, und wir tauschen ein Modell aus, wenn für dieselbe Hardware ein besseres verfügbar ist. Deshalb hat jedes Modell im AI Hosting einen Lebenszyklus-Status. Er zeigt dir, wie lange du auf ein Modell setzen kannst und wie viel Vorlauf du vor einer Abschaltung bekommst.
+
+Den aktuellen Status jedes Modells findest du in der Modell-Tabelle im mStudio (**AI Hosting** > **Modelle**) und in der [Liste der verfügbaren Modelle](../30-models/index.mdx).
+
+<LifecycleDiagram />
+
+## Phasen {#phasen}
+
+| Status    | Bedeutung                                                         | Vorlauf vor Abschaltung oder Ersatz |
+| --------- | ----------------------------------------------------------------- | ----------------------------------- |
+| Testphase | Neues Modell, Verhalten und Funktionsumfang können sich ändern    | keiner                              |
+| Stable    | Für den produktiven Einsatz empfohlen                             | mindestens 3 Monate                 |
+| LTS       | Langzeit-Support für Anwendungen, die du selten anpassen möchtest | mindestens 6 Monate                 |
+
+### Testphase {#testphase}
+
+Neue Modelle starten in der Testphase und bleiben dort mindestens einen Monat. In dieser Zeit erproben wir das Modell unter realen Bedingungen und sammeln Feedback. Verhalten und Funktionsumfang können sich noch ändern. Für den produktiven Einsatz empfehlen wir Modelle mit dem Status Stable oder LTS.
+
+### Stable {#stable}
+
+Schalten wir ein Stable-Modell ab oder ersetzen wir es, kündigen wir das mindestens 3 Monate vorher an und zeigen dir das Abschaltdatum in der Modell-Tabelle im mStudio an.
+
+### Long-Term Support (LTS) {#lts}
+
+Auf ein LTS-Modell kannst du langfristig setzen. Schalten wir es ab oder ersetzen wir es, kündigen wir das mindestens 6 Monate vorher an und zeigen dir das Abschaltdatum in der Modell-Tabelle im mStudio an.
+
+## Abkündigung und Ersatz {#abkuendigung}
+
+Sobald wir eine Abschaltung ankündigen, zeigt das mStudio das Abschaltdatum beim Modell an. Bieten wir einen Nachfolger an, nennt das mStudio auch ihn und das Datum, ab dem er verfügbar ist.
+
+Mit der Ankündigung beginnt der Vorlauf. Nutze ihn, um den Modellnamen in deinen Anwendungen zu ändern und das Ersatzmodell zu testen. Ein Ersatzmodell kann sich anders verhalten und einen anderen Namen tragen, denn das bestimmt der Hersteller des Modells.
+
+### Automatische Weiterleitung nach der Abschaltung {#weiterleitung}
+
+Ist ein Modell abgeschaltet, lehnen wir Anfragen mit der alten Modell-ID nicht ab. Wir leiten sie automatisch an ein vergleichbares Modell weiter. Deine Anwendungen laufen also weiter, die Antworten stammen aber vom Ersatzmodell und können von den bisherigen abweichen. Stelle so bald wie möglich auf die neue Modell-ID um, damit du weißt, welches Modell deine Anfragen beantwortet.
+
+:::tip
+
+Beginne mit dem Ersatzmodell, sobald es verfügbar ist. Beide Modelle laufen bis zum Abschaltdatum parallel, sodass du die Ergebnisse vor dem Umstieg vergleichen kannst.
+
+:::

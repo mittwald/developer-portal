@@ -1,0 +1,93 @@
+@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&display=swap");
+
+.board {
+  --ci: rgb(0, 32, 92);
+  --token-a: #dce6f7;
+  --token-b: #c9d9f0;
+  --output-text: #c8d8ff;
+  --divider: #b0bcd4;
+
+  font-family: "Caveat", cursive;
+  color: var(--ci);
+  background: transparent;
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+[data-theme="dark"] .board {
+  --ci: #c8d8ff;
+  --token-a: #1d3163;
+  --token-b: #17264f;
+  --output-text: rgb(0, 32, 92);
+}
+
+[data-theme="dark"] .output {
+  background: #c8d8ff;
+}
+
+.row {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  width: 100%;
+}
+
+.token {
+  border: 2.5px solid var(--ci);
+  border-radius: 14px;
+  padding: 8px 26px;
+  font-size: 2rem;
+  font-weight: 700;
+  box-shadow: 2px 2px 0 var(--ci);
+}
+
+.tokenA {
+  background: var(--token-a);
+  transform: rotate(-1deg);
+}
+
+.tokenB {
+  background: var(--token-b);
+  transform: rotate(0.8deg);
+}
+
+.arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--ci);
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 6px 0;
+}
+
+.arrow span {
+  text-align: center;
+}
+
+.divider {
+  width: 100%;
+  height: 2px;
+  margin: 18px 0 8px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--divider) 0 8px,
+    transparent 8px 14px
+  );
+}
+
+.output {
+  margin-top: 6px;
+  padding: 12px 24px;
+  border-radius: 12px;
+  background: var(--ci);
+  color: var(--output-text);
+  font-size: 1.7rem;
+  font-weight: 700;
+  text-align: center;
+  transform: rotate(0.5deg);
+}
