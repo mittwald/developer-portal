@@ -67,7 +67,9 @@ export interface VerifyApiKeyResult {
  * Verify an API key by calling the user profile endpoint.
  * Returns the user's email on success, or an error message on failure.
  */
-export async function verifyApiKey(apiKey: string): Promise<VerifyApiKeyResult> {
+export async function verifyApiKey(
+  apiKey: string,
+): Promise<VerifyApiKeyResult> {
   try {
     const response = await fetch("https://api.mittwald.de/v2/users/self", {
       method: "GET",
@@ -80,7 +82,10 @@ export async function verifyApiKey(apiKey: string): Promise<VerifyApiKeyResult> 
       if (response.status === 401 || response.status === 403) {
         return { success: false, error: "Invalid API key" };
       }
-      return { success: false, error: `Verification failed: ${response.status}` };
+      return {
+        success: false,
+        error: `Verification failed: ${response.status}`,
+      };
     }
 
     const user: UserResponse = await response.json();

@@ -10,14 +10,14 @@ Dedicated AI Hosting bietet dir exklusiven Zugriff auf reservierte GPU-Kapazitä
 
 ## Was du bekommst {#what-you-get}
 
-| Feature | Beschreibung |
-|---------|--------------|
-| **Exklusive GPU-Kapazität** | Deine Modelle laufen auf GPUs, die nur für dich reserviert sind. |
-| **Eigener API-Endpunkt** | Du erhältst einen dedizierten HTTPS-Endpunkt auf einer Kundensubdomain unter `llm.aihosting.mittwald.de`, z. B. `https://dein-unternehmen.llm.aihosting.mittwald.de/v1`. |
-| **Dedizierter API-Key** | Der Zugriff wird über einen dedizierten API-Key abgesichert. |
-| **OpenAI-kompatible API** | Anwendungen und Libraries mit OpenAI-Unterstützung funktionieren ohne Anpassung. |
-| **Hosting in Deutschland, DSGVO-konform** | Compute und Daten bleiben in der Infrastruktur, die mittwald in Deutschland betreibt. |
-| **Planbare Performance** | Deine Kapazität ist von anderen Kunden isoliert. |
+| Feature                                   | Beschreibung                                                                                                                                                             |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Exklusive GPU-Kapazität**               | Deine Modelle laufen auf GPUs, die nur für dich reserviert sind.                                                                                                         |
+| **Eigener API-Endpunkt**                  | Du erhältst einen dedizierten HTTPS-Endpunkt auf einer Kundensubdomain unter `llm.aihosting.mittwald.de`, z. B. `https://dein-unternehmen.llm.aihosting.mittwald.de/v1`. |
+| **Dedizierter API-Key**                   | Der Zugriff wird über einen dedizierten API-Key abgesichert.                                                                                                             |
+| **OpenAI-kompatible API**                 | Anwendungen und Libraries mit OpenAI-Unterstützung funktionieren ohne Anpassung.                                                                                         |
+| **Hosting in Deutschland, DSGVO-konform** | Compute und Daten bleiben in der Infrastruktur, die mittwald in Deutschland betreibt.                                                                                    |
+| **Planbare Performance**                  | Deine Kapazität ist von anderen Kunden isoliert.                                                                                                                         |
 
 ## Aktueller Produktumfang {#current-scope}
 
@@ -64,20 +64,20 @@ Die finale Auslegung wird im Onboarding auf deine Ziel-Latenz und deinen Ziel-Du
 Für eine erste Einschätzung kannst du diese einfache Rechnung nutzen:
 
 1. **Gewichtsspeicher**
-: `weights bytes ~= params count * bytes per weight`
+   : `weights bytes ~= params count * bytes per weight`
 
 2. **KV-Cache pro Token**
-: `kv per token bytes ~= 2 * layer count * kv width * bytes per kv value`
+   : `kv per token bytes ~= 2 * layer count * kv width * bytes per kv value`
 
 `kv width` liegt für grobe Planung oft nahe an der hidden size.
 
 3. **Gesamter KV-Cache**
-: `total kv bytes ~= concurrent sequences * total tokens * kv per token bytes`
+   : `total kv bytes ~= concurrent sequences * total tokens * kv per token bytes`
 
 `total tokens = input tokens + output tokens`
 
 4. **Zielwert für GPU-Speicher**
-: `total gpu bytes ~= weights bytes + total kv bytes + runtime overhead`
+   : `total gpu bytes ~= weights bytes + total kv bytes + runtime overhead`
 
 Plane eine Sicherheitsreserve für Runtime-Overhead ein (Allocator-Fragmentierung, CUDA-Buffer, Runtime-Metadaten). Praxisnah sind **+15% bis +30%**.
 
@@ -95,19 +95,19 @@ So liest du die Werte auf der Modellseite:
 Beispielrechnung auf **1x RTX PRO 6000 Blackwell (96 GB VRAM)**:
 
 1. Gewichtsspeicher (BF16)
-: `36.000.000.000 * 2 ~= 72.000.000.000 bytes` (~72 GB dezimal)
+   : `36.000.000.000 * 2 ~= 72.000.000.000 bytes` (~72 GB dezimal)
 
 2. KV-Cache pro Token (grob, hidden size als kv width)
-: `2 * 40 * 2048 * 2 = 327.680 bytes pro Token` (~0,3125 MiB pro Token)
+   : `2 * 40 * 2048 * 2 = 327.680 bytes pro Token` (~0,3125 MiB pro Token)
 
 3. Sicherheitsreserve
-: bei 20% Overhead liegt das nutzbare Planungsbudget bei etwa `96 GB / 1,2 ~= 80 GB`
+   : bei 20% Overhead liegt das nutzbare Planungsbudget bei etwa `96 GB / 1,2 ~= 80 GB`
 
 4. Verbleibend für KV-Cache
-: `80 GB - 72 GB ~= 8 GB` für KV-Cache
+   : `80 GB - 72 GB ~= 8 GB` für KV-Cache
 
 5. Grobe Tokenkapazität auf einer GPU bei Concurrency 1
-: `8 GB / 327.680 bytes ~= 24k-26k Gesamt-Tokens`
+   : `8 GB / 327.680 bytes ~= 24k-26k Gesamt-Tokens`
 
 Diese `Gesamt-Tokens` sind Input + Output zusammen.  
 Beispiel: `16k Input + 8k Output = 24k Gesamt`.
@@ -137,8 +137,8 @@ Gleiche Annahmen wie oben:
 
 Gewichtsspeicher grob nach Format:
 
-- **BF16**: `~72 GB` (36B * 2 Bytes)
-- **FP8**: `~36 GB` (36B * 1 Byte)
+- **BF16**: `~72 GB` (36B \* 2 Bytes)
+- **FP8**: `~36 GB` (36B \* 1 Byte)
 - **4-Bit-Familie (NVFP4/AWQ)**: theoretisch `~18 GB` (+Metadata-/Scale-Overhead, in der Praxis oft höher)
 
 Daraus grober Gesamt-Token-Bereich bei Concurrency 1 (Input + Output):
@@ -201,11 +201,11 @@ Bitte plane Modell, Präzisionsformat und Kapazität immer im persönlichen Aust
 
 Viele Kunden nutzen nicht nur einen einzigen Endpunkt. Wenn du über mehrere Provider oder zusätzliche Self-Hosted-Endpunkte routest, hilft diese Aufteilung:
 
-| Ziel | Empfohlene Komponente |
-|------|------------------------|
-| Keys pro Kunde ausstellen, Keys sperren/löschen, Budgets und Nutzung pro Key | **LiteLLM** |
-| Multi-Provider-Routing, Fallback-Ketten, gewichtete Lastverteilung | **Bifrost** |
-| Governance + Routing über mehrere Endpunkte | **LiteLLM + Bifrost zusammen** |
+| Ziel                                                                         | Empfohlene Komponente          |
+| ---------------------------------------------------------------------------- | ------------------------------ |
+| Keys pro Kunde ausstellen, Keys sperren/löschen, Budgets und Nutzung pro Key | **LiteLLM**                    |
+| Multi-Provider-Routing, Fallback-Ketten, gewichtete Lastverteilung           | **Bifrost**                    |
+| Governance + Routing über mehrere Endpunkte                                  | **LiteLLM + Bifrost zusammen** |
 
 Typische Muster:
 
@@ -213,7 +213,7 @@ Typische Muster:
 - **mittwald Dedicated-Endpunkt + weitere externe/self-hosted Modell-Endpunkte**: Bifrost ist für Routing-Richtlinien empfehlenswert.
 - **Dedicated + Shared + Anthropic/Claude (oder weitere Provider)**: Bifrost ist die Routing-Schicht für modell-/provider-spezifische Traffic-Entscheidungen.
 - **Kunden-Keys + Multi-Endpunkt-Routing**: LiteLLM vor Bifrost betreiben.
-: Request-Flow: `client -> LiteLLM -> Bifrost -> ausgewählter Provider-Endpunkt`
+  : Request-Flow: `client -> LiteLLM -> Bifrost -> ausgewählter Provider-Endpunkt`
 
 ### Nicht im initialen Umfang enthalten {#not-included}
 

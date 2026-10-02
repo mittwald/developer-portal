@@ -278,7 +278,9 @@ function GettingStartedFeature() {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/docs/v2/agentic-integration/mcp/getting-connected/cursor">Cursor</Link>
+                  <Link to="/docs/v2/agentic-integration/mcp/getting-connected/cursor">
+                    Cursor
+                  </Link>
                 </li>
                 <li>
                   <Link to="/docs/v2/agentic-integration/mcp/getting-connected/codex-cli">

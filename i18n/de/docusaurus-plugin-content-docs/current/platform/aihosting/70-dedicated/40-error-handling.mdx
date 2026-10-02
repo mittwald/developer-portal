@@ -11,14 +11,14 @@ Diese Seite beschreibt die HTTP-Fehlercodes, die deine Anwendung erhalten kann, 
 
 ## HTTP-Fehlercodes {#error-codes}
 
-| Code | Bedeutung | Was tun |
-|------|-----------|---------|
-| `400` | Fehlerhafte Anfrage — Eingabe zu lang oder falsches Format | Eingabelänge reduzieren oder Anfrage korrigieren (siehe Kontextlimit unten) |
-| `401` | Ungültiger oder fehlender API-Key | `Authorization: Bearer YOUR_API_KEY` Header prüfen |
-| `503` | Service vorübergehend nicht verfügbar — Endpunkt überlastet oder neugestartet | Mit exponentiellem Backoff wiederholen |
-| `500` | Interner Serverfehler | Mit Backoff wiederholen; bei dauerhaftem Auftreten Support kontaktieren |
-| `502` | Bad Gateway | Mit Backoff wiederholen |
-| `504` | Gateway-Timeout — Anfrage hat zu lange gedauert | Eingabe verkleinern, Concurrency reduzieren oder wiederholen |
+| Code  | Bedeutung                                                                     | Was tun                                                                     |
+| ----- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `400` | Fehlerhafte Anfrage — Eingabe zu lang oder falsches Format                    | Eingabelänge reduzieren oder Anfrage korrigieren (siehe Kontextlimit unten) |
+| `401` | Ungültiger oder fehlender API-Key                                             | `Authorization: Bearer YOUR_API_KEY` Header prüfen                          |
+| `503` | Service vorübergehend nicht verfügbar — Endpunkt überlastet oder neugestartet | Mit exponentiellem Backoff wiederholen                                      |
+| `500` | Interner Serverfehler                                                         | Mit Backoff wiederholen; bei dauerhaftem Auftreten Support kontaktieren     |
+| `502` | Bad Gateway                                                                   | Mit Backoff wiederholen                                                     |
+| `504` | Gateway-Timeout — Anfrage hat zu lange gedauert                               | Eingabe verkleinern, Concurrency reduzieren oder wiederholen                |
 
 :::note 401-Response-Format
 Der `401`-Response-Body lautet `{"error": "Unauthorized"}`. Das ist einfacher als das Standard-OpenAI-Fehlerformat und enthält keine Felder `type`, `param` oder `code`. Entsprechend in der Fehlerbehandlung berücksichtigen.

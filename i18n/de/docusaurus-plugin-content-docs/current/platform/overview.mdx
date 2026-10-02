@@ -43,7 +43,8 @@ graph TD
     class ORG,SERVER,PROJECT brandOrg
     class APP managed
     class STACK containers
-```
+
+````
 </InteractiveMermaidDiagram>
 
 **Wichtigste Beziehungen:**
@@ -65,9 +66,9 @@ Das folgende Diagramm zeigt alle wichtigen Plattformentitäten und wie sie mitei
 graph TD
     ORG[["🏢 Organisation"]]
     SERVER[["🖥️ Server"]]
-    
+
     PROJECT["📁 Projekt"]
-    
+
     APP["📦 Verwaltete App-Installation"]
     CONTAINERS(("🐳 Container"))
     NETWORKING(("🌐 Netzwerk"))
@@ -76,33 +77,33 @@ graph TD
     ACCESS(("🔑 Zugriff"))
     AIHOST(("🤖 AI-Hosting"))
     EXTENSIONS(["🔌 Erweiterungen"])
-    
+
     DATASTORES(("📊 Verwaltete Datenspeicher"))
     MYSQL[("🗄️ MySQL")]
     REDIS[("⚡ Redis")]
-    
+
     STACK{{"Container-Stack *(auto)*"}}
     SERVICE["⚙️ Service"]
     VOLUME["💾 Volume"]
     REGISTRY["📦 Registry"]
-    
+
     DOMAIN["🔗 Domain"]
     DNSZONE{{"DNS-Zone *(auto)*"}}
     INGRESS["Ingress"]
     CERT(["🔐 Zertifikat *(auto)*"])
-    
+
     CRONJOB["⏰ Cronjob"]
     BACKUP["Sicherung"]
     BACKUPSCHED["📅 Sicherungsplan"]
     BACKUPEXPORT["📥 Sicherungs-Export"]
-    
+
     MAILADDR["Mail-Adresse"]
     DELIVERYBOX{{"Postfach *(auto)*"}}
     MAILSETTINGS["⚙️ Mail-Einstellungen *(auto)*"]
-    
+
     SSHSFTP["🔑 SSH/SFTP"]
     APITOKEN["🔐 API-Token"]
-    
+
     AIHOSTKEY["AI-Hosting-API-Schlüssel"]
     AIHOST_URL["AI-Hosting-Basis-URL"]
 
@@ -169,7 +170,8 @@ graph TD
     class AIHOST,AIHOSTKEY,AIHOST_URL aiHosting
     class EXTENSIONS extensions
     class STACK,DNSZONE,CERT,DELIVERYBOX,MAILSETTINGS autocreated
-```
+````
+
 </InteractiveMermaidDiagram>
 
 ## Beschreibung der Entitäten {#entity-descriptions}
@@ -234,22 +236,22 @@ mittwald bietet sowohl verwaltete Dienste als auch Container-basierte Datenbanko
 
 **Verwaltete Dienste** werden vollständig von mittwald verwaltet und bieten automatische Sicherungen und vereinfachte Verbindungsverwaltung:
 
-| Entität | Technologie        | Typischer Einsatz                          |
-| ------- | ------------------ | ------------------------------------------ |
-| MySQL   | Relational (SQL)   | Webanwendungen, CMS                        |
-| Redis   | In-Memory-Speicher | Caching, Sessions, Queues                  |
+| Entität | Technologie        | Typischer Einsatz         |
+| ------- | ------------------ | ------------------------- |
+| MySQL   | Relational (SQL)   | Webanwendungen, CMS       |
+| Redis   | In-Memory-Speicher | Caching, Sessions, Queues |
 
 Jede MySQL-Datenbank kann mehrere **MySQL-Nutzer** haben – separate Nutzer-Konten mit konfigurierbaren Zugriffsprivilegien und Hostnamen.
 Dies ermöglicht dir, granulare Berechtigungen für verschiedene Anwendungen oder Services zu vergeben, die diese Datenbank nutzen.
 
 **Container-basierte Datenbanken** werden als Container innerhalb deines Projekts bereitgestellt und bieten mehr Flexibilität und erweiterte Funktionen:
 
-| Entität | Technologie        | Typischer Einsatz                          |
-| ------- | ------------------ | ------------------------------------------ |
-| MariaDB | Relational (SQL)   | Webanwendungen, CMS (Open-Source-Option)   |
+| Entität    | Technologie      | Typischer Einsatz                          |
+| ---------- | ---------------- | ------------------------------------------ |
+| MariaDB    | Relational (SQL) | Webanwendungen, CMS (Open-Source-Option)   |
 | PostgreSQL | Relational (SQL) | Anwendungen mit erweiterten SQL-Funktionen |
 | OpenSearch | Suchmaschine     | Volltextsuche, Log-Analyse                 |
-| Solr    | Suchmaschine       | Volltextsuche, Indexabfrage von Inhalten   |
+| Solr       | Suchmaschine     | Volltextsuche, Indexabfrage von Inhalten   |
 
 Verwaltete Dienste können direkt mit App-Installationen verknüpft werden.
 Container-basierte Datenbanken werden als separate Services innerhalb des Container-Stacks deines Projekts konfiguriert.
@@ -382,6 +384,7 @@ AI-Hosting ist für Agenturen konzipiert, die AI-gestützte Client-Lösungen bau
 und für Organisationen, die eine EU-basierte, datenschutzfreundliche AI-Infrastruktur benötigen.
 
 Jede AI-Hosting-Integration benötigt zwei Konfigurationswerte:
+
 - **AI-Hosting-API-Schlüssel**: Dein Authentifizierungsmerkmal für den Zugriff auf den AI-Service
 - **AI-Hosting-Basis-URL**: Die Endpunkt-URL für den AI-Service (`https://llm.aihosting.mittwald.de/v1`)
 
@@ -403,7 +406,7 @@ Sie wird als konstanter Wert in mStudio bereitgestellt, den du in deine Anwendun
 
 ## Workload-Typen auf einen Blick {#workload-types}
 
-| Workload         | Geeignet für                                              | Technische Basis              |
-| ---------------- | --------------------------------------------------------- | ----------------------------- |
+| Workload         | Geeignet für                                                   | Technische Basis              |
+| ---------------- | -------------------------------------------------------------- | ----------------------------- |
 | App-Installation | Vorkonfigurierte Laufzeiten (PHP, Node.js, Python, PHP Worker) | Verwaltetes Runtime-Framework |
-| Container-Stack  | Eigene Container, Microservices                           | OCI / Docker Compose          |
+| Container-Stack  | Eigene Container, Microservices                                | OCI / Docker Compose          |
