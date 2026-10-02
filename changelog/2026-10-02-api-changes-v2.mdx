@@ -1,0 +1,191 @@
+---
+title: API changes for v2 API, September 25 to October 2
+authors:
+  - machine
+tags:
+  - apiv2
+  - App
+  - Domain
+  - Project
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API introduces several enhancements, including the addition of optional properties to existing responses, new endpoints for managing DNS zone-file imports, and expanded activity log schemas for project activities.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- An optional property `/items/description` has been added to the response with the `200` status for the `GET` operation on the path `/v2/apps` (List Apps).
+- An optional property `description` has been added to the response with the `200` status for the `GET` operation on the path `/v2/apps/{appId}` (Get an App).
+- A new endpoint has been added for the `GET` operation on the path `/v2/dns-zone-imports/{zoneFileImportId}` to get the status of a DNS zone-file import job.
+- A new endpoint has been added for the `GET` operation on the path `/v2/projects/{projectId}/dns-zone-imports` to list DNS zone-file import jobs belonging to a project.
+- A new endpoint has been added for the `POST` operation on the path `/v2/projects/{projectId}/dns-zone-imports` to import a DNS zone file into a project, or preview it with a dry-run.
+- A new endpoint has been added for the `POST` operation on the path `/v2/projects/{projectId}/dns-zones` to create a DNSZone for a verified Ingress in a project.
+- The response property `anyOf` list for the `200` status has been updated for the `GET` operation on the path `/v2/projects/{projectId}/activities` to include multiple new activity log schemas.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "List apps"
+
+
+- added the optional property '/items/description' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-list-apps" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an app"
+
+
+- added the optional property 'description' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-get-app" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the status of a DNS zone-file import job"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="dns-get-dns-zone-file-import" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the activities of a project"
+
+
+- added '#/components/schemas/de.mittwald.v1.activitylog.CronjobCreated, #/components/schemas/de.mittwald.v1.activitylog.CronjobDescriptionUpdated, #/components/schemas/de.mittwald.v1.activitylog.CronjobIntervalUpdated, #/components/schemas/de.mittwald.v1.activitylog.CronjobTimeZoneUpdated, #/components/schemas/de.mittwald.v1.activitylog.CronjobTargetUpdated, #/components/schemas/de.mittwald.v1.activitylog.CronjobCommandUpdated, #/components/schemas/de.mittwald.v1.activitylog.CronjobServiceReferenceUpdated, #/components/schemas/de.mittwald.v1.activitylog.CronjobTimeoutUpdated, #/components/schemas/de.mittwald.v1.activitylog.CronjobConcurrencyPolicyUpdated, #/components/schemas/de.mittwald.v1.activitylog.CronjobAlertThresholdUpdated, #/components/schemas/de.mittwald.v1.activitylog.CronjobNotificationEmailUpdated, #/components/schemas/de.mittwald.v1.activitylog.CronjobActiveUpdated, #/components/schemas/de.mittwald.v1.activitylog.CronjobDeleted, #/components/schemas/de.mittwald.v1.activitylog.CronjobExecution' to the '/items/action' response property 'anyOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="project-list-project-activities" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List DNS zone-file import jobs belonging to a Project"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="dns-list-dns-zone-file-imports" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Import a DNS zone file into a Project, or preview it with dry-run"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="dns-create-dns-zone-file-import" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a DNS Zone for a verified Ingress in a Project"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="dns-create-project-dns-zone" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK v2.2.4 Release Summary
+
+The mittwald PHP SDK has released version 2.2.4, which introduces a comprehensive set of auto-generated PHP schema classes for the V2 API Client's Activity Log, focusing on **Cronjob** event tracking. These new models provide strict type-safe representations for lifecycle events and configuration modifications, allowing developers to accurately parse, validate, and serialize activity log payloads with built-in JSON Schema validation and immutable state management.
+
+#### Key Additions:
+- **Cronjob Lifecycle & Execution Events**: New classes such as `CronjobCreated`, `CronjobDeleted`, and `CronjobExecution` have been added to track lifecycle and execution events.
+- **Cronjob Configuration Update Events**: Classes like `CronjobActiveUpdated` and `CronjobCommandUpdated` have been introduced to handle configuration updates.
+- **Supporting & Validation Types**: Includes `*ChangesAfter` and `*ChangesBefore` classes for tracking state differences, enumerations for standardized event naming, and built-in methods for serialization/deserialization.
+
+These classes are auto-generated by the `mittwald/api-client-builder` package, featuring strict type declarations and immutable state management.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.2.4).
+
+### mittwald PHP SDK v2.2.3 Release Summary
+
+The mittwald PHP SDK has been updated to version 2.2.3, introducing significant enhancements and new features. This release focuses on improving DNS zone file management and DNS zone creation for verified Ingresses.
+
+#### Key Features:
+
+- **DNS Zone File Import Support**: 
+  - New endpoints for importing DNS zone files with validation, preview, and job tracking capabilities.
+  - Endpoints include `dnsCreateDnsZoneFileImport`, `dnsGetDnsZoneFileImport`, and `dnsListDnsZoneFileImports`.
+  - New models and schemas such as `CreateZoneFileImportResponse`, `ZoneFileImport`, and `ZoneImportPreview` are introduced.
+
+- **DNS Zone Creation for Verified Ingress**:
+  - New endpoint `dnsCreateProjectDnsZone` for creating DNS zones within a project for verified Ingresses, determining root or subzone provisioning automatically.
+
+#### Deprecation Notice:
+
+- The `DnsCreateDnsZone` operation is deprecated, replaced by `DnsCreateProjectDnsZone` and `DnsCreateDnsZoneFileImport`.
+
+#### Schema & Documentation Updates:
+
+- An optional `description` field added to the App Schema for localized descriptions.
+- Documentation updates for `MailClient` and `UserClient` to reflect changes in asynchronous workflows.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.2.3).
+
+### mittwald JavaScript SDK Release 4.480.0
+
+The mittwald JavaScript SDK has been updated to version 4.480.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.480.0).
+
+### mittwald JavaScript SDK Release 4.479.0
+
+The mittwald JavaScript SDK has been updated to version 4.479.0. This release includes a feature update with an updated generated client. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.479.0).
+
+### mittwald JavaScript SDK Release 4.478.0
+
+The mittwald JavaScript SDK has been updated to version 4.478.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.478.0).
+
+### mittwald JavaScript SDK Release 4.477.0
+
+The mittwald JavaScript SDK has been updated to version 4.477.0. This release includes an update to the generated client, enhancing its functionality. For more details, you can view the release on GitHub: [mittwald/api-client-js 4.477.0](https://github.com/mittwald/api-client-js/releases/tag/4.477.0).
+
+### mittwald JavaScript SDK Release 4.476.0
+
+The mittwald JavaScript SDK version 4.476.0 has been released. This update includes a feature enhancement with an updated generated client. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.476.0).
+
+### mittwald JavaScript SDK Release 4.475.0
+
+The mittwald JavaScript SDK has been updated to version 4.475.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.475.0).
+
+### mittwald JavaScript SDK Release 4.474.0
+
+The mittwald JavaScript SDK has been updated to version 4.474.0. This release includes an update to the generated client, enhancing the functionality and performance of the SDK. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.474.0).
+
+### mittwald JavaScript SDK Release 4.473.0
+
+The mittwald JavaScript SDK has been updated to version 4.473.0. This release includes the following feature:
+
+- Updated the generated client to enhance functionality and performance ([commit 826c8ef](https://github.com/mittwald/api-client-js/commit/826c8efce8502745b1dff22ceef6b1c91f846ebe)).
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.473.0).
+
+### mittwald JavaScript SDK Release 4.472.0
+
+The mittwald JavaScript SDK has been updated to version 4.472.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.472.0).
+
