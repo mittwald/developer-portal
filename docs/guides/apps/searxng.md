@@ -13,20 +13,36 @@ This guide is under development. Deployment and integration instructions will be
 
 ## Introduction {#introduction}
 
+Use searxng as search delegate - either for privacy-focussed human search or even agentic search capabilities.
+
 ## Prerequisites {#prerequisites}
+
+- mStudio account
+- mittwald API token
+- CLI installed
 
 ## How do I start the container? {#start-container}
 
-### Using the mStudio UI {#mstudio}
+NOT ONE container, but a composite create via docker compose file. Deployed to mittwald via mittwald CLI, then adjust configuration to allow JSON search responses for agentic usage.
 
-### Alternative: Using the `mw container run` command {#container-run}
+### Using the `mw stack deploy` command {#stack-deploy}
 
-### Alternative: Using the `mw stack deploy` command {#stack-deploy}
+#### Configuration
 
 ## Connecting to Open WebUI {#openwebui}
 
-## Operation notes {#operation-notes}
+First activate search service. Then assign search capabilities to models to be used.
 
-## Troubleshooting {#troubleshooting}
+- Admin Panel -> Settings -> Capabilites
+
+### Operation notes {#operation-notes}
+
+Creating separate workspaces in OpenWebUI is strongly recommended as it allows separating different user environments, knowledge bases and tools.
+
+### Troubleshooting {#troubleshooting}
+
+**Web search fails in OpenWebUI**
+
+Check Responses in chat directly in OpenWebUI. If `Unauthorized` errors occur, double-check `searXNG` configuration to allow `json` responses.
 
 ## Further resources {#further-resources}
