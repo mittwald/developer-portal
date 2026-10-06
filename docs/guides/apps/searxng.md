@@ -10,7 +10,7 @@ import TabItem from "@theme/TabItem";
 
 :::note Draft
 
-This guide is under development. The mStudio template workflow, CLI deployment configuration, and Open WebUI integration still need end-to-end verification before this guide is complete.
+The CLI deployment, JSON configuration, and Open WebUI integration have been tested end to end. The mStudio template workflow is still pending approval of the template pull request.
 
 :::
 
@@ -20,7 +20,7 @@ SearXNG is a self-hosted metasearch engine that combines results from multiple s
 
 This guide focuses on using SearXNG as a web-search service for agentic runtimes powered by [mittwald AI Hosting](/docs/v2/platform/aihosting/). It covers two deployment methods: a container template in mStudio and a Docker Compose stack deployed with the mittwald CLI. Both methods lead to the same search integration.
 
-[Open WebUI](./openwebui.md) serves as the integration example. SearXNG is not exclusive to Open WebUI: other agentic runtimes can use its search API if they support SearXNG or can integrate an HTTP-based search tool.
+[Open WebUI](/docs/v2/guides/apps/openwebui) serves as the integration example. SearXNG is not exclusive to Open WebUI: other agentic runtimes can use its search API if they support SearXNG or can integrate an HTTP-based search tool.
 
 ## Use case: Web search for AI agents {#use-case}
 
@@ -34,7 +34,7 @@ In the Open WebUI example, Open WebUI coordinates search and supplies retrieved 
 
 - Access to a mittwald mStudio project
 - A hosting plan that supports [containerized workloads](/docs/v2/platform/workloads/containers)
-- A mittwald AI Hosting API key and a runtime connected to AI Hosting; for this example, use [Open WebUI](./openwebui.md)
+- A mittwald AI Hosting API key and a runtime connected to AI Hosting; for this example, use [Open WebUI](/docs/v2/guides/apps/openwebui)
 
 For CLI deployment, you also need:
 
@@ -52,9 +52,11 @@ The deployment described here is a multi-service stack, rather than a single `mw
 
 The planned template-based workflow creates the SearXNG stack from within your mStudio project.
 
-:::note Pending verification
+:::note Pending template approval
 
-The SearXNG template's availability, exact selection steps, required inputs, and configuration defaults still need to be verified. A complete walkthrough will be added here once the template workflow has been tested.
+The SearXNG template pull request is awaiting review and approval. Once the template is approved, this section will document its selection steps, required inputs, and final configuration defaults.
+
+Those defaults determine which fine-tuning steps still need to be performed manually after starting the template, including whether JSON responses must be enabled separately. The template workflow and remaining manual steps will be tested and documented before this section is complete.
 
 :::
 
@@ -199,17 +201,17 @@ The file is stored on the persistent `core-config` volume, so the change survive
 
 ## Connecting to Open WebUI {#openwebui}
 
-First, [connect Open WebUI to mittwald AI Hosting](./openwebui.md). Then configure web search in Open WebUI:
+First, [connect Open WebUI to mittwald AI Hosting](/docs/v2/guides/apps/openwebui#connecting-to-mittwald-ai-hosting). Then configure web search in Open WebUI:
 
 1. Open **Admin Panel**, then **Settings**, and locate the **Web Search** settings.
 2. Enable web search and select **SearXNG** as the search engine.
-3. Set the SearXNG query URL to your reachable search endpoint, using the pattern `https://your-search-domain.example/search?q=<query>&format=json`. Use the project-internal address instead when both services run in the same project.
-4. Save the settings and enable the **Web Search** capability for the model you intend to use.
+3. Set the SearXNG query URL to `https://your-search-domain.example/search`, replacing the domain with your configured domain. Open WebUI adds the query and response-format parameters automatically; do not append `?q=<query>&format=json` to the configured URL.
+4. Save the settings, then enable **Web Search** as a tool for each model you intend to use. Configuring the search engine alone does not make the tool available to every model. If you use workspace models, make sure their underlying model also has web search enabled.
 5. Start a chat, activate web search, and ask a question that requires current information. Check that search results are retrieved and that the answer includes relevant sources.
 
-:::note Pending verification
+:::note
 
-Exact setting labels and model capability controls depend on the Open WebUI version. This walkthrough and the query URL syntax still need to be verified against the version used for this guide.
+Exact setting labels and model controls can vary between Open WebUI versions.
 
 :::
 
@@ -217,7 +219,13 @@ Exact setting labels and model capability controls depend on the Open WebUI vers
 
 - Keep the SearXNG configuration on a persistent volume so that updates or redeployments do not discard your settings.
 - Use separate Open WebUI workspaces where appropriate to organize model configurations, knowledge bases, and tools for different workflows. Workspace organization does not replace access controls.
-- Web-search queries and page retrieval can disclose information to external services. Do not include confidential information in queries unless your data-handling requirements allow it.
+- For dedicated web-research assistants, limit the available tools to those needed for the intended research workflow. A focused tool list reduces the risk of the assistant accidentally using tools that users do not want it to use.
+
+:::warning External data disclosure
+
+Web-search queries and page retrieval can disclose information to external search services and websites, even when you host SearXNG yourself. **Do not include confidential, personal, or otherwise sensitive information in search queries unless your data-handling requirements explicitly allow that disclosure.** Review which tools the assistant can use and what information it may send before enabling web search.
+
+:::
 
 ## Troubleshooting {#troubleshooting}
 
