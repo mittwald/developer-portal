@@ -170,14 +170,13 @@ With JSON responses still disabled, expect `403 Forbidden`. After enabling JSON 
 
 Agentic runtimes need machine-readable search results. Enable `json` in the `search.formats` list of SearXNG's `settings.yml`, keeping any formats you also need for browser-based searches:
 
+1. Download the configuration file created when SearXNG first started. Run the following command on your local machine, replacing `<CONTAINER_SSH_STRING>` with the SSH connection string for your SearXNG container (`user@host`):
 
-1. copy config created after first start
-
+```shellsession
+user@local $ scp <CONTAINER_SSH_STRING>:/etc/searxng/settings.yml settings.yml
 ```
-scp <CONTAINER_SSH_STRING>:/etc/searxng/settings.yml settings.yml
-```
 
-2. add snippet:
+2. Open the downloaded `settings.yml` in your editor and add `json` to the existing `search.formats` list. Keep `html` enabled for browser-based searches:
 
 ```yaml title="settings.yml (excerpt)"
 search:
@@ -186,19 +185,17 @@ search:
     - json
 ```
 
-3. copy config back to searxng config folder
+Merge this excerpt into the existing configuration rather than replacing the entire file or adding a duplicate `search` section.
 
+3. Upload the edited file to the container's configuration directory:
+
+```shellsession
+user@local $ scp settings.yml <CONTAINER_SSH_STRING>:/etc/searxng/
 ```
-scp settings.yml <CONTAINER_SSH_STRING>:/etc/searxng/
-```
 
-4. restart, try via curl
+The file is stored on the persistent `core-config` volume, so the change survives container restarts.
 
-:::note Pending verification
-
-The configuration volume, file-editing workflow, and restart steps for each deployment method still need to be documented and tested.
-
-:::
+4. Restart the SearXNG container in mStudio to apply the updated configuration. Repeat the JSON curl request from the previous section. It should now return `200 OK` with a JSON response body instead of `403 Forbidden`.
 
 ## Connecting to Open WebUI {#openwebui}
 
