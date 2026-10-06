@@ -65,13 +65,54 @@ The SearXNG template's availability, exact selection steps, required inputs, and
 
 The CLI workflow uses a Docker Compose file to describe the SearXNG stack and deploys it with [`mw stack deploy`](/docs/v2/cli/reference/stack).
 
-:::note Pending verification
+Start with the official [SearXNG Compose instancing instructions](https://docs.searxng.org/admin/installation-docker.html#compose-instancing). Download the upstream Compose file and environment example into a new directory:
 
-The complete `docker-compose.yml`, required companion services, persistent volumes, and initial configuration steps will be added after verification on mittwald. The deployment command below assumes that this configuration is already available and that the CLI targets the intended project.
+```shellsession
+user@local $ mkdir -p searxng
+user@local $ cd searxng
+user@local $ curl -fsSLO https://raw.githubusercontent.com/searxng/searxng/master/container/docker-compose.yml \
+		-O https://raw.githubusercontent.com/searxng/searxng/master/container/.env.example
+user@local $ cp .env.example .env
+```
 
-:::
+The upstream Compose file uses a relative bind mount for `core-config`. A local directory is not copied to mittwald when you deploy a stack, so replace that mount with a named stack volume. In `docker-compose.yml`, use this volume configuration for the `core` service and declare it in the top-level `volumes` section:
 
-Run the deployment from the directory containing `docker-compose.yml` on your local machine:
+```yaml title="docker-compose.yml (volume excerpt)"
+services:
+	core:
+		volumes:
+			- searxng-config:/etc/searxng/
+			- core-data:/var/cache/searxng/
+	valkey:
+		volumes:
+			- valkey-data:/data/
+
+volumes:
+	searxng-config: {}
+	core-data: {}
+	valkey-data: {}
+```
+
+Keep the other services and settings from the downloaded upstream file. The named volumes preserve SearXNG's configuration, cache, and Valkey data across container restarts and stack updates.
+
+Edit `.env` to set the values used by the Compose file. The upstream example comments these variables out, so remove the leading `#`:
+
+```dotenv title=".env"
+SEARXNG_VERSION=latest
+SEARXNG_PORT=8080
+```
+
+`SEARXNG_HOST` can remain unset. For production, use a specific SearXNG release tag instead of `latest` so that an image update does not change the version unexpectedly.
+
+Before deploying, check that the CLI context points to the intended project. If it does not, set the project ID and check the context again:
+
+```shellsession
+user@local $ mw context get
+user@local $ mw context set --project-id <PROJECT_ID>
+user@local $ mw context get
+```
+
+From the directory containing `docker-compose.yml`, deploy the stack:
 
 ```shellsession
 user@local $ mw stack deploy
@@ -103,9 +144,16 @@ The configuration volume, file-editing workflow, and restart steps for each depl
 
 ### Make the search endpoint reachable {#search-endpoint}
 
-The agentic runtime must be able to reach SearXNG's `/search` endpoint. If Open WebUI and SearXNG run in the same mittwald project, prefer a project-internal connection. Publishing a container port does not make it publicly accessible.
+The agentic runtime must be able to reach SearXNG's `/search` endpoint. If Open WebUI and SearXNG run in the same mittwald project, use the project-internal service address, for example `http://core:8080/search?q=<query>&format=json`. The Compose service name `core` is the internal hostname.
 
-For a runtime outside the project, configure an appropriate HTTP domain route and access controls. See the [container networking documentation](/docs/v2/platform/workloads/containers/#ingress-http). Avoid exposing an unrestricted public search endpoint.
+For a runtime outside the project, connect a domain to SearXNG in mStudio:
+
+1. Open the project in mStudio and select **Domains**.
+2. Add a subdomain, or select a domain that already belongs to the project.
+3. Set the domain target to **Container**, then select the SearXNG `core` container and port `8080`.
+4. Save the domain configuration.
+
+Use the resulting HTTPS domain as the search endpoint. Publishing a container port does not by itself make it publicly accessible. See the [container networking documentation](/docs/v2/platform/workloads/containers/#ingress-http), and avoid exposing an unrestricted public search endpoint.
 
 ## Connecting to Open WebUI {#openwebui}
 
