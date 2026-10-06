@@ -65,44 +65,56 @@ The SearXNG template's availability, exact selection steps, required inputs, and
 
 The CLI workflow uses a Docker Compose file to describe the SearXNG stack and deploys it with [`mw stack deploy`](/docs/v2/cli/reference/stack).
 
-Start with the official [SearXNG Compose instancing instructions](https://docs.searxng.org/admin/installation-docker.html#compose-instancing). Download the upstream Compose file and environment example into a new directory:
+Create a new directory for the deployment files:
 
 ```shellsession
 user@local $ mkdir -p searxng
 user@local $ cd searxng
-user@local $ curl -fsSLO https://raw.githubusercontent.com/searxng/searxng/master/container/docker-compose.yml \
-		-O https://raw.githubusercontent.com/searxng/searxng/master/container/.env.example
-user@local $ cp .env.example .env
 ```
 
-The upstream Compose file uses a relative bind mount for `core-config`. A local directory is not copied to mittwald when you deploy a stack, so replace that mount with a named stack volume. In `docker-compose.yml`, use this volume configuration for the `core` service and declare it in the top-level `volumes` section:
+Create `docker-compose.yml` with the following mittwald-specific configuration, adapted from the official [SearXNG Compose instancing instructions](https://docs.searxng.org/admin/installation-docker.html#compose-instancing):
 
-```yaml title="docker-compose.yml (volume excerpt)"
+```yaml title="docker-compose.yml"
+# Read the documentation before using the `docker-compose.yml` file:
+# https://docs.searxng.org/admin/installation-docker.html
+
+name: searxng
+
 services:
 	core:
+		container_name: searxng-core
+		image: docker.io/searxng/searxng:${SEARXNG_VERSION:-latest}
+		restart: always
+		ports:
+			- 8080:8080
+		env_file: ./.env
 		volumes:
-			- searxng-config:/etc/searxng/
+			- core-config:/etc/searxng/
 			- core-data:/var/cache/searxng/
+
 	valkey:
+		container_name: searxng-valkey
+		image: docker.io/valkey/valkey:9-alpine
+		command: ["valkey-server", "--save", "30", "1", "--loglevel", "warning"]
+		restart: always
 		volumes:
 			- valkey-data:/data/
 
 volumes:
-	searxng-config: {}
-	core-data: {}
-	valkey-data: {}
+	core-data:
+	core-config:
+	valkey-data:
 ```
 
-Keep the other services and settings from the downloaded upstream file. The named volumes preserve SearXNG's configuration, cache, and Valkey data across container restarts and stack updates.
+Unlike the upstream file, this configuration uses a named stack volume for SearXNG's configuration instead of a relative bind mount, a fixed port mapping, and an array for the Valkey command. The named volumes preserve SearXNG's configuration, cache, and Valkey data across container restarts and stack updates.
 
-Edit `.env` to set the values used by the Compose file. The upstream example comments these variables out, so remove the leading `#`:
+Create `.env` in the same directory to select the SearXNG image version:
 
 ```dotenv title=".env"
 SEARXNG_VERSION=latest
-SEARXNG_PORT=8080
 ```
 
-`SEARXNG_HOST` can remain unset. For production, use a specific SearXNG release tag instead of `latest` so that an image update does not change the version unexpectedly.
+For production, use a specific SearXNG release tag instead of `latest` so that an image update does not change the version unexpectedly. Port `8080` is configured directly in the Compose file.
 
 Before deploying, check that the CLI context points to the intended project. If it does not, set the project ID and check the context again:
 
@@ -123,25 +135,6 @@ user@local $ mw stack deploy
 
 ## Configure SearXNG for agentic search {#search-configuration}
 
-### Enable JSON responses {#json-responses}
-
-Agentic runtimes need machine-readable search results. Enable `json` in the `search.formats` list of SearXNG's `settings.yml`, keeping any formats you also need for browser-based searches:
-
-```yaml title="settings.yml (excerpt)"
-search:
-	formats:
-		- html
-		- json
-```
-
-Merge this excerpt into the existing configuration rather than replacing the entire file. Apply the updated configuration and restart SearXNG before testing the integration.
-
-:::note Pending verification
-
-The configuration volume, file-editing workflow, and restart steps for each deployment method still need to be documented and tested.
-
-:::
-
 ### Make the search endpoint reachable {#search-endpoint}
 
 The agentic runtime must be able to reach SearXNG's `/search` endpoint. If Open WebUI and SearXNG run in the same mittwald project, use the project-internal service address, for example `http://core:8080/search?q=<query>&format=json`. The Compose service name `core` is the internal hostname.
@@ -154,6 +147,58 @@ For a runtime outside the project, connect a domain to SearXNG in mStudio:
 4. Save the domain configuration.
 
 Use the resulting HTTPS domain as the search endpoint. Publishing a container port does not by itself make it publicly accessible. See the [container networking documentation](/docs/v2/platform/workloads/containers/#ingress-http), and avoid exposing an unrestricted public search endpoint.
+
+Test the endpoint from your local machine, replacing `your-search-domain.example` with your configured domain. First, request HTML search results:
+
+```shellsession
+user@local $ curl -i -G 'https://your-search-domain.example/search' \
+	--data-urlencode 'q=mittwald AI Hosting' \
+	--data-urlencode 'format=html'
+```
+
+Expect `200 OK` with an HTML response body. Then request the same search as JSON:
+
+```shellsession
+user@local $ curl -i -G 'https://your-search-domain.example/search' \
+	--data-urlencode 'q=mittwald AI Hosting' \
+	--data-urlencode 'format=json'
+```
+
+With JSON responses still disabled, expect `403 Forbidden`. After enabling JSON in the next section and restarting SearXNG, repeat this request: it should return `200 OK` with a JSON response body.
+
+### Enable JSON responses {#json-responses}
+
+Agentic runtimes need machine-readable search results. Enable `json` in the `search.formats` list of SearXNG's `settings.yml`, keeping any formats you also need for browser-based searches:
+
+
+1. copy config created after first start
+
+```
+scp <CONTAINER_SSH_STRING>:/etc/searxng/settings.yml settings.yml
+```
+
+2. add snippet:
+
+```yaml title="settings.yml (excerpt)"
+search:
+  formats:
+    - html
+    - json
+```
+
+3. copy config back to searxng config folder
+
+```
+scp settings.yml <CONTAINER_SSH_STRING>:/etc/searxng/
+```
+
+4. restart, try via curl
+
+:::note Pending verification
+
+The configuration volume, file-editing workflow, and restart steps for each deployment method still need to be documented and tested.
+
+:::
 
 ## Connecting to Open WebUI {#openwebui}
 
