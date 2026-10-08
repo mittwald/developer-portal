@@ -1,0 +1,31 @@
+---
+title: Testing Extensions
+---
+
+Use the DEV-Extensions page in mStudio to test frontend fragments locally without changing the fragment URLs in your Extension's marketplace entry.
+
+## Test frontend fragments locally {#test-frontend-fragments-locally}
+
+1. Start your frontend development server at `http://localhost:3000`.
+2. In mStudio, open **Profile > Development > DEV-Extensions** (`/profile/extension-development`).
+3. Enable the local override. You can optionally enter a path to load a specific fragment, for example `/my-fragment`.
+
+The override replaces the fragment URL for all installed Extensions with `http://localhost:3000` followed by the optional path. The path can contain [templating placeholders](/docs/v2/contribution/overview/concepts/templating/), such as `:projectId`.
+
+Fragments render at their configured anchors in mStudio. You do not need to reload the page, and the Extension's marketplace entry remains unchanged.
+
+:::note
+
+The setting is stored in this browser's local storage and applies only to your current user session.
+
+:::
+
+:::caution
+
+Chrome is recommended for local fragment testing. Some browsers, including Safari, block content served from `http://localhost` when it is embedded in the HTTPS mStudio, without displaying an error.
+
+:::
+
+## When to use a staging Extension {#when-to-use-staging}
+
+Use a hidden staging copy of your Extension when your development server cannot run on port 3000, or when you need to test a changed fragment configuration, such as its anchors, before publishing it. See [Staging](../staging) for details.
