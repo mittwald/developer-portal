@@ -10,14 +10,14 @@ Dedicated AI Hosting gives you exclusive access to reserved GPU capacity on the 
 
 ## What you get {#what-you-get}
 
-| Feature | Description |
-|---------|-------------|
-| **Exclusive GPU capacity** | Your models run on GPUs reserved only for you. |
-| **Your own API endpoint** | You receive a dedicated HTTPS endpoint on a customer subdomain under `llm.aihosting.mittwald.de`, e.g. `https://your-company.llm.aihosting.mittwald.de/v1`. |
-| **Dedicated API key** | Access is controlled by a dedicated API key tied to your endpoint. |
-| **OpenAI-compatible API** | Any application or library that supports OpenAI can connect. |
-| **Hosted in Germany, GDPR-compliant** | Compute and data stay on infrastructure that mittwald operates in Germany. |
-| **Predictable performance** | Your capacity is isolated from other customers. |
+| Feature                               | Description                                                                                                                                                 |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Exclusive GPU capacity**            | Your models run on GPUs reserved only for you.                                                                                                              |
+| **Your own API endpoint**             | You receive a dedicated HTTPS endpoint on a customer subdomain under `llm.aihosting.mittwald.de`, e.g. `https://your-company.llm.aihosting.mittwald.de/v1`. |
+| **Dedicated API key**                 | Access is controlled by a dedicated API key tied to your endpoint.                                                                                          |
+| **OpenAI-compatible API**             | Any application or library that supports OpenAI can connect.                                                                                                |
+| **Hosted in Germany, GDPR-compliant** | Compute and data stay on infrastructure that mittwald operates in Germany.                                                                                  |
+| **Predictable performance**           | Your capacity is isolated from other customers.                                                                                                             |
 
 ## Current product scope {#current-scope}
 
@@ -64,20 +64,20 @@ Final sizing is validated during onboarding against your target latency and thro
 You can do a quick pre-check with a simple calculator:
 
 1. **Weights memory**
-: `weights bytes ~= params count * bytes per weight`
+   : `weights bytes ~= params count * bytes per weight`
 
 2. **KV cache per token**
-: `kv per token bytes ~= 2 * layer count * kv width * bytes per kv value`
+   : `kv per token bytes ~= 2 * layer count * kv width * bytes per kv value`
 
 `kv width` is often close to hidden size for rough planning.
 
 3. **Total KV cache**
-: `total kv bytes ~= concurrent sequences * total tokens * kv per token bytes`
+   : `total kv bytes ~= concurrent sequences * total tokens * kv per token bytes`
 
 `total tokens = input tokens + output tokens`
 
 4. **Total GPU target**
-: `total gpu bytes ~= weights bytes + total kv bytes + runtime overhead`
+   : `total gpu bytes ~= weights bytes + total kv bytes + runtime overhead`
 
 Use a safety margin for runtime overhead (allocator fragmentation, CUDA buffers, runtime metadata). A practical planning range is **+15% to +30%**.
 
@@ -95,19 +95,19 @@ How to read values from the model page:
 Now estimate on **1x RTX PRO 6000 Blackwell (96 GB VRAM)**:
 
 1. Weights memory (BF16)
-: `36,000,000,000 * 2 ~= 72,000,000,000 bytes` (~72 GB decimal)
+   : `36,000,000,000 * 2 ~= 72,000,000,000 bytes` (~72 GB decimal)
 
 2. KV cache per token (rough, using hidden size as kv width)
-: `2 * 40 * 2048 * 2 = 327,680 bytes per token` (~0.3125 MiB per token)
+   : `2 * 40 * 2048 * 2 = 327,680 bytes per token` (~0.3125 MiB per token)
 
 3. Add safety headroom
-: with 20% overhead target, usable planning budget is about `96 GB / 1.2 ~= 80 GB`
+   : with 20% overhead target, usable planning budget is about `96 GB / 1.2 ~= 80 GB`
 
 4. Budget left for KV cache
-: `80 GB - 72 GB ~= 8 GB` for KV cache
+   : `80 GB - 72 GB ~= 8 GB` for KV cache
 
 5. Rough token capacity on one GPU at concurrency 1
-: `8 GB / 327,680 bytes ~= 24k-26k total tokens`
+   : `8 GB / 327,680 bytes ~= 24k-26k total tokens`
 
 This `total tokens` is input + output together.  
 Example: `16k input + 8k output = 24k total`.
@@ -137,8 +137,8 @@ Same assumptions as above:
 
 Approximate weight memory by format:
 
-- **BF16**: `~72 GB` (36B * 2 bytes)
-- **FP8**: `~36 GB` (36B * 1 byte)
+- **BF16**: `~72 GB` (36B \* 2 bytes)
+- **FP8**: `~36 GB` (36B \* 1 byte)
 - **4-bit family (NVFP4/AWQ)**: theoretical `~18 GB` (+metadata/scale overhead, so often higher in practice)
 
 Resulting rough total-token budget at concurrency 1 (input + output):
@@ -201,11 +201,11 @@ Please plan model, precision, and capacity choices in a personal consultation wi
 
 Many customers do not use only one endpoint. If you route across multiple providers or additional self-hosted endpoints, use this split:
 
-| Goal | Recommended component |
-|------|------------------------|
-| Per-customer key issuance, key revoke/block, spend limits, usage by key | **LiteLLM** |
-| Multi-provider routing, fallback chains, weighted traffic split | **Bifrost** |
-| Both governance + routing across multiple endpoints | **LiteLLM + Bifrost together** |
+| Goal                                                                    | Recommended component          |
+| ----------------------------------------------------------------------- | ------------------------------ |
+| Per-customer key issuance, key revoke/block, spend limits, usage by key | **LiteLLM**                    |
+| Multi-provider routing, fallback chains, weighted traffic split         | **Bifrost**                    |
+| Both governance + routing across multiple endpoints                     | **LiteLLM + Bifrost together** |
 
 Typical patterns:
 
@@ -213,7 +213,7 @@ Typical patterns:
 - **Dedicated mittwald endpoint + other external/self-hosted model endpoints**: Bifrost is recommended for routing policy.
 - **Dedicated + shared + Anthropic/Claude (or other providers)**: Bifrost is the routing layer for model/provider-specific traffic decisions.
 - **Customer keys + multi-endpoint routing**: run LiteLLM in front of Bifrost.
-: request flow: `client -> LiteLLM -> Bifrost -> selected provider endpoint`
+  : request flow: `client -> LiteLLM -> Bifrost -> selected provider endpoint`
 
 ### Not included in the initial scope {#not-included}
 
