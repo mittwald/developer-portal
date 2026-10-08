@@ -26,6 +26,25 @@ Query: {query}
 
 Here, `{query}` should express the individual search query in _one_ sentence, and `{task_description}` should describe the task, for example:
 
+## Batch inputs {#batch-inputs}
+
+You can pass an array of texts to `/v1/embeddings` to generate multiple embeddings in one request. The `index` on each response item identifies the position of its input text, starting at `0`:
+
+```python
+from openai import OpenAI
+
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+
+texts = ["First document", "Second document"]
+response = client.embeddings.create(
+    model="Qwen3-Embedding-8B",
+    input=texts,
+)
+
+for item in response.data:
+    print(texts[item.index], len(item.embedding))
+```
+
 ## Reducing embedding dimensions
 
 Qwen3-Embedding-8B supports server-side dimension reduction through the OpenAI-compatible `dimensions` parameter. This is a supported model capability based on [Matryoshka Representation Learning](https://arxiv.org/abs/2205.13147).

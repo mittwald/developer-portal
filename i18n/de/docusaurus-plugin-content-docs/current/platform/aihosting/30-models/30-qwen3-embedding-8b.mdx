@@ -30,6 +30,25 @@ task = 'Given a web search query, retrieve relevant passages that answer the que
 query = 'Explain gravity'
 ```
 
+## Batch-Eingaben {#batch-inputs}
+
+Du kannst ein Array mit Texten an `/v1/embeddings` übergeben, um mehrere Embeddings in einer Anfrage zu erstellen. Der `index` jedes Antwort-Eintrags gibt die Position des zugehörigen Eingabetextes an und beginnt bei `0`:
+
+```python
+from openai import OpenAI
+
+client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+
+texte = ["Erstes Dokument", "Zweites Dokument"]
+response = client.embeddings.create(
+    model="Qwen3-Embedding-8B",
+    input=texte,
+)
+
+for item in response.data:
+    print(texte[item.index], len(item.embedding))
+```
+
 ## Embedding-Dimensionen reduzieren
 
 Qwen3-Embedding-8B unterstützt die serverseitige Dimensionsreduktion über den OpenAI-kompatiblen Parameter `dimensions`. Diese unterstützte Modellfunktion basiert auf [Matryoshka Representation Learning](https://arxiv.org/abs/2205.13147).
