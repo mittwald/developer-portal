@@ -9,7 +9,7 @@ import {
 } from "@site/src/components/openapi/RequiredOptional";
 import Translate, { translate } from "@docusaurus/Translate";
 import HTTPResponseStatus from "@site/src/components/openapi/HTTPResponseStatus";
-import { Accordion, AlertBadge } from "@mittwald/flow-react-components";
+import { Accordion, Badge } from "@mittwald/flow-react-components";
 import { Heading } from "@mittwald/flow-react-components";
 import { Content } from "@mittwald/flow-react-components";
 import { Text } from "@mittwald/flow-react-components";
@@ -112,8 +112,10 @@ function OperationParameterList({
   return (
     <OutlinedAccordion defaultExpanded={expanded}>
       <Heading>
-        <div style={{ flexGrow: 1 }}>{title}</div>{" "}
-        {hasRequired ? <Required /> : undefined}
+        <span className={styles.accordionTitle}>
+          {title}
+          {hasRequired ? <Required /> : undefined}
+        </span>
       </Heading>
       <Content>
         <ul className={styles.parameterList} style={{ marginBottom: "1rem" }}>
@@ -172,9 +174,11 @@ function OperationRequestBody({
     return (
       <OutlinedAccordion>
         <Heading>
-          <div style={{ flexGrow: 1 }}>{title}</div>
-          <AlertBadge status={"info"}>multipart/form-data</AlertBadge>
-          {required}
+          <span className={styles.accordionTitle}>
+            {title}
+            <Badge color="blue">multipart/form-data</Badge>
+            {required}
+          </span>
         </Heading>
         <Content>
           <SchemaWithExample
@@ -192,9 +196,11 @@ function OperationRequestBody({
     return (
       <OutlinedAccordion>
         <Heading>
-          <div style={{ flexGrow: 1 }}>{title}</div>
-          <AlertBadge status={"info"}>application/json</AlertBadge>
-          {required}
+          <span className={styles.accordionTitle}>
+            {title}
+            <Badge color="blue">application/json</Badge>
+            {required}
+          </span>
         </Heading>
         <Content>
           <SchemaWithExample
@@ -228,8 +234,9 @@ function OperationResponseBody({ spec }: { spec?: OpenAPIV3.ResponseObject }) {
 
   if ("application/json" in spec.content) {
     return (
-      <>
-        <ColumnLayout m={[1, 5]}>
+      <div className={styles.responseBody}>
+        {/* The format column needs room for "application/json" */}
+        <ColumnLayout m={[1, 3]}>
           <LabeledValue>
             <Label>Format</Label>
             <Content>application/json</Content>
@@ -251,7 +258,7 @@ function OperationResponseBody({ spec }: { spec?: OpenAPIV3.ResponseObject }) {
           withRawJSONSchema
           withHeaders
         />
-      </>
+      </div>
     );
   }
 }

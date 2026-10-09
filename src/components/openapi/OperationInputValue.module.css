@@ -2,14 +2,34 @@
   color: var(--ifm-color-gray-600);
 }
 
+/* Wraps on narrow screens, so that long names and types do not push the
+   badges out of the list */
 .parameterListHeader {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  row-gap: var(--size-rem--xs);
+}
+
+/* Connecting line and badges wrap as one unit: the line fills the space up
+   to the badges, which stay on the right and keep their size */
+.parameterListHeaderTags {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--size-rem--xs);
+}
+
+.parameterListHeaderTags > :global(.flow--badge) {
+  flex-shrink: 0;
 }
 
 .parameterName {
   font-weight: bold;
   font-family: var(--ifm-font-family-monospace);
   margin-right: 0.5rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .parameterType:before {
@@ -22,11 +42,8 @@
 }
 
 .parameterListHeaderSpacer {
-  flex-grow: 1;
-  margin-top: 5px;
-  margin-left: 0.5rem;
-  margin-right: 0.5rem;
-  height: 0.5rem;
+  flex: 1 1 1rem;
+  margin-inline: 0.5rem;
   border-bottom: thin solid var(--ifm-color-gray-300);
 }
 

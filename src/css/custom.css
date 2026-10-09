@@ -2,121 +2,158 @@
  * Any CSS included here will be global. The classic template
  * bundles Infima by default. Infima is a CSS framework designed to
  * work well for content-centric websites.
+ *
+ * All colors, fonts, radii and spacings are mapped onto the Flow design
+ * tokens (loaded via @mittwald/flow-react-components/all.css). Flow switches
+ * its tokens on `[data-theme]`, just like Docusaurus, so dark mode works
+ * without separate overrides. Infima defines its own dark mode values on
+ * `html[data-theme="dark"]`, which is why the mapping is applied to that
+ * selector as well.
  */
 
-@font-face {
-  font-family: "Inter";
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url(/static/fonts/Inter-Regular.ttf) format("truetype");
-}
+:root,
+html[data-theme="dark"] {
+  /* Colors */
+  --ifm-color-primary: var(--primary--color--800);
+  --ifm-color-primary-dark: var(--primary--color--900);
+  --ifm-color-primary-darker: var(--primary--color--1000);
+  --ifm-color-primary-darkest: var(--primary--color--1100);
+  --ifm-color-primary-light: var(--primary--color--700);
+  --ifm-color-primary-lighter: var(--primary--color--600);
+  --ifm-color-primary-lightest: var(--primary--color--500);
+  --ifm-color-info: var(--info--color--800);
+  --ifm-color-info-dark: var(--info--color--900);
+  --ifm-color-info-darker: var(--info--color--1000);
+  --ifm-color-success: var(--success--color--800);
+  --ifm-color-success-dark: var(--success--color--900);
+  --ifm-color-success-darker: var(--success--color--1000);
+  --ifm-color-warning: var(--warning--color--700);
+  --ifm-color-warning-dark: var(--warning--color--900);
+  --ifm-color-warning-darker: var(--warning--color--1000);
+  --ifm-color-danger: var(--danger--color--800);
+  --ifm-color-danger-dark: var(--danger--color--900);
+  --ifm-color-danger-darker: var(--danger--color--1000);
 
-@font-face {
-  font-family: "InterBold";
-  font-style: normal;
-  font-weight: 900;
-  font-display: swap;
-  src: url(/static/fonts/Inter-Bold.ttf) format("truetype");
-}
+  --ifm-color-emphasis-0: var(--neutral--color--100);
+  --ifm-color-emphasis-100: var(--neutral--color--200);
+  --ifm-color-emphasis-200: var(--neutral--color--300);
+  --ifm-color-emphasis-300: var(--neutral--color--400);
+  --ifm-color-emphasis-400: var(--neutral--color--500);
+  --ifm-color-emphasis-500: var(--neutral--color--600);
+  --ifm-color-emphasis-600: var(--neutral--color--700);
+  --ifm-color-emphasis-700: var(--neutral--color--800);
+  --ifm-color-emphasis-800: var(--neutral--color--900);
+  --ifm-color-emphasis-900: var(--neutral--color--1000);
+  --ifm-color-emphasis-1000: var(--neutral--color--1100);
 
-@font-face {
-  font-family: "RobotoMono";
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url(/static/fonts/RobotoMono-Regular.ttf) format("truetype");
-}
+  --ifm-background-color: var(--neutral--color--100);
+  --ifm-background-surface-color: var(--neutral--color--100);
+  --ifm-color-content: var(--text--color--default);
+  --ifm-color-content-secondary: var(--neutral--color--800);
+  --ifm-font-color-base: var(--text--color--default);
+  --ifm-heading-color: var(--heading--color);
+  --ifm-hover-overlay: var(--neutral--color--200);
+  --ifm-hr-background-color: var(--separator--color);
+  --ifm-toc-border-color: var(--separator--color);
+  --ifm-table-border-color: var(--separator--color);
+  --ifm-table-head-background: transparent;
+  --ifm-table-stripe-background: var(--neutral--color--200);
+  --ifm-blockquote-border-color: var(--text--blockquote-border-color);
+  --ifm-card-background-color: var(--layout-card--background-color);
+  --docusaurus-highlighted-code-line-bg: var(
+    --neutral-soft-background-color--default
+  );
+  --docusaurus-collapse-button-bg: transparent;
+  --docusaurus-collapse-button-bg-hover: var(--neutral--color--200);
 
-@font-face {
-  font-family: "ProximaNova";
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url(/static/fonts/proximanova-bold-webfont.woff) format("woff");
-}
+  /* Links */
+  --ifm-link-color: var(--link--color--default);
+  --ifm-link-hover-color: var(--link--color--hover);
+  --ifm-link-decoration: none;
+  --ifm-link-hover-decoration: none;
 
-:root {
-  --ifm-color-primary: #27367b;
-  --ifm-color-primary-dark: #1d295c;
-  --ifm-color-primary-darker: #141b3e;
-  --ifm-color-primary-darkest: var(--ifm-color-primary-darker);
-  --ifm-color-primary-light: #5d689c;
-  --ifm-color-primary-lighter: #939bbd;
-  --ifm-color-primary-lightest: #c9cdde;
-  --ifm-color-info: #0054f5;
-  --ifm-color-info-dark: #003fb8;
-  --ifm-color-info-darker: #002a7b;
-  --ifm-color-success: #00a674;
-  --ifm-color-success-dark: #007d57;
-  --ifm-color-success-darker: #00533a;
-  --ifm-color-warning: #ff9343;
-  --ifm-color-warning-dark: #d4573e;
-  --ifm-color-warning-darker: #bf393c;
-  --ifm-color-content: #3c3c3b;
-  --ifm-color-gray-300: #c6c6c6;
+  /* Sidebar menu, styled like the Flow navigation */
+  --ifm-menu-color: var(--text--color--default);
+  --ifm-menu-color-active: var(--text--color--default);
+  --ifm-menu-color-background-active: var(
+    --menu-item--background-color--current
+  );
+  --ifm-menu-color-background-hover: var(--menu-item--background-color--hover);
+  --ifm-menu-link-padding-vertical: var(--menu-item--padding-y);
+  --ifm-menu-link-padding-horizontal: var(--menu-item--padding-x);
+  --ifm-menu-link-sublist-icon-filter: none;
+  --ifm-toc-link-color: var(--ifm-color-content-secondary);
+  --ifm-tabs-color-active: var(--link--color--default);
+  --ifm-tabs-color-active-border: var(--link--color--default);
 
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  /* Navbar */
+  --ifm-navbar-background-color: var(--neutral--color--100);
+  --ifm-navbar-height: 72px;
+  --ifm-navbar-link-color: var(--text--color--default);
+  --ifm-navbar-link-hover-color: var(--link--color--hover);
+  --ifm-navbar-link-active-color: var(--link--color--default);
+  --ifm-navbar-shadow: none;
+
+  /* Footer */
+  --ifm-footer-background-color: var(--neutral--color--200);
+  --ifm-footer-color: var(--text--color--default);
+  --ifm-footer-title-color: var(--heading--color);
+  --ifm-footer-link-color: var(--ifm-color-content-secondary);
+  --ifm-footer-link-hover-color: var(--link--color--hover);
+
+  /* Breadcrumbs */
+  --ifm-breadcrumb-color-active: var(--text--color--default);
+  --ifm-breadcrumb-item-background-active: none;
+  --ifm-breadcrumb-padding-vertical: 0;
+
+  /* Code */
+  --ifm-code-background: var(--inline-code--background-color);
+  --ifm-code-color: var(--inline-code--content-color);
+  --ifm-code-border-radius: var(--inline-code--corner-radius);
+  --ifm-code-font-size: 0.875em;
+  --ifm-code-padding-horizontal: var(--inline-code--padding-x);
+  --ifm-pre-background: var(--code-block--background-color);
+  --ifm-pre-color: var(--code-block--content-color);
+  --ifm-pre-padding: var(--code-block--padding);
+  --ifm-pre-line-height: 1.4;
+
+  /* Alerts */
   --ifm-alert-border-color: var(--ifm-color-info);
   --ifm-alert-border-width: 1px;
   --ifm-alert-shadow: none;
-  --ifm-breadcrumb-color-active: var(--ifm-color-content);
-  --ifm-breadcrumb-item-background-active: none;
-  --ifm-breadcrumb-padding-vertical: 0;
+
+  /* Typography */
+  --ifm-font-family-base: Inter, sans-serif;
+  --ifm-font-family-monospace: FiraCode, monospace;
+  --ifm-heading-font-family: var(--ifm-font-family-base);
+  --ifm-font-weight-bold: var(--font-weight--bold);
+  --ifm-heading-font-weight: var(--heading--font-weight);
+  --ifm-line-height-base: 1.5;
+  /* Page titles are compact like on flow.mittwald.de */
+  --ifm-h1-font-size: var(--font-size-heading--l);
+  --ifm-h2-font-size: var(--font-size-heading--l);
+  --ifm-h3-font-size: var(--font-size-heading--s);
+
+  /* Shapes and spacing */
+  --ifm-global-radius: var(--corner-radius--m);
+  --ifm-card-border-radius: var(--corner-radius--l);
+  --ifm-global-spacing: var(--size-rem--m);
   --ifm-button-size-multiplier: 1;
-  --ifm-card-border-radius: var(--ifm-global-radius);
-  --ifm-code-background: #ededed;
-  --ifm-code-font-size: 14px;
-  --ifm-color-emphasis-200: var(--ifm-color-gray-300);
-  --ifm-font-family-base: "Inter";
-  --ifm-font-family-bold: "InterBold";
-  --ifm-font-family-monospace: "RobotoMono";
-  --ifm-font-family-headline: "ProximaNova";
-  --ifm-footer-background-color: var(--ifm-color-primary);
-  --ifm-footer-color: #fff;
-  --ifm-footer-link-color: #fff;
-  --ifm-footer-link-hover-color: #fff;
-  --ifm-global-radius: 4px;
-  --ifm-global-spacing: 16px;
-  --ifm-h2-font-size: 24px;
-  --ifm-heading-color: var(--ifm-color-primary);
-  --ifm-heading-font-family: var(--ifm-font-family-bold);
-  --ifm-hover-overlay: #e7effa;
-  --ifm-line-height-base: 24px;
-  --ifm-link-color: var(--ifm-color-info);
-  --ifm-link-decoration: none;
-  --ifm-link-hover-color: var(--ifm-color-info-dark);
-  --ifm-link-hover-decoration: none;
-  --ifm-menu-color: var(--ifm-color-primary);
-  --ifm-menu-color-active: var(--ifm-color-info);
-  --ifm-navbar-background-color: var(--ifm-color-primary);
-  --ifm-navbar-height: 72px;
-  --ifm-navbar-link-color: #fff;
-  --ifm-navbar-link-hover-color: #fff;
-  --ifm-toc-link-color: var(--ifm-link-color);
-  --mw-main-background-color: #ededed;
-  --mw-main-feature-background-color: #fff;
+
+  /* Portal specific */
+  --mw-main-background-color: var(--neutral--color--200);
+  --mw-main-feature-background-color: var(--neutral--color--100);
 }
 
+/* Hero on the landing pages, on the Flow gradient like flow.mittwald.de */
 .hero--primary {
-  background:
-    radial-gradient(circle at 60.52% 67.2%, #264697, transparent 41%),
-    radial-gradient(circle at 56.14% 12.23%, #232b69, transparent 85%),
-    radial-gradient(circle at 6.01% 1.34%, #d989b9, transparent 25%),
-    radial-gradient(circle at 75.71% 4.03%, #0a0d66, transparent 34%),
-    radial-gradient(circle at 99.31% 70.7%, #2fd2eb, transparent 75%),
-    radial-gradient(circle at 76.91% 59.14%, #0a0d66, transparent 71%),
-    radial-gradient(circle at 71.07% 83.33%, #0a0d66, transparent 71%),
-    radial-gradient(circle at 15.11% 70.43%, #1556a1, transparent 64%),
-    radial-gradient(circle at 65.49% 37.9%, #3058a5, transparent 100%),
-    radial-gradient(circle at 99.4% 93.55%, #12f7ff, transparent 100%),
-    radial-gradient(circle at 50% 50%, #8f62aa, #8f62aa 100%);
+  --ifm-hero-text-color: var(--text--color--default);
+  background: var(--color--gradient);
 }
 
 .hero__title {
-  color: #fff;
+  color: var(--heading--color);
   font-size: 60px;
-  font-family: var(--ifm-font-family-headline);
 }
 
 .docPage_node_modules-\@docusaurus-theme-classic-lib-theme-DocPage-Layout-styles-module {
@@ -128,68 +165,113 @@ main.index {
   background-color: var(--mw-main-background-color);
 }
 
-aside.theme-doc-sidebar-container {
-  margin-right: var(--ifm-global-spacing);
+/* Space between sidebar and content. As padding of the main container (and
+   not as sidebar margin), so that the main container keeps its width and does
+   not overflow the viewport on the right. */
+@media (min-width: 997px) {
+  main[class*="docMainContainer"] {
+    padding-left: var(--ifm-global-spacing);
+  }
 }
 
-.pagination-nav__label {
-  font-size: 14px;
-}
-
-.card,
-.pagination-nav a {
+.card {
   box-shadow: none !important;
   padding: var(--ifm-global-spacing) !important;
 }
 
-.card:hover,
-.pagination-nav a:hover {
-  border-color: var(--ifm-color-gray-300) !important;
+.card:hover {
+  border-color: var(--separator--color) !important;
   background: var(--ifm-hover-overlay);
 }
 
 .card h2 {
-  font-size: 18px;
+  font-size: var(--font-size-heading--s);
 }
 
 .card p {
-  font-family: var(--ifm-font-family-base);
-  font-size: 16px;
+  font-size: var(--font-size-text--m);
   overflow: visible;
   white-space: pre-wrap;
 }
 
-.breadcrumbs__item--active {
-  font-family: var(--ifm-font-family-bold);
+a.navbar__link {
+  font-weight: var(--font-weight--normal);
 }
 
-.menu__link--active {
-  font-family: var(--ifm-font-family-bold) !important;
-}
+/* Sidebar: Docusaurus' structure and behavior, the look of the Flow
+   navigation (items, current item, chevrons) */
 
 a.menu__link {
-  font-family: var(--ifm-font-family-base);
+  font-weight: var(--font-weight--normal);
+}
+
+/* On large screens the sidebar grows into the space that is left over next
+   to the content container (max. --ifm-container-width-xl), so the content
+   never gets narrower. The 2rem cover the sidebar margin and a scrollbar.
+   Docusaurus defines the variable on :root in a CSS module loaded after this
+   file, hence the doubled selector. */
+:root:root {
+  --doc-sidebar-width: clamp(
+    300px,
+    calc(100vw - var(--ifm-container-width-xl) - 2rem),
+    400px
+  );
+}
+
+/* Desktop sidebar spaced like a Flow layout card */
+.theme-doc-sidebar-container nav.menu {
+  padding: var(--layout-card--padding);
+}
+
+.menu__link,
+.menu__caret {
+  border-radius: var(--menu-item--corner-radius);
+  transition-property: background-color;
+  transition-duration: var(--transition--duration--default);
+}
+
+.menu__list-item:not(:first-child) {
+  margin-top: var(--menu--item-to-item-spacing);
+}
+
+a.menu__link--active:not(.menu__link--sublist),
+a.menu__link--sublist[aria-current="page"] {
+  font-weight: var(--menu-item--font-weight--current);
+}
+
+/* A category containing the current page is emphasized, but only the current
+   page itself gets the current background */
+a.menu__link--sublist.menu__link--active {
+  font-weight: var(--menu-item--font-weight--current);
+}
+
+a.menu__link--sublist.menu__link--active:not([aria-current="page"]),
+.menu__list-item-collapsible--active {
+  background-color: transparent;
+}
+
+.menu__list-item-collapsible--active:hover,
+a.menu__link--sublist.menu__link--active:not([aria-current="page"]):hover {
+  background-color: var(--menu-item--background-color--hover);
+}
+
+/* Chevrons in the text color (Infima draws them as a black data URI) */
+.menu__link--sublist-caret::after,
+.menu__caret::before {
+  background: currentColor;
+  mask: var(--ifm-menu-link-sublist-icon) center / 1.5rem 1.5rem no-repeat;
 }
 
 aside {
-  /*border: none !important;*/
   clip-path: none !important;
 }
 
-.markdown > h2 {
-  --ifm-h2-font-size: 24px;
-}
-
-.markdown > h3 {
-  --ifm-h3-font-size: 18px;
-}
-
 .container h1 {
-  --ifm-h1-font-size: 32px !important;
+  --ifm-h1-font-size: var(--font-size-heading--l) !important;
 }
 
 article > header > h2 {
-  font-size: 1.5rem !important;
+  font-size: var(--font-size-heading--l) !important;
 }
 
 h1.title_node_modules-\@docusaurus-theme-classic-lib-theme-BlogPostItem-Header-Title-styles-module {
@@ -198,7 +280,7 @@ h1.title_node_modules-\@docusaurus-theme-classic-lib-theme-BlogPostItem-Header-T
 
 code {
   border: none;
-  padding: 0 8px;
+  padding: var(--inline-code--padding-y) var(--inline-code--padding-x);
 }
 
 h1 code {
@@ -207,36 +289,38 @@ h1 code {
 }
 
 pre {
-  background: var(--ifm-code-background);
+  background: var(--ifm-pre-background);
 }
 
-strong {
-  font-family: var(--ifm-font-family-bold);
+/* Code blocks look like Flow's CodeBlock. Docusaurus reads the radius from
+   the inline code variable and the title separator from an emphasis color,
+   so both are redefined for code blocks only. */
+.theme-code-block {
+  --ifm-code-border-radius: var(--code-block--corner-radius);
+  --ifm-pre-border-radius: var(--code-block--corner-radius);
+  --ifm-color-emphasis-300: var(--code-block--border-color);
+  --ifm-global-shadow-lw: none;
+  border: var(--code-block--border-width) var(--code-block--border-style)
+    var(--code-block--border-color);
 }
 
+strong,
 a {
-  font-family: var(--ifm-font-family-bold);
+  font-weight: var(--font-weight--bold);
 }
 
 nav a {
-  font-size: 14px;
+  font-size: var(--font-size-text--s);
 }
 
-section.footnotes {
-  font-size: 0.8em;
-}
-
-.markdown {
-  font-size: 16px;
-}
-
+.markdown,
 p {
-  font-size: 16px;
+  font-size: var(--font-size-text--m);
 }
 
 .markdown a,
 p a {
-  font-family: var(--ifm-font-family-base);
+  font-weight: var(--font-weight--normal);
   font-size: 1em;
   text-decoration: underline;
 
@@ -250,11 +334,11 @@ a.card {
 }
 
 .markdown strong a {
-  font-family: var(--ifm-font-family-bold);
+  font-weight: var(--font-weight--bold);
 }
 
 .button {
-  font-family: var(--ifm-font-family-bold);
+  font-weight: var(--font-weight--bold);
   font-size: initial;
 }
 
@@ -266,63 +350,68 @@ a.card {
   color: var(--ifm-color-gray-900);
 }
 
-.navbar button:hover {
-  background: var(--ifm-color-primary-dark);
+/* Navbar */
+
+.navbar {
+  border-bottom: 1px solid var(--separator--color);
 }
 
-.navbar-sidebar {
-  --ifm-menu-color: #fff;
-  --ifm-menu-color-active: #fff;
+/* The mobile menu button (a Flow button) brings its own spacing */
+.navbar__toggle {
+  margin-right: 0;
+}
+
+/* "Developer Portal" stacked below the mittwald logo */
+.navbar__brand {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  row-gap: var(--size-rem--xs);
+  margin-inline: var(--size-rem--m) var(--size-rem--xl);
+}
+
+/* The color mode toggle is part of the Flow header actions
+   (NavbarItem/FlowHeaderActions); hide the one Docusaurus adds itself */
+.navbar__items--right > [class*="colorModeToggle"] {
+  display: none;
+}
+
+.navbar__brand:hover {
+  color: var(--ifm-navbar-link-color);
+}
+
+/* Logo and title are about the same width (≈130px) */
+.navbar__logo {
+  height: 1.5rem;
+  margin: 0;
+}
+
+.navbar__title {
+  font-size: var(--font-size-text--m);
+  font-weight: var(--font-weight--bold);
+  line-height: 1;
 }
 
 .navbar__link {
   font-family: inherit;
 }
 
-.navbar__logo {
-  margin: 0 2rem 0 1rem;
-}
-
-.navbar button {
-  color: #fff;
-}
-
-.theme-doc-footer-tags-row,
-.theme-doc-footer-edit-meta-row {
-  margin: 0;
-}
-
-section.row {
-  margin: 0 calc(8px * -1);
-}
-
-.theme-doc-footer-tags-row b {
-  color: #878787;
-  font-size: 14px;
-  font-family: var(--ifm-font-family-bold);
-}
-
-.theme-doc-footer-tags-row a {
-  color: var(--ifm-color-content);
-  font-family: var(--ifm-font-family-base);
-  background: var(--ifm-code-background);
-  border: none;
-}
-
-.theme-doc-footer-tags-row a:hover {
-  background: var(--ifm-hover-overlay);
-}
-
-.col {
-  padding: 0 calc(var(--ifm-global-spacing) / 2);
-}
 
 .col.margin-bottom--lg {
   margin-bottom: var(--ifm-global-spacing) !important;
 }
 
-.table-of-contents__link {
-  font-family: var(--ifm-font-family-base);
+/* Footer */
+
+.footer {
+  border-top: 1px solid var(--separator--color);
+}
+
+/* Infima drops the horizontal footer padding on small screens */
+@media screen and (max-width: 996px) {
+  .footer {
+    --ifm-footer-padding-horizontal: var(--size-rem--m);
+  }
 }
 
 /* Banners */
@@ -332,7 +421,7 @@ section.row {
   --ifm-link-decoration: inherit;
   background-color: inherit;
   --ifm-alert-foreground-color: var(--ifm-color-content);
-  --ifm-alert-background-color-highlight: #ededed !important;
+  --ifm-alert-background-color-highlight: var(--neutral--color--200) !important;
 }
 
 .alert svg {
@@ -342,7 +431,7 @@ section.row {
 
 .alert > :first-child {
   text-transform: none !important;
-  font-family: var(--ifm-font-family-bold);
+  font-weight: var(--font-weight--bold);
 }
 
 .alert--info {
@@ -391,195 +480,32 @@ section.row {
 
 /* dark mode. */
 
-[data-theme="dark"] {
-  --ifm-color-primary: #c9cdde;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
-  --mw-main-background-color: #111;
-  --mw-main-feature-background-color: #222;
-  --ifm-navbar-background-color: #1c2658;
-  --ifm-footer-background-color: #1c2658;
-  --ifm-navbar-link-color: #fff;
-  --ifm-color-info: #80aafa;
-  --ifm-color-info-dark: #80aafa;
-  --ifm-color-info-darker: #bfd4fd;
-  --ifm-color-success: #00a674;
-  --ifm-color-success-dark: #00b785;
-  --ifm-color-success-darker: #00c795;
-  --ifm-color-warning: #ffae72;
-  /*--ifm-color-warning-dark: #ffae72;
-  --ifm-color-warning-darker: #ffc9a1;*/
-  --ifm-link-color: var(--ifm-color-info);
-  --ifm-menu-color-active: var(--ifm-color-info);
-  --ifm-color-content: #ffffff;
-  --ifm-button-color: #ffffff;
-
-  --content--color: #ffffff !important;
-  --content--color--default: #ffffff !important;
-  --heading--color: #c9cdde !important;
-  --accordion--header-background-color--hover: var(
-    --ifm-hover-overlay
-  ) !important;
-  --status-badge--warning-background-color: var(
-    --ifm-color-warning-darker
-  ) !important;
-  --status-badge--warning-content-color: var(--ifm-color-warning) !important;
-  --status-icon--warning-color: var(--ifm-color-warning) !important;
-}
-
-[data-theme="dark"] .hero--primary {
-  background:
-    radial-gradient(circle at 60.52% 67.2%, #1c2e60, transparent 41%),
-    radial-gradient(circle at 56.14% 12.23%, #232b69, transparent 85%),
-    radial-gradient(circle at 6.01% 1.34%, #562441, transparent 25%),
-    radial-gradient(circle at 75.71% 4.03%, #0a0d66, transparent 34%),
-    radial-gradient(circle at 99.31% 70.7%, #227b85, transparent 75%),
-    radial-gradient(circle at 76.91% 59.14%, #0a0d66, transparent 71%),
-    radial-gradient(circle at 71.07% 83.33%, #0a0d66, transparent 71%),
-    radial-gradient(circle at 15.11% 70.43%, #0f3464, transparent 64%),
-    radial-gradient(circle at 65.49% 37.9%, #25427a, transparent 100%),
-    radial-gradient(circle at 99.4% 93.55%, #288e8f, transparent 100%),
-    radial-gradient(circle at 50% 50%, #8f62aa, #8f62aa 100%);
-}
-
-[data-theme="dark"] .hero {
-  color: #fff;
-}
-
-[data-theme="dark"] code,
-[data-theme="dark"] pre {
-  --ifm-code-background: #141b3e;
-}
-
-[data-theme="dark"] .card,
-[data-theme="dark"] .pagination-nav a {
-  background: #333;
-  border: none;
-}
-
-[data-theme="dark"] .card:hover,
-[data-theme="dark"] .pagination-nav a:hover {
-  background-color: #2b3980;
-}
-
-[data-theme="dark"] .alert {
-  background-color: #2b398080;
-}
-
-[data-theme="dark"] .menu__link--active:not(.menu__link--sublist),
-[data-theme="dark"] .menu__link:hover,
-[data-theme="dark"] .menu__list-item-collapsible--active,
-[data-theme="dark"] .menu__list-item-collapsible:hover,
-[data-theme="dark"] .navbar-sidebar__back,
-[data-theme="dark"] .navbar button:hover {
-  background-color: #2b3980;
-}
-
-@media screen and (max-width: 996px) {
-  .navbar {
-    --ifm-menu-link-sublist-icon-filter: invert(100%) sepia(94%) saturate(17%)
-      hue-rotate(223deg) brightness(104%) contrast(98%);
-  }
-
-  .menu__link--active:not(.menu__link--sublist),
-  .menu__link:hover,
-  .menu__list-item-collapsible--active,
-  .menu__list-item-collapsible:hover,
-  .navbar-sidebar__back {
-    background-color: var(--ifm-color-primary-dark);
-  }
-}
-
 @media screen and (max-width: 600px) {
   .hero__title {
     font-size: 40px;
   }
-  .navbar__logo {
-    height: 24px;
-  }
 }
 
+/* Deprecated API operations in the sidebar */
 .api-operation-deprecated a {
-  color: var(--color--gray--600);
+  color: var(--ifm-color-content-secondary);
 }
 
-.api-operation-deprecated a::before {
-  text-decoration: none !important;
-  background-color: var(--color--gray--600) !important;
+/* Infima styles table rows by element (striping, top border) with a higher
+   specificity than Flow's :where() rules; restore Flow's own row styles */
+/* Infima collapses table borders, which drops Flow's rounded outer border */
+table.flow--table {
+  border-collapse: separate;
 }
 
-[data-theme="dark"] .api-operation-deprecated a {
-  color: var(--color--gray--800);
+.flow--table thead,
+.flow--table .flow--table--row {
+  background-color: transparent;
+  border-top: none;
 }
 
-[data-theme="dark"] .api-operation-deprecated a::before {
-  text-decoration: none !important;
-  background-color: var(--color--gray--800) !important;
-  color: black;
-}
-
-.api-operation-get a::before {
-  content: "GET";
-  border-radius: 4px;
-  background-color: var(--ifm-color-success);
-  color: white;
-  padding: 2px 4px;
-  margin-right: 8px;
-  font-size: 0.6rem;
-  font-weight: bold;
-  min-width: 48px;
-  text-align: center;
-}
-
-.api-operation-post a::before {
-  content: "POST";
-  border-radius: 4px;
-  background-color: var(--ifm-color-info);
-  color: white;
-  padding: 2px 4px;
-  margin-right: 8px;
-  font-size: 0.6rem;
-  font-weight: bold;
-  min-width: 48px;
-  text-align: center;
-}
-
-.api-operation-delete a::before {
-  content: "DELETE";
-  border-radius: 4px;
-  background-color: var(--ifm-color-danger);
-  color: white;
-  padding: 2px 4px;
-  margin-right: 8px;
-  font-size: 0.6rem;
-  font-weight: bold;
-  min-width: 48px;
-  text-align: center;
-}
-
-.api-operation-patch a::before {
-  content: "PATCH";
-  border-radius: 4px;
-  background-color: var(--ifm-color-warning);
-  color: white;
-  padding: 2px 4px;
-  margin-right: 8px;
-  font-size: 0.6rem;
-  font-weight: bold;
-  min-width: 48px;
-  text-align: center;
-}
-
-.api-operation-put a::before {
-  content: "PUT";
-  border-radius: 4px;
-  background-color: var(--ifm-color-warning);
-  color: white;
-  padding: 2px 4px;
-  margin-right: 8px;
-  font-size: 0.6rem;
-  font-weight: bold;
-  min-width: 48px;
-  text-align: center;
+.flow--table tbody .flow--table--row:nth-of-type(odd) {
+  background-color: var(--table--background-color-accent);
 }
 
 .flow--inline-alert,

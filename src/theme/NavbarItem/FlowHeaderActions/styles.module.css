@@ -1,0 +1,15 @@
+.item {
+  list-style: none;
+}
+
+/* Round like the icon buttons of the header navigation */
+.item :global(.flow--button) {
+  border-radius: var(--header-navigation--corner-radius-round);
+}
+
+/* For target="_blank", Flow appends its external link icon to the button,
+   which displaces the icon of an icon-only button. Workaround until Flow's
+   HeaderNavigation supports links with buttons. */
+.item :global(.flow--link--link-icon) {
+  display: none;
+}

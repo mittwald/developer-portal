@@ -2,12 +2,10 @@
 // Note: type annotations allow type checking and IDEs autocompletion
 
 import { Config } from "@docusaurus/types";
-import { themes } from "prism-react-renderer";
 import { Options, ThemeConfig } from "@docusaurus/preset-classic";
 import { Options as ClientRedirectOptions } from "@docusaurus/plugin-client-redirects";
-
-const lightCodeTheme = themes.oneLight;
-const darkCodeTheme = themes.dracula;
+import { flowTheme } from "./src/prism/flowTheme";
+import rehypeFlowSections from "./src/plugins/rehypeFlowSections";
 
 function webpackCryptoFallbackPlugin() {
   return {
@@ -110,6 +108,7 @@ const config: Config = {
         blogSidebarCount: "ALL",
         showReadingTime: false,
         onInlineTags: "ignore",
+        rehypePlugins: [rehypeFlowSections],
       },
     ],
     webpackCryptoFallbackPlugin,
@@ -185,6 +184,7 @@ This documentation covers:
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl: "https://github.com/mittwald/developer-portal/tree/master/",
+          rehypePlugins: [rehypeFlowSections],
           lastVersion: "current",
           versions: {
             current: {
@@ -203,6 +203,7 @@ This documentation covers:
         blog: {
           showReadingTime: false,
           onInlineTags: "ignore",
+          rehypePlugins: [rehypeFlowSections],
         },
         theme: {
           customCss: [
@@ -220,52 +221,59 @@ This documentation covers:
       title: "Developer Portal",
       logo: {
         alt: "mittwald",
-        src: "img/mittwald-logo.svg",
+        src: "img/mittwald-logo-dark.svg",
+        srcDark: "img/mittwald-logo.svg",
       },
       items: [
         {
-          type: "doc",
-          docId: "api/intro",
+          // Flow header navigation (src/theme/NavbarItem/FlowHeaderNavigation)
+          type: "custom-flowHeaderNavigation",
           position: "left",
-          label: "API Docs",
+          label: "Menu",
+          items: [
+            {
+              type: "doc",
+              docId: "api/intro",
+              label: "API Docs",
+            },
+            {
+              type: "doc",
+              docId: "cli/index",
+              label: "CLI",
+            },
+            {
+              type: "doc",
+              docId: "/category/platform",
+              label: "Platform",
+            },
+            {
+              type: "doc",
+              docId: "guides/deployment/index",
+              label: "Guides",
+            },
+            {
+              type: "doc",
+              docId: "contribution/index",
+              label: "Contribution",
+            },
+            {
+              to: "/changelog",
+              label: "Changelog",
+            },
+          ],
         },
         {
-          type: "doc",
-          docId: "cli/index",
-          position: "left",
-          label: "CLI",
-        },
-        {
-          type: "doc",
-          docId: "/category/platform",
-          position: "left",
-          label: "Platform",
-        },
-        {
-          type: "doc",
-          docId: "guides/deployment/index",
-          position: "left",
-          label: "Guides",
-        },
-        {
-          type: "doc",
-          docId: "contribution/index",
-          position: "left",
-          label: "Contribution",
-        },
-        {
-          to: "/changelog",
-          label: "Changelog",
-          position: "left",
-        },
-        {
-          href: "https://github.com/mittwald/developer-portal",
-          label: "GitHub",
+          // Flow header navigation (src/theme/NavbarItem/FlowHeaderActions)
+          // with these links, the language switch and the color mode toggle
+          type: "custom-flowHeaderActions",
           position: "right",
-        },
-        {
-          type: "localeDropdown",
-          position: "right",
+          items: [
+            {
+              href: "https://github.com/mittwald/developer-portal",
+              label: "GitHub",
+              icon: "github",
+            },
+          ],
         },
       ],
     },
@@ -325,9 +333,15 @@ This documentation covers:
       ],
       copyright: `Copyright © ${new Date().getFullYear()} Mittwald CM Service GmbH & Co. KG. Built with Docusaurus.`,
     },
+    mermaid: {
+      // Keep Mermaid's default themes, but use the Flow font
+      options: {
+        fontFamily: "Inter, sans-serif",
+      },
+    },
     prism: {
-      theme: lightCodeTheme,
-      darkTheme: darkCodeTheme,
+      theme: flowTheme,
+      darkTheme: flowTheme,
       additionalLanguages: ["php", "shell-session", "hcl"],
     },
   } satisfies ThemeConfig,

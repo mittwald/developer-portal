@@ -197,7 +197,11 @@ npm add @mittwald/ext-bridge
   This global secret is **not** the same as the Extension Instance secret, which is used to authenticate individual Extension Instances.
   An access token is required to authenticate your backend when interacting with the [mittwald API](https://developer.mittwald.de/de/docs/v2/reference/).
 
-> **Important:** Always generate a new access token on demand. Never cache or reuse access tokens.
+:::important
+
+Always generate a new access token on demand. Never cache or reuse access tokens.
+
+:::
 
 ### Frontend Implementation
 
@@ -205,12 +209,14 @@ npm add @mittwald/ext-bridge
 
 Use `getSessionToken()` to generate a session token.
 
-> **Important:**
->
-> - Server-Side Rendering (SSR) is **not supported** — this function must be called **client-side**.
-> - The method is available **only after** the `<RemoteRoot>` component has been rendered.
-> - Do **not** call `getSessionToken()` during initial rendering (e.g., inside `useEffect`).
->   Instead, invoke it **right before** making a backend request.
+:::important
+
+- Server-Side Rendering (SSR) is **not supported** — this function must be called **client-side**.
+- The method is available **only after** the `<RemoteRoot>` component has been rendered.
+- Do **not** call `getSessionToken()` during initial rendering (e.g., inside `useEffect`).
+  Instead, invoke it **right before** making a backend request.
+
+:::
 
 #### Example: Axios Interceptors
 
@@ -324,4 +330,8 @@ const projectsResponse = await fetch("https://api.mittwald.de/v2/projects", {
 });
 ```
 
-> **Important:** Always create a fresh access token on demand. Never cache or reuse access tokens.
+:::important
+
+Always create a fresh access token on demand. Never cache or reuse access tokens.
+
+:::

@@ -1,7 +1,7 @@
 import { OpenAPIV3 } from "openapi-types";
 import OperationPath from "@site/src/components/openapi/OperationPath";
 import Markdown from "react-markdown";
-import { Content } from "@mittwald/flow-react-components";
+import { AccentBox, Content } from "@mittwald/flow-react-components";
 import { LabeledValue } from "@mittwald/flow-react-components";
 import { Label } from "@mittwald/flow-react-components";
 import { ColumnLayout } from "@mittwald/flow-react-components";
@@ -74,19 +74,20 @@ function OperationPathHeader({
   }
 
   return (
-    <pre className={styles.meta}>
-      <HTTPMethod method={method} />
-      <span>
+    <AccentBox backgroundColor="neutral" className={styles.meta}>
+      <HTTPMethod method={method} className={styles.method} />
+      <span className={styles.path}>
         <OperationPath path={path} />
       </span>
-      <CopyButton
-        text={baseURL + pathWithoutBase}
-        size="m"
-        variant="plain"
-        style={{ marginTop: -8, marginBottom: -8 }}
-      />
-      <OperationPlayground path={path} method={method} spec={spec} />
-    </pre>
+      <span className={styles.actions}>
+        <CopyButton
+          text={baseURL + pathWithoutBase}
+          variant="plain"
+          color="dark"
+        />
+        <OperationPlayground path={path} method={method} spec={spec} />
+      </span>
+    </AccentBox>
   );
 }
 
@@ -125,19 +126,21 @@ export function OperationMetadata({
           <Label>Request method</Label>
           <Content>{method.toUpperCase()}</Content>
         </LabeledValue>
-        <LabeledValue className={styles.operationIdValue}>
+        <LabeledValue>
           <Label className={styles.labelWithHelp}>
             Operation ID <OperationIdHelp />
           </Label>
-          <Content>
-            <div>{spec.operationId}</div>
-            <CopyButton text={spec.operationId} size="s" variant="plain" />
-          </Content>
+          <Content>{spec.operationId}</Content>
+          {/* Placed next to the value by the labeled value */}
+          <CopyButton text={spec.operationId} />
         </LabeledValue>
       </ColumnLayout>
-      <hr />
       {spec.description && withDescription ? (
-        <Markdown>{spec.description}</Markdown>
+        <>
+          {/* Without a description, the next section's separator follows */}
+          <hr />
+          <Markdown>{spec.description}</Markdown>
+        </>
       ) : null}
     </>
   );

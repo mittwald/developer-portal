@@ -20,18 +20,17 @@
   font-size: 1.2rem;
 }
 
+/* Buttons keep their label on one line and wrap as a whole instead */
 .buttons {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  column-gap: 0.5em;
+  gap: var(--size-rem--s);
 }
 
-.buttons a {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  column-gap: 0.5em;
+.buttons :global(.flow--button) {
+  white-space: nowrap;
 }
 
 @media screen and (max-width: 996px) {
@@ -41,14 +40,5 @@
 
   .heroBanner img {
     width: 100%;
-  }
-
-  .buttons {
-    flex-wrap: wrap;
-  }
-
-  .buttons a {
-    flex-basis: 50%;
-    margin-bottom: 1em;
   }
 }

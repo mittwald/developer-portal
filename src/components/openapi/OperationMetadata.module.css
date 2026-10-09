@@ -1,26 +1,32 @@
-.operationIdValue > div {
-  display: flex;
-  align-items: center;
-}
-
-.operationIdValue > div > div {
-  flex-grow: 1;
-}
-
 .labelWithHelp {
   display: flex;
 }
 
+/* Method, path and actions in one row; the actions wrap below on narrow
+   screens */
 .meta {
-  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
+  gap: var(--size-rem--s);
 }
 
-.meta > * {
-  flex-grow: 0;
+.method {
+  margin-right: 0;
   flex-shrink: 0;
 }
 
-.meta > *:nth-child(2) {
-  flex-grow: 1;
+.path {
+  flex: 1 1 12rem;
+  min-width: 0;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: var(--font-size-text--s);
+  overflow-wrap: anywhere;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--size-rem--s);
+  margin-left: auto;
 }

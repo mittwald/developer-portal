@@ -1,11 +1,13 @@
 # Password security
 
+Various API calls enforce password policies. This document serves as a reference for different password policies enforced by the mStudio API.
+
 <!--
 NOTE: This document is linked from various places with in the API reference.
 DO NOT change the document ID or the header IDs
+(This comment is placed below the first paragraph, which Docusaurus uses as
+page description.)
 -->
-
-Various API calls enforce password policies. This document serves as a reference for different password policies enforced by the mStudio API.
 
 ## MySQL user passwords {#mysql}
 

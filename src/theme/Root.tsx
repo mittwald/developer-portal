@@ -4,8 +4,38 @@ import {
   MatomoProvider,
   useMatomo,
 } from "@datapunt/matomo-tracker-react";
-import { useLocation } from "@docusaurus/router";
+import { useHistory, useLocation } from "@docusaurus/router";
+import { useBaseUrlUtils } from "@docusaurus/useBaseUrl";
+import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
+import { IntlProvider, RouterProvider } from "@mittwald/flow-react-components";
 import "@mittwald/flow-react-components/all.css";
+
+/**
+ * Lets Flow links navigate through the Docusaurus router and resolves their
+ * hrefs against the base URL, which includes the locale prefix (e.g. `/de/`).
+ */
+function FlowRouterProvider({ children }: PropsWithChildren<{}>) {
+  const history = useHistory();
+  const { withBaseUrl } = useBaseUrlUtils();
+
+  return (
+    <RouterProvider
+      navigate={(href) => history.push(withBaseUrl(href))}
+      useHref={(href) => withBaseUrl(href)}
+    >
+      {children}
+    </RouterProvider>
+  );
+}
+
+/**
+ * Flow texts (e.g. labels of copy buttons) follow the page language instead
+ * of the browser language.
+ */
+function FlowIntlProvider({ children }: PropsWithChildren<{}>) {
+  const { i18n } = useDocusaurusContext();
+  return <IntlProvider locale={i18n.currentLocale}>{children}</IntlProvider>;
+}
 
 function PageViewTracker({ children }: PropsWithChildren<{}>) {
   const { trackPageView } = useMatomo();
@@ -48,7 +78,11 @@ export default function Root({ children }: PropsWithChildren<{}>) {
 
   return (
     <MatomoProvider value={matomoInstance}>
-      <PageViewTracker>{children}</PageViewTracker>
+      <PageViewTracker>
+        <FlowIntlProvider>
+          <FlowRouterProvider>{children}</FlowRouterProvider>
+        </FlowIntlProvider>
+      </PageViewTracker>
     </MatomoProvider>
   );
 }

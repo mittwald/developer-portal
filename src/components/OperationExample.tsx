@@ -51,10 +51,12 @@ export default function OperationExample(p: Props) {
     </>
   );
 
+  // Wrapped, so that the gap between section children does not separate the
+  // code block from its reference footer
   return (
-    <>
+    <div className={styles.example}>
       <CodeBlock language="yaml">{body}</CodeBlock>
       {withoutLink || <div className={clsx(styles.reference)}>{link}</div>}
-    </>
+    </div>
   );
 }

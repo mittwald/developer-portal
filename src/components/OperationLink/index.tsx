@@ -1,10 +1,13 @@
 import React, { PropsWithChildren } from "react";
-import Link from "@docusaurus/Link";
+import MDXComponents from "@theme/MDXComponents";
 import { APIVersion, getOperationById, useSpec } from "@site/src/openapi/specs";
-import HTTPMethod from "@site/src/components/openapi/HTTPMethod";
 import OperationPath from "@site/src/components/openapi/OperationPath";
+import HTTPMethod from "@site/src/components/openapi/HTTPMethod";
 import styles from "./styles.module.css";
 import { slugFromTagName } from "@site/src/openapi/slugFromTagName";
+
+// Rendered like any other Markdown link
+const OperationAnchor = MDXComponents.a;
 
 export interface OperationLinkProps {
   operation: string;
@@ -37,19 +40,19 @@ export default function OperationLink({
   }
 
   children = children || (
-    <span className={styles.operationLink}>
-      <HTTPMethod method={operationSpec.method} />
-      <code>
+    <>
+      <HTTPMethod method={operationSpec.method} className={styles.method} />
+      <span className={styles.path}>
         <OperationPath path={operationSpec.path} />
-      </code>
-    </span>
+      </span>
+    </>
   );
 
   if (apiVersion.endsWith("-preview")) {
     const url = `/docs/${apiVersion.replace("-preview", "")}/preview/${slugFromTagName(tag)}/${operation}`;
-    return <Link to={url}>{children}</Link>;
+    return <OperationAnchor href={url}>{children}</OperationAnchor>;
   }
 
   const url = `/docs/${apiVersion}/reference/${slugFromTagName(tag)}/${operation}`;
-  return <Link to={url}>{children}</Link>;
+  return <OperationAnchor href={url}>{children}</OperationAnchor>;
 }

@@ -1,8 +1,12 @@
 import React from "react";
 import clsx from "clsx";
-import Link from "@docusaurus/Link";
 import Layout from "@theme/Layout";
-import { Icon } from "@mittwald/flow-react-components";
+import {
+  Button,
+  Icon,
+  Link as FlowLink,
+  Text,
+} from "@mittwald/flow-react-components";
 import { IconBrandGithub, IconNotebook, IconRocket } from "@tabler/icons-react";
 
 import styles from "./cli.module.css";
@@ -35,33 +39,34 @@ function CLIPageHeader() {
           />
         </p>
         <div className={styles.buttons}>
-          <Link
-            className="button button--success button--lg"
-            to="/docs/v2/cli/usage/intro"
-          >
-            <Icon>
-              <IconRocket />
-            </Icon>
-            <Translate id={"cli.cta"}>Get started with our CLI</Translate>
-          </Link>
-          <Link
-            className="button button--secondary button--lg"
-            to="/docs/v2/cli"
-          >
-            <Icon>
-              <IconNotebook />
-            </Icon>
-            <Translate id={"cli.full-docs"}>Full documentation</Translate>
-          </Link>
-          <Link
-            className="button button--secondary button--lg"
-            href="https://github.com/mittwald/cli"
-          >
-            <Icon>
-              <IconBrandGithub />
-            </Icon>
-            Github
-          </Link>
+          <FlowLink href="/docs/v2/cli/usage/intro">
+            <Button color="primary">
+              <Icon>
+                <IconRocket />
+              </Icon>
+              <Text>
+                <Translate id={"cli.cta"}>Get started with our CLI</Translate>
+              </Text>
+            </Button>
+          </FlowLink>
+          <FlowLink href="/docs/v2/cli">
+            <Button color="secondary">
+              <Icon>
+                <IconNotebook />
+              </Icon>
+              <Text>
+                <Translate id={"cli.full-docs"}>Full documentation</Translate>
+              </Text>
+            </Button>
+          </FlowLink>
+          <FlowLink href="https://github.com/mittwald/cli" target="_blank">
+            <Button color="secondary">
+              <Icon>
+                <IconBrandGithub />
+              </Icon>
+              <Text>Github</Text>
+            </Button>
+          </FlowLink>
         </div>
       </div>
     </header>

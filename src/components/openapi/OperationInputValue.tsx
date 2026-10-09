@@ -88,9 +88,11 @@ export function PropertyValue({
       <div className={styles.parameterListHeader}>
         <span className={styles.parameterName}>{name}</span>
         <Type className={styles.parameterType} schema={schema} />
-        <div className={styles.parameterListHeaderSpacer} />
-        {deprecatedOrNot}
-        {requiredOrOptional}
+        <span className={styles.parameterListHeaderTags}>
+          <span className={styles.parameterListHeaderSpacer} />
+          {deprecatedOrNot}
+          {requiredOrOptional}
+        </span>
       </div>
       <div className={styles.parameterListBody}>{body}</div>
       {hasSubSchema && <Schema schema={schema} />}
@@ -129,10 +131,10 @@ export function OperationInputValue({
         <span className={styles.parameterName}>{name}</span>
         <Type className={styles.parameterType} schema={schema} />
         {tags.length > 0 && (
-          <>
-            <div className={styles.parameterListHeaderSpacer} />
+          <span className={styles.parameterListHeaderTags}>
+            <span className={styles.parameterListHeaderSpacer} />
             {tags}
-          </>
+          </span>
         )}
       </div>
       <div className={styles.parameterListBody}>{body}</div>

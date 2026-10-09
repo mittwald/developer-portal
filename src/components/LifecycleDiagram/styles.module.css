@@ -1,11 +1,12 @@
 @import url("https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&display=swap");
 
 .board {
-  --ci: rgb(0, 32, 92);
-  --token-a: #dce6f7;
-  --token-b: #c9d9f0;
-  --output-text: #c8d8ff;
-  --divider: #b0bcd4;
+  /* The primary scale is inverted in dark mode, so these work for both */
+  --ci: var(--primary--color--1100);
+  --token-a: var(--primary--color--200);
+  --token-b: var(--primary--color--300);
+  --output-text: var(--primary--color--200);
+  --divider: var(--neutral--color--500);
 
   font-family: "Caveat", cursive;
   color: var(--ci);
@@ -16,17 +17,6 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-[data-theme="dark"] .board {
-  --ci: #c8d8ff;
-  --token-a: #1d3163;
-  --token-b: #17264f;
-  --output-text: rgb(0, 32, 92);
-}
-
-[data-theme="dark"] .output {
-  background: #c8d8ff;
 }
 
 .row {
