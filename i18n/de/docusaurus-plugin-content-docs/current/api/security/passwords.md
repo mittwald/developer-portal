@@ -1,11 +1,13 @@
 # Passwortsicherheit
 
+Verschiedene API-Aufrufe erzwingen bestimmte Passwortrichtlinien. Dieses Dokument dient als Referenz für die verschiedenen Passwortrichtlinien, die von der mStudio-API durchgesetzt werden.
+
 <!--
 NOTE: This document is linked from various places with in the API reference.
 DO NOT change the document ID or the header IDs
+(This comment is placed below the first paragraph, which Docusaurus uses as
+page description.)
 -->
-
-Verschiedene API-Aufrufe erzwingen bestimmte Passwortrichtlinien. Dieses Dokument dient als Referenz für die verschiedenen Passwortrichtlinien, die von der mStudio-API durchgesetzt werden.
 
 ## MySQL-Benutzerpasswörter {#mysql}
 
