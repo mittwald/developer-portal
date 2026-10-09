@@ -5,6 +5,7 @@ import { Config } from "@docusaurus/types";
 import { Options, ThemeConfig } from "@docusaurus/preset-classic";
 import { Options as ClientRedirectOptions } from "@docusaurus/plugin-client-redirects";
 import { flowTheme } from "./src/prism/flowTheme";
+import rehypeFlowSections from "./src/plugins/rehypeFlowSections";
 
 function webpackCryptoFallbackPlugin() {
   return {
@@ -107,6 +108,7 @@ const config: Config = {
         blogSidebarCount: "ALL",
         showReadingTime: false,
         onInlineTags: "ignore",
+        rehypePlugins: [rehypeFlowSections],
       },
     ],
     webpackCryptoFallbackPlugin,
@@ -182,7 +184,8 @@ This documentation covers:
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl: "https://github.com/mittwald/developer-portal/tree/master/",
-            lastVersion: "current",
+          rehypePlugins: [rehypeFlowSections],
+          lastVersion: "current",
           versions: {
             current: {
               label: "API v2",
@@ -200,7 +203,8 @@ This documentation covers:
         blog: {
           showReadingTime: false,
           onInlineTags: "ignore",
-          },
+          rehypePlugins: [rehypeFlowSections],
+        },
         theme: {
           customCss: [
             require.resolve("./src/css/custom.css"),

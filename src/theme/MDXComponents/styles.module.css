@@ -1,0 +1,50 @@
+/* Flow resets the display and spacing of its top-level components; restore
+   the Markdown block layout and rhythm */
+
+.heading {
+  display: block;
+  margin-top: var(--size-rem--l);
+  margin-bottom: var(--size-rem--s);
+}
+
+.heading:first-child {
+  margin-top: 0;
+}
+
+/* A link is one piece of text: no bold parts and no inline code inside */
+.link strong,
+.link b,
+.link :global(.flow--inline-code) {
+  all: unset;
+}
+
+/* Inline code in headings (e.g. CLI command names) takes the heading size */
+.heading :global(.flow--inline-code) {
+  font-size: 0.9em;
+}
+
+.paragraph,
+.list,
+.table {
+  display: block;
+  margin-bottom: var(--ifm-leading);
+}
+
+/* No trailing space at the end of a container (admonition, list item, …) */
+.paragraph:last-child,
+.list:last-child,
+.table:last-child {
+  margin-bottom: 0;
+}
+
+/* Lists nested in list items keep their tighter spacing */
+li > .list {
+  margin-bottom: 0;
+}
+
+/* Within a Flow section the gap spaces the blocks, and Flow spaces the
+   sub-headings; drop the Markdown margins of direct children */
+.section > * {
+  margin-top: 0;
+  margin-bottom: 0;
+}
