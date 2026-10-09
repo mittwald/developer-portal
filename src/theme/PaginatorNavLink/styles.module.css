@@ -1,3 +1,11 @@
+/* The whole box is the link */
+.link {
+  display: block;
+  height: 100%;
+  width: 100%;
+  text-decoration: none !important;
+}
+
 .box {
   height: 100%;
 }
@@ -5,12 +13,19 @@
 /* Keeps "next" in the right column even without a "previous" link */
 .next {
   grid-column: 2 / 3;
-  align-items: flex-end;
   text-align: end;
 }
 
-.subLabel {
-  display: block;
-  font-size: var(--font-size-text--s);
-  color: var(--ifm-color-content-secondary);
+.next .labeledValue {
+  justify-items: end;
+}
+
+/* Styled like a dark Flow inline link */
+.title {
+  color: var(--link--color-dark--default);
+  text-decoration: underline;
+}
+
+.link:hover .title {
+  color: var(--link--color-dark--hover);
 }

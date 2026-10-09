@@ -1,0 +1,30 @@
+/* Separated from the content like two Flow sections */
+.footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--section--section-to-section-spacing);
+  margin-top: var(--section--section-to-section-spacing);
+}
+
+/* Tags on the left, the edit link always on the right (also without tags
+   and when it wraps below them) */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--section--spacing);
+}
+
+.editMetaRow {
+  margin-left: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--section--spacing);
+}
+
+@media print {
+  .editMetaRow :global(.theme-edit-this-page) {
+    display: none;
+  }
+}

@@ -1,24 +1,30 @@
 import React, { type ReactNode } from "react";
 import clsx from "clsx";
 import type { Props } from "@theme/PaginatorNavLink";
-import { AccentBox, Link, Text } from "@mittwald/flow-react-components";
+import {
+  AccentBox,
+  Label,
+  LabeledValue,
+  Link,
+  Text,
+} from "@mittwald/flow-react-components";
 import styles from "./styles.module.css";
 
 /**
- * Previous/next links below a page: a neutral Flow AccentBox with an inline
- * link. Swizzled (ejected) from @docusaurus/theme-classic.
+ * Previous/next links below a page: a linked neutral Flow AccentBox with a
+ * labeled value ("Previous"/"Next" as label, the page title styled as link).
+ * Swizzled (ejected) from @docusaurus/theme-classic.
  */
 export default function PaginatorNavLink(props: Props): ReactNode {
   const { permalink, title, subLabel, isNext } = props;
   return (
-    <AccentBox
-      backgroundColor="neutral"
-      className={clsx(styles.box, isNext && styles.next)}
-    >
-      {subLabel && <Text className={styles.subLabel}>{subLabel}</Text>}
-      <Link inline color="dark" href={permalink}>
-        {title}
-      </Link>
-    </AccentBox>
+    <Link href={permalink} className={clsx(styles.link, isNext && styles.next)}>
+      <AccentBox backgroundColor="neutral" className={styles.box}>
+        <LabeledValue className={styles.labeledValue}>
+          {subLabel && <Label>{subLabel}</Label>}
+          <Text className={styles.title}>{title}</Text>
+        </LabeledValue>
+      </AccentBox>
+    </Link>
   );
 }
