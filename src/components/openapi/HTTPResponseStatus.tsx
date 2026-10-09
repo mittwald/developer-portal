@@ -1,24 +1,37 @@
-import styles from "./HTTPResponseStatus.module.css";
-import clsx from "clsx";
+import React from "react";
+import { Badge, Label, Text } from "@mittwald/flow-react-components";
+import type { BadgeProps } from "@mittwald/flow-react-components";
 import { statusCodeName } from "@site/src/openapi/statusCodeName";
 
-function getClassNameByCode(code: string): string {
+function getColorByCode(code: string): BadgeProps["color"] {
   if (code.startsWith("2")) {
-    return styles.success;
+    return "green";
   } else if (code.startsWith("3")) {
-    return styles.redirect;
+    return "blue";
   } else if (code.startsWith("4")) {
-    return styles.clientError;
+    return "orange";
+  } else if (code.startsWith("5")) {
+    return "red";
   } else {
-    return styles.serverError;
+    return "neutral";
   }
 }
 
 function HTTPResponseStatus({ code }: { code: string }) {
+  const name = statusCodeName(code);
+  const color = getColorByCode(code);
+
+  // Codes without a known name (e.g. "default") would render an empty value
+  // next to the scope, so they are shown as a plain badge instead.
+  if (!name) {
+    return <Badge color={color}>{code}</Badge>;
+  }
+
   return (
-    <span className={clsx(styles.responseStatus, getClassNameByCode(code))}>
-      {`${code} ${statusCodeName(code)}`}
-    </span>
+    <Badge color={color}>
+      <Label>{code}</Label>
+      <Text>{name}</Text>
+    </Badge>
   );
 }
 

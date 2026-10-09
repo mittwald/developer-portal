@@ -222,48 +222,54 @@ This documentation covers:
       },
       items: [
         {
-          type: "doc",
-          docId: "api/intro",
+          // Flow header navigation (src/theme/NavbarItem/FlowHeaderNavigation)
+          type: "custom-flowHeaderNavigation",
           position: "left",
-          label: "API Docs",
+          label: "Menu",
+          items: [
+            {
+              type: "doc",
+              docId: "api/intro",
+              label: "API Docs",
+            },
+            {
+              type: "doc",
+              docId: "cli/index",
+              label: "CLI",
+            },
+            {
+              type: "doc",
+              docId: "/category/platform",
+              label: "Platform",
+            },
+            {
+              type: "doc",
+              docId: "guides/deployment/index",
+              label: "Guides",
+            },
+            {
+              type: "doc",
+              docId: "contribution/index",
+              label: "Contribution",
+            },
+            {
+              to: "/changelog",
+              label: "Changelog",
+            },
+          ],
         },
         {
-          type: "doc",
-          docId: "cli/index",
-          position: "left",
-          label: "CLI",
-        },
-        {
-          type: "doc",
-          docId: "/category/platform",
-          position: "left",
-          label: "Platform",
-        },
-        {
-          type: "doc",
-          docId: "guides/deployment/index",
-          position: "left",
-          label: "Guides",
-        },
-        {
-          type: "doc",
-          docId: "contribution/index",
-          position: "left",
-          label: "Contribution",
-        },
-        {
-          to: "/changelog",
-          label: "Changelog",
-          position: "left",
-        },
-        {
-          href: "https://github.com/mittwald/developer-portal",
-          label: "GitHub",
+          // Flow header navigation (src/theme/NavbarItem/FlowHeaderActions)
+          // with these links, the language switch and the color mode toggle
+          type: "custom-flowHeaderActions",
           position: "right",
-        },
-        {
-          type: "localeDropdown",
-          position: "right",
+          items: [
+            {
+              href: "https://github.com/mittwald/developer-portal",
+              label: "GitHub",
+              icon: "github",
+            },
+          ],
         },
       ],
     },

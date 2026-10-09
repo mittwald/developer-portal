@@ -1,74 +1,71 @@
 import FeatureRow from "@site/src/components/FeatureRow";
 import clsx from "clsx";
-import styles from "@site/src/components/HomepageFeatures/styles.module.css";
+import FeatureCard from "@site/src/components/HomepageFeatures/FeatureCard";
 import React from "react";
-import Intro, { IntroHeader } from "@site/src/components/Intro";
-import { Icon } from "@mittwald/flow-react-components";
+import Intro from "@site/src/components/Intro";
+import { Heading, Icon, Link, Text } from "@mittwald/flow-react-components";
 import { IconScript } from "@tabler/icons-react";
 import Translate from "@docusaurus/Translate";
-import Link from "@docusaurus/Link";
 import CodeBlock from "@theme/CodeBlock";
 
 function DevelopmentIntro() {
   return (
     <Intro>
-      <IntroHeader>
-        <Icon>
-          <IconScript />
-        </Icon>
-        <h3>
-          <Translate id={"cli.dev.title"}>
-            Supercharge your development
-          </Translate>
-        </h3>
-      </IntroHeader>
-      <p>
+      <Icon>
+        <IconScript />
+      </Icon>
+      <Heading level={2} size="l">
+        <Translate id={"cli.dev.title"}>Supercharge your development</Translate>
+      </Heading>
+      <Text>
         <Translate id={"cli.dev.body"}>
           The mittwald CLI can integrate seamlessly into your development
           workflow. It can simplify your development tasks and even help you set
           up your local development environment.
         </Translate>
-      </p>
+      </Text>
     </Intro>
   );
 }
 
 function DevelopmentDocumentation() {
   return (
-    <>
-      <h3>
+    <FeatureCard>
+      <Heading level={3}>
         <Translate id="cli.dev.features.title">Development features</Translate>
-      </h3>
-      <p>
+      </Heading>
+      <Text elementType="p">
         <Translate id={"cli.dev.features.body"}>
           Typical development tasks that can be simplified with the mittwald CLI
           include:
         </Translate>
-      </p>
-      <ul>
-        <li>
-          <Translate id="cli.dev.features.bootstrapping">
-            Bootstrapping new projects on the mittwald platform
-          </Translate>
-        </li>
-        <li>
-          <Translate id="cli.dev.features.localdev">
-            Setting up local development environments
-          </Translate>
-        </li>
-        <li>
-          <Translate id="cli.dev.features.operations">
-            Supporting operational tasks
-          </Translate>
-        </li>
-      </ul>
-    </>
+      </Text>
+      <Text elementType="div">
+        <ul>
+          <li>
+            <Translate id="cli.dev.features.bootstrapping">
+              Bootstrapping new projects on the mittwald platform
+            </Translate>
+          </li>
+          <li>
+            <Translate id="cli.dev.features.localdev">
+              Setting up local development environments
+            </Translate>
+          </li>
+          <li>
+            <Translate id="cli.dev.features.operations">
+              Supporting operational tasks
+            </Translate>
+          </li>
+        </ul>
+      </Text>
+    </FeatureCard>
   );
 }
 
 function DevelopmentExample() {
   return (
-    <>
+    <FeatureCard>
       <CodeBlock language="shell-session">{`$ # Setup ddev project
 $ mw ddev init
 
@@ -77,14 +74,12 @@ $ ddev pull mittwald
 
 $ # Start your local environment
 $ ddev start`}</CodeBlock>
-      <p className="padding--md">
-        <Link to="/docs/v2/platform/development/ddev/">
-          <Translate id={"cli.dev.ddev"}>
-            More about our DDEV integration
-          </Translate>
-        </Link>
-      </p>
-    </>
+      <Link href="/docs/v2/platform/development/ddev/">
+        <Translate id={"cli.dev.ddev"}>
+          More about our DDEV integration
+        </Translate>
+      </Link>
+    </FeatureCard>
   );
 }
 
@@ -92,19 +87,17 @@ export default function DevelopmentFeature() {
   return (
     <FeatureRow>
       <div className="container">
-        <div className="row">
-          <div className={clsx("col col--4")}>
+        <div className="row margin-bottom--lg">
+          <div className="col col--12">
             <DevelopmentIntro />
           </div>
-          <div className={clsx("col col--4")}>
-            <div className={clsx("padding--md", styles.feature)}>
-              <DevelopmentDocumentation />
-            </div>
+        </div>
+        <div className="row">
+          <div className={clsx("col col--6")}>
+            <DevelopmentDocumentation />
           </div>
-          <div className={clsx("col col--4")}>
-            <div className={clsx(styles.feature)}>
-              <DevelopmentExample />
-            </div>
+          <div className={clsx("col col--6")}>
+            <DevelopmentExample />
           </div>
         </div>
       </div>

@@ -5,14 +5,16 @@ test.describe('Dark mode regression - Flow theme sync', () => {
     await page.goto('/docs/v2/reference/file/file-create-file');
     await page.waitForLoadState('networkidle');
 
-    // This page should contain Flow components rendered from API reference blocks.
-    const flowElements = page.locator('[class*="flow--"]');
+    // This page should contain Flow components rendered from API reference
+    // blocks. The header uses Flow components too (some hidden on desktop),
+    // so only the article is considered.
+    const flowElements = page.locator('article [class*="flow--"]');
     await expect(flowElements.first()).toBeVisible();
 
+    // The toggle is a Flow button (swizzled ColorModeToggle); its aria-label
+    // is the stable hook
     const themeToggle = page
-      .locator(
-        'button[title*="dark and light mode"], button[aria-label*="color mode"], button[class*="colorModeToggle"], button[class*="toggleButton"]',
-      )
+      .locator('.navbar button[aria-label*="dark and light mode"]')
       .first();
 
     await expect(themeToggle).toBeVisible();
@@ -20,7 +22,7 @@ test.describe('Dark mode regression - Flow theme sync', () => {
     const before = await page.evaluate(() => {
       const theme = document.documentElement.getAttribute('data-theme') ?? '';
       const signatures = Array.from(
-        document.querySelectorAll('[class*="flow--"]'),
+        document.querySelectorAll('article [class*="flow--"]'),
       )
         .slice(0, 20)
         .map((element) => {
@@ -48,7 +50,7 @@ test.describe('Dark mode regression - Flow theme sync', () => {
     const after = await page.evaluate(() => {
       const theme = document.documentElement.getAttribute('data-theme') ?? '';
       const signatures = Array.from(
-        document.querySelectorAll('[class*="flow--"]'),
+        document.querySelectorAll('article [class*="flow--"]'),
       )
         .slice(0, 20)
         .map((element) => {

@@ -11,9 +11,6 @@ import { typedList } from "@mittwald/flow-react-components";
 import { Heading } from "@mittwald/flow-react-components";
 import { Text } from "@mittwald/flow-react-components";
 import HTTPMethod from "@site/src/components/openapi/HTTPMethod";
-import { Avatar } from "@mittwald/flow-react-components";
-import styles from "@site/src/components/openapi/OperationDocCardList.module.css";
-import clsx from "clsx";
 import { AlertBadge } from "@mittwald/flow-react-components";
 import OperationLink, {
   buildOperationUrl,
@@ -61,12 +58,11 @@ export default function OperationDocCardList(p: Props) {
       >
         {(op) => (
           <OperationList.ItemView>
-            <Avatar
-              className={clsx(styles.method, styles[`method-${op.method}`])}
-            >
-              {op.method}
-            </Avatar>
             <Heading>
+              <HTTPMethod
+                method={op.method}
+                deprecated={op.operation.deprecated}
+              />
               {op.operation.summary}
               {op.operation.deprecated && (
                 <AlertBadge status="warning">deprecated</AlertBadge>

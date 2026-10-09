@@ -4,8 +4,28 @@ import {
   MatomoProvider,
   useMatomo,
 } from "@datapunt/matomo-tracker-react";
-import { useLocation } from "@docusaurus/router";
+import { useHistory, useLocation } from "@docusaurus/router";
+import { useBaseUrlUtils } from "@docusaurus/useBaseUrl";
+import { RouterProvider } from "@mittwald/flow-react-components";
 import "@mittwald/flow-react-components/all.css";
+
+/**
+ * Lets Flow links navigate through the Docusaurus router and resolves their
+ * hrefs against the base URL, which includes the locale prefix (e.g. `/de/`).
+ */
+function FlowRouterProvider({ children }: PropsWithChildren<{}>) {
+  const history = useHistory();
+  const { withBaseUrl } = useBaseUrlUtils();
+
+  return (
+    <RouterProvider
+      navigate={(href) => history.push(withBaseUrl(href))}
+      useHref={(href) => withBaseUrl(href)}
+    >
+      {children}
+    </RouterProvider>
+  );
+}
 
 function PageViewTracker({ children }: PropsWithChildren<{}>) {
   const { trackPageView } = useMatomo();
@@ -48,7 +68,9 @@ export default function Root({ children }: PropsWithChildren<{}>) {
 
   return (
     <MatomoProvider value={matomoInstance}>
-      <PageViewTracker>{children}</PageViewTracker>
+      <PageViewTracker>
+        <FlowRouterProvider>{children}</FlowRouterProvider>
+      </PageViewTracker>
     </MatomoProvider>
   );
 }

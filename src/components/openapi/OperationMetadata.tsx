@@ -135,9 +135,12 @@ export function OperationMetadata({
           </Content>
         </LabeledValue>
       </ColumnLayout>
-      <hr />
       {spec.description && withDescription ? (
-        <Markdown>{spec.description}</Markdown>
+        <>
+          {/* Without a description, the next section's separator follows */}
+          <hr />
+          <Markdown>{spec.description}</Markdown>
+        </>
       ) : null}
     </>
   );
