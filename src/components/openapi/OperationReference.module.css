@@ -1,3 +1,21 @@
+/* Accordion heading with its badges directly after the title. One element,
+   so that the accordion header (which spaces out its children) keeps them
+   together. */
+.accordionTitle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--size-rem--s);
+}
+
+/* Format/description and the schema tabs of a response, spaced like the
+   blocks of a Flow section */
+.responseBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--section--spacing);
+}
+
 .parameterList {
   padding: 0;
   list-style-type: none;
@@ -11,6 +29,22 @@
   padding-bottom: 0.5rem;
   margin-top: 0 !important;
   overflow: auto;
+}
+
+/* Same spacing between all rows, also where a nested list starts or ends
+   (otherwise the badges of a parent and its first child touch, and the
+   paddings of the last child and its parent add up) */
+.parameterList li > ul {
+  margin-top: var(--size-rem--s);
+  margin-bottom: 0;
+}
+
+.parameterList li > ul > li:last-child {
+  padding-bottom: 0;
+}
+
+.parameterList li > ul + * {
+  margin-top: var(--size-rem--s);
 }
 
 .parameterList li:before {

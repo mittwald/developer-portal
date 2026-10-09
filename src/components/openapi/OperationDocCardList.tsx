@@ -11,7 +11,7 @@ import { typedList } from "@mittwald/flow-react-components";
 import { Heading } from "@mittwald/flow-react-components";
 import { Text } from "@mittwald/flow-react-components";
 import HTTPMethod from "@site/src/components/openapi/HTTPMethod";
-import { AlertBadge } from "@mittwald/flow-react-components";
+import { Badge } from "@mittwald/flow-react-components";
 import OperationLink, {
   buildOperationUrl,
 } from "@site/src/components/openapi/OperationLink";
@@ -65,7 +65,7 @@ export default function OperationDocCardList(p: Props) {
               />
               {op.operation.summary}
               {op.operation.deprecated && (
-                <AlertBadge status="warning">deprecated</AlertBadge>
+                <Badge color="orange">deprecated</Badge>
               )}
             </Heading>
             <Text>{op.path}</Text>

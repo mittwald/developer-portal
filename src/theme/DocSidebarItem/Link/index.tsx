@@ -66,13 +66,9 @@ export default function DocSidebarItemLink({
         {...props}
       >
         <LinkLabel label={label} />
-        {method && (
-          <HTTPMethod
-            className={styles.badge}
-            method={method}
-            deprecated={className?.includes("api-operation-deprecated")}
-          />
-        )}
+        {/* Deprecated operations keep their method color (only the label is
+            greyed out) */}
+        {method && <HTTPMethod className={styles.badge} method={method} />}
         {!isInternalLink && <IconExternalLink />}
       </Link>
     </li>

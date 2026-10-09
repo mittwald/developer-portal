@@ -37,7 +37,7 @@ function ApiKeyInfo({
 }: ApiKeyInfoProps) {
   return (
     <AccentBox>
-      <Icon>
+      <Icon color="var(--icon--color)">
         <IconKey />
       </Icon>
       <Section>

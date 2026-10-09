@@ -1,7 +1,8 @@
 import React from "react";
-import { Badge, Label, Text } from "@mittwald/flow-react-components";
+import { Badge } from "@mittwald/flow-react-components";
 import type { BadgeProps } from "@mittwald/flow-react-components";
 import { statusCodeName } from "@site/src/openapi/statusCodeName";
+import styles from "./HTTPResponseStatus.module.css";
 
 function getColorByCode(code: string): BadgeProps["color"] {
   if (code.startsWith("2")) {
@@ -17,21 +18,24 @@ function getColorByCode(code: string): BadgeProps["color"] {
   }
 }
 
+/**
+ * Response status for an accordion heading: its name as heading text,
+ * directly followed by the code as badge (codes without a known name, e.g.
+ * "default", are the heading text themselves).
+ */
 function HTTPResponseStatus({ code }: { code: string }) {
   const name = statusCodeName(code);
-  const color = getColorByCode(code);
-
-  // Codes without a known name (e.g. "default") would render an empty value
-  // next to the scope, so they are shown as a plain badge instead.
   if (!name) {
-    return <Badge color={color}>{code}</Badge>;
+    return code;
   }
 
+  // One element, so that accordion headers (which space out their children)
+  // keep name and badge together
   return (
-    <Badge color={color}>
-      <Label>{code}</Label>
-      <Text>{name}</Text>
-    </Badge>
+    <span className={styles.status}>
+      {name}
+      <Badge color={getColorByCode(code)}>{code}</Badge>
+    </span>
   );
 }
 

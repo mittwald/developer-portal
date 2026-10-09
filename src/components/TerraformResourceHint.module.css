@@ -1,70 +1,26 @@
-.cardRow {
-  flex-direction: row !important;
-  gap: var(--ifm-global-spacing);
-}
-
-.card {
-  --ifm-link-color: var(--ifm-color-emphasis-800);
-
-  border: 1px solid var(--ifm-color-emphasis-200);
-  transition: all var(--ifm-transition-fast) ease;
-  transition-property: border, box-shadow;
-}
-
-.card.compact {
-  padding: calc(var(--ifm-global-spacing) / 2) !important;
-}
-
-.card .logo {
-  flex: 1;
-  background-color: var(--badge--violet-scope-background-color);
-  color: var(--badge--violet-scope-content-color);
-  border-radius: var(--corner-radius--s);
-  padding: 2px 2px;
-  margin-right: 8px;
-  font-weight: bold;
-  text-decoration: none !important;
-  display: inline-flex;
-  text-align: center;
-  flex-shrink: 0;
-  align-items: center;
-  min-width: 36px;
-  min-height: 36px;
-  justify-content: center;
-}
-
-.header {
+/* Laid out like the endpoint list of the OperationHint */
+ul.links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
   display: flex;
+  flex-direction: column;
+  gap: var(--size-rem--s);
+}
+
+/* No list marker (Markdown lists draw it as pseudo element) */
+.item::before {
+  content: none;
+}
+
+.item {
+  display: flex;
+  gap: var(--size-rem--s);
   align-items: flex-start;
-  max-width: 100%;
 }
 
-.headerText {
-  flex-shrink: 2;
-  flex-grow: 1;
-  min-width: 50px;
-}
-
-.deprecated {
-  --ifm-link-color: var(--ifm-color-gray-600);
-}
-
-.card a {
-  color: var(--ifm-link-color);
-  text-decoration: none;
-}
-
-.card p {
-  font-size: 1rem;
-  font-weight: bold;
-}
-
-.card p:last-of-type {
-  margin-bottom: 0;
-}
-
-.path {
-  font-family: var(--ifm-font-family-monospace);
-  font-size: 0.8rem;
-  overflow-wrap: break-word;
+/* Terraform's brand color, from Flow's violet badge */
+.icon {
+  flex-shrink: 0;
+  color: var(--badge--violet-content-color);
 }

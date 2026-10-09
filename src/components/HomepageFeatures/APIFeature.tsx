@@ -66,7 +66,7 @@ function APIDocumentation() {
   return (
     <FeatureCard>
       <Heading level={3}>
-        <Translate id="index.reference.title">API documentation</Translate>
+        <Translate id="index.reference.title">API Reference</Translate>
       </Heading>
       <Text elementType="p">
         <Translate id={"index.reference.body"}>
