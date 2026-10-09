@@ -114,6 +114,8 @@ html[data-theme="dark"] {
   --ifm-code-padding-horizontal: var(--inline-code--padding-x);
   --ifm-pre-background: var(--code-block--background-color);
   --ifm-pre-color: var(--code-block--content-color);
+  --ifm-pre-padding: var(--code-block--padding);
+  --ifm-pre-line-height: 1.4;
 
   /* Alerts */
   --ifm-alert-border-color: var(--ifm-color-info);
@@ -290,11 +292,16 @@ pre {
   background: var(--ifm-pre-background);
 }
 
+/* Code blocks look like Flow's CodeBlock. Docusaurus reads the radius from
+   the inline code variable and the title separator from an emphasis color,
+   so both are redefined for code blocks only. */
 .theme-code-block {
+  --ifm-code-border-radius: var(--code-block--corner-radius);
+  --ifm-pre-border-radius: var(--code-block--corner-radius);
+  --ifm-color-emphasis-300: var(--code-block--border-color);
+  --ifm-global-shadow-lw: none;
   border: var(--code-block--border-width) var(--code-block--border-style)
     var(--code-block--border-color);
-  border-radius: var(--code-block--corner-radius);
-  box-shadow: none;
 }
 
 strong,
@@ -304,10 +311,6 @@ a {
 
 nav a {
   font-size: var(--font-size-text--s);
-}
-
-section.footnotes {
-  font-size: 0.8em;
 }
 
 .markdown,

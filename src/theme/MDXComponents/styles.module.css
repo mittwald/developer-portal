@@ -18,14 +18,16 @@
   all: unset;
 }
 
-/* Inline code in headings (e.g. CLI command names) takes the heading size */
+/* Inline code within heading text takes the heading size (headings that are
+   code only are rendered as plain text, see MDXHeading) */
 .heading :global(.flow--inline-code) {
   font-size: 0.9em;
 }
 
 .paragraph,
 .list,
-.table {
+.table,
+.blockquote {
   display: block;
   margin-bottom: var(--ifm-leading);
 }
@@ -33,8 +35,45 @@
 /* No trailing space at the end of a container (admonition, list item, …) */
 .paragraph:last-child,
 .list:last-child,
-.table:last-child {
+.table:last-child,
+.blockquote:last-child {
   margin-bottom: 0;
+}
+
+/* List item starting with an emoji icon: icon and text side by side */
+.iconListItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--size-rem--s);
+}
+
+/* Aligned to the first line of text */
+.listItemIcon {
+  display: inline-flex;
+  flex-shrink: 0;
+  height: calc(1em * var(--line-height));
+  align-items: center;
+}
+
+/* In a list of icon items, the icons replace the bullets */
+ul.iconList {
+  list-style: none;
+  padding-inline-start: 0;
+}
+
+ul.iconList > li::before {
+  content: none;
+}
+
+/* Flow styles the blockquote (border and padding at the start); Infima's own
+   blockquote styles are reset */
+.blockquote blockquote {
+  margin: 0;
+  padding-block: 0;
+  padding-inline-end: 0;
+  color: inherit;
+  font-size: inherit;
+  box-shadow: none;
 }
 
 /* Lists nested in list items keep their tighter spacing */
@@ -47,4 +86,26 @@ li > .list {
 .section > * {
   margin-top: 0;
   margin-bottom: 0;
+}
+
+/* Footnotes: a section of their own (with separator) in small text */
+.footnotes :global(.flow--text) {
+  font-size: var(--font-size-text--s);
+}
+
+/* Footnotes are rendered as loose list items with a paragraph each; the
+   section gap already spaces them from the heading */
+.footnotes li > p {
+  margin-top: 0;
+}
+
+.footnoteBackref {
+  margin-left: var(--size-rem--xs);
+  vertical-align: middle;
+}
+
+/* Status icon replacing an emoji at the start of a table cell's text */
+.leadingStatusIcon {
+  display: inline-flex;
+  vertical-align: text-bottom;
 }

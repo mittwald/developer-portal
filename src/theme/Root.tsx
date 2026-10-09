@@ -6,7 +6,8 @@ import {
 } from "@datapunt/matomo-tracker-react";
 import { useHistory, useLocation } from "@docusaurus/router";
 import { useBaseUrlUtils } from "@docusaurus/useBaseUrl";
-import { RouterProvider } from "@mittwald/flow-react-components";
+import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
+import { IntlProvider, RouterProvider } from "@mittwald/flow-react-components";
 import "@mittwald/flow-react-components/all.css";
 
 /**
@@ -25,6 +26,15 @@ function FlowRouterProvider({ children }: PropsWithChildren<{}>) {
       {children}
     </RouterProvider>
   );
+}
+
+/**
+ * Flow texts (e.g. labels of copy buttons) follow the page language instead
+ * of the browser language.
+ */
+function FlowIntlProvider({ children }: PropsWithChildren<{}>) {
+  const { i18n } = useDocusaurusContext();
+  return <IntlProvider locale={i18n.currentLocale}>{children}</IntlProvider>;
 }
 
 function PageViewTracker({ children }: PropsWithChildren<{}>) {
@@ -69,7 +79,9 @@ export default function Root({ children }: PropsWithChildren<{}>) {
   return (
     <MatomoProvider value={matomoInstance}>
       <PageViewTracker>
-        <FlowRouterProvider>{children}</FlowRouterProvider>
+        <FlowIntlProvider>
+          <FlowRouterProvider>{children}</FlowRouterProvider>
+        </FlowIntlProvider>
       </PageViewTracker>
     </MatomoProvider>
   );

@@ -1,5 +1,7 @@
 import React, {
   Children,
+  createContext,
+  useContext,
   isValidElement,
   type ComponentProps,
   type ReactElement,
@@ -23,6 +25,7 @@ import Mermaid from "@theme/Mermaid";
 import type { MDXComponentsObject } from "@theme/MDXComponents";
 import {
   Heading,
+  Icon,
   InlineCode,
   Link,
   Table,
@@ -34,6 +37,12 @@ import {
   Section,
   Text,
 } from "@mittwald/flow-react-components";
+import { IconArrowBackUp } from "@tabler/icons-react";
+import {
+  emojiIcons,
+  replaceLeadingEmojiIcon,
+  splitLeadingEmojiIcon,
+} from "./emojiIcons";
 import styles from "./styles.module.css";
 
 /**
@@ -56,12 +65,33 @@ const headingSizes = {
 } as const;
 
 /** Flow heading that keeps Docusaurus' anchor id and hash link */
+/**
+ * Headings that consist of inline code only (e.g. CLI command names) are
+ * rendered as plain heading text; in headings mixing text and code, the code
+ * keeps its look.
+ */
+function unwrapCodeOnlyHeading(children: ReactNode): ReactNode {
+  const nodes = Children.toArray(children).filter(
+    (node) => !(typeof node === "string" && !node.trim()),
+  );
+  const [node] = nodes;
+  if (
+    nodes.length === 1 &&
+    isValidElement<{ children?: ReactNode }>(node) &&
+    node.type === MDXInlineOrBlockCode
+  ) {
+    return node.props.children;
+  }
+  return children;
+}
+
 function MDXHeading({
   level,
   id,
-  children,
+  children: childrenFromProps,
   className,
 }: ComponentProps<"h2"> & { level: HeadingLevel }) {
+  const children = unwrapCodeOnlyHeading(childrenFromProps);
   const brokenLinks = useBrokenLinks();
   const anchorTargetClassName = useAnchorTargetClassName(id);
 
@@ -128,6 +158,23 @@ function MDXParagraph(props: ComponentProps<"p">) {
  * base URL handling, external link targets and broken link detection.
  */
 function MDXLink({ href, children, className, ...rest }: ComponentProps<"a">) {
+  // Back reference of a footnote: a Flow icon instead of the "↩" character
+  if ("data-footnote-backref" in rest) {
+    return (
+      <Link
+        inline
+        href={href}
+        linkComponent={MDXA}
+        className={clsx(styles.footnoteBackref, className)}
+        {...(rest as ComponentProps<typeof Link>)}
+      >
+        <Icon>
+          <IconArrowBackUp />
+        </Icon>
+      </Link>
+    );
+  }
+
   return (
     <Link
       inline
@@ -161,11 +208,53 @@ function MDXInlineOrBlockCode(props: ComponentProps<typeof MDXCode>) {
   return <MDXCode {...props} />;
 }
 
+/** Whether the items of the current list are icon items (see MDXList) */
+const IconListContext = createContext(false);
+
+/**
+ * Unordered list; when every item starts with an emoji icon, the icons
+ * replace the bullets
+ */
 function MDXList(props: ComponentProps<"ul">) {
+  const items = elementChildren(props.children);
+  const isIconList =
+    items.length > 0 &&
+    items.every((item) => splitLeadingEmojiIcon(item.props.children));
   return (
     <Text elementType="div" className={styles.list}>
-      <MDXUl {...props} />
+      <IconListContext.Provider value={isIconList}>
+        <MDXUl
+          {...props}
+          className={clsx(props.className, isIconList && styles.iconList)}
+        />
+      </IconListContext.Provider>
     </Text>
+  );
+}
+
+/**
+ * List item with an emoji at its start replaced by its icon: in an icon list
+ * in place of the bullet, otherwise inline at the start of the text
+ */
+function MDXListItem(props: ComponentProps<"li">) {
+  const isIconList = useContext(IconListContext);
+
+  if (!isIconList) {
+    const children = replaceLeadingEmojiIcon(props.children, (icon) => (
+      <span className={styles.leadingStatusIcon}>{icon}</span>
+    ));
+    return <MDXLi {...props}>{children ?? props.children}</MDXLi>;
+  }
+
+  const split = splitLeadingEmojiIcon(props.children);
+  if (!split) {
+    return <MDXLi {...props} />;
+  }
+  return (
+    <MDXLi {...props} className={clsx(props.className, styles.iconListItem)}>
+      <span className={styles.listItemIcon}>{split.icon}</span>
+      <span>{split.rest}</span>
+    </MDXLi>
   );
 }
 
@@ -177,16 +266,39 @@ function MDXOrderedList(props: ComponentProps<"ol">) {
   );
 }
 
-/** Sections created by the rehypeFlowSections plugin; other sections (e.g.
- * footnotes) stay plain */
+/** Blockquote styled by Flow's text component, as in Flow's Markdown */
+function MDXBlockquote(props: ComponentProps<"blockquote">) {
+  return (
+    <Text elementType="div" className={styles.blockquote}>
+      <blockquote {...props} />
+    </Text>
+  );
+}
+
+/** Sections created by the rehypeFlowSections plugin (including the
+ * footnotes); other sections stay plain */
 function MDXSection(
   props: ComponentProps<"section"> & Record<string, unknown>,
 ) {
-  const { "data-flow-section": isFlowSection, children, ...rest } = props;
+  const {
+    "data-flow-section": isFlowSection,
+    "data-footnotes": isFootnotes,
+    children,
+    ...rest
+  } = props;
   if (isFlowSection === undefined) {
     return <section {...rest}>{children}</section>;
   }
-  return <Section className={styles.section}>{children}</Section>;
+  return (
+    <Section
+      className={clsx(
+        styles.section,
+        isFootnotes !== undefined && styles.footnotes,
+      )}
+    >
+      {children}
+    </Section>
+  );
 }
 
 /* Tables */
@@ -213,9 +325,34 @@ function textContent(node: ReactNode): string {
     .join("");
 }
 
+/** The icon of a cell consisting only of an emoji icon */
+function statusIcon(cell: ElementWithChildren): ReactNode | undefined {
+  return emojiIcons[textContent(cell.props.children).trim()];
+}
+
+/** Cell content with a leading emoji replaced by its icon */
+function cellContent(cell: ElementWithChildren): ReactNode {
+  const icon = statusIcon(cell);
+  if (icon) {
+    return icon;
+  }
+
+  const split = splitLeadingEmojiIcon(cell.props.children);
+  if (split) {
+    return (
+      <>
+        <span className={styles.leadingStatusIcon}>{split.icon}</span>{" "}
+        {split.rest}
+      </>
+    );
+  }
+  return cell.props.children;
+}
+
 /**
  * Maps a Markdown table (table > thead/tbody > tr > th/td) onto a Flow table.
  * Tables Flow cannot represent (no header, spanning cells) stay plain HTML.
+ * Columns containing only status icons (and empty cells) are centered.
  */
 function MDXTable(props: ComponentProps<"table">) {
   const sections = elementChildren(props.children);
@@ -240,22 +377,44 @@ function MDXTable(props: ComponentProps<"table">) {
   }
 
   const label = headerCells.map((cell) => textContent(cell.props.children));
+  const rows = bodyRows.map((row) => elementChildren(row.props.children));
+
+  const isIconColumn = headerCells.map((_, index) => {
+    const cells = rows.map((cells) => cells[index]).filter(Boolean);
+    const icons = cells.filter((cell) => statusIcon(cell!) !== undefined);
+    return (
+      icons.length > 0 &&
+      cells.every(
+        (cell) =>
+          statusIcon(cell!) !== undefined ||
+          !textContent(cell!.props.children).trim(),
+      )
+    );
+  });
+  const align = (index: number) =>
+    isIconColumn[index] ? ("center" as const) : undefined;
 
   return (
     <div className={styles.table}>
       <Table aria-label={label.join(", ")}>
         <TableHeader>
           {headerCells.map((cell, index) => (
-            <TableColumn key={index} isRowHeader={index === 0}>
+            <TableColumn
+              key={index}
+              isRowHeader={index === 0}
+              horizontalAlign={align(index)}
+            >
               {cell.props.children}
             </TableColumn>
           ))}
         </TableHeader>
         <TableBody>
-          {bodyRows.map((row, rowIndex) => (
+          {rows.map((cells, rowIndex) => (
             <TableRow key={rowIndex}>
-              {elementChildren(row.props.children).map((cell, cellIndex) => (
-                <TableCell key={cellIndex}>{cell.props.children}</TableCell>
+              {cells.map((cell, cellIndex) => (
+                <TableCell key={cellIndex} horizontalAlign={align(cellIndex)}>
+                  {cellContent(cell)}
+                </TableCell>
               ))}
             </TableRow>
           ))}
@@ -275,7 +434,8 @@ const MDXComponents: MDXComponentsObject = {
   p: MDXParagraph,
   ul: MDXList,
   ol: MDXOrderedList,
-  li: MDXLi,
+  li: MDXListItem,
+  blockquote: MDXBlockquote,
   img: MDXImg,
   table: MDXTable,
   section: MDXSection,
