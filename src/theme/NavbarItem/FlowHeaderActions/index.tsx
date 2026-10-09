@@ -148,7 +148,14 @@ export default function FlowHeaderActions({ items, mobile }: Props): ReactNode {
         {items.map((item) => (
           <NavbarItem key={item.label} {...(item as NavbarItemProps)} mobile />
         ))}
-        <NavbarItem type="localeDropdown" mobile />
+        {/* The theme config validation only adds these defaults to items
+            from the config, so they have to be passed explicitly here */}
+        <NavbarItem
+          type="localeDropdown"
+          dropdownItemsBefore={[]}
+          dropdownItemsAfter={[]}
+          mobile
+        />
       </>
     );
   }

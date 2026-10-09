@@ -163,8 +163,13 @@ main.index {
   background-color: var(--mw-main-background-color);
 }
 
-aside.theme-doc-sidebar-container {
-  margin-right: var(--ifm-global-spacing);
+/* Space between sidebar and content. As padding of the main container (and
+   not as sidebar margin), so that the main container keeps its width and does
+   not overflow the viewport on the right. */
+@media (min-width: 997px) {
+  main[class*="docMainContainer"] {
+    padding-left: var(--ifm-global-spacing);
+  }
 }
 
 .card {
@@ -348,6 +353,11 @@ a.card {
   border-bottom: 1px solid var(--separator--color);
 }
 
+/* The mobile menu button (a Flow button) brings its own spacing */
+.navbar__toggle {
+  margin-right: 0;
+}
+
 /* "Developer Portal" stacked below the mittwald logo */
 .navbar__brand {
   flex-direction: column;
@@ -388,10 +398,6 @@ a.card {
   margin: 0;
 }
 
-section.row {
-  margin: 0 calc(8px * -1);
-}
-
 .theme-doc-footer-tags-row b {
   color: var(--ifm-color-content-secondary);
   font-size: var(--font-size-text--s);
@@ -408,9 +414,6 @@ section.row {
   background: var(--neutral--color--300);
 }
 
-.col {
-  padding: 0 calc(var(--ifm-global-spacing) / 2);
-}
 
 .col.margin-bottom--lg {
   margin-bottom: var(--ifm-global-spacing) !important;

@@ -1,5 +1,4 @@
 import React, { type ReactNode } from "react";
-import clsx from "clsx";
 import {
   findFirstSidebarItemLink,
   filterDocCardListItems,
@@ -16,6 +15,7 @@ import { usePluralForm } from "@docusaurus/theme-common";
 import type { Props } from "@theme/DocCardList";
 import {
   AccentBox,
+  ColumnLayout,
   Heading,
   Icon,
   Link,
@@ -31,7 +31,7 @@ import styles from "./styles.module.css";
 
 /**
  * Cards for sidebar items (e.g. on generated category index pages), rendered
- * as linked neutral Flow accent boxes. Swizzled (ejected) from
+ * as linked neutral Flow accent boxes in a Flow column layout. Swizzled (ejected) from
  * @docusaurus/theme-classic; replaces DocCard, whose emoji icons are swapped
  * for Flow icons.
  */
@@ -49,7 +49,7 @@ function Card({ href, icon, title, description }: CardProps) {
       <AccentBox backgroundColor="neutral" className={styles.card}>
         <Section>
           <Heading level={2} size="s">
-            <Icon>{icon}</Icon>
+            <Icon color="var(--icon--color)">{icon}</Icon>
             {title}
           </Heading>
           {description && (
@@ -109,7 +109,7 @@ function DocCardListItem({
   item: PropSidebarItemLink | PropSidebarItemCategory;
 }) {
   return (
-    <article className={clsx(styles.item, "col col--6")}>
+    <article className={styles.item}>
       {item.type === "category" ? (
         <CategoryCard item={item} />
       ) : (
@@ -133,11 +133,14 @@ export default function DocCardList(props: Props): ReactNode {
     (item): item is PropSidebarItemLink | PropSidebarItemCategory =>
       item.type === "link" || item.type === "category",
   );
+  // One column on small, two columns on wider containers
   return (
-    <section className={clsx("row", className)}>
-      {filteredItems.map((item, index) => (
-        <DocCardListItem key={index} item={item} />
-      ))}
+    <section className={className}>
+      <ColumnLayout m={[1, 1]}>
+        {filteredItems.map((item, index) => (
+          <DocCardListItem key={index} item={item} />
+        ))}
+      </ColumnLayout>
     </section>
   );
 }

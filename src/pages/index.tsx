@@ -57,7 +57,12 @@ function HomepageHeader() {
         <h1 className="hero__title">
           <Translate id={"index.title"}>mittwald Developer Portal</Translate>
         </h1>
-        <ColumnLayout s={[1]} m={[1, 1, 1]} className={styles.entries}>
+        <ColumnLayout
+          s={[1]}
+          m={[1, 1]}
+          l={[1, 1, 1]}
+          className={styles.entries}
+        >
           <HeroEntry
             href="/docs/v2/guides/deployment"
             icon={<IconRocket />}

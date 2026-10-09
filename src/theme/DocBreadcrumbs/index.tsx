@@ -37,7 +37,7 @@ export default function DocBreadcrumbs(): ReactNode {
         })}
       >
         <Breadcrumb size="s">
-          <Link href="/" aria-label={homeLabel}>
+          <Link href="/" aria-label={homeLabel} className={styles.homeLink}>
             <Icon>
               <IconHome />
             </Icon>
