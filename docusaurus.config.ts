@@ -2,12 +2,9 @@
 // Note: type annotations allow type checking and IDEs autocompletion
 
 import { Config } from "@docusaurus/types";
-import { themes } from "prism-react-renderer";
 import { Options, ThemeConfig } from "@docusaurus/preset-classic";
 import { Options as ClientRedirectOptions } from "@docusaurus/plugin-client-redirects";
-
-const lightCodeTheme = themes.oneLight;
-const darkCodeTheme = themes.dracula;
+import { flowTheme } from "./src/prism/flowTheme";
 
 function webpackCryptoFallbackPlugin() {
   return {
@@ -185,7 +182,7 @@ This documentation covers:
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl: "https://github.com/mittwald/developer-portal/tree/master/",
-          lastVersion: "current",
+            lastVersion: "current",
           versions: {
             current: {
               label: "API v2",
@@ -203,7 +200,7 @@ This documentation covers:
         blog: {
           showReadingTime: false,
           onInlineTags: "ignore",
-        },
+          },
         theme: {
           customCss: [
             require.resolve("./src/css/custom.css"),
@@ -220,7 +217,8 @@ This documentation covers:
       title: "Developer Portal",
       logo: {
         alt: "mittwald",
-        src: "img/mittwald-logo.svg",
+        src: "img/mittwald-logo-dark.svg",
+        srcDark: "img/mittwald-logo.svg",
       },
       items: [
         {
@@ -325,9 +323,15 @@ This documentation covers:
       ],
       copyright: `Copyright © ${new Date().getFullYear()} Mittwald CM Service GmbH & Co. KG. Built with Docusaurus.`,
     },
+    mermaid: {
+      // Keep Mermaid's default themes, but use the Flow font
+      options: {
+        fontFamily: "Inter, sans-serif",
+      },
+    },
     prism: {
-      theme: lightCodeTheme,
-      darkTheme: darkCodeTheme,
+      theme: flowTheme,
+      darkTheme: flowTheme,
       additionalLanguages: ["php", "shell-session", "hcl"],
     },
   } satisfies ThemeConfig,

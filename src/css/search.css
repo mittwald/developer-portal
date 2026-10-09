@@ -1,53 +1,68 @@
-/* Search Bar Styling - matches existing design */
+/* Search bar styled like a Flow text field, with the rounded shape of the
+   search in mStudio; the right padding leaves room for the shortcut hint
+   (src/theme/SearchBar) */
 .search-bar {
-  background-color: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--ifm-global-radius);
-  padding: 6px 12px 6px 36px;
+  background-color: var(--form-control--background-color--default);
+  border: var(--form-control--border-width) var(--form-control--border-style)
+    var(--form-control--border-color--default);
+  border-radius: 999px;
+  padding: var(--form-control--padding-y) 80px var(--form-control--padding-y)
+    40px;
   font-family: var(--ifm-font-family-base);
-  font-size: 14px;
-  color: #fff;
+  font-size: var(--font-size-text--m);
+  line-height: var(--line-height);
+  /* Infima fixes the height to 2rem; let it follow the Flow field metrics */
+  height: auto;
+  color: var(--form-control--content-color--default);
   transition: all 0.2s ease;
-  min-width: 200px;
-  width: 200px;
+  min-width: 260px;
+  width: 260px;
+}
+
+/* Infima draws the magnifier as a data URI background, where currentColor
+   does not apply; draw it as a mask in the field's content color instead */
+.navbar__search {
+  position: relative;
+}
+
+.navbar__search .search-bar {
+  background-image: none;
+}
+
+.navbar__search::before {
+  content: "";
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  transform: translateY(-50%);
+  /* As light as the placeholder, like the search in mStudio */
+  background-color: var(--form-control--placeholder-color--default);
+  mask: var(--ifm-navbar-search-input-icon) no-repeat center / contain;
+  pointer-events: none;
+  /* Above the autocomplete wrapper, which the plugin adds once the index is
+     loaded and which would cover the icon */
+  z-index: 1;
+}
+
+@media screen and (max-width: 996px) {
+  .navbar__search::before {
+    display: none;
+  }
 }
 
 .search-bar::placeholder {
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--form-control--placeholder-color--default);
 }
 
 .search-bar:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.3);
+  background-color: var(--form-control--background-color--hover);
 }
 
 .search-bar:focus {
   outline: none;
-  background-color: rgba(255, 255, 255, 0.25);
-  border-color: var(--ifm-color-info);
-  box-shadow: 0 0 0 2px rgba(0, 84, 245, 0.2);
-}
-
-/* Dark mode adjustments */
-[data-theme="dark"] .search-bar {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.15);
-  color: #fff;
-}
-
-[data-theme="dark"] .search-bar::placeholder {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-[data-theme="dark"] .search-bar:hover {
-  background-color: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.25);
-}
-
-[data-theme="dark"] .search-bar:focus {
-  background-color: rgba(255, 255, 255, 0.2);
-  border-color: var(--ifm-color-info);
-  box-shadow: 0 0 0 2px rgba(128, 170, 250, 0.2);
+  border-color: var(--form-control--border-color--focused);
 }
 
 /* Mobile responsiveness - deactivate search bar for now?! */
@@ -57,25 +72,19 @@
   }
 }
 
-@media screen and (max-width: 600px) {
-  .search-bar {
-    display: none;
-  }
-}
-
 /* Autocomplete Suggestions Styling */
 .ds-suggestions {
-  background-color: var(--mw-main-feature-background-color);
-  border: 1px solid var(--ifm-color-gray-300);
-  border-radius: var(--ifm-global-radius);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background-color: var(--neutral--color--100);
+  border: 1px solid var(--separator--color);
+  border-radius: var(--corner-radius--m);
+  box-shadow: 0 4px 12px var(--shadow--overlay);
   overflow: hidden;
   max-height: 70vh;
   overflow-y: auto;
 }
 
 .ds-suggestion {
-  border-bottom: 1px solid var(--ifm-color-gray-300);
+  border-bottom: 1px solid var(--separator--color);
 }
 
 .ds-suggestion:last-child {
@@ -97,14 +106,14 @@
 
 /* Category Header */
 .algolia-docsearch-suggestion--category-header {
-  background-color: var(--mw-main-feature-background-color) !important;
+  background-color: var(--neutral--color--100) !important;
   margin-bottom: 8px;
 }
 
 .algolia-docsearch-suggestion--category-header-lvl0 {
-  font-family: var(--ifm-font-family-bold);
+  font-weight: var(--font-weight--bold);
   font-size: 12px;
-  color: var(--ifm-color-primary);
+  color: var(--heading--color);
   text-transform: none !important;
   letter-spacing: 0 !important;
 }
@@ -121,18 +130,16 @@
 
 /* Title */
 .algolia-docsearch-suggestion--title {
-  font-family: var(--ifm-font-family-bold);
-  font-size: 14px;
+  font-weight: var(--font-weight--bold);
+  font-size: var(--font-size-text--s);
   color: var(--ifm-color-content);
   margin-bottom: 4px;
 }
 
 /* Description Text */
 .algolia-docsearch-suggestion--text {
-  font-family: var(--ifm-font-family-base);
   font-size: 13px;
-  color: var(--ifm-color-content);
-  opacity: 0.7;
+  color: var(--ifm-color-content-secondary);
   margin-top: 4px;
 }
 
@@ -143,51 +150,16 @@
 
 /* Highlight Search Terms */
 .algolia-docsearch-suggestion--highlight {
-  font-family: var(--ifm-font-family-bold);
-  color: var(--ifm-color-info);
+  font-weight: var(--font-weight--bold);
+  color: var(--link--color--default);
   background-color: transparent;
 }
 
 /* Footer */
 .algolia-docsearch-footer {
   padding: 8px var(--ifm-global-spacing);
-  background-color: var(--ifm-code-background);
-  border-top: 1px solid var(--ifm-color-gray-300);
+  background-color: var(--neutral--color--200);
+  border-top: 1px solid var(--separator--color);
   font-size: 11px;
-  color: var(--ifm-color-content);
-  opacity: 0.7;
-}
-
-/* Dark Mode */
-[data-theme="dark"] .ds-suggestions {
-  background-color: #333;
-  border-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-}
-
-[data-theme="dark"] .ds-suggestion {
-  border-bottom-color: rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="dark"] .ds-suggestion a:hover,
-[data-theme="dark"] .ds-suggestion.ds-cursor a {
-  background-color: #2b3980;
-}
-
-[data-theme="dark"] .algolia-docsearch-suggestion--category-header-lvl0 {
-  color: #fff;
-}
-
-[data-theme="dark"] .algolia-docsearch-suggestion--version {
-  background-color: var(--ifm-code-background);
-  color: var(--ifm-color-info);
-}
-
-[data-theme="dark"] .algolia-docsearch-suggestion--highlight {
-  color: var(--ifm-color-info);
-}
-
-[data-theme="dark"] .algolia-docsearch-footer {
-  background-color: #141b3e;
-  border-top-color: rgba(255, 255, 255, 0.1);
+  color: var(--ifm-color-content-secondary);
 }
