@@ -1,0 +1,35 @@
+/* Placed and separated like the docs sidebar (see BlogLayout) */
+.container {
+  display: none;
+}
+
+@media (min-width: 997px) {
+  .container {
+    display: block;
+    flex-shrink: 0;
+    /* Grows on large screens, as the entry titles are long */
+    width: clamp(var(--doc-sidebar-width), 24vw, 500px);
+    border-right: 1px solid var(--separator--color);
+  }
+}
+
+.sidebar {
+  position: sticky;
+  top: var(--ifm-navbar-height);
+  max-height: calc(100vh - var(--ifm-navbar-height));
+  overflow-y: auto;
+  padding: var(--size-rem--l) var(--size-rem--m);
+  scrollbar-width: thin;
+}
+
+/* Entry titles are long and only differ at the end; they wrap instead of
+   being truncated */
+.sidebar :global(.flow--navigation .flow--navigation--item) > span {
+  white-space: normal;
+  text-overflow: clip;
+}
+
+.title {
+  display: block;
+  margin-bottom: var(--size-rem--m);
+}
