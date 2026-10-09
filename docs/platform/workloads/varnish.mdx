@@ -337,7 +337,10 @@ Upload the VCL file to `/files/varnish/default.vcl` in your app.
 
 #### Step 4: Deploy the Varnish container
 
+Create a stack for Varnish, store it in your CLI context and start the container in it:
+
 ```shellsession
+$ mw stack create --description "Varnish" --update-context
 $ mw container run \
   --name varnish \
   --publish-all \
@@ -381,13 +384,14 @@ Upload it to `/files/varnish/default.vcl` in your app using the file manager or 
 #### Step 4: Create the Varnish container
 
 1. In your project, click "Containers" in the sidebar
-2. Click "Create Container"
-3. Select "varnish:8" as the image
-4. Configure:
+2. Create a new stack or open an existing one
+3. Click "Create" in the containers section of the stack
+4. Select "varnish:8" as the image
+5. Configure:
    - Name: `varnish`
    - Port mapping: `80:80/tcp`
    - Volumes: Mount `/files/varnish` to `/etc/varnish`
-5. Click "Create"
+6. Click "Create"
 
 #### Step 5: Connect to your domain
 

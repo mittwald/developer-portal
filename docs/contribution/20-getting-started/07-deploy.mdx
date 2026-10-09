@@ -278,15 +278,19 @@ use that Extension's values for `EXTENSION_ID` and `EXTENSION_SECRET`.
 
 | Variable       | Description                                                                           |
 | -------------- | ------------------------------------------------------------------------------------- |
-| `STACK_ID`     | Stack ID from mStudio container hosting; **equal to the project ID**                  |
+| `STACK_ID`     | ID of the container stack that the Extension is deployed into                         |
 | `EXTENSION_ID` | Extension ID in marketplace; if you created a second Extension, use that Extension ID |
 
 #### Determine Stack ID
 
-You can find the **stack ID** in mStudio:
+Create a dedicated container stack for your Extension in your project, or look up the ID of an existing stack, for example with the CLI:
 
-1. Navigate to your **project** in the server
-2. The **stack ID equals the project ID** and is shown in URL: `https://studio.mittwald.de/app/projects/{projectId}/dashboard`
+```shellsession
+user@local $ mw stack create --project-id <project-id> --description "My Extension"
+user@local $ mw stack list --project-id <project-id>
+```
+
+See [Creating a container stack](/docs/v2/platform/workloads/containers#create-stack) for other ways to create a stack.
 
 ## Trigger Deployment
 

@@ -134,7 +134,7 @@ Diese Konfiguration verwendet das `--install --idempotent`-Flag, das sicherstell
 
 ### Über die mStudio-Oberfläche {#mstudio-ui}
 
-In mStudio gehst du zu deinem Projekt und wählst **"Container erstellen"** aus. Ein geführter Dialog öffnet sich, um dich bei der Container-Einrichtung zu unterstützen.
+Gehe im mStudio zu deinem Projekt, wähle **"Container"** und lege einen neuen Stack an oder öffne einen bestehenden. Klicke dann im Container-Bereich des Stacks auf **"Anlegen"**. Ein geführter Dialog öffnet sich, um dich bei der Container-Einrichtung zu unterstützen.
 
 Gib zuerst eine Beschreibung ein – dies ist ein Freitextfeld, das zur Identifizierung des Containers verwendet wird. Gib zum Beispiel **"Listmonk"** ein und klicke auf **"Weiter"**.
 
@@ -193,6 +193,18 @@ Stelle sicher, dass du ein sicheres Passwort für deine Datenbankverbindung verw
 Nachdem du alle Umgebungsvariablen eingegeben hast, klicke auf **"Weiter"**. Im letzten Dialog wirst du nach dem **Port** gefragt – du kannst diesen unverändert bei `9000` lassen. Klicke auf **"Container erstellen"**, um den Container zu erstellen und zu starten.
 
 ### Alternative: Über den Befehl `mw container run` {#mw-container-run}
+
+:::note
+
+Die CLI stellt den Container in dem Stack bereit, der in deinem CLI-Kontext gespeichert ist. Falls du noch keinen Stack angelegt hast, lege zuerst einen an:
+
+```shellsession
+user@local $ mw stack create --description "Listmonk" --update-context
+```
+
+Alternativ kannst du die ID eines bestehenden Stacks mit `--stack-id` angeben. Details findest du unter [Einen Container-Stack anlegen](/docs/v2/platform/workloads/containers#create-stack).
+
+:::
 
 Du kannst auch den Befehl `mw container run` verwenden, um direkt von der Kommandozeile aus einen Listmonk-Container zu erstellen und zu starten. Dieser Ansatz ist ähnlich wie die Verwendung der Docker-CLI und ermöglicht es dir, alle Container-Parameter in einem einzigen Befehl anzugeben.
 
@@ -258,7 +270,7 @@ Dann stelle den Container mit dem Befehl `mw stack deploy` bereit:
 user@local $ mw stack deploy
 ```
 
-Dieser Befehl liest die `docker-compose.yml`-Datei aus dem aktuellen Verzeichnis und stellt sie auf deinem Standard-Stack bereit.
+Dieser Befehl liest die `docker-compose.yml`-Datei aus dem aktuellen Verzeichnis und stellt sie in dem Stack bereit, der in deinem CLI-Kontext gespeichert ist.
 
 ## Domain zuweisen {#assign-domain}
 

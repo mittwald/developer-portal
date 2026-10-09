@@ -197,6 +197,18 @@ DB_PORT=3306
 ````markdown
 ### Alternative: Using the `mw container run` command
 
+:::note
+
+The CLI deploys the container into the stack stored in your CLI context. If you have not created a stack yet, create one first:
+
+```shellsession
+user@local $ mw stack create --description "[App Name]" --update-context
+```
+
+Alternatively, pass the ID of an existing stack with `--stack-id`. See [Creating a container stack](/docs/v2/platform/workloads/containers#create-stack) for details.
+
+:::
+
 You can also use the `mw container run` command to directly create and start a [App Name] container from the command line. This approach is similar to using the Docker CLI and allows you to specify all container parameters in a single command.
 
 ```bash
@@ -242,7 +254,7 @@ Make sure to replace the placeholder values with your actual configuration detai
 mw stack deploy
 ```
 
-This command will read the `docker-compose.yml` file from the current directory and deploy it to your default stack.
+This command will read the `docker-compose.yml` file from the current directory and deploy it to the stack stored in your CLI context.
 ````
 
 ## Docker image references

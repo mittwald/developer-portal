@@ -63,7 +63,7 @@ In this example, the container is also connected to a domain, using the `mittwal
 
 ### Using the mStudio UI
 
-In mStudio, go to your project and select **"Create container"**. A guided dialog will open to assist you with the container setup.
+In mStudio, go to your project, select **"Containers"** and create a new stack or open an existing one. Then click **"Create"** in the containers section of the stack. A guided dialog will open to assist you with the container setup.
 
 First, enter a description – this is a free text field used to identify the container. For example, enter **"Directus"** and click **"Next"**.
 
@@ -111,6 +111,18 @@ DB_PASSWORD=your_database_password
 Once you've entered all the environment variables, click **"Next"**. In the final dialog, you'll be asked for the **port** – you can leave this unchanged. Click **"Create container"** to create and start the container.
 
 ### Alternative: Using the `mw container run` command
+
+:::note
+
+The CLI deploys the container into the stack stored in your CLI context. If you have not created a stack yet, create one first:
+
+```shellsession
+user@local $ mw stack create --description "Directus" --update-context
+```
+
+Alternatively, pass the ID of an existing stack with `--stack-id`. See [Creating a container stack](/docs/v2/platform/workloads/containers#create-stack) for details.
+
+:::
 
 You can also use the `mw container run` command to directly create and start a Directus container from the command line. This approach is similar to using the Docker CLI and allows you to specify all container parameters in a single command.
 
@@ -178,7 +190,7 @@ Make sure to replace the placeholder values with your actual configuration detai
 mw stack deploy
 ```
 
-This command will read the `docker-compose.yml` file from the current directory and deploy it to your default stack.
+This command will read the `docker-compose.yml` file from the current directory and deploy it to the stack stored in your CLI context.
 
 ## Operation
 

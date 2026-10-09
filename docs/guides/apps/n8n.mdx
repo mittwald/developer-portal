@@ -21,7 +21,7 @@ You can deploy n8n in your mittwald hosting environment as a container. There ar
 
 ### Using the mStudio user interface
 
-1. In your project, go to the **Container** menu item in mStudio and create a new container. You can choose any name you like.
+1. Go to the **Container** menu item in your project in mStudio, create a new stack or open an existing one, and click **"Create"** in the containers section of the stack to create a new container. You can choose any name you like.
 
 2. Enter the image `n8nio/n8n:stable`. You can use the default entrypoint and command.
 
@@ -51,6 +51,18 @@ Here, adjust the environment variables `N8N_HOST` and `WEBHOOK_URL` to match the
 Use the suggested default port `5678`.
 
 ### Using the CLI with `mw container run`
+
+:::note
+
+The CLI deploys the container into the stack stored in your CLI context. If you have not created a stack yet, create one first:
+
+```shellsession
+user@local $ mw stack create --description "n8n" --update-context
+```
+
+Alternatively, pass the ID of an existing stack with `--stack-id`. See [Creating a container stack](/docs/v2/platform/workloads/containers#create-stack) for details.
+
+:::
 
 You can also deploy an n8n container with the mittwald CLI and the command `mw container run`:
 
