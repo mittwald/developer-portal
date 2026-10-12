@@ -4,7 +4,7 @@ import type { BadgeProps } from "@mittwald/flow-react-components";
 import { statusCodeName } from "@site/src/openapi/statusCodeName";
 import styles from "./HTTPResponseStatus.module.css";
 
-function getColorByCode(code: string): BadgeProps["color"] {
+export function getColorByCode(code: string): BadgeProps["color"] {
   if (code.startsWith("2")) {
     return "green";
   } else if (code.startsWith("3")) {

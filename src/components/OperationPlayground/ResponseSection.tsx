@@ -1,12 +1,12 @@
 import {
   Accordion,
-  CodeBlock,
   Content,
   Heading,
   Section,
 } from "@mittwald/flow-react-components";
 import Translate from "@docusaurus/Translate";
 import React from "react";
+import CodeBlock from "@theme/CodeBlock";
 import ResponseStatus from "./ResponseStatus";
 import ResponseHeaders from "./ResponseHeaders";
 
@@ -35,7 +35,7 @@ function ResponseSection({ response, responseText }: ResponseSectionProps) {
           <Translate id="playground.response.body">Response body</Translate>
         </Heading>
         <Content>
-          <CodeBlock code={responseText} copyable={true} />
+          <CodeBlock language="json">{responseText}</CodeBlock>
         </Content>
       </Accordion>
     </Section>

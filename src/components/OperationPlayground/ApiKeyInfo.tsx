@@ -10,6 +10,7 @@ import Translate from "@docusaurus/Translate";
 import { IconKey } from "@tabler/icons-react";
 import React from "react";
 import ApiKeyForm from "./ApiKeyForm";
+import styles from "./index.module.css";
 
 export interface ApiKeyInfoProps {
   /** The user's email address */
@@ -41,7 +42,9 @@ function ApiKeyInfo({
         <IconKey />
       </Icon>
       <Section>
-        <Flex align="center">
+        {/* On narrow screens the buttons move to the next line as a whole
+            instead of breaking their labels */}
+        <Flex align="center" wrap="wrap" gap="s">
           <Flex grow>
             <Text>
               <Translate
@@ -52,19 +55,24 @@ function ApiKeyInfo({
               </Translate>
             </Text>
           </Flex>
-          <Flex>
+          <Flex wrap="wrap" gap="s" className={styles.apiKeyActions}>
             <ApiKeyForm
               isVerifying={isVerifying}
               error={verificationError}
               onSubmit={onSaveApiKey}
             >
-              <Button variant="plain">
+              <Button variant="soft" color="dark" size="s">
                 <Translate id="playground.apikey.change">
                   Change API key
                 </Translate>
               </Button>
             </ApiKeyForm>
-            <Button variant="plain" color="danger" onClick={onClearApiKey}>
+            <Button
+              variant="soft"
+              color="dark"
+              size="s"
+              onClick={onClearApiKey}
+            >
               <Translate id="playground.apikey.forget">
                 Forget API key
               </Translate>
