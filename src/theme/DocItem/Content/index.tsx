@@ -5,10 +5,14 @@ import { useDoc } from "@docusaurus/plugin-content-docs/client";
 import type { Props } from "@theme/DocItem/Content";
 import MDXComponents from "@theme/MDXComponents";
 import MDXContent from "@theme/MDXContent";
+import EditThisPage from "@theme/EditThisPage";
+import { Section } from "@mittwald/flow-react-components";
+import { TitleActionsContext } from "@site/src/theme/MDXComponents/titleActions";
 
 /**
  * Doc content with the title from the front matter rendered like a Markdown
- * h1, i.e. as Flow heading. Ejected from @docusaurus/theme-classic.
+ * h1, i.e. as Flow heading; the edit link is shown next to the title (from
+ * the front matter or the Markdown). Ejected from @docusaurus/theme-classic.
  */
 
 const MDXH1 = MDXComponents.h1;
@@ -35,14 +39,21 @@ function useSyntheticTitle(): string | null {
 
 export default function DocItemContent({ children }: Props): ReactNode {
   const syntheticTitle = useSyntheticTitle();
+  const { editUrl } = useDoc().metadata;
   return (
-    <div className={clsx(ThemeClassNames.docs.docMarkdown, "markdown")}>
-      {syntheticTitle && (
-        <header>
-          <MDXH1>{syntheticTitle}</MDXH1>
-        </header>
-      )}
-      <MDXContent>{children}</MDXContent>
-    </div>
+    <TitleActionsContext.Provider
+      value={editUrl && <EditThisPage editUrl={editUrl} />}
+    >
+      <div className={clsx(ThemeClassNames.docs.docMarkdown, "markdown")}>
+        {/* A section of its own (the Markdown title is in the first
+            section of the content); no separator below the title */}
+        {syntheticTitle && (
+          <Section hideSeparator>
+            <MDXH1>{syntheticTitle}</MDXH1>
+          </Section>
+        )}
+        <MDXContent>{children}</MDXContent>
+      </div>
+    </TitleActionsContext.Provider>
   );
 }

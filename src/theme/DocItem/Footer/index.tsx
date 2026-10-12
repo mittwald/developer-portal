@@ -3,7 +3,6 @@ import clsx from "clsx";
 import { ThemeClassNames } from "@docusaurus/theme-common";
 import { useDoc } from "@docusaurus/plugin-content-docs/client";
 import TagsListInline from "@theme/TagsListInline";
-import EditThisPage from "@theme/EditThisPage";
 import LastUpdated from "@theme/LastUpdated";
 import { Section, Separator } from "@mittwald/flow-react-components";
 import styles from "./styles.module.css";
@@ -14,11 +13,11 @@ import styles from "./styles.module.css";
  */
 export default function DocItemFooter(): ReactNode {
   const { metadata } = useDoc();
-  const { editUrl, lastUpdatedAt, lastUpdatedBy, tags } = metadata;
+  const { lastUpdatedAt, lastUpdatedBy, tags } = metadata;
 
   const canDisplayTagsRow = tags.length > 0;
   const canDisplayLastUpdated = !!(lastUpdatedAt || lastUpdatedBy);
-  if (!canDisplayTagsRow && !editUrl && !canDisplayLastUpdated) {
+  if (!canDisplayTagsRow && !canDisplayLastUpdated) {
     return null;
   }
 
@@ -26,28 +25,26 @@ export default function DocItemFooter(): ReactNode {
     <footer className={clsx(ThemeClassNames.docs.docFooter, styles.footer)}>
       <Separator />
       <Section>
-        {/* Tags left, edit link right; they wrap below each other when there
-            is not enough space */}
+        {/* Tags left, last update right; they wrap below each other when
+            there is not enough space (the edit link is next to the title, see
+            DocItem/Content) */}
         <div className={styles.row}>
           {canDisplayTagsRow && (
             <div className={ThemeClassNames.docs.docFooterTagsRow}>
               <TagsListInline tags={tags} />
             </div>
           )}
-          {(editUrl || canDisplayLastUpdated) && (
+          {canDisplayLastUpdated && (
             <div
               className={clsx(
                 ThemeClassNames.docs.docFooterEditMetaRow,
                 styles.editMetaRow,
               )}
             >
-              {editUrl && <EditThisPage editUrl={editUrl} />}
-              {canDisplayLastUpdated && (
-                <LastUpdated
-                  lastUpdatedAt={lastUpdatedAt}
-                  lastUpdatedBy={lastUpdatedBy}
-                />
-              )}
+              <LastUpdated
+                lastUpdatedAt={lastUpdatedAt}
+                lastUpdatedBy={lastUpdatedBy}
+              />
             </div>
           )}
         </div>

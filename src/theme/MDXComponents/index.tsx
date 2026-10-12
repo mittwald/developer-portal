@@ -1,8 +1,8 @@
 import React, {
   Children,
   createContext,
-  useContext,
   isValidElement,
+  useContext,
   type ComponentProps,
   type ReactElement,
   type ReactNode,
@@ -21,6 +21,7 @@ import Admonition from "@theme/Admonition";
 import Mermaid from "@theme/Mermaid";
 import type { MDXComponentsObject } from "@theme/MDXComponents";
 import {
+  Header,
   Icon,
   InlineCode,
   Link,
@@ -39,6 +40,7 @@ import {
   replaceLeadingEmojiIcon,
   splitLeadingEmojiIcon,
 } from "./emojiIcons";
+import { TitleActionsContext } from "./titleActions";
 import styles from "./styles.module.css";
 
 /**
@@ -84,6 +86,24 @@ function MDXHeading({
     >
       {unwrapCodeOnlyHeading(children)}
     </ThemeHeading>
+  );
+}
+
+/**
+ * The page title; with actions for the page (e.g. on doc pages), title and
+ * actions form the header of the section the title is in
+ */
+function MDXTitle(props: ComponentProps<"h1">) {
+  const actions = useContext(TitleActionsContext);
+  const heading = <MDXHeading level={1} {...props} />;
+  if (!actions) {
+    return heading;
+  }
+  return (
+    <Header>
+      {heading}
+      {actions}
+    </Header>
   );
 }
 
@@ -385,7 +405,7 @@ const MDXComponents: MDXComponentsObject = {
   img: MDXImg,
   table: MDXTable,
   section: MDXSection,
-  h1: (props: ComponentProps<"h1">) => <MDXHeading level={1} {...props} />,
+  h1: MDXTitle,
   h2: (props: ComponentProps<"h2">) => <MDXHeading level={2} {...props} />,
   h3: (props: ComponentProps<"h3">) => <MDXHeading level={3} {...props} />,
   h4: (props: ComponentProps<"h4">) => <MDXHeading level={4} {...props} />,
