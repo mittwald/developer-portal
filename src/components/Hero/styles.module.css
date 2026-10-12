@@ -1,0 +1,61 @@
+/* On the Flow gradient like flow.mittwald.de */
+.hero {
+  padding: var(--size-rem--xxl) var(--size-rem--m);
+  background: var(--color--gradient);
+}
+
+@media screen and (max-width: 996px) {
+  .hero {
+    padding-block: var(--size-rem--xl);
+  }
+}
+
+/* Lead text below the title, between body text and headings in size */
+.hero :global(.container) > :global(.flow--text) {
+  font-size: var(--font-size-heading--s);
+}
+
+/* Wrapped lines stay centered (Flow's flex layout resets the alignment) */
+.hero > :global(.container) {
+  text-align: center;
+}
+
+/* Inline code in the title takes the title size (as in Markdown headings) */
+.hero h1 :global(.flow--inline-code) {
+  font-size: 0.9em;
+}
+
+.hero img {
+  max-width: 100%;
+}
+
+/* Entry points below the title: linked accent boxes of equal height */
+.entries {
+  margin-top: var(--size-rem--xl);
+  width: 100%;
+  text-align: start;
+}
+
+.entry {
+  display: block;
+  height: 100%;
+}
+
+.entryCard {
+  height: 100%;
+}
+
+/* The layout card pads the box, the box pads the message */
+.entryMessage {
+  padding: 0;
+}
+
+/* Styled like a dark Flow inline link (the whole box is the link) */
+.entryLink {
+  color: var(--link--color-dark--default);
+  text-decoration: underline;
+}
+
+.entry:hover .entryLink {
+  color: var(--link--color-dark--hover);
+}

@@ -1,5 +1,4 @@
 import FeatureRow from "@site/src/components/FeatureRow";
-import clsx from "clsx";
 import FeatureCard from "@site/src/components/HomepageFeatures/FeatureCard";
 import React from "react";
 import Intro from "@site/src/components/Intro";
@@ -74,7 +73,7 @@ $ ddev pull mittwald
 
 $ # Start your local environment
 $ ddev start`}</CodeBlock>
-      <Link href="/docs/v2/platform/development/ddev/">
+      <Link inline href="/docs/v2/platform/development/ddev/">
         <Translate id={"cli.dev.ddev"}>
           More about our DDEV integration
         </Translate>
@@ -85,22 +84,9 @@ $ ddev start`}</CodeBlock>
 
 export default function DevelopmentFeature() {
   return (
-    <FeatureRow>
-      <div className="container">
-        <div className="row margin-bottom--lg">
-          <div className="col col--12">
-            <DevelopmentIntro />
-          </div>
-        </div>
-        <div className="row">
-          <div className={clsx("col col--6")}>
-            <DevelopmentDocumentation />
-          </div>
-          <div className={clsx("col col--6")}>
-            <DevelopmentExample />
-          </div>
-        </div>
-      </div>
+    <FeatureRow variant intro={<DevelopmentIntro />}>
+      <DevelopmentDocumentation />
+      <DevelopmentExample />
     </FeatureRow>
   );
 }

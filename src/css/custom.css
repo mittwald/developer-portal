@@ -128,7 +128,14 @@ html[data-theme="dark"] {
   --ifm-button-size-multiplier: 1;
 }
 
-/* Hero on the landing pages, on the Flow gradient like flow.mittwald.de */
+/* Flat design: Flow layout cards without shadow. Flow defines the token on
+   :root as well; the doubled selector wins regardless of the load order. */
+:root:root {
+  --layout-card--box-shadow: none;
+}
+
+/* Infima hero (changelog archive), on the Flow gradient like the landing
+   pages (src/components/Hero) */
 .hero--primary {
   --ifm-hero-text-color: var(--text--color--default);
   background: var(--color--gradient);
@@ -228,11 +235,6 @@ aside {
 code {
   border: none;
   padding: var(--inline-code--padding-y) var(--inline-code--padding-x);
-}
-
-h1 code {
-  font-size: 1em;
-  background: none;
 }
 
 pre {

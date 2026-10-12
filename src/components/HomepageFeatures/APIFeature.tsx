@@ -1,4 +1,3 @@
-import clsx from "clsx";
 import FeatureRow from "../FeatureRow";
 import Intro from "../Intro";
 import Translate, { translate } from "@docusaurus/Translate";
@@ -166,8 +165,7 @@ function APILibraries() {
           <Translate id="index.sdks.issue">
             Let us know, and we'll link it here!
           </Translate>
-        </IssueTrackerLink>{" "}
-        💙
+        </IssueTrackerLink>
       </Text>
     </FeatureCard>
   );
@@ -175,22 +173,9 @@ function APILibraries() {
 
 export default function APIFeature() {
   return (
-    <FeatureRow variant>
-      <div className="container">
-        <div className="row margin-bottom--lg">
-          <div className="col col--12">
-            <APIIntro />
-          </div>
-        </div>
-        <div className="row">
-          <div className={clsx("col col--6")}>
-            <APIDocumentation />
-          </div>
-          <div className={clsx("col col--6")}>
-            <APILibraries />
-          </div>
-        </div>
-      </div>
+    <FeatureRow variant intro={<APIIntro />}>
+      <APIDocumentation />
+      <APILibraries />
     </FeatureRow>
   );
 }

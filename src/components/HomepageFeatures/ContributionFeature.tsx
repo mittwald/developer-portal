@@ -1,7 +1,6 @@
 import Translate from "@docusaurus/Translate";
 import { Heading, Icon, Link, Text } from "@mittwald/flow-react-components";
 import { IconHeartHandshake } from "@tabler/icons-react";
-import clsx from "clsx";
 import FeatureRow from "../FeatureRow";
 import Intro from "../Intro";
 import { NewBadge } from "@site/src/components/NewBadge";
@@ -145,22 +144,9 @@ function ToolsFeature() {
 
 export default function ContributionFeature() {
   return (
-    <FeatureRow>
-      <div className="container">
-        <div className="row margin-bottom--lg">
-          <div className="col col--12">
-            <ContributionIntro />
-          </div>
-        </div>
-        <div className="row">
-          <div className={clsx("col col--6")}>
-            <ExtensionsFeature />
-          </div>
-          <div className={clsx("col col--6")}>
-            <ToolsFeature />
-          </div>
-        </div>
-      </div>
+    <FeatureRow intro={<ContributionIntro />}>
+      <ExtensionsFeature />
+      <ToolsFeature />
     </FeatureRow>
   );
 }

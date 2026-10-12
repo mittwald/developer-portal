@@ -1,4 +1,3 @@
-import clsx from "clsx";
 import FeatureRow from "../FeatureRow";
 import Intro from "../Intro";
 import Translate from "@docusaurus/Translate";
@@ -205,22 +204,9 @@ function PlatformTools() {
 
 export default function PlatformFeature() {
   return (
-    <FeatureRow>
-      <div className="container">
-        <div className="row margin-bottom--lg">
-          <div className="col col--12">
-            <PlatformIntro />
-          </div>
-        </div>
-        <div className="row">
-          <div className={clsx("col col--6")}>
-            <PlatformCoreFeatures />
-          </div>
-          <div className={clsx("col col--6")}>
-            <PlatformTools />
-          </div>
-        </div>
-      </div>
+    <FeatureRow intro={<PlatformIntro />}>
+      <PlatformCoreFeatures />
+      <PlatformTools />
     </FeatureRow>
   );
 }

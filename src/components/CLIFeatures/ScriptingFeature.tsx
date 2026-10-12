@@ -1,5 +1,4 @@
 import FeatureRow from "@site/src/components/FeatureRow";
-import clsx from "clsx";
 import FeatureCard from "@site/src/components/HomepageFeatures/FeatureCard";
 import React from "react";
 import Intro from "@site/src/components/Intro";
@@ -82,7 +81,7 @@ for t in \${emails[@]} ; do
     --address \$t \\
     --random-password
 done`}</CodeBlock>
-      <Link href="/docs/v2/category/cli-examples">
+      <Link inline href="/docs/v2/category/cli-examples">
         <Translate id={"cli.scripting.examples"}>More examples</Translate>
       </Link>
     </FeatureCard>
@@ -91,22 +90,9 @@ done`}</CodeBlock>
 
 export default function ScriptingFeature() {
   return (
-    <FeatureRow variant>
-      <div className="container">
-        <div className="row margin-bottom--lg">
-          <div className="col col--12">
-            <ScriptingIntro />
-          </div>
-        </div>
-        <div className="row">
-          <div className={clsx("col col--6")}>
-            <ScriptingDocumentation />
-          </div>
-          <div className={clsx("col col--6")}>
-            <ScriptingExample />
-          </div>
-        </div>
-      </div>
+    <FeatureRow intro={<ScriptingIntro />}>
+      <ScriptingDocumentation />
+      <ScriptingExample />
     </FeatureRow>
   );
 }
