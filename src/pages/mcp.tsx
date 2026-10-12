@@ -1,8 +1,8 @@
 import React from "react";
 import Layout from "@theme/Layout";
 import Translate, { translate } from "@docusaurus/Translate";
+import CodeBlock from "@theme/CodeBlock";
 import {
-  CodeBlock,
   Flex,
   Heading,
   Icon,
@@ -108,11 +108,9 @@ function ServerURLSection() {
             Use this MCP URL in the AI assistant of your choice:
           </Translate>
         </Text>
-        <CodeBlock
-          copyable
-          code="https://mcp.mittwald.de/mcp"
-          language="text"
-        />
+        <CodeBlock language="text" className={mcpStyles.url}>
+          https://mcp.mittwald.de/mcp
+        </CodeBlock>
         <Text elementType="p" align="center">
           <Translate
             id="mcp.url.setupGuides"

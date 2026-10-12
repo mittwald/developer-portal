@@ -192,12 +192,20 @@ a.menu__link--sublist.menu__link--active:not([aria-current="page"]):hover {
   background-color: var(--menu-item--background-color--hover);
 }
 
-/* Chevrons in the text color (Infima draws them as a black data URI) */
+/* Chevrons like in a Flow navigation: Tabler's chevron-down in the text color
+   and icon size s, pointing up when expanded (Infima draws a Material chevron
+   pointing right when collapsed) */
 .menu__link--sublist-caret::after,
 .menu__caret::before {
   background: currentColor;
-  mask: var(--ifm-menu-link-sublist-icon) center / var(--size-rem--l)
-    var(--size-rem--l) no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6l6 -6'/%3E%3C/svg%3E")
+    center / var(--icon--size--s) var(--icon--size--s) no-repeat;
+  transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.menu__list-item--collapsed .menu__link--sublist::after,
+.menu__list-item--collapsed .menu__caret::before {
+  transform: none;
 }
 
 aside {

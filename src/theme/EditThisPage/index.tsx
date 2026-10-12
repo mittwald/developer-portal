@@ -2,12 +2,12 @@ import React, { type ReactNode } from "react";
 import { translate } from "@docusaurus/Translate";
 import { ThemeClassNames } from "@docusaurus/theme-common";
 import type { Props } from "@theme/EditThisPage";
-import { Button, Icon, Link } from "@mittwald/flow-react-components";
 import { IconPencil } from "@tabler/icons-react";
+import IconLinkButton from "@site/src/components/IconLinkButton";
 import styles from "./styles.module.css";
 
 /**
- * "Edit this page" as a Flow link combined with an icon button; the section
+ * "Edit this page" as icon link button; the section
  * header of the page title places it on the right (see DocItem/Content).
  * Swizzled (ejected) from @docusaurus/theme-classic.
  */
@@ -19,18 +19,13 @@ export default function EditThisPage({ editUrl }: Props): ReactNode {
   });
 
   return (
-    <Link
+    // Sized like the buttons Flow places in a page title
+    <IconLinkButton
       href={editUrl}
       target="_blank"
-      aria-label={label}
+      label={label}
+      icon={<IconPencil />}
       className={`${ThemeClassNames.common.editThisPage} ${styles.link}`}
-    >
-      {/* Sized like the buttons Flow places in a page title */}
-      <Button variant="plain" color="secondary" size="m">
-        <Icon>
-          <IconPencil />
-        </Icon>
-      </Button>
-    </Link>
+    />
   );
 }

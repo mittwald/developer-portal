@@ -25,6 +25,7 @@ import {
   IconMoon,
   IconSun,
 } from "@tabler/icons-react";
+import IconLinkButton from "@site/src/components/IconLinkButton";
 import styles from "./styles.module.css";
 
 /**
@@ -185,13 +186,12 @@ export default function FlowHeaderActions({ items, mobile }: Props): ReactNode {
           // outside of its props context.
           <li key={item.href} className={styles.item}>
             <ClearPropsContext>
-              <Link href={item.href} target="_blank" aria-label={item.label}>
-                <Button variant="plain" color="secondary">
-                  <Icon>
-                    <LinkIcon />
-                  </Icon>
-                </Button>
-              </Link>
+              <IconLinkButton
+                href={item.href}
+                target="_blank"
+                label={item.label}
+                icon={<LinkIcon />}
+              />
             </ClearPropsContext>
           </li>
         ) : (

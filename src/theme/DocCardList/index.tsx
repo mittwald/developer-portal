@@ -13,14 +13,8 @@ import { translate } from "@docusaurus/Translate";
 import isInternalUrl from "@docusaurus/isInternalUrl";
 import { usePluralForm } from "@docusaurus/theme-common";
 import type { Props } from "@theme/DocCardList";
-import {
-  AccentBox,
-  ColumnLayout,
-  Heading,
-  Link,
-  Section,
-  Text,
-} from "@mittwald/flow-react-components";
+import { ColumnLayout } from "@mittwald/flow-react-components";
+import NavigationTile from "@site/src/components/NavigationTile";
 import {
   IconExternalLink,
   IconFileText,
@@ -30,7 +24,7 @@ import styles from "./styles.module.css";
 
 /**
  * Cards for sidebar items (e.g. on generated category index pages), rendered
- * as linked neutral Flow accent boxes in a Flow column layout. Swizzled (ejected) from
+ * as navigation tiles in a Flow column layout. Swizzled (ejected) from
  * @docusaurus/theme-classic; replaces DocCard, whose emoji icons are swapped
  * for Flow icons.
  */
@@ -43,20 +37,7 @@ interface CardProps {
 }
 
 function Card({ href, title, description }: CardProps) {
-  return (
-    <Link href={href} className={styles.link}>
-      <AccentBox backgroundColor="neutral" className={styles.card}>
-        <Section>
-          <Heading level={2} size="s">
-            {title}
-          </Heading>
-          {description && (
-            <Text className={styles.description}>{description}</Text>
-          )}
-        </Section>
-      </AccentBox>
-    </Link>
-  );
+  return <NavigationTile href={href} title={title} description={description} />;
 }
 
 function CategoryCard({ item }: { item: PropSidebarItemCategory }) {

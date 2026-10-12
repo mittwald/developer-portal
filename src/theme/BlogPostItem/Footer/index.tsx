@@ -2,14 +2,17 @@ import React, { type ReactNode } from "react";
 import clsx from "clsx";
 import { useBlogPost } from "@docusaurus/plugin-content-blog/client";
 import { ThemeClassNames } from "@docusaurus/theme-common";
-import EditMetaRow from "@theme/EditMetaRow";
+import EditThisPage from "@theme/EditThisPage";
+import LastUpdated from "@theme/LastUpdated";
+import { Section, Separator } from "@mittwald/flow-react-components";
 import TagsListInline from "@theme/TagsListInline";
 import ReadMoreLink from "@theme/BlogPostItem/Footer/ReadMoreLink";
 import styles from "./styles.module.css";
 
 /**
- * Footer of a changelog entry. In the list, "Read more" follows the excerpt
- * directly, the tags come below. Ejected from @docusaurus/theme-classic.
+ * Footer of a changelog entry. On the entry page it is built like the doc
+ * footer; in the list, "Read more" follows the excerpt directly, the tags
+ * come below. Ejected from @docusaurus/theme-classic.
  */
 export default function BlogPostItemFooter(): ReactNode {
   const { metadata, isBlogPostPage } = useBlogPost();
@@ -30,35 +33,32 @@ export default function BlogPostItemFooter(): ReactNode {
     return null;
   }
 
-  // BlogPost footer - details view
+  // BlogPost footer - details view, like the doc footer: separated from the
+  // content like two Flow sections, tags left, last update right
   if (isBlogPostPage) {
     const canDisplayEditMetaRow = !!(editUrl || lastUpdatedAt || lastUpdatedBy);
     return (
-      <footer className="docusaurus-mt-lg">
-        {tagsExists && (
-          <div
-            className={clsx(
-              "row",
-              "margin-top--sm",
-              ThemeClassNames.blog.blogFooterEditMetaRow,
+      <footer className={styles.pageFooter}>
+        <Separator />
+        <Section>
+          <div className={styles.row}>
+            {tagsExists && <TagsListInline tags={tags} />}
+            {canDisplayEditMetaRow && (
+              <div
+                className={clsx(
+                  ThemeClassNames.blog.blogFooterEditMetaRow,
+                  styles.editMetaRow,
+                )}
+              >
+                {editUrl && <EditThisPage editUrl={editUrl} />}
+                <LastUpdated
+                  lastUpdatedAt={lastUpdatedAt}
+                  lastUpdatedBy={lastUpdatedBy}
+                />
+              </div>
             )}
-          >
-            <div className="col">
-              <TagsListInline tags={tags} />
-            </div>
           </div>
-        )}
-        {canDisplayEditMetaRow && (
-          <EditMetaRow
-            className={clsx(
-              "margin-top--sm",
-              ThemeClassNames.blog.blogFooterEditMetaRow,
-            )}
-            editUrl={editUrl}
-            lastUpdatedAt={lastUpdatedAt}
-            lastUpdatedBy={lastUpdatedBy}
-          />
-        )}
+        </Section>
       </footer>
     );
   }

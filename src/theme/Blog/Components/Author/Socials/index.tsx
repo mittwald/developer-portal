@@ -1,6 +1,7 @@
 import React, { type ComponentType, type ReactNode } from "react";
 import type { Props } from "@theme/Blog/Components/Author/Socials";
-import { Button, Flex, Icon, Link } from "@mittwald/flow-react-components";
+import { Flex } from "@mittwald/flow-react-components";
+import IconLinkButton from "@site/src/components/IconLinkButton";
 import {
   IconBrandBluesky,
   IconBrandGithub,
@@ -16,7 +17,6 @@ import {
   IconMail,
   IconWorld,
 } from "@tabler/icons-react";
-import styles from "./styles.module.css";
 
 /**
  * Social links of a changelog author as Flow links with Tabler icon buttons
@@ -48,18 +48,13 @@ function SocialLink({ platform, link }: { platform: string; link: string }) {
     label: platform,
   };
   return (
-    <Link
+    <IconLinkButton
       href={link}
       target={link.startsWith("mailto:") ? undefined : "_blank"}
-      aria-label={label}
-      className={styles.link}
-    >
-      <Button variant="plain" color="secondary" size="s">
-        <Icon>
-          <PlatformIcon />
-        </Icon>
-      </Button>
-    </Link>
+      label={label}
+      icon={<PlatformIcon />}
+      size="s"
+    />
   );
 }
 
