@@ -82,13 +82,11 @@ export default function Home() {
       title="mittwald CLI"
       description={translate({ id: "cli.description" })}
     >
-      <>
-        <CLIPageHeader />
-        <main className={"index"}>
-          <ScriptingFeature />
-          <DevelopmentFeature />
-        </main>
-      </>
+      <CLIPageHeader />
+      <main className={"index"}>
+        <ScriptingFeature />
+        <DevelopmentFeature />
+      </main>
     </Layout>
   );
 }

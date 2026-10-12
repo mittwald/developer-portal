@@ -281,7 +281,7 @@ export function OperationRequest({
     return (
       <>
         <p>
-          <Translate key="openapi.operation.request.empty">
+          <Translate id="openapi.operation.request.empty">
             No request parameters.
           </Translate>
         </p>
@@ -372,33 +372,3 @@ export function OperationResponses({
     </>
   );
 }
-
-function OperationReference({
-  path,
-  method,
-  spec,
-  baseURL,
-}: {
-  path: string;
-  method: string;
-  spec: OpenAPIV3.OperationObject;
-  baseURL: string;
-}) {
-  return (
-    <>
-      <OperationMetadata
-        path={path}
-        method={method}
-        spec={spec}
-        baseURL={baseURL}
-      />
-      <OperationRequest spec={spec} />
-      <OperationResponses spec={spec} />
-
-      <h2>Complete OpenAPI spec</h2>
-      <CodeBlock language="json">{JSON.stringify(spec, null, 2)}</CodeBlock>
-    </>
-  );
-}
-
-export default OperationReference;

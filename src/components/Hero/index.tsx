@@ -1,5 +1,4 @@
 import React, { type PropsWithChildren, type ReactNode } from "react";
-import clsx from "clsx";
 import Translate from "@docusaurus/Translate";
 import {
   AccentBox,
@@ -18,12 +17,9 @@ import styles from "./styles.module.css";
  * Header of the landing pages on the Flow gradient: its content (title, lead
  * text, image, actions) is centered and stacked.
  */
-export default function Hero({
-  className,
-  children,
-}: PropsWithChildren<{ className?: string }>) {
+export default function Hero({ children }: PropsWithChildren<{}>) {
   return (
-    <header className={clsx(styles.hero, className)}>
+    <header className={styles.hero}>
       <Flex direction="column" align="center" gap="l" className="container">
         {children}
       </Flex>

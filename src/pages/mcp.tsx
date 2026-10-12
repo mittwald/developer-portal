@@ -36,8 +36,8 @@ function MCPPageHeader() {
       </Heading>
       <Text elementType="p" align="center">
         <Translate id="mcp.description">
-          Prompt your agent with intent. Let your AI agent interact with the
-          mittwald mStudio with safe, auditable tool calls.
+          Prompt your agent with intent. Let mittwald MCP execute the
+          infrastructure work with safe, auditable tool calls.
         </Translate>
       </Text>
       <Image
@@ -112,7 +112,6 @@ function ServerURLSection() {
           copyable
           code="https://mcp.mittwald.de/mcp"
           language="text"
-          className={mcpStyles.urlField}
         />
         <Text elementType="p" align="center">
           <Translate
@@ -140,25 +139,23 @@ function OverviewFeature() {
     <FeatureRow
       variant
       intro={
-        <>
-          <Intro>
-            <Icon>
-              <IconRobot />
-            </Icon>
-            <Heading level={2} size="l">
-              <Translate id="mcp.overview.agentFirst.title">
-                Agent-First Infrastructure
-              </Translate>
-            </Heading>
-            <Text>
-              <Translate id="mcp.overview.agentFirst.body">
-                mittwald MCP connects your AI coding assistant to mittwald's
-                infrastructure. Describe what you want in natural language, and
-                let your agent handle the API calls.
-              </Translate>
-            </Text>
-          </Intro>
-        </>
+        <Intro>
+          <Icon>
+            <IconRobot />
+          </Icon>
+          <Heading level={2} size="l">
+            <Translate id="mcp.overview.agentFirst.title">
+              Agent-First Infrastructure
+            </Translate>
+          </Heading>
+          <Text>
+            <Translate id="mcp.overview.agentFirst.body">
+              mittwald MCP connects your AI coding assistant to mittwald's
+              infrastructure. Describe what you want in natural language, and
+              let your agent handle the API calls.
+            </Translate>
+          </Text>
+        </Intro>
       }
     >
       <FeatureCard>
@@ -243,22 +240,20 @@ function GettingStartedFeature() {
   return (
     <FeatureRow
       intro={
-        <>
-          <Intro>
-            <Icon>
-              <IconPlugConnected />
-            </Icon>
-            <Heading level={2} size="l">
-              <Translate id="mcp.getStarted.title">Get Started</Translate>
-            </Heading>
-            <Text>
-              <Translate id="mcp.getStarted.body">
-                Connect your preferred AI assistant to mittwald MCP and start
-                managing infrastructure with natural language prompts.
-              </Translate>
-            </Text>
-          </Intro>
-        </>
+        <Intro>
+          <Icon>
+            <IconPlugConnected />
+          </Icon>
+          <Heading level={2} size="l">
+            <Translate id="mcp.getStarted.title">Get Started</Translate>
+          </Heading>
+          <Text>
+            <Translate id="mcp.getStarted.body">
+              Connect your preferred AI assistant to mittwald MCP and start
+              managing infrastructure with natural language prompts.
+            </Translate>
+          </Text>
+        </Intro>
       }
     >
       <FeatureCard>
@@ -356,23 +351,21 @@ function WorkflowFeature() {
     <FeatureRow
       variant
       intro={
-        <>
-          <Intro>
-            <Icon>
-              <IconListCheck />
-            </Icon>
-            <Heading level={2} size="l">
-              <Translate id="mcp.workflow.title">How It Works</Translate>
-            </Heading>
-            <Text>
-              <Translate id="mcp.workflow.body">
-                Agent-driven workflows follow a consistent pattern: you provide
-                intent, the agent discovers and executes tools, you verify
-                results.
-              </Translate>
-            </Text>
-          </Intro>
-        </>
+        <Intro>
+          <Icon>
+            <IconListCheck />
+          </Icon>
+          <Heading level={2} size="l">
+            <Translate id="mcp.workflow.title">How It Works</Translate>
+          </Heading>
+          <Text>
+            <Translate id="mcp.workflow.body">
+              Agent-driven workflows follow a consistent pattern: you provide
+              intent, the agent discovers and executes tools, you verify
+              results.
+            </Translate>
+          </Text>
+        </Intro>
       }
     >
       <FeatureCard>
@@ -448,29 +441,27 @@ function TutorialsFeature() {
   return (
     <FeatureRow
       intro={
-        <>
-          <Intro>
-            <Icon>
-              <IconUsers />
-            </Icon>
-            <Heading level={2} size="l">
-              <Translate id="mcp.tutorials.title">Tutorials by Team</Translate>
-            </Heading>
-            <Text>
-              <Translate id="mcp.tutorials.body">
-                Outcome-driven walkthroughs organized by team context and use
-                case.
+        <Intro>
+          <Icon>
+            <IconUsers />
+          </Icon>
+          <Heading level={2} size="l">
+            <Translate id="mcp.tutorials.title">Tutorials by Team</Translate>
+          </Heading>
+          <Text>
+            <Translate id="mcp.tutorials.body">
+              Outcome-driven walkthroughs organized by team context and use
+              case.
+            </Translate>
+          </Text>
+          <Text>
+            <FlowLink href="/docs/v2/agentic-integration/mcp/tutorials">
+              <Translate id="mcp.tutorials.link">
+                Browse all tutorials →
               </Translate>
-            </Text>
-            <Text>
-              <FlowLink href="/docs/v2/agentic-integration/mcp/tutorials">
-                <Translate id="mcp.tutorials.link">
-                  Browse all tutorials →
-                </Translate>
-              </FlowLink>
-            </Text>
-          </Intro>
-        </>
+            </FlowLink>
+          </Text>
+        </Intro>
       }
     >
       <FeatureCard>
@@ -549,16 +540,14 @@ export default function MCPPage() {
           "Prompt your agent with intent. Let mittwald MCP execute the infrastructure work with safe, auditable tool calls.",
       })}
     >
-      <div>
-        <MCPPageHeader />
-        <main className="index">
-          <ServerURLSection />
-          <OverviewFeature />
-          <GettingStartedFeature />
-          <WorkflowFeature />
-          <TutorialsFeature />
-        </main>
-      </div>
+      <MCPPageHeader />
+      <main className="index">
+        <ServerURLSection />
+        <OverviewFeature />
+        <GettingStartedFeature />
+        <WorkflowFeature />
+        <TutorialsFeature />
+      </main>
     </Layout>
   );
 }

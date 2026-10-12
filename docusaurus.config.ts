@@ -200,11 +200,8 @@ This documentation covers:
             },
           },
         },
-        blog: {
-          showReadingTime: false,
-          onInlineTags: "ignore",
-          rehypePlugins: [rehypeFlowSections],
-        },
+        // The changelog is a separate blog plugin instance (see plugins)
+        blog: false,
         theme: {
           customCss: [
             require.resolve("./src/css/custom.css"),

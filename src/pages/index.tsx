@@ -80,14 +80,12 @@ export default function Home() {
           "The mittwald Developer Portal provides developers with the resources they need to integrate mittwald products into their own applications using our API.",
       })}
     >
-      <>
-        <HomepageHeader />
-        <main className={"index"}>
-          <PlatformFeature />
-          <APIFeature />
-          <ContributionFeature />
-        </main>
-      </>
+      <HomepageHeader />
+      <main className={"index"}>
+        <PlatformFeature />
+        <APIFeature />
+        <ContributionFeature />
+      </main>
     </Layout>
   );
 }

@@ -14,7 +14,6 @@ interface ReferenceLinkProps {
   title: string;
   additionalLinks?: ReactNode[];
   spec: {
-    type: "openapi" | "swagger";
     typeLabel: string;
     url: string;
   };
@@ -83,7 +82,6 @@ function APIDocumentation() {
               spec={{
                 url: "https://api.mittwald.de/v1/openapi.json",
                 typeLabel: translate({ id: "index.reference.openapi" }),
-                type: "openapi",
               }}
             />
           </li>
@@ -99,7 +97,6 @@ function APIDocumentation() {
               spec={{
                 url: "https://api.mittwald.de/openapi",
                 typeLabel: translate({ id: "index.reference.openapi" }),
-                type: "openapi",
               }}
             />
           </li>
