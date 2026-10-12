@@ -1,6 +1,10 @@
 import { Fragment } from "react";
 import styles from "./OperationPath.module.css";
 
+/**
+ * An API path, the same everywhere (running text, links, hints, reference
+ * header): monospace like code, path parameters not set apart.
+ */
 function OperationPath({ path }: { path: string }) {
   // The leading slash yields an empty first part, so a separator is only
   // rendered between parts (and the path keeps its own trailing slash, if any).
@@ -8,15 +12,11 @@ function OperationPath({ path }: { path: string }) {
   const parts = path.split("/").map((part, index) => (
     <Fragment key={index}>
       {index > 0 && <>/{index > 1 && <wbr />}</>}
-      {part.startsWith("{") ? (
-        <span className={styles.variableLinkParameter}>{part}</span>
-      ) : (
-        part
-      )}
+      {part}
     </Fragment>
   ));
 
-  return <>{parts}</>;
+  return <span className={styles.path}>{parts}</span>;
 }
 
 export default OperationPath;

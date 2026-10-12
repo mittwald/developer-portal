@@ -17,7 +17,10 @@ export interface OperationHintProps {
   apiVersion?: APIVersion;
 }
 
-/** One endpoint: method badge, summary as link and the path after it */
+/**
+ * One endpoint: method badge and path (the link), as in running text, with
+ * the summary below
+ */
 function OperationHintItem({
   operationId,
   apiVersion,
@@ -42,20 +45,17 @@ function OperationHintItem({
 
   return (
     <li className={styles.item}>
-      <HTTPMethod
-        method={operation.method}
-        deprecated={isDeprecated(operation.operation)}
-        className={styles.method}
-      />
-      <span>
+      <span className={styles.route}>
+        <HTTPMethod
+          method={operation.method}
+          deprecated={isDeprecated(operation.operation)}
+          className={styles.method}
+        />
         <MDXLink href={buildOperationUrl(apiVersion, operation.operation)}>
-          {summary}
-        </MDXLink>
-        {" – "}
-        <span className={styles.path}>
           <OperationPath path={operation.path} />
-        </span>
+        </MDXLink>
       </span>
+      <Text className={styles.summary}>{summary}</Text>
     </li>
   );
 }
