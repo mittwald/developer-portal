@@ -76,8 +76,8 @@ function OperationPathHeader({
 
   return (
     <AccentBox backgroundColor="neutral" className={styles.meta}>
-      <HTTPMethod method={method} className={styles.method} />
-      <span className={styles.path}>
+      <span className={styles.route}>
+        <HTTPMethod method={method} className={styles.method} />
         <OperationPath path={path} />
       </span>
       <span className={styles.actions}>

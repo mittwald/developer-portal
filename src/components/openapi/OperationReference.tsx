@@ -145,14 +145,16 @@ function OperationResponseHeaderList({
   }
 
   return (
-    <>
-      <h4>{title}</h4>
-      <ul className={styles.parameterList}>
-        {Object.entries(headers).map(([name, header], idx: number) => (
-          <OperationResponseHeader key={idx} name={name} header={header} />
-        ))}
-      </ul>
-    </>
+    <LabeledValue>
+      <Label>{title}</Label>
+      <Content>
+        <ul className={styles.parameterList}>
+          {Object.entries(headers).map(([name, header], idx: number) => (
+            <OperationResponseHeader key={idx} name={name} header={header} />
+          ))}
+        </ul>
+      </Content>
+    </LabeledValue>
   );
 }
 
@@ -281,13 +283,11 @@ export function OperationRequest({
 
   if (spec.requestBody === undefined && parameters.length === 0) {
     return (
-      <>
-        <p>
-          <Translate id="openapi.operation.request.empty">
-            No request parameters.
-          </Translate>
-        </p>
-      </>
+      <Text>
+        <Translate id="openapi.operation.request.empty">
+          No request parameters.
+        </Translate>
+      </Text>
     );
   }
 
@@ -333,8 +333,9 @@ function OperationResponse({
 }: {
   response: OpenAPIV3.ResponseObject;
 }) {
+  // Headers and body spaced like the blocks of the body
   return (
-    <>
+    <div className={styles.responseBody}>
       <OperationResponseHeaderList
         title={translate({
           id: "openapi.operation.response.headers",
@@ -343,7 +344,7 @@ function OperationResponse({
         headers={response.headers as Record<string, OpenAPIV3.HeaderObject>}
       />
       <OperationResponseBody spec={response} />
-    </>
+    </div>
   );
 }
 

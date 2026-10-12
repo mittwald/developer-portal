@@ -5,7 +5,9 @@ import { Alert, Content, Heading, Text } from "@mittwald/flow-react-components";
 import HTTPMethod from "@site/src/components/openapi/HTTPMethod";
 import OperationPath from "@site/src/components/openapi/OperationPath";
 import { buildOperationUrl } from "@site/src/components/openapi/OperationLink";
+import { Deprecated } from "@site/src/components/openapi/RequiredOptional";
 import isDeprecated from "@site/src/openapi/isDeprecated";
+import operationSummary from "@site/src/openapi/operationSummary";
 import { APIVersion, getOperationById, useSpec } from "@site/src/openapi/specs";
 import styles from "./styles.module.css";
 
@@ -39,9 +41,8 @@ function OperationHintItem({
     );
   }
 
-  // Strip trailing dot from summary, it is used like a title
-  const summary =
-    operation.operation.summary?.replace(/\.$/, "") ?? operationId;
+  // The same title as in the sidebar and on the operation's page
+  const summary = operationSummary(apiVersion, operation.operation);
 
   return (
     <li className={styles.item}>
