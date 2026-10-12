@@ -42,9 +42,7 @@ export default function OperationLink({
   children = children || (
     <>
       <HTTPMethod method={operationSpec.method} className={styles.method} />
-      <span className={styles.path}>
-        <OperationPath path={operationSpec.path} />
-      </span>
+      <OperationPath path={operationSpec.path} />
     </>
   );
 

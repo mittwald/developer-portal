@@ -86,7 +86,6 @@ function ColorModeToggle({
   return (
     <div className={clsx(styles.toggle, className)}>
       <Button
-        className={styles.toggleButton}
         variant="plain"
         color="secondary"
         isDisabled={!isBrowser}

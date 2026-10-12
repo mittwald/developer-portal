@@ -91,8 +91,8 @@ function ServerURLSection() {
   return (
     <section
       style={{
-        padding: "2rem 0",
-        background: "var(--ifm-color-emphasis-100)",
+        padding: "var(--size-rem--xl) 0",
+        background: "var(--neutral--color--200)",
       }}
     >
       <div className={clsx("container", mcpStyles.urlContainer)}>

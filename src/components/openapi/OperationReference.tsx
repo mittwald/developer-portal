@@ -34,7 +34,7 @@ function OutlinedAccordion({
     <Accordion
       defaultExpanded={defaultExpanded}
       variant="outline"
-      style={{ marginBottom: "1em" }}
+      style={{ marginBottom: "var(--size-rem--m)" }}
     >
       {children}
     </Accordion>
@@ -118,7 +118,10 @@ function OperationParameterList({
         </span>
       </Heading>
       <Content>
-        <ul className={styles.parameterList} style={{ marginBottom: "1rem" }}>
+        <ul
+          className={styles.parameterList}
+          style={{ marginBottom: "var(--size-rem--m)" }}
+        >
           {params.map((param, idx) => (
             <OperationParameter key={idx} param={param} />
           ))}

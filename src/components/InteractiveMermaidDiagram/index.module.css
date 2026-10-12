@@ -1,8 +1,8 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  margin: 2rem 0;
+  gap: var(--size-rem--m);
+  margin: var(--size-rem--xl) 0;
 }
 
 .inlineView {
@@ -13,11 +13,12 @@
 .diagramWrapper {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  background-color: var(--mw-main-feature-background-color);
-  border: 1px solid var(--ifm-color-gray-300);
-  border-radius: var(--ifm-global-radius);
-  padding: 1rem;
+  gap: var(--size-rem--s);
+  background-color: var(--neutral--color--100);
+  border: var(--border-width--100) var(--border-style--default)
+    var(--separator--color);
+  border-radius: var(--corner-radius--m);
+  padding: var(--size-rem--m);
   overflow: hidden;
   min-height: 550px;
   max-width: 100%;
@@ -29,11 +30,12 @@
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  padding: 0.5rem;
+  gap: var(--size-rem--s);
+  padding: var(--size-rem--s);
   background-color: var(--neutral--color--200);
-  border-radius: var(--ifm-global-radius);
-  border: 1px solid var(--separator--color);
+  border-radius: var(--corner-radius--m);
+  border: var(--border-width--100) var(--border-style--default)
+    var(--separator--color);
   position: relative;
   z-index: 10;
   pointer-events: auto;
@@ -42,16 +44,16 @@
 .zoomControls {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--size-rem--s);
   pointer-events: auto;
 }
 
 .zoomLevel {
-  min-width: 3rem;
+  min-width: var(--size-rem--xl);
   text-align: center;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--ifm-color-content);
+  font-size: var(--font-size-text--s);
+  font-weight: var(--font-weight--normal);
+  color: var(--text--color--default);
   user-select: none;
   -webkit-user-select: none;
 }
@@ -100,11 +102,10 @@
 
 /* Hint text below diagram */
 .hint {
-  font-size: 0.75rem;
-  color: var(--ifm-color-content);
-  opacity: 0.7;
+  font-size: var(--font-size-text--s);
+  color: var(--neutral--color--800);
   text-align: center;
-  padding: 0.25rem 0;
+  padding: var(--size-rem--xs) 0;
   user-select: none;
   -webkit-user-select: none;
   pointer-events: none;
@@ -125,7 +126,7 @@
 /* Responsive adjustments for small tablets and large phones */
 @media screen and (max-width: 768px) {
   .diagramWrapper {
-    padding: 0.75rem;
+    padding: var(--size-rem--s);
     min-height: 400px;
   }
 
@@ -136,13 +137,13 @@
 
   .controls {
     flex-direction: row;
-    padding: 0.5rem;
+    padding: var(--size-rem--s);
   }
 
   .zoomControls {
     width: 100%;
     justify-content: center;
-    gap: 0.75rem;
+    gap: var(--size-rem--s);
   }
 }
 
@@ -150,7 +151,7 @@
 @media screen and (max-width: 480px) {
   .diagramWrapper {
     min-height: 300px;
-    padding: 0.5rem;
+    padding: var(--size-rem--s);
   }
 
   .diagram {
@@ -159,16 +160,15 @@
   }
 
   .controls {
-    padding: 0.5rem;
+    padding: var(--size-rem--s);
   }
 
   .zoomControls {
-    gap: 0.25rem;
+    gap: var(--size-rem--xs);
   }
 
   .zoomLevel {
-    min-width: 2.5rem;
-    font-size: 0.75rem;
+    min-width: var(--size-rem--xl);
   }
 
   .hint {

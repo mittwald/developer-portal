@@ -17,10 +17,6 @@ html[data-theme="dark"] {
   --ifm-color-primary: var(--primary--color--800);
   --ifm-color-primary-dark: var(--primary--color--900);
   --ifm-color-primary-darker: var(--primary--color--1000);
-  --ifm-color-primary-darkest: var(--primary--color--1100);
-  --ifm-color-primary-light: var(--primary--color--700);
-  --ifm-color-primary-lighter: var(--primary--color--600);
-  --ifm-color-primary-lightest: var(--primary--color--500);
   --ifm-color-info: var(--info--color--800);
   --ifm-color-info-dark: var(--info--color--900);
   --ifm-color-info-darker: var(--info--color--1000);
@@ -59,7 +55,6 @@ html[data-theme="dark"] {
   --ifm-table-head-background: transparent;
   --ifm-table-stripe-background: var(--neutral--color--200);
   --ifm-blockquote-border-color: var(--text--blockquote-border-color);
-  --ifm-card-background-color: var(--layout-card--background-color);
   --docusaurus-highlighted-code-line-bg: var(
     --neutral-soft-background-color--default
   );
@@ -91,7 +86,6 @@ html[data-theme="dark"] {
   --ifm-navbar-height: 72px;
   --ifm-navbar-link-color: var(--text--color--default);
   --ifm-navbar-link-hover-color: var(--link--color--hover);
-  --ifm-navbar-link-active-color: var(--link--color--default);
   --ifm-navbar-shadow: none;
 
   /* Footer */
@@ -108,7 +102,6 @@ html[data-theme="dark"] {
 
   /* Code */
   --ifm-code-background: var(--inline-code--background-color);
-  --ifm-code-color: var(--inline-code--content-color);
   --ifm-code-border-radius: var(--inline-code--corner-radius);
   --ifm-code-font-size: 0.875em;
   --ifm-code-padding-horizontal: var(--inline-code--padding-x);
@@ -119,7 +112,7 @@ html[data-theme="dark"] {
 
   /* Alerts */
   --ifm-alert-border-color: var(--ifm-color-info);
-  --ifm-alert-border-width: 1px;
+  --ifm-alert-border-width: var(--border-width--100);
   --ifm-alert-shadow: none;
 
   /* Typography */
@@ -136,13 +129,8 @@ html[data-theme="dark"] {
 
   /* Shapes and spacing */
   --ifm-global-radius: var(--corner-radius--m);
-  --ifm-card-border-radius: var(--corner-radius--l);
   --ifm-global-spacing: var(--size-rem--m);
   --ifm-button-size-multiplier: 1;
-
-  /* Portal specific */
-  --mw-main-background-color: var(--neutral--color--200);
-  --mw-main-feature-background-color: var(--neutral--color--100);
 }
 
 /* Hero on the landing pages, on the Flow gradient like flow.mittwald.de */
@@ -156,13 +144,8 @@ html[data-theme="dark"] {
   font-size: 60px;
 }
 
-.docPage_node_modules-\@docusaurus-theme-classic-lib-theme-DocPage-Layout-styles-module {
-  align-items: stretch;
-  flex: 1;
-}
-
 main.index {
-  background-color: var(--mw-main-background-color);
+  background-color: var(--neutral--color--200);
 }
 
 /* Space between sidebar and content. As padding of the main container (and
@@ -170,32 +153,8 @@ main.index {
    not overflow the viewport on the right. */
 @media (min-width: 997px) {
   main[class*="docMainContainer"] {
-    padding-left: var(--ifm-global-spacing);
+    padding-left: var(--size-rem--m);
   }
-}
-
-.card {
-  box-shadow: none !important;
-  padding: var(--ifm-global-spacing) !important;
-}
-
-.card:hover {
-  border-color: var(--separator--color) !important;
-  background: var(--ifm-hover-overlay);
-}
-
-.card h2 {
-  font-size: var(--font-size-heading--s);
-}
-
-.card p {
-  font-size: var(--font-size-text--m);
-  overflow: visible;
-  white-space: pre-wrap;
-}
-
-a.navbar__link {
-  font-weight: var(--font-weight--normal);
 }
 
 /* Sidebar: Docusaurus' structure and behavior, the look of the Flow
@@ -207,13 +166,13 @@ a.menu__link {
 
 /* On large screens the sidebar grows into the space that is left over next
    to the content container (max. --ifm-container-width-xl), so the content
-   never gets narrower. The 2rem cover the sidebar margin and a scrollbar.
+   never gets narrower. The extra space covers the sidebar margin and a scrollbar.
    Docusaurus defines the variable on :root in a CSS module loaded after this
    file, hence the doubled selector. */
 :root:root {
   --doc-sidebar-width: clamp(
     300px,
-    calc(100vw - var(--ifm-container-width-xl) - 2rem),
+    calc(100vw - var(--ifm-container-width-xl) - var(--size-rem--xl)),
     400px
   );
 }
@@ -259,7 +218,8 @@ a.menu__link--sublist.menu__link--active:not([aria-current="page"]):hover {
 .menu__link--sublist-caret::after,
 .menu__caret::before {
   background: currentColor;
-  mask: var(--ifm-menu-link-sublist-icon) center / 1.5rem 1.5rem no-repeat;
+  mask: var(--ifm-menu-link-sublist-icon) center / var(--size-rem--l)
+    var(--size-rem--l) no-repeat;
 }
 
 aside {
@@ -268,14 +228,6 @@ aside {
 
 .container h1 {
   --ifm-h1-font-size: var(--font-size-heading--l) !important;
-}
-
-article > header > h2 {
-  font-size: var(--font-size-heading--l) !important;
-}
-
-h1.title_node_modules-\@docusaurus-theme-classic-lib-theme-BlogPostItem-Header-Title-styles-module {
-  font-size: var(--ifm-h1-font-size);
 }
 
 code {
@@ -289,7 +241,7 @@ h1 code {
 }
 
 pre {
-  background: var(--ifm-pre-background);
+  background: var(--code-block--background-color);
 }
 
 /* Code blocks look like Flow's CodeBlock. Docusaurus reads the radius from
@@ -328,37 +280,26 @@ p a {
   text-underline-offset: 0.2em;
 }
 
-/** Required when a DocCardList is used in a markdown file */
-a.card {
-  text-decoration: none !important;
-}
-
 .markdown strong a {
   font-weight: var(--font-weight--bold);
-}
-
-.button {
-  font-weight: var(--font-weight--bold);
-  font-size: initial;
-}
-
-.button svg {
-  color: var(--ifm-button-color);
-}
-
-.button.button--secondary svg {
-  color: var(--ifm-color-gray-900);
 }
 
 /* Navbar */
 
 .navbar {
-  border-bottom: 1px solid var(--separator--color);
+  border-bottom: var(--border-width--100) var(--border-style--default)
+    var(--separator--color);
 }
 
 /* The mobile menu button (a Flow button) brings its own spacing */
 .navbar__toggle {
   margin-right: 0;
+}
+
+/* The mobile menu is a Flow off-canvas modal with its own backdrop
+   (Navbar/MobileSidebar) */
+.navbar-sidebar__backdrop {
+  display: none;
 }
 
 /* "Developer Portal" stacked below the mittwald logo */
@@ -377,12 +318,12 @@ a.card {
 }
 
 .navbar__brand:hover {
-  color: var(--ifm-navbar-link-color);
+  color: var(--text--color--default);
 }
 
 /* Logo and title are about the same width (≈130px) */
 .navbar__logo {
-  height: 1.5rem;
+  height: var(--size-rem--l);
   margin: 0;
 }
 
@@ -392,19 +333,11 @@ a.card {
   line-height: 1;
 }
 
-.navbar__link {
-  font-family: inherit;
-}
-
-
-.col.margin-bottom--lg {
-  margin-bottom: var(--ifm-global-spacing) !important;
-}
-
 /* Footer */
 
 .footer {
-  border-top: 1px solid var(--separator--color);
+  border-top: var(--border-width--100) var(--border-style--default)
+    var(--separator--color);
 }
 
 /* Infima drops the horizontal footer padding on small screens */
@@ -420,31 +353,13 @@ a.card {
   --ifm-link-hover-color: inherit;
   --ifm-link-decoration: inherit;
   background-color: inherit;
-  --ifm-alert-foreground-color: var(--ifm-color-content);
+  --ifm-alert-foreground-color: var(--text--color--default);
   --ifm-alert-background-color-highlight: var(--neutral--color--200) !important;
-}
-
-.alert svg {
-  height: 20px !important;
-  width: 20px !important;
 }
 
 .alert > :first-child {
   text-transform: none !important;
   font-weight: var(--font-weight--bold);
-}
-
-.alert--info {
-  --ifm-alert-border-color: var(--ifm-color-info);
-}
-
-.alert--info > :first-child {
-  color: var(--ifm-color-info-dark) !important;
-}
-
-.alert--info svg {
-  color: var(--ifm-color-info-dark) !important;
-  fill: var(--ifm-color-info-dark) !important;
 }
 
 .alert--warning {
@@ -453,11 +368,6 @@ a.card {
 
 .alert--warning > :first-child {
   color: var(--ifm-color-warning-dark) !important;
-}
-
-.alert--warning svg {
-  color: var(--ifm-color-warning-dark) !important;
-  fill: var(--ifm-color-warning-dark) !important;
 }
 
 /* Keep custom Flow admonitions visually intact, but prevent nested code blocks
@@ -478,8 +388,6 @@ a.card {
   overflow-x: auto;
 }
 
-/* dark mode. */
-
 @media screen and (max-width: 600px) {
   .hero__title {
     font-size: 40px;
@@ -488,7 +396,7 @@ a.card {
 
 /* Deprecated API operations in the sidebar */
 .api-operation-deprecated a {
-  color: var(--ifm-color-content-secondary);
+  color: var(--neutral--color--800);
 }
 
 /* Infima styles table rows by element (striping, top border) with a higher
@@ -508,7 +416,6 @@ table.flow--table {
   background-color: var(--table--background-color-accent);
 }
 
-.flow--inline-alert,
 .flow--alert {
   margin-bottom: var(--ifm-leading);
 }

@@ -128,14 +128,14 @@ export default function Home() {
           "The mittwald Developer Portal provides developers with the resources they need to integrate mittwald products into their own applications using our API.",
       })}
     >
-      <div className={styles.wrapper}>
+      <>
         <HomepageHeader />
         <main className={"index"}>
           <PlatformFeature />
           <APIFeature />
           <ContributionFeature />
         </main>
-      </div>
+      </>
     </Layout>
   );
 }

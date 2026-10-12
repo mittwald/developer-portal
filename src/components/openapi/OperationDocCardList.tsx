@@ -4,17 +4,13 @@ import {
   OperationWithMeta,
   useSpec,
 } from "@site/src/openapi/specs";
-import OperationDocCard from "@site/src/components/openapi/OperationDocCard";
-import { ColumnLayout } from "@mittwald/flow-react-components";
 import compareOperation from "@site/src/openapi/compareOperation";
 import { typedList } from "@mittwald/flow-react-components";
 import { Heading } from "@mittwald/flow-react-components";
 import { Text } from "@mittwald/flow-react-components";
 import HTTPMethod from "@site/src/components/openapi/HTTPMethod";
 import { Badge } from "@mittwald/flow-react-components";
-import OperationLink, {
-  buildOperationUrl,
-} from "@site/src/components/openapi/OperationLink";
+import { buildOperationUrl } from "@site/src/components/openapi/OperationLink";
 
 interface Props {
   apiVersion: APIVersion;

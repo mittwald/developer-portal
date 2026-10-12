@@ -79,13 +79,13 @@ export default function Home() {
       title="mittwald CLI"
       description={translate({ id: "cli.description" })}
     >
-      <div className={styles.wrapper}>
+      <>
         <CLIPageHeader />
         <main className={"index"}>
           <ScriptingFeature />
           <DevelopmentFeature />
         </main>
-      </div>
+      </>
     </Layout>
   );
 }

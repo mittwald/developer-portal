@@ -14,7 +14,7 @@
   /* Infima fixes the height to 2rem; let it follow the Flow field metrics */
   height: auto;
   color: var(--form-control--content-color--default);
-  transition: all 0.2s ease;
+  transition: all var(--transition--duration--fast) ease;
   min-width: 260px;
   width: 260px;
 }
@@ -75,16 +75,18 @@
 /* Autocomplete Suggestions Styling */
 .ds-suggestions {
   background-color: var(--neutral--color--100);
-  border: 1px solid var(--separator--color);
+  border: var(--border-width--100) var(--border-style--default)
+    var(--separator--color);
   border-radius: var(--corner-radius--m);
-  box-shadow: 0 4px 12px var(--shadow--overlay);
+  box-shadow: var(--shadow--overlay);
   overflow: hidden;
   max-height: 70vh;
   overflow-y: auto;
 }
 
 .ds-suggestion {
-  border-bottom: 1px solid var(--separator--color);
+  border-bottom: var(--border-width--100) var(--border-style--default)
+    var(--separator--color);
 }
 
 .ds-suggestion:last-child {
@@ -93,26 +95,26 @@
 
 .ds-suggestion a {
   display: block;
-  padding: var(--ifm-global-spacing);
-  color: var(--ifm-color-content);
+  padding: var(--size-rem--m);
+  color: var(--text--color--default);
   text-decoration: none;
-  transition: background-color 0.2s ease;
+  transition: background-color var(--transition--duration--fast) ease;
 }
 
 .ds-suggestion a:hover,
 .ds-suggestion.ds-cursor a {
-  background-color: var(--ifm-hover-overlay);
+  background-color: var(--neutral--color--200);
 }
 
 /* Category Header */
 .algolia-docsearch-suggestion--category-header {
   background-color: var(--neutral--color--100) !important;
-  margin-bottom: 8px;
+  margin-bottom: var(--size-rem--s);
 }
 
 .algolia-docsearch-suggestion--category-header-lvl0 {
   font-weight: var(--font-weight--bold);
-  font-size: 12px;
+  font-size: var(--font-size-text--s);
   color: var(--heading--color);
   text-transform: none !important;
   letter-spacing: 0 !important;
@@ -132,15 +134,15 @@
 .algolia-docsearch-suggestion--title {
   font-weight: var(--font-weight--bold);
   font-size: var(--font-size-text--s);
-  color: var(--ifm-color-content);
-  margin-bottom: 4px;
+  color: var(--text--color--default);
+  margin-bottom: var(--size-rem--xs);
 }
 
 /* Description Text */
 .algolia-docsearch-suggestion--text {
-  font-size: 13px;
-  color: var(--ifm-color-content-secondary);
-  margin-top: 4px;
+  font-size: var(--font-size-text--s);
+  color: var(--neutral--color--800);
+  margin-top: var(--size-rem--xs);
 }
 
 /* Version Badge */
@@ -157,9 +159,10 @@
 
 /* Footer */
 .algolia-docsearch-footer {
-  padding: 8px var(--ifm-global-spacing);
+  padding: var(--size-rem--s) var(--size-rem--m);
   background-color: var(--neutral--color--200);
-  border-top: 1px solid var(--separator--color);
-  font-size: 11px;
-  color: var(--ifm-color-content-secondary);
+  border-top: var(--border-width--100) var(--border-style--default)
+    var(--separator--color);
+  font-size: var(--font-size-text--s);
+  color: var(--neutral--color--800);
 }

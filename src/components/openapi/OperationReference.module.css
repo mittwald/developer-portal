@@ -19,14 +19,15 @@
 .parameterList {
   padding: 0;
   list-style-type: none;
-  font-size: 14px;
+  font-size: var(--font-size-text--s);
 }
 
 .parameterList li {
-  border-left: 1px solid var(--ifm-color-gray-300);
+  border-left: var(--border-width--100) var(--border-style--default)
+    var(--separator--color);
   position: relative;
-  padding-left: 1rem;
-  padding-bottom: 0.5rem;
+  padding-left: var(--size-rem--m);
+  padding-bottom: var(--size-rem--s);
   margin-top: 0 !important;
   overflow: auto;
 }
@@ -47,21 +48,23 @@
   margin-top: var(--size-rem--s);
 }
 
+/* Connector from the vertical line to the row; ends just before the name */
 .parameterList li:before {
   content: "";
   position: absolute;
   left: 0;
-  top: 5px;
-  border-bottom: thin solid var(--ifm-color-gray-300);
+  top: var(--size-px--xs);
+  border-bottom: var(--border-width--100) var(--border-style--default)
+    var(--separator--color);
   display: inline-block;
-  height: 0.5rem;
-  width: 0.7rem;
+  height: var(--size-rem--s);
+  width: calc(var(--size-rem--m) - var(--size-rem--xs));
   vertical-align: top;
 }
 
 .parameterExample {
-  color: var(--ifm-color-gray-600);
+  color: var(--neutral--color--800);
   text-transform: uppercase;
-  font-weight: bold;
+  font-weight: var(--font-weight--bold);
   vertical-align: baseline;
 }

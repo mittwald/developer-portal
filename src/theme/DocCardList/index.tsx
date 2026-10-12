@@ -17,7 +17,6 @@ import {
   AccentBox,
   ColumnLayout,
   Heading,
-  Icon,
   Link,
   Section,
   Text,
