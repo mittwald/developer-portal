@@ -3,7 +3,11 @@ import clsx from "clsx";
 import { useLocation } from "@docusaurus/router";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import { translate } from "@docusaurus/Translate";
-import { useColorMode, useThemeConfig } from "@docusaurus/theme-common";
+import {
+  useColorMode,
+  useThemeConfig,
+  type ColorMode,
+} from "@docusaurus/theme-common";
 import NavbarItem, { type Props as NavbarItemProps } from "@theme/NavbarItem";
 import {
   Button,
@@ -93,26 +97,54 @@ function LocaleSwitch() {
   );
 }
 
+function getNextColorMode(colorMode: ColorMode | null): ColorMode | null {
+  switch (colorMode) {
+    case null:
+      return "light";
+    case "light":
+      return "dark";
+    case "dark":
+      return null;
+  }
+}
+
+function getColorModeLabel(colorMode: ColorMode | null): string {
+  switch (colorMode) {
+    case null:
+      return translate({
+        message: "system mode",
+        id: "theme.colorToggle.ariaLabel.mode.system",
+        description: "The name for the system color mode",
+      });
+    case "light":
+      return translate({
+        message: "light mode",
+        id: "theme.colorToggle.ariaLabel.mode.light",
+        description: "The name for the light color mode",
+      });
+    case "dark":
+      return translate({
+        message: "dark mode",
+        id: "theme.colorToggle.ariaLabel.mode.dark",
+        description: "The name for the dark color mode",
+      });
+  }
+}
+
 function ColorModeButton() {
-  const { colorMode, setColorMode } = useColorMode();
+  const { colorModeChoice, setColorMode } = useColorMode();
   const { disableSwitch } = useThemeConfig().colorMode;
   if (disableSwitch) {
     return null;
   }
 
-  const label = translate({
-    message: "Switch between dark and light mode (currently {mode})",
-    id: "theme.colorToggle.ariaLabel",
-    description: "The ARIA label for the color mode toggle",
-  }).replace(
-    "{mode}",
-    translate({
-      message: colorMode === "dark" ? "dark mode" : "light mode",
-      id:
-        colorMode === "dark"
-          ? "theme.colorToggle.ariaLabel.mode.dark"
-          : "theme.colorToggle.ariaLabel.mode.light",
-    }),
+  const label = translate(
+    {
+      message: "Switch between system, light and dark mode (currently {mode})",
+      id: "theme.colorToggle.ariaLabel",
+      description: "The ARIA label for the color mode toggle",
+    },
+    { mode: getColorModeLabel(colorModeChoice) },
   );
 
   // All three icons are rendered; "data-theme-choice" on <html> picks the
@@ -120,7 +152,7 @@ function ColorModeButton() {
   return (
     <Button
       aria-label={label}
-      onPress={() => setColorMode(colorMode === "dark" ? "light" : "dark")}
+      onPress={() => setColorMode(getNextColorMode(colorModeChoice))}
     >
       <Icon
         className={clsx(toggleStyles.toggleIcon, toggleStyles.lightToggleIcon)}

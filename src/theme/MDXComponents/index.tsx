@@ -54,16 +54,6 @@ import styles from "./styles.module.css";
 
 type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
-/** Compact heading sizes like on flow.mittwald.de; sections carry the structure */
-const headingSizes = {
-  1: "l",
-  2: "s",
-  3: "xs",
-  4: "xs",
-  5: "xs",
-  6: "xs",
-} as const;
-
 /** Flow heading that keeps Docusaurus' anchor id and hash link */
 /**
  * Headings that consist of inline code only (e.g. CLI command names) are
@@ -98,11 +88,7 @@ function MDXHeading({
   // H1 headings do not need an id because they don't appear in the TOC
   if (level === 1 || !id) {
     return (
-      <Heading
-        level={level}
-        size={headingSizes[level]}
-        className={clsx(styles.heading, className)}
-      >
+      <Heading level={level} className={clsx(styles.heading, className)}>
         {children}
       </Heading>
     );
@@ -122,7 +108,6 @@ function MDXHeading({
   return (
     <Heading
       level={level}
-      size={headingSizes[level]}
       id={id}
       className={clsx(
         "anchor",
@@ -147,7 +132,7 @@ function MDXHeading({
 
 function MDXParagraph(props: ComponentProps<"p">) {
   return (
-    <Text elementType="p" className={clsx(styles.paragraph, props.className)}>
+    <Text elementType="p" className={props.className}>
       {props.children}
     </Text>
   );
@@ -243,7 +228,11 @@ function MDXListItem(props: ComponentProps<"li">) {
     const children = replaceLeadingEmojiIcon(props.children, (icon) => (
       <span className={styles.leadingStatusIcon}>{icon}</span>
     ));
-    return <MDXLi {...props}>{children ?? props.children}</MDXLi>;
+    return (
+      <MDXLi {...props} className={clsx(props.className, styles.listItem)}>
+        {children ?? props.children}
+      </MDXLi>
+    );
   }
 
   const split = splitLeadingEmojiIcon(props.children);

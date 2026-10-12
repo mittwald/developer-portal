@@ -216,6 +216,9 @@ This documentation covers:
   ],
 
   themeConfig: {
+    colorMode: {
+      respectPrefersColorScheme: true,
+    },
     navbar: {
       // style: 'primary',
       title: "Developer Portal",

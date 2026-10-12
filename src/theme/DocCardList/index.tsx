@@ -43,13 +43,12 @@ interface CardProps {
   description?: string;
 }
 
-function Card({ href, icon, title, description }: CardProps) {
+function Card({ href, title, description }: CardProps) {
   return (
     <Link href={href} className={styles.link}>
       <AccentBox backgroundColor="neutral" className={styles.card}>
         <Section>
           <Heading level={2} size="s">
-            <Icon color="var(--icon--color)">{icon}</Icon>
             {title}
           </Heading>
           {description && (

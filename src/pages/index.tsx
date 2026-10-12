@@ -1,6 +1,9 @@
 import React, { type ReactNode } from "react";
 import clsx from "clsx";
+import Translate, { translate } from "@docusaurus/Translate";
+import useBaseUrl from "@docusaurus/useBaseUrl";
 import Layout from "@theme/Layout";
+import ThemedImage from "@theme/ThemedImage";
 import {
   AccentBox,
   ColumnLayout,
@@ -12,11 +15,11 @@ import {
 } from "@mittwald/flow-react-components";
 import { IconPlugConnected, IconRobot, IconRocket } from "@tabler/icons-react";
 
-import styles from "./index.module.css";
-import Translate, { translate } from "@docusaurus/Translate";
 import APIFeature from "@site/src/components/HomepageFeatures/APIFeature";
-import PlatformFeature from "@site/src/components/HomepageFeatures/PlatformFeature";
 import ContributionFeature from "@site/src/components/HomepageFeatures/ContributionFeature";
+import PlatformFeature from "@site/src/components/HomepageFeatures/PlatformFeature";
+
+import styles from "./index.module.css";
 
 /** An entry point in the hero: a linked accent box with an illustrated message */
 function HeroEntry({
@@ -35,9 +38,7 @@ function HeroEntry({
       <AccentBox backgroundColor="neutral" className={styles.entryBox}>
         <IllustratedMessage>
           <Icon>{icon}</Icon>
-          <Heading level={2} size="s">
-            {title}
-          </Heading>
+          <Heading level={2}>{title}</Heading>
           <Text>{description}</Text>
           {/* Looks like a link for those who don't expect the whole box to
               be one; a real link inside the linked box would be invalid */}
@@ -51,11 +52,19 @@ function HeroEntry({
 }
 
 function HomepageHeader() {
+  const lightLogo = useBaseUrl("/img/mittwald-logo-dark.svg");
+  const darkLogo = useBaseUrl("/img/mittwald-logo.svg");
+
   return (
     <header className={clsx("hero hero--primary", styles.heroBanner)}>
       <div className="container">
-        <h1 className="hero__title">
-          <Translate id={"index.title"}>mittwald Developer Portal</Translate>
+        <h1 className={clsx("hero__title", styles.heroTitle)}>
+          <ThemedImage
+            className={styles.heroLogo}
+            sources={{ light: lightLogo, dark: darkLogo }}
+            alt="mittwald"
+          />
+          <Translate id={"index.title"}>Developer Portal</Translate>
         </h1>
         <ColumnLayout
           s={[1]}

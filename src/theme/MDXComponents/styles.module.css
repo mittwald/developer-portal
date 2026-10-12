@@ -24,7 +24,6 @@
   font-size: 0.9em;
 }
 
-.paragraph,
 .list,
 .table,
 .blockquote {
@@ -33,7 +32,6 @@
 }
 
 /* No trailing space at the end of a container (admonition, list item, …) */
-.paragraph:last-child,
 .list:last-child,
 .table:last-child,
 .blockquote:last-child {
@@ -79,6 +77,15 @@ ul.iconList > li::before {
 /* Lists nested in list items keep their tighter spacing */
 li > .list {
   margin-bottom: 0;
+}
+
+/* Keep native list markers while spacing block children like a Flow section */
+.list .listItem > p {
+  margin-block: 0;
+}
+
+.list .listItem > * + * {
+  margin-top: var(--section--spacing);
 }
 
 /* Within a Flow section the gap spaces the blocks, and Flow spaces the

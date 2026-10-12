@@ -5,11 +5,7 @@ import { translate } from "@docusaurus/Translate";
 import type { Props } from "@theme/ColorModeToggle";
 import type { ColorMode } from "@docusaurus/theme-common";
 import { Button, Icon } from "@mittwald/flow-react-components";
-import {
-  IconDeviceDesktop,
-  IconMoon,
-  IconSun,
-} from "@tabler/icons-react";
+import { IconDeviceDesktop, IconMoon, IconSun } from "@tabler/icons-react";
 import styles from "./styles.module.css";
 
 /**
@@ -67,7 +63,7 @@ function getColorModeLabel(colorMode: ColorMode | null): string {
 function getColorModeAriaLabel(colorMode: ColorMode | null) {
   return translate(
     {
-      message: "Switch between dark and light mode (currently {mode})",
+      message: "Switch between system, light and dark mode (currently {mode})",
       id: "theme.colorToggle.ariaLabel",
       description: "The ARIA label for the color mode toggle",
     },
