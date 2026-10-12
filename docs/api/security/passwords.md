@@ -5,8 +5,6 @@ Various API calls enforce password policies. This document serves as a reference
 <!--
 NOTE: This document is linked from various places with in the API reference.
 DO NOT change the document ID or the header IDs
-(This comment is placed below the first paragraph, which Docusaurus uses as
-page description.)
 -->
 
 ## MySQL user passwords {#mysql}

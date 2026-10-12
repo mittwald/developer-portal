@@ -5,8 +5,6 @@ Verschiedene API-Aufrufe erzwingen bestimmte Passwortrichtlinien. Dieses Dokumen
 <!--
 NOTE: This document is linked from various places with in the API reference.
 DO NOT change the document ID or the header IDs
-(This comment is placed below the first paragraph, which Docusaurus uses as
-page description.)
 -->
 
 ## MySQL-Benutzerpasswörter {#mysql}
