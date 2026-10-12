@@ -14,7 +14,7 @@ test.describe('Dark mode regression - Flow theme sync', () => {
     // The toggle is a Flow button (swizzled ColorModeToggle); its aria-label
     // is the stable hook
     const themeToggle = page
-      .locator('.navbar button[aria-label*="dark and light mode"]')
+      .locator('.navbar button[aria-label*="light and dark mode"]')
       .first();
 
     await expect(themeToggle).toBeVisible();
@@ -39,7 +39,14 @@ test.describe('Dark mode regression - Flow theme sync', () => {
       return { theme, signatures };
     });
 
-    await themeToggle.click();
+    // The toggle cycles through system, light and dark mode; from system mode
+    // the next mode can be the theme already shown, so click until it changes
+    const currentTheme = () =>
+      page.evaluate(() => document.documentElement.getAttribute('data-theme'));
+
+    for (let i = 0; i < 3 && (await currentTheme()) === before.theme; i++) {
+      await themeToggle.click();
+    }
 
     await page.waitForFunction(
       (initialTheme) =>
