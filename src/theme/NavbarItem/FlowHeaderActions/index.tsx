@@ -8,7 +8,6 @@ import {
   useThemeConfig,
   type ColorMode,
 } from "@docusaurus/theme-common";
-import NavbarItem, { type Props as NavbarItemProps } from "@theme/NavbarItem";
 import {
   Button,
   ClearPropsContext,
@@ -32,8 +31,8 @@ import styles from "./styles.module.css";
 /**
  * Navbar item type `custom-flowHeaderActions`: the right part of the header as
  * a Flow header navigation with external links (`items`), the language switch
- * and the color mode toggle. In Docusaurus' mobile sidebar the regular link
- * and locale items are rendered (the toggle sits in the sidebar header).
+ * and the color mode toggle. The actions are always in the header, so they
+ * are not repeated in Docusaurus' mobile sidebar.
  */
 
 interface LinkConfig {
@@ -174,22 +173,9 @@ function ColorModeButton() {
 }
 
 export default function FlowHeaderActions({ items, mobile }: Props): ReactNode {
+  // The actions stay in the header on small screens as well
   if (mobile) {
-    return (
-      <>
-        {items.map((item) => (
-          <NavbarItem key={item.label} {...(item as NavbarItemProps)} mobile />
-        ))}
-        {/* The theme config validation only adds these defaults to items
-            from the config, so they have to be passed explicitly here */}
-        <NavbarItem
-          type="localeDropdown"
-          dropdownItemsBefore={[]}
-          dropdownItemsAfter={[]}
-          mobile
-        />
-      </>
-    );
+    return null;
   }
 
   return (
