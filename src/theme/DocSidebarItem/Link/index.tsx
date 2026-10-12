@@ -7,12 +7,14 @@ import isInternalUrl from "@docusaurus/isInternalUrl";
 import type { Props } from "@theme/DocSidebarItem/Link";
 import { Icon, IconExternalLink } from "@mittwald/flow-react-components";
 import HTTPMethod from "@site/src/components/openapi/HTTPMethod";
+import { Deprecated } from "@site/src/components/openapi/RequiredOptional";
 import styles from "./styles.module.css";
 
 /**
  * Sidebar link; API operations (class `api-operation-<method>`, set by the
  * reference generator) get their HTTP method as Flow badge at the end, like
- * badges in a Flow navigation; external links show Flow's external link
+ * badges in a Flow navigation; deprecated operations (class
+ * `api-operation-deprecated`) get a deprecated alert badge instead; external links show Flow's external link
  * icon. Ejected from @docusaurus/theme-classic.
  */
 
@@ -36,6 +38,7 @@ export default function DocSidebarItemLink({
   const isActive = isActiveSidebarItem(item, activePath);
   const isInternalLink = isInternalUrl(href);
   const method = apiOperationMethod(className);
+  const deprecated = /\bapi-operation-deprecated\b/.test(className ?? "");
 
   return (
     <li
@@ -65,9 +68,12 @@ export default function DocSidebarItemLink({
         {...props}
       >
         <LinkLabel label={label} />
-        {/* Deprecated operations keep their method color (only the label is
-            greyed out) */}
-        {method && <HTTPMethod className={styles.badge} method={method} />}
+        {method &&
+          (deprecated ? (
+            <Deprecated className={styles.badge} />
+          ) : (
+            <HTTPMethod className={styles.badge} method={method} />
+          ))}
         {!isInternalLink && (
           <Icon size="s" className={styles.externalIcon}>
             <IconExternalLink />

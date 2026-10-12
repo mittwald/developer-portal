@@ -10,7 +10,7 @@ import {
 import Schema from "@site/src/components/openapi/Schema";
 import Description from "@site/src/components/openapi/Description";
 import React from "react";
-import clsx from "clsx";
+import Translate from "@docusaurus/Translate";
 
 export function AlternativeValue({
   schema,
@@ -84,7 +84,7 @@ export function PropertyValue({
     schema.oneOf;
 
   return (
-    <li key={name} className={clsx(deprecated && styles.deprecated)}>
+    <li key={name}>
       <div className={styles.parameterListHeader}>
         <span className={styles.parameterName}>{name}</span>
         <Type className={styles.parameterType} schema={schema} />

@@ -46,13 +46,22 @@ function OperationIdHelp() {
   );
 }
 
-function DeprecationNotice() {
+/**
+ * Warning for deprecated operations; a description that explains the
+ * deprecation itself (and usually names the alternative) replaces the
+ * generic text
+ */
+function DeprecationNotice({ description }: { description?: string }) {
   return (
-    <Admonition type="warning">
-      <Translate id="openapi.operation.metadata.deprecationnotice.text">
-        This operation is deprecated and should not be used anymore. Please
-        refer to this operation's description for alternatives.
-      </Translate>
+    <Admonition type="warning" title="Deprecated">
+      {description ? (
+        <Description>{description}</Description>
+      ) : (
+        <Translate id="openapi.operation.metadata.deprecationnotice.text">
+          This operation is deprecated and should not be used anymore. Please
+          refer to this operation's description for alternatives.
+        </Translate>
+      )}
     </Admonition>
   );
 }
@@ -105,6 +114,10 @@ export function OperationMetadata({
   baseURL: string;
   withDescription?: boolean;
 }) {
+  // A description about the deprecation is shown in the warning only
+  const descriptionIsNotice =
+    isDeprecated(spec) && /deprecat/i.test(spec.description ?? "");
+
   return (
     <>
       <OperationPathHeader
@@ -114,7 +127,11 @@ export function OperationMetadata({
         spec={spec}
       />
 
-      {isDeprecated(spec) && <DeprecationNotice />}
+      {isDeprecated(spec) && (
+        <DeprecationNotice
+          description={descriptionIsNotice ? spec.description : undefined}
+        />
+      )}
 
       <ColumnLayout m={[1, 1, 2]}>
         <LabeledValue>
@@ -136,7 +153,7 @@ export function OperationMetadata({
           <CopyButton text={spec.operationId} />
         </LabeledValue>
       </ColumnLayout>
-      {spec.description && withDescription ? (
+      {spec.description && withDescription && !descriptionIsNotice ? (
         <>
           {/* Without a description, the next section's separator follows */}
           <Separator />

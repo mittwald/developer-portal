@@ -47,14 +47,13 @@ function OperationHintItem({
   return (
     <li className={styles.item}>
       <span className={styles.route}>
-        <HTTPMethod
-          method={operation.method}
-          deprecated={isDeprecated(operation.operation)}
-          className={styles.method}
-        />
+        <HTTPMethod method={operation.method} className={styles.method} />
         <MDXLink href={buildOperationUrl(apiVersion, operation.operation)}>
           <OperationPath path={operation.path} />
         </MDXLink>
+        {isDeprecated(operation.operation) && (
+          <Deprecated className={styles.method} />
+        )}
       </span>
       <Text className={styles.summary}>{summary}</Text>
     </li>

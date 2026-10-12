@@ -8,6 +8,7 @@ import {
 import Translate from "@docusaurus/Translate";
 import React from "react";
 import { OpenAPIV3 } from "openapi-types";
+import { Deprecated } from "@site/src/components/openapi/RequiredOptional";
 import ParameterObject = OpenAPIV3.ParameterObject;
 
 export interface QueryParametersSectionProps {
@@ -49,7 +50,7 @@ function QueryParametersSection({
         >
           <Label>
             {param.name}
-            {param.deprecated ? " (deprecated)" : ""}
+            {param.deprecated && <Deprecated />}
           </Label>
           {param.description ? (
             <FieldDescription>{param.description}</FieldDescription>

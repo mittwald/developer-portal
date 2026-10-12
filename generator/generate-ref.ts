@@ -4,6 +4,7 @@ import { OpenAPIV3 } from "openapi-types";
 import * as url from "url";
 import * as yaml from "yaml";
 import compareOperation from "../src/openapi/compareOperation";
+import isDeprecated from "../src/openapi/isDeprecated";
 import * as ejs from "ejs";
 import {
   AI_OVERLAY_NAME,
@@ -275,8 +276,9 @@ class APIDocRenderer {
               operation.operationId + ".mdx",
             );
 
+            const deprecated = isDeprecated(operation);
             const classNames = [`api-operation-${method}`];
-            if (operation.deprecated) {
+            if (deprecated) {
               classNames.push("api-operation-deprecated");
             }
 
@@ -287,7 +289,7 @@ class APIDocRenderer {
               customProps: {
                 method,
                 path: urlPath,
-                deprecated: operation.deprecated,
+                deprecated,
                 summary,
               },
             });
