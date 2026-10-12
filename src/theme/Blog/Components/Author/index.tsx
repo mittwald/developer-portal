@@ -39,7 +39,7 @@ export default function BlogAuthor({
           )}
         </Avatar>
         {(name || title) && (
-          <Text>
+          <Text elementType="div">
             {displayName && link ? (
               <Link href={link} className={styles.name}>
                 {displayName}
@@ -53,12 +53,13 @@ export default function BlogAuthor({
                 <Badge>{count}</Badge>
               </>
             )}
-            {/* Combine stacks name and title, as in Flow's example */}
+            {/* Combine stacks name, title and social links, as in Flow's
+                example */}
             {title}
+            <AuthorSocials author={author} />
           </Text>
         )}
       </Combine>
-      <AuthorSocials author={author} />
     </div>
   );
 }
