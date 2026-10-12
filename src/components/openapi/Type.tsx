@@ -1,5 +1,13 @@
 import { OpenAPIV3 } from "openapi-types";
 import React from "react";
+import { translate } from "@docusaurus/Translate";
+
+function characters(count: number): string {
+  return translate(
+    { id: "openapi.schema.characters", message: "{count} characters" },
+    { count },
+  );
+}
 
 function Type({
   schema,
@@ -20,7 +28,13 @@ function Type({
   if (schema.oneOf !== undefined) {
     return (
       <span className={className}>
-        {`one of ${schema.oneOf.length} alternatives`}
+        {translate(
+          {
+            id: "openapi.schema.oneof",
+            message: "one of {count} alternatives",
+          },
+          { count: schema.oneOf.length },
+        )}
       </span>
     );
   }
@@ -31,11 +45,11 @@ function Type({
   }
 
   if (schema.minLength !== undefined) {
-    addendums.push(`≥ ${schema.minLength} characters`);
+    addendums.push(`≥ ${characters(schema.minLength)}`);
   }
 
   if (schema.maxLength !== undefined) {
-    addendums.push(`≤ ${schema.maxLength} characters`);
+    addendums.push(`≤ ${characters(schema.maxLength)}`);
   }
 
   if (schema.format !== undefined) {
@@ -46,7 +60,12 @@ function Type({
     if (schema.enum.length === 1 && typeof schema.enum[0] === "string") {
       return <span className={className}>{`"${schema.enum[0]}"`}</span>;
     }
-    addendums.push(`one of: ${schema.enum.join(", ")}`);
+    addendums.push(
+      translate(
+        { id: "openapi.schema.enum", message: "one of: {values}" },
+        { values: schema.enum.join(", ") },
+      ),
+    );
   }
 
   if (addendums.length > 0) {

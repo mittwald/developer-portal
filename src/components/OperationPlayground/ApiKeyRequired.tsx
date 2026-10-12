@@ -43,7 +43,7 @@ function ApiKeyRequired({
           <IconKey />
           <Heading>
             <Translate id="playground.apikey.required.title">
-              API Key Required
+              API key required
             </Translate>
           </Heading>
           <Text>
@@ -59,7 +59,7 @@ function ApiKeyRequired({
             onSubmit={onSubmit}
           >
             <Button color="accent">
-              <Translate id="playground.apikey.add">Add API Key</Translate>
+              <Translate id="playground.apikey.add">Add API key</Translate>
             </Button>
           </ApiKeyForm>
         </IllustratedMessage>

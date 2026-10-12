@@ -55,7 +55,7 @@ function MCPPageHeader() {
           href="/docs/v2/agentic-integration/mcp/getting-connected"
           icon={<IconRocket />}
           title={
-            <Translate id="mcp.cta.firstWorkflow">Run First Workflow</Translate>
+            <Translate id="mcp.cta.firstWorkflow">Run first workflow</Translate>
           }
           description={
             <Translate id="mcp.cta.firstWorkflow.description">
@@ -143,7 +143,7 @@ function OverviewFeature() {
           </Icon>
           <Heading level={2} size="l">
             <Translate id="mcp.overview.agentFirst.title">
-              Agent-First Infrastructure
+              Agent-first infrastructure
             </Translate>
           </Heading>
           <Text>
@@ -159,7 +159,7 @@ function OverviewFeature() {
       <FeatureCard>
         <Heading level={3}>
           <Translate id="mcp.overview.toolset.title">
-            Comprehensive Toolset
+            Comprehensive toolset
           </Translate>
         </Heading>
         <Text elementType="p">
@@ -196,7 +196,7 @@ function OverviewFeature() {
       <FeatureCard>
         <Heading level={3}>
           <Translate id="mcp.overview.auth.title">
-            Flexible Authentication
+            Flexible authentication
           </Translate>
         </Heading>
         <Text elementType="p">
@@ -243,7 +243,7 @@ function GettingStartedFeature() {
             <IconPlugConnected />
           </Icon>
           <Heading level={2} size="l">
-            <Translate id="mcp.getStarted.title">Get Started</Translate>
+            <Translate id="mcp.getStarted.title">Get started</Translate>
           </Heading>
           <Text>
             <Translate id="mcp.getStarted.body">
@@ -257,7 +257,7 @@ function GettingStartedFeature() {
       <FeatureCard>
         <Heading level={3}>
           <Translate id="mcp.getStarted.connect.title">
-            Connect Your Assistant
+            Connect your assistant
           </Translate>
         </Heading>
         <Text elementType="p">
@@ -293,7 +293,7 @@ function GettingStartedFeature() {
       <FeatureCard>
         <Heading level={3}>
           <Translate id="mcp.getStarted.learn.title">
-            Learn the Pattern
+            Learn the pattern
           </Translate>
         </Heading>
         <Text elementType="p">
@@ -318,7 +318,7 @@ function GettingStartedFeature() {
             <li>
               <FlowLink href="/docs/v2/agentic-integration/mcp/how-to">
                 <Translate id="mcp.getStarted.learn.howto">
-                  How-To Playbooks
+                  How-to playbooks
                 </Translate>
               </FlowLink>{" "}
               —{" "}
@@ -354,7 +354,7 @@ function WorkflowFeature() {
             <IconListCheck />
           </Icon>
           <Heading level={2} size="l">
-            <Translate id="mcp.workflow.title">How It Works</Translate>
+            <Translate id="mcp.workflow.title">How it works</Translate>
           </Heading>
           <Text>
             <Translate id="mcp.workflow.body">
@@ -369,7 +369,7 @@ function WorkflowFeature() {
       <FeatureCard>
         <Heading level={3}>
           <Translate id="mcp.workflow.steps.title">
-            The Agent Workflow
+            The agent workflow
           </Translate>
         </Heading>
         <Text elementType="div">
@@ -444,7 +444,7 @@ function TutorialsFeature() {
             <IconUsers />
           </Icon>
           <Heading level={2} size="l">
-            <Translate id="mcp.tutorials.title">Tutorials by Team</Translate>
+            <Translate id="mcp.tutorials.title">Tutorials by team</Translate>
           </Heading>
           <Text>
             <Translate id="mcp.tutorials.body">
@@ -465,7 +465,7 @@ function TutorialsFeature() {
       <FeatureCard>
         <Heading level={3}>
           <Translate id="mcp.tutorials.freelancers.title">
-            Freelancers & Agencies
+            Freelancers & agencies
           </Translate>
         </Heading>
         <Text elementType="div">
@@ -496,7 +496,7 @@ function TutorialsFeature() {
       <FeatureCard>
         <Heading level={3}>
           <Translate id="mcp.tutorials.devops.title">
-            E-Commerce & DevOps
+            E-commerce & DevOps
           </Translate>
         </Heading>
         <Text elementType="div">

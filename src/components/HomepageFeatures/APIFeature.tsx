@@ -121,7 +121,7 @@ function APILibraries() {
   return (
     <FeatureCard>
       <Heading level={3}>
-        <Translate id="index.sdks.title">SDKs and Libraries</Translate>
+        <Translate id="index.sdks.title">SDKs and libraries</Translate>
       </Heading>
       <Text elementType="p">
         <Translate id={"index.sdks.body"}>

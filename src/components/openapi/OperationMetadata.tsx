@@ -135,18 +135,27 @@ export function OperationMetadata({
 
       <ColumnLayout m={[1, 1, 2]}>
         <LabeledValue>
-          <Label>API version</Label>
+          <Label>
+            <Translate id="openapi.metadata.apiversion">API version</Translate>
+          </Label>
           <Content>
             {path.split("/").filter((p) => p.startsWith("v"))[0]}
           </Content>
         </LabeledValue>
         <LabeledValue>
-          <Label>Request method</Label>
+          <Label>
+            <Translate id="openapi.operation.metadata.requestmethod">
+              Request method
+            </Translate>
+          </Label>
           <Content>{method.toUpperCase()}</Content>
         </LabeledValue>
         <LabeledValue>
           <Label className={styles.labelWithHelp}>
-            Operation ID <OperationIdHelp />
+            <Translate id="openapi.operation.metadata.operationid">
+              Operation ID
+            </Translate>{" "}
+            <OperationIdHelp />
           </Label>
           <Content>{spec.operationId}</Content>
           {/* Placed next to the value by the labeled value */}

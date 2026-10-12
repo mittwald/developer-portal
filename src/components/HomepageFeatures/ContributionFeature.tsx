@@ -116,7 +116,7 @@ function ToolsFeature() {
       </Text>
       <Heading level={4}>
         <Translate id="index.contribution.tools.community-title">
-          Community Contributions
+          Community contributions
         </Translate>
       </Heading>
       <Text elementType="div">

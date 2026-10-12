@@ -131,7 +131,7 @@ function PlatformTools() {
     <FeatureCard>
       <Heading level={3}>
         <Translate id="index.deploy.tools.title">
-          Tooling and Integration
+          Tooling and integration
         </Translate>
       </Heading>
       <Text elementType="p">
@@ -159,7 +159,7 @@ function PlatformTools() {
             <LinkGroup
               title={
                 <Translate id="index.deploy.tools.deployment-provisioning">
-                  Deployment and Provisioning
+                  Deployment and provisioning
                 </Translate>
               }
               links={[

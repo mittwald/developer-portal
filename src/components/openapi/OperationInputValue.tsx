@@ -26,7 +26,9 @@ export function AlternativeValue({
   return (
     <li>
       <div className={styles.parameterListHeader}>
-        <span className={styles.parameterAlternative}>Alternative</span>
+        <span className={styles.parameterAlternative}>
+          <Translate id="openapi.schema.alternative">Alternative</Translate>
+        </span>
         <Type className={styles.parameterType} schema={schema} />
       </div>
       {body && <div className={styles.parameterListBody}>{body}</div>}

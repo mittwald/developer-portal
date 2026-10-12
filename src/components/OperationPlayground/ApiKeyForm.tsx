@@ -51,7 +51,7 @@ function ApiKeyForm({
       <Modal size="s">
         <Heading>
           <Translate id="playground.apikey.form.title">
-            Configure API Key
+            Configure API key
           </Translate>
         </Heading>
         <Content>
@@ -64,7 +64,7 @@ function ApiKeyForm({
             >
               <Label>
                 <Translate id="playground.apikey.form.label">
-                  mStudio API Token
+                  mStudio API token
                 </Translate>
               </Label>
               <FieldDescription>
@@ -85,7 +85,7 @@ function ApiKeyForm({
           <Action onAction={handleSubmit}>
             <Button color="accent" isPending={isVerifying}>
               <Translate id="playground.apikey.form.submit">
-                Verify & Save
+                Verify & save
               </Translate>
             </Button>
           </Action>

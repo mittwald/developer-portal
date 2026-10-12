@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import { Button } from "@mittwald/flow-react-components";
 import { IconZoomIn, IconZoomOut, IconRefresh } from "@tabler/icons-react";
+import { translate } from "@docusaurus/Translate";
 import styles from "./index.module.css";
 
 export interface InteractiveMermaidDiagramProps {
@@ -276,7 +277,10 @@ function InteractiveMermaidDiagram({
             variant="soft"
             size="s"
             onClick={handleZoomOut}
-            aria-label="Zoom out"
+            aria-label={translate({
+              id: "components.InteractiveMermaidDiagram.zoomOut",
+              message: "Zoom out",
+            })}
           >
             <IconZoomOut size={16} />
           </Button>
@@ -285,7 +289,10 @@ function InteractiveMermaidDiagram({
             variant="soft"
             size="s"
             onClick={handleZoomIn}
-            aria-label="Zoom in"
+            aria-label={translate({
+              id: "components.InteractiveMermaidDiagram.zoomIn",
+              message: "Zoom in",
+            })}
           >
             <IconZoomIn size={16} />
           </Button>
@@ -293,7 +300,10 @@ function InteractiveMermaidDiagram({
             variant="soft"
             size="s"
             onClick={handleReset}
-            aria-label="Reset zoom"
+            aria-label={translate({
+              id: "components.InteractiveMermaidDiagram.resetZoom",
+              message: "Reset zoom",
+            })}
           >
             <IconRefresh size={16} />
           </Button>
@@ -313,7 +323,13 @@ function InteractiveMermaidDiagram({
         onTouchEnd={handleDiagramTouchEnd}
         onTouchCancel={handleDiagramTouchCancel}
         role="img"
-        aria-label={title || "Interactive diagram"}
+        aria-label={
+          title ||
+          translate({
+            id: "components.InteractiveMermaidDiagram.label",
+            message: "Interactive diagram",
+          })
+        }
       >
         <div className={styles.diagramContent} ref={contentRef}>
           {children}

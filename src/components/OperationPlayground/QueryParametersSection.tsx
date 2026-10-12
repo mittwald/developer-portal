@@ -38,7 +38,7 @@ function QueryParametersSection({
     <Section>
       <Heading>
         <Translate id="playground.query-params.title">
-          Query Parameters
+          Query parameters
         </Translate>
       </Heading>
       {parameters.map((param) => (

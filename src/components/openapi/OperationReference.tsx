@@ -245,7 +245,11 @@ function OperationResponseBody({ spec }: { spec?: OpenAPIV3.ResponseObject }) {
         {/* The format column needs room for "application/json" */}
         <ColumnLayout m={[1, 3]}>
           <LabeledValue>
-            <Label>Format</Label>
+            <Label>
+              <Translate id="openapi.operation.response.format">
+                Format
+              </Translate>
+            </Label>
             <Content>application/json</Content>
           </LabeledValue>
           <LabeledValue>
