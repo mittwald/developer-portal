@@ -5,15 +5,18 @@ import { Heading } from "@mittwald/flow-react-components";
 
 /**
  * Title of a changelog entry as Flow heading. In the list it is not linked
- * (the "Read more" link leads to the entry); on the entry page it is the h1,
- * sized like the doc titles. Ejected from @docusaurus/theme-classic.
+ * and sized like any h2 (the "Read more" link leads to the entry); on the
+ * entry page it is the h1, sized like the doc titles. Ejected from
+ * @docusaurus/theme-classic.
  */
-export default function BlogPostItemHeaderTitle({ className }: Props): ReactNode {
+export default function BlogPostItemHeaderTitle({
+  className,
+}: Props): ReactNode {
   const { metadata, isBlogPostPage } = useBlogPost();
   return (
     <Heading
       level={isBlogPostPage ? 1 : 2}
-      size={isBlogPostPage ? "l" : "m"}
+      size={isBlogPostPage ? "l" : undefined}
       className={className}
     >
       {metadata.title}
