@@ -1,0 +1,31 @@
+---
+title: Extensions testen
+---
+
+Nutze die DEV-Extensions-Seite im mStudio, um Frontend-Fragmente lokal zu testen, ohne die Fragment-URLs im Marketplace-Eintrag deiner Extension zu ändern.
+
+## Frontend-Fragmente lokal testen {#test-frontend-fragments-locally}
+
+1. Starte deinen Frontend-Entwicklungsserver unter `http://localhost:3000`.
+2. Öffne im mStudio **Profil > Entwicklung > DEV-Extensions** (`/profile/extension-development`).
+3. Aktiviere die lokale Überschreibung. Optional kannst du einen Pfad angeben, um ein bestimmtes Fragment zu laden, zum Beispiel `/my-fragment`.
+
+Die Überschreibung ersetzt die Fragment-URL aller installierten Extensions durch `http://localhost:3000` gefolgt vom optionalen Pfad. Der Pfad kann [Templating-Platzhalter](/docs/v2/contribution/overview/concepts/templating/) wie `:projectId` enthalten.
+
+Die Fragmente werden an ihren konfigurierten Anchors im mStudio angezeigt. Du musst die Seite nicht neu laden und der Marketplace-Eintrag der Extension bleibt unverändert.
+
+:::note
+
+Die Einstellung wird im lokalen Speicher dieses Browsers gespeichert und gilt nur für deine aktuelle Benutzersitzung.
+
+:::
+
+:::caution
+
+Für lokale Fragmenttests wird Chrome empfohlen. Einige Browser, darunter Safari, blockieren Inhalte von `http://localhost`, wenn diese in das HTTPS-mStudio eingebettet werden, ohne einen Fehler anzuzeigen.
+
+:::
+
+## Wann du eine Staging-Extension verwenden solltest {#when-to-use-staging}
+
+Verwende eine versteckte Staging-Kopie deiner Extension, wenn dein Entwicklungsserver nicht auf Port 3000 laufen kann oder wenn du eine geänderte Fragmentkonfiguration, zum Beispiel die Anchors, vor der Veröffentlichung testen musst. Weitere Informationen findest du unter [Staging](../staging).
