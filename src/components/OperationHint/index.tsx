@@ -1,12 +1,7 @@
 import React from "react";
 import Translate from "@docusaurus/Translate";
 import MDXComponents from "@theme/MDXComponents";
-import {
-  Alert,
-  Content,
-  Heading,
-  Text,
-} from "@mittwald/flow-react-components";
+import { Alert, Content, Heading, Text } from "@mittwald/flow-react-components";
 import HTTPMethod from "@site/src/components/openapi/HTTPMethod";
 import OperationPath from "@site/src/components/openapi/OperationPath";
 import { buildOperationUrl } from "@site/src/components/openapi/OperationLink";
@@ -65,11 +60,27 @@ function OperationHintItem({
   );
 }
 
-export default function OperationHint({
+/** The endpoints as list, without the surrounding alert */
+export function OperationList({
   operation,
   apiVersion = "v2",
 }: OperationHintProps) {
   const operations = Array.isArray(operation) ? operation : [operation];
+
+  return (
+    <ul className={styles.operations}>
+      {operations.map((o) => (
+        <OperationHintItem key={o} operationId={o} apiVersion={apiVersion} />
+      ))}
+    </ul>
+  );
+}
+
+export default function OperationHint({
+  operation,
+  apiVersion = "v2",
+}: OperationHintProps) {
+  const isPlural = Array.isArray(operation) && operation.length > 1;
 
   return (
     <Alert status="info">
@@ -78,22 +89,14 @@ export default function OperationHint({
       </Heading>
       <Content>
         <Text>
-          {operations.length > 1 ? (
+          {isPlural ? (
             <Translate id="components.OperationHint.text.plural" />
           ) : (
             <Translate id="components.OperationHint.text" />
           )}
           :
         </Text>
-        <ul className={styles.operations}>
-          {operations.map((o) => (
-            <OperationHintItem
-              key={o}
-              operationId={o}
-              apiVersion={apiVersion}
-            />
-          ))}
-        </ul>
+        <OperationList operation={operation} apiVersion={apiVersion} />
       </Content>
     </Alert>
   );
