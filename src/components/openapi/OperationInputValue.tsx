@@ -8,7 +8,7 @@ import {
   Required,
 } from "@site/src/components/openapi/RequiredOptional";
 import Schema from "@site/src/components/openapi/Schema";
-import Markdown from "react-markdown";
+import Description from "@site/src/components/openapi/Description";
 import React from "react";
 import clsx from "clsx";
 
@@ -20,7 +20,7 @@ export function AlternativeValue({
   let body: ReactNode;
 
   if (schema.description) {
-    body = <Markdown>{schema.description}</Markdown>;
+    body = <Description>{schema.description}</Description>;
   }
 
   return (
@@ -39,7 +39,7 @@ export function ArrayValue({ schema }: { schema: OpenAPIV3.SchemaObject }) {
   let body: ReactNode;
 
   if (schema.description) {
-    body = <Markdown>{schema.description}</Markdown>;
+    body = <Description>{schema.description}</Description>;
   }
 
   return (
@@ -74,7 +74,7 @@ export function PropertyValue({
   let body: ReactNode;
 
   if (schema.description) {
-    body = <Markdown>{schema.description}</Markdown>;
+    body = <Description>{schema.description}</Description>;
   }
 
   const hasSubSchema =

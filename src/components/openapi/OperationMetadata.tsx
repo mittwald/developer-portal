@@ -1,6 +1,6 @@
 import { OpenAPIV3 } from "openapi-types";
 import OperationPath from "@site/src/components/openapi/OperationPath";
-import Markdown from "react-markdown";
+import Description from "@site/src/components/openapi/Description";
 import { AccentBox, Content } from "@mittwald/flow-react-components";
 import { LabeledValue } from "@mittwald/flow-react-components";
 import { Label } from "@mittwald/flow-react-components";
@@ -140,7 +140,7 @@ export function OperationMetadata({
         <>
           {/* Without a description, the next section's separator follows */}
           <Separator />
-          <Markdown>{spec.description}</Markdown>
+          <Description>{spec.description}</Description>
         </>
       ) : null}
     </>
