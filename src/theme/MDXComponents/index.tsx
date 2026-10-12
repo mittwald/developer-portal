@@ -137,10 +137,15 @@ function MDXLink({ href, children, className, ...rest }: ComponentProps<"a">) {
     );
   }
 
+  // External links open in a new tab, which also shows Flow's external link
+  // icon (as with all other external Flow links)
+  const isExternal = !!href && /^(https?:)?\/\//.test(href);
+
   return (
     <Link
       inline
       href={href}
+      target={isExternal ? "_blank" : undefined}
       linkComponent={MDXA}
       className={clsx(styles.link, className)}
       // Remaining anchor attributes from MDX (e.g. footnote ids and aria
@@ -243,6 +248,25 @@ function MDXBlockquote(props: ComponentProps<"blockquote">) {
 
 /** Sections created by the rehypeFlowSections plugin (including the
  * footnotes); other sections stay plain */
+/**
+ * Whether the content is only the page title (Docusaurus wraps the Markdown
+ * title in a header element)
+ */
+function containsOnlyTitle(children: ReactNode): boolean {
+  const nodes = Children.toArray(children).filter(
+    (node) => !(typeof node === "string" && !node.trim()),
+  );
+  return (
+    nodes.length > 0 &&
+    nodes.every(
+      (node) =>
+        isValidElement<{ children?: ReactNode }>(node) &&
+        (node.type === MDXTitle ||
+          (node.type === "header" && containsOnlyTitle(node.props.children))),
+    )
+  );
+}
+
 function MDXSection(
   props: ComponentProps<"section"> & Record<string, unknown>,
 ) {
@@ -255,8 +279,12 @@ function MDXSection(
   if (isFlowSection === undefined) {
     return <section {...rest}>{children}</section>;
   }
+  // A section with only the page title gets no separator below it, like the
+  // title from the front matter (see DocItem/Content)
+  const isTitleOnly = containsOnlyTitle(children);
   return (
     <Section
+      hideSeparator={isTitleOnly}
       className={clsx(
         styles.section,
         isFootnotes !== undefined && styles.footnotes,

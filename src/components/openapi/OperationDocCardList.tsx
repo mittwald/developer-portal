@@ -9,6 +9,7 @@ import { typedList } from "@mittwald/flow-react-components";
 import { Heading } from "@mittwald/flow-react-components";
 import { Text } from "@mittwald/flow-react-components";
 import HTTPMethod from "@site/src/components/openapi/HTTPMethod";
+import OperationPath from "@site/src/components/openapi/OperationPath";
 import { Badge } from "@mittwald/flow-react-components";
 import { buildOperationUrl } from "@site/src/components/openapi/OperationLink";
 
@@ -64,7 +65,9 @@ export default function OperationDocCardList(p: Props) {
                 <Badge color="orange">deprecated</Badge>
               )}
             </Heading>
-            <Text>{op.path}</Text>
+            <Text>
+              <OperationPath path={op.path} />
+            </Text>
           </OperationList.ItemView>
         )}
       </OperationList.Item>
