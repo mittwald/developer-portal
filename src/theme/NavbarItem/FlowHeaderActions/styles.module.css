@@ -13,3 +13,15 @@
 .item :global(.flow--link--link-icon) {
   display: none;
 }
+
+/* The color mode button renders all three icons; "data-theme-choice" on
+   <html> shows the current one, which also works before React hydrates */
+.toggleIcon {
+  display: none !important;
+}
+
+:global([data-theme-choice="system"]) .systemToggleIcon,
+:global([data-theme-choice="light"]) .lightToggleIcon,
+:global([data-theme-choice="dark"]) .darkToggleIcon {
+  display: inline-block !important;
+}

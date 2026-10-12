@@ -25,7 +25,6 @@ import {
   IconMoon,
   IconSun,
 } from "@tabler/icons-react";
-import toggleStyles from "@site/src/theme/ColorModeToggle/styles.module.css";
 import styles from "./styles.module.css";
 
 /**
@@ -146,26 +145,18 @@ function ColorModeButton() {
     { mode: getColorModeLabel(colorModeChoice) },
   );
 
-  // All three icons are rendered; "data-theme-choice" on <html> picks the
-  // visible one, which also works before React hydrates
   return (
     <Button
       aria-label={label}
       onPress={() => setColorMode(getNextColorMode(colorModeChoice))}
     >
-      <Icon
-        className={clsx(toggleStyles.toggleIcon, toggleStyles.lightToggleIcon)}
-      >
+      <Icon className={clsx(styles.toggleIcon, styles.lightToggleIcon)}>
         <IconSun />
       </Icon>
-      <Icon
-        className={clsx(toggleStyles.toggleIcon, toggleStyles.darkToggleIcon)}
-      >
+      <Icon className={clsx(styles.toggleIcon, styles.darkToggleIcon)}>
         <IconMoon />
       </Icon>
-      <Icon
-        className={clsx(toggleStyles.toggleIcon, toggleStyles.systemToggleIcon)}
-      >
+      <Icon className={clsx(styles.toggleIcon, styles.systemToggleIcon)}>
         <IconDeviceDesktop />
       </Icon>
     </Button>
