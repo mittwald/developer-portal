@@ -9,10 +9,6 @@ import React, {
 } from "react";
 import clsx from "clsx";
 import Head from "@docusaurus/Head";
-import DocusaurusLink from "@docusaurus/Link";
-import useBrokenLinks from "@docusaurus/useBrokenLinks";
-import { translate } from "@docusaurus/Translate";
-import { useAnchorTargetClassName } from "@docusaurus/theme-common";
 import MDXCode from "@theme/MDXComponents/Code";
 import MDXA from "@theme/MDXComponents/A";
 import MDXPre from "@theme/MDXComponents/Pre";
@@ -20,11 +16,11 @@ import MDXDetails from "@theme/MDXComponents/Details";
 import MDXUl from "@theme/MDXComponents/Ul";
 import MDXLi from "@theme/MDXComponents/Li";
 import MDXImg from "@theme/MDXComponents/Img";
+import ThemeHeading from "@theme/Heading";
 import Admonition from "@theme/Admonition";
 import Mermaid from "@theme/Mermaid";
 import type { MDXComponentsObject } from "@theme/MDXComponents";
 import {
-  Heading,
   Icon,
   InlineCode,
   Link,
@@ -54,7 +50,6 @@ import styles from "./styles.module.css";
 
 type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
-/** Flow heading that keeps Docusaurus' anchor id and hash link */
 /**
  * Headings that consist of inline code only (e.g. CLI command names) are
  * rendered as plain heading text; in headings mixing text and code, the code
@@ -78,55 +73,17 @@ function unwrapCodeOnlyHeading(children: ReactNode): ReactNode {
 function MDXHeading({
   level,
   id,
-  children: childrenFromProps,
+  children,
   className,
 }: ComponentProps<"h2"> & { level: HeadingLevel }) {
-  const children = unwrapCodeOnlyHeading(childrenFromProps);
-  const brokenLinks = useBrokenLinks();
-  const anchorTargetClassName = useAnchorTargetClassName(id);
-
-  // H1 headings do not need an id because they don't appear in the TOC
-  if (level === 1 || !id) {
-    return (
-      <Heading level={level} className={clsx(styles.heading, className)}>
-        {children}
-      </Heading>
-    );
-  }
-
-  brokenLinks.collectAnchor(id);
-
-  const anchorTitle = translate(
-    {
-      id: "theme.common.headingLinkTitle",
-      message: "Direct link to {heading}",
-      description: "Title for link to heading",
-    },
-    { heading: typeof children === "string" ? children : id },
-  );
-
   return (
-    <Heading
-      level={level}
+    <ThemeHeading
+      as={`h${level}`}
       id={id}
-      className={clsx(
-        "anchor",
-        anchorTargetClassName,
-        styles.heading,
-        className,
-      )}
+      className={clsx(styles.heading, className)}
     >
-      {children}
-      <DocusaurusLink
-        className="hash-link"
-        to={`#${id}`}
-        aria-label={anchorTitle}
-        title={anchorTitle}
-        translate="no"
-      >
-        &#8203;
-      </DocusaurusLink>
-    </Heading>
+      {unwrapCodeOnlyHeading(children)}
+    </ThemeHeading>
   );
 }
 

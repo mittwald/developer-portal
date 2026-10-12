@@ -22,7 +22,9 @@ export default function PaginatorNavLink(props: Props): ReactNode {
       <AccentBox backgroundColor="neutral" className={styles.box}>
         <LabeledValue className={styles.labeledValue}>
           {subLabel && <Label>{subLabel}</Label>}
-          <Text className={styles.title}>{title}</Text>
+          <Text className={styles.title} align={isNext ? "end" : "start"}>
+            {title}
+          </Text>
         </LabeledValue>
       </AccentBox>
     </Link>

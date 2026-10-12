@@ -13,6 +13,7 @@ import {
 import { Heading } from "@mittwald/flow-react-components";
 import { Text } from "@mittwald/flow-react-components";
 import { Button } from "@mittwald/flow-react-components";
+import { Separator } from "@mittwald/flow-react-components";
 import styles from "./OperationMetadata.module.css";
 import Translate from "@docusaurus/Translate";
 import Admonition from "@theme/Admonition";
@@ -138,7 +139,7 @@ export function OperationMetadata({
       {spec.description && withDescription ? (
         <>
           {/* Without a description, the next section's separator follows */}
-          <hr />
+          <Separator />
           <Markdown>{spec.description}</Markdown>
         </>
       ) : null}
