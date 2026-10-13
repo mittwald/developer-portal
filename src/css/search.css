@@ -60,6 +60,12 @@
   border-color: var(--form-control--border-color--focused);
 }
 
+/* The Flow clear button replaces the browser's own (src/theme/SearchBar) */
+.search-bar::-webkit-search-cancel-button,
+.search-bar::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+
 /* No search on small screens (yet) */
 @media screen and (max-width: 996px) {
   .search-bar,
@@ -68,97 +74,158 @@
   }
 }
 
-/* Autocomplete Suggestions Styling */
-.ds-suggestions {
-  background-color: var(--neutral--color--100);
-  border: var(--border-width--100) var(--border-style--default)
-    var(--separator--color);
-  border-radius: var(--corner-radius--m);
-  box-shadow: var(--shadow--overlay);
-  overflow: hidden;
+/* Search results: the plugin's Algolia dropdown styled like a Flow context
+   menu (popover with menu items). The plugin's stylesheet loads later
+   with selectors of the same weight, so these rules are scoped to the navbar
+   (and override its dark mode rules, which use !important). */
+
+/* The popover, without the plugin's tip and shadow */
+.navbar .algolia-autocomplete .ds-dropdown-menu {
+  margin-top: var(--popover--spacing);
+  box-shadow: none;
+}
+
+.navbar .algolia-autocomplete .ds-dropdown-menu::before {
+  display: none;
+}
+
+.navbar .algolia-autocomplete .ds-dropdown-menu [class^="ds-dataset-"] {
   max-height: 70vh;
   overflow-y: auto;
+  padding: var(--popover--padding--s);
+  background-color: var(--popover--background-color);
+  border: var(--popover--border-width) var(--popover--border-style)
+    var(--popover--border-color);
+  border-radius: var(--popover--corner-radius);
+  box-shadow: var(--popover--box-shadow);
 }
 
-.ds-suggestion {
-  border-bottom: var(--border-width--100) var(--border-style--default)
-    var(--separator--color);
+.navbar .algolia-autocomplete .ds-dropdown-menu .ds-suggestions {
+  display: flex;
+  flex-direction: column;
+  row-gap: var(--menu--item-to-item-spacing);
 }
 
-.ds-suggestion:last-child {
-  border-bottom: none;
-}
-
-.ds-suggestion a {
-  display: block;
-  padding: var(--size-rem--m);
+.navbar .algolia-autocomplete .algolia-docsearch-suggestion {
   color: var(--text--color--default);
+  font-weight: var(--font-weight--normal);
   text-decoration: none;
-  transition: background-color var(--transition--duration--fast);
 }
 
-.ds-suggestion a:hover,
-.ds-suggestion.ds-cursor a {
-  background-color: var(--neutral--color--200);
-}
-
-/* Category Header */
-.algolia-docsearch-suggestion--category-header {
-  background-color: var(--neutral--color--100) !important;
-  margin-bottom: var(--size-rem--s);
-}
-
-.algolia-docsearch-suggestion--category-header-lvl0 {
-  font-weight: var(--font-weight--bold);
+/* The page of the following results, like a section heading; sections are
+   separated like in a Flow context menu */
+.navbar .algolia-autocomplete .algolia-docsearch-suggestion--category-header,
+html[data-theme] .navbar .algolia-docsearch-suggestion--category-header {
+  padding: var(--menu-item--padding-y) var(--menu-item--padding-x);
+  background: none !important;
+  color: var(--text--color--default) !important;
   font-size: var(--font-size-text--s);
-  color: var(--heading--color);
-  text-transform: none !important;
-  letter-spacing: 0 !important;
-}
-
-/* Subcategory Column */
-.algolia-docsearch-suggestion--subcategory-column {
-  display: none !important;
-}
-
-.algolia-docsearch-suggestion--content {
-  float: none !important;
-  width: 100% !important;
-}
-
-/* Title */
-.algolia-docsearch-suggestion--title {
   font-weight: var(--font-weight--bold);
-  font-size: var(--font-size-text--s);
-  color: var(--text--color--default);
-  margin-bottom: var(--size-rem--xs);
+  letter-spacing: normal;
+  text-transform: none;
 }
 
-/* Description Text */
-.algolia-docsearch-suggestion--text {
-  font-size: var(--font-size-text--s);
-  color: var(--neutral--color--800);
-  margin-top: var(--size-rem--xs);
-}
-
-/* Version Badge */
-.algolia-docsearch-suggestion--version {
-  display: none !important;
-}
-
-/* Highlight Search Terms */
-.algolia-docsearch-suggestion--highlight {
-  font-weight: var(--font-weight--bold);
-  color: var(--link--color--default);
-  background-color: transparent;
-}
-
-/* Footer */
-.algolia-docsearch-footer {
-  padding: var(--size-rem--s) var(--size-rem--m);
-  background-color: var(--neutral--color--200);
+.navbar
+  .algolia-autocomplete
+  .ds-suggestion:not(:first-child)
+  .algolia-docsearch-suggestion__main
+  .algolia-docsearch-suggestion--category-header {
+  margin-top: calc(
+    var(--menu--group-to-group-spacing) - var(--menu--item-to-item-spacing)
+  );
+  padding-top: var(--menu--group-to-group-spacing);
   border-top: var(--border-width--100) var(--border-style--default)
     var(--separator--color);
+}
+
+/* A result is a menu item: heading, then the matching text */
+.navbar .algolia-autocomplete .algolia-docsearch-suggestion--wrapper,
+html[data-theme] .navbar .algolia-docsearch-suggestion--wrapper {
+  float: none;
+  padding: var(--menu-item--padding-y) var(--menu-item--padding-x);
+  border-radius: var(--menu-item--corner-radius);
+  background: var(--menu-item--background-color--default) !important;
+  color: var(--text--color--default) !important;
+  transition: background-color var(--transition--duration--default);
+}
+
+.navbar .algolia-autocomplete .ds-cursor .algolia-docsearch-suggestion--wrapper,
+html[data-theme] .navbar .ds-cursor .algolia-docsearch-suggestion--wrapper {
+  background: var(--menu-item--background-color--hover) !important;
+  box-shadow: none;
+}
+
+.navbar .algolia-autocomplete .algolia-docsearch-suggestion--subcategory-column,
+.navbar .algolia-autocomplete .algolia-docsearch-suggestion--subcategory-inline,
+.navbar .algolia-autocomplete .algolia-docsearch-suggestion--version {
+  display: none !important;
+}
+
+.navbar .algolia-autocomplete .algolia-docsearch-suggestion--content {
+  float: none;
+  width: 100%;
+  padding: 0;
+}
+
+.navbar .algolia-autocomplete .algolia-docsearch-suggestion--content::before {
+  display: none;
+}
+
+.navbar .algolia-autocomplete .algolia-docsearch-suggestion--title,
+html[data-theme] .navbar .algolia-docsearch-suggestion--title {
+  margin: 0;
+  color: var(--text--color--default) !important;
+  font-size: var(--font-size-text--m);
+  font-weight: var(--font-weight--normal);
+}
+
+.navbar .algolia-autocomplete .algolia-docsearch-suggestion--text {
+  margin-top: var(--size-rem--xxs);
+  color: var(--label--color--default);
   font-size: var(--font-size-text--s);
-  color: var(--neutral--color--800);
+  line-height: var(--line-height-s);
+}
+
+/* Matches are bold, without the plugin's marker colors */
+.navbar .algolia-autocomplete .algolia-docsearch-suggestion--highlight,
+.navbar
+  .algolia-autocomplete
+  .algolia-docsearch-suggestion--text
+  .algolia-docsearch-suggestion--highlight {
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  color: inherit;
+  font-weight: var(--font-weight--bold);
+}
+
+.navbar .algolia-autocomplete .algolia-docsearch-suggestion code {
+  padding: 0 var(--size-rem--xxs);
+  border-radius: var(--inline-code--corner-radius);
+  background-color: var(--inline-code--background-color);
+  color: var(--inline-code--content-color);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: var(--inline-code--font-size);
+}
+
+.navbar .algolia-autocomplete .algolia-docsearch-suggestion--no-results {
+  margin: 0;
+  padding: var(--menu-item--padding-y) var(--menu-item--padding-x);
+  background: none;
+  font-size: var(--font-size-text--m);
+  text-align: start;
+}
+
+.navbar
+  .algolia-autocomplete
+  .algolia-docsearch-suggestion--no-results
+  .algolia-docsearch-suggestion--text {
+  margin: 0;
+  color: var(--text--color--default);
+  font-size: inherit;
+}
+
+/* lunr has no Algolia footer to show */
+.navbar .algolia-autocomplete .algolia-docsearch-footer {
+  display: none;
 }
