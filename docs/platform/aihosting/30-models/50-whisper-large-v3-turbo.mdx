@@ -7,7 +7,7 @@ slug: /platform/aihosting/models/whisper-large-v3-turbo
 
 The [Speech-to-text guide](../../examples/whisper/) has runnable examples for basic transcription, multi-language usage, large-file chunking, and a transcription + summarisation pipeline.
 
-For speaker separation, word timestamps, subtitles, or recordings longer than 10 minutes, see [Cohere-Transcribe-03-2026](/docs/v2/platform/aihosting/models/cohere-transcribe-03-2026).
+For speaker separation, word timestamps, subtitles, or recordings longer than 30 minutes, see [Cohere-Transcribe-03-2026](/docs/v2/platform/aihosting/models/cohere-transcribe-03-2026).
 
 ## Description
 
@@ -24,7 +24,7 @@ by a token factor of `0.5x`, resulting in **25 billed tokens per second** of aud
 The following limitations apply to this model on our platform:
 
 - Maximum file size: 25 MB per upload
-- Maximum audio duration: 10 minutes (600 seconds) per request
+- Maximum audio duration: 30 minutes (1800 seconds) per request
 - Translation is currently not supported (`to_language`)
 - Supported output formats: **`json`**, **`verbose_json`**
   - `response_format="text"` is accepted but returns a JSON body regardless — use `"json"` instead
@@ -33,12 +33,12 @@ The following limitations apply to this model on our platform:
 ### Audio duration and file size {#duration-limit}
 
 :::warning Both limits apply independently
-A file well below 25 MB can still be rejected for being too long. At typical speech bitrates the duration limit is the one you hit first: 25 MB holds roughly 52 minutes of 64 kbps mono audio, but everything beyond 10 minutes is rejected.
+A file well below 25 MB can still be rejected for being too long. Which limit you hit first depends on the bitrate: 25 MB holds roughly 52 minutes of 64 kbit/s mono `mp3`, but everything beyond 30 minutes is rejected. At 128 kbit/s stereo the file size limit comes first, at about 27 minutes.
 
-Exceeding the duration returns HTTP 400:
+Exceeding the duration returns HTTP 400 with a message that starts like this:
 
 ```text
-Audio exceeds maximum allowed duration of 600s (file contains 1500.6s at 44100Hz).
+Audio exceeds maximum allowed duration of 1800s (…)
 ```
 
 Split longer recordings before uploading. The [speech-to-text guide](../../examples/whisper/#large-files) contains a ready-to-use `pydub` example that cuts at silence points and keeps every chunk under both limits.
@@ -54,7 +54,7 @@ Split longer recordings before uploading. The [speech-to-text guide](../../examp
 
 ### Recommended Inference Parameters
 
-- `temperature=1.0`
+- `temperature=0`, the default. Higher values make the model sample instead of picking the most likely word, and the transcript gets worse: on ten German and English broadcast and interview recordings, the word error rate rose from 18.4 % at `0` to 30.1 % at `1.0`.
 - `top_p=1.0`
 - `response_format="json"`
 - **`language` like `language="de"`should always be set explicitly** to maximize accuracy.

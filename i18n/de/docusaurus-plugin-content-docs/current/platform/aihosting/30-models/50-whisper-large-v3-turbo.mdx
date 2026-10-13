@@ -6,7 +6,7 @@ title: Whisper-Large-V3-Turbo
 
 Der [Spracherkennungs-Guide](../../examples/whisper/) enthält lauffähige Beispiele für einfache Transkription, Mehrsprachigkeit, die Verarbeitung großer Dateien und eine Transkriptions- und Zusammenfassungs-Pipeline.
 
-Für Sprechertrennung, Wort-Zeitstempel, Untertitel oder Aufnahmen über 10 Minuten siehe [Cohere-Transcribe-03-2026](/docs/v2/platform/aihosting/models/cohere-transcribe-03-2026).
+Für Sprechertrennung, Wort-Zeitstempel, Untertitel oder Aufnahmen über 30 Minuten siehe [Cohere-Transcribe-03-2026](/docs/v2/platform/aihosting/models/cohere-transcribe-03-2026).
 
 ## Beschreibung
 
@@ -23,7 +23,7 @@ final **25 Token pro Audiosekunde** berechnet.
 Die folgenden Einschränkungen gelten für dieses Modell bei unserer Plattform:
 
 - Maximale Dateigröße: 25 MB pro Upload
-- Maximale Audiolänge: 10 Minuten (600 Sekunden) pro Anfrage
+- Maximale Audiolänge: 30 Minuten (1800 Sekunden) pro Anfrage
 - Es ist derzeit keine Übersetzung möglich (`to_language`)
 - Unterstützte Ausgabeformate: **`json`**, **`verbose_json`**
   - `response_format="text"` wird akzeptiert, gibt aber immer einen JSON-Body zurück – stattdessen `"json"` verwenden
@@ -32,15 +32,15 @@ Die folgenden Einschränkungen gelten für dieses Modell bei unserer Plattform:
 ### Audiolänge und Dateigröße {#duration-limit}
 
 :::warning Beide Limits gelten unabhängig voneinander
-Eine Datei kann deutlich unter 25 MB liegen und trotzdem wegen ihrer Länge abgelehnt werden. Bei üblichen Sprach-Bitraten greift das Längenlimit zuerst: In 25 MB passen rund 52 Minuten Audio bei 64 kbps mono, akzeptiert wird davon aber nur, was 10 Minuten nicht überschreitet.
+Eine Datei kann deutlich unter 25 MB liegen und trotzdem wegen ihrer Länge abgelehnt werden. Welches Limit zuerst greift, hängt von der Bitrate ab: In 25 MB passen rund 52 Minuten `mp3` mit 64 kbit/s mono, akzeptiert werden davon aber nur 30 Minuten. Bei 128 kbit/s stereo greift zuerst die Dateigröße, nach rund 27 Minuten.
 
-Wird die Länge überschritten, kommt HTTP 400 zurück:
+Wird die Länge überschritten, kommt HTTP 400 mit einer Meldung zurück, die so beginnt:
 
 ```text
-Audio exceeds maximum allowed duration of 600s (file contains 1500.6s at 44100Hz).
+Audio exceeds maximum allowed duration of 1800s (…)
 ```
 
-Längere Aufnahmen vor dem Upload aufteilen. Der [Spracherkennungs-Guide](../../examples/whisper/#grosse-dateien) enthält ein fertiges `pydub`-Beispiel, das an Stille-Stellen schneidet und jeden Abschnitt unter beiden Limits hält.
+Teile längere Aufnahmen vor dem Upload auf. Der [Spracherkennungs-Guide](../../examples/whisper/#grosse-dateien) enthält ein fertiges `pydub`-Beispiel, das an Stille-Stellen schneidet und jeden Abschnitt unter beiden Limits hält.
 :::
 
 ### Unterstützte Eingabeformate
@@ -53,7 +53,7 @@ Längere Aufnahmen vor dem Upload aufteilen. Der [Spracherkennungs-Guide](../../
 
 ### Empfohlene Inferenzparameter
 
-- `temperature=1.0`
+- `temperature=0`, der Standard. Höhere Werte lassen das Modell würfeln, statt das wahrscheinlichste Wort zu nehmen, und das Transkript wird schlechter: Bei zehn deutschen und englischen Nachrichten- und Interviewaufnahmen stieg die Wortfehlerrate von 18,4 % bei `0` auf 30,1 % bei `1.0`.
 - `top_p=1.0`
 - `response_format="json"`
 - **`language` wie `language="de"`sollte immer explizit gesetzt werden**, um die Genauigkeit zu maximieren.
