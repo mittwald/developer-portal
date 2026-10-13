@@ -2,6 +2,7 @@ import React, { type ReactNode } from "react";
 import clsx from "clsx";
 import type { Props } from "@theme/TOCItems/Tree";
 import { Link, Navigation } from "@mittwald/flow-react-components";
+import tocLabel from "@site/src/openapi/tocLabel";
 import styles from "./styles.module.css";
 
 /**
@@ -38,7 +39,11 @@ function TOCItemTree({ toc, linkClassName }: Props): ReactNode {
           }}
         >
           {/* Developer provided the HTML, so assume it's safe. */}
-          <span dangerouslySetInnerHTML={{ __html: heading.value }} />
+          <span
+            dangerouslySetInnerHTML={{
+              __html: tocLabel(heading.id, heading.value),
+            }}
+          />
         </Link>
       ))}
     </Navigation>

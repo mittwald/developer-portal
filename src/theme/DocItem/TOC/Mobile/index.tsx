@@ -15,6 +15,7 @@ import {
   MenuItem,
   Text,
 } from "@mittwald/flow-react-components";
+import tocLabel from "@site/src/openapi/tocLabel";
 import styles from "./styles.module.css";
 
 /**
@@ -42,7 +43,7 @@ function toPlainText(html: string): string {
 
 function flatten(nodes: readonly TOCTreeNode[], depth = 0): Entry[] {
   return nodes.flatMap((node) => [
-    { id: node.id, label: toPlainText(node.value), depth },
+    { id: node.id, label: toPlainText(tocLabel(node.id, node.value)), depth },
     ...flatten(node.children, depth + 1),
   ]);
 }
