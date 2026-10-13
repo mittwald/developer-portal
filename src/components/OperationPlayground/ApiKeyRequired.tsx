@@ -43,13 +43,13 @@ function ApiKeyRequired({
           <IconSshKey />
           <Heading>
             <Translate id="playground.apikey.required.title">
-              API key required
+              API token required
             </Translate>
           </Heading>
           <Text>
             <Translate id="playground.apikey.required.description">
               To use the API Playground, you need to configure your mStudio API
-              key first. Your API key will be stored in your browser's local
+              token first. Your API token will be stored in your browser's local
               storage.
             </Translate>
           </Text>
@@ -59,7 +59,7 @@ function ApiKeyRequired({
             onSubmit={onSubmit}
           >
             <Button color="accent">
-              <Translate id="playground.apikey.add">Add API key</Translate>
+              <Translate id="playground.apikey.add">Add API token</Translate>
             </Button>
           </ApiKeyForm>
         </IllustratedMessage>

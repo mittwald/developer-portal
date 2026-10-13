@@ -51,7 +51,7 @@ function ApiKeyForm({
       <Modal size="s">
         <Heading>
           <Translate id="playground.apikey.form.title">
-            Configure API key
+            Configure API token
           </Translate>
         </Heading>
         <Content>

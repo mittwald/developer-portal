@@ -60,7 +60,7 @@ function ApiKeyInfo({
             >
               <Button variant="soft" color="dark" size="s">
                 <Translate id="playground.apikey.change">
-                  Change API key
+                  Change API token
                 </Translate>
               </Button>
             </ApiKeyForm>
@@ -71,7 +71,7 @@ function ApiKeyInfo({
               onPress={onClearApiKey}
             >
               <Translate id="playground.apikey.forget">
-                Forget API key
+                Forget API token
               </Translate>
             </Button>
           </Flex>

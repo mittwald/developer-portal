@@ -85,7 +85,7 @@ export async function verifyApiKey(
           success: false,
           error: translate({
             id: "playground.apikey.error.invalid",
-            message: "Invalid API key",
+            message: "Invalid API token",
           }),
         };
       }
