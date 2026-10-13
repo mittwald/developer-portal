@@ -7,10 +7,6 @@ export function Required() {
   return <Badge color="neutral">required</Badge>;
 }
 
-export function Optional() {
-  return <Badge color="blue">optional</Badge>;
-}
-
 export function Deprecated({ className }: { className?: string }) {
   return (
     <AlertBadge status="warning" className={className}>

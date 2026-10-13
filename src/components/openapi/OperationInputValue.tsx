@@ -4,7 +4,6 @@ import styles from "./OperationInputValue.module.css";
 import Type from "@site/src/components/openapi/Type";
 import {
   Deprecated,
-  Optional,
   Required,
 } from "@site/src/components/openapi/RequiredOptional";
 import Schema from "@site/src/components/openapi/Schema";
@@ -121,10 +120,9 @@ export function OperationInputValue({
     tags.push(<Deprecated key="deprecated" />);
   }
 
-  if (required !== undefined) {
-    tags.push(
-      required ? <Required key="required" /> : <Optional key="optional" />,
-    );
+  // Only required values get a badge, optional is the default
+  if (required) {
+    tags.push(<Required key="required" />);
   }
 
   return (

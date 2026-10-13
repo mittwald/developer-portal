@@ -1,8 +1,12 @@
 import React, { ReactNode } from "react";
 import styles from "./styles.module.css";
 import Translate, { translate } from "@docusaurus/Translate";
-import Link from "@docusaurus/Link";
+import MDXComponents from "@theme/MDXComponents";
+import { Text } from "@mittwald/flow-react-components";
 import Admonition from "@theme/Admonition";
+
+// Rendered like any other Markdown link (Flow link, external link icon)
+const MDXLink = MDXComponents.a;
 
 type FeatureDefinition = {
   url?: string;
@@ -25,9 +29,9 @@ export default function PlanCompatibility({
   const names: ReactNode = features
     .map((feature): ReactNode =>
       featureDefinitions[feature].url ? (
-        <Link to={featureDefinitions[feature].url} target="_blank">
+        <MDXLink href={featureDefinitions[feature].url}>
           <Translate id={`compat.${feature}`} />
-        </Link>
+        </MDXLink>
       ) : (
         <Translate id={`compat.${feature}`} />
       ),
@@ -37,13 +41,13 @@ export default function PlanCompatibility({
 
   return (
     <Admonition type={"note"} title={translate({ id: "compat.title" })}>
-      <p>
+      <Text elementType="p">
         <Translate id="compat.body">
           This documentation requires the following mStudio features which might
           not be available in all hosting plans
         </Translate>
         : {names}.
-      </p>
+      </Text>
     </Admonition>
   );
 }

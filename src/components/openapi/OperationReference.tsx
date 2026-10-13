@@ -1,15 +1,11 @@
 import styles from "./OperationReference.module.css";
 import { PropsWithChildren } from "react";
 import Description from "@site/src/components/openapi/Description";
-import CodeBlock from "@theme/CodeBlock";
 import { OpenAPIV3 } from "openapi-types";
-import {
-  Optional,
-  Required,
-} from "@site/src/components/openapi/RequiredOptional";
+import { Required } from "@site/src/components/openapi/RequiredOptional";
 import Translate, { translate } from "@docusaurus/Translate";
 import HTTPResponseStatus from "@site/src/components/openapi/HTTPResponseStatus";
-import { Accordion, Badge } from "@mittwald/flow-react-components";
+import { Accordion, InlineCode } from "@mittwald/flow-react-components";
 import { Heading } from "@mittwald/flow-react-components";
 import { Content } from "@mittwald/flow-react-components";
 import { Text } from "@mittwald/flow-react-components";
@@ -54,7 +50,7 @@ function OperationParameter({ param }: { param: ParameterObject }) {
         <span className={styles.parameterExample}>
           <Translate id="openapi.example">Example</Translate>:
         </span>
-        <code>{JSON.stringify(param.example)}</code>
+        <InlineCode>{JSON.stringify(param.example)}</InlineCode>
       </div>,
     );
   }
@@ -164,6 +160,18 @@ function isParameterObject(
   return (param as ParameterObject).name !== undefined;
 }
 
+/** The content type of a request body, labeled like that of a response */
+function RequestBodyFormat({ format }: { format: string }) {
+  return (
+    <LabeledValue>
+      <Label>
+        <Translate id="openapi.operation.response.format">Format</Translate>
+      </Label>
+      <Content>{format}</Content>
+    </LabeledValue>
+  );
+}
+
 function OperationRequestBody({
   title,
   spec,
@@ -175,7 +183,7 @@ function OperationRequestBody({
     return null;
   }
 
-  const required = spec.required ? <Required /> : <Optional />;
+  const required = spec.required ? <Required /> : undefined;
 
   if ("multipart/form-data" in spec.content) {
     return (
@@ -183,16 +191,20 @@ function OperationRequestBody({
         <Heading>
           <span className={styles.accordionTitle}>
             {title}
-            <Badge color="blue">multipart/form-data</Badge>
             {required}
           </span>
         </Heading>
         <Content>
-          <SchemaWithExample
-            schema={spec.content["multipart/form-data"].schema as SchemaObject}
-            format="multipart-form"
-            withHeaders
-          />
+          <div className={styles.responseBody}>
+            <RequestBodyFormat format="multipart/form-data" />
+            <SchemaWithExample
+              schema={
+                spec.content["multipart/form-data"].schema as SchemaObject
+              }
+              format="multipart-form"
+              withHeaders
+            />
+          </div>
         </Content>
       </OutlinedAccordion>
     );
@@ -205,17 +217,19 @@ function OperationRequestBody({
         <Heading>
           <span className={styles.accordionTitle}>
             {title}
-            <Badge color="blue">application/json</Badge>
             {required}
           </span>
         </Heading>
         <Content>
-          <SchemaWithExample
-            schema={body.schema as SchemaObject}
-            examples={body.examples as Record<string, ExampleObject>}
-            withRawJSONSchema
-            withHeaders
-          />
+          <div className={styles.responseBody}>
+            <RequestBodyFormat format="application/json" />
+            <SchemaWithExample
+              schema={body.schema as SchemaObject}
+              examples={body.examples as Record<string, ExampleObject>}
+              withRawJSONSchema
+              withHeaders
+            />
+          </div>
         </Content>
       </OutlinedAccordion>
     );
