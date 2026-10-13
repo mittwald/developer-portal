@@ -1,0 +1,276 @@
+---
+sidebar_label: Cohere-Transcribe-03-2026
+description: Detailed information about cohere-transcribe-03-2026
+title: Cohere-Transcribe-03-2026
+slug: /platform/aihosting/models/cohere-transcribe-03-2026
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+The [speech-to-text guide for Cohere Transcribe](../../examples/cohere-transcribe/) has runnable examples for speaker separation, word timestamps, subtitles, and phone recordings.
+
+## Description {#description}
+
+"cohere-transcribe-03-2026" is a speech recognition model by Cohere. You send an audio file and get back the text, optionally with word timestamps, subtitles, or a separation by speaker. It serves the same `/v1/audio/transcriptions` endpoint as [Whisper-Large-V3-Turbo](/docs/v2/platform/aihosting/models/whisper-large-v3-turbo) and is a drop-in replacement for OpenAI-compatible code.
+
+This model is in the [Testphase](../20-access-and-usage/40-lifecycle.mdx#testphase). Its behavior and feature set can still change, so we recommend Stable or LTS models for production use.
+
+On our hardware it makes fewer errors than Whisper-Large-V3-Turbo in German and English, see [Accuracy](#accuracy). Whisper stays available and covers far more languages.
+
+It supports and is suitable for:
+
+- Transcribing speech in 14 languages, with automatic language detection
+- Speaker separation: who said what, with speaking time per speaker
+- Word timestamps with start, end, and alignment confidence for every word, in 8 languages
+- Subtitles as `srt` or `vtt`, cut at word boundaries, optionally with speaker labels
+- Phone recordings with one speaker per channel, transcribed per channel
+- Recordings up to 95 minutes in a single request
+
+The following limitations apply:
+
+- Maximum file size: 25 MB per upload
+- Maximum audio duration: 95 minutes per request
+- One language per request. Mixed-language speech is not supported, see [One language per request](#one-language)
+- Streaming is not supported. A request with `stream=true` returns HTTP 400, so send it without `stream` to get the complete transcript
+- No realtime or microphone input. The endpoint takes a complete file
+- Translation into another language is not supported
+- Word timestamps are not available for `el`, `ar`, `ko`, `ja`, `vi`, and `zh`
+
+## One language per request {#one-language}
+
+:::warning[Mixed-language speech comes out wrong without an error]
+The model transcribes each request in one language. If a recording switches language, for example an interview that moves from German to English, the second language comes out wrong and the response gives no error. Split such recordings by language and send each part with its own `language` value.
+:::
+
+## Token usage {#token-usage}
+
+The model is billed per second of audio at the same rate as [Whisper-Large-V3-Turbo](/docs/v2/platform/aihosting/models/whisper-large-v3-turbo#token-usage): **25 billed tokens per second** of audio.
+
+## Accuracy {#accuracy}
+
+Word error rate measured on our hardware, lower is better:
+
+| Language | cohere-transcribe-03-2026 | whisper-large-v3-turbo | Test set                                        |
+| -------- | ------------------------- | ---------------------- | ----------------------------------------------- |
+| German   | 3.44%                     | 4.93%                  | 1010 clips from Common Voice, MLS, FLEURS       |
+| English  | 3.78%                     | 4.25%                  | 462 clips from LibriSpeech, FLEURS, Earnings-22 |
+
+## Supported input formats {#input-formats}
+
+| Format       | Examples                                                         |
+| ------------ | ---------------------------------------------------------------- |
+| `wav`        | including 8 kHz µ-law telephone audio, stereo, 24-bit, and float |
+| `mp3`        |                                                                  |
+| `m4a`/`aac`  | iPhone voice memos                                               |
+| `ogg`/`opus` |                                                                  |
+| `flac`       |                                                                  |
+| `webm`       | recordings from the browser's `MediaRecorder`                    |
+| `mp4`        | videos, the audio track is transcribed                           |
+
+Any sample rate works. You don't need to convert the audio before you upload it.
+
+## Audio duration and file size {#limits}
+
+An upload can be up to 25 MB, and the audio in it up to 95 minutes long. Both limits apply independently, and exceeding either returns HTTP 413.
+
+At typical speech bitrates the file size is the limit you hit first: 25 MB holds roughly 52 minutes of 64 kbit/s mono audio. Compress long recordings to `mp3` or `opus` mono before you upload them, instead of sending `wav`. Recordings that are longer still need a lower bitrate or have to be split. Speaker labels are assigned per request, so `SPEAKER_00` in one part is not necessarily the same person as `SPEAKER_00` in the next.
+
+## Supported values for parameter `language` {#language}
+
+`ar`, `de`, `el`, `en`, `es`, `fr`, `it`, `ja`, `ko`, `nl`, `pl`, `pt`, `vi`, `zh`
+
+`language` takes ISO-639-1 codes. Variants such as `DE`, `de-DE`, and `de_AT`, and English or German language names such as `german`, are accepted and mapped to the code. An unsupported language returns HTTP 400, and the message lists the supported codes.
+
+If you leave `language` out, the model detects the language. Set it whenever you know the language: on very short or unusual recordings, detection can fall back to German.
+
+Word timestamps are available for `de`, `en`, `es`, `fr`, `it`, `nl`, `pl`, and `pt`.
+
+## Output formats {#output-formats}
+
+| `response_format` | Returns                                                                                                     |
+| ----------------- | ----------------------------------------------------------------------------------------------------------- |
+| `json`            | Default. The text as JSON                                                                                   |
+| `text`            | The text as plain text, no JSON                                                                             |
+| `srt`             | Subtitles in SubRip format                                                                                  |
+| `vtt`             | Subtitles in WebVTT format                                                                                  |
+| `verbose_json`    | Language, duration, segments with timestamps, and optionally words, see [Word timestamps](#word-timestamps) |
+| `diarized_json`   | Segments by speaker plus speaking statistics, see [Speaker separation](#speaker-separation)                 |
+
+`srt` and `vtt` cues are cut at word boundaries and kept short enough to read on screen. With `diarize=true` they carry speaker labels: `srt` puts the label in front of the text (`SPEAKER_00: …`), `vtt` uses voice tags (`<v SPEAKER_00>…`).
+
+If the audio contains only silence, noise, or tones, the transcript is empty. The model does not invent text for it.
+
+## Getting started {#getting-started}
+
+<Tabs groupId="language">
+<TabItem value="python" label="Python">
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1",
+    api_key="sk-your-api-key-here",
+)
+
+with open("meeting.mp3", "rb") as f:
+    result = client.audio.transcriptions.create(
+        model="cohere-transcribe-03-2026",
+        file=f,
+        language="de",
+    )
+
+print(result.text)
+```
+
+</TabItem>
+<TabItem value="javascript" label="JavaScript">
+
+```javascript
+import OpenAI from "openai";
+import { createReadStream } from "node:fs";
+
+const client = new OpenAI({
+  baseURL: "https://llm.aihosting.mittwald.de/v1",
+  apiKey: "sk-your-api-key-here",
+});
+
+const result = await client.audio.transcriptions.create({
+  model: "cohere-transcribe-03-2026",
+  file: createReadStream("meeting.mp3"),
+  language: "de",
+});
+
+console.log(result.text);
+```
+
+</TabItem>
+<TabItem value="php" label="PHP">
+
+```php
+<?php
+
+$ch = curl_init("https://llm.aihosting.mittwald.de/v1/audio/transcriptions");
+curl_setopt_array($ch, [
+    CURLOPT_POST => true,
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_HTTPHEADER => [
+        "Authorization: Bearer sk-your-api-key-here",
+    ],
+    CURLOPT_POSTFIELDS => [
+        "model" => "cohere-transcribe-03-2026",
+        "file" => new CURLFile("meeting.mp3"),
+        "language" => "de",
+    ],
+]);
+
+$result = json_decode(curl_exec($ch), true);
+curl_close($ch);
+
+echo $result["text"];
+```
+
+</TabItem>
+</Tabs>
+
+## Recommended inference parameters {#parameters}
+
+| Parameter                   | Value                       | Effect                                                                  |
+| --------------------------- | --------------------------- | ----------------------------------------------------------------------- |
+| `language`                  | ISO-639-1 code such as `de` | Set it when you know it, see [Supported values](#language)              |
+| `response_format`           | `json`                      | See [Output formats](#output-formats)                                   |
+| `timestamp_granularities[]` | `word`                      | Optional. Word timestamps, with `verbose_json` or `diarized_json`       |
+| `num_speakers`              | integer from 1 to 20        | Optional. Exact number of speakers, with `diarized_json`                |
+| `min_speakers`              | integer from 1 to 20        | Optional. Lower bound for the number of speakers                        |
+| `max_speakers`              | integer from 1 to 20        | Optional. Upper bound for the number of speakers                        |
+| `diarize`                   | `true`                      | Optional. Speaker labels in `srt` and `vtt`                             |
+| `prompt`                    | free text                   | Optional. Context or vocabulary hint, such as names and technical terms |
+| `temperature`               | between 0 and 1             | Optional                                                                |
+
+## Word timestamps {#word-timestamps}
+
+Request `timestamp_granularities[]=word` together with `response_format="verbose_json"` or `"diarized_json"`. The response then contains a `words` list with `start` and `end` in seconds and a `confidence` for every word. `confidence` says how well the word was aligned to the audio, not how sure the model is that it heard the word correctly. `verbose_json` always contains the segments as well.
+
+Word timestamps are available for `de`, `en`, `es`, `fr`, `it`, `nl`, `pl`, and `pt`.
+
+```json
+{
+  "task": "transcribe",
+  "language": "de",
+  "duration": 4.2,
+  "text": "Heute regnet es in Berlin …",
+  "segments": [{ "id": 0, "start": 0.04, "end": 4.1, "text": "…" }],
+  "words": [
+    { "word": "Heute", "start": 0.04, "end": 0.26, "confidence": 0.97 },
+    { "word": "regnet", "start": 0.36, "end": 0.72, "confidence": 0.95 }
+  ]
+}
+```
+
+## Speaker separation {#speaker-separation}
+
+`response_format="diarized_json"` returns the transcript split into segments by speaker. Every segment carries `speaker` (`SPEAKER_00`, `SPEAKER_01`, and so on), `start`, `end`, and `text`. `speaker_analytics` adds the speaking time, share, and number of turns for every speaker, plus the total speech time, the silence, and the share of overlapping speech.
+
+The model estimates the number of speakers itself. If you know it, pass `num_speakers`, or narrow it down with `min_speakers` and `max_speakers`. All three take integers from 1 to 20.
+
+Two-channel recordings with one speaker per channel, such as many phone call recordings, are detected automatically. They are transcribed per channel instead of separated by estimation, and the labels name the channel (`CHANNEL_00`, `CHANNEL_01`).
+
+```json
+{
+  "task": "transcribe",
+  "language": "de",
+  "duration": 92.18,
+  "text": "Am Ende wird es wieder in eine Fressorgie ausarten. Ja, aber bei mir ist das auch etwas ganz anderes. …",
+  "segments": [
+    {
+      "id": "seg_0",
+      "type": "transcript.text.segment",
+      "start": 0.38,
+      "end": 4.22,
+      "speaker": "SPEAKER_00",
+      "text": "Am Ende wird es wieder in eine Fressorgie ausarten."
+    },
+    {
+      "id": "seg_1",
+      "type": "transcript.text.segment",
+      "start": 4.78,
+      "end": 8.66,
+      "speaker": "SPEAKER_01",
+      "text": "Ja, aber bei mir ist das auch etwas ganz anderes."
+    }
+  ],
+  "speaker_analytics": {
+    "speakers": [
+      {
+        "speaker": "SPEAKER_00",
+        "speaking_time": 41.2,
+        "speaking_share": 0.52,
+        "turns": 7
+      }
+    ],
+    "speaker_count": 2,
+    "total_speech_time": 79.4,
+    "silence_time": 12.8,
+    "overlap_ratio": 0.0
+  },
+  "usage": { "type": "duration", "seconds": 92 }
+}
+```
+
+## Error responses {#error-responses}
+
+| Situation                                                             | Status |
+| --------------------------------------------------------------------- | ------ |
+| Unsupported `language`, the message lists the supported codes         | 400    |
+| The file is empty, is not audio, or is a video without an audio track | 400    |
+| `num_speakers`, `min_speakers`, or `max_speakers` outside 1 to 20     | 400    |
+| `stream=true`                                                         | 400    |
+| File larger than 25 MB or audio longer than 95 minutes                | 413    |
+| Missing or invalid API key                                            | 401    |
+
+Every 400 response has a message that says what is wrong with the request. With the OpenAI SDKs, a 400 raises `BadRequestError`.
+
+## Licence and terms of use {#licence}
+
+The model is published by Cohere under the Apache 2.0 licence. The components we use for speaker separation and word timestamps are published under Apache 2.0 or MIT.

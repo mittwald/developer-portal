@@ -255,7 +255,7 @@ Abhängig vom Embedding-Modell können weitere Parameter wie `dimensions` überm
 
 ## /v1/audio/transcriptions
 
-Dieser Endpunkt ermöglicht es, Audiodateien mit Whisper-Modellen in Text zu transkribieren.
+Dieser Endpunkt transkribiert Audiodateien mit [whisper-large-v3-turbo](../../models/whisper-large-v3-turbo/) oder [cohere-transcribe-03-2026](../../models/cohere-transcribe-03-2026/) in Text. Eingabeformate, Limits und Parameter unterscheiden sich zwischen den beiden Modellen. Die folgende Beschreibung gilt für `whisper-large-v3-turbo`, zu `cohere-transcribe-03-2026` siehe die Hinweise am Ende dieses Abschnitts.
 
 ```sh
 curl -X POST https://llm.aihosting.mittwald.de/v1/audio/transcriptions \
@@ -287,6 +287,8 @@ curl -X POST https://llm.aihosting.mittwald.de/v1/audio/transcriptions \
 - Übersetzungsfunktion (`to_language`-Parameter) wird nicht unterstützt
 - Für beste Ergebnisse sollte der `language`-Parameter immer explizit angegeben werden
 - Segmentiere Audiodateien bei Bedarf in Teile kleiner als 25 MB und kürzer als 10 Minuten. Wird die Länge überschritten, kommt HTTP 400 mit `Audio exceeds maximum allowed duration of 600s` zurück. Ein Beispiel dazu im [Spracherkennungs-Guide](../../examples/whisper/#grosse-dateien)
+
+`cohere-transcribe-03-2026` nimmt Uploads bis 25 MB mit bis zu 95 Minuten Audio an und erkennt die Sprache, wenn `language` fehlt. Neben `json` unterstützt es `text`, `srt`, `vtt`, `verbose_json` mit Wort-Zeitstempeln und `diarized_json` für die Sprechertrennung. Streaming wird nicht unterstützt, `stream=true` antwortet mit HTTP 400. Alle Parameter stehen auf der [Modellseite](../../models/cohere-transcribe-03-2026/), Beispiele im [Spracherkennungs-Guide für Cohere Transcribe](../../examples/cohere-transcribe/).
 
 ## /v1/audio/speech
 

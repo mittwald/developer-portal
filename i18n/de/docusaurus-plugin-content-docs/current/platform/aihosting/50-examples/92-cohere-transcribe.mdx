@@ -1,0 +1,235 @@
+---
+sidebar_label: Spracherkennung mit Cohere Transcribe
+description: Audio mit Sprechertrennung, Wort-Zeitstempeln und Untertiteln über die OpenAI-kompatible API mit cohere-transcribe-03-2026 transkribieren
+title: Spracherkennung mit Cohere Transcribe
+---
+
+`cohere-transcribe-03-2026` erreichst du über dieselbe Route `/v1/audio/transcriptions` wie die OpenAI-Transkriptions-API. Code, der für OpenAI geschrieben wurde, funktioniert, wenn du `base_url` änderst. Über die reine Transkription hinaus trennt das Modell Sprecher, liefert Wort-Zeitstempel und schreibt Untertitel. Sprachen, Eingabeformate, Limits und die vollständigen Antworten stehen auf der [Modellseite zu Cohere Transcribe](/docs/v2/platform/aihosting/models/cohere-transcribe-03-2026).
+
+Für die reine Transkription mit `whisper-large-v3-turbo` siehe [Spracherkennung mit Whisper](/docs/v2/platform/aihosting/examples/whisper/).
+
+## Vorbereitung {#vorbereitung}
+
+```shellsession
+user@local $ pip install openai
+user@local $ export OPENAI_API_KEY="sk-…"
+```
+
+## Einfache Transkription {#einfach}
+
+```python
+import os
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1",
+    api_key=os.environ["OPENAI_API_KEY"],
+)
+
+with open("meeting.mp3", "rb") as f:
+    result = client.audio.transcriptions.create(
+        model="cohere-transcribe-03-2026",
+        file=f,
+        language="de",
+    )
+
+print(result.text)
+```
+
+Ohne `language` erkennt das Modell die Sprache selbst. Setz den Parameter, wenn du die Sprache kennst: Bei sehr kurzen oder ungewöhnlichen Aufnahmen kann die Erkennung auf Deutsch zurückfallen. Eine Aufnahme muss bei einer Sprache bleiben, siehe [Eine Sprache pro Anfrage](/docs/v2/platform/aihosting/models/cohere-transcribe-03-2026#eine-sprache).
+
+Die folgenden Beispiele verwenden `client` aus diesem Block weiter.
+
+## Wer hat was gesagt: Sprechertrennung {#sprechertrennung}
+
+`response_format="diarized_json"` teilt das Transkript in Segmente nach Sprecher:
+
+```python
+with open("interview.mp3", "rb") as f:
+    result = client.audio.transcriptions.create(
+        model="cohere-transcribe-03-2026",
+        file=f,
+        language="de",
+        response_format="diarized_json",
+    )
+
+for seg in result.segments:
+    print(f"[{seg.start:7.2f}s] {seg.speaker}: {seg.text}")
+```
+
+```text
+[   0.38s] SPEAKER_00: Am Ende wird es wieder in eine Fressorgie ausarten.
+[   4.78s] SPEAKER_01: Ja, aber bei mir ist das auch etwas ganz anderes.
+```
+
+Wie viele Personen sprechen, schätzt das Modell selbst. Kennst du die Zahl, gib sie als `num_speakers` mit. Das OpenAI-SDK hat dafür kein eigenes Argument, der Wert gehört deshalb in `extra_body`:
+
+```python
+with open("interview.mp3", "rb") as f:
+    result = client.audio.transcriptions.create(
+        model="cohere-transcribe-03-2026",
+        file=f,
+        language="de",
+        response_format="diarized_json",
+        extra_body={"num_speakers": 2},
+    )
+```
+
+Kennst du nur einen Bereich, nimm auf dieselbe Weise `min_speakers` und `max_speakers`. Alle drei nehmen Ganzzahlen von 1 bis 20.
+
+## Sprechzeit pro Sprecher {#sprechzeit}
+
+`diarized_json` enthält außerdem `speaker_analytics`. Das SDK kennt dieses Feld nicht, lies es deshalb aus `model_dump()`:
+
+```python
+data = result.model_dump()
+analytics = data["speaker_analytics"]
+
+for s in analytics["speakers"]:
+    print(f"{s['speaker']}: {s['speaking_time']:.0f}s, {s['speaking_share']:.0%}, {s['turns']} turns")
+
+print(f"Speech {analytics['total_speech_time']:.0f}s, silence {analytics['silence_time']:.0f}s")
+```
+
+```text
+SPEAKER_00: 41s, 52%, 7 turns
+…
+Speech 79s, silence 13s
+```
+
+## Telefonaufnahmen mit einem Sprecher pro Kanal {#telefonaufnahmen}
+
+Viele Telefonanlagen zeichnen jede Seite eines Gesprächs auf einem eigenen Kanal auf. Schick eine solche Zweikanaldatei wie oben mit `response_format="diarized_json"`. Das Modell erkennt, dass jeder Kanal einen Sprecher enthält, und transkribiert die Kanäle getrennt, statt die Stimmen per Schätzung zu trennen. Die Kennungen nennen dann den Kanal, `CHANNEL_00` und `CHANNEL_01`, sodass du weißt, welche Seite des Gesprächs was gesagt hat.
+
+`wav`-Dateien mit 8 kHz und µ-law, wie viele Telefonanlagen sie schreiben, funktionieren ohne Umwandlung.
+
+## Wort-Zeitstempel {#wort-zeitstempel}
+
+Fordere `timestamp_granularities=["word"]` zusammen mit `response_format="verbose_json"` an:
+
+```python
+with open("ansage.wav", "rb") as f:
+    result = client.audio.transcriptions.create(
+        model="cohere-transcribe-03-2026",
+        file=f,
+        language="de",
+        response_format="verbose_json",
+        timestamp_granularities=["word"],
+    )
+
+for w in result.words:
+    print(f"{w.start:6.2f}–{w.end:6.2f}  {w.word}  ({w.confidence:.2f})")
+```
+
+```text
+  0.04–  0.26  Heute  (0.97)
+  0.36–  0.72  regnet  (0.95)
+```
+
+`confidence` gibt an, wie gut sich das Wort dem Audio zuordnen ließ, nicht wie sicher sich das Modell ist, das Wort richtig gehört zu haben. Wort-Zeitstempel gibt es für `de`, `en`, `es`, `fr`, `it`, `nl`, `pl` und `pt`. `verbose_json` enthält außerdem immer die Segmente, `result.segments` ist also ebenfalls gefüllt.
+
+Dasselbe Argument funktioniert mit `response_format="diarized_json"`, wenn du Sprecher und Wort-Zeitstempel in einer Anfrage brauchst.
+
+## Untertitel {#untertitel}
+
+`response_format="srt"` oder `"vtt"` liefert eine fertige Untertiteldatei. Das SDK gibt sie als String zurück:
+
+```python
+with open("video.mp4", "rb") as f:
+    subtitles = client.audio.transcriptions.create(
+        model="cohere-transcribe-03-2026",
+        file=f,
+        language="de",
+        response_format="srt",
+    )
+
+with open("video.srt", "w", encoding="utf-8") as out:
+    out.write(subtitles)
+```
+
+Die Untertitel sind an Wortgrenzen geschnitten und kurz genug, um sie am Bildschirm zu lesen. Aus einer `mp4`-Datei transkribiert das Modell die Tonspur, du musst sie vorher nicht herauslösen.
+
+Für Untertitel mit Sprecherkennung ergänze `diarize`:
+
+```python
+with open("video.mp4", "rb") as f:
+    subtitles = client.audio.transcriptions.create(
+        model="cohere-transcribe-03-2026",
+        file=f,
+        language="de",
+        response_format="vtt",
+        extra_body={"diarize": "true"},
+    )
+```
+
+In `vtt` wird die Kennung zum Voice-Tag:
+
+```text
+00:00:00.380 --> 00:00:04.220
+<v SPEAKER_00>Am Ende wird es wieder in eine Fressorgie ausarten.
+```
+
+In `srt` steht die Kennung als `SPEAKER_00: …` vor dem Text.
+
+## Namen und Fachbegriffe {#prompt}
+
+Gib Namen, Produktnamen oder Fachbegriffe, die in der Aufnahme vorkommen, als `prompt` mit. Das Modell nutzt sie als Hinweis für die Schreibweise:
+
+```python
+with open("standup.mp3", "rb") as f:
+    result = client.audio.transcriptions.create(
+        model="cohere-transcribe-03-2026",
+        file=f,
+        language="de",
+        prompt="mStudio, Kubernetes, Container, Deployment",
+    )
+```
+
+## Lange Aufnahmen {#lange-aufnahmen}
+
+Ein Upload darf bis zu 25 MB groß sein, das Audio bis zu 95 Minuten lang. Bei langen Aufnahmen stößt du zuerst an die Dateigröße, komprimier sie deshalb vor dem Upload zu `mp3` oder `opus` in mono. Bei 64 kbit/s passen in 25 MB rund 52 Minuten:
+
+```shellsession
+user@local $ ffmpeg -i recording.wav -ac 1 -c:a libopus -b:a 64k recording.ogg
+```
+
+Noch längere Aufnahmen brauchen eine niedrigere Bitrate oder müssen aufgeteilt werden. Dafür kannst du das [`pydub`-Beispiel aus dem Whisper-Guide](/docs/v2/platform/aihosting/examples/whisper/#grosse-dateien) mit längeren Abschnitten verwenden. Die Sprecherkennungen werden pro Anfrage vergeben, `SPEAKER_00` im einen Teil ist also nicht unbedingt dieselbe Person wie `SPEAKER_00` im nächsten.
+
+## Fehler behandeln {#fehler}
+
+Ungültige Anfragen antworten mit HTTP 400 und einer Meldung, die sagt, was nicht stimmt, zum Beispiel bei einer nicht unterstützten Sprache, einer Datei, die kein Audio ist, oder einem Video ohne Tonspur. Dateien über 25 MB und Audio über 95 Minuten antworten mit HTTP 413. Das OpenAI-SDK löst dafür Exceptions aus:
+
+```python
+import openai
+
+try:
+    with open("meeting.mp3", "rb") as f:
+        result = client.audio.transcriptions.create(
+            model="cohere-transcribe-03-2026",
+            file=f,
+            language="de",
+        )
+except openai.BadRequestError as e:
+    print(f"Request rejected: {e.message}")
+except openai.APIStatusError as e:
+    if e.status_code == 413:
+        print("File too large or recording too long, compress or split it")
+    else:
+        raise
+```
+
+Streaming wird nicht unterstützt: `stream=True` antwortet mit HTTP 400. Schick die Anfrage ohne `stream`, um das vollständige Transkript zu bekommen.
+
+## Umstieg von Whisper {#umstieg-von-whisper}
+
+Code, der für `whisper-large-v3-turbo` geschrieben wurde, funktioniert weiter, wenn du den Modellnamen änderst. Das sind die Unterschiede:
+
+|                     | whisper-large-v3-turbo | cohere-transcribe-03-2026                                     |
+| ------------------- | ---------------------- | ------------------------------------------------------------- |
+| Sprachen            | über 99                | 14                                                            |
+| Ohne `language`     | nimmt Deutsch an       | erkennt die Sprache                                           |
+| Audio pro Anfrage   | 10 Minuten             | 95 Minuten                                                    |
+| `response_format`   | `json`, `verbose_json` | `json`, `text`, `srt`, `vtt`, `verbose_json`, `diarized_json` |
+| Wort-Zeitstempel    | nein                   | in 8 Sprachen                                                 |
+| Sprechertrennung    | nein                   | ja                                                            |
+| Lebenszyklus-Status | LTS                    | Testphase                                                     |
