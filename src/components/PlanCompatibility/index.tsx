@@ -1,5 +1,4 @@
 import React, { ReactNode } from "react";
-import styles from "./styles.module.css";
 import Translate, { translate } from "@docusaurus/Translate";
 import MDXComponents from "@theme/MDXComponents";
 import { Text } from "@mittwald/flow-react-components";
@@ -36,7 +35,6 @@ export default function PlanCompatibility({
         <Translate id={`compat.${feature}`} />
       ),
     )
-    .map((n): ReactNode => <span className={styles.compatName}>{n}</span>)
     .reduce((prev, curr) => [prev, ", ", curr]);
 
   return (
