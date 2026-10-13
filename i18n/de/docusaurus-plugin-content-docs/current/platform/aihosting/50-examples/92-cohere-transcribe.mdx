@@ -260,7 +260,7 @@ Setz bei Push-to-Talk `language`. Ein Clip mit wenigen Wörtern ist zu kurz für
 
 `cohere-transcribe-03-2026` transkribiert kein Audio, das noch aufgenommen wird, und für das Modell gibt es keinen Endpunkt `/v1/realtime`. Für Live-Untertitel oder fortlaufendes Diktat schneidest du das Mikrofonsignal bei dir an Sprechpausen und schickst jeden Satz als eigene Anfrage. Ein Satz braucht nur einen Bruchteil einer Sekunde zum Transkribieren, der Text erscheint also kurz nach jeder Pause.
 
-Das folgende Beispiel erkennt Pausen an der Lautstärke, ohne zusätzliches Modell. Wer flüssig spricht, macht selten lange Pausen. Deshalb beendet schon eine Pause von 300 ms einen Satz, sobald er mindestens 3 Sekunden lang ist, und nach 15 Sekunden schneidet das Beispiel in jedem Fall. Der Text hängt also höchstens rund 15 Sekunden hinterher. Es braucht `numpy` und `sounddevice`:
+Das folgende Beispiel erkennt Pausen an der Lautstärke, ohne zusätzliches Modell. Wer flüssig spricht, macht selten lange Pausen. Deshalb beendet schon eine Pause von 300 ms einen Satz, sobald er mindestens 3 Sekunden lang ist, und nach 15 Sekunden schneidet das Beispiel in jedem Fall. In unseren Tests mit einer Interviewaufnahme stand ein Wort im Mittel rund 5 Sekunden nach dem Sprechen da, höchstens nach rund 15 Sekunden. Für Diktat und Notizen reicht das, für Live-Untertitel oder Sprachassistenten, die innerhalb einer Sekunde reagieren müssen, ist es zu langsam. Es braucht `numpy` und `sounddevice`:
 
 ```shellsession
 user@local $ pip install numpy sounddevice

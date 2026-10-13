@@ -260,7 +260,7 @@ Set `language` for push-to-talk. A clip of a few words is too short for reliable
 
 `cohere-transcribe-03-2026` does not transcribe audio while it is still being recorded, and there is no `/v1/realtime` endpoint for it. For live captions or continuous dictation, cut the microphone input at speech pauses on your side and send each sentence as its own request. A sentence takes only a fraction of a second to transcribe, so the text appears shortly after each pause.
 
-The following example detects pauses by volume, with no extra model. Fluent speakers rarely pause for long, so a short pause of 300 ms ends a sentence once it is at least 3 seconds long, and after 15 seconds the example cuts regardless. The text therefore lags behind by at most about 15 seconds. It needs `numpy` and `sounddevice`:
+The following example detects pauses by volume, with no extra model. Fluent speakers rarely pause for long, so a short pause of 300 ms ends a sentence once it is at least 3 seconds long, and after 15 seconds the example cuts regardless. In our tests with an interview recording, a word appeared on average about 5 seconds after it was spoken, at most about 15 seconds. That is fine for dictation and notes, but too slow for live subtitles or voice assistants that have to react within a second. It needs `numpy` and `sounddevice`:
 
 ```shellsession
 user@local $ pip install numpy sounddevice
