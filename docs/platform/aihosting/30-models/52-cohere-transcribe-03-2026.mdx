@@ -53,8 +53,8 @@ Word error rate measured on our hardware, lower is better:
 
 | Language | cohere-transcribe-03-2026 | whisper-large-v3-turbo | Test set                                        |
 | -------- | ------------------------- | ---------------------- | ----------------------------------------------- |
-| German   | 3.44%                     | 4.93%                  | 1010 clips from Common Voice, MLS, FLEURS       |
-| English  | 3.78%                     | 4.25%                  | 462 clips from LibriSpeech, FLEURS, Earnings-22 |
+| German   | 3.39%                     | 4.93%                  | 1010 clips from Common Voice, MLS, FLEURS       |
+| English  | 3.77%                     | 4.25%                  | 462 clips from LibriSpeech, FLEURS, Earnings-22 |
 
 ## Supported input formats {#input-formats}
 
@@ -74,7 +74,7 @@ Any sample rate works. You don't need to convert the audio before you upload it.
 
 An upload can be up to 25 MB, and the audio in it up to 95 minutes long. Both limits apply independently, and exceeding either returns HTTP 413.
 
-At typical speech bitrates the file size is the limit you hit first: 25 MB holds roughly 52 minutes of 64 kbit/s mono audio. Compress long recordings to `mp3` or `opus` mono before you upload them, instead of sending `wav`. Recordings that are longer still need a lower bitrate or have to be split. Speaker labels are assigned per request, so `SPEAKER_00` in one part is not necessarily the same person as `SPEAKER_00` in the next.
+At typical speech bitrates the file size is the limit you hit first: 25 MB holds roughly 52 minutes of 64 kbit/s mono audio. Compress long recordings to `mp3` or `opus` mono before you upload them, instead of sending `wav`. Recordings that are longer still need a lower bitrate or have to be split. Speaker labels are assigned per request in the order people first speak, so `SPEAKER_00` in one part is not necessarily the same person as `SPEAKER_00` in the next.
 
 ## Supported values for parameter `language` {#language}
 

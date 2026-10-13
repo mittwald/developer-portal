@@ -52,8 +52,8 @@ Wortfehlerrate, gemessen auf unserer Hardware, niedriger ist besser:
 
 | Sprache  | cohere-transcribe-03-2026 | whisper-large-v3-turbo | Testdaten                                          |
 | -------- | ------------------------- | ---------------------- | -------------------------------------------------- |
-| Deutsch  | 3,44 %                    | 4,93 %                 | 1.010 Aufnahmen aus Common Voice, MLS, FLEURS      |
-| Englisch | 3,78 %                    | 4,25 %                 | 462 Aufnahmen aus LibriSpeech, FLEURS, Earnings-22 |
+| Deutsch  | 3,39 %                    | 4,93 %                 | 1.010 Aufnahmen aus Common Voice, MLS, FLEURS      |
+| Englisch | 3,77 %                    | 4,25 %                 | 462 Aufnahmen aus LibriSpeech, FLEURS, Earnings-22 |
 
 ## Unterstützte Eingabeformate {#eingabeformate}
 
@@ -73,7 +73,7 @@ Jede Abtastrate funktioniert. Du musst das Audio vor dem Upload nicht umwandeln.
 
 Ein Upload darf bis zu 25 MB groß sein, das Audio darin bis zu 95 Minuten lang. Beide Limits gelten unabhängig voneinander. Wird eines überschritten, kommt HTTP 413 zurück.
 
-Bei üblichen Sprach-Bitraten stößt du zuerst an die Dateigröße: In 25 MB passen rund 52 Minuten Audio bei 64 kbit/s mono. Komprimier lange Aufnahmen vor dem Upload zu `mp3` oder `opus` in mono, statt `wav` zu schicken. Noch längere Aufnahmen brauchen eine niedrigere Bitrate oder müssen aufgeteilt werden. Die Sprecherkennungen werden pro Anfrage vergeben, `SPEAKER_00` im einen Teil ist also nicht unbedingt dieselbe Person wie `SPEAKER_00` im nächsten.
+Bei üblichen Sprach-Bitraten stößt du zuerst an die Dateigröße: In 25 MB passen rund 52 Minuten Audio bei 64 kbit/s mono. Komprimier lange Aufnahmen vor dem Upload zu `mp3` oder `opus` in mono, statt `wav` zu schicken. Noch längere Aufnahmen brauchen eine niedrigere Bitrate oder müssen aufgeteilt werden. Die Sprecherkennungen werden pro Anfrage in der Reihenfolge vergeben, in der jemand zum ersten Mal spricht. `SPEAKER_00` im einen Teil ist also nicht unbedingt dieselbe Person wie `SPEAKER_00` im nächsten.
 
 ## Gültige Werte für den Parameter `language` {#sprache}
 
