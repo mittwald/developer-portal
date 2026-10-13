@@ -120,7 +120,7 @@ Um dieses Problem zu umgehen, kannst du deine SSH-Schlüssel manuell im DDEV-Web
 
 0. Finde das SSH-Schlüsselpaar, das du für die Verbindung verwenden möchtest, und stelle sicher, dass der öffentliche Schlüssel zu deinem mStudio-Benutzerprofil hinzugefügt ist. Für die folgenden Schritte gehen wir davon aus, dass der SSH-Schlüssel `mstudio` heißt und der private Schlüssel in `~/.ssh/mstudio` gespeichert ist.
 
-1. Füge den erforderlichen SSH-Schlüssel direkt zum DDEV-Webcontainer hinzu, indem du ihn in `.ddev/homeadditions` verlinkst:
+1. Füge den erforderlichen SSH-Schlüssel direkt zum DDEV-Webcontainer hinzu, indem du ihn in [`.ddev/homeadditions`](https://ddev.readthedocs.io/en/stable/users/extend/in-container-configuration/) verlinkst. Damit erweitert DDEV dein Home-Verzeichnis innerhalb des Webcontainers:
 
    ```shell-session
    $ mkdir -p .ddev/homeadditions/.ssh
@@ -137,5 +137,3 @@ Um dieses Problem zu umgehen, kannst du deine SSH-Schlüssel manuell im DDEV-Web
 [cli-ssh]: /docs/v2/cli/usage/intro/#ssh
 [apitoken]: /docs/v2/api/intro
 [ddev-addon]: https://github.com/mittwald/ddev
-
-[^1]: DDEV-`homeadditions` sind ein Mechanismus, um dein Home-Verzeichnis innerhalb des Webcontainers zu erweitern. Siehe das [Handbuch](https://ddev.readthedocs.io/en/stable/users/extend/in-container-configuration/) für weitere Informationen.

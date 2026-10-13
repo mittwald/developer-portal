@@ -120,7 +120,7 @@ To circumvent this issue, you can manually configure your SSH keys inside the DD
 
 0. Find the SSH key pair that you want to use for the connection, and make sure that the public key is added to your mStudio user profile. For the following steps, we'll assume that the SSH key is named `mstudio` and the private key is stored in `~/.ssh/mstudio`.
 
-1. Add the required SSH key directly to the DDEV web container by symlinking it into `.ddev/homeadditions`:[^1]
+1. Add the required SSH key directly to the DDEV web container by symlinking it into [`.ddev/homeadditions`](https://ddev.readthedocs.io/en/stable/users/extend/in-container-configuration/), DDEV's mechanism to extend your home directory within the web container:
 
    ```shell-session
    $ mkdir -p .ddev/homeadditions/.ssh
@@ -137,5 +137,3 @@ To circumvent this issue, you can manually configure your SSH keys inside the DD
 [cli-ssh]: /docs/v2/cli/usage/intro/#ssh
 [apitoken]: /docs/v2/api/intro
 [ddev-addon]: https://github.com/mittwald/ddev
-
-[^1]: DDEV `homeadditions` are a mechanism to extend your home directory within the web container. Have a look at the [manual](https://ddev.readthedocs.io/en/stable/users/extend/in-container-configuration/) for more information.
