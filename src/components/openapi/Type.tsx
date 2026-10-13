@@ -19,7 +19,7 @@ function Type({
   if (schema.type === "array") {
     return (
       <span className={className}>
-        {"array of "}
+        {translate({ id: "openapi.schema.arrayof", message: "array of" })}{" "}
         <Type schema={schema.items as OpenAPIV3.SchemaObject} />
       </span>
     );

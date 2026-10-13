@@ -27,7 +27,7 @@ export default function NotFoundContent({ className }: Props): ReactNode {
             id="theme.NotFound.title"
             description="The title of the 404 page"
           >
-            Page Not Found
+            Page not found
           </Translate>
         </Heading>
         <Text>

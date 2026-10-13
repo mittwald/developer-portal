@@ -3,6 +3,7 @@ import CodeBlock from "@theme/CodeBlock";
 import { generateSchemaExample } from "@site/src/openapi/generateSchemaExample";
 import * as yaml from "yaml";
 import React from "react";
+import { translate } from "@docusaurus/Translate";
 
 interface Props {
   title?: string;
@@ -37,7 +38,10 @@ export default function SchemaExample({
     return schema.oneOf.map((s, idx) => (
       <SchemaExample
         key={idx}
-        title={`Alternative #${idx + 1}`}
+        title={`${translate({
+          id: "openapi.schema.alternative",
+          message: "Alternative",
+        })} #${idx + 1}`}
         schema={s as OpenAPIV3.SchemaObject}
         withHeaders={withHeaders}
       />

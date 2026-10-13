@@ -109,7 +109,9 @@ function ToolsFeature() {
             </Link>{" "}
             |{" "}
             <Link href="https://flow.mittwald.de" target="_blank">
-              Documentation
+              <Translate id="index.contribution.tools.flow.docs">
+                Documentation
+              </Translate>
             </Link>
           </li>
         </ul>

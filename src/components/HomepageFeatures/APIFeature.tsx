@@ -141,7 +141,9 @@ function APILibraries() {
             <Link href="/docs/v2/api/sdks/javascript">
               mittwald JavaScript SDK
             </Link>{" "}
-            (Node.js + browser)
+            <Translate id="index.sdks.javascript.platforms">
+              (Node.js + browser)
+            </Translate>
           </li>
           <li>
             <Link href="/docs/v2/api/sdks/python">mittwald Python SDK</Link>{" "}
