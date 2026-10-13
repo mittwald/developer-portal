@@ -2,8 +2,7 @@ import React, { type ReactNode } from "react";
 import { useThemeConfig } from "@docusaurus/theme-common";
 import { useNavbarSecondaryMenu } from "@docusaurus/theme-common/internal";
 import { translate } from "@docusaurus/Translate";
-import { Button, Icon, Text } from "@mittwald/flow-react-components";
-import { IconChevronLeft } from "@tabler/icons-react";
+import { Button, IconChevronLeft, Text } from "@mittwald/flow-react-components";
 import styles from "./styles.module.css";
 
 /**
@@ -34,9 +33,7 @@ export default function NavbarMobileSidebarSecondaryMenu(): ReactNode {
           className={styles.back}
           onPress={() => secondaryMenu.hide()}
         >
-          <Icon>
-            <IconChevronLeft />
-          </Icon>
+          <IconChevronLeft />
           <Text>{backLabel}</Text>
         </Button>
       )}

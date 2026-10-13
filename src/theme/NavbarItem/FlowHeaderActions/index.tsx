@@ -15,16 +15,12 @@ import {
   ContextMenuTrigger,
   HeaderNavigation,
   Icon,
+  IconDesktop,
+  IconLanguage,
   Link,
   MenuItem,
 } from "@mittwald/flow-react-components";
-import {
-  IconBrandGithub,
-  IconDeviceDesktop,
-  IconLanguage,
-  IconMoon,
-  IconSun,
-} from "@tabler/icons-react";
+import { IconBrandGithub, IconMoon, IconSun } from "@tabler/icons-react";
 import IconLinkButton from "@site/src/components/IconLinkButton";
 import styles from "./styles.module.css";
 
@@ -74,9 +70,7 @@ function LocaleSwitch() {
   return (
     <ContextMenuTrigger>
       <Button aria-label={label}>
-        <Icon>
-          <IconLanguage />
-        </Icon>
+        <IconLanguage />
       </Button>
       <ContextMenu
         selectionMode="single"
@@ -157,9 +151,9 @@ function ColorModeButton() {
       <Icon className={clsx(styles.toggleIcon, styles.darkToggleIcon)}>
         <IconMoon />
       </Icon>
-      <Icon className={clsx(styles.toggleIcon, styles.systemToggleIcon)}>
-        <IconDeviceDesktop />
-      </Icon>
+      <IconDesktop
+        className={clsx(styles.toggleIcon, styles.systemToggleIcon)}
+      />
     </Button>
   );
 }
@@ -190,7 +184,11 @@ export default function FlowHeaderActions({ items, mobile }: Props): ReactNode {
                 href={item.href}
                 target="_blank"
                 label={item.label}
-                icon={<LinkIcon />}
+                icon={
+                  <Icon>
+                    <LinkIcon />
+                  </Icon>
+                }
               />
             </ClearPropsContext>
           </li>

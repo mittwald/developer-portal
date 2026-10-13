@@ -2,12 +2,11 @@ import {
   AccentBox,
   Button,
   Flex,
-  Icon,
+  IconSshKey,
   Section,
   Text,
 } from "@mittwald/flow-react-components";
 import Translate from "@docusaurus/Translate";
-import { IconKey } from "@tabler/icons-react";
 import React from "react";
 import ApiKeyForm from "./ApiKeyForm";
 import styles from "./index.module.css";
@@ -38,9 +37,7 @@ function ApiKeyInfo({
 }: ApiKeyInfoProps) {
   return (
     <AccentBox>
-      <Icon color="var(--icon--color)">
-        <IconKey />
-      </Icon>
+      <IconSshKey color="var(--icon--color)" />
       <Section>
         {/* On narrow screens the buttons move to the next line as a whole
             instead of breaking their labels */}
@@ -71,7 +68,7 @@ function ApiKeyInfo({
               variant="soft"
               color="dark"
               size="s"
-              onClick={onClearApiKey}
+              onPress={onClearApiKey}
             >
               <Translate id="playground.apikey.forget">
                 Forget API key

@@ -5,9 +5,13 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
-import { Button } from "@mittwald/flow-react-components";
-import { IconZoomIn, IconZoomOut, IconRefresh } from "@tabler/icons-react";
-import { translate } from "@docusaurus/Translate";
+import {
+  Button,
+  IconMinus,
+  IconPlus,
+  IconRefresh,
+} from "@mittwald/flow-react-components";
+import Translate, { translate } from "@docusaurus/Translate";
 import styles from "./index.module.css";
 
 export interface InteractiveMermaidDiagramProps {
@@ -276,36 +280,36 @@ function InteractiveMermaidDiagram({
           <Button
             variant="soft"
             size="s"
-            onClick={handleZoomOut}
+            onPress={handleZoomOut}
             aria-label={translate({
               id: "components.InteractiveMermaidDiagram.zoomOut",
               message: "Zoom out",
             })}
           >
-            <IconZoomOut size={16} />
+            <IconMinus />
           </Button>
           <span className={styles.zoomLevel}>{zoom}%</span>
           <Button
             variant="soft"
             size="s"
-            onClick={handleZoomIn}
+            onPress={handleZoomIn}
             aria-label={translate({
               id: "components.InteractiveMermaidDiagram.zoomIn",
               message: "Zoom in",
             })}
           >
-            <IconZoomIn size={16} />
+            <IconPlus />
           </Button>
           <Button
             variant="soft"
             size="s"
-            onClick={handleReset}
+            onPress={handleReset}
             aria-label={translate({
               id: "components.InteractiveMermaidDiagram.resetZoom",
               message: "Reset zoom",
             })}
           >
-            <IconRefresh size={16} />
+            <IconRefresh />
           </Button>
         </div>
       </div>
@@ -337,10 +341,10 @@ function InteractiveMermaidDiagram({
       </div>
 
       <div className={styles.hint}>
-        <small>
-          💡 Desktop: Ctrl/Cmd + Scroll to zoom • Drag to pan • Mobile: Pinch to
+        <Translate id="components.InteractiveMermaidDiagram.hint">
+          Desktop: Ctrl/Cmd + scroll to zoom • Drag to pan • Mobile: Pinch to
           zoom • Drag to pan
-        </small>
+        </Translate>
       </div>
     </div>
   );

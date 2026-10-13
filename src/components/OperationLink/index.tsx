@@ -3,6 +3,7 @@ import MDXComponents from "@theme/MDXComponents";
 import { APIVersion, getOperationById, useSpec } from "@site/src/openapi/specs";
 import OperationPath from "@site/src/components/openapi/OperationPath";
 import HTTPMethod from "@site/src/components/openapi/HTTPMethod";
+import { InlineCode } from "@mittwald/flow-react-components";
 import styles from "./styles.module.css";
 import { slugFromTagName } from "@site/src/openapi/slugFromTagName";
 
@@ -25,7 +26,7 @@ export default function OperationLink({
   if (!operationSpec) {
     return (
       <>
-        unknown operation <code>{operation}</code>
+        unknown operation <InlineCode>{operation}</InlineCode>
       </>
     );
   }
@@ -34,7 +35,7 @@ export default function OperationLink({
   if (!tag) {
     return (
       <>
-        <code>{operation}</code> (untagged)
+        <InlineCode>{operation}</InlineCode> (untagged)
       </>
     );
   }

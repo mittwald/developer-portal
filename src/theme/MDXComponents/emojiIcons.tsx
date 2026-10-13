@@ -5,15 +5,14 @@ import React, {
   type ReactElement,
   type ReactNode,
 } from "react";
-import { Icon } from "@mittwald/flow-react-components";
 import {
-  IconAlertTriangle,
-  IconCash,
   IconCheck,
+  IconClose,
+  IconExtension,
   IconLock,
-  IconPuzzle,
-  IconX,
-} from "@tabler/icons-react";
+  IconPayment,
+  IconWarning,
+} from "@mittwald/flow-react-components";
 
 // Flow's default icon color; status icons use their status color instead
 const defaultIconColor = "var(--icon--color)";
@@ -24,36 +23,12 @@ const defaultIconColor = "var(--icon--color)";
  * name.
  */
 export const emojiIcons: Record<string, ReactElement> = {
-  "✅": (
-    <Icon color="success" aria-label="✅">
-      <IconCheck />
-    </Icon>
-  ),
-  "❌": (
-    <Icon color="danger" aria-label="❌">
-      <IconX />
-    </Icon>
-  ),
-  "⚠️": (
-    <Icon color="warning" aria-label="⚠️">
-      <IconAlertTriangle />
-    </Icon>
-  ),
-  "🧩": (
-    <Icon color={defaultIconColor} aria-label="🧩">
-      <IconPuzzle />
-    </Icon>
-  ),
-  "🔐": (
-    <Icon color={defaultIconColor} aria-label="🔐">
-      <IconLock />
-    </Icon>
-  ),
-  "💸": (
-    <Icon color={defaultIconColor} aria-label="💸">
-      <IconCash />
-    </Icon>
-  ),
+  "✅": <IconCheck color="success" aria-label="✅" />,
+  "❌": <IconClose color="danger" aria-label="❌" />,
+  "⚠️": <IconWarning color="warning" aria-label="⚠️" />,
+  "🧩": <IconExtension color={defaultIconColor} aria-label="🧩" />,
+  "🔐": <IconLock color={defaultIconColor} aria-label="🔐" />,
+  "💸": <IconPayment color={defaultIconColor} aria-label="💸" />,
 };
 
 /**

@@ -11,11 +11,10 @@ import {
   Button,
   ContextMenu,
   ContextMenuTrigger,
-  Icon,
+  IconChevronDown,
   MenuItem,
   Text,
 } from "@mittwald/flow-react-components";
-import { IconChevronDown } from "@tabler/icons-react";
 import styles from "./styles.module.css";
 
 /**
@@ -75,9 +74,7 @@ export default function DocItemTOCMobile(): ReactNode {
                 "The label used by the button on the collapsible TOC component",
             })}
           </Text>
-          <Icon>
-            <IconChevronDown />
-          </Icon>
+          <IconChevronDown />
         </Button>
         <ContextMenu
           onAction={(id) => {

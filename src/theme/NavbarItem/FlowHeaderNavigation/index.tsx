@@ -11,12 +11,11 @@ import {
   ContextMenu,
   ContextMenuTrigger,
   HeaderNavigation,
-  Icon,
+  IconMenu,
   Link,
   MenuItem,
   Text,
 } from "@mittwald/flow-react-components";
-import { IconMenu2 } from "@tabler/icons-react";
 import styles from "./styles.module.css";
 
 /**
@@ -137,9 +136,7 @@ export default function FlowHeaderNavigation({
       <div className={styles.compact}>
         <ContextMenuTrigger>
           <Button variant="plain" color="secondary" aria-label={label}>
-            <Icon>
-              <IconMenu2 />
-            </Icon>
+            <IconMenu />
           </Button>
           <ContextMenu>
             <Entries

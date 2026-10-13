@@ -4,7 +4,7 @@ import SchemaWithExample from "@site/src/components/openapi/SchemaWithExample";
 
 interface Props {
   apiVersion: APIVersion;
-  ref: string;
+  path: string;
   withExample: boolean;
 }
 

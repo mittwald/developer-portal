@@ -1,7 +1,13 @@
 import React from "react";
 import Translate from "@docusaurus/Translate";
 import MDXComponents from "@theme/MDXComponents";
-import { Alert, Content, Heading, Text } from "@mittwald/flow-react-components";
+import {
+  Alert,
+  Content,
+  Heading,
+  InlineCode,
+  Text,
+} from "@mittwald/flow-react-components";
 import HTTPMethod from "@site/src/components/openapi/HTTPMethod";
 import OperationPath from "@site/src/components/openapi/OperationPath";
 import { buildOperationUrl } from "@site/src/components/openapi/OperationLink";
@@ -36,7 +42,7 @@ function OperationHintItem({
   if (!operation) {
     return (
       <li>
-        unknown operation <code>{operationId}</code>
+        unknown operation <InlineCode>{operationId}</InlineCode>
       </li>
     );
   }

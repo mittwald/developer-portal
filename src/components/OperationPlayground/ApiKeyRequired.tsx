@@ -4,13 +4,13 @@ import {
   Button,
   Content,
   Heading,
+  IconSshKey,
   IllustratedMessage,
   Modal,
   ModalProps,
   Text,
 } from "@mittwald/flow-react-components";
 import Translate from "@docusaurus/Translate";
-import { IconKey } from "@tabler/icons-react";
 import React from "react";
 import ApiKeyForm from "./ApiKeyForm";
 
@@ -40,7 +40,7 @@ function ApiKeyRequired({
       </Heading>
       <Content>
         <IllustratedMessage>
-          <IconKey />
+          <IconSshKey />
           <Heading>
             <Translate id="playground.apikey.required.title">
               API key required

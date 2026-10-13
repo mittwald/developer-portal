@@ -1,8 +1,7 @@
 import React, { type ReactNode } from "react";
 import { useNavbarMobileSidebar } from "@docusaurus/theme-common/internal";
 import { translate } from "@docusaurus/Translate";
-import { Button, Icon } from "@mittwald/flow-react-components";
-import { IconMenu2 } from "@tabler/icons-react";
+import { Button, IconMenu } from "@mittwald/flow-react-components";
 
 /**
  * Mobile menu toggle as a plain Flow icon button, like the compact header
@@ -26,9 +25,7 @@ export default function MobileSidebarToggle(): ReactNode {
             "The ARIA label for hamburger menu button of mobile navigation",
         })}
       >
-        <Icon>
-          <IconMenu2 />
-        </Icon>
+        <IconMenu />
       </Button>
     </span>
   );

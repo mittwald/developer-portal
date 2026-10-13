@@ -48,7 +48,7 @@ function RequestSection({
         <Translate id="playground.request.title">Request</Translate>
       </Heading>
       <div className={styles.operationPath}>
-        <HTTPMethod method={method} />
+        <HTTPMethod method={method} className={styles.operationPathMethod} />
         <OperationPath
           path={path}
           values={pathParams}

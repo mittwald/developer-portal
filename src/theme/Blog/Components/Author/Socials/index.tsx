@@ -1,6 +1,11 @@
 import React, { type ComponentType, type ReactNode } from "react";
 import type { Props } from "@theme/Blog/Components/Author/Socials";
-import { Flex } from "@mittwald/flow-react-components";
+import {
+  Flex,
+  Icon,
+  IconDomain,
+  IconEmail,
+} from "@mittwald/flow-react-components";
 import IconLinkButton from "@site/src/components/IconLinkButton";
 import {
   IconBrandBluesky,
@@ -14,8 +19,6 @@ import {
   IconBrandTwitter,
   IconBrandX,
   IconBrandYoutube,
-  IconMail,
-  IconWorld,
 } from "@tabler/icons-react";
 
 /**
@@ -24,27 +27,39 @@ import {
  * @docusaurus/theme-classic.
  */
 
+/** A Tabler brand icon (Flow has no brand icons) as Flow icon */
+function brandIcon(BrandIcon: ComponentType) {
+  return (
+    <Icon>
+      <BrandIcon />
+    </Icon>
+  );
+}
+
 const socialPlatforms: Record<
   string,
-  { Icon: ComponentType; label: string } | undefined
+  { icon: ReactNode; label: string } | undefined
 > = {
-  twitter: { Icon: IconBrandTwitter, label: "Twitter" },
-  github: { Icon: IconBrandGithub, label: "GitHub" },
-  stackoverflow: { Icon: IconBrandStackoverflow, label: "Stack Overflow" },
-  linkedin: { Icon: IconBrandLinkedin, label: "LinkedIn" },
-  x: { Icon: IconBrandX, label: "X" },
-  bluesky: { Icon: IconBrandBluesky, label: "Bluesky" },
-  instagram: { Icon: IconBrandInstagram, label: "Instagram" },
-  threads: { Icon: IconBrandThreads, label: "Threads" },
-  mastodon: { Icon: IconBrandMastodon, label: "Mastodon" },
-  youtube: { Icon: IconBrandYoutube, label: "YouTube" },
-  twitch: { Icon: IconBrandTwitch, label: "Twitch" },
-  email: { Icon: IconMail, label: "Email" },
+  twitter: { icon: brandIcon(IconBrandTwitter), label: "Twitter" },
+  github: { icon: brandIcon(IconBrandGithub), label: "GitHub" },
+  stackoverflow: {
+    icon: brandIcon(IconBrandStackoverflow),
+    label: "Stack Overflow",
+  },
+  linkedin: { icon: brandIcon(IconBrandLinkedin), label: "LinkedIn" },
+  x: { icon: brandIcon(IconBrandX), label: "X" },
+  bluesky: { icon: brandIcon(IconBrandBluesky), label: "Bluesky" },
+  instagram: { icon: brandIcon(IconBrandInstagram), label: "Instagram" },
+  threads: { icon: brandIcon(IconBrandThreads), label: "Threads" },
+  mastodon: { icon: brandIcon(IconBrandMastodon), label: "Mastodon" },
+  youtube: { icon: brandIcon(IconBrandYoutube), label: "YouTube" },
+  twitch: { icon: brandIcon(IconBrandTwitch), label: "Twitch" },
+  email: { icon: <IconEmail />, label: "Email" },
 };
 
 function SocialLink({ platform, link }: { platform: string; link: string }) {
-  const { Icon: PlatformIcon, label } = socialPlatforms[platform] ?? {
-    Icon: IconWorld,
+  const { icon, label } = socialPlatforms[platform] ?? {
+    icon: <IconDomain />,
     label: platform,
   };
   return (
@@ -52,7 +67,7 @@ function SocialLink({ platform, link }: { platform: string; link: string }) {
       href={link}
       target={link.startsWith("mailto:") ? undefined : "_blank"}
       label={label}
-      icon={<PlatformIcon />}
+      icon={icon}
       size="s"
     />
   );

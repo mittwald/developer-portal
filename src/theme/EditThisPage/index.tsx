@@ -2,7 +2,7 @@ import React, { type ReactNode } from "react";
 import { translate } from "@docusaurus/Translate";
 import { ThemeClassNames } from "@docusaurus/theme-common";
 import type { Props } from "@theme/EditThisPage";
-import { IconPencil } from "@tabler/icons-react";
+import { IconEdit } from "@mittwald/flow-react-components";
 import IconLinkButton from "@site/src/components/IconLinkButton";
 import styles from "./styles.module.css";
 
@@ -24,7 +24,7 @@ export default function EditThisPage({ editUrl }: Props): ReactNode {
       href={editUrl}
       target="_blank"
       label={label}
-      icon={<IconPencil />}
+      icon={<IconEdit />}
       className={`${ThemeClassNames.common.editThisPage} ${styles.link}`}
     />
   );

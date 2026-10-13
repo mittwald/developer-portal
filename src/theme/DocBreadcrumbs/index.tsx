@@ -4,8 +4,7 @@ import { ThemeClassNames } from "@docusaurus/theme-common";
 import { useSidebarBreadcrumbs } from "@docusaurus/plugin-content-docs/client";
 import { translate } from "@docusaurus/Translate";
 import DocBreadcrumbsStructuredData from "@theme/DocBreadcrumbs/StructuredData";
-import { Breadcrumb, Icon, Link } from "@mittwald/flow-react-components";
-import { IconHome } from "@tabler/icons-react";
+import { Breadcrumb, IconHome, Link } from "@mittwald/flow-react-components";
 import styles from "./styles.module.css";
 
 /**
@@ -38,9 +37,7 @@ export default function DocBreadcrumbs(): ReactNode {
       >
         <Breadcrumb size="s">
           <Link href="/" aria-label={homeLabel} className={styles.homeLink}>
-            <Icon>
-              <IconHome />
-            </Icon>
+            <IconHome />
           </Link>
           {breadcrumbs.map((item, idx) => {
             // Unlisted category links must not be linked

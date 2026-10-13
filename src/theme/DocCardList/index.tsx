@@ -10,28 +10,20 @@ import type {
   PropSidebarItemLink,
 } from "@docusaurus/plugin-content-docs";
 import { translate } from "@docusaurus/Translate";
-import isInternalUrl from "@docusaurus/isInternalUrl";
 import { usePluralForm } from "@docusaurus/theme-common";
 import type { Props } from "@theme/DocCardList";
 import { ColumnLayout } from "@mittwald/flow-react-components";
 import NavigationTile from "@site/src/components/NavigationTile";
-import {
-  IconExternalLink,
-  IconFileText,
-  IconFolder,
-} from "@tabler/icons-react";
 import styles from "./styles.module.css";
 
 /**
  * Cards for sidebar items (e.g. on generated category index pages), rendered
  * as navigation tiles in a Flow column layout. Swizzled (ejected) from
- * @docusaurus/theme-classic; replaces DocCard, whose emoji icons are swapped
- * for Flow icons.
+ * @docusaurus/theme-classic; replaces DocCard (without its emoji icons).
  */
 
 interface CardProps {
   href: string;
-  icon: ReactNode;
   title: string;
   description?: string;
 }
@@ -63,7 +55,6 @@ function CategoryCard({ item }: { item: PropSidebarItemCategory }) {
   return (
     <Card
       href={href}
-      icon={<IconFolder />}
       title={item.label}
       description={item.description ?? itemCount}
     />
@@ -75,7 +66,6 @@ function LinkCard({ item }: { item: PropSidebarItemLink }) {
   return (
     <Card
       href={item.href}
-      icon={isInternalUrl(item.href) ? <IconFileText /> : <IconExternalLink />}
       title={item.label}
       description={item.description ?? doc?.description}
     />

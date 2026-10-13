@@ -14,7 +14,8 @@
   /* Infima fixes the height to 2rem; let it follow the Flow field metrics */
   height: auto;
   color: var(--form-control--content-color--default);
-  transition: all var(--transition--duration--fast) ease;
+  transition-property: background-color, border-color;
+  transition-duration: var(--transition--duration--fast);
   min-width: 260px;
   width: 260px;
 }
@@ -46,12 +47,6 @@
   z-index: 1;
 }
 
-@media screen and (max-width: 996px) {
-  .navbar__search::before {
-    display: none;
-  }
-}
-
 .search-bar::placeholder {
   color: var(--form-control--placeholder-color--default);
 }
@@ -65,9 +60,10 @@
   border-color: var(--form-control--border-color--focused);
 }
 
-/* Mobile responsiveness - deactivate search bar for now?! */
+/* No search on small screens (yet) */
 @media screen and (max-width: 996px) {
-  .search-bar {
+  .search-bar,
+  .navbar__search::before {
     display: none;
   }
 }
@@ -98,7 +94,7 @@
   padding: var(--size-rem--m);
   color: var(--text--color--default);
   text-decoration: none;
-  transition: background-color var(--transition--duration--fast) ease;
+  transition: background-color var(--transition--duration--fast);
 }
 
 .ds-suggestion a:hover,

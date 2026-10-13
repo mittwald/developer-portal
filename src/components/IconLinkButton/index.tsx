@@ -1,13 +1,14 @@
 import React, { type ReactNode } from "react";
 import clsx from "clsx";
-import { Button, Icon, Link } from "@mittwald/flow-react-components";
+import { Button, Link } from "@mittwald/flow-react-components";
 import styles from "./styles.module.css";
 
 interface IconLinkButtonProps {
   href: string;
   /** Accessible name, the button only shows the icon */
   label: string;
-  /** The (Tabler) icon */
+  /** A Flow icon (e.g. `<IconEdit />`), or another icon wrapped in Flow's
+   * `<Icon>` */
   icon: ReactNode;
   /** e.g. "_blank" for external links */
   target?: string;
@@ -36,7 +37,7 @@ export default function IconLinkButton({
       className={clsx(styles.link, className)}
     >
       <Button variant="plain" color="secondary" size={size}>
-        <Icon>{icon}</Icon>
+        {icon}
       </Button>
     </Link>
   );

@@ -3,8 +3,7 @@ import clsx from "clsx";
 import { translate } from "@docusaurus/Translate";
 import { ThemeClassNames } from "@docusaurus/theme-common";
 import { useBackToTopButton } from "@docusaurus/theme-common/internal";
-import { Button, Icon } from "@mittwald/flow-react-components";
-import { IconArrowUp } from "@tabler/icons-react";
+import { Button, IconChevronUp } from "@mittwald/flow-react-components";
 import styles from "./styles.module.css";
 
 /**
@@ -31,9 +30,7 @@ export default function BackToTopButton(): ReactNode {
         })}
         onPress={scrollToTop}
       >
-        <Icon>
-          <IconArrowUp />
-        </Icon>
+        <IconChevronUp />
       </Button>
     </div>
   );
