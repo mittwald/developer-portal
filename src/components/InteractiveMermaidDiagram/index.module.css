@@ -13,28 +13,26 @@
 .diagramWrapper {
   display: flex;
   flex-direction: column;
-  gap: var(--size-rem--s);
   background-color: var(--neutral--color--100);
   border: var(--border-width--100) var(--border-style--default)
     var(--separator--color);
   border-radius: var(--corner-radius--m);
-  padding: var(--size-rem--m);
+  /* No padding: the diagram spans the whole width, only controls and hint
+     are padded */
   overflow: hidden;
   min-height: 550px;
   max-width: 100%;
 }
 
-/* Control bar for zoom buttons */
+/* Control bar for zoom buttons, separated from the diagram by a line */
 .controls {
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
   gap: var(--size-rem--s);
-  padding: var(--size-rem--s);
-  background-color: var(--neutral--color--200);
-  border-radius: var(--corner-radius--m);
-  border: var(--border-width--100) var(--border-style--default)
+  padding: var(--size-rem--s) var(--size-rem--m);
+  border-bottom: var(--border-width--100) var(--border-style--default)
     var(--separator--color);
   position: relative;
   z-index: 10;
@@ -56,6 +54,14 @@
   color: var(--text--color--default);
   user-select: none;
   -webkit-user-select: none;
+}
+
+/* The visible area of the (zoomed and panned) diagram */
+.viewport {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* The diagram container - where mermaid SVG renders */
@@ -101,12 +107,14 @@
   margin: 0 auto;
 }
 
-/* Hint text below diagram */
+/* Hint text below diagram, separated from it by a line */
 .hint {
   font-size: var(--font-size-text--s);
   color: var(--neutral--color--800);
   text-align: center;
-  padding: var(--size-rem--xs) 0;
+  padding: var(--size-rem--s) var(--size-rem--m);
+  border-top: var(--border-width--100) var(--border-style--default)
+    var(--separator--color);
   user-select: none;
   -webkit-user-select: none;
   pointer-events: none;
@@ -127,7 +135,6 @@
 /* Responsive adjustments for small tablets and large phones */
 @media screen and (max-width: 768px) {
   .diagramWrapper {
-    padding: var(--size-rem--s);
     min-height: 400px;
   }
 
@@ -138,7 +145,6 @@
 
   .controls {
     flex-direction: row;
-    padding: var(--size-rem--s);
   }
 
   .zoomControls {
@@ -152,16 +158,11 @@
 @media screen and (max-width: 480px) {
   .diagramWrapper {
     min-height: 300px;
-    padding: var(--size-rem--s);
   }
 
   .diagram {
     min-height: 280px;
     max-height: 400px;
-  }
-
-  .controls {
-    padding: var(--size-rem--s);
   }
 
   .zoomControls {

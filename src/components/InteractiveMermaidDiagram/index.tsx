@@ -314,29 +314,32 @@ function InteractiveMermaidDiagram({
         </div>
       </div>
 
-      <div
-        ref={diagramRef}
-        className={styles.diagram}
-        style={transformStyle as React.CSSProperties}
-        onMouseDown={handleDiagramMouseDown}
-        onMouseMove={handleDiagramMouseMove}
-        onMouseUp={handleDiagramMouseUp}
-        onMouseLeave={handleDiagramMouseUp}
-        onTouchStart={handleDiagramTouchStart}
-        onTouchMove={handleDiagramTouchMove}
-        onTouchEnd={handleDiagramTouchEnd}
-        onTouchCancel={handleDiagramTouchCancel}
-        role="img"
-        aria-label={
-          title ||
-          translate({
-            id: "components.InteractiveMermaidDiagram.label",
-            message: "Interactive diagram",
-          })
-        }
-      >
-        <div className={styles.diagramContent} ref={contentRef}>
-          {children}
+      {/* Clips the zoomed diagram, so that it does not cover the hint */}
+      <div className={styles.viewport}>
+        <div
+          ref={diagramRef}
+          className={styles.diagram}
+          style={transformStyle as React.CSSProperties}
+          onMouseDown={handleDiagramMouseDown}
+          onMouseMove={handleDiagramMouseMove}
+          onMouseUp={handleDiagramMouseUp}
+          onMouseLeave={handleDiagramMouseUp}
+          onTouchStart={handleDiagramTouchStart}
+          onTouchMove={handleDiagramTouchMove}
+          onTouchEnd={handleDiagramTouchEnd}
+          onTouchCancel={handleDiagramTouchCancel}
+          role="img"
+          aria-label={
+            title ||
+            translate({
+              id: "components.InteractiveMermaidDiagram.label",
+              message: "Interactive diagram",
+            })
+          }
+        >
+          <div className={styles.diagramContent} ref={contentRef}>
+            {children}
+          </div>
         </div>
       </div>
 
