@@ -170,15 +170,7 @@ With JSON responses still disabled, expect `403 Forbidden`. After enabling JSON 
 
 ### Enable JSON responses {#json-responses}
 
-Agentic runtimes need machine-readable search results. Enable `json` in the `search.formats` list of SearXNG's `settings.yml`, keeping any formats you also need for browser-based searches:
-
-1. Download the configuration file created when SearXNG first started. Run the following command on your local machine, replacing `<CONTAINER_SSH_STRING>` with the SSH connection string for your SearXNG container (`user@host`):
-
-```shellsession
-user@local $ scp <CONTAINER_SSH_STRING>:/etc/searxng/settings.yml settings.yml
-```
-
-2. Open the downloaded `settings.yml` in your editor and add `json` to the existing `search.formats` list. Keep `html` enabled for browser-based searches:
+Agentic runtimes need machine-readable search results. Add the entire following `search` section to SearXNG's `settings.yml` to enable JSON responses while keeping HTML enabled for browser-based searches:
 
 ```yaml title="settings.yml (excerpt)"
 search:
@@ -187,17 +179,42 @@ search:
     - json
 ```
 
-Merge this excerpt into the existing configuration rather than replacing the entire file or adding a duplicate `search` section.
+Keep the rest of the configuration unchanged. If a `search` section already exists, merge the block into that section, preserving other settings and any additional formats you need. Do not add a duplicate `search` section.
 
+Choose how to edit the configuration file:
+
+<Tabs groupId="searxng-config-access">
+<TabItem value="mstudio" label="mStudio File browser">
+
+The **File browser** extension from the mStudio marketplace lets you upload and download files in mStudio. Some files can also be edited directly in the browser; others must be downloaded, edited locally, and uploaded again.
+
+1. Install the **File browser** extension from the mStudio marketplace.
+2. Open the SearXNG container's settings in mStudio and select the **File browser** tab, which becomes available after installation.
+3. Locate `/etc/searxng/settings.yml`. If direct editing is available, add the entire `search` block shown above (or merge it into an existing `search` section) and save the file.
+4. Otherwise, download `settings.yml`, make the same change in your local editor, and upload the edited file back to `/etc/searxng/`. mStudio asks for confirmation before overwriting the existing file; confirm to replace it with your edited version.
+
+</TabItem>
+<TabItem value="scp" label="SCP">
+
+1. Download the configuration file created when SearXNG first started. Run the following command on your local machine, replacing `<CONTAINER_SSH_STRING>` with the SSH connection string for your SearXNG container (`user@host`):
+
+```shellsession
+user@local $ scp <CONTAINER_SSH_STRING>:/etc/searxng/settings.yml settings.yml
+```
+
+2. Open the downloaded `settings.yml` in your editor and add the entire `search` block shown above (or merge it into an existing `search` section).
 3. Upload the edited file to the container's configuration directory:
 
 ```shellsession
 user@local $ scp settings.yml <CONTAINER_SSH_STRING>:/etc/searxng/
 ```
 
+</TabItem>
+</Tabs>
+
 The file is stored on the persistent `core-config` volume, so the change survives container restarts.
 
-4. Restart the SearXNG container in mStudio to apply the updated configuration. Repeat the JSON curl request from the previous section. It should now return `200 OK` with a JSON response body instead of `403 Forbidden`.
+Restart the SearXNG container in mStudio to apply the updated configuration. Repeat the JSON curl request from the previous section. It should now return `200 OK` with a JSON response body instead of `403 Forbidden`.
 
 ## Connecting to Open WebUI {#openwebui}
 
