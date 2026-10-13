@@ -31,10 +31,10 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
+  IconUndo,
   Section,
   Text,
 } from "@mittwald/flow-react-components";
-import { IconArrowBackUp } from "@tabler/icons-react";
 import {
   emojiIcons,
   replaceLeadingEmojiIcon,
@@ -100,7 +100,7 @@ function MDXTitle(props: ComponentProps<"h1">) {
     return heading;
   }
   return (
-    <Header>
+    <Header className={styles.titleHeader}>
       {heading}
       {actions}
     </Header>
@@ -130,9 +130,7 @@ function MDXLink({ href, children, className, ...rest }: ComponentProps<"a">) {
         className={clsx(styles.footnoteBackref, className)}
         {...(rest as ComponentProps<typeof Link>)}
       >
-        <Icon>
-          <IconArrowBackUp />
-        </Icon>
+        <IconUndo />
       </Link>
     );
   }
@@ -140,10 +138,13 @@ function MDXLink({ href, children, className, ...rest }: ComponentProps<"a">) {
   // External links open in a new tab, which also shows Flow's external link
   // icon (as with all other external Flow links)
   const isExternal = !!href && /^(https?:)?\/\//.test(href);
+  // Footnote references (superscript numbers) are standalone Flow links: bold,
+  // without underline
+  const isFootnoteRef = "data-footnote-ref" in rest;
 
   return (
     <Link
-      inline
+      inline={!isFootnoteRef}
       href={href}
       target={isExternal ? "_blank" : undefined}
       linkComponent={MDXA}
@@ -246,8 +247,6 @@ function MDXBlockquote(props: ComponentProps<"blockquote">) {
   );
 }
 
-/** Sections created by the rehypeFlowSections plugin (including the
- * footnotes); other sections stay plain */
 /**
  * Whether the content is only the page title (Docusaurus wraps the Markdown
  * title in a header element)
@@ -267,6 +266,8 @@ function containsOnlyTitle(children: ReactNode): boolean {
   );
 }
 
+/** Sections created by the rehypeFlowSections plugin (including the
+ * footnotes); other sections stay plain */
 function MDXSection(
   props: ComponentProps<"section"> & Record<string, unknown>,
 ) {

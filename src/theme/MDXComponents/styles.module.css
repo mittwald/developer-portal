@@ -59,10 +59,6 @@ ul.iconList {
   padding-inline-start: 0;
 }
 
-ul.iconList > li::before {
-  content: none;
-}
-
 /* Flow styles the blockquote (border and padding at the start); Infima's own
    blockquote styles are reset */
 .blockquote blockquote {
@@ -84,7 +80,9 @@ li > .list {
   margin-block: 0;
 }
 
-.list .listItem > * + * {
+/* Only block children are spaced; inline content (links, code, emphasis)
+   stays in the text flow */
+.list .listItem > * + :is(p, ul, ol, div, pre, table, blockquote, section) {
   margin-top: var(--section--spacing);
 }
 
@@ -115,4 +113,15 @@ li > .list {
 .leadingStatusIcon {
   display: inline-flex;
   vertical-align: text-bottom;
+}
+
+/* The actions stay next to the title (also when it wraps), aligned with its
+   first line */
+.titleHeader {
+  flex-wrap: nowrap;
+  align-items: flex-start;
+}
+
+.titleHeader > :first-child {
+  min-width: 0;
 }

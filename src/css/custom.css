@@ -259,6 +259,12 @@ p a {
   text-decoration: underline;
 }
 
+/* Footnote references are standalone Flow links (see MDXComponents) */
+.markdown a[data-footnote-ref] {
+  font-weight: var(--font-weight--bold);
+  text-decoration: none;
+}
+
 /* Navbar */
 
 .navbar {
@@ -266,9 +272,36 @@ p a {
     var(--separator--color);
 }
 
+/* The menu buttons (compact header menu, mobile menu toggle) sit at the
+   right end of the navbar: the left and right item groups are dissolved, so
+   that all items share one flex row and the buttons can be moved to its end;
+   the right items keep their place on the right */
+.navbar__inner {
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.navbar__inner > .navbar__items {
+  display: contents;
+}
+
+.navbar__items--right > :first-child {
+  margin-left: auto;
+}
+
 /* The mobile menu button (a Flow button) brings its own spacing */
 .navbar__toggle {
+  order: 1;
   margin-right: 0;
+  margin-left: var(--size-rem--s);
+}
+
+/* Infima shows the toggle with "display: inherit", which would now inherit
+   the dissolved group's "contents" and drop the order */
+@media (max-width: 996px) {
+  .navbar__toggle {
+    display: flex;
+  }
 }
 
 /* The mobile menu is a Flow off-canvas modal with its own backdrop
@@ -284,6 +317,13 @@ p a {
   justify-content: center;
   row-gap: var(--size-rem--xs);
   margin-inline: var(--size-rem--m) var(--size-rem--xl);
+}
+
+/* On small screens flush with the content (the menu toggle is on the right) */
+@media (max-width: 996px) {
+  .navbar__brand {
+    margin-inline-start: 0;
+  }
 }
 
 .navbar__brand:hover {
@@ -353,11 +393,6 @@ table.flow--table {
 
 .flow--alert {
   margin-bottom: var(--ifm-leading);
-}
-
-.flow--alert--content ul {
-  list-style-type: square;
-  margin-left: 1.5em;
 }
 
 .flow--overlay {

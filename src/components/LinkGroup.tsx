@@ -1,10 +1,5 @@
 import React, { Fragment, type ReactNode } from "react";
-import {
-  Content,
-  Label,
-  LabeledValue,
-  Text,
-} from "@mittwald/flow-react-components";
+import { Text } from "@mittwald/flow-react-components";
 
 interface LinkGroupProps {
   title: ReactNode;
@@ -12,24 +7,20 @@ interface LinkGroupProps {
 }
 
 /**
- * Related links under a common title, as Flow labeled value. Used in the
- * (dark) feature cards of the landing pages; the labeled value content does
- * not pass on the card's color, so the text sets it again.
+ * Related links under a common title in bold text (not a Flow label), the
+ * links in the line below. Used in the feature cards of the landing pages.
  */
 export default function LinkGroup({ title, links }: LinkGroupProps) {
   return (
-    <LabeledValue>
-      <Label>{title}</Label>
-      <Content>
-        <Text color="dark">
-          {links.map((link, i) => (
-            <Fragment key={i}>
-              {link}
-              {i < links.length - 1 && " | "}
-            </Fragment>
-          ))}
-        </Text>
-      </Content>
-    </LabeledValue>
+    <Text elementType="div" color="dark">
+      <strong>{title}</strong>
+      <br />
+      {links.map((link, i) => (
+        <Fragment key={i}>
+          {link}
+          {i < links.length - 1 && " | "}
+        </Fragment>
+      ))}
+    </Text>
   );
 }

@@ -15,7 +15,7 @@ import {
 import styles from "./styles.module.css";
 
 /**
- * Mobile navigation as Flow off-canvas modal on the left, where the menu
+ * Mobile navigation as Flow off-canvas modal on the right, where the menu
  * toggle is; Flow brings the backdrop, the close button and the scroll lock.
  * Shows either the navbar items or the contextual secondary menu (e.g. the
  * docs sidebar). Ejected from @docusaurus/theme-classic (replaces Layout and
@@ -39,7 +39,7 @@ export default function NavbarMobileSidebar(): ReactNode {
   return (
     <Modal
       offCanvas
-      offCanvasOrientation="left"
+      offCanvasOrientation="right"
       controller={controller}
       // Closed by Flow (close button, backdrop, Escape)
       onOpenChange={(isOpen) => {

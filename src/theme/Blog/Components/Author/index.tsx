@@ -1,14 +1,15 @@
 import React, { type ReactNode } from "react";
 import clsx from "clsx";
-import Link from "@docusaurus/Link";
+import DocusaurusLink from "@docusaurus/Link";
 import AuthorSocials from "@theme/Blog/Components/Author/Socials";
 import type { Props } from "@theme/Blog/Components/Author";
 import {
   Avatar,
-  Badge,
   Combine,
+  CounterBadge,
   Image,
   Initials,
+  Link,
   Text,
 } from "@mittwald/flow-react-components";
 import styles from "./styles.module.css";
@@ -40,19 +41,22 @@ export default function BlogAuthor({
         </Avatar>
         {(name || title) && (
           <Text elementType="div">
-            {displayName && link ? (
-              <Link href={link} className={styles.name}>
-                {displayName}
-              </Link>
-            ) : (
-              displayName
-            )}
-            {count !== undefined && (
-              <>
-                {" "}
-                <Badge>{count}</Badge>
-              </>
-            )}
+            {/* The post count (on the authors page) stays next to the name */}
+            <span className={styles.nameRow}>
+              {displayName && link ? (
+                <Link
+                  href={link}
+                  color="dark"
+                  inline
+                  linkComponent={DocusaurusLink}
+                >
+                  {displayName}
+                </Link>
+              ) : (
+                displayName
+              )}
+              {count !== undefined && <CounterBadge count={count} />}
+            </span>
             {/* Combine stacks name, title and social links, as in Flow's
                 example */}
             {title}
