@@ -29,13 +29,14 @@ export default function Hero({ children }: PropsWithChildren<{}>) {
 
 /**
  * Entry points below the title: linked accent boxes, three per row, spaced
- * like the cards of the feature rows
+ * like the cards of the feature rows. Narrower, they stack instead of leaving
+ * the third box alone in a second row (see styles.module.css).
  */
 export function HeroEntries({ children }: PropsWithChildren<{}>) {
   return (
     <ColumnLayout
       s={[1]}
-      m={[1, 1]}
+      m={[1]}
       l={[1, 1, 1]}
       rowGap="m"
       columnGap="xl"

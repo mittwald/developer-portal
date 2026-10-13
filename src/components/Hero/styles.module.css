@@ -1,7 +1,8 @@
-/* On the Flow gradient like flow.mittwald.de */
+/* On the landing page background (src/css/custom.css) */
 .hero {
   padding: var(--size-rem--xxl) var(--size-rem--m);
-  background: var(--color--gradient);
+  background: var(--landing--gradient);
+  background-blend-mode: overlay, normal;
 }
 
 /* On small screens the container alone pads the content, flush with the
@@ -38,6 +39,14 @@
   text-align: start;
 }
 
+/* All three side by side from 700px on, earlier than Flow's large layout
+   (850px); below that they stack */
+@container (min-width: 700px) {
+  .entries :global(.flow--column-layout) {
+    grid-template-columns: var(--column-layout--columns-l);
+  }
+}
+
 .entry {
   display: block;
   height: 100%;
@@ -58,11 +67,14 @@
 
 /* The layout card pads the box, the box pads the message */
 .entryMessage {
+  flex-grow: 1;
   padding: 0;
 }
 
-/* Styled like a dark Flow inline link (the whole box is the link) */
+/* Styled like a dark Flow inline link (the whole box is the link); at the
+   bottom, so the links of a row line up */
 .entryLink {
+  margin-top: auto;
   color: var(--link--color-dark--default);
   text-decoration: underline;
 }
