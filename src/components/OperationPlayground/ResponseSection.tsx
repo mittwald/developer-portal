@@ -1,5 +1,6 @@
 import {
   Accordion,
+  AccordionGroup,
   Content,
   Heading,
   Section,
@@ -29,15 +30,17 @@ function ResponseSection({ response, responseText }: ResponseSectionProps) {
         <Translate id="playground.response.title">Response</Translate>
       </Heading>
       <ResponseStatus response={response} />
-      <ResponseHeaders headers={response.headers} />
-      <Accordion defaultExpanded={true} variant="outline">
-        <Heading>
-          <Translate id="playground.response.body">Response body</Translate>
-        </Heading>
-        <Content>
-          <CodeBlock language="json">{responseText}</CodeBlock>
-        </Content>
-      </Accordion>
+      <AccordionGroup>
+        <ResponseHeaders headers={response.headers} />
+        <Accordion defaultExpanded={true}>
+          <Heading>
+            <Translate id="playground.response.body">Response body</Translate>
+          </Heading>
+          <Content>
+            <CodeBlock language="json">{responseText}</CodeBlock>
+          </Content>
+        </Accordion>
+      </AccordionGroup>
     </Section>
   );
 }

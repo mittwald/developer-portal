@@ -1,11 +1,14 @@
 import styles from "./OperationReference.module.css";
-import { PropsWithChildren } from "react";
 import Description from "@site/src/components/openapi/Description";
 import { OpenAPIV3 } from "openapi-types";
 import { Required } from "@site/src/components/openapi/RequiredOptional";
 import Translate, { translate } from "@docusaurus/Translate";
 import HTTPResponseStatus from "@site/src/components/openapi/HTTPResponseStatus";
-import { Accordion, InlineCode } from "@mittwald/flow-react-components";
+import {
+  Accordion,
+  AccordionGroup,
+  InlineCode,
+} from "@mittwald/flow-react-components";
 import { Heading } from "@mittwald/flow-react-components";
 import { Content } from "@mittwald/flow-react-components";
 import { Text } from "@mittwald/flow-react-components";
@@ -21,21 +24,6 @@ import SchemaWithExample from "@site/src/components/openapi/SchemaWithExample";
 import SchemaObject = OpenAPIV3.SchemaObject;
 import React from "react";
 import ExampleObject = OpenAPIV3.ExampleObject;
-
-function OutlinedAccordion({
-  children,
-  defaultExpanded,
-}: PropsWithChildren<{ defaultExpanded?: boolean }>) {
-  return (
-    <Accordion
-      defaultExpanded={defaultExpanded}
-      variant="outline"
-      style={{ marginBottom: "var(--size-rem--m)" }}
-    >
-      {children}
-    </Accordion>
-  );
-}
 
 function OperationParameter({ param }: { param: ParameterObject }) {
   const body = [];
@@ -108,7 +96,7 @@ function OperationParameterList({
   const hasRequired = params.some((param) => param.required);
 
   return (
-    <OutlinedAccordion defaultExpanded={expanded}>
+    <Accordion defaultExpanded={expanded}>
       <Heading>
         <span className={styles.accordionTitle}>
           {title}
@@ -116,16 +104,13 @@ function OperationParameterList({
         </span>
       </Heading>
       <Content>
-        <ul
-          className={styles.parameterList}
-          style={{ marginBottom: "var(--size-rem--m)" }}
-        >
+        <ul className={styles.parameterList}>
           {params.map((param, idx) => (
             <OperationParameter key={idx} param={param} />
           ))}
         </ul>
       </Content>
-    </OutlinedAccordion>
+    </Accordion>
   );
 }
 
@@ -187,7 +172,7 @@ function OperationRequestBody({
 
   if ("multipart/form-data" in spec.content) {
     return (
-      <OutlinedAccordion>
+      <Accordion>
         <Heading>
           <span className={styles.accordionTitle}>
             {title}
@@ -206,14 +191,14 @@ function OperationRequestBody({
             />
           </div>
         </Content>
-      </OutlinedAccordion>
+      </Accordion>
     );
   }
 
   if ("application/json" in spec.content) {
     const body = spec.content["application/json"];
     return (
-      <OutlinedAccordion>
+      <Accordion>
         <Heading>
           <span className={styles.accordionTitle}>
             {title}
@@ -231,7 +216,7 @@ function OperationRequestBody({
             />
           </div>
         </Content>
-      </OutlinedAccordion>
+      </Accordion>
     );
   }
 }
@@ -310,7 +295,7 @@ export function OperationRequest({
   }
 
   return (
-    <>
+    <AccordionGroup>
       <OperationParameterList
         title={translate({
           id: "openapi.operation.request.pathparams",
@@ -342,7 +327,7 @@ export function OperationRequest({
         })}
         spec={spec.requestBody as OpenAPIV3.RequestBodyObject}
       />
-    </>
+    </AccordionGroup>
   );
 }
 
@@ -373,12 +358,9 @@ export function OperationResponses({
 }) {
   const responseCodes = Object.keys(spec.responses);
   return (
-    <>
+    <AccordionGroup>
       {responseCodes.map((status) => (
-        <OutlinedAccordion
-          key={status}
-          defaultExpanded={status.startsWith("2")}
-        >
+        <Accordion key={status} defaultExpanded={status.startsWith("2")}>
           <Heading>
             <HTTPResponseStatus code={status} />
           </Heading>
@@ -388,8 +370,8 @@ export function OperationResponses({
               response={spec.responses[status] as ResponseObject}
             />
           </Content>
-        </OutlinedAccordion>
+        </Accordion>
       ))}
-    </>
+    </AccordionGroup>
   );
 }
