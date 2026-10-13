@@ -185,6 +185,148 @@ with open("standup.mp3", "rb") as f:
     )
 ```
 
+## Push-to-talk and dictation {#push-to-talk}
+
+For push-to-talk you don't need streaming: record while the user holds a button, and upload the clip when they let go. A transcription comes back fast enough that the text appears right after the button is released. In our test with the example below, the text appeared 0.2 to 0.4 seconds after the button was released. Your network round trip comes on top.
+
+Don't call the API from the browser directly, because the page would expose your API key. Let the browser send the recording to your own backend, and forward it from there. A minimal backend with [FastAPI](https://fastapi.tiangolo.com/):
+
+```shellsession
+user@local $ pip install openai fastapi uvicorn python-multipart
+```
+
+```python
+from fastapi import FastAPI, UploadFile
+from fastapi.responses import FileResponse
+
+app = FastAPI()
+
+
+@app.get("/")
+def page():
+    return FileResponse("index.html")
+
+
+@app.post("/api/transcribe")
+def transcribe(file: UploadFile):
+    result = client.audio.transcriptions.create(
+        model="cohere-transcribe-03-2026",
+        file=(file.filename, file.file.read(), file.content_type),
+        language="de",
+    )
+    return {"text": result.text}
+```
+
+Start it with `uvicorn app:app`. The `index.html` next to it records with the browser's `MediaRecorder` while the button is held down:
+
+```html
+<button id="talk">Hold to talk</button>
+<p id="text"></p>
+
+<script type="module">
+  const button = document.getElementById("talk");
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  let recorder;
+
+  button.addEventListener("pointerdown", () => {
+    const chunks = [];
+    recorder = new MediaRecorder(stream);
+    recorder.ondataavailable = (event) => chunks.push(event.data);
+    recorder.onstop = async () => {
+      // Chrome and Firefox record webm, Safari records mp4
+      const name = recorder.mimeType.includes("mp4")
+        ? "speech.m4a"
+        : "speech.webm";
+      const form = new FormData();
+      form.append("file", new Blob(chunks, { type: recorder.mimeType }), name);
+      const response = await fetch("/api/transcribe", {
+        method: "POST",
+        body: form,
+      });
+      document.getElementById("text").textContent = (
+        await response.json()
+      ).text;
+    };
+    recorder.start();
+  });
+
+  button.addEventListener("pointerup", () => recorder?.stop());
+</script>
+```
+
+Set `language` for push-to-talk. A clip of a few words is too short for reliable language detection.
+
+## Near-live transcription {#near-live}
+
+`cohere-transcribe-03-2026` does not transcribe audio while it is still being recorded, and there is no `/v1/realtime` endpoint for it. For live captions or continuous dictation, cut the microphone input at speech pauses on your side and send each sentence as its own request. A sentence takes only a fraction of a second to transcribe, so the text appears shortly after each pause.
+
+The following example detects pauses by volume, with no extra model. Fluent speakers rarely pause for long, so a short pause of 300 ms ends a sentence once it is at least 3 seconds long, and after 15 seconds the example cuts regardless. The text therefore lags behind by at most about 15 seconds. It needs `numpy` and `sounddevice`:
+
+```shellsession
+user@local $ pip install numpy sounddevice
+```
+
+```python
+import io
+import queue
+import wave
+
+import numpy as np
+import sounddevice as sd
+
+RATE = 16000
+FRAME = 480            # 30 ms per frame
+THRESHOLD = 0.02       # Volume that counts as speech, adjust it to your microphone
+PAUSE_FRAMES = 10      # 300 ms below the threshold end a sentence ...
+MIN_FRAMES = 100       # ... once it is at least 3 s long
+MAX_FRAMES = 500       # Cut after 15 s even without a pause
+
+
+def microphone():
+    """Yield the microphone input in 30 ms frames."""
+    frames = queue.Queue()
+    with sd.InputStream(samplerate=RATE, channels=1, blocksize=FRAME, dtype="float32",
+                        callback=lambda data, *_: frames.put(data[:, 0].copy())):
+        while True:
+            yield frames.get()
+
+
+def sentences(frames):
+    """Group frames into sentences of 3 to 15 seconds that end at a pause."""
+    current, quiet = [], 0
+    for frame in frames:
+        loud = np.sqrt(np.mean(frame ** 2)) > THRESHOLD
+        if loud or current:
+            current.append(frame)
+            quiet = 0 if loud else quiet + 1
+            if (quiet >= PAUSE_FRAMES and len(current) >= MIN_FRAMES) or len(current) >= MAX_FRAMES:
+                yield np.concatenate(current)
+                current, quiet = [], 0
+
+
+def to_wav(samples):
+    buf = io.BytesIO()
+    with wave.open(buf, "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(RATE)
+        w.writeframes((np.clip(samples, -1, 1) * 32767).astype(np.int16).tobytes())
+    return buf.getvalue()
+
+
+for sentence in sentences(microphone()):
+    if len(sentence) < RATE // 2:   # Skip clicks and coughs shorter than 0.5 s
+        continue
+    result = client.audio.transcriptions.create(
+        model="cohere-transcribe-03-2026",
+        file=("sentence.wav", to_wav(sentence)),
+        language="de",
+    )
+    print(result.text, flush=True)
+```
+
+While a request is running, the microphone keeps recording into the queue, so nothing is lost. Each request is billed by its audio duration, and pauses between sentences are not sent at all. Speaker labels and word timestamps are per request here too, so they start over with every sentence.
+
 ## Long recordings {#long-recordings}
 
 An upload can be up to 25 MB, the audio up to 95 minutes long. For long recordings the file size is the limit you hit first, so compress them to mono `mp3` or `opus` before you upload them. At 64 kbit/s, 25 MB holds roughly 52 minutes:

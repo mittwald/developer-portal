@@ -185,6 +185,148 @@ with open("standup.mp3", "rb") as f:
     )
 ```
 
+## Push-to-Talk und Diktat {#push-to-talk}
+
+Für Push-to-Talk brauchst du kein Streaming: Nimm auf, solange die Taste gedrückt ist, und lade den Clip hoch, wenn sie losgelassen wird. Die Transkription kommt so schnell zurück, dass der Text direkt nach dem Loslassen erscheint. In unserem Test mit dem Beispiel unten stand der Text 0,2 bis 0,4 Sekunden nach dem Loslassen da. Dazu kommt der Weg durch dein Netz.
+
+Ruf die API nicht direkt aus dem Browser auf, sonst steht dein API-Key im Quelltext der Seite. Lass den Browser die Aufnahme an dein eigenes Backend schicken und reich sie von dort weiter. Ein minimales Backend mit [FastAPI](https://fastapi.tiangolo.com/):
+
+```shellsession
+user@local $ pip install openai fastapi uvicorn python-multipart
+```
+
+```python
+from fastapi import FastAPI, UploadFile
+from fastapi.responses import FileResponse
+
+app = FastAPI()
+
+
+@app.get("/")
+def seite():
+    return FileResponse("index.html")
+
+
+@app.post("/api/transcribe")
+def transkribieren(file: UploadFile):
+    result = client.audio.transcriptions.create(
+        model="cohere-transcribe-03-2026",
+        file=(file.filename, file.file.read(), file.content_type),
+        language="de",
+    )
+    return {"text": result.text}
+```
+
+Starte es mit `uvicorn app:app`. Die `index.html` daneben nimmt mit dem `MediaRecorder` des Browsers auf, solange die Taste gedrückt ist:
+
+```html
+<button id="talk">Gedrückt halten und sprechen</button>
+<p id="text"></p>
+
+<script type="module">
+  const button = document.getElementById("talk");
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  let recorder;
+
+  button.addEventListener("pointerdown", () => {
+    const chunks = [];
+    recorder = new MediaRecorder(stream);
+    recorder.ondataavailable = (event) => chunks.push(event.data);
+    recorder.onstop = async () => {
+      // Chrome und Firefox nehmen webm auf, Safari mp4
+      const name = recorder.mimeType.includes("mp4")
+        ? "speech.m4a"
+        : "speech.webm";
+      const form = new FormData();
+      form.append("file", new Blob(chunks, { type: recorder.mimeType }), name);
+      const response = await fetch("/api/transcribe", {
+        method: "POST",
+        body: form,
+      });
+      document.getElementById("text").textContent = (
+        await response.json()
+      ).text;
+    };
+    recorder.start();
+  });
+
+  button.addEventListener("pointerup", () => recorder?.stop());
+</script>
+```
+
+Setz bei Push-to-Talk `language`. Ein Clip mit wenigen Wörtern ist zu kurz für eine verlässliche Spracherkennung.
+
+## Fast live transkribieren {#fast-live}
+
+`cohere-transcribe-03-2026` transkribiert kein Audio, das noch aufgenommen wird, und für das Modell gibt es keinen Endpunkt `/v1/realtime`. Für Live-Untertitel oder fortlaufendes Diktat schneidest du das Mikrofonsignal bei dir an Sprechpausen und schickst jeden Satz als eigene Anfrage. Ein Satz braucht nur einen Bruchteil einer Sekunde zum Transkribieren, der Text erscheint also kurz nach jeder Pause.
+
+Das folgende Beispiel erkennt Pausen an der Lautstärke, ohne zusätzliches Modell. Wer flüssig spricht, macht selten lange Pausen. Deshalb beendet schon eine Pause von 300 ms einen Satz, sobald er mindestens 3 Sekunden lang ist, und nach 15 Sekunden schneidet das Beispiel in jedem Fall. Der Text hängt also höchstens rund 15 Sekunden hinterher. Es braucht `numpy` und `sounddevice`:
+
+```shellsession
+user@local $ pip install numpy sounddevice
+```
+
+```python
+import io
+import queue
+import wave
+
+import numpy as np
+import sounddevice as sd
+
+RATE = 16000
+FRAME = 480            # 30 ms pro Frame
+THRESHOLD = 0.02       # Lautstärke, die als Sprache zählt, an dein Mikrofon anpassen
+PAUSE_FRAMES = 10      # 300 ms unter dem Schwellwert beenden einen Satz ...
+MIN_FRAMES = 100       # ... sobald er mindestens 3 s lang ist
+MAX_FRAMES = 500       # Nach 15 s auch ohne Pause schneiden
+
+
+def mikrofon():
+    """Liefert das Mikrofonsignal in Frames zu 30 ms."""
+    frames = queue.Queue()
+    with sd.InputStream(samplerate=RATE, channels=1, blocksize=FRAME, dtype="float32",
+                        callback=lambda data, *_: frames.put(data[:, 0].copy())):
+        while True:
+            yield frames.get()
+
+
+def saetze(frames):
+    """Fasst Frames zu Sätzen von 3 bis 15 Sekunden zusammen, die an einer Pause enden."""
+    aktuell, leise = [], 0
+    for frame in frames:
+        laut = np.sqrt(np.mean(frame ** 2)) > THRESHOLD
+        if laut or aktuell:
+            aktuell.append(frame)
+            leise = 0 if laut else leise + 1
+            if (leise >= PAUSE_FRAMES and len(aktuell) >= MIN_FRAMES) or len(aktuell) >= MAX_FRAMES:
+                yield np.concatenate(aktuell)
+                aktuell, leise = [], 0
+
+
+def als_wav(samples):
+    buf = io.BytesIO()
+    with wave.open(buf, "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(RATE)
+        w.writeframes((np.clip(samples, -1, 1) * 32767).astype(np.int16).tobytes())
+    return buf.getvalue()
+
+
+for satz in saetze(mikrofon()):
+    if len(satz) < RATE // 2:   # Klicks und Husten unter 0,5 s überspringen
+        continue
+    result = client.audio.transcriptions.create(
+        model="cohere-transcribe-03-2026",
+        file=("satz.wav", als_wav(satz)),
+        language="de",
+    )
+    print(result.text, flush=True)
+```
+
+Während eine Anfrage läuft, nimmt das Mikrofon weiter in die Queue auf, es geht also nichts verloren. Jede Anfrage wird nach ihrer Audiodauer abgerechnet, die Pausen zwischen den Sätzen werden gar nicht erst geschickt. Sprecherkennungen und Wort-Zeitstempel gelten auch hier pro Anfrage, sie fangen also mit jedem Satz von vorn an.
+
 ## Lange Aufnahmen {#lange-aufnahmen}
 
 Ein Upload darf bis zu 25 MB groß sein, das Audio bis zu 95 Minuten lang. Bei langen Aufnahmen stößt du zuerst an die Dateigröße, komprimier sie deshalb vor dem Upload zu `mp3` oder `opus` in mono. Bei 64 kbit/s passen in 25 MB rund 52 Minuten:

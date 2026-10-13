@@ -33,6 +33,7 @@ The following limitations apply:
 - Maximum audio duration: 95 minutes per request
 - One language per request. Mixed-language speech is not supported, see [One language per request](#one-language)
 - Streaming is not supported. A request with `stream=true` returns HTTP 400, so send it without `stream` to get the complete transcript
+- No real-time transcription of audio that is still being recorded, and no `/v1/realtime` endpoint. Push-to-talk works without it, and for live captions you can cut the input at speech pauses, see [Push-to-talk and dictation](/docs/v2/platform/aihosting/examples/cohere-transcribe/#push-to-talk) and [Near-live transcription](/docs/v2/platform/aihosting/examples/cohere-transcribe/#near-live)
 - No realtime or microphone input. The endpoint takes a complete file
 - Translation into another language is not supported
 - Word timestamps are not available for `el`, `ar`, `ko`, `ja`, `vi`, and `zh`
