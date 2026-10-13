@@ -40,7 +40,12 @@ export default function NavigationTile({
             {title}
           </Heading>
           {description && (
-            <Text className={styles.description}>{description}</Text>
+            <Text
+              align={alignEnd ? "end" : undefined}
+              className={styles.description}
+            >
+              {description}
+            </Text>
           )}
         </div>
       </AccentBox>
