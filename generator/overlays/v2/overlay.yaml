@@ -286,3 +286,19 @@ actions:
         "data:/var/lib/mysql",
         "/home/p-XXXXX/html:/var/www"
       ]
+
+  # These response descriptions link to operations with Swagger UI anchors
+  # (#/<tag>/<internal operation id>), which don't exist in the developer
+  # portal; link to the reference pages instead.
+  - target: $.paths['/v2/conversations/{conversationId}'].get.responses['200']
+    update:
+      description: |
+        The metadata of the conversation.
+        Does not contain messages send in the conversation.
+        Use [`/v2/conversations/{conversationId}/messages`](/docs/v2/reference/conversation/conversation-list-messages-by-conversation/) to get the messages.
+  - target: $.paths['/v2/conversations/{conversationId}/files'].post.responses['201']
+    update:
+      description: |
+        The upload token with additional rules describing what files can be uploaded using this token.
+        The token can be used with [`POST /v2/files`](/docs/v2/reference/file/file-create-file/) to upload a file that is
+        linked with the conversation.
