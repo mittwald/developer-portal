@@ -1,15 +1,16 @@
 /* On the landing page background (src/css/custom.css) */
 .hero {
-  padding: var(--size-rem--xxl) var(--size-rem--m);
+  padding: calc(var(--size-rem--xxl) * 1.5) var(--size-rem--m);
   background: var(--landing--gradient);
   background-blend-mode: overlay, normal;
 }
 
 /* On small screens the container alone pads the content, flush with the
-   header and the docs */
+   header and the docs; the top stays as high as the space between the title
+   and the entries */
 @media screen and (max-width: 996px) {
   .hero {
-    padding: var(--size-rem--xl) 0;
+    padding: calc(var(--size-rem--xxl) * 1.5) 0 calc(var(--size-rem--xl) * 1.5);
   }
 }
 
@@ -34,7 +35,7 @@
 
 /* Entry points below the title: linked accent boxes of equal height */
 .entries {
-  margin-top: var(--size-rem--xl);
+  margin-top: var(--size-rem--xxl);
   width: 100%;
   text-align: start;
 }

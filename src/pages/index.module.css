@@ -3,14 +3,41 @@
  * and scoped locally.
  */
 
-/* Logo above the title text, without gap: the line height of the text alone
-   spaces them like logo and title in the navbar (relative to the logo) */
+/* Logo centered above the title text; both full width, so that the logo can
+   grow beyond the title text */
+.heroTitle,
+.heroTitle :global(.flow--heading--heading-text) {
+  width: 100%;
+}
+
 .heroTitle :global(.flow--heading--heading-text) {
   display: flex;
   flex-direction: column;
   align-items: center;
+  row-gap: var(--size-rem--xs);
 }
 
+/* 1.25 times the largest size token high (the width follows from the logo's
+   aspect ratio, 2081.8 : 386.4) */
 .heroLogo {
-  height: var(--size-rem--xxl);
+  width: calc(var(--size-rem--xxl) * 1.25 * 2081.8 / 386.4);
+  max-width: 100%;
+  height: auto;
+}
+
+/* Smaller on small screens (Flow's breakpoint): the title one heading size
+   down, the logo about as wide as the title, spaced by the line height of the
+   text alone */
+@media (max-width: 550px) {
+  .heroTitle.heroTitle {
+    font-size: var(--font-size-heading--xl);
+  }
+
+  .heroTitle :global(.flow--heading--heading-text) {
+    row-gap: 0;
+  }
+
+  .heroLogo {
+    width: calc(var(--size-rem--xl) * 1.5 * 2081.8 / 386.4);
+  }
 }
