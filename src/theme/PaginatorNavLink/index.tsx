@@ -8,28 +8,30 @@ import styles from "./styles.module.css";
 /**
  * Previous/next links below a page as navigation tiles, like the category
  * cards: "Previous"/"Next" as heading with an arrow pointing in its
- * direction, the page title as text. Swizzled (ejected) from
- * @docusaurus/theme-classic.
+ * direction, the page title as text. Without such a label (e.g. "Newer
+ * entries" in the changelog list), the title is the heading. Swizzled
+ * (ejected) from @docusaurus/theme-classic.
  */
 export default function PaginatorNavLink(props: Props): ReactNode {
   const { permalink, title, subLabel, isNext } = props;
+  const heading = subLabel ?? title;
   return (
     <NavigationTile
       href={permalink}
       title={
         isNext ? (
           <>
-            {subLabel}
+            {heading}
             <IconForwardLink className={styles.forwardIcon} />
           </>
         ) : (
           <>
             <IconBackLink />
-            {subLabel}
+            {heading}
           </>
         )
       }
-      description={title}
+      description={subLabel ? title : undefined}
       alignEnd={isNext}
       className={clsx(isNext && styles.next)}
     />
