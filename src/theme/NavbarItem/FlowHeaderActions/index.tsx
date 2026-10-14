@@ -15,12 +15,16 @@ import {
   ContextMenuTrigger,
   HeaderNavigation,
   Icon,
-  IconDesktop,
   IconLanguage,
   Link,
   MenuItem,
 } from "@mittwald/flow-react-components";
-import { IconBrandGithub, IconMoon, IconSun } from "@tabler/icons-react";
+import {
+  IconBrandGithub,
+  IconColorModeDark,
+  IconColorModeLight,
+  IconColorModeSystem,
+} from "@site/src/icons";
 import IconLinkButton from "@site/src/components/IconLinkButton";
 import styles from "./styles.module.css";
 
@@ -146,14 +150,14 @@ function ColorModeButton() {
       onPress={() => setColorMode(getNextColorMode(colorModeChoice))}
     >
       <Icon className={clsx(styles.toggleIcon, styles.lightToggleIcon)}>
-        <IconSun />
+        <IconColorModeLight />
       </Icon>
       <Icon className={clsx(styles.toggleIcon, styles.darkToggleIcon)}>
-        <IconMoon />
+        <IconColorModeDark />
       </Icon>
-      <IconDesktop
-        className={clsx(styles.toggleIcon, styles.systemToggleIcon)}
-      />
+      <Icon className={clsx(styles.toggleIcon, styles.systemToggleIcon)}>
+        <IconColorModeSystem />
+      </Icon>
     </Button>
   );
 }

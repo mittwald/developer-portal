@@ -6,13 +6,13 @@ import LinkGroup from "@site/src/components/LinkGroup";
 import { NewBadge } from "@site/src/components/NewBadge";
 import FeatureCard from "@site/src/components/HomepageFeatures/FeatureCard";
 import { Heading, Icon, Link, Text } from "@mittwald/flow-react-components";
-import { IconCloudNetwork } from "@tabler/icons-react";
+import { IconCloud } from "@site/src/icons";
 
 function PlatformIntro() {
   return (
     <Intro>
       <Icon>
-        <IconCloudNetwork />
+        <IconCloud />
       </Icon>
       <Heading level={2} size="l">
         <Translate id={"index.deploy.title"}>

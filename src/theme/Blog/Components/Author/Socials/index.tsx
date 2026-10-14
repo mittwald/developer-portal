@@ -19,15 +19,15 @@ import {
   IconBrandTwitter,
   IconBrandX,
   IconBrandYoutube,
-} from "@tabler/icons-react";
+} from "@site/src/icons";
 
 /**
- * Social links of a changelog author as Flow links with Tabler icon buttons
- * (instead of the theme's own SVG logos). Ejected from
+ * Social links of a changelog author as Flow links with FontAwesome brand icon
+ * buttons (instead of the theme's own SVG logos). Ejected from
  * @docusaurus/theme-classic.
  */
 
-/** A Tabler brand icon (Flow has no brand icons) as Flow icon */
+/** A FontAwesome brand icon (Flow has no brand icons) as Flow icon */
 function brandIcon(BrandIcon: ComponentType) {
   return (
     <Icon>

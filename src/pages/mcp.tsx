@@ -14,11 +14,11 @@ import {
   IconBook,
   IconBrandGithub,
   IconListCheck,
-  IconPlugConnected,
+  IconPlug,
   IconRobot,
   IconRocket,
   IconUsers,
-} from "@tabler/icons-react";
+} from "@site/src/icons";
 
 import styles from "./cli.module.css";
 import mcpStyles from "./mcp.module.css";
@@ -240,7 +240,7 @@ function GettingStartedFeature() {
       intro={
         <Intro>
           <Icon>
-            <IconPlugConnected />
+            <IconPlug />
           </Icon>
           <Heading level={2} size="l">
             <Translate id="mcp.getStarted.title">Get started</Translate>

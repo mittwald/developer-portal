@@ -4,7 +4,7 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
 import Layout from "@theme/Layout";
 import ThemedImage from "@theme/ThemedImage";
 import { Heading } from "@mittwald/flow-react-components";
-import { IconPlugConnected, IconRobot, IconRocket } from "@tabler/icons-react";
+import { IconPlug, IconRobot, IconRocket } from "@site/src/icons";
 
 import APIFeature from "@site/src/components/HomepageFeatures/APIFeature";
 import ContributionFeature from "@site/src/components/HomepageFeatures/ContributionFeature";
@@ -56,7 +56,7 @@ function HomepageHeader() {
         />
         <HeroEntry
           href="/docs/v2/api/intro"
-          icon={<IconPlugConnected />}
+          icon={<IconPlug />}
           title={
             <Translate id={"index.cta"}>Get started with our API</Translate>
           }

@@ -6,7 +6,7 @@ import { IssueTrackerLink } from "@site/src/components/IssueTrackerLink";
 import LinkGroup from "@site/src/components/LinkGroup";
 import FeatureCard from "@site/src/components/HomepageFeatures/FeatureCard";
 import { Heading, Icon, Link, Text } from "@mittwald/flow-react-components";
-import { IconPlugConnected } from "@tabler/icons-react";
+import { IconPlug } from "@site/src/icons";
 import { NewBadge } from "@site/src/components/NewBadge";
 
 interface ReferenceLinkProps {
@@ -41,7 +41,7 @@ function APIIntro() {
   return (
     <Intro>
       <Icon>
-        <IconPlugConnected />
+        <IconPlug />
       </Icon>
       <Heading level={2} size="l">
         <Translate id={"index.api.title"}>

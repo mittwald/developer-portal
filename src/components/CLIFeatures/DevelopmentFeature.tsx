@@ -2,17 +2,14 @@ import FeatureRow from "@site/src/components/FeatureRow";
 import FeatureCard from "@site/src/components/HomepageFeatures/FeatureCard";
 import React from "react";
 import Intro from "@site/src/components/Intro";
-import { Heading, Icon, Link, Text } from "@mittwald/flow-react-components";
-import { IconScript } from "@tabler/icons-react";
+import { Heading, IconCode, Link, Text } from "@mittwald/flow-react-components";
 import Translate from "@docusaurus/Translate";
 import CodeBlock from "@theme/CodeBlock";
 
 function DevelopmentIntro() {
   return (
     <Intro>
-      <Icon>
-        <IconScript />
-      </Icon>
+      <IconCode />
       <Heading level={2} size="l">
         <Translate id={"cli.dev.title"}>Supercharge your development</Translate>
       </Heading>

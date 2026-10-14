@@ -1,6 +1,10 @@
 import Translate from "@docusaurus/Translate";
-import { Heading, Icon, Link, Text } from "@mittwald/flow-react-components";
-import { IconHeartHandshake } from "@tabler/icons-react";
+import {
+  Heading,
+  IconExtension,
+  Link,
+  Text,
+} from "@mittwald/flow-react-components";
 import FeatureRow from "../FeatureRow";
 import Intro from "../Intro";
 import { NewBadge } from "@site/src/components/NewBadge";
@@ -9,9 +13,7 @@ import FeatureCard from "@site/src/components/HomepageFeatures/FeatureCard";
 function ContributionIntro() {
   return (
     <Intro>
-      <Icon>
-        <IconHeartHandshake />
-      </Icon>
+      <IconExtension />
       <Heading level={2} size="l">
         <Translate id={"index.contribution.title"}>
           Build your own extensions for the mStudio marketplace

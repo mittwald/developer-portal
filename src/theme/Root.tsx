@@ -7,7 +7,13 @@ import {
 import { useHistory, useLocation } from "@docusaurus/router";
 import { useBaseUrlUtils } from "@docusaurus/useBaseUrl";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
-import { IntlProvider, RouterProvider } from "@mittwald/flow-react-components";
+import {
+  IconSetProvider,
+  IntlProvider,
+  RouterProvider,
+} from "@mittwald/flow-react-components";
+import { proIconSet } from "@mittwald/flow-icons-pro";
+import IconMasks from "@site/src/icons/IconMasks";
 import "@mittwald/flow-react-components/all.css";
 
 /**
@@ -80,7 +86,13 @@ export default function Root({ children }: PropsWithChildren<{}>) {
     <MatomoProvider value={matomoInstance}>
       <PageViewTracker>
         <FlowIntlProvider>
-          <FlowRouterProvider>{children}</FlowRouterProvider>
+          {/* FontAwesome Pro icons like on flow.mittwald.de; without them
+              installed, proIconSet is undefined and Flow keeps its default
+              icons (see docusaurus.config.ts) */}
+          <IconSetProvider set={proIconSet}>
+            <IconMasks />
+            <FlowRouterProvider>{children}</FlowRouterProvider>
+          </IconSetProvider>
         </FlowIntlProvider>
       </PageViewTracker>
     </MatomoProvider>

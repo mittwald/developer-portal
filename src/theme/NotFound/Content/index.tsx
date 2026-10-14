@@ -8,7 +8,7 @@ import {
   IllustratedMessage,
   Text,
 } from "@mittwald/flow-react-components";
-import { IconError404 } from "@tabler/icons-react";
+import { IconNotFound } from "@site/src/icons";
 import styles from "./styles.module.css";
 
 /**
@@ -20,7 +20,7 @@ export default function NotFoundContent({ className }: Props): ReactNode {
     <main className={clsx("container", styles.notFound, className)}>
       <IllustratedMessage>
         <Icon>
-          <IconError404 />
+          <IconNotFound />
         </Icon>
         <Heading level={1}>
           <Translate

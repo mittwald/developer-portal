@@ -218,14 +218,18 @@ a.menu__link--sublist.menu__link--active:not([aria-current="page"]):hover {
   background-color: var(--menu-item--background-color--hover);
 }
 
-/* Chevrons like in a Flow navigation: Tabler's chevron-down in the text color
-   and icon size s, pointing up when expanded (Infima draws a Material chevron
-   pointing right when collapsed) */
+/* Chevrons like in a Flow navigation: Flow's chevron-down (the FontAwesome
+   Pro icon from src/icons/IconMasks.tsx, Tabler's without it) in the text
+   color and icon size s, pointing up when expanded (Infima draws a Material
+   chevron pointing right when collapsed) */
 .menu__link--sublist-caret::after,
 .menu__caret::before {
   background: currentColor;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6l6 -6'/%3E%3C/svg%3E")
-    center / var(--icon--size--s) var(--icon--size--s) no-repeat;
+  mask: var(
+      --icon-mask--chevron-down,
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6l6 -6'/%3E%3C/svg%3E")
+    )
+    center / auto var(--icon--size--s) no-repeat;
   transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
 }
 

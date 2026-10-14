@@ -4,7 +4,7 @@ import BrowserOnly from "@docusaurus/BrowserOnly";
 import { translate } from "@docusaurus/Translate";
 import { useCodeBlockContext } from "@docusaurus/theme-common/internal";
 import { Button, CopyButton, Icon } from "@mittwald/flow-react-components";
-import { IconTextWrap } from "@tabler/icons-react";
+import { IconTextWrap } from "@site/src/icons";
 import styles from "./styles.module.css";
 
 /**

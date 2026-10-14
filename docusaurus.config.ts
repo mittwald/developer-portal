@@ -6,6 +6,8 @@ import { Options, ThemeConfig } from "@docusaurus/preset-classic";
 import { Options as ClientRedirectOptions } from "@docusaurus/plugin-client-redirects";
 import { flowTheme } from "./src/prism/flowTheme";
 import rehypeFlowSections from "./src/plugins/rehypeFlowSections";
+import path from "node:path";
+import { proIconsPackage, readProIconsVersion } from "./dev/proIcons";
 
 function webpackCryptoFallbackPlugin() {
   return {
@@ -28,6 +30,30 @@ function webpackCryptoFallbackPlugin() {
           }),
         ],
       };
+    },
+  };
+}
+
+/*
+ * Flow icons render as FontAwesome Pro once `dev/installProIcons.ts` fetched
+ * them (`start` and `build` run it first). Without them (a fork's PR, no
+ * access to the registry), both names the Pro icons go by are swapped for the
+ * stand-ins in `src/icons/withoutProIcons` and Flow keeps its default icons.
+ */
+function proIconsPlugin() {
+  const withoutProIcons = (file: string) =>
+    path.resolve(__dirname, "src/icons/withoutProIcons", file);
+  const alias: Record<string, string> = readProIconsVersion()
+    ? { "@fortawesome/sharp-regular-svg-icons$": proIconsPackage }
+    : {
+        "@mittwald/flow-icons-pro$": withoutProIcons("iconsPro.ts"),
+        "@fortawesome/sharp-regular-svg-icons$":
+          withoutProIcons("sharpRegular.ts"),
+      };
+  return {
+    name: "flow-pro-icons",
+    configureWebpack() {
+      return { resolve: { alias } };
     },
   };
 }
@@ -112,6 +138,7 @@ const config: Config = {
       },
     ],
     webpackCryptoFallbackPlugin,
+    proIconsPlugin,
     [
       "docusaurus-plugin-llms",
       {
