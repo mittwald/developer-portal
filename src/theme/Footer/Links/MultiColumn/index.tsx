@@ -38,7 +38,7 @@ function Column({ column }: { column: ColumnType }) {
     <Section
       className={clsx(ThemeClassNames.layout.footer.column, column.className)}
     >
-      <Heading level={2} size="s">
+      <Heading level={2} size="xs">
         {column.title}
       </Heading>
       <ul className={styles.items}>

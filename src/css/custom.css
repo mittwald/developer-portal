@@ -159,6 +159,15 @@ main.index {
   }
 }
 
+/* Headings with a tighter line height than Flow's 1.5, so that headings
+   wrapping onto several lines stay compact (Flow derives the height of
+   heading icons from --line-height as well); doubled selector to win over
+   Flow's stylesheet regardless of the load order */
+.flow--heading.flow--heading {
+  --line-height: 1.25;
+  line-height: var(--line-height);
+}
+
 /* Sidebar: Docusaurus' structure and behavior, the look of the Flow
    navigation (items, current item, chevrons) */
 
@@ -313,6 +322,14 @@ p a {
 
 .navbar__items--right > :first-child {
   margin-left: auto;
+}
+
+/* The search comes first on the right; on small screens Docusaurus positions
+   its (then empty) container absolutely, which would drop the margin above */
+@media (max-width: 996px) {
+  .navbar__items--right > [class*="navbarSearchContainer"] {
+    position: static;
+  }
 }
 
 /* The mobile menu button (a Flow button) brings its own spacing */

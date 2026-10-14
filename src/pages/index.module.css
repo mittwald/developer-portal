@@ -4,10 +4,15 @@
  */
 
 /* Logo centered above the title text; both full width, so that the logo can
-   grow beyond the title text */
+   grow beyond the title text. Extra room above and below, in addition to the
+   hero's padding */
 .heroTitle,
 .heroTitle :global(.flow--heading--heading-text) {
   width: 100%;
+}
+
+.heroTitle {
+  padding-block: var(--size-rem--xxl) var(--size-rem--xl);
 }
 
 .heroTitle :global(.flow--heading--heading-text) {
@@ -17,10 +22,10 @@
   row-gap: var(--size-rem--xs);
 }
 
-/* 1.25 times the largest size token high (the width follows from the logo's
+/* 1.5 times the largest size token high (the width follows from the logo's
    aspect ratio, 2081.8 : 386.4) */
 .heroLogo {
-  width: calc(var(--size-rem--xxl) * 1.25 * 2081.8 / 386.4);
+  width: calc(var(--size-rem--xxl) * 1.5 * 2081.8 / 386.4);
   max-width: 100%;
   height: auto;
 }
@@ -31,6 +36,7 @@
 @media (max-width: 550px) {
   .heroTitle.heroTitle {
     font-size: var(--font-size-heading--xl);
+    padding-block: var(--size-rem--xl) var(--size-rem--m);
   }
 
   .heroTitle :global(.flow--heading--heading-text) {
@@ -38,6 +44,6 @@
   }
 
   .heroLogo {
-    width: calc(var(--size-rem--xl) * 1.5 * 2081.8 / 386.4);
+    width: calc(var(--size-rem--xl) * 1.75 * 2081.8 / 386.4);
   }
 }

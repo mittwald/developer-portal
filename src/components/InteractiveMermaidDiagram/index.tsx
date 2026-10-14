@@ -279,6 +279,7 @@ function InteractiveMermaidDiagram({
         <div className={styles.zoomControls}>
           <Button
             variant="soft"
+            color="secondary"
             size="s"
             onPress={handleZoomOut}
             aria-label={translate({
@@ -291,6 +292,7 @@ function InteractiveMermaidDiagram({
           <span className={styles.zoomLevel}>{zoom}%</span>
           <Button
             variant="soft"
+            color="secondary"
             size="s"
             onPress={handleZoomIn}
             aria-label={translate({
@@ -302,6 +304,7 @@ function InteractiveMermaidDiagram({
           </Button>
           <Button
             variant="soft"
+            color="secondary"
             size="s"
             onPress={handleReset}
             aria-label={translate({

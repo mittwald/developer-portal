@@ -290,6 +290,12 @@ This documentation covers:
           ],
         },
         {
+          // Search (src/theme/SearchBar) left of the header actions; without
+          // this item it would be added at the end of the navbar
+          type: "search",
+          position: "right",
+        },
+        {
           // Flow header navigation (src/theme/NavbarItem/FlowHeaderActions)
           // with these links, the language switch and the color mode toggle
           type: "custom-flowHeaderActions",

@@ -6,7 +6,7 @@ import type { Props } from "@theme/Footer/LinkItem";
 import { Link } from "@mittwald/flow-react-components";
 
 /**
- * Footer link as a dark Flow link, like the footer on flow.mittwald.de.
+ * Footer link as a small, dark inline Flow link.
  * Swizzled (ejected) from @docusaurus/theme-classic; it still renders through
  * Docusaurus' Link for base URL handling and broken link detection.
  */
@@ -19,6 +19,8 @@ export default function FooterLinkItem({ item }: Props): ReactNode {
   return (
     <Link
       color="dark"
+      inline
+      size="s"
       linkComponent={DocusaurusLink}
       href={href ? (prependBaseUrlToHref ? normalizedHref : href) : toUrl}
       target={isExternal ? "_blank" : undefined}
