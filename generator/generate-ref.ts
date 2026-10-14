@@ -244,6 +244,19 @@ class APIDocRenderer {
 
     console.log("generating API for ", spec.info.title);
 
+    // The tag directories are generated entirely: remove them first, so that
+    // pages of operations or tags that no longer exist (or that were rendered
+    // with an older template) do not remain and break the build
+    fs.mkdirSync(outputPath, { recursive: true });
+    for (const entry of fs.readdirSync(outputPath, { withFileTypes: true })) {
+      if (entry.isDirectory()) {
+        fs.rmSync(path.join(outputPath, entry.name), {
+          recursive: true,
+          force: true,
+        });
+      }
+    }
+
     exportSpecToSource(
       originalSpec,
       apiVersion,
