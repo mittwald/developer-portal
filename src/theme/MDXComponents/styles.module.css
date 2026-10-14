@@ -18,12 +18,6 @@
   all: unset;
 }
 
-/* Inline code within heading text takes the heading size (headings that are
-   code only are rendered as plain text, see MDXHeading) */
-.heading :global(.flow--inline-code) {
-  font-size: 0.9em;
-}
-
 .list,
 .table,
 .blockquote {
@@ -109,6 +103,14 @@ li > .list {
   vertical-align: middle;
 }
 
+/* Breaking change badge at the start of a list item, in the line of its text
+   (see breakingBadge.tsx); on the text's baseline the badge sits slightly
+   above the text's center, so it is moved down a little */
+.breakingBadge {
+  display: inline-flex;
+  vertical-align: -0.125em;
+}
+
 /* Status icon replacing an emoji at the start of a table cell's text */
 .leadingStatusIcon {
   display: inline-flex;
@@ -124,4 +126,15 @@ li > .list {
 
 .titleHeader > :first-child {
   min-width: 0;
+}
+
+/* Title with the page details (e.g. tags) close below it */
+.titleWithDetails {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-rem--s);
+}
+
+div.titleWithDetails > * {
+  margin: 0;
 }

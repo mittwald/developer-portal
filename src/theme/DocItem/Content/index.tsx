@@ -7,12 +7,17 @@ import MDXComponents from "@theme/MDXComponents";
 import MDXContent from "@theme/MDXContent";
 import EditThisPage from "@theme/EditThisPage";
 import { Section } from "@mittwald/flow-react-components";
-import { TitleActionsContext } from "@site/src/theme/MDXComponents/titleActions";
+import { TagBadges } from "@site/src/theme/TagsListInline";
+import {
+  TitleActionsContext,
+  TitleDetailsContext,
+} from "@site/src/theme/MDXComponents/titleActions";
 
 /**
  * Doc content with the title from the front matter rendered like a Markdown
- * h1, i.e. as Flow heading; the edit link is shown next to the title (from
- * the front matter or the Markdown). Ejected from @docusaurus/theme-classic.
+ * h1, i.e. as Flow heading; the edit link is shown next to the title and the
+ * tags directly below it (from the front matter or the Markdown). Ejected
+ * from @docusaurus/theme-classic.
  */
 
 const MDXH1 = MDXComponents.h1;
@@ -39,21 +44,25 @@ function useSyntheticTitle(): string | null {
 
 export default function DocItemContent({ children }: Props): ReactNode {
   const syntheticTitle = useSyntheticTitle();
-  const { editUrl } = useDoc().metadata;
+  const { editUrl, tags } = useDoc().metadata;
   return (
     <TitleActionsContext.Provider
       value={editUrl && <EditThisPage editUrl={editUrl} />}
     >
-      <div className={clsx(ThemeClassNames.docs.docMarkdown, "markdown")}>
-        {/* A section of its own (the Markdown title is in the first
-            section of the content); no separator below the title */}
-        {syntheticTitle && (
-          <Section hideSeparator>
-            <MDXH1>{syntheticTitle}</MDXH1>
-          </Section>
-        )}
-        <MDXContent>{children}</MDXContent>
-      </div>
+      <TitleDetailsContext.Provider
+        value={tags.length > 0 && <TagBadges tags={tags} />}
+      >
+        <div className={clsx(ThemeClassNames.docs.docMarkdown, "markdown")}>
+          {/* A section of its own (the Markdown title is in the first
+              section of the content); no separator below the title */}
+          {syntheticTitle && (
+            <Section hideSeparator>
+              <MDXH1>{syntheticTitle}</MDXH1>
+            </Section>
+          )}
+          <MDXContent>{children}</MDXContent>
+        </div>
+      </TitleDetailsContext.Provider>
     </TitleActionsContext.Provider>
   );
 }

@@ -2,22 +2,20 @@ import React, { type ReactNode } from "react";
 import clsx from "clsx";
 import { ThemeClassNames } from "@docusaurus/theme-common";
 import { useDoc } from "@docusaurus/plugin-content-docs/client";
-import TagsListInline from "@theme/TagsListInline";
 import LastUpdated from "@theme/LastUpdated";
 import { Section, Separator } from "@mittwald/flow-react-components";
 import styles from "./styles.module.css";
 
 /**
- * Doc footer (tags, edit link, last update) as Flow section, separated from
- * the content like two Flow sections. Ejected from @docusaurus/theme-classic.
+ * Doc footer (last update) as Flow section, separated from the content like
+ * two Flow sections; the edit link is next to the title and the tags are
+ * below it (see DocItem/Content). Ejected from @docusaurus/theme-classic.
  */
 export default function DocItemFooter(): ReactNode {
   const { metadata } = useDoc();
-  const { lastUpdatedAt, lastUpdatedBy, tags } = metadata;
+  const { lastUpdatedAt, lastUpdatedBy } = metadata;
 
-  const canDisplayTagsRow = tags.length > 0;
-  const canDisplayLastUpdated = !!(lastUpdatedAt || lastUpdatedBy);
-  if (!canDisplayTagsRow && !canDisplayLastUpdated) {
+  if (!lastUpdatedAt && !lastUpdatedBy) {
     return null;
   }
 
@@ -25,28 +23,17 @@ export default function DocItemFooter(): ReactNode {
     <footer className={clsx(ThemeClassNames.docs.docFooter, styles.footer)}>
       <Separator />
       <Section>
-        {/* Tags left, last update right; they wrap below each other when
-            there is not enough space (the edit link is next to the title, see
-            DocItem/Content) */}
-        <div className={styles.row}>
-          {canDisplayTagsRow && (
-            <div className={ThemeClassNames.docs.docFooterTagsRow}>
-              <TagsListInline tags={tags} />
-            </div>
+        {/* The last update on the right */}
+        <div
+          className={clsx(
+            ThemeClassNames.docs.docFooterEditMetaRow,
+            styles.editMetaRow,
           )}
-          {canDisplayLastUpdated && (
-            <div
-              className={clsx(
-                ThemeClassNames.docs.docFooterEditMetaRow,
-                styles.editMetaRow,
-              )}
-            >
-              <LastUpdated
-                lastUpdatedAt={lastUpdatedAt}
-                lastUpdatedBy={lastUpdatedBy}
-              />
-            </div>
-          )}
+        >
+          <LastUpdated
+            lastUpdatedAt={lastUpdatedAt}
+            lastUpdatedBy={lastUpdatedBy}
+          />
         </div>
       </Section>
     </footer>

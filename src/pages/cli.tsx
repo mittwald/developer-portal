@@ -1,12 +1,7 @@
 import React from "react";
 import Layout from "@theme/Layout";
-import {
-  Heading,
-  Image,
-  InlineCode,
-  Text,
-} from "@mittwald/flow-react-components";
-import { IconBrandGithub, IconNotebook, IconRocket } from "@tabler/icons-react";
+import { Heading, Image, Text } from "@mittwald/flow-react-components";
+import { IconBook, IconBrandGithub, IconRocket } from "@site/src/icons";
 
 import styles from "./cli.module.css";
 import demo from "@site/static/img/cli-demo.png";
@@ -19,7 +14,7 @@ function CLIPageHeader() {
   return (
     <Hero>
       <Heading level={1} size="xxl">
-        <InlineCode>mw</InlineCode> –{" "}
+        mw –{" "}
         <Translate id={"cli.title"}>the mittwald command-line tool</Translate>
       </Heading>
       <Text elementType="p" align="center">
@@ -52,7 +47,7 @@ function CLIPageHeader() {
         />
         <HeroEntry
           href="/docs/v2/cli"
-          icon={<IconNotebook />}
+          icon={<IconBook />}
           title={<Translate id={"cli.full-docs"}>Full documentation</Translate>}
           description={
             <Translate id="cli.full-docs.description">

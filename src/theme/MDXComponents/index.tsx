@@ -40,7 +40,8 @@ import {
   replaceLeadingEmojiIcon,
   splitLeadingEmojiIcon,
 } from "./emojiIcons";
-import { TitleActionsContext } from "./titleActions";
+import { replaceBreakingMarker } from "./breakingBadge";
+import { TitleActionsContext, TitleDetailsContext } from "./titleActions";
 import styles from "./styles.module.css";
 
 /**
@@ -53,23 +54,16 @@ import styles from "./styles.module.css";
 type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
 /**
- * Headings that consist of inline code only (e.g. CLI command names) are
- * rendered as plain heading text; in headings mixing text and code, the code
- * keeps its look.
+ * Headings have no inline code: code in a heading (e.g. CLI command names) is
+ * rendered as plain heading text.
  */
-function unwrapCodeOnlyHeading(children: ReactNode): ReactNode {
-  const nodes = Children.toArray(children).filter(
-    (node) => !(typeof node === "string" && !node.trim()),
-  );
-  const [node] = nodes;
-  if (
-    nodes.length === 1 &&
+function unwrapHeadingCode(children: ReactNode): ReactNode {
+  return Children.map(children, (node) =>
     isValidElement<{ children?: ReactNode }>(node) &&
     node.type === MDXInlineOrBlockCode
-  ) {
-    return node.props.children;
-  }
-  return children;
+      ? node.props.children
+      : node,
+  );
 }
 
 function MDXHeading({
@@ -84,26 +78,37 @@ function MDXHeading({
       id={id}
       className={clsx(styles.heading, className)}
     >
-      {unwrapCodeOnlyHeading(children)}
+      {unwrapHeadingCode(children)}
     </ThemeHeading>
   );
 }
 
 /**
  * The page title; with actions for the page (e.g. on doc pages), title and
- * actions form the header of the section the title is in
+ * actions form the header of the section the title is in. Details for the
+ * page (e.g. the tags on doc pages) follow directly below.
  */
 function MDXTitle(props: ComponentProps<"h1">) {
   const actions = useContext(TitleActionsContext);
+  const details = useContext(TitleDetailsContext);
   const heading = <MDXHeading level={1} {...props} />;
-  if (!actions) {
-    return heading;
-  }
-  return (
+  const title = actions ? (
     <Header className={styles.titleHeader}>
       {heading}
       {actions}
     </Header>
+  ) : (
+    heading
+  );
+  if (!details) {
+    return title;
+  }
+  // Closer to the title than the section's spacing
+  return (
+    <div className={styles.titleWithDetails}>
+      {title}
+      {details}
+    </div>
   );
 }
 
@@ -187,7 +192,12 @@ function MDXList(props: ComponentProps<"ul">) {
   const items = elementChildren(props.children);
   const isIconList =
     items.length > 0 &&
-    items.every((item) => splitLeadingEmojiIcon(item.props.children));
+    items.every(
+      (item) =>
+        // Items with a breaking change badge keep their bullet
+        !replaceBreakingMarker(item.props.children) &&
+        splitLeadingEmojiIcon(item.props.children),
+    );
   return (
     <Text elementType="div" className={styles.list}>
       <IconListContext.Provider value={isIconList}>
@@ -202,10 +212,20 @@ function MDXList(props: ComponentProps<"ul">) {
 
 /**
  * List item with an emoji at its start replaced by its icon: in an icon list
- * in place of the bullet, otherwise inline at the start of the text
+ * in place of the bullet, otherwise inline at the start of the text. A
+ * breaking change marker becomes an alert badge (see breakingBadge.tsx).
  */
 function MDXListItem(props: ComponentProps<"li">) {
   const isIconList = useContext(IconListContext);
+
+  const withBreakingBadge = replaceBreakingMarker(props.children);
+  if (withBreakingBadge !== undefined) {
+    return (
+      <MDXLi {...props} className={clsx(props.className, styles.listItem)}>
+        {withBreakingBadge}
+      </MDXLi>
+    );
+  }
 
   if (!isIconList) {
     const children = replaceLeadingEmojiIcon(props.children, (icon) => (

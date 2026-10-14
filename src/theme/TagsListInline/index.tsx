@@ -5,6 +5,19 @@ import Tag from "@theme/Tag";
 import { Label, LabeledValue } from "@mittwald/flow-react-components";
 import styles from "./styles.module.css";
 
+/** The tag badges of a page in a row */
+export function TagBadges({ tags }: Props): ReactNode {
+  return (
+    <ul className={styles.tags}>
+      {tags.map((tag) => (
+        <li key={tag.permalink}>
+          <Tag {...tag} />
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 /**
  * The tags of a page as Flow labeled value with the tag badges as value.
  * Ejected from @docusaurus/theme-classic.
@@ -20,13 +33,7 @@ export default function TagsListInline({ tags }: Props): ReactNode {
   return (
     <LabeledValue>
       <Label>{label}</Label>
-      <ul className={styles.tags}>
-        {tags.map((tag) => (
-          <li key={tag.permalink}>
-            <Tag {...tag} />
-          </li>
-        ))}
-      </ul>
+      <TagBadges tags={tags} />
     </LabeledValue>
   );
 }
