@@ -264,7 +264,7 @@ The <OperationLink operation="container-declare-stack" /> operation is **idempot
 When a feature is planned but not yet available, document it briefly:
 
 ```markdown
-## Starting a new container stack (planned)
+## [Feature name] (planned)
 
-Starting new container stacks next to the default stack is not supported at the moment.
+[Feature description] is not supported at the moment.
 ```

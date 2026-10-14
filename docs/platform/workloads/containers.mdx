@@ -20,6 +20,46 @@ import OperationExample from "@site/src/components/OperationExample";
 
 <PlanCompatibility features={["container"]} />
 
+## Creating a container stack {#create-stack}
+
+Containers and volumes always belong to a container stack. A stack groups containers and volumes that are deployed and managed together. A project can contain any number of stacks. Create a stack before starting your first container.
+
+<Tabs groupId="access-mode">
+  <TabItem value="gui" label="mStudio UI">
+    To create a stack via the mStudio, follow these steps:
+
+    1. Navigate to the project that you want to create the stack in, or create a new project.
+    2. Select the "Containers" menu item in the sidebar. This opens the overview of your stacks.
+    3. Click the "Create" button.
+
+  </TabItem>
+  <TabItem value="cli" label="CLI">
+    To create a stack via the CLI, use the `mw stack create` command:
+
+    ```shellsession
+    user@local $ mw stack create --description "My application" --update-context
+    ```
+
+    The `--update-context` flag stores the ID of the new stack in your CLI context. Subsequent commands like `mw container run`, `mw stack deploy` or `mw volume create` will then use this stack automatically.
+
+    To use an existing stack instead, look up its ID with `mw stack list` and store it in your CLI context with `mw context set --stack-id <stack-id>`. Alternatively, you can pass the stack ID to each command using the `--stack-id` flag.
+
+    See the documentation on the [`mw stack create` command](/docs/v2/cli/reference/stack#mw-stack-create) for more information.
+
+  </TabItem>
+  <TabItem value="api" label="API">
+    To create a stack via the API, use the <OperationLink operation="container-create-stack" apiVersion="v2" /> operation:
+
+    <OperationExample
+      operation="container-create-stack"
+      example={{
+        description: "My application",
+      }}
+    />
+
+  </TabItem>
+</Tabs>
+
 ## Starting a containerized application
 
 <Tabs groupId="access-mode">
@@ -28,14 +68,15 @@ import OperationExample from "@site/src/components/OperationExample";
 
     1. Navigate to the project that you want to create the container in.
     2. Select the "Containers" menu item in the sidebar.
-    3. Click the "Create Container" button.
-    4. In the installation wizard, select the container image that should be used to start your application and complete the wizard, by providing the desired configuration regarding environment variables, volumes and network ports.
+    3. Create a new stack or open an existing one (see [Creating a container stack](#create-stack)).
+    4. Click the "Create" button in the containers section of the stack.
+    5. In the installation wizard, select the container image that should be used to start your application and complete the wizard, by providing the desired configuration regarding environment variables, volumes and network ports.
 
     The internal DNS name of your container will be derived from the name of the container. For example, if you create a container named `My container`, the internal DNS name will be `my-container`. You can observe the internal DNS name in the UI after the container has been created.
 
   </TabItem>
   <TabItem value="cli" label="CLI">
-    To start a container via the CLI, you can use the `mw container run` command:
+    To start a container via the CLI, you can use the `mw container run` command. It starts the container in the stack stored in your CLI context (see [Creating a container stack](#create-stack)):
 
     ```shellsession
     $ mw container run \
@@ -210,10 +251,11 @@ Check [this guide](https://distribution.github.io/distribution/about/deploying/)
 
     1. Navigate to the project that you want to create the container in.
     2. Select the "Containers" menu item in the sidebar.
-    3. In the open "Container" tab, click the "Create" button.
-    4. Configure the container as needed, use `mittwald/registry:3` image.
-    5. Set up environment variables to your liking; check the guide above for details.
-    6. To configure authentication (for private images), additionally supply a `REGISTRY_USER` and a `REGISTRY_PASSWORD` environment variable with secure credentials of your choice.
+    3. Create a new stack or open an existing one (see [Creating a container stack](#create-stack)).
+    4. Click the "Create" button in the containers section of the stack.
+    5. Configure the container as needed, use `mittwald/registry:3` image.
+    6. Set up environment variables to your liking; check the guide above for details.
+    7. To configure authentication (for private images), additionally supply a `REGISTRY_USER` and a `REGISTRY_PASSWORD` environment variable with secure credentials of your choice.
 
   </TabItem>
   <TabItem value="cli" label="CLI">

@@ -122,7 +122,7 @@ The `typo3_solr_version` should match the version of the TYPO3 Solr extension yo
 
 Alternatively, you can set up a Solr container manually:
 
-1. Go to **Containers** in your project in mStudio and create a new one. You can choose any name you like.
+1. Go to the **Container** menu item in your project in mStudio, create a new stack or open an existing one, and click **"Create"** in the containers section of the stack to create a new container. You can choose any name you like.
 
 2. As image, enter either `solr:9` or a more specific version number like `solr:9.9`, depending on how specific the version should be constrained. You can keep the entrypoint and command as suggested.
 
@@ -144,6 +144,18 @@ Alternatively, you can set up a Solr container manually:
 The suggested port values are standard in the Solr context and can be accepted as is. The default port for Solr is 8983.
 
 ### Using the CLI with `mw container run`
+
+:::note
+
+The CLI deploys the container into the stack stored in your CLI context. If you have not created a stack yet, create one first:
+
+```shellsession
+user@local $ mw stack create --description "Solr" --update-context
+```
+
+Alternatively, pass the ID of an existing stack with `--stack-id`. See [Creating a container stack](/docs/v2/platform/workloads/containers#create-stack) for details.
+
+:::
 
 You can also deploy a Solr container using the mittwald CLI with the `mw container run` command:
 

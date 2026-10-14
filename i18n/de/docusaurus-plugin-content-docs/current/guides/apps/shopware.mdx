@@ -169,13 +169,26 @@ user@local $ docker push docker.p-XXXXXX.project.space/shopware/shopware-app:8.3
 
 Erstelle den Container aus deinem gepushten Image, gib den HTTP-Port frei, mounte Volumes für Shopwares persistente Daten und route eine Domain darauf. Da das Runtime-Dateisystem schreibgeschützt ist und Container bei jedem Deploy neu erstellt werden, müssen die Verzeichnisse mit nutzergenerierten oder erzeugten Inhalten auf [persistenten Volumes](#persistent-volumes) liegen, sonst gehen Medien, generierte Themes, Thumbnails und Sitemaps verloren. Die Beispiele unten mounten sie alle.
 
+:::note
+
+Die CLI stellt den Container in dem Stack bereit, der in deinem CLI-Kontext gespeichert ist. Falls du noch keinen Stack angelegt hast, lege zuerst einen an:
+
+```shellsession
+user@local $ mw stack create --description "Shopware" --update-context
+```
+
+Alternativ kannst du die ID eines bestehenden Stacks mit `--stack-id` angeben. Details findest du unter [Einen Container-Stack anlegen](/docs/v2/platform/workloads/containers#create-stack).
+
+:::
+
 <Tabs groupId="access-mode">
   <TabItem value="mstudio" label="mStudio">
     1. Öffne dein Projekt im mStudio und wähle "Container".
-    2. Klicke auf "Container erstellen".
-    3. Wähle im Assistenten dein Image `docker.p-XXXXXX.project.space/shopware/shopware-app:8.3-frankenphp`.
-    4. Gib die Umgebungsvariablen aus dem Konfigurationsschritt an und gib Port `8000` frei.
-    5. Füge unter **Volumes** für jedes von Shopwares [persistenten Verzeichnissen](#persistent-volumes) ein Mount hinzu und schließe dann den Assistenten ab.
+    2. Lege einen neuen Stack an oder öffne einen bestehenden.
+    3. Klicke im Container-Bereich des Stacks auf "Anlegen".
+    4. Wähle im Assistenten dein Image `docker.p-XXXXXX.project.space/shopware/shopware-app:8.3-frankenphp`.
+    5. Gib die Umgebungsvariablen aus dem Konfigurationsschritt an und gib Port `8000` frei.
+    6. Füge unter **Volumes** für jedes von Shopwares [persistenten Verzeichnissen](#persistent-volumes) ein Mount hinzu und schließe dann den Assistenten ab.
   </TabItem>
   <TabItem value="cli" label="CLI">
     ```shellsession

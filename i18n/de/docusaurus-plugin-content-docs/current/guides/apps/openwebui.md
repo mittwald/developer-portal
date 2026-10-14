@@ -24,7 +24,7 @@ Wir verwenden das Image `ghcr.io/open-webui/open-webui:main` aus der [GitHub Con
 
 ### Über das mStudio UI
 
-Gehe in mStudio zu deinem Projekt und wähle **„Container erstellen"**. Ein geführter Dialog öffnet sich, um dir beim Container-Setup zu helfen.
+Gehe im mStudio zu deinem Projekt, wähle **„Container“** und lege einen neuen Stack an oder öffne einen bestehenden. Klicke dann im Container-Bereich des Stacks auf **„Anlegen“**. Ein geführter Dialog öffnet sich, um dir beim Container-Setup zu helfen.
 
 Gib zunächst eine Beschreibung ein – dies ist ein Freitextfeld zur Identifizierung des Containers. Gib zum Beispiel **„Open WebUI"** ein und klicke auf **„Weiter"**.
 
@@ -63,6 +63,18 @@ ENABLE_SIGNUP=false
 Sobald du alle Umgebungsvariablen eingegeben hast, klicke auf **„Weiter"**. Im letzten Dialog wirst du nach dem **Port** gefragt – gib `8080` ein. Klicke auf **„Container erstellen"**, um den Container zu erstellen und zu starten.
 
 ### Alternative: Verwendung des `mw container run`-Befehls
+
+:::note
+
+Die CLI stellt den Container in dem Stack bereit, der in deinem CLI-Kontext gespeichert ist. Falls du noch keinen Stack angelegt hast, lege zuerst einen an:
+
+```shellsession
+user@local $ mw stack create --description "Open WebUI" --update-context
+```
+
+Alternativ kannst du die ID eines bestehenden Stacks mit `--stack-id` angeben. Details findest du unter [Einen Container-Stack anlegen](/docs/v2/platform/workloads/containers#create-stack).
+
+:::
 
 Du kannst auch den Befehl `mw container run` verwenden, um direkt einen Open WebUI-Container über die Kommandozeile zu erstellen und zu starten. Dieser Ansatz ist ähnlich wie die Verwendung der Docker-CLI und ermöglicht es dir, alle Container-Parameter in einem einzigen Befehl anzugeben.
 
@@ -105,7 +117,7 @@ Stelle dann den Container mit dem Befehl `mw stack deploy` bereit:
 user@local $ mw stack deploy
 ```
 
-Dieser Befehl liest die `docker-compose.yml`-Datei aus dem aktuellen Verzeichnis und stellt sie in deinem Standard-Stack bereit.
+Dieser Befehl liest die `docker-compose.yml`-Datei aus dem aktuellen Verzeichnis und stellt sie in dem Stack bereit, der in deinem CLI-Kontext gespeichert ist.
 
 ## Verbindung mit mittwald AI Hosting
 

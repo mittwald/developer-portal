@@ -270,15 +270,19 @@ Falls du, wie empfohlen, eine **zweite Extension** angelegt hast, wähle für di
 
 | Variable       | Beschreibung                                                                                     |
 | -------------- | ------------------------------------------------------------------------------------------------ |
-| `STACK_ID`     | Die Stack-ID aus dem mStudio Container Hosting; **entspricht der Projekt-ID**                    |
+| `STACK_ID`     | ID des Container-Stacks, in den die Extension deployt wird                                       |
 | `EXTENSION_ID` | ID der Extension im Marktplatz; wenn du eine zweite Extension angelegt hast, wähle die ID dieser |
 
 #### Stack-ID ermitteln
 
-Die **Stack-ID** findest du im mStudio:
+Lege in deinem Projekt einen eigenen Container-Stack für deine Extension an oder ermittle die ID eines bestehenden Stacks, zum Beispiel mit der CLI:
 
-1. Navigiere zu deinem **Projekt** im Server
-2. Die **Stack-ID entspricht der Projekt-ID** und wird in der URL angezeigt: `https://studio.mittwald.de/app/projects/{projectId}/dashboard`
+```shellsession
+user@local $ mw stack create --project-id <project-id> --description "Meine Extension"
+user@local $ mw stack list --project-id <project-id>
+```
+
+Weitere Möglichkeiten, einen Stack anzulegen, findest du unter [Einen Container-Stack anlegen](/docs/v2/platform/workloads/containers#create-stack).
 
 ## Deployment auslösen
 

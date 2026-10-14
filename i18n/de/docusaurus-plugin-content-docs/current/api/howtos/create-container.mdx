@@ -56,21 +56,31 @@ Zum Beispiel kannst du die <OperationLink operation="container-create-registry" 
 
 Nachdem eine Container-Registry für ein Projekt konfiguriert wurde, kannst du sie einfach **innerhalb dieses Projekts** verwenden, indem du den Namen des Images mit jeweiligen Präfix der Registry versiehst, genau wie bei einem `docker run`-Befehl.
 
-## Starten eines Containers im Standard-Stack
+## Starten eines Containers {#start-container}
 
-Container werden als Teil eines Container-Stacks ausgeführt. Ein Container-Stack ist eine Sammlung von Containern und Volumes, die zusammen ausgeführt werden. Du kannst die folgenden API-Operationen verwenden, um Container-Stacks zu verwalten:
+Container werden als Teil eines Container-Stacks ausgeführt. Ein Container-Stack ist eine Sammlung von Containern und Volumes, die zusammen ausgeführt werden. Ein Projekt kann beliebig viele Stacks enthalten. Du kannst die folgenden API-Operationen verwenden, um Container-Stacks zu verwalten:
 
 <!-- prettier-ignore -->
-- <OperationLink operation="container-list-stacks" apiVersion="v2" /> um verfügbare Stacks aufzulisten (verwende den `default` Stack)
+- <OperationLink operation="container-create-stack" apiVersion="v2" /> um einen neuen Stack anzulegen
+- <OperationLink operation="container-list-stacks" apiVersion="v2" /> um die Stacks eines Projekts aufzulisten
 - <OperationLink operation="container-declare-stack" apiVersion="v2" /> um den gewünschten Zustand eines Container-Stacks zu deklarieren; diese Operation ist idempotent und kann verwendet werden, um Container und Volumes zu einem Stack hinzuzufügen/aktualisieren oder zu entfernen
 
-### Identifizieren des Standard-Stacks {#identify-default-stack}
+### Einen Container-Stack anlegen {#create-stack}
 
-Bevor du einen Container im Standard-Stack startest, musst du die ID des Standard-Stacks ermitteln. Dazu listest du die verfügbaren Stacks in deinem Projekt auf, indem du den <OperationLink operation="container-list-stacks" />-Endpunkt aufrufst. Der Standard-Stack wird `default` genannt.
+Um einen Container zu starten, brauchst du die ID des Stacks, in dem er laufen soll. Um einen neuen Stack anzulegen, rufe die <OperationLink operation="container-create-stack" />-Operation auf. Die Antwort enthält die ID des neuen Stacks:
+
+<OperationExample
+  operation="container-create-stack"
+  example={{
+    description: "Meine Anwendung",
+  }}
+/>
+
+Um stattdessen einen bestehenden Stack zu verwenden, liste die Stacks deines Projekts mit der <OperationLink operation="container-list-stacks" />-Operation auf und verwende die ID des gewünschten Stacks.
 
 ### Definieren des Container-Stacks
 
-Nachdem du den Standard-Stack ermittelt hast, kannst du definieren, welche Container und Volumes du in diesem Stack erstellen möchtest. Das folgende Beispiel zeigt eine Beispielanfrage, die einen Container mit einem Volume startet:
+Sobald du die ID des Stacks hast, kannst du definieren, welche Container und Volumes du in diesem Stack starten möchtest. Das folgende Beispiel zeigt eine Beispielanfrage, die einen Container mit einem Volume startet:
 
 <OperationExample
   operation="container-declare-stack"
@@ -99,10 +109,6 @@ Die <OperationLink operation="container-declare-stack" />-Operation ist **idempo
 :::
 
 Siehe die Dokumentation zu [Container-Workloads](/docs/v2/platform/workloads/containers/) für weitere Informationen darüber, wie Container, Volumes und Netzwerke definiert werden.
-
-## Starten eines neuen Container-Stacks (geplant)
-
-Das Starten neuer Container-Stacks neben dem Standard-Stack wird momentan nicht unterstützt.
 
 ## Verbinden von Domains mit Containern
 

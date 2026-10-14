@@ -77,7 +77,7 @@ Merke dir den internen DNS-Namen des Containers, der nach der Installation in mS
 
 ### Alternative: Manuelles Setup über das mStudio UI {#daemon-ui}
 
-Falls dein Hosting-Produkt keine Container-Vorlagen unterstützt, oder du von den Standardeinstellungen der Vorlage abweichen musst, kannst du den Daemon-Container auch manuell einrichten. Gehe dazu in mStudio zu deinem Projekt, wähle **„Container"** und klicke auf **„Container erstellen"**. Ein geführter Dialog öffnet sich, um dir beim Container-Setup zu helfen.
+Falls dein Hosting-Produkt keine Container-Vorlagen unterstützt, oder du von den Standardeinstellungen der Vorlage abweichen musst, kannst du den Daemon-Container auch manuell einrichten. Gehe dazu im mStudio zu deinem Projekt, wähle **„Container“** und lege einen neuen Stack an oder öffne einen bestehenden. Klicke dann im Container-Bereich des Stacks auf **„Anlegen“**. Ein geführter Dialog öffnet sich, um dir beim Container-Setup zu helfen.
 
 Gib zunächst eine Beschreibung ein — dies ist ein Freitextfeld zur Identifizierung des Containers. Gib zum Beispiel **„Tideways-Daemon"** ein und klicke auf **„Weiter"**.
 
@@ -101,6 +101,18 @@ Am Ende des Dialogs wirst du nach dem **Port** gefragt. Gib `9135` ein, damit de
 Merke dir auch hier den internen DNS-Namen des Containers, der nach der Erstellung in mStudio angezeigt wird. Du benötigst ihn in [Schritt 2](#php-config).
 
 ### Alternative: Verwendung des `mw container run`-Befehls {#daemon-cli-run}
+
+:::note
+
+Die CLI stellt den Container in dem Stack bereit, der in deinem CLI-Kontext gespeichert ist. Falls du noch keinen Stack angelegt hast, lege zuerst einen an:
+
+```shellsession
+user@local $ mw stack create --description "Tideways" --update-context
+```
+
+Alternativ kannst du die ID eines bestehenden Stacks mit `--stack-id` angeben. Details findest du unter [Einen Container-Stack anlegen](/docs/v2/platform/workloads/containers#create-stack).
+
+:::
 
 Du kannst den Daemon-Container auch direkt über die Kommandozeile erstellen und starten:
 
@@ -143,7 +155,7 @@ Deploye sie anschließend:
 user@local $ mw stack deploy
 ```
 
-Dieser Befehl liest die `docker-compose.yml`-Datei aus dem aktuellen Verzeichnis und deployt sie in deinen Standard-Stack.
+Dieser Befehl liest die `docker-compose.yml`-Datei aus dem aktuellen Verzeichnis und deployt sie in den Stack, der in deinem CLI-Kontext gespeichert ist.
 
 ### Daemon-Optionen {#daemon-options}
 

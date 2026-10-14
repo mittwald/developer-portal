@@ -37,7 +37,7 @@ Collabora/CODE kann entweder als separate Instanz in einem eigenen Projekt oder 
 
 ### Mit der mStudio UI
 
-Gehe im mStudio zu deinem Projekt und wähle **„Container erstellen“**. Ein geführter Dialog öffnet sich, um dir bei der Container-Einrichtung zu helfen.
+Gehe im mStudio zu deinem Projekt, wähle **„Container“** und lege einen neuen Stack an oder öffne einen bestehenden. Klicke dann im Container-Bereich des Stacks auf **„Anlegen“**. Ein geführter Dialog öffnet sich, um dir bei der Container-Einrichtung zu helfen.
 
 Zuerst gib eine Beschreibung ein – dies ist ein Freitextfeld, das zur Identifizierung des Containers verwendet wird. Gib zum Beispiel **„collabora/code“** ein.
 
@@ -79,6 +79,18 @@ extra_params=--o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.ho
 Sobald du den gewünschten Wert eingegeben hast, klicke auf **„Speichern“**. Im letzten Abschnitt wirst du nach dem **Port** gefragt – du kannst dies unverändert lassen. Klicke auf **„Container erstellen“**, um den Container zu erstellen und zu starten.
 
 ### Alternative: Mit dem Befehl `mw container run`
+
+:::note
+
+Die CLI stellt den Container in dem Stack bereit, der in deinem CLI-Kontext gespeichert ist. Falls du noch keinen Stack angelegt hast, lege zuerst einen an:
+
+```shellsession
+user@local $ mw stack create --description "Collabora" --update-context
+```
+
+Alternativ kannst du die ID eines bestehenden Stacks mit `--stack-id` angeben. Details findest du unter [Einen Container-Stack anlegen](/docs/v2/platform/workloads/containers#create-stack).
+
+:::
 
 Du kannst auch den Befehl `mw container run` verwenden, um direkt einen Collabora-Container über die Kommandozeile zu erstellen und zu starten. Dieser Ansatz ähnelt der Verwendung der Docker CLI und ermöglicht es dir, alle Containerparameter in einem einzigen Befehl anzugeben.
 
@@ -137,7 +149,7 @@ Dann stelle den Container mit dem Befehl `mw stack deploy` bereit:
 mw stack deploy
 ```
 
-Dieser Befehl liest die `docker-compose.yml`-Datei aus dem aktuellen Verzeichnis und stellt sie in deinem Standard-Stack bereit. Wenn du eine andere Datei oder einen anderen Stack angeben möchtest, kannst du die folgenden Optionen verwenden:
+Dieser Befehl liest die `docker-compose.yml`-Datei aus dem aktuellen Verzeichnis und stellt sie in dem Stack bereit, der in deinem CLI-Kontext gespeichert ist. Wenn du eine andere Datei oder einen anderen Stack angeben möchtest, kannst du die folgenden Optionen verwenden:
 
 ```bash
 mw stack deploy --compose-file=/path/to/docker-compose.yml --stack-id=dein-stack-id
