@@ -241,15 +241,19 @@ Without `allowed_openai_params` the field is dropped, the request returns `200` 
 
 This route allows you to generate embeddings for texts.
 
+Pass multiple texts as an array in `input` to generate embeddings in one request:
+
 ```sh
 curl -i -X POST https://llm.aihosting.mittwald.de/v1/embeddings \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $APIKEY" \
     -d '{
         "model": "Qwen3-Embedding-8B",
-        "input": "An important document"
+        "input": ["An important document", "Another important document"]
     }'
 ```
+
+Each item in the response's `data` array has an `index` that identifies its position in the original `input` array, starting at `0`. Use this value to associate each embedding with its input text.
 
 Depending on the embedding model, additional parameters such as `dimensions` can be submitted. [Qwen3-Embedding-8B](../../models/qwen3-embedding-8b/) supports `dimensions` with a model-specific set of values. Refer to the respective model page for supported parameters and values; support is a property of each model rather than the endpoint as a whole.
 

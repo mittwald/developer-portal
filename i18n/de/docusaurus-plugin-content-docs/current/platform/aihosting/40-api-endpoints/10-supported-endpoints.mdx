@@ -241,15 +241,19 @@ Ohne `allowed_openai_params` wird das Feld entfernt, die Anfrage antwortet mit `
 
 Mit dieser Route können Embeddings für Texte erstellt werden.
 
+Mehrere Texte lassen sich gemeinsam verarbeiten, indem du `input` als Array übergibst:
+
 ```sh
 curl -i -X POST https://llm.aihosting.mittwald.de/v1/embeddings \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $APIKEY" \
     -d '{
         "model": "Qwen3-Embedding-8B",
-        "input": "Ein wichtiges Dokument"
+        "input": ["Ein wichtiges Dokument", "Noch ein wichtiges Dokument"]
     }'
 ```
+
+Jeder Eintrag im `data`-Array der Antwort enthält einen `index`, der seine Position im ursprünglichen `input`-Array angibt und bei `0` beginnt. Verwende diesen Wert, um jedes Embedding dem jeweiligen Eingabetext zuzuordnen.
 
 Abhängig vom Embedding-Modell können weitere Parameter wie `dimensions` übermittelt werden. [Qwen3-Embedding-8B](../../models/qwen3-embedding-8b/) unterstützt `dimensions` mit einer modellspezifischen Auswahl an Werten. Die unterstützten Parameter und Werte findest du auf der jeweiligen Modellseite. Die Unterstützung ist eine Eigenschaft des einzelnen Modells und nicht des gesamten Endpunkts.
 
