@@ -39,8 +39,13 @@ More specific skills build on top of this one:
 - **Dash usage:**
   - hyphens (`-`) for compound words and ranges, e.g. "open-source", "2024-2025"
   - em dashes (`—`) for parenthetical asides and sentence breaks, e.g. "Deploy your app — with
-    integrated tools — in minutes"
+    integrated tools — in minutes". Use them sparingly; a colon, a semicolon or a second sentence
+    is usually the better choice, and a page full of them reads like machine-generated prose.
   - en dashes (`–`) sparingly, only for numeric ranges where an em dash or hyphen is inappropriate
+- **Indentation in code examples:** indent with spaces, never with tabs, even when the tool in
+  question formats its own files with tabs (Grafana Alloy configuration, Go, Makefile recipes
+  excepted where tabs are syntactically required). Tabs render inconsistently across browsers and
+  make the examples hard to align with the surrounding documentation.
 
 ## Security
 
