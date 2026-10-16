@@ -4,6 +4,7 @@ import OperationLink from "@site/src/components/OperationLink";
 import styles from "./OperationExample.module.css";
 import clsx from "clsx";
 import React from "react";
+import Translate from "@docusaurus/Translate";
 
 interface Props {
   apiVersion?: APIVersion;
@@ -47,14 +48,19 @@ export default function OperationExample(p: Props) {
 
   const link = (
     <>
-      See full request reference at: <OperationLink operation={p.operation} />
+      <Translate id="components.OperationExample.reference">
+        See full request reference at:
+      </Translate>{" "}
+      <OperationLink operation={p.operation} />
     </>
   );
 
+  // Wrapped, so that the gap between section children does not separate the
+  // code block from its reference footer
   return (
-    <>
+    <div className={styles.example}>
       <CodeBlock language="yaml">{body}</CodeBlock>
       {withoutLink || <div className={clsx(styles.reference)}>{link}</div>}
-    </>
+    </div>
   );
 }

@@ -1,10 +1,14 @@
 import React, { PropsWithChildren } from "react";
-import Link from "@docusaurus/Link";
+import MDXComponents from "@theme/MDXComponents";
 import { APIVersion, getOperationById, useSpec } from "@site/src/openapi/specs";
-import HTTPMethod from "@site/src/components/openapi/HTTPMethod";
 import OperationPath from "@site/src/components/openapi/OperationPath";
+import HTTPMethod from "@site/src/components/openapi/HTTPMethod";
+import { InlineCode } from "@mittwald/flow-react-components";
 import styles from "./styles.module.css";
 import { slugFromTagName } from "@site/src/openapi/slugFromTagName";
+
+// Rendered like any other Markdown link
+const OperationAnchor = MDXComponents.a;
 
 export interface OperationLinkProps {
   operation: string;
@@ -22,7 +26,7 @@ export default function OperationLink({
   if (!operationSpec) {
     return (
       <>
-        unknown operation <code>{operation}</code>
+        unknown operation <InlineCode>{operation}</InlineCode>
       </>
     );
   }
@@ -31,25 +35,23 @@ export default function OperationLink({
   if (!tag) {
     return (
       <>
-        <code>{operation}</code> (untagged)
+        <InlineCode>{operation}</InlineCode> (untagged)
       </>
     );
   }
 
   children = children || (
-    <span className={styles.operationLink}>
-      <HTTPMethod method={operationSpec.method} />
-      <code>
-        <OperationPath path={operationSpec.path} />
-      </code>
-    </span>
+    <>
+      <HTTPMethod method={operationSpec.method} className={styles.method} />
+      <OperationPath path={operationSpec.path} />
+    </>
   );
 
   if (apiVersion.endsWith("-preview")) {
     const url = `/docs/${apiVersion.replace("-preview", "")}/preview/${slugFromTagName(tag)}/${operation}`;
-    return <Link to={url}>{children}</Link>;
+    return <OperationAnchor href={url}>{children}</OperationAnchor>;
   }
 
   const url = `/docs/${apiVersion}/reference/${slugFromTagName(tag)}/${operation}`;
-  return <Link to={url}>{children}</Link>;
+  return <OperationAnchor href={url}>{children}</OperationAnchor>;
 }

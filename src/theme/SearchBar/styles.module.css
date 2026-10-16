@@ -1,0 +1,41 @@
+.search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Shortcut hint inside the field, hidden while searching */
+.shortcut {
+  position: absolute;
+  inset-inline-end: var(--form-control--padding-x);
+  pointer-events: none;
+  font-family: var(--ifm-font-family-base);
+  font-size: var(--font-size-text--s);
+  color: var(--form-control--placeholder-color--default);
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+.search:focus-within .shortcut,
+.search:has(input:not(:placeholder-shown)) .shortcut {
+  display: none;
+}
+
+@media screen and (max-width: 996px) {
+  .shortcut {
+    display: none;
+  }
+}
+
+/* Clear button at the end of the field, like in Flow's SearchField; its icon
+   ends where the shortcut hint does (the button pads the icon by xs) */
+.clear {
+  position: absolute;
+  inset-inline-end: calc(
+    var(--form-control--padding-x) - var(--size-rem--xs)
+  );
+  top: 50%;
+  transform: translateY(-50%);
+}

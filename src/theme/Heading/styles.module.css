@@ -1,0 +1,17 @@
+/* Hash link after a heading, shown on hover and focus (from the original
+   theme component, which is no longer loaded) */
+:global(.hash-link) {
+  opacity: 0;
+  padding-left: var(--size-rem--s);
+  transition: opacity var(--transition--duration--fast);
+  user-select: none;
+}
+
+:global(.hash-link::before) {
+  content: "#";
+}
+
+:global(.hash-link:focus),
+:global(*:hover > .hash-link) {
+  opacity: 1;
+}

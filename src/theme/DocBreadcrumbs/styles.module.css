@@ -1,0 +1,23 @@
+.container {
+  margin-bottom: var(--size-rem--l);
+}
+
+/* The icon would sit on the text baseline, i.e. too high next to the labels */
+.homeLink {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+}
+
+/* The current page (repeated as title right below) only takes the remaining
+   space, so the parent pages stay readable on small screens; on very deep
+   pages it still shows its beginning */
+.container :global(.flow--breadcrumb--breadcrumb-item:last-child) {
+  flex: 1 1 0;
+  min-width: var(--size-rem--xxl);
+}
+
+/* The home icon keeps its size */
+.container :global(.flow--breadcrumb--breadcrumb-item:first-child) {
+  flex-shrink: 0;
+}

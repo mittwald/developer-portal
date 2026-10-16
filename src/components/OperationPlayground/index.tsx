@@ -32,7 +32,7 @@ function OperationPlayground({ path, method, spec }: OperationPlaygroundProps) {
 
   return (
     <ModalTrigger>
-      <Button>
+      <Button color="dark" variant="outline">
         <Translate id="playground.trigger">Try it out</Translate>
       </Button>
       {!apiKey ? (

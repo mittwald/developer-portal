@@ -1,3 +1,4 @@
+import { translate } from "@docusaurus/Translate";
 const API_KEY_STORAGE_KEY = "mstudio-api-key";
 const USER_EMAIL_STORAGE_KEY = "mstudio-user-email";
 
@@ -80,17 +81,40 @@ export async function verifyApiKey(
 
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
-        return { success: false, error: "Invalid API key" };
+        return {
+          success: false,
+          error: translate({
+            id: "playground.apikey.error.invalid",
+            message: "Invalid API token",
+          }),
+        };
       }
       return {
         success: false,
-        error: `Verification failed: ${response.status}`,
+        error: translate(
+          {
+            id: "playground.apikey.error.verification",
+            message: "Verification failed: {status}",
+          },
+          { status: response.status },
+        ),
       };
     }
 
     const user: UserResponse = await response.json();
-    return { success: true, email: user.email ?? "Unknown" };
+    return {
+      success: true,
+      email:
+        user.email ??
+        translate({ id: "playground.apikey.unknownEmail", message: "Unknown" }),
+    };
   } catch {
-    return { success: false, error: "Network error during verification" };
+    return {
+      success: false,
+      error: translate({
+        id: "playground.apikey.error.network",
+        message: "Network error during verification",
+      }),
+    };
   }
 }

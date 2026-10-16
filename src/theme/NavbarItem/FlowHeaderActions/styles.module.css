@@ -1,0 +1,20 @@
+.item {
+  list-style: none;
+}
+
+/* Round like the icon buttons of the header navigation */
+.item :global(.flow--button) {
+  border-radius: var(--header-navigation--corner-radius-round);
+}
+
+/* The color mode button renders all three icons; "data-theme-choice" on
+   <html> shows the current one, which also works before React hydrates */
+.toggleIcon {
+  display: none !important;
+}
+
+:global([data-theme-choice="system"]) .systemToggleIcon,
+:global([data-theme-choice="light"]) .lightToggleIcon,
+:global([data-theme-choice="dark"]) .darkToggleIcon {
+  display: inline-block !important;
+}

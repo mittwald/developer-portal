@@ -4,18 +4,20 @@
     description: spec.description ?? "",
     openapi: {
         method
-    }
+    },
+    // Generated, not in the repository: no edit link
+    custom_edit_url: null
 }) %>
 ---
 
 import {OperationRequest, OperationResponses} from "@site/src/components/openapi/OperationReference";
 import {OperationMetadata} from "@site/src/components/openapi/OperationMetadata";
 import {OperationUsage} from "@site/src/components/openapi/OperationUsage";
-import OperationDocCardById from "@site/src/components/openapi/OperationDocCardById";
 import OperationLink from "@site/src/components/OperationLink";
-import OperationHint from "@site/src/components/OperationHint";
+import OperationHint, { OperationList } from "@site/src/components/OperationHint";
 import OperationExample from "@site/src/components/OperationExample";
 import TabItem from "@theme/TabItem";
+import Translate from "@docusaurus/Translate";
 
 <% const serializedSpec = JSON.stringify(spec); -%>
 
@@ -38,7 +40,7 @@ import TabItem from "@theme/TabItem";
 
 <OperationResponses spec={<%- serializedSpec %>} />
 
-## Usage examples
+## <Translate id="openapi.operation.usage.title">Usage examples</Translate> {#usage-examples}
 
 <OperationUsage
     method="<%- method _%>"

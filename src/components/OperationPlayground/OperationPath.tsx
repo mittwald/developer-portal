@@ -1,6 +1,6 @@
 import { TextField } from "@mittwald/flow-react-components";
 import { translate } from "@docusaurus/Translate";
-import React, { Fragment } from "react";
+import React from "react";
 import styles from "./index.module.css";
 
 export interface OperationPathProps {
@@ -13,18 +13,24 @@ export interface OperationPathProps {
 }
 
 /**
- * Renders an API path with inline input fields for path parameters.
- * Static path segments are displayed as text, while parameters (enclosed in
- * curly braces) become editable text fields.
+ * Renders an API path with inline input fields for path parameters, in
+ * monospace like the paths elsewhere. Static path segments are displayed as
+ * text, while parameters (enclosed in curly braces) become editable text
+ * fields.
  */
 function OperationPath({ path, values, onChange }: OperationPathProps) {
-  const components = path.split("/");
-  const parts = components.map((part, idx) => {
-    if (part.startsWith("{")) {
-      const paramName = part.slice(1, -1);
-      return (
-        <Fragment key={idx}>
+  // Splitting at the parameters keeps the static text between them (with its
+  // slashes) together
+  const parts = path
+    .split(/(\{[^}]+\})/)
+    .filter((part) => part !== "")
+    .map((part, idx) => {
+      if (part.startsWith("{")) {
+        const paramName = part.slice(1, -1);
+        return (
           <TextField
+            key={idx}
+            className={styles.operationPathParam}
             placeholder={paramName}
             value={values[paramName] ?? ""}
             onChange={(e) => onChange(paramName, e)}
@@ -36,20 +42,17 @@ function OperationPath({ path, values, onChange }: OperationPathProps) {
               { paramName },
             )}
           />
-          <span className={styles.operationPathItem}>/</span>
-        </Fragment>
+        );
+      }
+
+      return (
+        <span key={idx} className={styles.operationPathItem}>
+          {part}
+        </span>
       );
-    }
+    });
 
-    return (
-      <Fragment key={idx}>
-        <span className={styles.operationPathItem}>{part}</span>
-        <span className={styles.operationPathItem}>/</span>
-      </Fragment>
-    );
-  });
-
-  return parts;
+  return <>{parts}</>;
 }
 
 export default OperationPath;

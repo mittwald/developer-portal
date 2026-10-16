@@ -1,11 +1,13 @@
 import React from "react";
+import Translate from "@docusaurus/Translate";
+import { Badge } from "@mittwald/flow-react-components";
 import styles from "./styles.module.css";
-import clsx from "clsx";
 
+/** Marks new features, styled like the "Neu" badge in the Flow docs */
 export function NewBadge() {
   return (
-    <div className={clsx("badge", styles.badgeNew)}>
-      <span>NEW</span>
-    </div>
+    <Badge color="violet" className={styles.badgeNew}>
+      <Translate id="component.newBadge.label">New</Translate>
+    </Badge>
   );
 }

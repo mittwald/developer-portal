@@ -1,4 +1,4 @@
-import { deburr, isPlainObject, trim, upperFirst } from "lodash";
+import { deburr, trim, upperFirst } from "lodash";
 
 /**
  * Copied from json-schema-to-typescript

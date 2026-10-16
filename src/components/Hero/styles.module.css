@@ -1,0 +1,80 @@
+/* On the landing page background (src/css/custom.css) */
+.hero {
+  padding: calc(var(--size-rem--xxl) * 1.5) var(--size-rem--m);
+  background: var(--landing--gradient);
+  background-blend-mode: overlay, normal;
+}
+
+/* On small screens the container alone pads the content, flush with the
+   header and the docs; the top stays as high as the space between the title
+   and the entries */
+@media screen and (max-width: 996px) {
+  .hero {
+    padding: calc(var(--size-rem--xxl) * 1.5) 0 calc(var(--size-rem--xl) * 1.5);
+  }
+}
+
+/* Lead text below the title, between body text and headings in size */
+.hero :global(.container) > :global(.flow--text) {
+  font-size: var(--font-size-heading--s);
+}
+
+/* Wrapped lines stay centered (Flow's flex layout resets the alignment) */
+.hero > :global(.container) {
+  text-align: center;
+}
+
+.hero img {
+  max-width: 100%;
+}
+
+/* Entry points below the title: linked accent boxes of equal height */
+.entries {
+  margin-top: var(--size-rem--xxl);
+  width: 100%;
+  text-align: start;
+}
+
+/* All three side by side from 700px on, earlier than Flow's large layout
+   (850px); below that they stack */
+@container (min-width: 700px) {
+  .entries :global(.flow--column-layout) {
+    grid-template-columns: var(--column-layout--columns-l);
+  }
+}
+
+.entry {
+  display: block;
+  height: 100%;
+}
+
+.entryCard {
+  height: 100%;
+}
+
+/* The whole box is the link; hovering it darkens the box one step */
+.entryCard :global(.flow--accent-box) {
+  transition: background-color var(--transition--duration--default);
+}
+
+.entry:hover .entryCard :global(.flow--accent-box) {
+  background-color: var(--neutral--color--400);
+}
+
+/* The layout card pads the box, the box pads the message */
+.entryMessage {
+  flex-grow: 1;
+  padding: 0;
+}
+
+/* Styled like a dark Flow inline link (the whole box is the link); at the
+   bottom, so the links of a row line up */
+.entryLink {
+  margin-top: auto;
+  color: var(--link--color-dark--default);
+  text-decoration: underline;
+}
+
+.entry:hover .entryLink {
+  color: var(--link--color-dark--hover);
+}

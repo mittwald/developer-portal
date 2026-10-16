@@ -1,14 +1,8 @@
-import { APIVersion, OperationWithMeta } from "@site/src/openapi/specs";
-import { PropsWithChildren } from "react";
+import { APIVersion } from "@site/src/openapi/specs";
 import buildDocumentId from "@site/src/openapi/buildDocumentId";
-import Link from "@docusaurus/Link";
 import { OpenAPIV3 } from "openapi-types";
 
-type Props = PropsWithChildren<{
-  apiVersion: APIVersion;
-  operation: OperationWithMeta;
-}>;
-
+/** The URL of an operation's reference page */
 export const buildOperationUrl = (
   apiVersion: APIVersion,
   operation: OpenAPIV3.OperationObject,
@@ -18,10 +12,3 @@ export const buildOperationUrl = (
     ? `/docs/${apiVersion.replace("-preview", "")}/preview/${docId.replace("reference/", "")}`
     : `/docs/${apiVersion}/reference/${docId.replace("reference/", "")}`;
 };
-
-export default function OperationLink(p: Props) {
-  const { apiVersion } = p;
-  const { operation } = p.operation;
-  const url = buildOperationUrl(apiVersion, operation);
-  return <Link to={url}>{p.children}</Link>;
-}

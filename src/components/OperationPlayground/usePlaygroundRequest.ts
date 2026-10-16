@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { translate } from "@docusaurus/Translate";
 
 export type RequestState = "idle" | "loading" | "success" | "error";
 
@@ -109,7 +110,13 @@ export function usePlaygroundRequest({
       setRequestState(res.ok ? "success" : "error");
       setResponse(res);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Request failed";
+      const message =
+        error instanceof Error
+          ? error.message
+          : translate({
+              id: "playground.request.error",
+              message: "Request failed",
+            });
       setResponseText(message);
       setRequestState("error");
       setResponse(null);

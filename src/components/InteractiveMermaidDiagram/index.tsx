@@ -5,8 +5,13 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
-import { Button } from "@mittwald/flow-react-components";
-import { IconZoomIn, IconZoomOut, IconRefresh } from "@tabler/icons-react";
+import {
+  Button,
+  IconMinus,
+  IconPlus,
+  IconRefresh,
+} from "@mittwald/flow-react-components";
+import Translate, { translate } from "@docusaurus/Translate";
 import styles from "./index.module.css";
 
 export interface InteractiveMermaidDiagramProps {
@@ -274,57 +279,78 @@ function InteractiveMermaidDiagram({
         <div className={styles.zoomControls}>
           <Button
             variant="soft"
+            color="secondary"
             size="s"
-            onClick={handleZoomOut}
-            aria-label="Zoom out"
+            onPress={handleZoomOut}
+            aria-label={translate({
+              id: "components.InteractiveMermaidDiagram.zoomOut",
+              message: "Zoom out",
+            })}
           >
-            <IconZoomOut size={16} />
+            <IconMinus />
           </Button>
           <span className={styles.zoomLevel}>{zoom}%</span>
           <Button
             variant="soft"
+            color="secondary"
             size="s"
-            onClick={handleZoomIn}
-            aria-label="Zoom in"
+            onPress={handleZoomIn}
+            aria-label={translate({
+              id: "components.InteractiveMermaidDiagram.zoomIn",
+              message: "Zoom in",
+            })}
           >
-            <IconZoomIn size={16} />
+            <IconPlus />
           </Button>
           <Button
             variant="soft"
+            color="secondary"
             size="s"
-            onClick={handleReset}
-            aria-label="Reset zoom"
+            onPress={handleReset}
+            aria-label={translate({
+              id: "components.InteractiveMermaidDiagram.resetZoom",
+              message: "Reset zoom",
+            })}
           >
-            <IconRefresh size={16} />
+            <IconRefresh />
           </Button>
         </div>
       </div>
 
-      <div
-        ref={diagramRef}
-        className={styles.diagram}
-        style={transformStyle as React.CSSProperties}
-        onMouseDown={handleDiagramMouseDown}
-        onMouseMove={handleDiagramMouseMove}
-        onMouseUp={handleDiagramMouseUp}
-        onMouseLeave={handleDiagramMouseUp}
-        onTouchStart={handleDiagramTouchStart}
-        onTouchMove={handleDiagramTouchMove}
-        onTouchEnd={handleDiagramTouchEnd}
-        onTouchCancel={handleDiagramTouchCancel}
-        role="img"
-        aria-label={title || "Interactive diagram"}
-      >
-        <div className={styles.diagramContent} ref={contentRef}>
-          {children}
+      {/* Clips the zoomed diagram, so that it does not cover the hint */}
+      <div className={styles.viewport}>
+        <div
+          ref={diagramRef}
+          className={styles.diagram}
+          style={transformStyle as React.CSSProperties}
+          onMouseDown={handleDiagramMouseDown}
+          onMouseMove={handleDiagramMouseMove}
+          onMouseUp={handleDiagramMouseUp}
+          onMouseLeave={handleDiagramMouseUp}
+          onTouchStart={handleDiagramTouchStart}
+          onTouchMove={handleDiagramTouchMove}
+          onTouchEnd={handleDiagramTouchEnd}
+          onTouchCancel={handleDiagramTouchCancel}
+          role="img"
+          aria-label={
+            title ||
+            translate({
+              id: "components.InteractiveMermaidDiagram.label",
+              message: "Interactive diagram",
+            })
+          }
+        >
+          <div className={styles.diagramContent} ref={contentRef}>
+            {children}
+          </div>
         </div>
       </div>
 
       <div className={styles.hint}>
-        <small>
-          💡 Desktop: Ctrl/Cmd + Scroll to zoom • Drag to pan • Mobile: Pinch to
+        <Translate id="components.InteractiveMermaidDiagram.hint">
+          Desktop: Ctrl/Cmd + scroll to zoom • Drag to pan • Mobile: Pinch to
           zoom • Drag to pan
-        </small>
+        </Translate>
       </div>
     </div>
   );
