@@ -17,6 +17,7 @@ We currently offer the following models, which may change or expand over time. E
 | Qwen3-Embedding-8B              | Embedding                 | Text to vector                                  | 32,768            | Apache 2.0 | LTS                              |
 | Qwen3-VL-Reranker-2B            | Reranking                 | Text, image to score                            | 32,768            | Apache 2.0 | Stable                           |
 | whisper-large-v3-turbo          | Speech-to-Text            | Audio to text                                   | N/A (audio-based) | MIT        | LTS                              |
+| cohere-transcribe-03-2026       | Speech-to-Text            | Audio to text, speakers, word timestamps        | N/A (audio-based) | Apache 2.0 | Testphase                        |
 | Qwen3-TTS-12Hz-1.7B-CustomVoice | Text-to-Speech            | Text to audio                                   | N/A (audio-based) | Apache 2.0 | Stable                           |
 
 Status shows the [lifecycle phase](../20-access-and-usage/40-lifecycle.mdx) of each model.
@@ -45,6 +46,8 @@ Tool-calling in this table reflects support on `/v1/chat/completions`. Support o
     use `Qwen3-Embedding-8B`
   - For any audio transcription or voice-command needs \
     use `whisper-large-v3-turbo`
+  - For transcripts that need speaker separation, word timestamps, or subtitles, and for recordings longer than 30 minutes \
+    use `cohere-transcribe-03-2026`
   - For reading text out loud, for example voice responses, accessibility, or audio versions of written content \
     use `Qwen3-TTS-12Hz-1.7B-CustomVoice`
   - To improve RAG retrieval precision by adding it as a second-pass reranker after vector search \

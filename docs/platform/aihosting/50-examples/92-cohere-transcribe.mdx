@@ -1,0 +1,377 @@
+---
+sidebar_label: Speech-to-text with Cohere Transcribe
+description: Transcribe audio with speaker separation, word timestamps, and subtitles using cohere-transcribe-03-2026 through the OpenAI-compatible API
+title: Speech-to-text with Cohere Transcribe
+---
+
+`cohere-transcribe-03-2026` serves the same `/v1/audio/transcriptions` endpoint as the OpenAI transcription API, so code written for OpenAI works by changing `base_url`. On top of plain transcription it separates speakers, returns word timestamps, and writes subtitles. See the [Cohere Transcribe model page](/docs/v2/platform/aihosting/models/cohere-transcribe-03-2026) for languages, input formats, limits, and the full response shapes.
+
+For plain transcription with `whisper-large-v3-turbo`, see [Speech-to-text with Whisper](/docs/v2/platform/aihosting/examples/whisper/).
+
+## Setup {#setup}
+
+```shellsession
+user@local $ pip install openai
+user@local $ export OPENAI_API_KEY="sk-…"
+```
+
+## Basic transcription {#basic}
+
+```python
+import os
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1",
+    api_key=os.environ["OPENAI_API_KEY"],
+)
+
+with open("meeting.mp3", "rb") as f:
+    result = client.audio.transcriptions.create(
+        model="cohere-transcribe-03-2026",
+        file=f,
+        language="de",
+    )
+
+print(result.text)
+```
+
+Without `language` the model detects the language itself. Set it when you know it: on very short or unusual recordings, detection can fall back to German. A recording has to stay in one language, see [One language per request](/docs/v2/platform/aihosting/models/cohere-transcribe-03-2026#one-language).
+
+The examples below reuse `client` from this block.
+
+## Who said what: speaker separation {#speaker-separation}
+
+`response_format="diarized_json"` splits the transcript into segments by speaker:
+
+```python
+with open("interview.mp3", "rb") as f:
+    result = client.audio.transcriptions.create(
+        model="cohere-transcribe-03-2026",
+        file=f,
+        language="de",
+        response_format="diarized_json",
+    )
+
+for seg in result.segments:
+    print(f"[{seg.start:7.2f}s] {seg.speaker}: {seg.text}")
+```
+
+```text
+[   0.38s] SPEAKER_00: Am Ende wird es wieder in eine Fressorgie ausarten.
+[   4.78s] SPEAKER_01: Ja, aber bei mir ist das auch etwas ganz anderes.
+```
+
+The model estimates how many people are speaking. If you know the number, pass it as `num_speakers`. The OpenAI SDK has no argument for it, so it goes into `extra_body`:
+
+```python
+with open("interview.mp3", "rb") as f:
+    result = client.audio.transcriptions.create(
+        model="cohere-transcribe-03-2026",
+        file=f,
+        language="de",
+        response_format="diarized_json",
+        extra_body={"num_speakers": 2},
+    )
+```
+
+If you only know a range, use `min_speakers` and `max_speakers` the same way. All three take integers from 1 to 20.
+
+## Speaking time per speaker {#speaker-analytics}
+
+`diarized_json` also contains `speaker_analytics`. The SDK does not know this field, so read it from `model_dump()`:
+
+```python
+data = result.model_dump()
+analytics = data["speaker_analytics"]
+
+for s in analytics["speakers"]:
+    print(f"{s['speaker']}: {s['speaking_time']:.0f}s, {s['speaking_share']:.0%}, {s['turns']} turns")
+
+print(f"Speech {analytics['total_speech_time']:.0f}s, silence {analytics['silence_time']:.0f}s")
+```
+
+```text
+SPEAKER_00: 41s, 52%, 7 turns
+…
+Speech 79s, silence 13s
+```
+
+## Phone recordings with one speaker per channel {#phone-recordings}
+
+Many phone systems record each side of a call on its own channel. Send such a two-channel file with `response_format="diarized_json"` as above. The model detects that each channel holds one speaker and transcribes the channels separately instead of separating the voices by estimation. The labels then name the channel, `CHANNEL_00` and `CHANNEL_01`, so you know which side of the call said what.
+
+8 kHz µ-law `wav` files, as many phone systems write them, work without conversion.
+
+## Word timestamps {#word-timestamps}
+
+Request `timestamp_granularities=["word"]` together with `response_format="verbose_json"`:
+
+```python
+with open("ansage.wav", "rb") as f:
+    result = client.audio.transcriptions.create(
+        model="cohere-transcribe-03-2026",
+        file=f,
+        language="de",
+        response_format="verbose_json",
+        timestamp_granularities=["word"],
+    )
+
+for w in result.words:
+    print(f"{w.start:6.2f}–{w.end:6.2f}  {w.word}  ({w.confidence:.2f})")
+```
+
+```text
+  0.04–  0.26  Heute  (0.97)
+  0.36–  0.72  regnet  (0.95)
+```
+
+`confidence` says how well the word was aligned to the audio, not how sure the model is that it heard the word correctly. Word timestamps are available for `de`, `en`, `es`, `fr`, `it`, `nl`, `pl`, and `pt`. `verbose_json` always contains the segments as well, so `result.segments` is filled too.
+
+The same argument works with `response_format="diarized_json"` if you need speakers and word timestamps in one request.
+
+## Subtitles {#subtitles}
+
+`response_format="srt"` or `"vtt"` returns a finished subtitle file. The SDK returns it as a string:
+
+```python
+with open("video.mp4", "rb") as f:
+    subtitles = client.audio.transcriptions.create(
+        model="cohere-transcribe-03-2026",
+        file=f,
+        language="de",
+        response_format="srt",
+    )
+
+with open("video.srt", "w", encoding="utf-8") as out:
+    out.write(subtitles)
+```
+
+The cues are cut at word boundaries and are short enough to read on screen. From an `mp4` the model transcribes the audio track, so you don't need to extract it first.
+
+For subtitles with speaker labels, add `diarize`:
+
+```python
+with open("video.mp4", "rb") as f:
+    subtitles = client.audio.transcriptions.create(
+        model="cohere-transcribe-03-2026",
+        file=f,
+        language="de",
+        response_format="vtt",
+        extra_body={"diarize": "true"},
+    )
+```
+
+In `vtt` the label becomes a voice tag:
+
+```text
+00:00:00.380 --> 00:00:04.220
+<v SPEAKER_00>Am Ende wird es wieder in eine Fressorgie ausarten.
+```
+
+In `srt` the label precedes the text as `SPEAKER_00: …`.
+
+## Names and technical terms {#prompt}
+
+Pass names, product names, or technical terms that occur in the recording as `prompt`. The model uses them as a hint for the spelling:
+
+```python
+with open("standup.mp3", "rb") as f:
+    result = client.audio.transcriptions.create(
+        model="cohere-transcribe-03-2026",
+        file=f,
+        language="de",
+        prompt="mStudio, Kubernetes, Container, Deployment",
+    )
+```
+
+## Push-to-talk and dictation {#push-to-talk}
+
+For push-to-talk you don't need streaming: record while the user holds a button, and upload the clip when they let go. A transcription comes back fast enough that the text appears right after the button is released. In our test with the example below, the text appeared 0.2 to 0.4 seconds after the button was released. Your network round trip comes on top.
+
+Don't call the API from the browser directly, because the page would expose your API key. Let the browser send the recording to your own backend, and forward it from there. A minimal backend with [FastAPI](https://fastapi.tiangolo.com/):
+
+```shellsession
+user@local $ pip install openai fastapi uvicorn python-multipart
+```
+
+```python
+from fastapi import FastAPI, UploadFile
+from fastapi.responses import FileResponse
+
+app = FastAPI()
+
+
+@app.get("/")
+def page():
+    return FileResponse("index.html")
+
+
+@app.post("/api/transcribe")
+def transcribe(file: UploadFile):
+    result = client.audio.transcriptions.create(
+        model="cohere-transcribe-03-2026",
+        file=(file.filename, file.file.read(), file.content_type),
+        language="de",
+    )
+    return {"text": result.text}
+```
+
+Start it with `uvicorn app:app`. The `index.html` next to it records with the browser's `MediaRecorder` while the button is held down:
+
+```html
+<button id="talk">Hold to talk</button>
+<p id="text"></p>
+
+<script type="module">
+  const button = document.getElementById("talk");
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  let recorder;
+
+  button.addEventListener("pointerdown", () => {
+    const chunks = [];
+    recorder = new MediaRecorder(stream);
+    recorder.ondataavailable = (event) => chunks.push(event.data);
+    recorder.onstop = async () => {
+      // Chrome and Firefox record webm, Safari records mp4
+      const name = recorder.mimeType.includes("mp4")
+        ? "speech.m4a"
+        : "speech.webm";
+      const form = new FormData();
+      form.append("file", new Blob(chunks, { type: recorder.mimeType }), name);
+      const response = await fetch("/api/transcribe", {
+        method: "POST",
+        body: form,
+      });
+      document.getElementById("text").textContent = (
+        await response.json()
+      ).text;
+    };
+    recorder.start();
+  });
+
+  button.addEventListener("pointerup", () => recorder?.stop());
+</script>
+```
+
+Set `language` for push-to-talk. A clip of a few words is too short for reliable language detection.
+
+## Near-live transcription {#near-live}
+
+`cohere-transcribe-03-2026` does not transcribe audio while it is still being recorded, and there is no `/v1/realtime` endpoint for it. For live captions or continuous dictation, cut the microphone input at speech pauses on your side and send each sentence as its own request. A sentence takes only a fraction of a second to transcribe, so the text appears shortly after each pause.
+
+The following example detects pauses by volume, with no extra model. Fluent speakers rarely pause for long, so a short pause of 300 ms ends a sentence once it is at least 3 seconds long, and after 15 seconds the example cuts regardless. In our tests with an interview recording, a word appeared on average about 5 seconds after it was spoken, at most about 15 seconds. That is fine for dictation and notes, but too slow for live subtitles or voice assistants that have to react within a second. It needs `numpy` and `sounddevice`:
+
+```shellsession
+user@local $ pip install numpy sounddevice
+```
+
+```python
+import io
+import queue
+import wave
+
+import numpy as np
+import sounddevice as sd
+
+RATE = 16000
+FRAME = 480            # 30 ms per frame
+THRESHOLD = 0.02       # Volume that counts as speech, adjust it to your microphone
+PAUSE_FRAMES = 10      # 300 ms below the threshold end a sentence ...
+MIN_FRAMES = 100       # ... once it is at least 3 s long
+MAX_FRAMES = 500       # Cut after 15 s even without a pause
+
+
+def microphone():
+    """Yield the microphone input in 30 ms frames."""
+    frames = queue.Queue()
+    with sd.InputStream(samplerate=RATE, channels=1, blocksize=FRAME, dtype="float32",
+                        callback=lambda data, *_: frames.put(data[:, 0].copy())):
+        while True:
+            yield frames.get()
+
+
+def sentences(frames):
+    """Group frames into sentences of 3 to 15 seconds that end at a pause."""
+    current, quiet = [], 0
+    for frame in frames:
+        loud = np.sqrt(np.mean(frame ** 2)) > THRESHOLD
+        if loud or current:
+            current.append(frame)
+            quiet = 0 if loud else quiet + 1
+            if (quiet >= PAUSE_FRAMES and len(current) >= MIN_FRAMES) or len(current) >= MAX_FRAMES:
+                yield np.concatenate(current)
+                current, quiet = [], 0
+
+
+def to_wav(samples):
+    buf = io.BytesIO()
+    with wave.open(buf, "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(RATE)
+        w.writeframes((np.clip(samples, -1, 1) * 32767).astype(np.int16).tobytes())
+    return buf.getvalue()
+
+
+for sentence in sentences(microphone()):
+    if len(sentence) < RATE // 2:   # Skip clicks and coughs shorter than 0.5 s
+        continue
+    result = client.audio.transcriptions.create(
+        model="cohere-transcribe-03-2026",
+        file=("sentence.wav", to_wav(sentence)),
+        language="de",
+    )
+    print(result.text, flush=True)
+```
+
+While a request is running, the microphone keeps recording into the queue, so nothing is lost. Each request is billed by its audio duration, and pauses between sentences are not sent at all. Speaker labels and word timestamps are per request here too, so they start over with every sentence.
+
+## Long recordings {#long-recordings}
+
+An upload can be up to 25 MB, the audio up to 95 minutes long. For long recordings the file size is the limit you hit first, so compress them to mono `mp3` or `opus` before you upload them. At 64 kbit/s, 25 MB holds roughly 52 minutes:
+
+```shellsession
+user@local $ ffmpeg -i recording.wav -ac 1 -c:a libopus -b:a 64k recording.ogg
+```
+
+Longer recordings need a lower bitrate or have to be split. You can use the [`pydub` example from the Whisper guide](/docs/v2/platform/aihosting/examples/whisper/#large-files) for that, with a larger chunk length. Speaker labels are assigned per request, so `SPEAKER_00` in one part is not necessarily the same person as `SPEAKER_00` in the next.
+
+## Handling errors {#errors}
+
+Invalid requests return HTTP 400 with a message that says what is wrong, for example an unsupported language, a file that is not audio, or a video without an audio track. Files above 25 MB and audio longer than 95 minutes return HTTP 413. The OpenAI SDK raises these as exceptions:
+
+```python
+import openai
+
+try:
+    with open("meeting.mp3", "rb") as f:
+        result = client.audio.transcriptions.create(
+            model="cohere-transcribe-03-2026",
+            file=f,
+            language="de",
+        )
+except openai.BadRequestError as e:
+    print(f"Request rejected: {e.message}")
+except openai.APIStatusError as e:
+    if e.status_code == 413:
+        print("File too large or recording too long, compress or split it")
+    else:
+        raise
+```
+
+Streaming is not supported: `stream=True` returns HTTP 400. Send the request without `stream` to get the complete transcript.
+
+## Switching from Whisper {#from-whisper}
+
+Code written for `whisper-large-v3-turbo` keeps working when you change the model name. These are the differences:
+
+|                    | whisper-large-v3-turbo | cohere-transcribe-03-2026                                     |
+| ------------------ | ---------------------- | ------------------------------------------------------------- |
+| Languages          | over 99                | 14                                                            |
+| Without `language` | assumes German         | detects the language                                          |
+| Audio per request  | 30 minutes             | 95 minutes                                                    |
+| `response_format`  | `json`, `verbose_json` | `json`, `text`, `srt`, `vtt`, `verbose_json`, `diarized_json` |
+| Word timestamps    | no                     | in 8 languages                                                |
+| Speaker separation | no                     | yes                                                           |
+| Lifecycle status   | LTS                    | Testphase                                                     |
