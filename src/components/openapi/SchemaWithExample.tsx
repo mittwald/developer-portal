@@ -8,7 +8,9 @@ import SchemaExample, {
 import { OpenAPIV3 } from "openapi-types";
 import { translate } from "@docusaurus/Translate";
 import CodeBlock from "@theme/CodeBlock";
+import Link from "@docusaurus/Link";
 import React from "react";
+import Markdown from "react-markdown";
 import ExampleObject = OpenAPIV3.ExampleObject;
 
 interface Props {
@@ -39,13 +41,24 @@ export default function SchemaWithExample({
 }: Props) {
   const renderedExamples = examples ? (
     Object.entries(examples).map(([key, example]) => (
-      <SchemaExampleRenderer
-        content={example}
-        withHeaders={withHeaders}
-        format={format}
-        title={examples[key].summary ?? key}
-        key={key}
-      />
+      <React.Fragment key={key}>
+        {example.description && <Markdown>{example.description}</Markdown>}
+        {example.value !== undefined ? (
+          <SchemaExampleRenderer
+            content={example.value}
+            withHeaders={withHeaders}
+            format={format}
+            title={example.summary ?? key}
+          />
+        ) : (
+          example.externalValue && (
+            <p>
+              {example.summary ?? key}:{" "}
+              <Link href={example.externalValue}>{example.externalValue}</Link>
+            </p>
+          )
+        )}
+      </React.Fragment>
     ))
   ) : (
     <SchemaExample schema={schema} format={format} withHeaders={withHeaders} />
