@@ -32,6 +32,13 @@
   margin-bottom: 0;
 }
 
+/* Flow hides empty column headers, which shifts the following headers by a
+   column. Markdown tables leave the top left header empty when the first
+   column holds row labels, so it stays a cell here. */
+.table :global(.flow--table .flow--table--column:empty) {
+  display: table-cell;
+}
+
 /* List item starting with an emoji icon: icon and text side by side */
 .iconListItem {
   display: flex;
