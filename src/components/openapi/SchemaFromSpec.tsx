@@ -1,13 +1,10 @@
 import Schema from "@site/src/components/openapi/Schema";
-import TabItem from "@theme/TabItem";
-import SchemaExample from "@site/src/components/openapi/SchemaExample";
-import Tabs from "@theme/Tabs";
 import { APIVersion, specs } from "@site/src/openapi/specs";
 import SchemaWithExample from "@site/src/components/openapi/SchemaWithExample";
 
 interface Props {
   apiVersion: APIVersion;
-  ref: string;
+  path: string;
   withExample: boolean;
 }
 

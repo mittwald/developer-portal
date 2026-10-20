@@ -190,7 +190,11 @@ npm add @mittwald/ext-bridge
   Dieses globale Secret ist **nicht** dasselbe wie das Secret der Extensions Instance, das verwendet wird, um einzelne Extension Instances zu authentifizieren.
   Ein Access Token ist erforderlich, um dein Backend gegen [mittwald API](https://developer.mittwald.de/de/docs/v2/reference/) zu authentifizieren.
 
-> **Wichtig:** Erstelle immer ein neues Access Token auf Anfrage. Cache oder wiederverwende niemals Access Token.
+:::important
+
+Erstelle immer ein neues Access Token auf Anfrage. Cache oder wiederverwende niemals Access Token.
+
+:::
 
 ### Frontend-Implementierung
 
@@ -198,11 +202,13 @@ npm add @mittwald/ext-bridge
 
 Verwende `getSessionToken()`, um ein Session-Token zu generieren.
 
-> **Wichtig:**
->
-> - Server-Side Rendering (SSR) wird für diese Funktionalität **nicht unterstützt** – diese Funktion muss **client-seitig** aufgerufen werden.
-> - Die Methode ist **nur verfügbar**, nachdem die `<RemoteRoot>`-Komponente gerendert wurde.
-> - Rufe **nicht** `getSessionToken()` während des initialen Renderns auf (z. B. innerhalb von `useEffect`). Stattdessen rufe es **kurz bevor** du eine Backend-Anfrage machst, auf.
+:::important
+
+- Server-Side Rendering (SSR) wird für diese Funktionalität **nicht unterstützt** – diese Funktion muss **client-seitig** aufgerufen werden.
+- Die Methode ist **nur verfügbar**, nachdem die `<RemoteRoot>`-Komponente gerendert wurde.
+- Rufe **nicht** `getSessionToken()` während des initialen Renderns auf (z. B. innerhalb von `useEffect`). Stattdessen rufe es **kurz bevor** du eine Backend-Anfrage machst, auf.
+
+:::
 
 #### Beispiel: Axios-Interceptor
 
@@ -312,5 +318,9 @@ const projectsResponse = await fetch("https://api.mittwald.de/v2/projects", {
 });
 ```
 
-> **Wichtig:** Erstelle immer ein frisches Access Token bei Bedarf.
-> Cache oder wiederverwende niemals Access Token.
+:::important
+
+Erstelle immer ein frisches Access Token bei Bedarf.
+Cache oder wiederverwende niemals Access Token.
+
+:::

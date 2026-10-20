@@ -28,7 +28,7 @@ function ResponseHeaders({ headers }: ResponseHeadersProps) {
   });
 
   return (
-    <Accordion defaultExpanded={false} variant="outline">
+    <Accordion defaultExpanded={false}>
       <Heading>
         <Translate id="playground.response.headers">Headers</Translate>
       </Heading>

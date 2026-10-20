@@ -30,7 +30,7 @@ function RequestBodySection({
   return (
     <Section>
       <Heading>
-        <Translate id="playground.request-body.title">Request Body</Translate>
+        <Translate id="playground.request-body.title">Request body</Translate>
       </Heading>
       <TextArea
         onChange={onRequestBodyChange}

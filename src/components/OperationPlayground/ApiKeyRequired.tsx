@@ -4,13 +4,13 @@ import {
   Button,
   Content,
   Heading,
+  IconSshKey,
   IllustratedMessage,
   Modal,
   ModalProps,
   Text,
 } from "@mittwald/flow-react-components";
 import Translate from "@docusaurus/Translate";
-import { IconKey } from "@tabler/icons-react";
 import React from "react";
 import ApiKeyForm from "./ApiKeyForm";
 
@@ -40,16 +40,16 @@ function ApiKeyRequired({
       </Heading>
       <Content>
         <IllustratedMessage>
-          <IconKey />
+          <IconSshKey />
           <Heading>
             <Translate id="playground.apikey.required.title">
-              API Key Required
+              API token required
             </Translate>
           </Heading>
           <Text>
             <Translate id="playground.apikey.required.description">
               To use the API Playground, you need to configure your mStudio API
-              key first. Your API key will be stored in your browser's local
+              token first. Your API token will be stored in your browser's local
               storage.
             </Translate>
           </Text>
@@ -59,7 +59,7 @@ function ApiKeyRequired({
             onSubmit={onSubmit}
           >
             <Button color="accent">
-              <Translate id="playground.apikey.add">Add API Key</Translate>
+              <Translate id="playground.apikey.add">Add API token</Translate>
             </Button>
           </ApiKeyForm>
         </IllustratedMessage>

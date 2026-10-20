@@ -1,193 +1,233 @@
-/* Search Bar Styling - matches existing design */
+/* Search bar styled like a Flow text field, with the rounded shape of the
+   search in mStudio; the right padding leaves room for the shortcut hint
+   (src/theme/SearchBar) */
 .search-bar {
-  background-color: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--ifm-global-radius);
-  padding: 6px 12px 6px 36px;
+  background-color: var(--form-control--background-color--default);
+  border: var(--form-control--border-width) var(--form-control--border-style)
+    var(--form-control--border-color--default);
+  border-radius: 999px;
+  padding: var(--form-control--padding-y) 80px var(--form-control--padding-y)
+    40px;
   font-family: var(--ifm-font-family-base);
-  font-size: 14px;
-  color: #fff;
-  transition: all 0.2s ease;
-  min-width: 200px;
-  width: 200px;
+  font-size: var(--font-size-text--m);
+  line-height: var(--line-height);
+  /* Infima fixes the height to 2rem; let it follow the Flow field metrics */
+  height: auto;
+  color: var(--form-control--content-color--default);
+  transition-property: background-color, border-color;
+  transition-duration: var(--transition--duration--fast);
+  min-width: 260px;
+  width: 260px;
+}
+
+/* Infima draws the magnifier as a data URI background, where currentColor
+   does not apply; draw it as a mask in the field's content color instead */
+.navbar__search {
+  position: relative;
+}
+
+.navbar__search .search-bar {
+  background-image: none;
+}
+
+.navbar__search::before {
+  content: "";
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  transform: translateY(-50%);
+  /* As light as the placeholder, like the search in mStudio */
+  background-color: var(--form-control--placeholder-color--default);
+  /* --icon-mask--search: the Pro icon, see src/icons/IconMasks.tsx */
+  mask: var(--icon-mask--search, var(--ifm-navbar-search-input-icon))
+    no-repeat center / contain;
+  pointer-events: none;
+  /* Above the autocomplete wrapper, which the plugin adds once the index is
+     loaded and which would cover the icon */
+  z-index: 1;
 }
 
 .search-bar::placeholder {
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--form-control--placeholder-color--default);
 }
 
 .search-bar:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.3);
+  background-color: var(--form-control--background-color--hover);
 }
 
 .search-bar:focus {
   outline: none;
-  background-color: rgba(255, 255, 255, 0.25);
-  border-color: var(--ifm-color-info);
-  box-shadow: 0 0 0 2px rgba(0, 84, 245, 0.2);
+  border-color: var(--form-control--border-color--focused);
 }
 
-/* Dark mode adjustments */
-[data-theme="dark"] .search-bar {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.15);
-  color: #fff;
+/* The Flow clear button replaces the browser's own (src/theme/SearchBar) */
+.search-bar::-webkit-search-cancel-button,
+.search-bar::-webkit-search-decoration {
+  -webkit-appearance: none;
 }
 
-[data-theme="dark"] .search-bar::placeholder {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-[data-theme="dark"] .search-bar:hover {
-  background-color: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.25);
-}
-
-[data-theme="dark"] .search-bar:focus {
-  background-color: rgba(255, 255, 255, 0.2);
-  border-color: var(--ifm-color-info);
-  box-shadow: 0 0 0 2px rgba(128, 170, 250, 0.2);
-}
-
-/* Mobile responsiveness - deactivate search bar for now?! */
+/* No search on small screens (yet) */
 @media screen and (max-width: 996px) {
-  .search-bar {
+  .search-bar,
+  .navbar__search::before {
     display: none;
   }
 }
 
-@media screen and (max-width: 600px) {
-  .search-bar {
-    display: none;
-  }
+/* Search results: the plugin's Algolia dropdown styled like a Flow context
+   menu (popover with menu items). The plugin's stylesheet loads later
+   with selectors of the same weight, so these rules are scoped to the navbar
+   (and override its dark mode rules, which use !important). */
+
+/* The popover, without the plugin's tip and shadow */
+.navbar .algolia-autocomplete .ds-dropdown-menu {
+  margin-top: var(--popover--spacing);
+  box-shadow: none;
 }
 
-/* Autocomplete Suggestions Styling */
-.ds-suggestions {
-  background-color: var(--mw-main-feature-background-color);
-  border: 1px solid var(--ifm-color-gray-300);
-  border-radius: var(--ifm-global-radius);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  overflow: hidden;
+.navbar .algolia-autocomplete .ds-dropdown-menu::before {
+  display: none;
+}
+
+.navbar .algolia-autocomplete .ds-dropdown-menu [class^="ds-dataset-"] {
   max-height: 70vh;
   overflow-y: auto;
+  padding: var(--popover--padding--s);
+  background-color: var(--popover--background-color);
+  border: var(--popover--border-width) var(--popover--border-style)
+    var(--popover--border-color);
+  border-radius: var(--popover--corner-radius);
+  box-shadow: var(--popover--box-shadow);
 }
 
-.ds-suggestion {
-  border-bottom: 1px solid var(--ifm-color-gray-300);
+.navbar .algolia-autocomplete .ds-dropdown-menu .ds-suggestions {
+  display: flex;
+  flex-direction: column;
+  row-gap: var(--menu--item-to-item-spacing);
 }
 
-.ds-suggestion:last-child {
-  border-bottom: none;
-}
-
-.ds-suggestion a {
-  display: block;
-  padding: var(--ifm-global-spacing);
-  color: var(--ifm-color-content);
+.navbar .algolia-autocomplete .algolia-docsearch-suggestion {
+  color: var(--text--color--default);
+  font-weight: var(--font-weight--normal);
   text-decoration: none;
-  transition: background-color 0.2s ease;
 }
 
-.ds-suggestion a:hover,
-.ds-suggestion.ds-cursor a {
-  background-color: var(--ifm-hover-overlay);
+/* The page of the following results, like a section heading; sections are
+   separated like in a Flow context menu */
+.navbar .algolia-autocomplete .algolia-docsearch-suggestion--category-header,
+html[data-theme] .navbar .algolia-docsearch-suggestion--category-header {
+  padding: var(--menu-item--padding-y) var(--menu-item--padding-x);
+  background: none !important;
+  color: var(--text--color--default) !important;
+  font-size: var(--font-size-text--s);
+  font-weight: var(--font-weight--bold);
+  letter-spacing: normal;
+  text-transform: none;
 }
 
-/* Category Header */
-.algolia-docsearch-suggestion--category-header {
-  background-color: var(--mw-main-feature-background-color) !important;
-  margin-bottom: 8px;
+.navbar
+  .algolia-autocomplete
+  .ds-suggestion:not(:first-child)
+  .algolia-docsearch-suggestion__main
+  .algolia-docsearch-suggestion--category-header {
+  margin-top: calc(
+    var(--menu--group-to-group-spacing) - var(--menu--item-to-item-spacing)
+  );
+  padding-top: var(--menu--group-to-group-spacing);
+  border-top: var(--border-width--100) var(--border-style--default)
+    var(--separator--color);
 }
 
-.algolia-docsearch-suggestion--category-header-lvl0 {
-  font-family: var(--ifm-font-family-bold);
-  font-size: 12px;
-  color: var(--ifm-color-primary);
-  text-transform: none !important;
-  letter-spacing: 0 !important;
+/* A result is a menu item: heading, then the matching text */
+.navbar .algolia-autocomplete .algolia-docsearch-suggestion--wrapper,
+html[data-theme] .navbar .algolia-docsearch-suggestion--wrapper {
+  float: none;
+  padding: var(--menu-item--padding-y) var(--menu-item--padding-x);
+  border-radius: var(--menu-item--corner-radius);
+  background: var(--menu-item--background-color--default) !important;
+  color: var(--text--color--default) !important;
+  transition: background-color var(--transition--duration--default);
 }
 
-/* Subcategory Column */
-.algolia-docsearch-suggestion--subcategory-column {
+.navbar .algolia-autocomplete .ds-cursor .algolia-docsearch-suggestion--wrapper,
+html[data-theme] .navbar .ds-cursor .algolia-docsearch-suggestion--wrapper {
+  background: var(--menu-item--background-color--hover) !important;
+  box-shadow: none;
+}
+
+.navbar .algolia-autocomplete .algolia-docsearch-suggestion--subcategory-column,
+.navbar .algolia-autocomplete .algolia-docsearch-suggestion--subcategory-inline,
+.navbar .algolia-autocomplete .algolia-docsearch-suggestion--version {
   display: none !important;
 }
 
-.algolia-docsearch-suggestion--content {
-  float: none !important;
-  width: 100% !important;
+.navbar .algolia-autocomplete .algolia-docsearch-suggestion--content {
+  float: none;
+  width: 100%;
+  padding: 0;
 }
 
-/* Title */
-.algolia-docsearch-suggestion--title {
-  font-family: var(--ifm-font-family-bold);
-  font-size: 14px;
-  color: var(--ifm-color-content);
-  margin-bottom: 4px;
+.navbar .algolia-autocomplete .algolia-docsearch-suggestion--content::before {
+  display: none;
 }
 
-/* Description Text */
-.algolia-docsearch-suggestion--text {
-  font-family: var(--ifm-font-family-base);
-  font-size: 13px;
-  color: var(--ifm-color-content);
-  opacity: 0.7;
-  margin-top: 4px;
+.navbar .algolia-autocomplete .algolia-docsearch-suggestion--title,
+html[data-theme] .navbar .algolia-docsearch-suggestion--title {
+  margin: 0;
+  color: var(--text--color--default) !important;
+  font-size: var(--font-size-text--m);
+  font-weight: var(--font-weight--normal);
 }
 
-/* Version Badge */
-.algolia-docsearch-suggestion--version {
-  display: none !important;
+.navbar .algolia-autocomplete .algolia-docsearch-suggestion--text {
+  margin-top: var(--size-rem--xxs);
+  color: var(--label--color--default);
+  font-size: var(--font-size-text--s);
+  line-height: var(--line-height-s);
 }
 
-/* Highlight Search Terms */
-.algolia-docsearch-suggestion--highlight {
-  font-family: var(--ifm-font-family-bold);
-  color: var(--ifm-color-info);
-  background-color: transparent;
+/* Matches are bold, without the plugin's marker colors */
+.navbar .algolia-autocomplete .algolia-docsearch-suggestion--highlight,
+.navbar
+  .algolia-autocomplete
+  .algolia-docsearch-suggestion--text
+  .algolia-docsearch-suggestion--highlight {
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  color: inherit;
+  font-weight: var(--font-weight--bold);
 }
 
-/* Footer */
-.algolia-docsearch-footer {
-  padding: 8px var(--ifm-global-spacing);
-  background-color: var(--ifm-code-background);
-  border-top: 1px solid var(--ifm-color-gray-300);
-  font-size: 11px;
-  color: var(--ifm-color-content);
-  opacity: 0.7;
+.navbar .algolia-autocomplete .algolia-docsearch-suggestion code {
+  padding: 0 var(--size-rem--xxs);
+  border-radius: var(--inline-code--corner-radius);
+  background-color: var(--inline-code--background-color);
+  color: var(--inline-code--content-color);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: var(--inline-code--font-size);
 }
 
-/* Dark Mode */
-[data-theme="dark"] .ds-suggestions {
-  background-color: #333;
-  border-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+.navbar .algolia-autocomplete .algolia-docsearch-suggestion--no-results {
+  margin: 0;
+  padding: var(--menu-item--padding-y) var(--menu-item--padding-x);
+  background: none;
+  font-size: var(--font-size-text--m);
+  text-align: start;
 }
 
-[data-theme="dark"] .ds-suggestion {
-  border-bottom-color: rgba(255, 255, 255, 0.1);
+.navbar
+  .algolia-autocomplete
+  .algolia-docsearch-suggestion--no-results
+  .algolia-docsearch-suggestion--text {
+  margin: 0;
+  color: var(--text--color--default);
+  font-size: inherit;
 }
 
-[data-theme="dark"] .ds-suggestion a:hover,
-[data-theme="dark"] .ds-suggestion.ds-cursor a {
-  background-color: #2b3980;
-}
-
-[data-theme="dark"] .algolia-docsearch-suggestion--category-header-lvl0 {
-  color: #fff;
-}
-
-[data-theme="dark"] .algolia-docsearch-suggestion--version {
-  background-color: var(--ifm-code-background);
-  color: var(--ifm-color-info);
-}
-
-[data-theme="dark"] .algolia-docsearch-suggestion--highlight {
-  color: var(--ifm-color-info);
-}
-
-[data-theme="dark"] .algolia-docsearch-footer {
-  background-color: #141b3e;
-  border-top-color: rgba(255, 255, 255, 0.1);
+/* lunr has no Algolia footer to show */
+.navbar .algolia-autocomplete .algolia-docsearch-footer {
+  display: none;
 }

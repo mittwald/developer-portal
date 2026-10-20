@@ -25,7 +25,7 @@ function LifecycleDiagram() {
   return (
     <figure className={styles.board}>
       <div className={`${styles.token} ${styles.tokenA}`}>
-        <Translate id="lifecycle.diagram.testphase">Testphase</Translate>
+        <Translate id="lifecycle.diagram.testphase">Test phase</Translate>
       </div>
       <Arrow
         label={

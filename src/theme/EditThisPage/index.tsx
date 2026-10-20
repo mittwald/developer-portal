@@ -1,0 +1,31 @@
+import React, { type ReactNode } from "react";
+import { translate } from "@docusaurus/Translate";
+import { ThemeClassNames } from "@docusaurus/theme-common";
+import type { Props } from "@theme/EditThisPage";
+import { IconEdit } from "@mittwald/flow-react-components";
+import IconLinkButton from "@site/src/components/IconLinkButton";
+import styles from "./styles.module.css";
+
+/**
+ * "Edit this page" as icon link button; the section
+ * header of the page title places it on the right (see DocItem/Content).
+ * Swizzled (ejected) from @docusaurus/theme-classic.
+ */
+export default function EditThisPage({ editUrl }: Props): ReactNode {
+  const label = translate({
+    id: "theme.common.editThisPage",
+    message: "Edit this page",
+    description: "The link label to edit the current page",
+  });
+
+  return (
+    // Sized like the buttons Flow places in a page title
+    <IconLinkButton
+      href={editUrl}
+      target="_blank"
+      label={label}
+      icon={<IconEdit />}
+      className={`${ThemeClassNames.common.editThisPage} ${styles.link}`}
+    />
+  );
+}

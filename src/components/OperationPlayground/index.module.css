@@ -1,15 +1,32 @@
+/* Method badge and path parts follow each other without space and wrap
+   line by line; the path is monospace like the paths elsewhere (see
+   openapi/OperationPath) */
 .operationPath {
   display: flex;
-  flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
+  row-gap: var(--size-rem--xs);
 }
 
-.operationPath * {
-  height: 100%;
+.operationPathMethod {
+  margin-right: var(--size-rem--xs);
+}
+
+.operationPathItem,
+.operationPathParam {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: var(--font-size-text--s);
 }
 
 .operationPathItem {
-  margin: 0 4px;
-  display: inline-flex;
-  align-items: center;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.operationPathParam {
+  margin-inline: var(--size-rem--xs);
+}
+
+.apiKeyActions :global(.flow--button) {
+  white-space: nowrap;
 }

@@ -8,9 +8,10 @@ import SchemaExample, {
 import { OpenAPIV3 } from "openapi-types";
 import { translate } from "@docusaurus/Translate";
 import CodeBlock from "@theme/CodeBlock";
-import Link from "@docusaurus/Link";
+import MDXComponents from "@theme/MDXComponents";
 import React from "react";
-import Markdown from "react-markdown";
+import { Text } from "@mittwald/flow-react-components";
+import Description from "@site/src/components/openapi/Description";
 import ExampleObject = OpenAPIV3.ExampleObject;
 
 interface Props {
@@ -48,7 +49,9 @@ export default function SchemaWithExample({
   if (examples) {
     renderedExamples = Object.entries(examples).map(([key, example]) => (
       <React.Fragment key={key}>
-        {example.description && <Markdown>{example.description}</Markdown>}
+        {example.description && (
+          <Description>{example.description}</Description>
+        )}
         {example.value !== undefined ? (
           <SchemaExampleRenderer
             content={example.value}
@@ -58,10 +61,12 @@ export default function SchemaWithExample({
           />
         ) : (
           example.externalValue && (
-            <p>
+            <Text elementType="p">
               {example.summary ?? key}:{" "}
-              <Link href={example.externalValue}>{example.externalValue}</Link>
-            </p>
+              <MDXComponents.a href={example.externalValue}>
+                {example.externalValue}
+              </MDXComponents.a>
+            </Text>
           )
         )}
       </React.Fragment>

@@ -4,6 +4,7 @@ import { OpenAPIV3 } from "openapi-types";
 import * as url from "url";
 import * as yaml from "yaml";
 import compareOperation from "../src/openapi/compareOperation";
+import isDeprecated from "../src/openapi/isDeprecated";
 import * as ejs from "ejs";
 import {
   AI_OVERLAY_NAME,
@@ -243,6 +244,19 @@ class APIDocRenderer {
 
     console.log("generating API for ", spec.info.title);
 
+    // The tag directories are generated entirely: remove them first, so that
+    // pages of operations or tags that no longer exist (or that were rendered
+    // with an older template) do not remain and break the build
+    fs.mkdirSync(outputPath, { recursive: true });
+    for (const entry of fs.readdirSync(outputPath, { withFileTypes: true })) {
+      if (entry.isDirectory()) {
+        fs.rmSync(path.join(outputPath, entry.name), {
+          recursive: true,
+          force: true,
+        });
+      }
+    }
+
     exportSpecToSource(
       originalSpec,
       apiVersion,
@@ -275,8 +289,9 @@ class APIDocRenderer {
               operation.operationId + ".mdx",
             );
 
+            const deprecated = isDeprecated(operation);
             const classNames = [`api-operation-${method}`];
-            if (operation.deprecated) {
+            if (deprecated) {
               classNames.push("api-operation-deprecated");
             }
 
@@ -287,7 +302,7 @@ class APIDocRenderer {
               customProps: {
                 method,
                 path: urlPath,
-                deprecated: operation.deprecated,
+                deprecated,
                 summary,
               },
             });

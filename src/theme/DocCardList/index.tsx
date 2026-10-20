@@ -1,0 +1,115 @@
+import React, { type ReactNode } from "react";
+import {
+  findFirstSidebarItemLink,
+  filterDocCardListItems,
+  useCurrentSidebarSiblings,
+  useDocById,
+} from "@docusaurus/plugin-content-docs/client";
+import type {
+  PropSidebarItemCategory,
+  PropSidebarItemLink,
+} from "@docusaurus/plugin-content-docs";
+import { translate } from "@docusaurus/Translate";
+import { usePluralForm } from "@docusaurus/theme-common";
+import type { Props } from "@theme/DocCardList";
+import { ColumnLayout } from "@mittwald/flow-react-components";
+import NavigationTile from "@site/src/components/NavigationTile";
+import styles from "./styles.module.css";
+
+/**
+ * Cards for sidebar items (e.g. on generated category index pages), rendered
+ * as navigation tiles in a Flow column layout. Swizzled (ejected) from
+ * @docusaurus/theme-classic; replaces DocCard (without its emoji icons).
+ */
+
+interface CardProps {
+  href: string;
+  title: string;
+  description?: string;
+}
+
+function Card({ href, title, description }: CardProps) {
+  return <NavigationTile href={href} title={title} description={description} />;
+}
+
+function CategoryCard({ item }: { item: PropSidebarItemCategory }) {
+  const href = findFirstSidebarItemLink(item);
+  const { selectMessage } = usePluralForm();
+
+  // Categories without a link have been filtered upfront
+  if (!href) {
+    return null;
+  }
+
+  const itemCount = selectMessage(
+    item.items.length,
+    translate(
+      {
+        message: "1 item|{count} items",
+        id: "theme.docs.DocCard.categoryDescription.plurals",
+      },
+      { count: item.items.length },
+    ),
+  );
+
+  return (
+    <Card
+      href={href}
+      title={item.label}
+      description={item.description ?? itemCount}
+    />
+  );
+}
+
+function LinkCard({ item }: { item: PropSidebarItemLink }) {
+  const doc = useDocById(item.docId ?? undefined);
+  return (
+    <Card
+      href={item.href}
+      title={item.label}
+      description={item.description ?? doc?.description}
+    />
+  );
+}
+
+function DocCardListItem({
+  item,
+}: {
+  item: PropSidebarItemLink | PropSidebarItemCategory;
+}) {
+  return (
+    <article className={styles.item}>
+      {item.type === "category" ? (
+        <CategoryCard item={item} />
+      ) : (
+        <LinkCard item={item} />
+      )}
+    </article>
+  );
+}
+
+function DocCardListForCurrentSidebarCategory({ className }: Props) {
+  const items = useCurrentSidebarSiblings();
+  return <DocCardList items={items} className={className} />;
+}
+
+export default function DocCardList(props: Props): ReactNode {
+  const { items, className } = props;
+  if (!items) {
+    return <DocCardListForCurrentSidebarCategory {...props} />;
+  }
+  const filteredItems = filterDocCardListItems(items).filter(
+    (item): item is PropSidebarItemLink | PropSidebarItemCategory =>
+      item.type === "link" || item.type === "category",
+  );
+  // One column on small, two columns on wider containers
+  return (
+    <section className={className}>
+      <ColumnLayout m={[1, 1]}>
+        {filteredItems.map((item, index) => (
+          <DocCardListItem key={index} item={item} />
+        ))}
+      </ColumnLayout>
+    </section>
+  );
+}
