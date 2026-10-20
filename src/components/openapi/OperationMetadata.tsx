@@ -1,6 +1,6 @@
 import { OpenAPIV3 } from "openapi-types";
 import OperationPath from "@site/src/components/openapi/OperationPath";
-import Markdown from "react-markdown";
+import SpecMarkdown from "@site/src/components/openapi/SpecMarkdown";
 import { Content } from "@mittwald/flow-react-components";
 import { LabeledValue } from "@mittwald/flow-react-components";
 import { Label } from "@mittwald/flow-react-components";
@@ -137,7 +137,7 @@ export function OperationMetadata({
       </ColumnLayout>
       <hr />
       {spec.description && withDescription ? (
-        <Markdown>{spec.description}</Markdown>
+        <SpecMarkdown>{spec.description}</SpecMarkdown>
       ) : null}
     </>
   );

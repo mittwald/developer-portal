@@ -1,6 +1,6 @@
 import styles from "./OperationReference.module.css";
 import { PropsWithChildren } from "react";
-import Markdown from "react-markdown";
+import SpecMarkdown from "@site/src/components/openapi/SpecMarkdown";
 import CodeBlock from "@theme/CodeBlock";
 import { OpenAPIV3 } from "openapi-types";
 import {
@@ -45,7 +45,9 @@ function OperationParameter({ param }: { param: ParameterObject }) {
   const body = [];
 
   if (param.description) {
-    body.push(<Markdown key="description">{param.description}</Markdown>);
+    body.push(
+      <SpecMarkdown key="description">{param.description}</SpecMarkdown>,
+    );
   }
 
   if (param.example) {
@@ -80,7 +82,9 @@ function OperationResponseHeader({
   const body = [];
 
   if (header.description) {
-    body.push(<Markdown key="description">{header.description}</Markdown>);
+    body.push(
+      <SpecMarkdown key="description">{header.description}</SpecMarkdown>,
+    );
   }
 
   return (
@@ -242,7 +246,7 @@ function OperationResponseBody({ spec }: { spec?: OpenAPIV3.ResponseObject }) {
               </Translate>
             </Label>
             <Content>
-              <Markdown>{spec.description}</Markdown>
+              <SpecMarkdown>{spec.description}</SpecMarkdown>
             </Content>
           </LabeledValue>
         </ColumnLayout>

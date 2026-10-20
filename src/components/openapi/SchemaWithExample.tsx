@@ -10,7 +10,7 @@ import { translate } from "@docusaurus/Translate";
 import CodeBlock from "@theme/CodeBlock";
 import Link from "@docusaurus/Link";
 import React from "react";
-import Markdown from "react-markdown";
+import SpecMarkdown from "@site/src/components/openapi/SpecMarkdown";
 import ExampleObject = OpenAPIV3.ExampleObject;
 
 interface Props {
@@ -48,7 +48,9 @@ export default function SchemaWithExample({
   if (examples) {
     renderedExamples = Object.entries(examples).map(([key, example]) => (
       <React.Fragment key={key}>
-        {example.description && <Markdown>{example.description}</Markdown>}
+        {example.description && (
+          <SpecMarkdown>{example.description}</SpecMarkdown>
+        )}
         {example.value !== undefined ? (
           <SchemaExampleRenderer
             content={example.value}
