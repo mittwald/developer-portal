@@ -1,0 +1,294 @@
+---
+title: API changes for v2 API, October 2 to October 9
+authors:
+  - machine
+tags:
+  - apiv2
+  - AI hosting
+  - Contract
+  - Notification
+  - Project
+  - Domain
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API introduces a new endpoint for rotating keys, adds optional properties to various invoice responses, and includes non-success status responses for specific operations.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- A new endpoint has been added for rotating a customer's key with the operation `POST` at the path `/v2/customers/{customerId}/ai-hosting-keys/{keyId}/actions/rotate`.
+- A new endpoint has been added for rotating a project's key with the operation `POST` at the path `/v2/projects/{projectId}/ai-hosting-keys/{keyId}/actions/rotate`.
+- The response for the `GET` operation `invoice-list-customer-invoices` at the path `/v2/customers/{customerId}/invoices` now includes two optional properties: `/items/cancellation/xRechnungId` and `/items/xRechnungId`.
+- The response for the `GET` operation `deprecated-invoice-detail-of-invoice` at the path `/v2/customers/{customerId}/invoices/{invoiceId}` now includes two optional properties: `cancellation/xRechnungId` and `xRechnungId`.
+- The response for the `GET` operation `invoice-detail` at the path `/v2/invoices/{invoiceId}` now includes two optional properties: `cancellation/xRechnungId` and `xRechnungId`.
+- A new optional request parameter `fileType` has been added to the `GET` operation `invoice-get-file-access-token` at the path `/v2/customers/{customerId}/invoices/{invoiceId}/file-access-token`.
+- The `PUT` operation `notifications-read-notification` at the path `/v2/notifications/{notificationId}/status` now includes a non-success response with the status `403`.
+- The `GET` operation `project-list-project-activities` at the path `/v2/projects/{projectId}/activities` has had multiple schemas added to the `/items/action` response property `anyOf` list for the response status `200`.
+- The `POST` operation `dns-create-dns-zone-file-import` at the path `/v2/projects/{projectId}/dns-zone-imports` now includes a non-success response with the status `409`.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Rotates a customer's key"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ai-hosting-customer-rotate-key" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Invoices of a Customer"
+
+
+- added the optional property '/items/cancellation/xRechnungId' to the response with the '200' status
+
+- added the optional property '/items/xRechnungId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="invoice-list-customer-invoices" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get details of an Invoice"
+
+
+- added the optional property 'cancellation/xRechnungId' to the response with the '200' status
+
+- added the optional property 'xRechnungId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="deprecated-invoice-detail-of-invoice" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Request an Access Token for a file of the Invoice"
+
+
+- added the new optional 'query' request parameter 'fileType'
+
+
+For details, refer to the <OperationLink operation="invoice-get-file-access-token" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get details of an Invoice"
+
+
+- added the optional property 'cancellation/xRechnungId' to the response with the '200' status
+
+- added the optional property 'xRechnungId' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="invoice-detail" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Mark notification as read"
+
+
+- added the non-success response with the status '403'
+
+
+For details, refer to the <OperationLink operation="notifications-read-notification" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the activities of a project"
+
+
+- added '#/components/schemas/de.mittwald.v1.activitylog.ContainerStackCreated, #/components/schemas/de.mittwald.v1.activitylog.ContainerStackDescriptionUpdated, #/components/schemas/de.mittwald.v1.activitylog.ContainerStackStorageUpdated, #/components/schemas/de.mittwald.v1.activitylog.ContainerStackUpdateScheduleUpdated, #/components/schemas/de.mittwald.v1.activitylog.ContainerStackDeleted, #/components/schemas/de.mittwald.v1.activitylog.ContainerCreated, #/components/schemas/de.mittwald.v1.activitylog.ContainerDescriptionUpdated, #/components/schemas/de.mittwald.v1.activitylog.ContainerImageUpdated, #/components/schemas/de.mittwald.v1.activitylog.ContainerEntrypointUpdated, #/components/schemas/de.mittwald.v1.activitylog.ContainerCommandUpdated, #/components/schemas/de.mittwald.v1.activitylog.ContainerPortsUpdated, #/components/schemas/de.mittwald.v1.activitylog.ContainerVolumesUpdated, #/components/schemas/de.mittwald.v1.activitylog.ContainerEnvsUpdated, #/components/schemas/de.mittwald.v1.activitylog.ContainerResourcesUpdated, #/components/schemas/de.mittwald.v1.activitylog.ContainerRestartPolicyUpdated, #/components/schemas/de.mittwald.v1.activitylog.ContainerLifecycle, #/components/schemas/de.mittwald.v1.activitylog.ContainerDeleted, #/components/schemas/de.mittwald.v1.activitylog.ContainerVolumeCreated, #/components/schemas/de.mittwald.v1.activitylog.ContainerVolumeDeleted, #/components/schemas/de.mittwald.v1.activitylog.ContainerRegistryCreated, #/components/schemas/de.mittwald.v1.activitylog.ContainerRegistryDescriptionUpdated, #/components/schemas/de.mittwald.v1.activitylog.ContainerRegistryUriUpdated, #/components/schemas/de.mittwald.v1.activitylog.ContainerRegistryCredentialsUpdated, #/components/schemas/de.mittwald.v1.activitylog.ContainerRegistryDeleted, #/components/schemas/de.mittwald.v1.activitylog.ProjectCreated, #/components/schemas/de.mittwald.v1.activitylog.ProjectDescriptionUpdated' to the '/items/action' response property 'anyOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="project-list-project-activities" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Rotates a project's key"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ai-hosting-project-rotate-key" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Import a DNS zone file into a Project, or preview it with dry-run"
+
+
+- added the non-success response with the status '409'
+
+
+For details, refer to the <OperationLink operation="dns-create-dns-zone-file-import" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK v2.2.9 Release Summary
+
+The mittwald PHP SDK has been updated to version 2.2.9. This release introduces several new features and enhancements:
+
+- **AI Hosting Key Rotation**: New endpoints have been added to facilitate secure API key rotation for both customers and projects. This feature allows developers to issue new secrets while managing the transition period effectively.
+- **Grace Period Support**: The key rotation operations now include an optional `gracePeriod` parameter, allowing the old secret to remain valid for a specified duration (e.g., `24h`, `1m`) alongside the new one before being revoked.
+- **Enhanced Error Handling**: The SDK now generates comprehensive type-safe response classes to handle standard HTTP status codes (`400`, `403`, `404`, `429`) with structured error payloads.
+
+**API Additions**:
+- `AIHostingClient::customerRotateKey(CustomerRotateKeyRequest $request): CustomerRotateKeyOKResponse`
+- `AIHostingClient::projectRotateKey(ProjectRotateKeyRequest $request): ProjectRotateKeyOKResponse`
+
+**Generated Types**:
+- New request and response classes have been added under the `CustomerRotateKey` and `ProjectRotateKey` namespaces. These include request builders with automatic URL construction, request body models with `gracePeriod` support, and dedicated response containers for success and error states, complete with validation and JSON serialization utilities.
+
+For more details, please visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.2.9).
+
+### mittwald PHP SDK v2.2.8 Release Summary
+
+The mittwald PHP SDK has been updated to version 2.2.8. This release introduces new activity log schemas, enhancing the tracking and handling of container lifecycle and configuration changes. The update includes comprehensive auto-generated PHP schema classes for container activity log events, providing structured data models for both `before` and `after` states, along with contextual parameters and strict JSON schema validation.
+
+#### Key Features:
+
+- **Container Lifecycle Events**: New events include `container.started`, `container.stopped`, `container.restarted`, and `container.recreated`.
+- **Configuration & State Changes**: Tracks updates to container commands, descriptions, entrypoints, environment variables, image references, and port mappings.
+- **Schema Features**:
+  - Immutable builder pattern for safe state mutations.
+  - Strict JSON schema validation with detailed error reporting.
+  - Serialization support for JSON conversion.
+  - Contextual parameters for precise tracing.
+  - Namespace organization under `Mittwald\\ApiClient\\Generated\\V2\\Schemas\\Activitylog`.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.2.8).
+
+### mittwald PHP SDK v2.2.7 Release Summary
+
+The mittwald PHP SDK has been updated to version 2.2.7. This release introduces several enhancements and new features:
+
+- **Notification API Enhancements**: 
+  - Added explicit handling for `403 Forbidden` HTTP responses in the `NotificationsReadNotification` endpoint.
+  - Introduced the `NotificationsReadNotificationForbiddenResponse` class to parse, validate, and serialize forbidden error payloads.
+
+- **Activity Log: Project Event Tracking**:
+  - Extended the activity log schema to track project-level lifecycle events, enabling detailed auditing of project creation and description modifications.
+  - Added `ProjectCreated` and `ProjectDescriptionUpdated` schema classes to capture project lifecycle events.
+  - Implemented change tracking models with dedicated `After` and `Before` state classes for comparing pre- and post-modification data.
+  - Added `ParameterProperty` and `Name` enum models for structured metadata representation.
+  - Updated `LogEntry` type unions, match statements, and JSON serialization logic to support the new action types.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.2.7).
+
+### mittwald PHP SDK Release v2.2.6
+
+The mittwald PHP SDK has been updated to version 2.2.6. This release focuses on enhancing the database client schema, particularly for MySQL user password requirements. Key updates include:
+
+- **Database Client Updates**: The V2 Database client schema now explicitly documents MySQL user password requirements for both creation and update operations. This ensures developers are aware of complexity rules, character restrictions, and minimum length requirements when using the MySQL user API.
+
+- **Schema & Documentation Improvements**:
+  - **Creation Schemas**: Added detailed `description` fields for the `password` parameter in `CreateMySqlUser` and `CreateMySqlUserWithDatabase` schemas.
+  - **Update Schemas**: Consistent password requirement documentation has been applied to `UpdateMysqlUserRequest` and `UpdateMysqlUserRequestBody`.
+  - **Deprecated Classes**: Password constraint descriptions have been migrated to match the active schema for consistency.
+  - **PHPDoc Updates**: Inline documentation has been added to the private `$password` properties across all affected request and schema classes.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.2.6).
+
+### mittwald PHP SDK v2.2.5 Release Summary
+
+The mittwald PHP SDK version 2.2.5 has been released, introducing several enhancements and new features. You can view the full release details [here](https://github.com/mittwald/api-client-php/releases/tag/v2.2.5).
+
+#### Key Updates:
+
+- **Invoice File Access Token Enhancement**: 
+  - Introduced a `fileType` enum (`PDF`, `XRECHNUNG`) for `InvoiceGetFileAccessTokenRequest`, defaulting to `PDF`.
+  - Added `InvoiceGetFileAccessTokenRequestFileType` enum with updated request builders, getters, and setters.
+
+- **DNS Zone Import Conflict Handling**:
+  - Implemented `DnsCreateDnsZoneFileImportConflictResponse` to manage `409 Conflict` HTTP status codes during DNS zone imports.
+  - Enhanced `DomainClientImpl` to map `409` responses to the new conflict response class.
+
+- **XRechnung ID Support**:
+  - Added `xRechnungId` (UUID) field to `Invoice` and `Cancellation` schema objects for tracking XRechnung XML files.
+  - Provided full support through getters, setters, and serialization/deserialization methods.
+
+- **Documentation & Code Quality**:
+  - Improved docblock comments for invoice file access token retrieval.
+  - Clarified DNS zone import conflict rejection behavior and preview details.
+
+These updates aim to enhance functionality and improve the handling of specific scenarios within the SDK.
+
+### mittwald JavaScript SDK Release 4.491.0
+
+The mittwald JavaScript SDK has been updated to version 4.491.0. This release includes the following feature:
+
+- Updated the generated client to enhance functionality ([commit 76fa6f1](https://github.com/mittwald/api-client-js/commit/76fa6f111c54f4b169372ed6ff23b45e5ada2e49)).
+
+For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.491.0](https://github.com/mittwald/api-client-js/releases/tag/4.491.0).
+
+### mittwald JavaScript SDK Release 4.490.0
+
+The mittwald JavaScript SDK has been updated to version 4.490.0. This release includes an update to the generated client, enhancing the functionality and performance of the SDK. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.490.0).
+
+### mittwald JavaScript SDK Release 4.489.0
+
+The mittwald JavaScript SDK has been updated to version 4.489.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.489.0).
+
+### mittwald JavaScript SDK Release 4.488.0
+
+The mittwald JavaScript SDK has been updated to version 4.488.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.488.0).
+
+### mittwald JavaScript SDK Release 4.487.0
+
+The mittwald JavaScript SDK has been updated to version 4.487.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.487.0).
+
+### mittwald JavaScript SDK Release 4.486.0
+
+The mittwald JavaScript SDK has been updated to version 4.486.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.486.0).
+
+### mittwald JavaScript SDK Release 4.485.0
+
+The mittwald JavaScript SDK has been updated to version 4.485.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.485.0).
+
+### mittwald JavaScript SDK Release 4.484.0
+
+The mittwald JavaScript SDK has been updated to version 4.484.0. This release includes the following feature:
+
+- Updated generated client ([commit 9d3be5e](https://github.com/mittwald/api-client-js/commit/9d3be5ee0a8a6ddfa9a1c91358e9f855f70e7fa2)).
+
+For more details, please visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.484.0).
+
+### mittwald JavaScript SDK Release 4.483.1
+
+The mittwald JavaScript SDK version 4.483.1 has been released. This update includes performance improvements specifically in the models, where all resources of an invalidated URL are refreshed in one pass. This enhancement is aimed at optimizing resource handling and improving overall efficiency. 
+
+For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.483.1](https://github.com/mittwald/api-client-js/releases/tag/4.483.1).
+
+### mittwald JavaScript SDK Release 4.483.0
+
+The mittwald JavaScript SDK has been updated to version 4.483.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the full release notes on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.483.0).
+
+### mittwald JavaScript SDK Release 4.482.0
+
+The mittwald JavaScript SDK has been updated to version 4.482.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.482.0](https://github.com/mittwald/api-client-js/releases/tag/4.482.0).
+
+### mittwald JavaScript SDK Release 4.481.0
+
+The mittwald JavaScript SDK has been updated to version 4.481.0. This release includes the following feature:
+
+- Updated generated client ([commit 06c2790](https://github.com/mittwald/api-client-js/commit/06c2790e5e79fea3af73acd860a777a5bb3d7e7f)).
+
+For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.481.0).
+

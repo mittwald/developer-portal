@@ -1,0 +1,275 @@
+---
+sidebar_label: Cohere-Transcribe-03-2026
+description: Detaillierte Informationen zu cohere-transcribe-03-2026
+title: Cohere-Transcribe-03-2026
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+Im [Spracherkennungs-Guide für Cohere Transcribe](../../examples/cohere-transcribe/) findest du lauffähige Beispiele für Sprechertrennung, Wort-Zeitstempel, Untertitel und Telefonaufnahmen.
+
+## Beschreibung {#beschreibung}
+
+„cohere-transcribe-03-2026" ist ein Spracherkennungsmodell von Cohere. Du schickst eine Audiodatei und bekommst den Text zurück, auf Wunsch mit Wort-Zeitstempeln, als Untertitel oder nach Sprechern getrennt. Es bedient dieselbe Route `/v1/audio/transcriptions` wie [Whisper-Large-V3-Turbo](/docs/v2/platform/aihosting/models/whisper-large-v3-turbo), und OpenAI-kompatibler Code funktioniert damit ohne Änderungen.
+
+Dieses Modell befindet sich in der [Testphase](../20-access-and-usage/40-lifecycle.mdx#testphase). Verhalten und Funktionsumfang können sich noch ändern, daher empfehlen wir für den produktiven Einsatz Stable- oder LTS-Modelle.
+
+Auf unserer Hardware macht es auf Deutsch und Englisch weniger Fehler als Whisper-Large-V3-Turbo, siehe [Genauigkeit](#genauigkeit). Whisper bleibt verfügbar und deckt deutlich mehr Sprachen ab.
+
+Das Modell eignet sich für:
+
+- Transkription in 14 Sprachen, mit automatischer Spracherkennung
+- Sprechertrennung: wer was gesagt hat, mit Sprechzeit pro Sprecher
+- Wort-Zeitstempel mit Anfang, Ende und Zuordnungssicherheit für jedes Wort, in 8 Sprachen
+- Untertitel als `srt` oder `vtt`, an Wortgrenzen geschnitten, auf Wunsch mit Sprecherkennung
+- Telefonaufnahmen mit einem Sprecher pro Kanal, die Kanal für Kanal transkribiert werden
+- Aufnahmen bis 95 Minuten in einer einzigen Anfrage
+
+Diese Einschränkungen gelten:
+
+- Maximale Dateigröße: 25 MB pro Upload
+- Maximale Audiolänge: 95 Minuten pro Anfrage
+- Eine Sprache pro Anfrage. Gemischtsprachige Aufnahmen werden nicht unterstützt, siehe [Eine Sprache pro Anfrage](#eine-sprache)
+- Streaming wird nicht unterstützt. Eine Anfrage mit `stream=true` antwortet mit HTTP 400, schick sie also ohne `stream`, um das vollständige Transkript zu bekommen
+- Keine Echtzeit-Transkription von Audio, das noch aufgenommen wird, und kein Endpunkt `/v1/realtime`. Push-to-Talk funktioniert auch ohne, und für Live-Untertitel kannst du das Signal an Sprechpausen schneiden, siehe [Push-to-Talk und Diktat](/docs/v2/platform/aihosting/examples/cohere-transcribe/#push-to-talk) und [Fast live transkribieren](/docs/v2/platform/aihosting/examples/cohere-transcribe/#fast-live)
+- Keine Echtzeit- oder Mikrofoneingabe. Die Route nimmt eine fertige Datei entgegen
+- Eine Übersetzung in eine andere Sprache ist nicht möglich
+- Für `el`, `ar`, `ko`, `ja`, `vi` und `zh` gibt es keine Wort-Zeitstempel
+
+## Eine Sprache pro Anfrage {#eine-sprache}
+
+:::warning[Gemischtsprachige Aufnahmen kommen ohne Fehlermeldung falsch zurück]
+Das Modell transkribiert jede Anfrage in einer Sprache. Wechselt eine Aufnahme die Sprache, etwa ein Interview, das von Deutsch zu Englisch übergeht, kommt die zweite Sprache falsch heraus, und die Antwort meldet keinen Fehler. Teil solche Aufnahmen nach Sprache auf und schick jeden Teil mit seinem eigenen Wert für `language`.
+:::
+
+## Tokenverbrauch {#tokenverbrauch}
+
+Abgerechnet wird pro Audiosekunde zum selben Satz wie bei [Whisper-Large-V3-Turbo](/docs/v2/platform/aihosting/models/whisper-large-v3-turbo#tokenverbrauch): **25 Token pro Audiosekunde**.
+
+## Genauigkeit {#genauigkeit}
+
+Wortfehlerrate, gemessen auf unserer Hardware, niedriger ist besser:
+
+| Sprache  | cohere-transcribe-03-2026 | whisper-large-v3-turbo | Testdaten                                          |
+| -------- | ------------------------- | ---------------------- | -------------------------------------------------- |
+| Deutsch  | 3,39 %                    | 4,93 %                 | 1.010 Aufnahmen aus Common Voice, MLS, FLEURS      |
+| Englisch | 3,77 %                    | 4,25 %                 | 462 Aufnahmen aus LibriSpeech, FLEURS, Earnings-22 |
+
+## Unterstützte Eingabeformate {#eingabeformate}
+
+| Format       | Beispiele                                               |
+| ------------ | ------------------------------------------------------- |
+| `wav`        | auch 8-kHz-µ-law-Telefonaudio, Stereo, 24 Bit und Float |
+| `mp3`        |                                                         |
+| `m4a`/`aac`  | Sprachmemos vom iPhone                                  |
+| `ogg`/`opus` |                                                         |
+| `flac`       |                                                         |
+| `webm`       | Aufnahmen aus dem `MediaRecorder` des Browsers          |
+| `mp4`        | Videos, transkribiert wird die Tonspur                  |
+
+Jede Abtastrate funktioniert. Du musst das Audio vor dem Upload nicht umwandeln.
+
+## Audiolänge und Dateigröße {#laenge-und-groesse}
+
+Ein Upload darf bis zu 25 MB groß sein, das Audio darin bis zu 95 Minuten lang. Beide Limits gelten unabhängig voneinander. Wird eines überschritten, kommt HTTP 413 zurück.
+
+Bei üblichen Sprach-Bitraten stößt du zuerst an die Dateigröße: In 25 MB passen rund 52 Minuten Audio bei 64 kbit/s mono. Komprimier lange Aufnahmen vor dem Upload zu `mp3` oder `opus` in mono, statt `wav` zu schicken. Noch längere Aufnahmen brauchen eine niedrigere Bitrate oder müssen aufgeteilt werden. Die Sprecherkennungen werden pro Anfrage in der Reihenfolge vergeben, in der jemand zum ersten Mal spricht. `SPEAKER_00` im einen Teil ist also nicht unbedingt dieselbe Person wie `SPEAKER_00` im nächsten.
+
+## Gültige Werte für den Parameter `language` {#sprache}
+
+`ar`, `de`, `el`, `en`, `es`, `fr`, `it`, `ja`, `ko`, `nl`, `pl`, `pt`, `vi`, `zh`
+
+`language` erwartet ISO-639-1-Codes. Varianten wie `DE`, `de-DE` und `de_AT` sowie englische oder deutsche Sprachnamen wie `german` werden angenommen und auf den Code abgebildet. Eine nicht unterstützte Sprache antwortet mit HTTP 400, und die Meldung nennt die gültigen Codes.
+
+Lässt du `language` weg, erkennt das Modell die Sprache selbst. Setz den Parameter, wann immer du die Sprache kennst: Bei sehr kurzen oder ungewöhnlichen Aufnahmen kann die Erkennung auf Deutsch zurückfallen.
+
+Wort-Zeitstempel gibt es für `de`, `en`, `es`, `fr`, `it`, `nl`, `pl` und `pt`.
+
+## Ausgabeformate {#ausgabeformate}
+
+| `response_format` | Liefert                                                                                                      |
+| ----------------- | ------------------------------------------------------------------------------------------------------------ |
+| `json`            | Standard. Den Text als JSON                                                                                  |
+| `text`            | Den Text als reinen Text, ohne JSON                                                                          |
+| `srt`             | Untertitel im SubRip-Format                                                                                  |
+| `vtt`             | Untertitel im WebVTT-Format                                                                                  |
+| `verbose_json`    | Sprache, Dauer, Segmente mit Zeitstempeln und auf Wunsch Wörter, siehe [Wort-Zeitstempel](#wort-zeitstempel) |
+| `diarized_json`   | Segmente nach Sprecher und Sprechstatistik, siehe [Sprechertrennung](#sprechertrennung)                      |
+
+Die Untertitel in `srt` und `vtt` sind an Wortgrenzen geschnitten und kurz genug, um sie am Bildschirm zu lesen. Mit `diarize=true` tragen sie die Sprecherkennung: `srt` setzt sie vor den Text (`SPEAKER_00: …`), `vtt` nutzt Voice-Tags (`<v SPEAKER_00>…`).
+
+Enthält das Audio nur Stille, Rauschen oder Töne, ist das Transkript leer. Das Modell erfindet keinen Text dazu.
+
+## Erste Schritte {#erste-schritte}
+
+<Tabs groupId="language">
+<TabItem value="python" label="Python">
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1",
+    api_key="sk-your-api-key-here",
+)
+
+with open("meeting.mp3", "rb") as f:
+    result = client.audio.transcriptions.create(
+        model="cohere-transcribe-03-2026",
+        file=f,
+        language="de",
+    )
+
+print(result.text)
+```
+
+</TabItem>
+<TabItem value="javascript" label="JavaScript">
+
+```javascript
+import OpenAI from "openai";
+import { createReadStream } from "node:fs";
+
+const client = new OpenAI({
+  baseURL: "https://llm.aihosting.mittwald.de/v1",
+  apiKey: "sk-your-api-key-here",
+});
+
+const result = await client.audio.transcriptions.create({
+  model: "cohere-transcribe-03-2026",
+  file: createReadStream("meeting.mp3"),
+  language: "de",
+});
+
+console.log(result.text);
+```
+
+</TabItem>
+<TabItem value="php" label="PHP">
+
+```php
+<?php
+
+$ch = curl_init("https://llm.aihosting.mittwald.de/v1/audio/transcriptions");
+curl_setopt_array($ch, [
+    CURLOPT_POST => true,
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_HTTPHEADER => [
+        "Authorization: Bearer sk-your-api-key-here",
+    ],
+    CURLOPT_POSTFIELDS => [
+        "model" => "cohere-transcribe-03-2026",
+        "file" => new CURLFile("meeting.mp3"),
+        "language" => "de",
+    ],
+]);
+
+$result = json_decode(curl_exec($ch), true);
+
+echo $result["text"];
+```
+
+</TabItem>
+</Tabs>
+
+## Empfohlene Parameter {#parameter}
+
+| Parameter                   | Wert                    | Wirkung                                                                  |
+| --------------------------- | ----------------------- | ------------------------------------------------------------------------ |
+| `language`                  | ISO-639-1-Code wie `de` | Setz ihn, wenn du die Sprache kennst, siehe [Gültige Werte](#sprache)    |
+| `response_format`           | `json`                  | Siehe [Ausgabeformate](#ausgabeformate)                                  |
+| `timestamp_granularities[]` | `word`                  | Optional. Wort-Zeitstempel, mit `verbose_json` oder `diarized_json`      |
+| `num_speakers`              | Ganzzahl von 1 bis 20   | Optional. Genaue Zahl der Sprecher, mit `diarized_json`                  |
+| `min_speakers`              | Ganzzahl von 1 bis 20   | Optional. Untergrenze für die Zahl der Sprecher                          |
+| `max_speakers`              | Ganzzahl von 1 bis 20   | Optional. Obergrenze für die Zahl der Sprecher                           |
+| `diarize`                   | `true`                  | Optional. Sprecherkennung in `srt` und `vtt`                             |
+| `prompt`                    | freier Text             | Optional. Hinweis auf Kontext und Vokabular, etwa Namen und Fachbegriffe |
+| `temperature`               | zwischen 0 und 1        | Optional                                                                 |
+
+## Wort-Zeitstempel {#wort-zeitstempel}
+
+Fordere `timestamp_granularities[]=word` zusammen mit `response_format="verbose_json"` oder `"diarized_json"` an. Die Antwort enthält dann eine Liste `words` mit `start` und `end` in Sekunden und einem `confidence`-Wert für jedes Wort. `confidence` gibt an, wie gut sich das Wort dem Audio zuordnen ließ, nicht wie sicher sich das Modell ist, das Wort richtig gehört zu haben. `verbose_json` enthält außerdem immer die Segmente.
+
+Wort-Zeitstempel gibt es für `de`, `en`, `es`, `fr`, `it`, `nl`, `pl` und `pt`.
+
+```json
+{
+  "task": "transcribe",
+  "language": "de",
+  "duration": 4.2,
+  "text": "Heute regnet es in Berlin …",
+  "segments": [{ "id": 0, "start": 0.04, "end": 4.1, "text": "…" }],
+  "words": [
+    { "word": "Heute", "start": 0.04, "end": 0.26, "confidence": 0.97 },
+    { "word": "regnet", "start": 0.36, "end": 0.72, "confidence": 0.95 }
+  ]
+}
+```
+
+## Sprechertrennung {#sprechertrennung}
+
+`response_format="diarized_json"` liefert das Transkript in Segmenten nach Sprecher. Jedes Segment trägt `speaker` (`SPEAKER_00`, `SPEAKER_01` und so weiter), `start`, `end` und `text`. `speaker_analytics` ergänzt für jeden Sprecher Sprechzeit, Anteil und Zahl der Wortbeiträge, dazu die gesamte Sprechzeit, die Stille und den Anteil überlappender Sprache.
+
+Die Zahl der Sprecher schätzt das Modell selbst. Kennst du sie, gib sie als `num_speakers` mit, oder grenz sie mit `min_speakers` und `max_speakers` ein. Alle drei nehmen Ganzzahlen von 1 bis 20.
+
+Zweikanalaufnahmen mit einem Sprecher pro Kanal, wie sie viele Telefonanlagen aufzeichnen, erkennt das Modell selbst. Es transkribiert sie Kanal für Kanal, statt die Stimmen per Schätzung zu trennen, und die Kennungen nennen den Kanal (`CHANNEL_00`, `CHANNEL_01`).
+
+```json
+{
+  "task": "transcribe",
+  "language": "de",
+  "duration": 92.18,
+  "text": "Am Ende wird es wieder in eine Fressorgie ausarten. Ja, aber bei mir ist das auch etwas ganz anderes. …",
+  "segments": [
+    {
+      "id": "seg_0",
+      "type": "transcript.text.segment",
+      "start": 0.38,
+      "end": 4.22,
+      "speaker": "SPEAKER_00",
+      "text": "Am Ende wird es wieder in eine Fressorgie ausarten."
+    },
+    {
+      "id": "seg_1",
+      "type": "transcript.text.segment",
+      "start": 4.78,
+      "end": 8.66,
+      "speaker": "SPEAKER_01",
+      "text": "Ja, aber bei mir ist das auch etwas ganz anderes."
+    }
+  ],
+  "speaker_analytics": {
+    "speakers": [
+      {
+        "speaker": "SPEAKER_00",
+        "speaking_time": 41.2,
+        "speaking_share": 0.52,
+        "turns": 7
+      }
+    ],
+    "speaker_count": 2,
+    "total_speech_time": 79.4,
+    "silence_time": 12.8,
+    "overlap_ratio": 0.0
+  },
+  "usage": { "type": "duration", "seconds": 92 }
+}
+```
+
+## Fehlerantworten {#fehlerantworten}
+
+| Situation                                                                 | Status |
+| ------------------------------------------------------------------------- | ------ |
+| Nicht unterstützte `language`, die Meldung nennt die gültigen Codes       | 400    |
+| Die Datei ist leer, ist kein Audio oder ist ein Video ohne Tonspur        | 400    |
+| `num_speakers`, `min_speakers` oder `max_speakers` außerhalb von 1 bis 20 | 400    |
+| `stream=true`                                                             | 400    |
+| Datei größer als 25 MB oder Audio länger als 95 Minuten                   | 413    |
+| Fehlender oder ungültiger API-Key                                         | 401    |
+
+Jede Antwort mit 400 enthält eine Meldung, die sagt, was an der Anfrage nicht stimmt. In den OpenAI-SDKs löst eine Antwort mit 400 einen `BadRequestError` aus.
+
+## Lizenz und Nutzungsbedingungen {#lizenz}
+
+Cohere veröffentlicht das Modell unter der Apache-2.0-Lizenz. Die Komponenten, die wir für Sprechertrennung und Wort-Zeitstempel einsetzen, stehen unter Apache 2.0 oder MIT.
