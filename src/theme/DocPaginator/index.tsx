@@ -1,5 +1,4 @@
 import React, { type ReactNode } from "react";
-import clsx from "clsx";
 import Translate, { translate } from "@docusaurus/Translate";
 import type { Props } from "@theme/DocPaginator";
 import PaginatorNavLink from "@theme/PaginatorNavLink";
@@ -8,15 +7,13 @@ import styles from "./styles.module.css";
 
 /**
  * Previous/next links below a page, separated from the content like two
- * Flow sections. Ejected from @docusaurus/theme-classic.
+ * Flow sections. The `className` prop is not applied: its only caller
+ * (DocItem/Paginator) passes Docusaurus' "docusaurus-mt-lg" margin, which the
+ * section spacing here replaces. Ejected from @docusaurus/theme-classic.
  */
-export default function DocPaginator({
-  className,
-  previous,
-  next,
-}: Props): ReactNode {
+export default function DocPaginator({ previous, next }: Props): ReactNode {
   return (
-    <div className={clsx(className, styles.paginator)}>
+    <div className={styles.paginator}>
       <Separator />
       <nav
         className="pagination-nav"

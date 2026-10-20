@@ -3,12 +3,14 @@ import React, {
   isValidElement,
   type ReactElement,
   type ReactNode,
+  useRef,
 } from "react";
 import clsx from "clsx";
 import { ThemeClassNames } from "@docusaurus/theme-common";
 import {
   sanitizeTabsChildren,
   TabsProvider,
+  useScrollPositionBlocker,
   useTabsContextValue,
 } from "@docusaurus/theme-common/internal";
 import useIsBrowser from "@docusaurus/useIsBrowser";
@@ -27,6 +29,20 @@ export default function Tabs(props: Props): ReactNode {
   const isBrowser = useIsBrowser();
   const value = useTabsContextValue(props);
   const { selectedValue, selectValue, tabValues } = value;
+  const { blockElementScrollPositionUntilNextRender } =
+    useScrollPositionBlocker();
+
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleSelectionChange = (key: string) => {
+    // Keep the tabs in place while synced tab groups above them change their
+    // height, as in the original component (which keeps the clicked tab in
+    // place; the tab list is at the top of the container)
+    if (containerRef.current) {
+      blockElementScrollPositionUntilNextRender(containerRef.current);
+    }
+    selectValue(key);
+  };
 
   const items = Children.toArray(sanitizeTabsChildren(props.children)).filter(
     (child): child is ReactElement<TabItemProps> => isValidElement(child),
@@ -39,6 +55,7 @@ export default function Tabs(props: Props): ReactNode {
       key={String(isBrowser)}
     >
       <div
+        ref={containerRef}
         className={clsx(
           ThemeClassNames.tabs.container,
           "tabs-container",
@@ -47,7 +64,7 @@ export default function Tabs(props: Props): ReactNode {
       >
         <FlowTabs
           selectedKey={selectedValue}
-          onSelectionChange={(key) => selectValue(String(key))}
+          onSelectionChange={(key) => handleSelectionChange(String(key))}
         >
           {tabValues.map(({ value: tabValue, label }) => (
             <Tab key={tabValue} id={tabValue}>

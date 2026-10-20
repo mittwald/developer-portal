@@ -3,7 +3,7 @@ import Translate from "@docusaurus/Translate";
 import { Badge } from "@mittwald/flow-react-components";
 import styles from "./styles.module.css";
 
-/** Marks new features, styled like the "Neu" badge in the Flow docs */
+/** Marks new features, styled like the "Neu" (= new) badge in the Flow docs */
 export function NewBadge() {
   return (
     <Badge color="violet" className={styles.badgeNew}>

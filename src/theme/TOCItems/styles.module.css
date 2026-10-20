@@ -10,16 +10,21 @@
   gap: var(--size-rem--s);
 }
 
+/* Plain links instead of Flow navigation items: no padding, no background */
 .link {
+  --menu-item--padding-x: 0;
+  --menu-item--padding-y: 0;
+  --menu-item--background-color--default: transparent;
+  --menu-item--background-color--hover: transparent;
   font-size: var(--font-size-text--s);
   font-weight: var(--font-weight--normal);
-  color: var(--text--color--default) !important;
   text-decoration: underline;
-  padding: 0 !important;
 }
 
-.link:hover {
-  background: none !important;
+/* Docusaurus colors TOC links, hovered and active ones in the primary color */
+.navigation .link,
+.navigation .link:hover {
+  color: var(--text--color--default);
 }
 
 /* Code in headings (e.g. CLI commands) is plain link text here */
@@ -31,5 +36,4 @@
 .link:global(.table-of-contents__link--active) {
   font-weight: var(--font-weight--bold);
   text-decoration: none;
-  background: none !important;
 }

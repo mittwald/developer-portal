@@ -18,7 +18,7 @@ import styles from "./styles.module.css";
  * Swizzled (ejected) from @docusaurus/theme-classic.
  */
 
-// Very simple pluralization: probably good enough for now
+// Very simple pluralization
 function useNDocsTaggedPlural() {
   const { selectMessage } = usePluralForm();
   return (count: number) =>
