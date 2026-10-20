@@ -15,6 +15,7 @@ import ExampleObject = OpenAPIV3.ExampleObject;
 
 interface Props {
   schema: OpenAPIV3.SchemaObject;
+  example?: any;
   examples?: Record<string, ExampleObject>;
   format?: ExampleFormat;
   withRawJSONSchema?: boolean;
@@ -25,7 +26,9 @@ interface Props {
  * This component renders a schema with an example in a tabbed view.
  *
  * @param schema The schema to render and to generate an example for
- * @param examples Optional examples to show instead of generating one
+ * @param example Optional single example to show instead of generating one
+ * @param examples Optional examples to show instead of generating one; take
+ *   precedence over `example`
  * @param withRawJSONSchema Whether to show the raw JSON schema in a tab
  * @param format Optional format for the example (json or yaml)
  * @param withHeaders Whether to include headers in the example
@@ -34,13 +37,16 @@ interface Props {
  */
 export default function SchemaWithExample({
   schema,
+  example,
   examples,
   withRawJSONSchema,
   format,
   withHeaders,
 }: Props) {
-  const renderedExamples = examples ? (
-    Object.entries(examples).map(([key, example]) => (
+  let renderedExamples: React.ReactNode;
+
+  if (examples) {
+    renderedExamples = Object.entries(examples).map(([key, example]) => (
       <React.Fragment key={key}>
         {example.description && <Markdown>{example.description}</Markdown>}
         {example.value !== undefined ? (
@@ -59,10 +65,24 @@ export default function SchemaWithExample({
           )
         )}
       </React.Fragment>
-    ))
-  ) : (
-    <SchemaExample schema={schema} format={format} withHeaders={withHeaders} />
-  );
+    ));
+  } else if (example !== undefined) {
+    renderedExamples = (
+      <SchemaExampleRenderer
+        content={example}
+        withHeaders={withHeaders}
+        format={format}
+      />
+    );
+  } else {
+    renderedExamples = (
+      <SchemaExample
+        schema={schema}
+        format={format}
+        withHeaders={withHeaders}
+      />
+    );
+  }
 
   return (
     <Tabs groupId="component" defaultValue="schema">
