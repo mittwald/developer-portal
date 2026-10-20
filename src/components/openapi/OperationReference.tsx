@@ -248,6 +248,12 @@ function OperationResponseBody({ spec }: { spec?: OpenAPIV3.ResponseObject }) {
 
         <SchemaWithExample
           schema={spec.content["application/json"].schema as SchemaObject}
+          examples={
+            spec.content["application/json"].examples as Record<
+              string,
+              ExampleObject
+            >
+          }
           withRawJSONSchema
           withHeaders
         />
