@@ -18,16 +18,20 @@ import "@mittwald/flow-react-components/all.css";
 
 /**
  * Lets Flow links navigate through the Docusaurus router and resolves their
- * hrefs against the base URL, which includes the locale prefix (e.g. `/de/`).
+ * absolute hrefs against the base URL, which includes the locale prefix (e.g.
+ * `/de/`). Relative hrefs (e.g. `./mcp/` in DocCardList items) stay relative
+ * to the current page, as with Docusaurus links.
  */
 function FlowRouterProvider({ children }: PropsWithChildren<{}>) {
   const history = useHistory();
   const { withBaseUrl } = useBaseUrlUtils();
+  const resolveHref = (href: string) =>
+    href.startsWith("/") ? withBaseUrl(href) : href;
 
   return (
     <RouterProvider
-      navigate={(href) => history.push(withBaseUrl(href))}
-      useHref={(href) => withBaseUrl(href)}
+      navigate={(href) => history.push(resolveHref(href))}
+      useHref={resolveHref}
     >
       {children}
     </RouterProvider>

@@ -4,7 +4,8 @@ import React, {
   isValidElement,
   type ReactNode,
 } from "react";
-import { AlertBadge } from "@mittwald/flow-react-components";
+import clsx from "clsx";
+import { AlertIcon, Text } from "@mittwald/flow-react-components";
 import styles from "./styles.module.css";
 
 /**
@@ -25,8 +26,13 @@ export function replaceBreakingMarker(
   );
   const first = nodes[index];
 
-  // The marker is a warning emoji followed by a bold label ending with ":"
-  if (typeof first === "string" && first.trim() === "⚠️") {
+  // The marker is a warning emoji followed by a bold label ending with ":".
+  // The emoji is matched with and without its (invisible) emoji presentation
+  // selector U+FE0F, as either may end up in hand-written content.
+  if (
+    typeof first === "string" &&
+    first.replace(/\uFE0F/g, "").trim() === "\u26A0"
+  ) {
     const label = nodes[index + 1];
     if (
       isValidElement<{ children?: ReactNode }>(label) &&
@@ -37,13 +43,9 @@ export function replaceBreakingMarker(
       nodes.splice(
         index,
         2,
-        <AlertBadge
-          key="breakingBadge"
-          status="warning"
-          className={styles.breakingBadge}
-        >
+        <BreakingBadge key="breakingBadge">
           {label.props.children.slice(0, -1)}
-        </AlertBadge>,
+        </BreakingBadge>,
       );
       return nodes;
     }
@@ -60,4 +62,26 @@ export function replaceBreakingMarker(
   }
 
   return undefined;
+}
+
+/**
+ * A Flow warning alert badge. Flow's AlertBadge component renders a `<div>`,
+ * which is invalid in the paragraph of a loose list item: the browser closes
+ * the paragraph before it, and the page no longer matches React's server-side
+ * markup (hydration error). So the badge markup is rendered with a `<span>`
+ * and Flow's alert badge classes.
+ */
+function BreakingBadge({ children }: { children: ReactNode }) {
+  return (
+    <span
+      className={clsx(
+        "flow--alert-badge",
+        "flow--alert-badge--warning",
+        styles.breakingBadge,
+      )}
+    >
+      <AlertIcon size="s" status="warning" />
+      <Text className="flow--alert-badge--text">{children}</Text>
+    </span>
+  );
 }

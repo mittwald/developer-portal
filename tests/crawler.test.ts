@@ -200,8 +200,14 @@ test.describe('Documentation crawler - all pages', () => {
       // Extract all links from the page
       try {
         const links = await page.evaluate(() => {
-          return Array.from(document.querySelectorAll('a[href]'))
+          const anchors = Array.from(document.querySelectorAll('a[href]'))
             .map(a => (a as HTMLAnchorElement).href);
+          // The language switch is a menu that is only rendered when opened,
+          // so other locales are reached via the hreflang alternates. These
+          // point to the production URL; only the path is crawled.
+          const alternates = Array.from(document.querySelectorAll('link[rel="alternate"][hreflang]'))
+            .map(link => new URL((link as HTMLLinkElement).href).pathname);
+          return [...anchors, ...alternates];
         });
 
         // Add new links to queue
