@@ -38,6 +38,7 @@ import {
 import {
   emojiIcons,
   replaceLeadingEmojiIcon,
+  replaceStarRatings,
   splitLeadingEmojiIcon,
 } from "./emojiIcons";
 import { replaceBreakingMarker } from "./breakingBadge";
@@ -113,9 +114,13 @@ function MDXTitle(props: ComponentProps<"h1">) {
 }
 
 function MDXParagraph(props: ComponentProps<"p">) {
+  // A leading emoji (e.g. "✅ **Success!**") as a Flow icon, as in list items
+  const children = replaceLeadingEmojiIcon(props.children, (icon) => (
+    <span className={styles.leadingStatusIcon}>{icon}</span>
+  ));
   return (
     <Text elementType="p" className={props.className}>
-      {props.children}
+      {children ?? props.children}
     </Text>
   );
 }
@@ -228,12 +233,17 @@ function MDXListItem(props: ComponentProps<"li">) {
   }
 
   if (!isIconList) {
-    const children = replaceLeadingEmojiIcon(props.children, (icon) => (
-      <span className={styles.leadingStatusIcon}>{icon}</span>
-    ));
+    const withEmojiIcon =
+      replaceLeadingEmojiIcon(props.children, (icon) => (
+        <span className={styles.leadingStatusIcon}>{icon}</span>
+      )) ?? props.children;
+    const children =
+      replaceStarRatings(withEmojiIcon, (stars) => (
+        <span className={styles.starRating}>{stars}</span>
+      )) ?? withEmojiIcon;
     return (
       <MDXLi {...props} className={clsx(props.className, styles.listItem)}>
-        {children ?? props.children}
+        {children}
       </MDXLi>
     );
   }
@@ -342,7 +352,7 @@ function textContent(node: ReactNode): string {
 
 /** The icon of a cell consisting only of an emoji icon */
 function statusIcon(cell: ElementWithChildren): ReactNode | undefined {
-  return emojiIcons[textContent(cell.props.children).trim()];
+  return emojiIcons[textContent(cell.props.children).trim()]?.();
 }
 
 /** Cell content with a leading emoji replaced by its icon */
