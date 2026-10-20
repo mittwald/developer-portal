@@ -1,5 +1,8 @@
 /* The doc sidebar items carry their own spacing; keep Flow's content
-   padding only */
+   padding only. The menu (which scrolls and clips horizontally) reaches into
+   that padding by the item padding, so the items pulled out like a Flow
+   navigation (custom.css) are not clipped. */
 .content :global(.menu) {
-  padding: 0;
+  margin-inline: calc(var(--menu-item--padding-x) * -1);
+  padding: 0 var(--menu-item--padding-x);
 }
