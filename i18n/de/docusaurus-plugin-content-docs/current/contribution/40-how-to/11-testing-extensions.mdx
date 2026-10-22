@@ -6,11 +6,11 @@ Nutze die DEV-Extensions-Seite im mStudio, um Frontend-Fragmente lokal zu testen
 
 ## Frontend-Fragmente lokal testen {#test-frontend-fragments-locally}
 
-1. Starte deinen Frontend-Entwicklungsserver unter `http://localhost:3000`.
+1. Stelle dein Frontend unter der gewünschten Adresse bereit, zum Beispiel `http://localhost:4711`.
 2. Öffne im mStudio **Profil > Entwicklung > DEV-Extensions** (`/profile/extension-development`).
-3. Aktiviere die lokale Überschreibung. Optional kannst du einen Pfad angeben, um ein bestimmtes Fragment zu laden, zum Beispiel `/my-fragment`.
+3. Aktiviere die lokale Überschreibung und gib die vollständige URL des zu ladenden Frontends an, zum Beispiel `http://localhost:4711/my-fragment?projectId=:projectId`.
 
-Die Überschreibung ersetzt die Fragment-URL aller installierten Extensions durch `http://localhost:3000` gefolgt vom optionalen Pfad. Der Pfad kann [Templating-Platzhalter](/docs/v2/contribution/overview/concepts/templating/) wie `:projectId` enthalten.
+Die Überschreibung ersetzt die konfigurierte Fragment-URL aller installierten Extensions. Du kannst eine beliebige URL verwenden, einschließlich eines anderen Hosts oder Ports, eines Pfads und von Query-Parametern. [Templating-Platzhalter](/docs/v2/contribution/overview/concepts/templating/) wie `:projectId` können im Pfad oder in Query-Parametern verwendet werden.
 
 Die Fragmente werden an ihren konfigurierten Anchors im mStudio angezeigt. Du musst die Seite nicht neu laden und der Marketplace-Eintrag der Extension bleibt unverändert.
 
@@ -20,9 +20,9 @@ Die DEV-Extensions-Einstellung wird im lokalen Speicher dieses Browsers gespeich
 
 :::
 
-## Den localStorage-Kompatibilitäts-Override verwenden {#use-the-localstorage-compatibility-override}
+## Den localStorage-Override verwenden {#use-the-localstorage-compatibility-override}
 
-Du kannst die lokale Frontend-URL auch direkt im lokalen Speicher des Browsers festlegen. Öffne die Entwicklerkonsole des Browsers, während mStudio geöffnet ist, und führe Folgendes aus:
+Der localStorage-Override ist auch als Alternative zur DEV-Extensions-Einstellung verfügbar. Öffne die Entwicklerkonsole des Browsers, während mStudio geöffnet ist, und führe Folgendes aus:
 
 ```js
 localStorage["mstudio/fragment-dev-url"] =
