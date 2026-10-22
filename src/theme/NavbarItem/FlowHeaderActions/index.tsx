@@ -10,7 +10,6 @@ import {
 } from "@docusaurus/theme-common";
 import {
   Button,
-  ClearPropsContext,
   ContextMenu,
   ContextMenuTrigger,
   HeaderNavigation,
@@ -179,23 +178,18 @@ export default function FlowHeaderActions({ items, mobile }: Props): ReactNode {
       {items.map((item) => {
         const LinkIcon = item.icon ? linkIcons[item.icon] : undefined;
         return LinkIcon ? (
-          // Link combined with a button, as documented for Flow links. The
-          // header navigation would treat it as a text link, so it is placed
-          // outside of its props context.
-          <li key={item.href} className={styles.item}>
-            <ClearPropsContext>
-              <IconLinkButton
-                href={item.href}
-                target="_blank"
-                label={item.label}
-                icon={
-                  <Icon>
-                    <LinkIcon />
-                  </Icon>
-                }
-              />
-            </ClearPropsContext>
-          </li>
+          // Link combined with a button, as documented for Flow links
+          <IconLinkButton
+            key={item.href}
+            href={item.href}
+            target="_blank"
+            label={item.label}
+            icon={
+              <Icon>
+                <LinkIcon />
+              </Icon>
+            }
+          />
         ) : (
           <Link key={item.href} href={item.href} target="_blank">
             {item.label}
