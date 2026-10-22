@@ -1,0 +1,42 @@
+---
+title: Testing Extensions
+---
+
+Use the DEV-Extensions page in mStudio to test frontend fragments locally without changing the fragment URLs in your Extension's marketplace entry.
+
+## Test frontend fragments locally {#test-frontend-fragments-locally}
+
+1. Make your frontend available at the address you want to use, for example `http://localhost:4711`.
+2. In mStudio, open **Profile > Development > DEV-Extensions** (`/profile/extension-development`).
+3. Enable the local override and enter the full URL of the frontend you want to load, for example `http://localhost:4711/my-fragment?projectId=:projectId`.
+
+The override replaces the configured fragment URL for all installed Extensions. You can use any URL, including a different host or port, a path, and query parameters. [Templating placeholders](/docs/v2/contribution/overview/concepts/templating/), such as `:projectId`, can be used in the path or query parameters.
+
+Fragments render at their configured anchors in mStudio. You do not need to reload the page, and the Extension's marketplace entry remains unchanged.
+
+:::note
+
+The DEV-Extensions setting is stored in this browser's local storage and applies only to your current user session.
+
+:::
+
+## Use the localStorage override {#use-the-localstorage-compatibility-override}
+
+The localStorage override is also available as an alternative to the DEV-Extensions setting. Open the browser's developer console while mStudio is open and run:
+
+```js
+localStorage["mstudio/fragment-dev-url"] =
+	"http://localhost:3000/?contextId=:contextId";
+```
+
+Adjust the URL, port, path, or query parameters to match your local frontend.
+
+:::caution
+
+Chrome is recommended for local fragment testing. Some browsers, including Safari, block content served from `http://localhost` when it is embedded in the HTTPS mStudio, without displaying an error.
+
+:::
+
+## When to use a staging Extension {#when-to-use-staging}
+
+Use a hidden staging copy when you need a separate Extension setup for testing or demos. Extensions do not support multiple environments, so create a second Extension and configure it as hidden. You can still add it to a context to test or demonstrate it. See [Staging](../staging) for details.
