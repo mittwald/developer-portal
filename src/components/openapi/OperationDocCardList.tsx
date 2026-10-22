@@ -7,8 +7,8 @@ import {
 import compareOperation from "@site/src/openapi/compareOperation";
 import { typedList } from "@mittwald/flow-react-components";
 import { Heading } from "@mittwald/flow-react-components";
-import { Text } from "@mittwald/flow-react-components";
-import HTTPMethod from "@site/src/components/openapi/HTTPMethod";
+import { Badge, Text } from "@mittwald/flow-react-components";
+import { methodColors } from "@site/src/components/openapi/HTTPMethod";
 import OperationPath from "@site/src/components/openapi/OperationPath";
 import { Deprecated } from "@site/src/components/openapi/RequiredOptional";
 import { buildOperationUrl } from "@site/src/components/openapi/OperationLink";
@@ -84,8 +84,10 @@ export default function OperationDocCardList(p: Props) {
         {(op) => (
           <OperationList.ItemView>
             <Heading>
-              <HTTPMethod method={op.method} />
               {op.title}
+              <Badge color={methodColors[op.method.toUpperCase()] ?? "neutral"}>
+                {op.method.toUpperCase()}
+              </Badge>
               {op.deprecationState === "deprecated" && <Deprecated />}
             </Heading>
             <Text>

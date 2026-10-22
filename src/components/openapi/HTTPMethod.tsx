@@ -3,7 +3,7 @@ import type { BadgeProps } from "@mittwald/flow-react-components";
 import clsx from "clsx";
 import styles from "./HTTPMethod.module.css";
 
-const methodColors: Record<string, BadgeProps["color"]> = {
+export const methodColors: Record<string, BadgeProps["color"]> = {
   GET: "blue",
   POST: "green",
   PUT: "violet",
