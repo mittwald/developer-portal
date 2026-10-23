@@ -14,6 +14,7 @@ Folgende Grenz- und Standardwerte gelten:
 
 - Maximale Kontextlänge: 32.768 Token
 - Standarddimension des Embeddings: 4.096
+- Maximale Anzahl an Einträgen in `input` pro Anfrage: 200
 - Unterstützte Werte für `dimensions`: 256, 512, 768, 1.024, 1.536, 2.048, 3.072 und 4.096
 
 Es wird empfohlen, Embeddings für Suchanfragen mit folgendem Template zu formatieren:
@@ -37,7 +38,10 @@ Du kannst ein Array mit Texten an `/v1/embeddings` übergeben, um mehrere Embedd
 ```python
 from openai import OpenAI
 
-client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1",
+    api_key="YOUR_API_KEY",
+)
 
 texte = ["Erstes Dokument", "Zweites Dokument"]
 response = client.embeddings.create(
@@ -48,6 +52,8 @@ response = client.embeddings.create(
 for item in response.data:
     print(texte[item.index], len(item.embedding))
 ```
+
+Eine Anfrage mit mehr als 200 Einträgen in `input` lehnt der Endpunkt mit HTTP `400` und der Fehlermeldung `Batch too large` ab. Teile größere Listen auf mehrere Anfragen auf.
 
 ## Embedding-Dimensionen reduzieren
 

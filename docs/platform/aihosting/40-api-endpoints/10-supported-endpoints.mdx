@@ -251,7 +251,7 @@ curl -i -X POST https://llm.aihosting.mittwald.de/v1/embeddings \
     }'
 ```
 
-`input` accepts either a single string, as shown above, or an array of strings. Pass an array, such as `["An important document", "Another important document"]`, to generate multiple embeddings in one request. Each item in the response's `data` array has an `index` that identifies its position in the input array, starting at `0`. Use this value to associate each embedding with its input text.
+`input` accepts either a single string, as shown above, or an array of strings. Pass an array, such as `["An important document", "Another important document"]`, to generate multiple embeddings in one request. Each item in the response's `data` array has an `index` that identifies its position in the input array, starting at `0`. Use this value to associate each embedding with its input text. The maximum number of entries per request depends on the model and is listed on its model page; larger requests are rejected with HTTP `400` and the error message `Batch too large`.
 
 Depending on the embedding model, additional parameters such as `dimensions` can be submitted. [Qwen3-Embedding-8B](../../models/qwen3-embedding-8b/) supports `dimensions` with a model-specific set of values. Refer to the respective model page for supported parameters and values; support is a property of each model rather than the endpoint as a whole.
 

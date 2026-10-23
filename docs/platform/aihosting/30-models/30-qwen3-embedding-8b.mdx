@@ -15,6 +15,7 @@ The following limits and defaults apply:
 
 - Maximum context length: 32,768 tokens
 - Default embedding dimension: 4,096
+- Maximum number of entries in `input` per request: 200
 - Supported values for `dimensions`: 256, 512, 768, 1,024, 1,536, 2,048, 3,072, and 4,096
 
 It is recommended to format embeddings for search queries using the following template:
@@ -25,6 +26,11 @@ Query: {query}
 ```
 
 Here, `{query}` should express the individual search query in _one_ sentence, and `{task_description}` should describe the task, for example:
+
+```
+task = 'Given a web search query, retrieve relevant passages that answer the query'
+query = 'Explain gravity'
+```
 
 ## Batch inputs {#batch-inputs}
 
@@ -47,6 +53,8 @@ response = client.embeddings.create(
 for item in response.data:
     print(texts[item.index], len(item.embedding))
 ```
+
+A request with more than 200 entries in `input` is rejected with HTTP `400` and the error message `Batch too large`. Split larger lists into several requests.
 
 ## Reducing embedding dimensions
 
