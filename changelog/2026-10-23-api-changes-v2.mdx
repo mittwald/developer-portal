@@ -1,0 +1,266 @@
+---
+title: Breaking (!) API changes for v2 API, October 16 to October 23
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - User
+  - Domain
+  - Contract
+  - Project
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API introduces several enhancements, including changes to response body formats, the addition of optional and required properties across various endpoints, and the deprecation of certain operations, aimed at improving the overall functionality and user experience.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The response body type for the `GET` operation at the path `/v2/password-policies/{passwordPolicy}` has changed from `string` to `object` for status `200`. This is a breaking change.
+- The response body type for the deprecated `GET` operation at the path `/v2/password/policies/{path}` has also changed from `string` to `object` for status `200`. This is a breaking change.
+- The `POST` operation at the path `/v2/actions/list-ingresses-compatible-with-certificate` now includes an optional property `/items/senderLoginProtection` in the response for status `200`.
+- The `GET` operation at the path `/v2/customers/{customerId}/invoice-settings` has a new non-success response with status `403`.
+- The `GET` operation at the path `/v2/domains` now includes an optional property `/items/ownerVerification` in the response for status `200`.
+- The `GET` operation at the path `/v2/domains/{domainId}` now includes an optional property `ownerVerification` in the response for status `200`.
+- The `GET` operation at the path `/v2/ingresses` now includes an optional property `/items/senderLoginProtection` in the response for status `200`.
+- The `GET` operation at the path `/v2/ingresses/{ingressId}` now includes an optional property `senderLoginProtection` in the response for status `200`.
+- The `POST` operation at the path `/v2/oauth2/token` has added a new optional request property `refresh_token`.
+- The `POST` operation at the path `/v2/oauth2/token` has added 'subschema #1, subschema #2' to the request body `oneOf` list.
+- The request properties `code`, `grant_type`, and `redirect_uri` have all become optional for the `POST` operation at the path `/v2/oauth2/token`.
+- The request property `grant_type` has a new enum value `refresh_token` added for the `POST` operation at the path `/v2/oauth2/token`.
+- The `GET` operation at the path `/v2/password-policies/{passwordPolicy}` now includes required properties `minComplexity` and `rules` in the response for status `200`.
+- The deprecated `GET` operation at the path `/v2/password/policies/{path}` also includes required properties `minComplexity` and `rules` in the response for status `200`. 
+- The `GET` operation at the path `/v2/projects/{projectId}/activities` has added several schemas to the `/items/action` response property `anyOf` list for the response status `200`.
+- The deprecated `GET` operation at the path `/v2/projects/{projectId}/domains` now includes an optional property `/items/ownerVerification` in the response for status `200`.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "Get a PasswordPolicy"
+
+
+- ⚠️ **Breaking:** the response's body type/format changed from 'string'/'' to 'object'/'' for status '200'
+
+- added the required property 'minComplexity' to the response with the '200' status
+
+- added the required property 'rules' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="password-validation-get-password-policy" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "DEPRECAED. Use GET /v2/password-policies/\{passwordPolicy\} instead"
+
+
+- ⚠️ **Breaking:** the response's body type/format changed from 'string'/'' to 'object'/'' for status '200'
+
+- added the required property 'minComplexity' to the response with the '200' status
+
+- added the required property 'rules' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="password-validation-get-password-policy-v2-deprecated" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Ingresses compatible with a certificate"
+
+
+- added the optional property '/items/senderLoginProtection' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ingress-list-ingresses-compatible-with-certificate" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get InvoiceSettings of a Customer"
+
+
+- added the non-success response with the status '403'
+
+
+For details, refer to the <OperationLink operation="invoice-get-detail-of-invoice-settings" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Domains"
+
+
+- added the optional property '/items/ownerVerification' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="domain-list-domains" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Domain"
+
+
+- added the optional property 'ownerVerification' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="domain-get-domain" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Ingresses"
+
+
+- added the optional property '/items/senderLoginProtection' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ingress-list-ingresses" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an Ingress"
+
+
+- added the optional property 'senderLoginProtection' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ingress-get-ingress" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Retrieve an OAuth access token"
+
+
+- added the new optional request property 'refresh_token'
+
+- added 'subschema #1, subschema #2' to the request body 'oneOf' list
+
+- the request property 'code' became optional
+
+- the request property 'grant_type' became optional
+
+- the request property 'redirect_uri' became optional
+
+- added the new 'refresh_token' enum value to the request property 'grant_type'
+
+
+For details, refer to the <OperationLink operation="user-oauth-retrieve-access-token" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the activities of a project"
+
+
+- added '#/components/schemas/de.mittwald.v1.activitylog.BackupCreated, #/components/schemas/de.mittwald.v1.activitylog.BackupDescriptionUpdated, #/components/schemas/de.mittwald.v1.activitylog.BackupExpirationUpdated, #/components/schemas/de.mittwald.v1.activitylog.BackupExportRequested, #/components/schemas/de.mittwald.v1.activitylog.BackupRestoreRequested, #/components/schemas/de.mittwald.v1.activitylog.BackupScheduleCreated, #/components/schemas/de.mittwald.v1.activitylog.BackupScheduleIntervalUpdated, #/components/schemas/de.mittwald.v1.activitylog.BackupScheduleTtlUpdated, #/components/schemas/de.mittwald.v1.activitylog.BackupDeleted' to the '/items/action' response property 'anyOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="project-list-project-activities" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Domains belonging to a Project"
+
+
+- added the optional property '/items/ownerVerification' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="deprecated-domain-list-domains" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK v2.2.18 Release
+
+The mittwald PHP SDK has been updated to version 2.2.18. This release focuses on enhancing API client error handling, specifically for HTTP 403 (Forbidden) responses when accessing invoice settings details. Key improvements include:
+
+- Introduction of `InvoiceGetDetailOfInvoiceSettingsForbiddenResponse` to handle 403 responses with a standardized schema for validation and JSON serialization.
+- Updates to `ContractClientImpl` to ensure HTTP 403 status codes are correctly routed to the new forbidden response handler.
+- Necessary class imports and match-case statements have been added to support the new error handling mechanism.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.2.18).
+
+### mittwald PHP SDK v2.2.17 Release Summary
+
+The mittwald PHP SDK has been updated to version 2.2.17. This release introduces new features and enhancements aimed at improving security and usability.
+
+#### New Features
+- **Ingress Sender Login Protection**: A new `senderLoginProtection` boolean field has been added to the `Ingress` schema. When enabled, it restricts email sending from the Ingress and its SubIngresses exclusively to mailboxes within the same project.
+- **Password Policy Schema**: New `Policy` and `PolicyRulesItem` schema classes have been introduced to represent structured password validation policies. This feature provides developers with access to minimum password complexity requirements and a list of configurable rule types.
+
+#### Enhancements & API Updates
+- **Structured Password Policy Responses**: The `PasswordValidationGetPasswordPolicyOKResponse` and its deprecated V2 counterpart have been updated to return a strongly typed `Policy` object instead of a raw string. This change enhances type safety and provides direct access to policy rules and complexity metrics.
+- **OAuth Endpoint Documentation**: Inline documentation for the OAuth access token retrieval method has been refined. The updated description clarifies that the endpoint supports exchanging both authorization codes and refresh tokens, and notes that successful exchanges trigger a refresh token rotation.
+
+For more details, please visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.2.17).
+
+### mittwald PHP SDK v2.2.16 Release
+
+The mittwald PHP SDK has been updated to version 2.2.16. This release focuses on schema and documentation enhancements to improve integration and developer experience. Key updates include:
+
+- Clarification of field requirements for AI hosting orders and machine type specifications to ensure compatibility with available articles.
+- Updated descriptions for `monthlyTokens` and `requestsPerMinute` in the AI Hosting Order schema, emphasizing the need for exact matches with available articles via the `/articles` endpoint.
+- Added validation descriptions for the `machineType` field in the Machine Type Specification schema, aligning it with article matching requirements.
+- Enhanced PHPDoc comments and schema metadata to improve autocomplete, documentation generation, and developer guidance.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.2.16).
+
+### mittwald PHP SDK v2.2.15 Release Summary
+
+The mittwald PHP SDK has released version v2.2.15, which introduces new features and updates to enhance functionality and user experience. 
+
+#### New Features
+- **Activity Log Schemas for Backup Operations**: This release includes a comprehensive suite of auto-generated PHP schema classes for modeling backup-related activity log events. These schemas offer structured data handling, JSON schema validation, serialization capabilities, and immutable builder methods. Supported activity log events include:
+  - `backup.created` and `backup.deleted` (covering standard, export, and schedule deletions)
+  - `backup.description-updated`
+  - `backup.expiration-updated`
+  - `backup.export-requested`
+  - `backup.restore-requested`
+  - `backup.schedule-created`
+  - `backup.schedule-interval-updated`
+  - `backup.schedule-ttl-updated`
+
+  Each event type is paired with dedicated `Changes`, `Parameters`, and `Name` classes, enforcing strict typing and providing utilities for seamless API integration.
+
+#### Domain API Client Updates
+- **Method Deprecation**: The `resendContactVerificationEmail()` method in `DomainClient` is now deprecated. Users are advised to migrate to the `POST /v2/domains/{domainId}/actions/resend-email` endpoint.
+- **Behavior Clarification**: Documentation for the `resendDomainEmail()` operation has been expanded to clarify its scope and constraints, including details on when a `412` Precondition Failed error will be returned.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.2.15).
+
+### mittwald JavaScript SDK Release 4.503.0
+
+The mittwald JavaScript SDK has been updated to version 4.503.0. This release includes the following feature:
+
+- Updated the generated client to enhance functionality ([commit d56fd9e](https://github.com/mittwald/api-client-js/commit/d56fd9ef16cd8f18bd438346dcfed712f66745c4)).
+
+For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.503.0](https://github.com/mittwald/api-client-js/releases/tag/4.503.0).
+
+### mittwald JavaScript SDK Release 4.502.0
+
+The mittwald JavaScript SDK has been updated to version 4.502.0. This release includes the following feature:
+
+- Updated the generated client to improve functionality and performance ([commit c6a8b63](https://github.com/mittwald/api-client-js/commit/c6a8b63d809485f236c8f7754f4f82935c257f28)).
+
+For more details, please visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.502.0).
+
