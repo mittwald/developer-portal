@@ -251,6 +251,8 @@ curl -i -X POST https://llm.aihosting.mittwald.de/v1/embeddings \
     }'
 ```
 
+`input` akzeptiert entweder einen einzelnen String wie oben oder ein Array mit Strings. Übergib ein Array wie `["Ein wichtiges Dokument", "Noch ein wichtiges Dokument"]`, um mehrere Embeddings in einer Anfrage zu erstellen. Jeder Eintrag im `data`-Array der Antwort enthält einen `index`, der seine Position im `input`-Array angibt und bei `0` beginnt. Verwende diesen Wert, um jedes Embedding dem jeweiligen Eingabetext zuzuordnen. Wie viele Einträge eine Anfrage höchstens enthalten darf, hängt vom Modell ab und steht auf der jeweiligen Modellseite. Größere Anfragen lehnt der Endpunkt mit HTTP `400` und der Fehlermeldung `Batch too large` ab.
+
 Abhängig vom Embedding-Modell können weitere Parameter wie `dimensions` übermittelt werden. [Qwen3-Embedding-8B](../../models/qwen3-embedding-8b/) unterstützt `dimensions` mit einer modellspezifischen Auswahl an Werten. Die unterstützten Parameter und Werte findest du auf der jeweiligen Modellseite. Die Unterstützung ist eine Eigenschaft des einzelnen Modells und nicht des gesamten Endpunkts.
 
 ## /v1/audio/transcriptions
