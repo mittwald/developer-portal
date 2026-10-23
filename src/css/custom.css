@@ -119,23 +119,19 @@ html[data-theme="dark"] {
    archive): a vertical gradient with a fine grain, recreated from design
    assets (the light one halfway towards Flow's lighter
    --color--background-gradient). Flow has no tokens for these colors, so this
-   is the one place with literal colors. The grain is gray noise laid over the
-   gradient with `background-blend-mode: overlay, normal` (set wherever the
+   is the one place with literal colors. The grain is Flow's texture token,
+   laid over the gradient with `background-blend-mode: overlay, normal` (set wherever the
    token is used), so it does not shift the colors. */
 :root[data-theme="light"] {
-  --landing--grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0.33 0.33 0.33 0 0 0.33 0.33 0.33 0 0 0.33 0.33 0.33 0 0 0 0 0 0 1'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='0.5' intercept='0.25'/%3E%3CfeFuncG type='linear' slope='0.5' intercept='0.25'/%3E%3CfeFuncB type='linear' slope='0.5' intercept='0.25'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")
-    0 0 / 200px 200px;
   --landing--colors: linear-gradient(#eaeff3, #cdd4e9 50%, #b0b9e3);
 }
 
 :root[data-theme="dark"] {
-  --landing--grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0.33 0.33 0.33 0 0 0.33 0.33 0.33 0 0 0.33 0.33 0.33 0 0 0 0 0 0 1'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='0.8' intercept='0.1'/%3E%3CfeFuncG type='linear' slope='0.8' intercept='0.1'/%3E%3CfeFuncB type='linear' slope='0.8' intercept='0.1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")
-    0 0 / 200px 200px;
   --landing--colors: linear-gradient(#0d101a, #354176);
 }
 
 :root {
-  --landing--gradient: var(--landing--grain), var(--landing--colors);
+  --landing--gradient: var(--texture--grain), var(--landing--colors);
 }
 
 /* Infima hero (changelog archive), on the landing page background

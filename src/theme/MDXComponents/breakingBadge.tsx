@@ -4,8 +4,7 @@ import React, {
   isValidElement,
   type ReactNode,
 } from "react";
-import clsx from "clsx";
-import { AlertIcon, Text } from "@mittwald/flow-react-components";
+import { AlertBadge } from "@mittwald/flow-react-components";
 import styles from "./styles.module.css";
 
 /**
@@ -64,24 +63,10 @@ export function replaceBreakingMarker(
   return undefined;
 }
 
-/**
- * A Flow warning alert badge. Flow's AlertBadge component renders a `<div>`,
- * which is invalid in the paragraph of a loose list item: the browser closes
- * the paragraph before it, and the page no longer matches React's server-side
- * markup (hydration error). So the badge markup is rendered with a `<span>`
- * and Flow's alert badge classes.
- */
 function BreakingBadge({ children }: { children: ReactNode }) {
   return (
-    <span
-      className={clsx(
-        "flow--alert-badge",
-        "flow--alert-badge--warning",
-        styles.breakingBadge,
-      )}
-    >
-      <AlertIcon size="s" status="warning" />
-      <Text className="flow--alert-badge--text">{children}</Text>
-    </span>
+    <AlertBadge status="warning" className={styles.breakingBadge}>
+      {children}
+    </AlertBadge>
   );
 }

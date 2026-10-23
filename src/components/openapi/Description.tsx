@@ -5,9 +5,8 @@ import styles from "./Description.module.css";
 
 /**
  * Links like in the docs (src/theme/MDXComponents): internal ones via the
- * Docusaurus router in the same tab, inline code taking the link color. Flow's
- * Markdown would open every link in a new tab. `node` (the Markdown syntax
- * tree node) is not passed on to the DOM.
+ * Docusaurus router (with the site's base URL), inline code taking the link
+ * color. `node` (the Markdown syntax tree node) is not passed on to the DOM.
  */
 function DescriptionLink({
   node: _node,
