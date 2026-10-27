@@ -2,12 +2,12 @@
 // Note: type annotations allow type checking and IDEs autocompletion
 
 import { Config } from "@docusaurus/types";
-import { themes } from "prism-react-renderer";
 import { Options, ThemeConfig } from "@docusaurus/preset-classic";
 import { Options as ClientRedirectOptions } from "@docusaurus/plugin-client-redirects";
-
-const lightCodeTheme = themes.oneLight;
-const darkCodeTheme = themes.dracula;
+import { flowTheme } from "./src/prism/flowTheme";
+import rehypeFlowSections from "./src/plugins/rehypeFlowSections";
+import path from "node:path";
+import { proIconsPackage, readProIconsVersion } from "./dev/proIcons";
 
 function webpackCryptoFallbackPlugin() {
   return {
@@ -34,6 +34,30 @@ function webpackCryptoFallbackPlugin() {
   };
 }
 
+/*
+ * Flow icons render as FontAwesome Pro once `dev/installProIcons.ts` fetched
+ * them (`start` and `build` run it first). Without them (a fork's PR, no
+ * access to the registry), both names the Pro icons go by are swapped for the
+ * stand-ins in `src/icons/withoutProIcons` and Flow keeps its default icons.
+ */
+function proIconsPlugin() {
+  const withoutProIcons = (file: string) =>
+    path.resolve(__dirname, "src/icons/withoutProIcons", file);
+  const alias: Record<string, string> = readProIconsVersion()
+    ? { "@fortawesome/sharp-regular-svg-icons$": proIconsPackage }
+    : {
+        "@mittwald/flow-icons-pro$": withoutProIcons("iconsPro.ts"),
+        "@fortawesome/sharp-regular-svg-icons$":
+          withoutProIcons("sharpRegular.ts"),
+      };
+  return {
+    name: "flow-pro-icons",
+    configureWebpack() {
+      return { resolve: { alias } };
+    },
+  };
+}
+
 const config: Config = {
   title: "mittwald Developer Portal",
   favicon: "img/favicon.ico",
@@ -43,6 +67,13 @@ const config: Config = {
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: "/",
+
+  future: {
+    faster: {
+      // Reuse compiled MDX between the client and server builds.
+      mdxCrossCompilerCache: true,
+    },
+  },
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
@@ -110,9 +141,11 @@ const config: Config = {
         blogSidebarCount: "ALL",
         showReadingTime: false,
         onInlineTags: "ignore",
+        rehypePlugins: [rehypeFlowSections],
       },
     ],
     webpackCryptoFallbackPlugin,
+    proIconsPlugin,
     [
       "docusaurus-plugin-llms",
       {
@@ -185,6 +218,7 @@ This documentation covers:
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl: "https://github.com/mittwald/developer-portal/tree/master/",
+          rehypePlugins: [rehypeFlowSections],
           lastVersion: "current",
           versions: {
             current: {
@@ -200,10 +234,8 @@ This documentation covers:
             },
           },
         },
-        blog: {
-          showReadingTime: false,
-          onInlineTags: "ignore",
-        },
+        // The changelog is a separate blog plugin instance (see plugins)
+        blog: false,
         theme: {
           customCss: [
             require.resolve("./src/css/custom.css"),
@@ -215,57 +247,73 @@ This documentation covers:
   ],
 
   themeConfig: {
+    colorMode: {
+      respectPrefersColorScheme: true,
+    },
     navbar: {
       // style: 'primary',
       title: "Developer Portal",
       logo: {
         alt: "mittwald",
-        src: "img/mittwald-logo.svg",
+        src: "img/mittwald-logo-dark.svg",
+        srcDark: "img/mittwald-logo.svg",
       },
       items: [
         {
-          type: "doc",
-          docId: "api/intro",
+          // Flow header navigation (src/theme/NavbarItem/FlowHeaderNavigation)
+          type: "custom-flowHeaderNavigation",
           position: "left",
-          label: "API Docs",
+          label: "Menu",
+          items: [
+            {
+              type: "doc",
+              docId: "api/intro",
+              label: "API Docs",
+            },
+            {
+              type: "doc",
+              docId: "cli/index",
+              label: "CLI",
+            },
+            {
+              type: "doc",
+              docId: "/category/platform",
+              label: "Platform",
+            },
+            {
+              type: "doc",
+              docId: "guides/deployment/index",
+              label: "Guides",
+            },
+            {
+              type: "doc",
+              docId: "contribution/index",
+              label: "Contribution",
+            },
+            {
+              to: "/changelog",
+              label: "Changelog",
+            },
+          ],
         },
         {
-          type: "doc",
-          docId: "cli/index",
-          position: "left",
-          label: "CLI",
-        },
-        {
-          type: "doc",
-          docId: "/category/platform",
-          position: "left",
-          label: "Platform",
-        },
-        {
-          type: "doc",
-          docId: "guides/deployment/index",
-          position: "left",
-          label: "Guides",
-        },
-        {
-          type: "doc",
-          docId: "contribution/index",
-          position: "left",
-          label: "Contribution",
-        },
-        {
-          to: "/changelog",
-          label: "Changelog",
-          position: "left",
-        },
-        {
-          href: "https://github.com/mittwald/developer-portal",
-          label: "GitHub",
+          // Search (src/theme/SearchBar) left of the header actions; without
+          // this item it would be added at the end of the navbar
+          type: "search",
           position: "right",
         },
         {
-          type: "localeDropdown",
+          // Flow header navigation (src/theme/NavbarItem/FlowHeaderActions)
+          // with these links, the language switch and the color mode toggle
+          type: "custom-flowHeaderActions",
           position: "right",
+          items: [
+            {
+              href: "https://github.com/mittwald/developer-portal",
+              label: "GitHub",
+              icon: "github",
+            },
+          ],
         },
       ],
     },
@@ -325,9 +373,15 @@ This documentation covers:
       ],
       copyright: `Copyright © ${new Date().getFullYear()} Mittwald CM Service GmbH & Co. KG. Built with Docusaurus.`,
     },
+    mermaid: {
+      // Keep Mermaid's default themes, but use the Flow font
+      options: {
+        fontFamily: "Inter, sans-serif",
+      },
+    },
     prism: {
-      theme: lightCodeTheme,
-      darkTheme: darkCodeTheme,
+      theme: flowTheme,
+      darkTheme: flowTheme,
       additionalLanguages: ["php", "shell-session", "hcl"],
     },
   } satisfies ThemeConfig,

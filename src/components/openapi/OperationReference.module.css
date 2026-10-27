@@ -1,33 +1,70 @@
+/* Accordion heading with its badges directly after the title. One element,
+   so that the accordion header (which spaces out its children) keeps them
+   together. */
+.accordionTitle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--size-rem--s);
+}
+
+/* Format/description and the schema tabs of a response, spaced like the
+   blocks of a Flow section */
+.responseBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--section--spacing);
+}
+
 .parameterList {
   padding: 0;
   list-style-type: none;
-  font-size: 14px;
+  font-size: var(--font-size-text--s);
 }
 
 .parameterList li {
-  border-left: 1px solid var(--ifm-color-gray-300);
+  border-left: var(--border-width--100) var(--border-style--default)
+    var(--separator--color);
   position: relative;
-  padding-left: 1rem;
-  padding-bottom: 0.5rem;
+  padding-left: var(--size-rem--m);
+  padding-bottom: var(--size-rem--s);
   margin-top: 0 !important;
   overflow: auto;
 }
 
+/* Same spacing between all rows, also where a nested list starts or ends
+   (otherwise the badges of a parent and its first child touch, and the
+   paddings of the last child and its parent add up) */
+.parameterList li > ul {
+  margin-top: var(--size-rem--s);
+  margin-bottom: 0;
+}
+
+.parameterList li > ul > li:last-child {
+  padding-bottom: 0;
+}
+
+.parameterList li > ul + * {
+  margin-top: var(--size-rem--s);
+}
+
+/* Connector from the vertical line to the row; ends just before the name */
 .parameterList li:before {
   content: "";
   position: absolute;
   left: 0;
-  top: 5px;
-  border-bottom: thin solid var(--ifm-color-gray-300);
+  top: var(--size-px--xs);
+  border-bottom: var(--border-width--100) var(--border-style--default)
+    var(--separator--color);
   display: inline-block;
-  height: 0.5rem;
-  width: 0.7rem;
+  height: var(--size-rem--s);
+  width: calc(var(--size-rem--m) - var(--size-rem--xs));
   vertical-align: top;
 }
 
 .parameterExample {
-  color: var(--ifm-color-gray-600);
+  color: var(--neutral--color--800);
   text-transform: uppercase;
-  font-weight: bold;
+  font-weight: var(--font-weight--bold);
   vertical-align: baseline;
 }

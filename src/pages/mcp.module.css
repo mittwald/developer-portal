@@ -1,20 +1,25 @@
-.urlField {
-  width: auto;
-  margin: 1rem;
+.urlSection {
+  padding: var(--size-rem--xl) var(--size-rem--m);
+  background: var(--neutral--color--200);
+  text-align: center;
 }
 
-.urlField code {
-  font-size: 150%;
+/* On small screens the container alone pads the content, flush with the
+   header and the docs */
+@media screen and (max-width: 996px) {
+  .urlSection {
+    padding-inline: 0;
+  }
 }
 
-.urlContainer {
-  width: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+/* The code block keeps its own alignment and is spaced by the flex gap */
+.url {
+  max-width: 100%;
+  margin-bottom: 0;
+  text-align: start;
 }
 
-.urlContainer p:first-of-type {
-  margin-bottom: 0.5rem;
-  font-size: 1.1rem;
+/* Room for the copy button, so that it does not cover the end of the URL */
+.url :global(pre code) {
+  padding-inline-end: calc(var(--code-block--padding) + var(--size-rem--xl));
 }

@@ -1,0 +1,31 @@
+.markLink {
+  display: none;
+  color: var(--text--color--default);
+}
+
+.markLink:hover {
+  color: var(--text--color--default);
+}
+
+/* As large as the header buttons; the glyph starts 2/24 into the box, so it
+   is pulled to the left to sit flush with the content */
+.mark {
+  display: block;
+  width: calc(var(--size-rem--xl) + var(--size-rem--s));
+  height: calc(var(--size-rem--xl) + var(--size-rem--s));
+  margin-inline-start: calc(
+    (var(--size-rem--xl) + var(--size-rem--s)) * -2 / 24
+  );
+}
+
+/* Flow's small-screen breakpoint: the header fits into one row only with the
+   mark instead of the logo and title */
+@media (max-width: 550px) {
+  :global(.navbar__brand) {
+    display: none;
+  }
+
+  .markLink {
+    display: block;
+  }
+}

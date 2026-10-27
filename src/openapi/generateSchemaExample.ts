@@ -3,7 +3,7 @@ import { OpenAPIV3 } from "openapi-types";
 export function generateSchemaExample(schema: OpenAPIV3.SchemaObject): any {
   if (schema.example) {
     if (schema.format === "binary") {
-      return '[Binary Example]';
+      return "[Binary Example]";
     }
     return schema.example;
   }
@@ -24,7 +24,10 @@ export function generateSchemaExample(schema: OpenAPIV3.SchemaObject): any {
         );
       });
     }
-    if (schema.additionalProperties) {
+    if (
+      schema.additionalProperties &&
+      typeof schema.additionalProperties === "object"
+    ) {
       let exampleKey = "string";
 
       if ("x-example-key" in schema) {
@@ -46,7 +49,7 @@ export function generateSchemaExample(schema: OpenAPIV3.SchemaObject): any {
   // as the examples are (re-)generated on the client side!
   if (schema.type === "string") {
     if (schema.format === "date-time") {
-      return '1985-10-26T01:21:00.000Z';
+      return "1985-10-26T01:21:00.000Z";
     } else if (schema.format === "email" || schema.format === "idn-email") {
       return "email@mittwald.example";
     } else if (schema.format === "uuid") {

@@ -1,0 +1,154 @@
+/* Flow resets the display and spacing of its top-level components; restore
+   the Markdown block layout and rhythm */
+
+.heading {
+  display: block;
+  margin-top: var(--size-rem--l);
+  margin-bottom: var(--size-rem--s);
+}
+
+.heading:first-child {
+  margin-top: 0;
+}
+
+/* A link is one piece of text: no bold parts and no inline code inside */
+.link strong,
+.link b,
+.link :global(.flow--inline-code) {
+  all: unset;
+}
+
+.list,
+.table,
+.blockquote {
+  display: block;
+  margin-bottom: var(--ifm-leading);
+}
+
+/* No trailing space at the end of a container (admonition, list item, …) */
+.list:last-child,
+.table:last-child,
+.blockquote:last-child {
+  margin-bottom: 0;
+}
+
+/* Flow hides empty column headers, which shifts the following headers by a
+   column. Markdown tables leave the top left header empty when the first
+   column holds row labels, so it stays a cell here. */
+.table :global(.flow--table .flow--table--column:empty) {
+  display: table-cell;
+}
+
+/* List item starting with an emoji icon: icon and text side by side */
+.iconListItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--size-rem--s);
+}
+
+/* Aligned to the first line of text */
+.listItemIcon {
+  display: inline-flex;
+  flex-shrink: 0;
+  height: calc(1em * var(--line-height));
+  align-items: center;
+}
+
+/* In a list of icon items, the icons replace the bullets */
+ul.iconList {
+  list-style: none;
+  padding-inline-start: 0;
+}
+
+/* Flow styles the blockquote (border and padding at the start); Infima's own
+   blockquote styles are reset */
+.blockquote blockquote {
+  margin: 0;
+  padding-block: 0;
+  padding-inline-end: 0;
+  color: inherit;
+  font-size: inherit;
+  box-shadow: none;
+}
+
+/* Lists nested in list items keep their tighter spacing */
+li > .list {
+  margin-bottom: 0;
+}
+
+/* Keep native list markers while spacing block children like a Flow section */
+.list .listItem > p {
+  margin-block: 0;
+}
+
+/* Only block children are spaced; inline content (links, code, emphasis)
+   stays in the text flow */
+.list .listItem > * + :is(p, ul, ol, div, pre, table, blockquote, section) {
+  margin-top: var(--section--spacing);
+}
+
+/* Within a Flow section the gap spaces the blocks, and Flow spaces the
+   sub-headings; drop the Markdown margins of direct children */
+.section > * {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* Footnotes: a section of their own (with separator) in small text */
+.footnotes :global(.flow--text) {
+  font-size: var(--font-size-text--s);
+}
+
+/* Footnotes are rendered as loose list items with a paragraph each; the
+   section gap already spaces them from the heading */
+.footnotes li > p {
+  margin-top: 0;
+}
+
+.footnoteBackref {
+  margin-left: var(--size-rem--xs);
+  vertical-align: middle;
+}
+
+/* Breaking change badge at the start of a list item, in the line of its text
+   (see breakingBadge.tsx); on the text's baseline the badge sits slightly
+   above the text's center, so it is moved down a little */
+.breakingBadge {
+  display: inline-flex;
+  vertical-align: -0.125em;
+}
+
+/* Status icon replacing an emoji at the start of a table cell's text */
+.leadingStatusIcon {
+  display: inline-flex;
+  vertical-align: text-bottom;
+}
+
+/* Star icons replacing a "⭐⭐" rating in the text, kept together */
+.starRating {
+  display: inline-flex;
+  vertical-align: text-bottom;
+  white-space: nowrap;
+}
+
+/* The actions stay next to the title (also when it wraps), aligned with its
+   first line */
+.titleHeader {
+  flex-wrap: nowrap;
+  align-items: flex-start;
+}
+
+.titleHeader > :first-child {
+  min-width: 0;
+}
+
+/* Title with the page details (e.g. tags) close below it */
+.titleWithDetails {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-rem--s);
+}
+
+div.titleWithDetails > * {
+  margin: 0;
+}

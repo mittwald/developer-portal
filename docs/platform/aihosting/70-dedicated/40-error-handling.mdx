@@ -11,14 +11,14 @@ This page covers the HTTP error codes your application may receive, how to handl
 
 ## HTTP error codes {#error-codes}
 
-| Code | Meaning | What to do |
-|------|---------|------------|
-| `400` | Bad request — input too long or malformed | Reduce input length or fix request format (see context limit below) |
-| `401` | Invalid or missing API key | Check `Authorization: Bearer YOUR_API_KEY` header |
-| `503` | Service temporarily unavailable — endpoint overloaded or restarting | Retry with exponential backoff |
-| `500` | Internal server error | Retry with backoff; contact support if it persists |
-| `502` | Bad gateway | Retry with backoff |
-| `504` | Gateway timeout — request took too long | Reduce input size, lower concurrency, or retry |
+| Code  | Meaning                                                             | What to do                                                          |
+| ----- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `400` | Bad request — input too long or malformed                           | Reduce input length or fix request format (see context limit below) |
+| `401` | Invalid or missing API key                                          | Check `Authorization: Bearer YOUR_API_KEY` header                   |
+| `503` | Service temporarily unavailable — endpoint overloaded or restarting | Retry with exponential backoff                                      |
+| `500` | Internal server error                                               | Retry with backoff; contact support if it persists                  |
+| `502` | Bad gateway                                                         | Retry with backoff                                                  |
+| `504` | Gateway timeout — request took too long                             | Reduce input size, lower concurrency, or retry                      |
 
 :::note 401 response format
 The `401` response body is `{"error": "Unauthorized"}`. This is simpler than the standard OpenAI error object format and does not include `type`, `param`, or `code` fields. Check your error handling code accordingly.

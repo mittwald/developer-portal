@@ -1,7 +1,7 @@
 import { OpenAPIV3 } from "openapi-types";
 import OperationPath from "@site/src/components/openapi/OperationPath";
-import Markdown from "react-markdown";
-import { Content } from "@mittwald/flow-react-components";
+import Description from "@site/src/components/openapi/Description";
+import { AccentBox, Content } from "@mittwald/flow-react-components";
 import { LabeledValue } from "@mittwald/flow-react-components";
 import { Label } from "@mittwald/flow-react-components";
 import { ColumnLayout } from "@mittwald/flow-react-components";
@@ -13,6 +13,7 @@ import {
 import { Heading } from "@mittwald/flow-react-components";
 import { Text } from "@mittwald/flow-react-components";
 import { Button } from "@mittwald/flow-react-components";
+import { Separator } from "@mittwald/flow-react-components";
 import styles from "./OperationMetadata.module.css";
 import Translate from "@docusaurus/Translate";
 import Admonition from "@theme/Admonition";
@@ -45,13 +46,22 @@ function OperationIdHelp() {
   );
 }
 
-function DeprecationNotice() {
+/**
+ * Warning for deprecated operations; a description that explains the
+ * deprecation itself (and usually names the alternative) replaces the
+ * generic text
+ */
+function DeprecationNotice({ description }: { description?: string }) {
   return (
-    <Admonition type="warning">
-      <Translate id="openapi.operation.metadata.deprecationnotice.text">
-        This operation is deprecated and should not be used anymore. Please
-        refer to this operation's description for alternatives.
-      </Translate>
+    <Admonition type="warning" title="Deprecated">
+      {description ? (
+        <Description>{description}</Description>
+      ) : (
+        <Translate id="openapi.operation.metadata.deprecationnotice.text">
+          This operation is deprecated and should not be used anymore. Please
+          refer to this operation's description for alternatives.
+        </Translate>
+      )}
     </Admonition>
   );
 }
@@ -74,19 +84,20 @@ function OperationPathHeader({
   }
 
   return (
-    <pre className={styles.meta}>
-      <HTTPMethod method={method} />
-      <span>
+    <AccentBox backgroundColor="neutral" className={styles.meta}>
+      <span className={styles.route}>
+        <HTTPMethod method={method} />
         <OperationPath path={path} />
       </span>
-      <CopyButton
-        text={baseURL + pathWithoutBase}
-        size="m"
-        variant="plain"
-        style={{ marginTop: -8, marginBottom: -8 }}
-      />
-      <OperationPlayground path={path} method={method} spec={spec} />
-    </pre>
+      <span className={styles.actions}>
+        <CopyButton
+          text={baseURL + pathWithoutBase}
+          variant="plain"
+          color="dark"
+        />
+        <OperationPlayground path={path} method={method} spec={spec} />
+      </span>
+    </AccentBox>
   );
 }
 
@@ -103,6 +114,10 @@ export function OperationMetadata({
   baseURL: string;
   withDescription?: boolean;
 }) {
+  // A description about the deprecation is shown in the warning only
+  const descriptionIsNotice =
+    isDeprecated(spec) && /deprecat/i.test(spec.description ?? "");
+
   return (
     <>
       <OperationPathHeader
@@ -112,32 +127,47 @@ export function OperationMetadata({
         spec={spec}
       />
 
-      {isDeprecated(spec) && <DeprecationNotice />}
+      {isDeprecated(spec) && (
+        <DeprecationNotice
+          description={descriptionIsNotice ? spec.description : undefined}
+        />
+      )}
 
       <ColumnLayout m={[1, 1, 2]}>
         <LabeledValue>
-          <Label>API version</Label>
+          <Label>
+            <Translate id="openapi.metadata.apiversion">API version</Translate>
+          </Label>
           <Content>
             {path.split("/").filter((p) => p.startsWith("v"))[0]}
           </Content>
         </LabeledValue>
         <LabeledValue>
-          <Label>Request method</Label>
+          <Label>
+            <Translate id="openapi.operation.metadata.requestmethod">
+              Request method
+            </Translate>
+          </Label>
           <Content>{method.toUpperCase()}</Content>
         </LabeledValue>
-        <LabeledValue className={styles.operationIdValue}>
+        <LabeledValue>
           <Label className={styles.labelWithHelp}>
-            Operation ID <OperationIdHelp />
+            <Translate id="openapi.operation.metadata.operationid">
+              Operation ID
+            </Translate>{" "}
+            <OperationIdHelp />
           </Label>
-          <Content>
-            <div>{spec.operationId}</div>
-            <CopyButton text={spec.operationId} size="s" variant="plain" />
-          </Content>
+          <Content>{spec.operationId}</Content>
+          {/* Placed next to the value by the labeled value */}
+          <CopyButton text={spec.operationId} />
         </LabeledValue>
       </ColumnLayout>
-      <hr />
-      {spec.description && withDescription ? (
-        <Markdown>{spec.description}</Markdown>
+      {spec.description && withDescription && !descriptionIsNotice ? (
+        <>
+          {/* Without a description, the next section's separator follows */}
+          <Separator />
+          <Description>{spec.description}</Description>
+        </>
       ) : null}
     </>
   );

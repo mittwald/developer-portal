@@ -1,54 +1,59 @@
 import React, { FC } from "react";
 import Translate from "@docusaurus/Translate";
-import { Alert, Content, Heading } from "@mittwald/flow-react-components";
-import clsx from "clsx";
+import MDXComponents from "@theme/MDXComponents";
+import {
+  Alert,
+  Content,
+  Heading,
+  Icon,
+  Text,
+} from "@mittwald/flow-react-components";
 import styles from "@site/src/components/TerraformResourceHint.module.css";
 import { IconBrandTerraform } from "@tabler/icons-react";
+
+// Rendered like any other Markdown link
+const MDXLink = MDXComponents.a;
 
 interface TerraformResourceHintProps {
   resource: string;
   description?: string;
 }
 
+/** Hint linking to a Terraform resource, styled like the OperationHint */
 const TerraformResourceHint: FC<TerraformResourceHintProps> = ({
   description,
   resource,
 }) => {
-  const heading = <Translate id="components.TerraformResourceHint.text" />;
   const baseURL =
     "https://registry.terraform.io/providers/mittwald/mittwald/latest/docs";
   const url = `${baseURL}/resources/${resource}`;
-  const cls = clsx("card", "margin-bottom--xs", styles.card, styles.compact);
 
   return (
     <Alert status="info">
-      <Heading>{heading}:</Heading>
-      <Content className={styles.cardRow}>
-        <div className={cls}>
-          <div className={styles.header}>
-            <div className={styles.logo}>
+      <Heading>Terraform</Heading>
+      <Content>
+        <Text>
+          <Translate id="components.TerraformResourceHint.text" />:
+        </Text>
+        <ul className={styles.links}>
+          <li className={styles.item}>
+            <Icon className={styles.icon}>
               <IconBrandTerraform />
-            </div>
-            <a href={url} className={styles.headerText}>
-              <strong>
-                Terraform Resource: <code>mittwald_{resource}</code>
-              </strong>
-              {description && <div>{description}</div>}
-            </a>
-          </div>
-        </div>
-        <div className={cls}>
-          <div className={styles.header}>
-            <div className={styles.logo}>
+            </Icon>
+            <span>
+              <MDXLink href={url}>mittwald_{resource}</MDXLink>
+              {description && <> – {description}</>}
+            </span>
+          </li>
+          <li className={styles.item}>
+            <Icon className={styles.icon}>
               <IconBrandTerraform />
-            </div>
-            <a href={baseURL} className={styles.headerText}>
-              <strong>
-                <Translate id="components.TerraformResourceHint.provider" />
-              </strong>
-            </a>
-          </div>
-        </div>
+            </Icon>
+            <MDXLink href={baseURL}>
+              <Translate id="components.TerraformResourceHint.provider" />
+            </MDXLink>
+          </li>
+        </ul>
       </Content>
     </Alert>
   );

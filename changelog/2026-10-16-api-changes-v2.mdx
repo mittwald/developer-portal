@@ -1,0 +1,641 @@
+---
+title: Breaking (!) API changes for v2 API, October 9 to October 16
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Database
+  - App
+  - AI hosting
+  - Project
+  - Domain
+  - File
+  - Notification
+  - SSH/SFTP User
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week's changelog for the mittwald API includes the removal of an API path without deprecation, the addition of new optional request parameters and properties across various endpoints, and the introduction of new enum values in response properties, enhancing the overall functionality and flexibility of the API.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The API path `/v2/legacy-tariff-change` has been removed without deprecation for the `POST` operation `relocation-create-legacy-tariff-change`. This is a breaking change.
+- The new enum value 'terminating' has been added to the 'status' response property for the `GET` operations `database-get-mysql-database` (`/v2/mysql-databases/{mysqlDatabaseId}`) and `database-get-redis-database` (`/v2/redis-databases/{redisDatabaseId}`) with a response status of '200'.
+- The new enum value 'terminating' has also been added to the '/items/status' response property for the `GET` operations `database-list-mysql-databases` (`/v2/projects/{projectId}/mysql-databases`) and `database-list-redis-databases` (`/v2/projects/{projectId}/redis-databases`) with a response status of '200'.
+- The `GET` operation `app-list-appinstallations-for-user` (`/v2/app-installations`) has received several updates: the new optional request parameters 'autoUpdatesActivated' and 'autoUpdatesSupported' have been added, along with the optional response property '/items/lastAutoUpdateFailedAt'.
+- The `GET` operation `app-get-appinstallation` (`/v2/app-installations/{appInstallationId}`) has had the optional response property 'lastAutoUpdateFailedAt' added.
+- The `GET` operation `app-list-appversions` (`/v2/apps/{appId}/versions`) has had the optional response property '/items/updateConstraint' added.
+- The `GET` operation `app-get-appversion` (`/v2/apps/{appId}/versions/{appVersionId}`) has had the optional response property 'updateConstraint' added.
+- The `GET` operation `app-list-update-candidates-for-appversion` (`/v2/apps/{appId}/versions/{baseAppVersionId}/update-candidates`) has had the optional response property '/items/updateConstraint' added.
+- The `GET` operation `ai-hosting-customer-get-usage` (`/v2/customers/{customerId}/ai-hosting`) has had the optional response property 'suspended' added.
+- The `GET` operation `ai-hosting-customer-get-plans` (`/v2/customers/{customerId}/ai-hostings`) has had the optional response property 'plans/items/suspended' added.
+- The `GET` operation `ai-hosting-customer-get-plan` (`/v2/customers/{customerId}/ai-hostings/{planId}`) has had the optional response property 'suspended' added.
+- The `GET` operation `project-list-customer-projects` (`/v2/customers/{customerId}/projects`) has had the optional response property '/items/primaryIpAddresses' added.
+- The `POST` operation `domain-check-domain-transferability` (`/v2/domain-transferable`) has had the required property 'reasons/premiumDomain' added to the response with a status of '200'.
+- The `POST` operation `file-create-file` (`/v2/files`) has had a non-success response with the status '413' added.
+- The `POST` operation `database-copy-mysql-database` (`/v2/mysql-databases/{mysqlDatabaseId}/actions/copy`) has had the new optional request property 'user/description' added.
+- The `GET` operation `notifications-get-notification-settings` (`/v2/notification-settings`) has been added as a new endpoint.
+- The `PATCH` operation `notifications-adjust-notification-message-type-settings` (`/v2/notification-settings/{messageType}`) has been added as a new endpoint.
+- The `GET` operation `notifications-list-notifications` (`/v2/notifications`) has had the new optional request parameters 'order' and 'sort' added.
+- The `PUT` operation `notifications-read-notification` has been removed and replaced with `notifications-update-notification-status` (`/v2/notifications/{notificationId}/status`).
+- The `GET` operation `project-list-projects` (`/v2/projects`) has had the optional response property '/items/primaryIpAddresses' added.
+- The `GET` operation `project-get-project` (`/v2/projects/{projectId}`) has had the optional response property 'primaryIpAddresses' added.
+- The `GET` operation `project-list-project-activities` (`/v2/projects/{projectId}/activities`) has had several schemas added to the '/items/action' response property 'anyOf' list for the response status '200'.
+- The `GET` operation `ai-hosting-project-get-usage` (`/v2/projects/{projectId}/ai-hosting`) has had the optional response property 'suspended' added.
+- The `GET` operation `ai-hosting-project-get-plans` (`/v2/projects/{projectId}/ai-hostings`) has had the optional response property 'plans/items/suspended' added.
+- The `GET` operation `ai-hosting-project-get-plan` (`/v2/projects/{projectId}/ai-hostings/{planId}`) has had the optional response property 'suspended' added.
+- The `GET` operation `app-list-appinstallations` (`/v2/projects/{projectId}/app-installations`) has had the new optional request parameters 'autoUpdatesActivated' and 'autoUpdatesSupported' added, along with the optional response property '/items/lastAutoUpdateFailedAt'.
+- The `POST` operation `database-create-mysql-database` (`/v2/projects/{projectId}/mysql-databases`) has had the new optional request property 'user/description' added.
+- The `GET` operation `sftp-user-list-sftp-users` (`/v2/projects/{projectId}/sftp-users`) has had the optional response property '/items/detailedPublicKeys' added.
+- The `POST` operation `sftp-user-create-sftp-user` (`/v2/projects/{projectId}/sftp-users`) has had the optional response property 'detailedPublicKeys' added with a status of '201'.
+- The `GET` operation `ssh-user-list-ssh-users` (`/v2/projects/{projectId}/ssh-users`) has had the optional response property '/items/detailedPublicKeys' added.
+- The `POST` operation `ssh-user-create-ssh-user` (`/v2/projects/{projectId}/ssh-users`) has had the optional response property 'detailedPublicKeys' added with a status of '201'.
+- The `GET` operation `project-list-servers` (`/v2/servers`) has had the optional response property '/items/primaryIpAddresses' added.
+- The `GET` operation `project-get-server` (`/v2/servers/{serverId}`) has had the optional response property 'primaryIpAddresses' added.
+- The `GET` operation `sftp-user-get-sftp-user` (`/v2/sftp-users/{sftpUserId}`) has had the optional response property 'detailedPublicKeys' added.
+- The `GET` operation `ssh-user-get-ssh-user` (`/v2/ssh-users/{sshUserId}`) has had the optional response property 'detailedPublicKeys' added.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "relocation-create-legacy-tariff-change"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+
+For details, refer to the <OperationLink operation="relocation-create-legacy-tariff-change" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a MySQL database"
+
+
+- added the new 'terminating' enum value to the 'status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="database-get-mysql-database" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List MySQL databases belonging to a Project"
+
+
+- added the new 'terminating' enum value to the '/items/status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="database-list-mysql-databases" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Redis databases belonging to a Project"
+
+
+- added the new 'terminating' enum value to the '/items/status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="database-list-redis-databases" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Redis database"
+
+
+- added the new 'terminating' enum value to the 'status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="database-get-redis-database" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app installations that a user has access to"
+
+
+- added the new optional 'query' request parameter 'autoUpdatesActivated'
+
+- added the new optional 'query' request parameter 'autoUpdatesSupported'
+
+- added the optional property '/items/lastAutoUpdateFailedAt' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations-for-user" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an app installation"
+
+
+- added the optional property 'lastAutoUpdateFailedAt' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-get-appinstallation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app versions belonging to an app"
+
+
+- added the optional property '/items/updateConstraint' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-list-appversions" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an app version"
+
+
+- added the optional property 'updateConstraint' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-get-appversion" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List update candidates belonging to an app version"
+
+
+- added the optional property '/items/updateConstraint' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-list-update-candidates-for-appversion" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get ai hosting plan and usages of a customer"
+
+
+- added the optional property 'suspended' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ai-hosting-customer-get-usage" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all ai hosting plans of a customer"
+
+
+- added the optional property 'plans/items/suspended' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ai-hosting-customer-get-plans" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get ai hosting plan and usages of a customer by planId"
+
+
+- added the optional property 'suspended' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ai-hosting-customer-get-plan" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Projects belonging to a Customer"
+
+
+- added the optional property '/items/primaryIpAddresses' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-list-customer-projects" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Check if a Domain is available to transfer"
+
+
+- added the required property 'reasons/premiumDomain' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="domain-check-domain-transferability" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a File"
+
+
+- added the non-success response with the status '413'
+
+
+For details, refer to the <OperationLink operation="file-create-file" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Copy a MySQL database with a MySQL user"
+
+
+- added the new optional request property 'user/description'
+
+
+For details, refer to the <OperationLink operation="database-copy-mysql-database" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get notification settings for a user"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="notifications-get-notification-settings" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Adjust notification settings for message type"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="notifications-adjust-notification-message-type-settings" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List all unread notifications"
+
+
+- added the new optional 'query' request parameter 'order'
+
+- added the new optional 'query' request parameter 'sort'
+
+
+For details, refer to the <OperationLink operation="notifications-list-notifications" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "notifications-read-notification"
+
+
+- api operation id 'notifications-read-notification' removed and replaced with 'notifications-update-notification-status'
+
+
+For details, refer to the <OperationLink operation="notifications-read-notification" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Projects belonging to the executing user"
+
+
+- added the optional property '/items/primaryIpAddresses' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-list-projects" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Project"
+
+
+- added the optional property 'primaryIpAddresses' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-get-project" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the activities of a project"
+
+
+- added '#/components/schemas/de.mittwald.v1.activitylog.MembershipInviteCreated, #/components/schemas/de.mittwald.v1.activitylog.MembershipInviteStatusChanged, #/components/schemas/de.mittwald.v1.activitylog.MembershipMemberAdded, #/components/schemas/de.mittwald.v1.activitylog.MembershipMemberRoleUpdated, #/components/schemas/de.mittwald.v1.activitylog.MembershipMemberExpiryUpdated, #/components/schemas/de.mittwald.v1.activitylog.MembershipMemberRemoved, #/components/schemas/de.mittwald.v1.activitylog.SshUserCreated, #/components/schemas/de.mittwald.v1.activitylog.SftpUserCreated, #/components/schemas/de.mittwald.v1.activitylog.SshUserDescriptionUpdated, #/components/schemas/de.mittwald.v1.activitylog.SshUserPasswordUpdated, #/components/schemas/de.mittwald.v1.activitylog.SshUserPublicKeysUpdated, #/components/schemas/de.mittwald.v1.activitylog.SshUserActiveUpdated, #/components/schemas/de.mittwald.v1.activitylog.SshUserExpiryUpdated, #/components/schemas/de.mittwald.v1.activitylog.SftpUserAccessLevelUpdated, #/components/schemas/de.mittwald.v1.activitylog.SftpUserDirectoriesUpdated, #/components/schemas/de.mittwald.v1.activitylog.SshUserDeleted' to the '/items/action' response property 'anyOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="project-list-project-activities" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get ai hosting plan and usages of a project"
+
+
+- added the optional property 'suspended' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ai-hosting-project-get-usage" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all ai hosting plans and usages of a project"
+
+
+- added the optional property 'plans/items/suspended' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ai-hosting-project-get-plans" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get ai hosting plan and usages of a project by planId"
+
+
+- added the optional property 'suspended' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ai-hosting-project-get-plan" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List app installations belonging to a Project"
+
+
+- added the new optional 'query' request parameter 'autoUpdatesActivated'
+
+- added the new optional 'query' request parameter 'autoUpdatesSupported'
+
+- added the optional property '/items/lastAutoUpdateFailedAt' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-list-appinstallations" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a MySQL database with a MySQL user"
+
+
+- added the new optional request property 'user/description'
+
+
+For details, refer to the <OperationLink operation="database-create-mysql-database" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all SFTP users for a Project"
+
+
+- added the optional property '/items/detailedPublicKeys' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="sftp-user-list-sftp-users" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create an SFTP user for a Project"
+
+
+- added the optional property 'detailedPublicKeys' to the response with the '201' status
+
+
+For details, refer to the <OperationLink operation="sftp-user-create-sftp-user" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all SSH users for a Project"
+
+
+- added the optional property '/items/detailedPublicKeys' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ssh-user-list-ssh-users" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create an SSH user for a Project"
+
+
+- added the optional property 'detailedPublicKeys' to the response with the '201' status
+
+
+For details, refer to the <OperationLink operation="ssh-user-create-ssh-user" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Servers belonging to the executing user"
+
+
+- added the optional property '/items/primaryIpAddresses' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-list-servers" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Server"
+
+
+- added the optional property 'primaryIpAddresses' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-get-server" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an SFTP user"
+
+
+- added the optional property 'detailedPublicKeys' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="sftp-user-get-sftp-user" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an SSH user"
+
+
+- added the optional property 'detailedPublicKeys' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ssh-user-get-ssh-user" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK v2.2.14 Release Summary
+
+The mittwald PHP SDK has released version 2.2.14, which includes several new features, deprecations, and updates. This release focuses on improving error handling, enhancing status tracking, and implementing important security updates.
+
+#### Features
+- **Improved Error Handling**: Introduced support for handling HTTP 413 (Request Entity Too Large) responses during file operations with the new `CreateFileRequestEntityTooLargeResponse` class.
+- **Status Tracking for Plans**: Added a `suspended` boolean field to `CustomerPlan` and `ProjectPlan` schemas to track suspension status, including validation and JSON serialization/deserialization support.
+
+#### Deprecations
+- **AI Hosting API Key Exposure**: The `key` field in the `AIHosting/Key` schema is now deprecated. Future responses will not expose the secret API key, and clients should prepare to transition away from using this field.
+
+#### Updates
+- Enhanced the `FileClientImpl` to route 413 status codes to the new error response handler.
+- Improved validation and serialization logic for AI Hosting schema models.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.2.14).
+
+### mittwald PHP SDK v2.2.13 Release Summary
+
+The mittwald PHP SDK has been updated to version 2.2.13. This release introduces new features and updates to enhance domain transferability checks and network visibility for servers and projects. 
+
+#### Features
+- **Domain Transferability Premium Flag**: A new `premiumDomain` boolean field has been added to domain transfer checks. This flag indicates when a registry charges a premium price for transferring a domain. Note that premium domains are not currently supported for transfer operations.
+- **Primary IP Address Tracking**: The `primaryIpAddresses` attribute has been added to the `Project`, `ProjectListItem`, and `Server` models. This feature provides access to the primary public IPv4 and IPv6 addresses, facilitating easier network configuration.
+
+#### API & Client Updates
+- The `CheckDomainTransferability` response classes have been updated to include logic for the `premiumDomain` property.
+- A new `PrimaryIpAddresses` schema class has been introduced, featuring nullable `v4` and `v6` string properties with JSON schema validation.
+- The `primaryIpAddresses` feature has been integrated into relevant models, with corresponding methods for manipulation and serialization.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.2.13).
+
+### mittwald PHP SDK Release v2.2.12
+
+The latest release of the mittwald PHP SDK, [v2.2.12](https://github.com/mittwald/api-client-php/releases/tag/v2.2.12), introduces enhancements to the activity log schema, focusing on comprehensive tracking for SSH and SFTP user operations. This update includes new event types to capture the lifecycle of SSH/SFTP users, such as creation, modification, and deletion, along with detailed `before`/`after` state snapshots for audit purposes.
+
+#### New Activity Log Events
+
+The release supports the following new SSH/SFTP user activity log events:
+
+- **`SshUserCreated`**: Logs the creation of new SSH users.
+- **`SftpUserCreated`**: Logs the creation of new SFTP users.
+- **`SshUserDeleted`**: Tracks the deletion or expiration of SSH/SFTP users.
+- **`SshUserActiveUpdated`**: Monitors changes to the active/inactive status of users.
+- **`SshUserDescriptionUpdated`**: Captures updates to user descriptions.
+- **`SshUserPasswordUpdated`**: Logs password configuration changes.
+- **`SshUserPublicKeysUpdated`**: Tracks updates to user public keys.
+- **`SshUserExpiryUpdated`**: Monitors changes to user expiration dates.
+- **`SftpUserAccessLevelUpdated`**: Tracks modifications to SFTP user access levels (e.g., `read` vs `full`).
+- **`SftpUserDirectoriesUpdated`**: Records updates to SFTP user directory mappings.
+
+These updates are seamlessly integrated with the existing `LogEntry` structure to enhance detailed activity monitoring.
+
+### mittwald PHP SDK v2.2.11 Release Summary
+
+The mittwald PHP SDK has released version 2.2.11, introducing several enhancements and improvements. This release focuses on expanding the notification API and adding comprehensive support for activity log membership events. Key updates include:
+
+- **Notification API Enhancements**: 
+  - New boolean filters `autoUpdatesActivated` and `autoUpdatesSupported` for app installation listings.
+  - Added methods for updating and retrieving user notification settings.
+  - Enhanced notification listing with customizable sorting options.
+  - Unified notification status management with `notificationsUpdateNotificationStatus`.
+
+- **Activity Log Membership Events**:
+  - Added schema support for tracking membership lifecycle events such as invites, role updates, and member removals.
+  - Standardized event logging with `Changes` and `Parameters` objects for detailed state comparisons.
+
+- **Improvements & Refactoring**:
+  - Support for immutable builder patterns in client classes.
+  - Updated request and response payloads to align with the latest API specifications.
+  - Removal of deprecated notification read methods to improve type safety.
+
+- **Migration Notes**:
+  - Transition to `notificationsUpdateNotificationStatus` for managing notification statuses.
+  - Utilize new methods for filtering app installations by auto-update preferences.
+  - Adjust notification listing requests to accommodate new sorting defaults and options.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.2.11).
+
+### mittwald PHP SDK v2.2.10 Release
+
+The latest release of the mittwald PHP SDK, version 2.2.10, introduces significant changes and new features. This release removes the legacy tariff change relocation functionality from the Relocation client and introduces a new `ScopedToken` schema to support restricted authentication tokens within the Signup module.
+
+#### Breaking Changes
+- **Removed Legacy Tariff Change Endpoint**: The `createLegacyTariffChange` method and all related request/response classes have been removed from `RelocationClient` and `RelocationClientImpl`.
+
+#### New Features
+- **Scoped Token Support**: 
+  - Introduces the `ScopedToken` schema for interacting with scoped authentication tokens.
+  - Supports granular permissions with scope roles.
+  - Includes lifecycle tracking with automatic validation for `createdAt` and `createdBy` fields.
+  - Offers flexible expiration options and project-scoped token binding.
+  - Provides immutable builders with a fluent API for constructing and validating token instances.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.2.10).
+
+### mittwald JavaScript SDK Release 4.501.0
+
+The mittwald JavaScript SDK has been updated to version 4.501.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.501.0).
+
+### mittwald JavaScript SDK Release 4.500.2
+
+The mittwald JavaScript SDK version 4.500.2 has been released on October 16, 2026. This update primarily focuses on bug fixes, specifically addressing security issues by bumping runtime dependencies to their latest minor or patch versions. Notable updates include security fixes for dependencies such as `axios` and `path-to-regexp`. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.500.2).
+
+### mittwald JavaScript SDK Release 4.500.1
+
+The mittwald JavaScript SDK version 4.500.1 has been released. This update includes a bug fix in the generator, where `declare namespace` is now emitted instead of `declare module`. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.500.1).
+
+### mittwald JavaScript SDK Release 4.500.0
+
+The mittwald JavaScript SDK has been updated to version 4.500.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.500.0](https://github.com/mittwald/api-client-js/releases/tag/4.500.0).
+
+### mittwald JavaScript SDK Release 4.499.1
+
+The mittwald JavaScript SDK has been updated to version 4.499.1. This release includes a version bump for the package root. For more details, you can view the release on GitHub: [mittwald/api-client-js 4.499.1](https://github.com/mittwald/api-client-js/releases/tag/4.499.1).
+
+### mittwald JavaScript SDK Release 4.499.0
+
+The mittwald JavaScript SDK has been updated to version 4.499.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details on the changes and improvements, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.499.0).
+
+### mittwald JavaScript SDK Release 4.498.1
+
+The mittwald JavaScript SDK has been updated to version 4.498.1. This release includes a version bump for the package root. For more details, you can view the release on GitHub: [mittwald/api-client-js 4.498.1](https://github.com/mittwald/api-client-js/releases/tag/4.498.1).
+
+### mittwald JavaScript SDK Release 4.498.0
+
+The mittwald JavaScript SDK has been updated to version 4.498.0. This release includes a significant update to dependencies, with major version bumps across the board. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.498.0](https://github.com/mittwald/api-client-js/releases/tag/4.498.0).
+
+### mittwald JavaScript SDK Release 4.497.1
+
+The mittwald JavaScript SDK has been updated to version 4.497.1. This release primarily involves a version bump for the package root, with no additional changes or new features introduced. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.497.1).
+
+### mittwald JavaScript SDK Release 4.497.0
+
+The mittwald JavaScript SDK has been updated to version 4.497.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.497.0).
+
+### mittwald JavaScript SDK Release 4.496.0
+
+The mittwald JavaScript SDK has been updated to version 4.496.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.496.0).
+
+### mittwald JavaScript SDK Release 4.495.1
+
+The mittwald JavaScript SDK has been updated to version 4.495.1. This release primarily involves a version bump for the package root, with no additional changes or features introduced. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.495.1).
+
+### mittwald JavaScript SDK Release 4.495.0
+
+The mittwald JavaScript SDK has been updated to version 4.495.0. This release introduces a new feature in the generator, which now emits `@deprecated` JSDoc annotations for type aliases and parameters. This enhancement addresses issues raised in [#297](https://github.com/mittwald/api-client-js/issues/297) and closes [#166](https://github.com/mittwald/api-client-js/issues/166).
+
+For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.495.0](https://github.com/mittwald/api-client-js/releases/tag/4.495.0).
+
+### mittwald JavaScript SDK Release 4.494.0
+
+The mittwald JavaScript SDK has been updated to version 4.494.0. This release includes the following feature:
+
+- Updated generated client ([commit 923764c](https://github.com/mittwald/api-client-js/commit/923764c6081cb16b2a01d91b7c2badc239b285e8)).
+
+For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.494.0).
+
+### mittwald JavaScript SDK Release 4.493.1
+
+The mittwald JavaScript SDK has been updated to version 4.493.1. This release is a version bump only for the package root, with no additional changes or new features introduced. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.493.1).
+
+### mittwald JavaScript SDK Release 4.493.0
+
+The mittwald JavaScript SDK has been updated to version 4.493.0. This release includes the following feature:
+
+- Updated the generated client to enhance functionality and performance.
+
+For more details, please visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.493.0).
+
+### mittwald JavaScript SDK Release 4.492.0
+
+The mittwald JavaScript SDK has been updated to version 4.492.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the full release notes on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.492.0).
+

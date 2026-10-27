@@ -110,6 +110,7 @@ kann Probleme bei der Bereitstellung und im laufenden Betrieb verhindern. Vermei
 und überprüfe deine Abhängigkeiten regelmäßig auf Sicherheitslücken.
 
 Bereitstellungs-Checkliste:
+
 - [ ] App läuft lokal ohne Fehler
 - [ ] Alle Secrets/Keys sind nicht in deinem Code!
 - [ ] README erklärt Setup & Verwendung
@@ -126,6 +127,7 @@ mittwald bietet eine Zero-Conf-Deployment-Option für mit KI entwickelte Apps,
 die es dir ermöglicht, deine Apps direkt von GitHub mit minimalem Setup bereitzustellen.
 
 Gegenwärtig gibt es zwei Hauptwege für das Zero-Conf-Deployment von mit KI entwickelten Apps:
+
 - Manuell über die mittwald-CLI
 - Automatisiert über GitHub Actions (siehe [Deployment mit GitHub Actions](/docs/v2/guides/deployment/container-actions/), insbesondere die [`zerodeploy-action`](/docs/v2/guides/deployment/container-actions/#deploy-mit-zerodeploy-action))
 
@@ -139,6 +141,7 @@ Bereitstellungsprozess durch eine integrierte Erfahrung in der Entwicklungsumgeb
 ## Schnellstart-Anleitung zum Zero-Conf-Deployment von mit KI entwickelten Apps {#quickstart-zero-conf-deployment-ai-developed-apps}
 
 Voraussetzungen:
+
 - Eine mit KI entwickelte App mit einem GitHub-Repository
 - Ein mittwald-Hosting-Konto mit aktivierten Container-Hosting-Funktionen
 - Grundlegendes Verständnis von Git und GitHub
@@ -147,12 +150,13 @@ Voraussetzungen:
   (optional, aber empfohlen für Fehlerbehebung und Unterstützung während der Bereitstellung)
 
 Manuell durchzuführende Schritte:
+
 1. Bereite deine mit KI entwickelte App für die Bereitstellung vor: Vergewissere dich, dass sie lokal läuft und dass alle Abhängigkeiten installiert sind.
 
-    ```shellsession
-    user@local $ git clone https://github.com/<your-org>/<your-repo>.git
-    user@local $ cd <your-repo>
-    ```
+   ```shellsession
+   user@local $ git clone https://github.com/<your-org>/<your-repo>.git
+   user@local $ cd <your-repo>
+   ```
 
 Die konkreten Befehle zum lokalen Ausführen deiner App hängen vom spezifischen Setup deiner App ab.
 Häufige Informationsquellen dafür sind die README-Datei in deinem Repository,
@@ -162,17 +166,17 @@ zum lokalen Ausführen deiner App zu identifizieren, indem sie die Projektstrukt
 
 2. Stelle sicher, dass dein lokales Repository mit GitHub synchron ist und dass deine Änderungen committed und gepusht sind.
 
-    ```shellsession
-    user@local $ git pull
-    user@local $ git status
-    ```
+   ```shellsession
+   user@local $ git pull
+   user@local $ git status
+   ```
 
 3. Verwende in deinem App-Ordner die mittwald-CLI, um ein Projekt zu erstellen und das Bereitstellungskommando auszuführen.
 
-    ```shellsession
-    user@local $ mw project create --description=<project-name> --update-context
-    user@local $ mw experimental deploy
-    ```
+   ```shellsession
+   user@local $ mw project create --description=<project-name> --update-context
+   user@local $ mw experimental deploy
+   ```
 
 :::note
 Beachte, dass der hier verwendete Befehl im `experimental`-Namespace implementiert ist.
@@ -222,12 +226,12 @@ beim Build folgende Variablen setzen, zum Beispiel um im Beispiel-Monorepo den
 Workspace `hello-world` zu verwenden. Aus einer GitHub-Action-Workflow-Datei:
 
 ```yaml
-      - name: Deploy to Mittwald Container Hosting
-        uses: mittwald/zerodeploy-action@master
-        env:
-          RAILPACK_BUILD_CMD: 'pnpm --filter @workspace/hello-world run build'
-          RAILPACK_INSTALL_CMD: 'pnpm --filter @workspace/hello-world install'
-          RAILPACK_START_CMD: 'pnpm --filter @workspace/hello-world run serve'
+- name: Deploy to Mittwald Container Hosting
+  uses: mittwald/zerodeploy-action@master
+  env:
+    RAILPACK_BUILD_CMD: "pnpm --filter @workspace/hello-world run build"
+    RAILPACK_INSTALL_CMD: "pnpm --filter @workspace/hello-world install"
+    RAILPACK_START_CMD: "pnpm --filter @workspace/hello-world run serve"
 ```
 
 [Replit-Dokumentation zur Git-Schnittstelle](https://docs.replit.com/references/workspace-tools/git-interface)
@@ -256,13 +260,13 @@ Paketmanager-Erkennung und zu Konfigurationsoptionen findest du in der
 Während du dich auf die Bereitstellung vorbereitest, berücksichtige diese Praktiken, die Apps zum Erfolg bringen:
 
 - **Sicherheit und Datenschutz sind wichtig.** Entferne hartcodierte Secrets, verwende Umgebungsvariablen und halte Abhängigkeiten aktuell.
-Diese Praktiken sind unkompliziert und machen deine App zuverlässiger. Sowohl das CLI-Kommando als auch die GitHub Action unterstützen Umgebungsvariablen,
-sodass du Secrets aus deinem Code halten und sicher verwalten kannst.
+  Diese Praktiken sind unkompliziert und machen deine App zuverlässiger. Sowohl das CLI-Kommando als auch die GitHub Action unterstützen Umgebungsvariablen,
+  sodass du Secrets aus deinem Code halten und sicher verwalten kannst.
 - **Teste früh.** Stelle lokal bereit, teile mit Freunden und hole dir Feedback ein, bevor du live gehst.
 - **Community ist hier.** Unser [mittwald Discord](https://discord.gg/Fvtkwkwa8c)-Server ist ein großartiger Ort, um Fragen zu stellen, deine Projekte zu teilen,
-und von anderen Entwicklern zu lernen.
+  und von anderen Entwicklern zu lernen.
 - **Eine Größe passt nicht für alle.** Zero-Conf-Deployment funktioniert großartig für viele mit KI entwickelte Apps. Falls deine App spezifische Anforderungen hat — komplexe
-Datenbanken, benutzerdefinierte Infrastruktur oder Compliance-Anforderungen — das ist kein Problem. Plane entsprechend und
-zögere nicht, uns um Orientierung zu bitten.
+  Datenbanken, benutzerdefinierte Infrastruktur oder Compliance-Anforderungen — das ist kein Problem. Plane entsprechend und
+  zögere nicht, uns um Orientierung zu bitten.
 
 Du hast etwas Cooles gebaut. Starte es, lerne daraus und iteriere weiter.

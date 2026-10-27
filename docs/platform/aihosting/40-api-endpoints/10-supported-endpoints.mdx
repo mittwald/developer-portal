@@ -257,7 +257,7 @@ Depending on the embedding model, additional parameters such as `dimensions` can
 
 ## /v1/audio/transcriptions
 
-This endpoint allows you to transcribe audio files into text using Whisper models.
+This endpoint transcribes audio files into text with [whisper-large-v3-turbo](../../models/whisper-large-v3-turbo/) or [cohere-transcribe-03-2026](../../models/cohere-transcribe-03-2026/). Input formats, limits, and parameters differ between the two models. The description below covers `whisper-large-v3-turbo`; for `cohere-transcribe-03-2026`, see the notes at the end of this section.
 
 ```sh
 curl -X POST https://llm.aihosting.mittwald.de/v1/audio/transcriptions \
@@ -266,12 +266,12 @@ curl -X POST https://llm.aihosting.mittwald.de/v1/audio/transcriptions \
     -F "model=whisper-large-v3-turbo"
 ```
 
-The `file` parameter should contain the audio file to be transcribed. Supported formats include MP3, OGG, WAV, and FLAC. Maximum file size is 25 MB and maximum audio duration is 10 minutes (600 seconds); both limits apply independently. The `model` parameter specifies which Whisper model to use for transcription.
+The `file` parameter should contain the audio file to be transcribed. Supported formats include MP3, OGG, WAV, and FLAC. Maximum file size is 25 MB and maximum audio duration is 30 minutes (1800 seconds); both limits apply independently. The `model` parameter specifies which Whisper model to use for transcription.
 
 Additional optional parameters can be provided:
 
 - `language`: The language of the input audio (ISO-639-1 format). If not specified, German ("de") will be assumed by default. It is strongly recommended to always set this parameter explicitly for best accuracy.
-- `temperature`: Sampling temperature, recommended value is 1.0
+- `temperature`: Sampling temperature, recommended value is 0 (the default)
 - `response_format`: Format of the response (json or text). Other formats like srt, vtt, and verbose_json are not currently supported.
 
 ```sh
@@ -280,7 +280,7 @@ curl -X POST https://llm.aihosting.mittwald.de/v1/audio/transcriptions \
     -F "file=@/path/to/audio.mp3" \
     -F "model=whisper-large-v3-turbo" \
     -F "language=de" \
-    -F "temperature=1.0" \
+    -F "temperature=0" \
     -F "response_format=json"
 ```
 
@@ -288,7 +288,9 @@ curl -X POST https://llm.aihosting.mittwald.de/v1/audio/transcriptions \
 
 - Translation functionality (`to_language` parameter) is not supported
 - For best results, always specify the `language` parameter explicitly
-- Segment audio files into chunks smaller than 25 MB and shorter than 10 minutes if needed. Exceeding the duration returns HTTP 400 with `Audio exceeds maximum allowed duration of 600s`. See the [speech-to-text guide](../../examples/whisper/#large-files) for a chunking example
+- Segment audio files into chunks smaller than 25 MB and shorter than 30 minutes if needed. Exceeding the duration returns HTTP 400 with `Audio exceeds maximum allowed duration of 1800s`. See the [speech-to-text guide](../../examples/whisper/#large-files) for a chunking example
+
+`cohere-transcribe-03-2026` accepts uploads up to 25 MB with up to 95 minutes of audio and detects the language if `language` is omitted. Besides `json` it supports `text`, `srt`, `vtt`, `verbose_json` with word timestamps, and `diarized_json` for speaker separation. Streaming is not supported, `stream=true` returns HTTP 400. See the [model page](../../models/cohere-transcribe-03-2026/) for all parameters and the [speech-to-text guide for Cohere Transcribe](../../examples/cohere-transcribe/) for examples.
 
 ## /v1/audio/speech
 

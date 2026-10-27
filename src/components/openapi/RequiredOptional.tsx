@@ -1,14 +1,16 @@
-import { AlertBadge } from "@mittwald/flow-react-components";
+import { AlertBadge, Badge } from "@mittwald/flow-react-components";
 import React from "react";
 
+// Plain badges without status icon; deprecated is a warning alert badge
+
 export function Required() {
-  return <AlertBadge status="warning">required</AlertBadge>;
+  return <Badge color="neutral">required</Badge>;
 }
 
-export function Optional() {
-  return <AlertBadge status="info">optional</AlertBadge>;
-}
-
-export function Deprecated() {
-  return <AlertBadge status="danger">deprecated</AlertBadge>;
+export function Deprecated({ className }: { className?: string }) {
+  return (
+    <AlertBadge status="warning" className={className}>
+      deprecated
+    </AlertBadge>
+  );
 }

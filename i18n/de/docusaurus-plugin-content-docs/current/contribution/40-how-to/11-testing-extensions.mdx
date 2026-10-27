@@ -1,0 +1,42 @@
+---
+title: Extensions testen
+---
+
+Nutze die DEV-Extensions-Seite im mStudio, um Frontend-Fragmente lokal zu testen, ohne die Fragment-URLs im Marketplace-Eintrag deiner Extension zu ändern.
+
+## Frontend-Fragmente lokal testen {#test-frontend-fragments-locally}
+
+1. Stelle dein Frontend unter der gewünschten Adresse bereit, zum Beispiel `http://localhost:4711`.
+2. Öffne im mStudio **Profil > Entwicklung > DEV-Extensions** (`/profile/extension-development`).
+3. Aktiviere die lokale Überschreibung und gib die vollständige URL des zu ladenden Frontends an, zum Beispiel `http://localhost:4711/my-fragment?projectId=:projectId`.
+
+Die Überschreibung ersetzt die konfigurierte Fragment-URL aller installierten Extensions. Du kannst eine beliebige URL verwenden, einschließlich eines anderen Hosts oder Ports, eines Pfads und von Query-Parametern. [Templating-Platzhalter](/docs/v2/contribution/overview/concepts/templating/) wie `:projectId` können im Pfad oder in Query-Parametern verwendet werden.
+
+Die Fragmente werden an ihren konfigurierten Anchors im mStudio angezeigt. Du musst die Seite nicht neu laden und der Marketplace-Eintrag der Extension bleibt unverändert.
+
+:::note
+
+Die DEV-Extensions-Einstellung wird im lokalen Speicher dieses Browsers gespeichert und gilt nur für deine aktuelle Benutzersitzung.
+
+:::
+
+## Den localStorage-Override verwenden {#use-the-localstorage-compatibility-override}
+
+Der localStorage-Override ist auch als Alternative zur DEV-Extensions-Einstellung verfügbar. Öffne die Entwicklerkonsole des Browsers, während mStudio geöffnet ist, und führe Folgendes aus:
+
+```js
+localStorage["mstudio/fragment-dev-url"] =
+	"http://localhost:3000/?contextId=:contextId";
+```
+
+Passe URL, Port, Pfad oder Query-Parameter an dein lokales Frontend an.
+
+:::caution
+
+Für lokale Fragmenttests wird Chrome empfohlen. Einige Browser, darunter Safari, blockieren Inhalte von `http://localhost`, wenn diese in das HTTPS-mStudio eingebettet werden, ohne einen Fehler anzuzeigen.
+
+:::
+
+## Wann du eine Staging-Extension verwenden solltest {#when-to-use-staging}
+
+Verwende eine versteckte Staging-Kopie, wenn du ein separates Extension-Setup für Tests oder Demos benötigst. Extensions unterstützen keine mehreren Umgebungen. Erstelle daher eine zweite Extension und konfiguriere sie als verborgen. Du kannst sie trotzdem einem Kontext hinzufügen, um sie zu testen oder zu demonstrieren. Weitere Informationen findest du unter [Staging](../staging).

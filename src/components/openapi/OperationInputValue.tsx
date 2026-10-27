@@ -4,13 +4,12 @@ import styles from "./OperationInputValue.module.css";
 import Type from "@site/src/components/openapi/Type";
 import {
   Deprecated,
-  Optional,
   Required,
 } from "@site/src/components/openapi/RequiredOptional";
 import Schema from "@site/src/components/openapi/Schema";
-import Markdown from "react-markdown";
+import Description from "@site/src/components/openapi/Description";
 import React from "react";
-import clsx from "clsx";
+import Translate from "@docusaurus/Translate";
 
 export function AlternativeValue({
   schema,
@@ -20,13 +19,15 @@ export function AlternativeValue({
   let body: ReactNode;
 
   if (schema.description) {
-    body = <Markdown>{schema.description}</Markdown>;
+    body = <Description>{schema.description}</Description>;
   }
 
   return (
     <li>
       <div className={styles.parameterListHeader}>
-        <span className={styles.parameterAlternative}>Alternative</span>
+        <span className={styles.parameterAlternative}>
+          <Translate id="openapi.schema.alternative">Alternative</Translate>
+        </span>
         <Type className={styles.parameterType} schema={schema} />
       </div>
       {body && <div className={styles.parameterListBody}>{body}</div>}
@@ -39,7 +40,7 @@ export function ArrayValue({ schema }: { schema: OpenAPIV3.SchemaObject }) {
   let body: ReactNode;
 
   if (schema.description) {
-    body = <Markdown>{schema.description}</Markdown>;
+    body = <Description>{schema.description}</Description>;
   }
 
   return (
@@ -48,7 +49,7 @@ export function ArrayValue({ schema }: { schema: OpenAPIV3.SchemaObject }) {
         <span className={styles.parameterAlternative}>Array[</span>
       </div>
       <div className={styles.parameterListBody}>{body}</div>
-      <ul className={styles.parameterList}>
+      <ul>
         <PropertyValue name="*" schema={schema} required={false} />
       </ul>
       <div className={styles.parameterListHeader}>
@@ -74,7 +75,7 @@ export function PropertyValue({
   let body: ReactNode;
 
   if (schema.description) {
-    body = <Markdown>{schema.description}</Markdown>;
+    body = <Description>{schema.description}</Description>;
   }
 
   const hasSubSchema =
@@ -84,13 +85,15 @@ export function PropertyValue({
     schema.oneOf;
 
   return (
-    <li key={name} className={clsx(deprecated && styles.deprecated)}>
+    <li key={name}>
       <div className={styles.parameterListHeader}>
         <span className={styles.parameterName}>{name}</span>
         <Type className={styles.parameterType} schema={schema} />
-        <div className={styles.parameterListHeaderSpacer} />
-        {deprecatedOrNot}
-        {requiredOrOptional}
+        <span className={styles.parameterListHeaderTags}>
+          <span className={styles.parameterListHeaderSpacer} />
+          {deprecatedOrNot}
+          {requiredOrOptional}
+        </span>
       </div>
       <div className={styles.parameterListBody}>{body}</div>
       {hasSubSchema && <Schema schema={schema} />}
@@ -117,10 +120,9 @@ export function OperationInputValue({
     tags.push(<Deprecated key="deprecated" />);
   }
 
-  if (required !== undefined) {
-    tags.push(
-      required ? <Required key="required" /> : <Optional key="optional" />,
-    );
+  // Only required values get a badge, optional is the default
+  if (required) {
+    tags.push(<Required key="required" />);
   }
 
   return (
@@ -129,10 +131,10 @@ export function OperationInputValue({
         <span className={styles.parameterName}>{name}</span>
         <Type className={styles.parameterType} schema={schema} />
         {tags.length > 0 && (
-          <>
-            <div className={styles.parameterListHeaderSpacer} />
+          <span className={styles.parameterListHeaderTags}>
+            <span className={styles.parameterListHeaderSpacer} />
             {tags}
-          </>
+          </span>
         )}
       </div>
       <div className={styles.parameterListBody}>{body}</div>

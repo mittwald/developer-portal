@@ -2,373 +2,396 @@
  * Any CSS included here will be global. The classic template
  * bundles Infima by default. Infima is a CSS framework designed to
  * work well for content-centric websites.
+ *
+ * All colors, fonts, radii and spacings are mapped onto the Flow design
+ * tokens (loaded via @mittwald/flow-react-components/all.css). Flow switches
+ * its tokens on `[data-theme]`, just like Docusaurus, so dark mode works
+ * without separate overrides. Infima defines its own dark mode values on
+ * `html[data-theme="dark"]`, which is why the mapping is applied to that
+ * selector as well.
  */
 
-@font-face {
-  font-family: "Inter";
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url(/static/fonts/Inter-Regular.ttf) format("truetype");
+:root,
+html[data-theme="dark"] {
+  /* Colors */
+  --ifm-color-primary: var(--primary--color--800);
+  --ifm-color-primary-dark: var(--primary--color--900);
+  --ifm-color-primary-darker: var(--primary--color--1000);
+  --ifm-color-info: var(--info--color--800);
+  --ifm-color-info-dark: var(--info--color--900);
+  --ifm-color-info-darker: var(--info--color--1000);
+  --ifm-color-success: var(--success--color--800);
+  --ifm-color-success-dark: var(--success--color--900);
+  --ifm-color-success-darker: var(--success--color--1000);
+  --ifm-color-warning: var(--warning--color--700);
+  --ifm-color-warning-dark: var(--warning--color--900);
+  --ifm-color-warning-darker: var(--warning--color--1000);
+  --ifm-color-danger: var(--danger--color--800);
+  --ifm-color-danger-dark: var(--danger--color--900);
+  --ifm-color-danger-darker: var(--danger--color--1000);
+
+  --ifm-color-emphasis-0: var(--neutral--color--100);
+  --ifm-color-emphasis-100: var(--neutral--color--200);
+  --ifm-color-emphasis-200: var(--neutral--color--300);
+  --ifm-color-emphasis-300: var(--neutral--color--400);
+  --ifm-color-emphasis-400: var(--neutral--color--500);
+  --ifm-color-emphasis-500: var(--neutral--color--600);
+  --ifm-color-emphasis-600: var(--neutral--color--700);
+  --ifm-color-emphasis-700: var(--neutral--color--800);
+  --ifm-color-emphasis-800: var(--neutral--color--900);
+  --ifm-color-emphasis-900: var(--neutral--color--1000);
+  --ifm-color-emphasis-1000: var(--neutral--color--1100);
+
+  --ifm-background-color: var(--neutral--color--100);
+  --ifm-background-surface-color: var(--neutral--color--100);
+  --ifm-color-content: var(--text--color--default);
+  --ifm-color-content-secondary: var(--neutral--color--800);
+  --ifm-font-color-base: var(--text--color--default);
+  --ifm-heading-color: var(--heading--color);
+  --ifm-hover-overlay: var(--neutral--color--200);
+  --ifm-hr-background-color: var(--separator--color);
+  --ifm-toc-border-color: var(--separator--color);
+  --ifm-table-border-color: var(--separator--color);
+  --ifm-table-head-background: transparent;
+  --ifm-table-stripe-background: var(--neutral--color--200);
+  --ifm-blockquote-border-color: var(--text--blockquote-border-color);
+  --docusaurus-highlighted-code-line-bg: var(
+    --neutral-soft-background-color--default
+  );
+
+  /* Links */
+  --ifm-link-color: var(--link--color--default);
+  --ifm-link-hover-color: var(--link--color--hover);
+  --ifm-link-decoration: none;
+  --ifm-link-hover-decoration: none;
+
+  /* Sidebar menu, styled like the Flow navigation */
+  --ifm-menu-color: var(--text--color--default);
+  --ifm-menu-color-active: var(--text--color--default);
+  --ifm-menu-color-background-active: var(
+    --menu-item--background-color--current
+  );
+  --ifm-menu-color-background-hover: var(--menu-item--background-color--hover);
+  --ifm-menu-link-padding-vertical: var(--menu-item--padding-y);
+  --ifm-menu-link-padding-horizontal: var(--menu-item--padding-x);
+  --ifm-menu-link-sublist-icon-filter: none;
+
+  /* Navbar */
+  --ifm-navbar-background-color: var(--neutral--color--100);
+  --ifm-navbar-height: 72px;
+  --ifm-navbar-link-color: var(--text--color--default);
+  --ifm-navbar-shadow: none;
+
+  /* Footer */
+  --ifm-footer-background-color: var(--neutral--color--200);
+  --ifm-footer-color: var(--text--color--default);
+
+  /* Code */
+  --ifm-code-background: var(--inline-code--background-color);
+  --ifm-code-border-radius: var(--inline-code--corner-radius);
+  --ifm-code-font-size: 0.875em;
+  --ifm-code-padding-horizontal: var(--inline-code--padding-x);
+  --ifm-pre-background: var(--code-block--background-color);
+  --ifm-pre-color: var(--code-block--content-color);
+  --ifm-pre-padding: var(--code-block--padding);
+  --ifm-pre-line-height: 1.4;
+
+  /* Typography */
+  --ifm-font-family-base: Inter, sans-serif;
+  --ifm-font-family-monospace: FiraCode, monospace;
+  --ifm-heading-font-family: var(--ifm-font-family-base);
+  --ifm-font-weight-bold: var(--font-weight--bold);
+  --ifm-heading-font-weight: var(--heading--font-weight);
+  --ifm-line-height-base: 1.5;
+
+  /* Shapes and spacing */
+  --ifm-global-radius: var(--corner-radius--m);
+  --ifm-global-spacing: var(--size-rem--m);
 }
 
-@font-face {
-  font-family: "InterBold";
-  font-style: normal;
-  font-weight: 900;
-  font-display: swap;
-  src: url(/static/fonts/Inter-Bold.ttf) format("truetype");
+/* Flat design: Flow layout cards without shadow. Flow defines the token on
+   :root as well; the doubled selector wins regardless of the load order. */
+:root:root {
+  --layout-card--box-shadow: none;
 }
 
-@font-face {
-  font-family: "RobotoMono";
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url(/static/fonts/RobotoMono-Regular.ttf) format("truetype");
+/* Background of the landing pages (hero, highlighted feature rows, changelog
+   archive): a vertical gradient with a fine grain, recreated from design
+   assets (the light one halfway towards Flow's lighter
+   --color--background-gradient). Flow has no tokens for these colors, so this
+   is the one place with literal colors. The grain is Flow's texture token,
+   laid over the gradient with `background-blend-mode: overlay, normal` (set wherever the
+   token is used), so it does not shift the colors. */
+:root[data-theme="light"] {
+  --landing--colors: linear-gradient(#eaeff3, #cdd4e9 50%, #b0b9e3);
 }
 
-@font-face {
-  font-family: "ProximaNova";
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url(/static/fonts/proximanova-bold-webfont.woff) format("woff");
+:root[data-theme="dark"] {
+  --landing--colors: linear-gradient(#0d101a, #354176);
 }
 
 :root {
-  --ifm-color-primary: #27367b;
-  --ifm-color-primary-dark: #1d295c;
-  --ifm-color-primary-darker: #141b3e;
-  --ifm-color-primary-darkest: var(--ifm-color-primary-darker);
-  --ifm-color-primary-light: #5d689c;
-  --ifm-color-primary-lighter: #939bbd;
-  --ifm-color-primary-lightest: #c9cdde;
-  --ifm-color-info: #0054f5;
-  --ifm-color-info-dark: #003fb8;
-  --ifm-color-info-darker: #002a7b;
-  --ifm-color-success: #00a674;
-  --ifm-color-success-dark: #007d57;
-  --ifm-color-success-darker: #00533a;
-  --ifm-color-warning: #ff9343;
-  --ifm-color-warning-dark: #d4573e;
-  --ifm-color-warning-darker: #bf393c;
-  --ifm-color-content: #3c3c3b;
-  --ifm-color-gray-300: #c6c6c6;
-
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
-  --ifm-alert-border-color: var(--ifm-color-info);
-  --ifm-alert-border-width: 1px;
-  --ifm-alert-shadow: none;
-  --ifm-breadcrumb-color-active: var(--ifm-color-content);
-  --ifm-breadcrumb-item-background-active: none;
-  --ifm-breadcrumb-padding-vertical: 0;
-  --ifm-button-size-multiplier: 1;
-  --ifm-card-border-radius: var(--ifm-global-radius);
-  --ifm-code-background: #ededed;
-  --ifm-code-font-size: 14px;
-  --ifm-color-emphasis-200: var(--ifm-color-gray-300);
-  --ifm-font-family-base: "Inter";
-  --ifm-font-family-bold: "InterBold";
-  --ifm-font-family-monospace: "RobotoMono";
-  --ifm-font-family-headline: "ProximaNova";
-  --ifm-footer-background-color: var(--ifm-color-primary);
-  --ifm-footer-color: #fff;
-  --ifm-footer-link-color: #fff;
-  --ifm-footer-link-hover-color: #fff;
-  --ifm-global-radius: 4px;
-  --ifm-global-spacing: 16px;
-  --ifm-h2-font-size: 24px;
-  --ifm-heading-color: var(--ifm-color-primary);
-  --ifm-heading-font-family: var(--ifm-font-family-bold);
-  --ifm-hover-overlay: #e7effa;
-  --ifm-line-height-base: 24px;
-  --ifm-link-color: var(--ifm-color-info);
-  --ifm-link-decoration: none;
-  --ifm-link-hover-color: var(--ifm-color-info-dark);
-  --ifm-link-hover-decoration: none;
-  --ifm-menu-color: var(--ifm-color-primary);
-  --ifm-menu-color-active: var(--ifm-color-info);
-  --ifm-navbar-background-color: var(--ifm-color-primary);
-  --ifm-navbar-height: 72px;
-  --ifm-navbar-link-color: #fff;
-  --ifm-navbar-link-hover-color: #fff;
-  --ifm-toc-link-color: var(--ifm-link-color);
-  --mw-main-background-color: #ededed;
-  --mw-main-feature-background-color: #fff;
+  --landing--gradient: var(--texture--grain), var(--landing--colors);
 }
 
+/* Infima hero (changelog archive), on the landing page background
+   (src/components/Hero) */
 .hero--primary {
-  background:
-    radial-gradient(circle at 60.52% 67.2%, #264697, transparent 41%),
-    radial-gradient(circle at 56.14% 12.23%, #232b69, transparent 85%),
-    radial-gradient(circle at 6.01% 1.34%, #d989b9, transparent 25%),
-    radial-gradient(circle at 75.71% 4.03%, #0a0d66, transparent 34%),
-    radial-gradient(circle at 99.31% 70.7%, #2fd2eb, transparent 75%),
-    radial-gradient(circle at 76.91% 59.14%, #0a0d66, transparent 71%),
-    radial-gradient(circle at 71.07% 83.33%, #0a0d66, transparent 71%),
-    radial-gradient(circle at 15.11% 70.43%, #1556a1, transparent 64%),
-    radial-gradient(circle at 65.49% 37.9%, #3058a5, transparent 100%),
-    radial-gradient(circle at 99.4% 93.55%, #12f7ff, transparent 100%),
-    radial-gradient(circle at 50% 50%, #8f62aa, #8f62aa 100%);
-}
-
-.hero__title {
-  color: #fff;
-  font-size: 60px;
-  font-family: var(--ifm-font-family-headline);
-}
-
-.docPage_node_modules-\@docusaurus-theme-classic-lib-theme-DocPage-Layout-styles-module {
-  align-items: stretch;
-  flex: 1;
+  --ifm-hero-text-color: var(--text--color--default);
+  background: var(--landing--gradient);
+  background-blend-mode: overlay, normal;
 }
 
 main.index {
-  background-color: var(--mw-main-background-color);
+  background-color: var(--neutral--color--200);
 }
 
-aside.theme-doc-sidebar-container {
-  margin-right: var(--ifm-global-spacing);
+/* Space between sidebar and content. As padding of the main container (and
+   not as sidebar margin), so that the main container keeps its width and does
+   not overflow the viewport on the right. */
+@media (min-width: 997px) {
+  main[class*="docMainContainer"] {
+    padding-left: var(--size-rem--m);
+  }
 }
 
-.pagination-nav__label {
-  font-size: 14px;
+/* Headings with a tighter line height than Flow's 1.5, so that headings
+   wrapping onto several lines stay compact (Flow derives the height of
+   heading icons from --line-height as well); doubled selector to win over
+   Flow's stylesheet regardless of the load order */
+.flow--heading.flow--heading {
+  --line-height: 1.25;
+  line-height: var(--line-height);
 }
 
-.card,
-.pagination-nav a {
-  box-shadow: none !important;
-  padding: var(--ifm-global-spacing) !important;
-}
-
-.card:hover,
-.pagination-nav a:hover {
-  border-color: var(--ifm-color-gray-300) !important;
-  background: var(--ifm-hover-overlay);
-}
-
-.card h2 {
-  font-size: 18px;
-}
-
-.card p {
-  font-family: var(--ifm-font-family-base);
-  font-size: 16px;
-  overflow: visible;
-  white-space: pre-wrap;
-}
-
-.breadcrumbs__item--active {
-  font-family: var(--ifm-font-family-bold);
-}
-
-.menu__link--active {
-  font-family: var(--ifm-font-family-bold) !important;
-}
+/* Sidebar: Docusaurus' structure and behavior, the look of the Flow
+   navigation (items, current item, chevrons) */
 
 a.menu__link {
-  font-family: var(--ifm-font-family-base);
+  font-weight: var(--font-weight--normal);
+  /* Infima's 1.25 is tighter than the Flow navigation */
+  line-height: var(--line-height-m);
+}
+
+/* On large screens the sidebar grows into the space that is left over next
+   to the content container (max. --ifm-container-width-xl), so the content
+   never gets narrower. The extra space covers the sidebar margin and a scrollbar.
+   Docusaurus defines the variable on :root in a CSS module loaded after this
+   file, hence the doubled selector. */
+:root:root {
+  --doc-sidebar-width: clamp(
+    300px,
+    calc(100vw - var(--ifm-container-width-xl) - var(--size-rem--xl)),
+    400px
+  );
+}
+
+/* Desktop sidebar spaced like a Flow layout card */
+.theme-doc-sidebar-container nav.menu {
+  padding: var(--layout-card--padding);
+}
+
+/* Pulled out by the item padding like a Flow navigation, so the item texts
+   align with the content edge */
+.theme-doc-sidebar-menu {
+  margin-inline: calc(var(--menu-item--padding-x) * -1);
+}
+
+.menu__link,
+.menu__caret {
+  border-radius: var(--menu-item--corner-radius);
+  transition-property: background-color;
+  transition-duration: var(--transition--duration--default);
+}
+
+.menu__list-item:not(:first-child) {
+  margin-top: var(--menu--item-to-item-spacing);
+}
+
+a.menu__link--active:not(.menu__link--sublist),
+a.menu__link--sublist[aria-current="page"] {
+  font-weight: var(--menu-item--font-weight--current);
+}
+
+/* A category containing the current page is emphasized, but only the current
+   page itself gets the current background */
+a.menu__link--sublist.menu__link--active {
+  font-weight: var(--menu-item--font-weight--current);
+}
+
+a.menu__link--sublist.menu__link--active:not([aria-current="page"]),
+.menu__list-item-collapsible--active {
+  background-color: transparent;
+}
+
+.menu__list-item-collapsible--active:hover,
+a.menu__link--sublist.menu__link--active:not([aria-current="page"]):hover {
+  background-color: var(--menu-item--background-color--hover);
+}
+
+/* Chevrons like in a Flow navigation: Flow's chevron-down (the FontAwesome
+   Pro icon from src/icons/IconMasks.tsx, Tabler's without it) in the text
+   color and icon size s, pointing up when expanded (Infima draws a Material
+   chevron pointing right when collapsed) */
+.menu__link--sublist-caret::after,
+.menu__caret::before {
+  background: currentColor;
+  mask: var(
+      --icon-mask--chevron-down,
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6l6 -6'/%3E%3C/svg%3E")
+    )
+    center / auto var(--icon--size--s) no-repeat;
+  transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.menu__list-item--collapsed .menu__link--sublist::after,
+.menu__list-item--collapsed .menu__caret::before {
+  transform: none;
 }
 
 aside {
-  /*border: none !important;*/
   clip-path: none !important;
 }
 
-.markdown > h2 {
-  --ifm-h2-font-size: 24px;
-}
-
-.markdown > h3 {
-  --ifm-h3-font-size: 18px;
-}
-
-.container h1 {
-  --ifm-h1-font-size: 32px !important;
-}
-
-article > header > h2 {
-  font-size: 1.5rem !important;
-}
-
-h1.title_node_modules-\@docusaurus-theme-classic-lib-theme-BlogPostItem-Header-Title-styles-module {
-  font-size: var(--ifm-h1-font-size);
+/* The page title gets no margin of its own (Infima gives the first h1 of a
+   page a large one); Flow sections space it like any other block */
+.markdown h1:first-child {
+  margin-bottom: 0;
 }
 
 code {
   border: none;
-  padding: 0 8px;
-}
-
-h1 code {
-  font-size: 1em;
-  background: none;
+  padding: var(--inline-code--padding-y) var(--inline-code--padding-x);
 }
 
 pre {
-  background: var(--ifm-code-background);
+  background: var(--code-block--background-color);
 }
 
-strong {
-  font-family: var(--ifm-font-family-bold);
+/* Code blocks look like Flow's CodeBlock. Docusaurus reads the radius from
+   the inline code variable and the title separator from an emphasis color,
+   so both are redefined for code blocks only. */
+.theme-code-block {
+  --ifm-code-border-radius: var(--code-block--corner-radius);
+  --ifm-pre-border-radius: var(--code-block--corner-radius);
+  --ifm-color-emphasis-300: var(--code-block--border-color);
+  --ifm-global-shadow-lw: none;
+  border: var(--code-block--border-width) var(--code-block--border-style)
+    var(--code-block--border-color);
 }
 
+strong,
 a {
-  font-family: var(--ifm-font-family-bold);
+  font-weight: var(--font-weight--bold);
 }
 
-nav a {
-  font-size: 14px;
-}
-
-section.footnotes {
-  font-size: 0.8em;
-}
-
-.markdown {
-  font-size: 16px;
-}
-
+.markdown,
 p {
-  font-size: 16px;
+  font-size: var(--font-size-text--m);
 }
 
 .markdown a,
 p a {
-  font-family: var(--ifm-font-family-base);
-  font-size: 1em;
+  font-weight: var(--font-weight--normal);
   text-decoration: underline;
-
-  /** underline offset is necessary because <code> blocks nested in linkes look shitty otherwise */
-  text-underline-offset: 0.2em;
 }
 
-/** Required when a DocCardList is used in a markdown file */
-a.card {
-  text-decoration: none !important;
+/* Footnote references are standalone Flow links (see MDXComponents) */
+.markdown a[data-footnote-ref] {
+  font-weight: var(--font-weight--bold);
+  text-decoration: none;
 }
 
-.markdown strong a {
-  font-family: var(--ifm-font-family-bold);
+/* Navbar */
+
+.navbar {
+  border-bottom: var(--border-width--100) var(--border-style--default)
+    var(--separator--color);
 }
 
-.button {
-  font-family: var(--ifm-font-family-bold);
-  font-size: initial;
+/* The menu buttons (compact header menu, mobile menu toggle) sit at the
+   right end of the navbar: the left and right item groups are dissolved, so
+   that all items share one flex row and the buttons can be moved to its end;
+   the right items keep their place on the right */
+.navbar__inner {
+  justify-content: flex-start;
+  align-items: center;
 }
 
-.button svg {
-  color: var(--ifm-button-color);
+.navbar__inner > .navbar__items {
+  display: contents;
 }
 
-.button.button--secondary svg {
-  color: var(--ifm-color-gray-900);
+.navbar__items--right > :first-child {
+  margin-left: auto;
 }
 
-.navbar button:hover {
-  background: var(--ifm-color-primary-dark);
+/* The search comes first on the right; on small screens Docusaurus positions
+   its (then empty) container absolutely, which would drop the margin above */
+@media (max-width: 996px) {
+  .navbar__items--right > [class*="navbarSearchContainer"] {
+    position: static;
+  }
 }
 
-.navbar-sidebar {
-  --ifm-menu-color: #fff;
-  --ifm-menu-color-active: #fff;
+/* The mobile menu button (a Flow button) brings its own spacing */
+.navbar__toggle {
+  order: 1;
+  margin-right: 0;
+  margin-left: var(--size-rem--s);
 }
 
-.navbar__link {
-  font-family: inherit;
+/* Infima shows the toggle with "display: inherit", which would now inherit
+   the dissolved group's "contents" and drop the order */
+@media (max-width: 996px) {
+  .navbar__toggle {
+    display: flex;
+  }
 }
 
+/* The mobile menu is a Flow off-canvas modal with its own backdrop
+   (Navbar/MobileSidebar) */
+.navbar-sidebar__backdrop {
+  display: none;
+}
+
+/* "Developer Portal" stacked below the mittwald logo */
+.navbar__brand {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  row-gap: var(--size-rem--xs);
+  margin-inline: var(--size-rem--m) var(--size-rem--xl);
+}
+
+/* On small screens flush with the content (the menu toggle is on the right) */
+@media (max-width: 996px) {
+  .navbar__brand {
+    margin-inline-start: 0;
+  }
+}
+
+.navbar__brand:hover {
+  color: var(--text--color--default);
+}
+
+/* Logo and title are about the same width (≈130px) */
 .navbar__logo {
-  margin: 0 2rem 0 1rem;
-}
-
-.navbar button {
-  color: #fff;
-}
-
-.theme-doc-footer-tags-row,
-.theme-doc-footer-edit-meta-row {
+  height: var(--size-rem--l);
   margin: 0;
 }
 
-section.row {
-  margin: 0 calc(8px * -1);
+.navbar__title {
+  font-size: var(--font-size-text--m);
+  font-weight: var(--font-weight--bold);
+  line-height: 1;
 }
 
-.theme-doc-footer-tags-row b {
-  color: #878787;
-  font-size: 14px;
-  font-family: var(--ifm-font-family-bold);
-}
+/* Footer */
 
-.theme-doc-footer-tags-row a {
-  color: var(--ifm-color-content);
-  font-family: var(--ifm-font-family-base);
-  background: var(--ifm-code-background);
-  border: none;
-}
-
-.theme-doc-footer-tags-row a:hover {
-  background: var(--ifm-hover-overlay);
-}
-
-.col {
-  padding: 0 calc(var(--ifm-global-spacing) / 2);
-}
-
-.col.margin-bottom--lg {
-  margin-bottom: var(--ifm-global-spacing) !important;
-}
-
-.table-of-contents__link {
-  font-family: var(--ifm-font-family-base);
-}
-
-/* Banners */
-.alert {
-  --ifm-link-color: inherit;
-  --ifm-link-hover-color: inherit;
-  --ifm-link-decoration: inherit;
-  background-color: inherit;
-  --ifm-alert-foreground-color: var(--ifm-color-content);
-  --ifm-alert-background-color-highlight: #ededed !important;
-}
-
-.alert svg {
-  height: 20px !important;
-  width: 20px !important;
-}
-
-.alert > :first-child {
-  text-transform: none !important;
-  font-family: var(--ifm-font-family-bold);
-}
-
-.alert--info {
-  --ifm-alert-border-color: var(--ifm-color-info);
-}
-
-.alert--info > :first-child {
-  color: var(--ifm-color-info-dark) !important;
-}
-
-.alert--info svg {
-  color: var(--ifm-color-info-dark) !important;
-  fill: var(--ifm-color-info-dark) !important;
-}
-
-.alert--warning {
-  --ifm-alert-border-color: var(--ifm-color-warning);
-}
-
-.alert--warning > :first-child {
-  color: var(--ifm-color-warning-dark) !important;
-}
-
-.alert--warning svg {
-  color: var(--ifm-color-warning-dark) !important;
-  fill: var(--ifm-color-warning-dark) !important;
+.footer {
+  border-top: var(--border-width--100) var(--border-style--default)
+    var(--separator--color);
 }
 
 /* Keep custom Flow admonitions visually intact, but prevent nested code blocks
@@ -389,207 +412,25 @@ section.row {
   overflow-x: auto;
 }
 
-/* dark mode. */
-
-[data-theme="dark"] {
-  --ifm-color-primary: #c9cdde;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
-  --mw-main-background-color: #111;
-  --mw-main-feature-background-color: #222;
-  --ifm-navbar-background-color: #1c2658;
-  --ifm-footer-background-color: #1c2658;
-  --ifm-navbar-link-color: #fff;
-  --ifm-color-info: #80aafa;
-  --ifm-color-info-dark: #80aafa;
-  --ifm-color-info-darker: #bfd4fd;
-  --ifm-color-success: #00a674;
-  --ifm-color-success-dark: #00b785;
-  --ifm-color-success-darker: #00c795;
-  --ifm-color-warning: #ffae72;
-  /*--ifm-color-warning-dark: #ffae72;
-  --ifm-color-warning-darker: #ffc9a1;*/
-  --ifm-link-color: var(--ifm-color-info);
-  --ifm-menu-color-active: var(--ifm-color-info);
-  --ifm-color-content: #ffffff;
-  --ifm-button-color: #ffffff;
-
-  --content--color: #ffffff !important;
-  --content--color--default: #ffffff !important;
-  --heading--color: #c9cdde !important;
-  --accordion--header-background-color--hover: var(
-    --ifm-hover-overlay
-  ) !important;
-  --status-badge--warning-background-color: var(
-    --ifm-color-warning-darker
-  ) !important;
-  --status-badge--warning-content-color: var(--ifm-color-warning) !important;
-  --status-icon--warning-color: var(--ifm-color-warning) !important;
+/* Infima styles table rows by element (striping, top border) with a higher
+   specificity than Flow's :where() rules; restore Flow's own row styles */
+/* Infima collapses table borders, which drops Flow's rounded outer border */
+table.flow--table {
+  border-collapse: separate;
 }
 
-[data-theme="dark"] .hero--primary {
-  background:
-    radial-gradient(circle at 60.52% 67.2%, #1c2e60, transparent 41%),
-    radial-gradient(circle at 56.14% 12.23%, #232b69, transparent 85%),
-    radial-gradient(circle at 6.01% 1.34%, #562441, transparent 25%),
-    radial-gradient(circle at 75.71% 4.03%, #0a0d66, transparent 34%),
-    radial-gradient(circle at 99.31% 70.7%, #227b85, transparent 75%),
-    radial-gradient(circle at 76.91% 59.14%, #0a0d66, transparent 71%),
-    radial-gradient(circle at 71.07% 83.33%, #0a0d66, transparent 71%),
-    radial-gradient(circle at 15.11% 70.43%, #0f3464, transparent 64%),
-    radial-gradient(circle at 65.49% 37.9%, #25427a, transparent 100%),
-    radial-gradient(circle at 99.4% 93.55%, #288e8f, transparent 100%),
-    radial-gradient(circle at 50% 50%, #8f62aa, #8f62aa 100%);
+.flow--table thead,
+.flow--table .flow--table--row {
+  background-color: transparent;
+  border-top: none;
 }
 
-[data-theme="dark"] .hero {
-  color: #fff;
+.flow--table tbody .flow--table--row:nth-of-type(odd) {
+  background-color: var(--table--background-color-accent);
 }
 
-[data-theme="dark"] code,
-[data-theme="dark"] pre {
-  --ifm-code-background: #141b3e;
-}
-
-[data-theme="dark"] .card,
-[data-theme="dark"] .pagination-nav a {
-  background: #333;
-  border: none;
-}
-
-[data-theme="dark"] .card:hover,
-[data-theme="dark"] .pagination-nav a:hover {
-  background-color: #2b3980;
-}
-
-[data-theme="dark"] .alert {
-  background-color: #2b398080;
-}
-
-[data-theme="dark"] .menu__link--active:not(.menu__link--sublist),
-[data-theme="dark"] .menu__link:hover,
-[data-theme="dark"] .menu__list-item-collapsible--active,
-[data-theme="dark"] .menu__list-item-collapsible:hover,
-[data-theme="dark"] .navbar-sidebar__back,
-[data-theme="dark"] .navbar button:hover {
-  background-color: #2b3980;
-}
-
-@media screen and (max-width: 996px) {
-  .navbar {
-    --ifm-menu-link-sublist-icon-filter: invert(100%) sepia(94%) saturate(17%)
-      hue-rotate(223deg) brightness(104%) contrast(98%);
-  }
-
-  .menu__link--active:not(.menu__link--sublist),
-  .menu__link:hover,
-  .menu__list-item-collapsible--active,
-  .menu__list-item-collapsible:hover,
-  .navbar-sidebar__back {
-    background-color: var(--ifm-color-primary-dark);
-  }
-}
-
-@media screen and (max-width: 600px) {
-  .hero__title {
-    font-size: 40px;
-  }
-  .navbar__logo {
-    height: 24px;
-  }
-}
-
-.api-operation-deprecated a {
-  color: var(--color--gray--600);
-}
-
-.api-operation-deprecated a::before {
-  text-decoration: none !important;
-  background-color: var(--color--gray--600) !important;
-}
-
-[data-theme="dark"] .api-operation-deprecated a {
-  color: var(--color--gray--800);
-}
-
-[data-theme="dark"] .api-operation-deprecated a::before {
-  text-decoration: none !important;
-  background-color: var(--color--gray--800) !important;
-  color: black;
-}
-
-.api-operation-get a::before {
-  content: "GET";
-  border-radius: 4px;
-  background-color: var(--ifm-color-success);
-  color: white;
-  padding: 2px 4px;
-  margin-right: 8px;
-  font-size: 0.6rem;
-  font-weight: bold;
-  min-width: 48px;
-  text-align: center;
-}
-
-.api-operation-post a::before {
-  content: "POST";
-  border-radius: 4px;
-  background-color: var(--ifm-color-info);
-  color: white;
-  padding: 2px 4px;
-  margin-right: 8px;
-  font-size: 0.6rem;
-  font-weight: bold;
-  min-width: 48px;
-  text-align: center;
-}
-
-.api-operation-delete a::before {
-  content: "DELETE";
-  border-radius: 4px;
-  background-color: var(--ifm-color-danger);
-  color: white;
-  padding: 2px 4px;
-  margin-right: 8px;
-  font-size: 0.6rem;
-  font-weight: bold;
-  min-width: 48px;
-  text-align: center;
-}
-
-.api-operation-patch a::before {
-  content: "PATCH";
-  border-radius: 4px;
-  background-color: var(--ifm-color-warning);
-  color: white;
-  padding: 2px 4px;
-  margin-right: 8px;
-  font-size: 0.6rem;
-  font-weight: bold;
-  min-width: 48px;
-  text-align: center;
-}
-
-.api-operation-put a::before {
-  content: "PUT";
-  border-radius: 4px;
-  background-color: var(--ifm-color-warning);
-  color: white;
-  padding: 2px 4px;
-  margin-right: 8px;
-  font-size: 0.6rem;
-  font-weight: bold;
-  min-width: 48px;
-  text-align: center;
-}
-
-.flow--inline-alert,
 .flow--alert {
   margin-bottom: var(--ifm-leading);
-}
-
-.flow--alert--content ul {
-  list-style-type: square;
-  margin-left: 1.5em;
 }
 
 .flow--overlay {

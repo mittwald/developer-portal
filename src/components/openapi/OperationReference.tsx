@@ -1,15 +1,14 @@
 import styles from "./OperationReference.module.css";
-import { PropsWithChildren } from "react";
-import Markdown from "react-markdown";
-import CodeBlock from "@theme/CodeBlock";
+import Description from "@site/src/components/openapi/Description";
 import { OpenAPIV3 } from "openapi-types";
-import {
-  Optional,
-  Required,
-} from "@site/src/components/openapi/RequiredOptional";
+import { Required } from "@site/src/components/openapi/RequiredOptional";
 import Translate, { translate } from "@docusaurus/Translate";
 import HTTPResponseStatus from "@site/src/components/openapi/HTTPResponseStatus";
-import { Accordion, AlertBadge } from "@mittwald/flow-react-components";
+import {
+  Accordion,
+  AccordionGroup,
+  InlineCode,
+} from "@mittwald/flow-react-components";
 import { Heading } from "@mittwald/flow-react-components";
 import { Content } from "@mittwald/flow-react-components";
 import { Text } from "@mittwald/flow-react-components";
@@ -26,26 +25,11 @@ import SchemaObject = OpenAPIV3.SchemaObject;
 import React from "react";
 import ExampleObject = OpenAPIV3.ExampleObject;
 
-function OutlinedAccordion({
-  children,
-  defaultExpanded,
-}: PropsWithChildren<{ defaultExpanded?: boolean }>) {
-  return (
-    <Accordion
-      defaultExpanded={defaultExpanded}
-      variant="outline"
-      style={{ marginBottom: "1em" }}
-    >
-      {children}
-    </Accordion>
-  );
-}
-
 function OperationParameter({ param }: { param: ParameterObject }) {
   const body = [];
 
   if (param.description) {
-    body.push(<Markdown key="description">{param.description}</Markdown>);
+    body.push(<Description key="description">{param.description}</Description>);
   }
 
   if (param.example) {
@@ -54,7 +38,7 @@ function OperationParameter({ param }: { param: ParameterObject }) {
         <span className={styles.parameterExample}>
           <Translate id="openapi.example">Example</Translate>:
         </span>
-        <code>{JSON.stringify(param.example)}</code>
+        <InlineCode>{JSON.stringify(param.example)}</InlineCode>
       </div>,
     );
   }
@@ -80,7 +64,9 @@ function OperationResponseHeader({
   const body = [];
 
   if (header.description) {
-    body.push(<Markdown key="description">{header.description}</Markdown>);
+    body.push(
+      <Description key="description">{header.description}</Description>,
+    );
   }
 
   return (
@@ -110,19 +96,21 @@ function OperationParameterList({
   const hasRequired = params.some((param) => param.required);
 
   return (
-    <OutlinedAccordion defaultExpanded={expanded}>
+    <Accordion defaultExpanded={expanded}>
       <Heading>
-        <div style={{ flexGrow: 1 }}>{title}</div>{" "}
-        {hasRequired ? <Required /> : undefined}
+        <span className={styles.accordionTitle}>
+          {title}
+          {hasRequired ? <Required /> : undefined}
+        </span>
       </Heading>
       <Content>
-        <ul className={styles.parameterList} style={{ marginBottom: "1rem" }}>
+        <ul className={styles.parameterList}>
           {params.map((param, idx) => (
             <OperationParameter key={idx} param={param} />
           ))}
         </ul>
       </Content>
-    </OutlinedAccordion>
+    </Accordion>
   );
 }
 
@@ -138,14 +126,16 @@ function OperationResponseHeaderList({
   }
 
   return (
-    <>
-      <h4>{title}</h4>
-      <ul className={styles.parameterList}>
-        {Object.entries(headers).map(([name, header], idx: number) => (
-          <OperationResponseHeader key={idx} name={name} header={header} />
-        ))}
-      </ul>
-    </>
+    <LabeledValue>
+      <Label>{title}</Label>
+      <Content>
+        <ul className={styles.parameterList}>
+          {Object.entries(headers).map(([name, header], idx: number) => (
+            <OperationResponseHeader key={idx} name={name} header={header} />
+          ))}
+        </ul>
+      </Content>
+    </LabeledValue>
   );
 }
 
@@ -153,6 +143,18 @@ function isParameterObject(
   param: ReferenceObject | ParameterObject,
 ): param is ParameterObject {
   return (param as ParameterObject).name !== undefined;
+}
+
+/** The content type of a request body, labeled like that of a response */
+function RequestBodyFormat({ format }: { format: string }) {
+  return (
+    <LabeledValue>
+      <Label>
+        <Translate id="openapi.operation.response.format">Format</Translate>
+      </Label>
+      <Content>{format}</Content>
+    </LabeledValue>
+  );
 }
 
 function OperationRequestBody({
@@ -166,45 +168,56 @@ function OperationRequestBody({
     return null;
   }
 
-  const required = spec.required ? <Required /> : <Optional />;
+  const required = spec.required ? <Required /> : undefined;
 
   if ("multipart/form-data" in spec.content) {
     return (
-      <OutlinedAccordion>
+      <Accordion>
         <Heading>
-          <div style={{ flexGrow: 1 }}>{title}</div>
-          <AlertBadge status={"info"}>multipart/form-data</AlertBadge>
-          {required}
+          <span className={styles.accordionTitle}>
+            {title}
+            {required}
+          </span>
         </Heading>
         <Content>
-          <SchemaWithExample
-            schema={spec.content["multipart/form-data"].schema as SchemaObject}
-            format="multipart-form"
-            withHeaders
-          />
+          <div className={styles.responseBody}>
+            <RequestBodyFormat format="multipart/form-data" />
+            <SchemaWithExample
+              schema={
+                spec.content["multipart/form-data"].schema as SchemaObject
+              }
+              format="multipart-form"
+              withHeaders
+            />
+          </div>
         </Content>
-      </OutlinedAccordion>
+      </Accordion>
     );
   }
 
   if ("application/json" in spec.content) {
     const body = spec.content["application/json"];
     return (
-      <OutlinedAccordion>
+      <Accordion>
         <Heading>
-          <div style={{ flexGrow: 1 }}>{title}</div>
-          <AlertBadge status={"info"}>application/json</AlertBadge>
-          {required}
+          <span className={styles.accordionTitle}>
+            {title}
+            {required}
+          </span>
         </Heading>
         <Content>
-          <SchemaWithExample
-            schema={body.schema as SchemaObject}
-            examples={body.examples as Record<string, ExampleObject>}
-            withRawJSONSchema
-            withHeaders
-          />
+          <div className={styles.responseBody}>
+            <RequestBodyFormat format="application/json" />
+            <SchemaWithExample
+              schema={body.schema as SchemaObject}
+              example={body.example}
+              examples={body.examples as Record<string, ExampleObject>}
+              withRawJSONSchema
+              withHeaders
+            />
+          </div>
         </Content>
-      </OutlinedAccordion>
+      </Accordion>
     );
   }
 }
@@ -228,10 +241,15 @@ function OperationResponseBody({ spec }: { spec?: OpenAPIV3.ResponseObject }) {
 
   if ("application/json" in spec.content) {
     return (
-      <>
-        <ColumnLayout m={[1, 5]}>
+      <div className={styles.responseBody}>
+        {/* The format column needs room for "application/json" */}
+        <ColumnLayout m={[1, 3]}>
           <LabeledValue>
-            <Label>Format</Label>
+            <Label>
+              <Translate id="openapi.operation.response.format">
+                Format
+              </Translate>
+            </Label>
             <Content>application/json</Content>
           </LabeledValue>
           <LabeledValue>
@@ -241,17 +259,24 @@ function OperationResponseBody({ spec }: { spec?: OpenAPIV3.ResponseObject }) {
               </Translate>
             </Label>
             <Content>
-              <Markdown>{spec.description}</Markdown>
+              <Description>{spec.description}</Description>
             </Content>
           </LabeledValue>
         </ColumnLayout>
 
         <SchemaWithExample
           schema={spec.content["application/json"].schema as SchemaObject}
+          example={spec.content["application/json"].example}
+          examples={
+            spec.content["application/json"].examples as Record<
+              string,
+              ExampleObject
+            >
+          }
           withRawJSONSchema
           withHeaders
         />
-      </>
+      </div>
     );
   }
 }
@@ -269,18 +294,16 @@ export function OperationRequest({
 
   if (spec.requestBody === undefined && parameters.length === 0) {
     return (
-      <>
-        <p>
-          <Translate key="openapi.operation.request.empty">
-            No request parameters.
-          </Translate>
-        </p>
-      </>
+      <Text>
+        <Translate id="openapi.operation.request.empty">
+          No request parameters.
+        </Translate>
+      </Text>
     );
   }
 
   return (
-    <>
+    <AccordionGroup>
       <OperationParameterList
         title={translate({
           id: "openapi.operation.request.pathparams",
@@ -312,7 +335,7 @@ export function OperationRequest({
         })}
         spec={spec.requestBody as OpenAPIV3.RequestBodyObject}
       />
-    </>
+    </AccordionGroup>
   );
 }
 
@@ -321,8 +344,9 @@ function OperationResponse({
 }: {
   response: OpenAPIV3.ResponseObject;
 }) {
+  // Headers and body spaced like the blocks of the body
   return (
-    <>
+    <div className={styles.responseBody}>
       <OperationResponseHeaderList
         title={translate({
           id: "openapi.operation.response.headers",
@@ -331,7 +355,7 @@ function OperationResponse({
         headers={response.headers as Record<string, OpenAPIV3.HeaderObject>}
       />
       <OperationResponseBody spec={response} />
-    </>
+    </div>
   );
 }
 
@@ -342,12 +366,9 @@ export function OperationResponses({
 }) {
   const responseCodes = Object.keys(spec.responses);
   return (
-    <>
+    <AccordionGroup>
       {responseCodes.map((status) => (
-        <OutlinedAccordion
-          key={status}
-          defaultExpanded={status.startsWith("2")}
-        >
+        <Accordion key={status} defaultExpanded={status.startsWith("2")}>
           <Heading>
             <HTTPResponseStatus code={status} />
           </Heading>
@@ -357,38 +378,8 @@ export function OperationResponses({
               response={spec.responses[status] as ResponseObject}
             />
           </Content>
-        </OutlinedAccordion>
+        </Accordion>
       ))}
-    </>
+    </AccordionGroup>
   );
 }
-
-function OperationReference({
-  path,
-  method,
-  spec,
-  baseURL,
-}: {
-  path: string;
-  method: string;
-  spec: OpenAPIV3.OperationObject;
-  baseURL: string;
-}) {
-  return (
-    <>
-      <OperationMetadata
-        path={path}
-        method={method}
-        spec={spec}
-        baseURL={baseURL}
-      />
-      <OperationRequest spec={spec} />
-      <OperationResponses spec={spec} />
-
-      <h2>Complete OpenAPI spec</h2>
-      <CodeBlock language="json">{JSON.stringify(spec, null, 2)}</CodeBlock>
-    </>
-  );
-}
-
-export default OperationReference;

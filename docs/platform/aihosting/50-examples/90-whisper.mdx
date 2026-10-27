@@ -6,6 +6,8 @@ title: Speech-to-text with Whisper
 
 `whisper-large-v3-turbo` is accessible via the same `/v1/audio/transcriptions` endpoint as the OpenAI Whisper API, so any code written for OpenAI works as a drop-in replacement by changing `base_url`. See the [Whisper model page](/docs/v2/platform/aihosting/models/whisper-large-v3-turbo) for supported formats, language codes, and inference parameters.
 
+For speaker separation, word timestamps, subtitles, or recordings longer than 30 minutes, see [Speech-to-text with Cohere Transcribe](/docs/v2/platform/aihosting/examples/cohere-transcribe/).
+
 ## Setup {#setup}
 
 ```shellsession
@@ -13,7 +15,7 @@ user@local $ pip install openai
 user@local $ export OPENAI_API_KEY="sk-…"
 ```
 
-For chunking long or large files (over 10 minutes or over 25 MB):
+For chunking long or large files (over 30 minutes or over 25 MB):
 
 ```shellsession
 user@local $ pip install pydub
@@ -36,7 +38,7 @@ with open("recording.mp3", "rb") as f:
         file=f,
         language="en",             # Always set explicitly — default is "de"
         response_format="json",
-        temperature=1.0,
+        temperature=0,
     )
 
 print(result.text)
@@ -63,21 +65,22 @@ for filename, lang in files_and_languages:
             file=f,
             language=lang,
             response_format="json",
-            temperature=1.0,
+            temperature=0,
         )
     print(f"[{lang}] {result.text[:120]}")
 ```
 
-## Long or large files (> 10 minutes or > 25 MB) {#large-files}
+## Long or large files (> 30 minutes or > 25 MB) {#large-files}
 
-The API accepts files up to 25 MB and up to 10 minutes of audio. Both limits apply independently, and for speech recordings the duration limit is usually the binding one. Split longer recordings at silence points using `pydub` so that each chunk stays below both limits and no words are cut mid-utterance:
+The API accepts files up to 25 MB and up to 30 minutes of audio. Both limits apply independently. Which one you hit first depends on the bitrate: 25 MB hold about 52 minutes of 64 kbit/s mono `mp3`, but only about 27 minutes of 128 kbit/s stereo. The example below splits longer recordings at silence points with `pydub`, packs the pieces back into chunks of up to 25 minutes, and re-encodes each chunk as mono `mp3`, so every request stays below both limits and no words are cut mid-utterance:
 
 ```python
-from pydub import AudioSegment
-from pydub.silence import split_on_silence
 from io import BytesIO
 
-MAX_CHUNK_MS = 9 * 60 * 1000   # Stay below the 10-minute duration limit
+from pydub import AudioSegment
+from pydub.silence import split_on_silence
+
+MAX_CHUNK_MS = 25 * 60 * 1000   # Stay below the 30-minute duration limit
 
 
 def transcribe_large_file(path: str, language: str = "en") -> str:
@@ -85,32 +88,32 @@ def transcribe_large_file(path: str, language: str = "en") -> str:
     audio = AudioSegment.from_file(path)
 
     # Split at pauses longer than 700 ms with silence below -40 dBFS
-    chunks = split_on_silence(
+    pieces = split_on_silence(
         audio,
         min_silence_len=700,
         silence_thresh=-40,
         keep_silence=300,   # Keep 300 ms of silence at each edge for context
-    )
+        seek_step=10,       # Check every 10 ms instead of every 1 ms, about 10x faster
+    ) or [audio]
 
-    # Guard: if no silence found, fall back to fixed 60-second chunks
-    if not chunks:
-        chunk_ms = 60_000
-        chunks = [audio[i: i + chunk_ms] for i in range(0, len(audio), chunk_ms)]
-
-    # Guard: a passage without pauses can still exceed the 10-minute limit
+    # A passage without pauses can still exceed the limit: cut it hard
     bounded: list[AudioSegment] = []
-    for chunk in chunks:
-        if len(chunk) <= MAX_CHUNK_MS:
-            bounded.append(chunk)
+    for piece in pieces:
+        bounded.extend(piece[i: i + MAX_CHUNK_MS] for i in range(0, len(piece), MAX_CHUNK_MS))
+
+    # Pack consecutive pieces into as few requests as possible
+    chunks: list[AudioSegment] = []
+    for piece in bounded:
+        if chunks and len(chunks[-1]) + len(piece) <= MAX_CHUNK_MS:
+            chunks[-1] += piece
         else:
-            bounded.extend(
-                chunk[i: i + MAX_CHUNK_MS] for i in range(0, len(chunk), MAX_CHUNK_MS)
-            )
+            chunks.append(piece)
 
     transcripts: list[str] = []
-    for chunk in bounded:
+    for chunk in chunks:
         buf = BytesIO()
-        chunk.export(buf, format="mp3")
+        # Mono at 64 kbit/s: 25 minutes come to about 12 MB, well below 25 MB
+        chunk.set_channels(1).export(buf, format="mp3", bitrate="64k")
         buf.seek(0)
         buf.name = "chunk.mp3"   # openai SDK reads the .name attribute for MIME type
 
@@ -119,7 +122,7 @@ def transcribe_large_file(path: str, language: str = "en") -> str:
             file=buf,
             language=language,
             response_format="json",
-            temperature=1.0,
+            temperature=0,
         )
         transcripts.append(result.text)
 
@@ -143,7 +146,7 @@ def transcribe_and_summarise(audio_path: str, language: str = "en") -> dict:
             file=f,
             language=language,
             response_format="json",
-            temperature=1.0,
+            temperature=0,
         )
     transcript = result.text
 
@@ -198,7 +201,7 @@ with open("recording.mp3", "rb") as f:
         file=f,
         language="en",
         response_format="verbose_json",
-        temperature=1.0,
+        temperature=0,
     )
 
 print(result.text)

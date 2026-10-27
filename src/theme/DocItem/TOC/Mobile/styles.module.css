@@ -1,0 +1,29 @@
+.tocMobile {
+  margin-bottom: var(--size-rem--l);
+}
+
+/* Nested headings are indented */
+.depth1 {
+  padding-inline-start: calc(var(--size-rem--m) * 2) !important;
+}
+
+.depth2 {
+  padding-inline-start: calc(var(--size-rem--m) * 3) !important;
+}
+
+.depth3 {
+  padding-inline-start: calc(var(--size-rem--m) * 4) !important;
+}
+
+@media (min-width: 997px) {
+  /* Prevent hydration FOUC, as the mobile TOC needs to be server-rendered */
+  .tocMobile {
+    display: none;
+  }
+}
+
+@media print {
+  .tocMobile {
+    display: none;
+  }
+}

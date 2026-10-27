@@ -1,12 +1,22 @@
-.reference {
-  border: 1px solid var(--ifm-color-emphasis-200);
-  border-top: 0;
-  border-bottom-right-radius: var(--ifm-card-border-radius);
-  border-bottom-left-radius: var(--ifm-card-border-radius);
-  padding: calc(var(--ifm-global-spacing) / 2);
-  font-size: 0.8rem;
-  text-align: right;
+.example {
   margin-bottom: var(--ifm-leading);
+}
+
+.example > :global(.theme-code-block) {
+  margin-bottom: 0;
+}
+
+/* Footer of the code block, styled like its (optional) title bar */
+.reference {
+  border: var(--code-block--border-width) var(--code-block--border-style)
+    var(--code-block--border-color);
+  border-top: 0;
+  border-bottom-right-radius: var(--code-block--corner-radius);
+  border-bottom-left-radius: var(--code-block--corner-radius);
+  background-color: var(--code-block--background-color);
+  padding: var(--size-px--s) var(--code-block--padding);
+  font-size: var(--font-size-text--s);
+  text-align: right;
 }
 
 .reference > p {
@@ -14,8 +24,7 @@
   margin-bottom: calc(var(--ifm-paragraph-margin-bottom) / 2);
 }
 
-div[class^="language-"]:has(+ div.reference) {
-  margin-bottom: 0;
+.example > :global(.theme-code-block):has(+ .reference) {
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
 }

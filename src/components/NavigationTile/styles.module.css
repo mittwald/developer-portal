@@ -1,0 +1,44 @@
+/* The whole tile is the link */
+.link {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+/* Not underlined like other links: in Markdown content (".markdown a" in
+   custom.css) and on hover (Infima's "a:hover") */
+.link,
+.link:hover,
+:global(.markdown) .link {
+  text-decoration: none;
+}
+
+/* Light tile outlined in the separator color */
+.tile {
+  height: 100%;
+  --accent-box--background-color-neutral: var(--neutral--color--200);
+  border: var(--separator--height) var(--separator--border-style)
+    var(--separator--color);
+  transition: background-color var(--transition--duration--default);
+}
+
+/* Hovering the link darkens the tile one step */
+.link:hover .tile {
+  --accent-box--background-color-neutral: var(--neutral--color--300);
+}
+
+/* The title close to its text */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-rem--xs);
+}
+
+.alignEnd .content {
+  align-items: flex-end;
+  text-align: end;
+}
+
+.description {
+  color: var(--neutral--color--800);
+}
