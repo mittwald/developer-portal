@@ -24,7 +24,10 @@ export function generateSchemaExample(schema: OpenAPIV3.SchemaObject): any {
         );
       });
     }
-    if (schema.additionalProperties) {
+    if (
+      schema.additionalProperties &&
+      typeof schema.additionalProperties === "object"
+    ) {
       let exampleKey = "string";
 
       if ("x-example-key" in schema) {

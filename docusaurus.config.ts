@@ -68,6 +68,13 @@ const config: Config = {
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: "/",
 
+  future: {
+    faster: {
+      // Reuse compiled MDX between the client and server builds.
+      mdxCrossCompilerCache: true,
+    },
+  },
+
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: "mittwald", // Usually your GitHub org/user name.
