@@ -18,7 +18,7 @@ Provider-Eintrag.
 ## Installation {#installation}
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash
+curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
 ```
 
 Installation prüfen:
@@ -29,23 +29,22 @@ hermes --version
 
 ## Hermes auf mittwald AI Hosting zeigen lassen {#configuration}
 
-Hermes liest `~/.hermes/config.yaml`. Füge einen `custom_providers`-Eintrag
-hinzu und mach ihn zum Standard:
+Hermes liest `~/.hermes/config.yaml`. Leg unter `providers:` einen Eintrag an
+und mach ihn zum Standard:
 
 ```yaml
 model:
-  default: Qwen3.5-122B-A10B-FP8
+  default: Qwen3.8-27B-NVFP4
   provider: mittwald
-  base_url: https://llm.aihosting.mittwald.de/v1
-custom_providers:
-  - name: mittwald
-    base_url: https://llm.aihosting.mittwald.de/v1
+providers:
+  mittwald:
+    api: https://llm.aihosting.mittwald.de/v1
     api_key: sk-...
     models:
-      - Qwen3.5-122B-A10B-FP8
-      - Qwen3.8-27B-NVFP4
-      - Qwen3.6-35B-A3B-FP8
-    context_length: 245760
+      Qwen3.8-27B-NVFP4:
+        context_length: 256000
+      Qwen3.6-35B-A3B-FP8:
+        context_length: 256000
 ```
 
 Ersetze `sk-...` durch deinen AI-Hosting-API-Key. Den legst du im Bereich
@@ -54,27 +53,29 @@ Ersetze `sk-...` durch deinen AI-Hosting-API-Key. Den legst du im Bereich
 mStudio-API-Token aus den Profileinstellungen ist ein anderes Zugangsmittel und
 funktioniert hier nicht.
 
-Ein `custom_providers`-Eintrag akzeptiert diese Schlüssel: `name`, `base_url`,
-`api_key`, `api_mode`, `model`, `models`, `context_length`, `rate_limit_delay`,
-`extra_body`, `ssl_ca_cert`, `ssl_verify` und `key_env`. Ein nicht erkannter
-Schlüssel wird nicht zuverlässig abgefangen, bevor du bis zu einer
-Chat-Session kommst – siehe
-[Konfiguration und Endpoint getrennt prüfen](#checking-separately) –, prüfe
-also im Zweifel die Schreibweise gegen diese Liste.
+Ein Eintrag unter `providers:` kennt diese Schlüssel: `api` (alternativ
+`base_url` oder `url`), `name`, `api_key`, `key_env`, `key_cmd`, `transport`
+(oder `api_mode`), `default_model` (oder `model`), `models`, `context_length`,
+`rate_limit_delay`, `request_timeout_seconds`, `stale_timeout_seconds`,
+`discover_models`, `extra_body`, `extra_headers`, `capabilities`, `ssl_ca_cert`,
+`ssl_verify`, `catalog_provider` und `session_affinity_header`. Alle anderen
+Schlüssel ignoriert Hermes und vermerkt sie nur in `~/.hermes/logs/errors.log`
+(siehe [Konfiguration und Endpoint getrennt prüfen](#checking-separately)).
+Verhält sich der Provider seltsam, vergleich die Schreibweise also mit dieser
+Liste.
 
-Statt den Key als `api_key` in `config.yaml` einzufügen, kannst du ihn
-komplett aus der Datei heraushalten und mit `key_env` aus einer
-Umgebungsvariable lesen:
+Den Key musst du nicht als `api_key` in die `config.yaml` schreiben. Mit
+`key_env` liest Hermes ihn aus einer Umgebungsvariable, die du in deiner Shell
+oder in `~/.hermes/.env` setzt:
 
 ```yaml
 key_env: MITTWALD_LLM_API_KEY
 ```
 
 :::note
-`context_length` gilt für den gesamten Eintrag. Setze ihn auf das kleinste
-Kontextfenster unter den aufgeführten Modellen – für die Auswahl oben also
-245.760 – oder trenne Modelle mit unterschiedlichen Fenstern in eigene
-Einträge.
+`context_length` steht pro Modell unter `models`. Beide Modelle oben verarbeiten
+256.000 Token. Steht `context_length` direkt im Eintrag, gilt der Wert für alle
+Modelle darin.
 :::
 
 ## Verbindung prüfen {#verify}
@@ -86,10 +87,10 @@ hermes doctor
 ```
 
 `doctor` deckt gängige Umgebungs- und Setup-Probleme auf, aber seine Ausgabe
-unterscheidet sich je nach Installation, und er validiert die Feldnamen von
-`custom_providers` nicht zuverlässig – ein nicht erkannter Schlüssel wird
-womöglich einfach ignoriert statt gemeldet. Verhält sich der Provider nicht
-wie erwartet, prüfe die Schreibweise gegen die Schlüsselliste unter
+unterscheidet sich je nach Installation. Falsch geschriebene Schlüssel in einem
+`providers:`-Eintrag meldet er nicht, Hermes übergeht sie ohne Hinweis im
+Terminal. Verhält sich der Provider nicht wie erwartet, prüf die Schreibweise
+anhand der Schlüsselliste unter
 [Hermes auf mittwald AI Hosting zeigen lassen](#configuration), statt dich
 darauf zu verlassen, dass `doctor` das abfängt.
 
@@ -97,20 +98,19 @@ Führe dann einen Turn aus, der einen Tool Call erzwingt, denn eine reine
 Chat-Antwort würde auch bei kaputtem Tool Calling gelingen:
 
 ```bash
-hermes chat --model Qwen3.5-122B-A10B-FP8 \
+hermes chat --oneshot --model Qwen3.8-27B-NVFP4 \
   -q "Create a file called hello.txt containing the word hello, then read it back."
 ```
 
 Zwei Dinge an diesem Befehl weichen vom Erwarteten ab:
 
-- Es gibt kein `-p`-Flag. Das Flag für den nicht-interaktiven Modus heißt
-  `-q`/`--query`.
-- Übergib nicht `--provider mittwald`. Hermes' `--provider`-Flag akzeptiert
-  nur seine eingebauten Provider-Namen (`auto`, `openrouter`, `nous`,
-  `anthropic` und so weiter) – ein eigener Provider-Name wird mit
-  `error: argument --provider: invalid choice` abgelehnt. Lass es weg;
-  Hermes übernimmt `mittwald` automatisch aus `model.provider` in
-  `config.yaml`, du musst also nur `-m`/`--model` angeben.
+- Es gibt kein `-p`-Flag. Die Anfrage übergibst du mit `-q`/`--query`. In einem
+  interaktiven Terminal eröffnet `-q` damit nur eine Chat-Session; erst mit
+  `--oneshot` antwortet Hermes und beendet sich danach.
+- `--provider` brauchst du nicht. Hermes nimmt `mittwald` aus `model.provider`
+  in der `config.yaml`, du gibst also nur `-m`/`--model` an. `--provider mittwald`
+  geht trotzdem, denn das Flag kennt neben Hermes' eingebauten Providern auch
+  die Schlüssel unter `providers:`.
 
 Ein erfolgreicher Lauf zeigt, wie der Agent einen `write_file`-Call vorbereitet,
 ein Diff dessen ausgibt, was geschrieben werden soll, dann einen
@@ -150,10 +150,15 @@ hermes skills list
 
 Nützlich für Entwicklungsarbeit:
 
-- `codebase-inspection` – strukturierte Exploration eines unbekannten
-  Repositorys
-- `github-pr-workflow`, `github-code-review`, `github-issues` – GitHub-Workflows
-- `native-mcp`, `mcporter` – Arbeiten mit MCP-Servern innerhalb einer Session
+- `codebase-inspection` – zählt Codezeilen eines Repositorys und schlüsselt sie
+  nach Sprache und Kommentaranteil auf
+- `github` – Pull Requests, Issues, Code-Reviews und Repositorys über die
+  `gh`-CLI
+
+Für MCP-Server brauchst du keinen Skill, Hermes bindet sie selbst ein (siehe
+[MCP-Server](#mcp-servers)). Der optionale Skill `mcporter` listet MCP-Server
+im Terminal auf, meldet sich an und ruft ihre Tools auf. Du installierst ihn mit
+`hermes skills install official/mcp/mcporter`.
 
 Weitere Skills kommen aus Registries:
 
@@ -217,33 +222,79 @@ Die Variante mit API-Token und die Fehlerbehebung stehen unter
 
 ## Troubleshooting {#troubleshooting}
 
-### `error: argument --provider: invalid choice: 'mittwald'` {#provider-invalid-choice}
+### `Unknown provider 'mittwald'` {#unknown-provider}
 
-`hermes chat --provider` akzeptiert nur Hermes' eingebaute Provider-Namen –
-`auto`, `openrouter`, `nous`, `openai-codex`, `copilot-acp`, `copilot`,
-`anthropic`, `gemini`, `huggingface`, `zai`, `kimi-coding`, `minimax`,
-`minimax-cn`, `kilocode` – nicht den Namen eines `custom_providers`-Eintrags.
-`--provider mittwald` schlägt mit genau diesem Fehler fehl, noch bevor der
-Agent startet. Lass `--provider` weg; mit `model.provider: mittwald` in
-`config.yaml` nutzt Hermes ihn als Standard, und `-m Qwen3.5-122B-A10B-FP8`
-reicht, um das Modell zu wählen.
+Hermes kennt keinen Provider mit diesem Namen. `--provider` und
+`model.provider` nehmen Hermes' eingebaute Provider-Namen und die Schlüssel
+unter `providers:` in der `config.yaml`. Prüf, ob der Schlüssel unter
+`providers:` genau so geschrieben ist wie der Name, den du übergibst, und ob der
+Eintrag eine gültige `api`-URL hat. Einen Eintrag ohne gültige URL verwirft
+Hermes.
+
+### `Legacy custom_providers entry 'mittwald' has no providers: twin` {#legacy-custom-providers}
+
+Diese Warnung zeigt `hermes doctor`, wenn deine Konfiguration den Provider noch
+in einer `custom_providers:`-Liste auf oberster Ebene definiert. So haben es
+ältere Hermes-Versionen und frühere Fassungen dieser Anleitung gemacht. Hermes
+liest die Liste zwar weiterhin, alles andere in Hermes bearbeitet aber nur noch
+`providers:`. Verschieb den Eintrag unter `providers:`, wie in
+[Hermes auf mittwald AI Hosting zeigen lassen](#configuration) gezeigt, und
+lösch die Liste. Die alten Schlüsselnamen funktionieren dort weiter, aktuell
+heißen sie aber `api` statt `base_url`, `default_model` statt `model` und
+`transport` statt `api_mode`. Willst du `context_length` pro Modell setzen, mach
+aus der `models`-Liste eine Zuordnung.
 
 ### Konfiguration und Endpoint getrennt prüfen {#checking-separately}
 
 `hermes doctor` und ein erzwungener Tool Call decken zwei unterschiedliche
 Fehlerarten ab, und es lohnt sich zu wissen, welche man gerade diagnostiziert:
 
-- `hermes doctor` deckt gängige Setup-Probleme auf, validiert aber die
-  Feldnamen von `custom_providers` nicht zuverlässig – ein falsch
-  geschriebener oder nicht unterstützter Schlüssel wird womöglich einfach
-  ignoriert statt gemeldet. Prüfe die Schreibweise gegen die Schlüsselliste
-  unter [Hermes auf mittwald AI Hosting zeigen lassen](#configuration),
-  statt dich darauf zu verlassen, dass `doctor` das abfängt.
+- `hermes doctor` prüft den Aufbau der `config.yaml`, meldet aber keine falsch
+  geschriebenen oder unbekannten Schlüssel in einem `providers:`-Eintrag.
+  Hermes übergeht solche Schlüssel und vermerkt sie nur in
+  `~/.hermes/logs/errors.log`, als
+  `providers.mittwald: unknown config keys ignored: …`. Vergleich die
+  Schreibweise mit der Schlüsselliste unter
+  [Hermes auf mittwald AI Hosting zeigen lassen](#configuration) oder such im
+  Log nach dieser Meldung.
 - Parst die Konfiguration sauber, aber Endpoint, Key oder Modell sind falsch,
   fängt `doctor` das ebenfalls nicht ab, weil er den Endpoint nicht aufruft. Ein
   erzwungener Tool Call (wie unter
   [Verbindung prüfen](#verify)) bestätigt, dass der mittwald-Endpoint
   tatsächlich erreichbar ist und Tool Calls zurückliefert.
+
+### Der Agent wiederholt denselben Tool-Call {#repeated-tool-calls}
+
+Der Agent liest immer wieder dieselbe Datei und kommt nie zu einer Änderung.
+Hermes erkennt so eine Schleife und hängt eine Warnung an das Tool-Ergebnis an.
+In einer interaktiven Session hält er sie von sich aus aber nicht an, und jede
+Iteration geht von deinem Token-Kontingent ab. Schalte in der
+`~/.hermes/config.yaml` den harten Stopp ein und begrenze die Iterationen pro
+Turn:
+
+```yaml
+tool_loop_guardrails:
+  hard_stop_enabled: true
+agent:
+  max_turns: 30
+```
+
+Mit `hard_stop_enabled` beendet Hermes den Turn, sobald derselbe Call fünfmal
+hintereinander dasselbe Ergebnis geliefert hat
+(`hard_stop_after.idempotent_no_progress`), und sagt dir, welche Schutzregel
+gegriffen hat. Antwortest du mit `continue`, macht der Agent weiter.
+`max_turns` ist die Höchstzahl an Tool-Iterationen pro Turn, ohne Angabe gibt es
+keine Grenze. Erreicht der Agent sie, fordert Hermes das Modell zum Abschluss
+auf und lässt noch einen Call für die letzte Antwort zu. Für einen einzelnen
+Lauf übergibst du stattdessen `--max-turns 30` an `hermes chat`.
+
+Die Limits beenden eine Schleife, verhindern sie aber nicht. Schleifen entstehen
+vor allem mit ausgeschaltetem Thinking. Lass bei `Qwen3.8-27B-NVFP4` Thinking für
+Planung und Tool-Arbeit eingeschaltet, siehe
+[Agent-Schleifen im Non-Thinking-Modus](/docs/v2/platform/aihosting/models/qwen3-8-27b-nvfp4#non-thinking-agent-loops).
+Das Modell denkt standardmäßig mit. Sieh also nach, ob du Thinking im
+Provider-Eintrag abgeschaltet hast, etwa mit `enable_thinking: false` unter
+`extra_body`.
 
 ## Nächste Schritte {#next-steps}
 

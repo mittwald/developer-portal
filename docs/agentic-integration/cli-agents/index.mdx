@@ -39,33 +39,38 @@ These three are documented here because they were verified end to end against mi
 AI Hosting. Any agent that lets you point it at a custom OpenAI-compatible endpoint
 works the same way.
 
-| Agent                          | Config file                        | MCP support                        | Skills                           |
-| ------------------------------ | ---------------------------------- | ---------------------------------- | -------------------------------- |
-| [Hermes Agent](./hermes-agent) | `~/.hermes/config.yaml`            | Built in (`hermes mcp add`)        | Built in, plus registries        |
-| [Pi](./pi)                     | `~/.pi/agent/models.json`          | Via the `pi-mcp-adapter` extension | Directory discovery or `--skill` |
-| [opencode](./opencode)         | `~/.config/opencode/opencode.json` | Built in (`mcp` config block)      | `~/.config/opencode/skills/`     |
+| Agent                          | Config file                        | MCP support                           | Skills                           |
+| ------------------------------ | ---------------------------------- | ------------------------------------- | -------------------------------- |
+| [Hermes Agent](./hermes-agent) | `~/.hermes/config.yaml`            | Built in (`hermes mcp add`)           | Built in, plus registries        |
+| [Pi](./pi)                     | `~/.pi/agent/models.json`          | Built in (`pi mcp add`), since 0.99.0 | Directory discovery or `--skill` |
+| [opencode](./opencode)         | `~/.config/opencode/opencode.json` | Built in (`mcp` config block)         | `~/.config/opencode/skills/`     |
 
 ## Choosing a model {#model-choice}
 
 All models are listed in the [AI models documentation](/docs/v2/platform/aihosting/models).
 For agentic work:
 
-| Use for                 | Model                   | Context        |
-| ----------------------- | ----------------------- | -------------- |
-| Main driver             | `Qwen3.5-122B-A10B-FP8` | 245,760        |
-| Faster default choice   | `Qwen3.8-27B-NVFP4`     | 256,000        |
-| Subagents, cheap turns  | `Qwen3.6-35B-A3B-FP8`   | 256,000        |
-| Reasoning-heavy work    | `gpt-oss-120b`          | 131,072        |
-| Routing, classification | `Qwen3.5-0.8B`          | 262,144        |
-| Documents and images    | `GLM-OCR`               | see model page |
+| Use for                 | Model                 | Context        |
+| ----------------------- | --------------------- | -------------- |
+| Main driver             | `Qwen3.8-27B-NVFP4`   | 256,000        |
+| Subagents, cheap turns  | `Qwen3.6-35B-A3B-FP8` | 256,000        |
+| Reasoning-heavy work    | `gpt-oss-120b`        | 131,072        |
+| Routing, classification | `Qwen3.5-0.8B`        | 262,144        |
+| Documents and images    | `GLM-OCR`             | see model page |
 
-Image understanding (vision) isn't limited to one entry here — `Qwen3.5-122B-A10B-FP8`,
-`Qwen3.8-27B-NVFP4` and `Qwen3.6-35B-A3B-FP8` all accept image input as Base64-encoded
-data URLs, though `Qwen3.8-27B-NVFP4` caps requests at 5 images.
+Image understanding (vision) isn't limited to one entry here — `Qwen3.8-27B-NVFP4` and
+`Qwen3.6-35B-A3B-FP8` both accept image input as Base64-encoded data URLs, though
+`Qwen3.8-27B-NVFP4` caps requests at 5 images.
 
-Start with `Qwen3.5-122B-A10B-FP8` as the driver. If an agent supports per-subagent
-model overrides, point the subagents at `Qwen3.6-35B-A3B-FP8` — the work they do is
-mostly search and summarising, and the faster model keeps long sessions responsive.
+Start with `Qwen3.8-27B-NVFP4` as the driver and leave thinking on, which is its default.
+With thinking off, agents on this model can get stuck repeating the same tool call — see
+[Agent loops in non-thinking mode](/docs/v2/platform/aihosting/models/qwen3-8-27b-nvfp4#non-thinking-agent-loops).
+If an agent supports per-subagent model overrides, point the subagents at
+`Qwen3.6-35B-A3B-FP8` — the work they do is mostly search and summarising, and the
+faster model keeps long sessions responsive.
+
+`Qwen3.5-122B-A10B-FP8` will be disabled on 28.12.2026. If your agents still use it,
+move them to `Qwen3.8-27B-NVFP4`.
 
 ## Quick start {#quick-start}
 
@@ -82,8 +87,10 @@ Large context windows are not a reason to send more. Agents burn context fastest
 file contents and command output.
 
 - Point the agent at specific files and functions rather than whole repositories.
-- Use `temperature` at or below 0.2 for edits and tool calls, so results are
-  reproducible.
+- Use the sampling parameters recommended on the model's page. Don't lower
+  `temperature` to 0: greedy decoding makes the models repeat themselves.
+- Set a step limit where the agent has one, so a run that loops ends early
+  instead of using up your token quota.
 - Raise `max_tokens` only when a reply is actually being truncated.
 - Where the agent supports compaction or summarisation, leave it enabled for long
   sessions.

@@ -16,9 +16,18 @@ unterstützt, mittwald AI Hosting braucht also keine Sonderbehandlung.
 
 ## Installation {#installation}
 
+opencode 2.x und 1.x liegen in unterschiedlichen npm-Paketen:
+
 ```bash
+# opencode 2.x
+npm install -g @opencode/cli
+
+# opencode 1.x
 npm install -g opencode-ai
 ```
+
+Beide Versionen bringen denselben Befehl `opencode` mit und lassen sich deshalb nicht
+nebeneinander installieren. Entferne eine 1.x-Installation, bevor du 2.x installierst.
 
 Installation prüfen:
 
@@ -36,7 +45,7 @@ opencode liest die Konfiguration aus einem der beiden Orte:
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "mittwald/Qwen3.5-122B-A10B-FP8",
+  "model": "mittwald/Qwen3.8-27B-NVFP4",
   "provider": {
     "mittwald": {
       "npm": "@ai-sdk/openai-compatible",
@@ -46,12 +55,6 @@ opencode liest die Konfiguration aus einem der beiden Orte:
         "apiKey": "sk-..."
       },
       "models": {
-        "Qwen3.5-122B-A10B-FP8": {
-          "name": "Qwen3.5-122B-A10B-FP8",
-          "reasoning": true,
-          "tool_call": true,
-          "limit": { "context": 245760, "output": 32768 }
-        },
         "Qwen3.8-27B-NVFP4": {
           "name": "Qwen3.8-27B-NVFP4",
           "reasoning": true,
@@ -98,6 +101,17 @@ auf dessen Seite in der
 [Dokumentation zu KI-Modellen](/docs/v2/platform/aihosting/models).
 :::
 
+:::note[opencode 2.x liest diese Konfiguration unverändert]
+Das Beispiel nutzt das Konfigurationsformat von 1.x, und das versteht opencode 2.x weiterhin.
+2.x liest dieselben Dateien und wandelt den `provider`-Block beim Laden selbst um. Das Feld
+`reasoning` am Modell übergeht 2.x und schreibt dazu eine Warnung ins Log. Auf das Thinking
+hat das keinen Einfluss, das steuert das Modell auf dem Server. Daneben kennt 2.x ein eigenes
+Format (`providers`, `package`, `settings`, `capabilities.tools`), beschrieben im
+[Migrationsleitfaden von opencode](https://opencode.ai/v2/docs/migrate-v1/). Umstellen musst
+du nicht. Liest opencode 1.x die Datei noch, lass sie im alten Format, denn mit dem neuen kann
+1.x nichts anfangen.
+:::
+
 ## Verbindung prüfen {#verify}
 
 ```bash
@@ -111,9 +125,10 @@ dort, wo du ihn startest. Eine reine Frage würde auch bei fehlendem
 
 Ohne `--auto` musst du den Dateischreibzugriff erst genehmigen, bevor er
 passiert. `--auto` genehmigt automatisch Berechtigungen, die nicht explizit
-verweigert sind. `--standalone` läuft gegen einen privaten Server statt gegen
-den gemeinsamen Hintergrunddienst – nützlich, wenn `opencode run` keine
-Ausgabe liefert (siehe [Troubleshooting](#no-output) weiter unten).
+verweigert sind. In opencode 2.x läuft `--standalone` gegen einen privaten
+Server statt gegen den gemeinsamen Hintergrunddienst. Das hilft, wenn
+`opencode run` keine Ausgabe liefert, siehe [Troubleshooting](#no-output).
+opencode 1.x hat weder den Hintergrunddienst noch das Flag `--standalone`.
 
 ## Nutzung {#usage}
 
@@ -134,7 +149,8 @@ MCP-Server werden im Top-Level-Objekt `mcp` deklariert. Jeder Eintrag hat
 eine von zwei Formen:
 
 - `"type": "local"` – `command` ist ein **Array**: das ausführbare Programm
-  gefolgt von seinen Argumenten. `env` ist optional.
+  gefolgt von seinen Argumenten. Mit dem optionalen `environment` setzt du
+  Umgebungsvariablen für den Server.
 - `"type": "remote"` – `url` zeigt auf einen MCP-Endpoint.
 
 ```json
@@ -167,7 +183,7 @@ eine von zwei Formen:
     "directus": {
       "type": "local",
       "command": ["npx", "-y", "@directus/content-mcp"],
-      "env": {
+      "environment": {
         "DIRECTUS_URL": "https://your-directus-instance.com",
         "DIRECTUS_TOKEN": "your-directus-token"
       },
@@ -176,7 +192,7 @@ eine von zwei Formen:
     "opensearch": {
       "type": "local",
       "command": ["uvx", "opensearch-mcp-server-py"],
-      "env": {
+      "environment": {
         "OPENSEARCH_URL": "https://localhost:9200",
         "OPENSEARCH_USERNAME": "your-opensearch-username",
         "OPENSEARCH_PASSWORD": "your-opensearch-password"
@@ -220,13 +236,20 @@ Plugins stehen im Array `plugin`:
 }
 ```
 
+:::warning[Plugins für 1.x laufen nicht in opencode 2.x]
+opencode 2.x hat eine neue Plugin-API, das Array heißt dort `plugins`. Plugins für 1.x lädt
+2.x nicht, auch wenn du den Schlüssel umbenennst. Das gilt auch für `opencode-scheduler`, es
+baut auf der Plugin-API von 1.x auf. Prüf deshalb vor dem Umstieg bei jedem Plugin, ob es 2.x
+schon unterstützt.
+:::
+
 Skills liegen unter `~/.config/opencode/skills/`, ein Verzeichnis pro Skill.
 
 Agent Packs fügen vorkonfigurierte Subagenten hinzu, jeder davon kann auf ein
-eigenes Modell zeigen. Subagenten auf `Qwen3.6-35B-A3B-FP8` zu routen,
-während der Hauptagent bei `Qwen3.5-122B-A10B-FP8` bleibt, hält lange
-Sessions reaktionsfähig, da Subagenten-Arbeit meist aus Suchen und
-Zusammenfassen besteht.
+eigenes Modell zeigen. Lass die Subagenten auf `Qwen3.6-35B-A3B-FP8` laufen
+und den Hauptagenten auf `Qwen3.8-27B-NVFP4` mit eingeschaltetem Thinking, so
+wie das Modell ausgeliefert wird. Dann bleiben auch lange Sessions flott, denn
+Subagenten suchen und fassen vor allem zusammen.
 
 ## Troubleshooting {#troubleshooting}
 
@@ -234,8 +257,8 @@ Zusammenfassen besteht.
 
 `opencode run` ist nicht interaktiv, und je nach Build liefert es unter
 Umständen gar nichts zurück – keine Ausgabe, keine Datei, keine Fehlermeldung
-– statt zu melden, was schiefgelaufen ist. `--standalone` führt den Befehl
-gegen einen privaten Server statt gegen den gemeinsamen Hintergrunddienst
+– statt zu melden, was schiefgelaufen ist. In opencode 2.x führt
+`--standalone` den Befehl gegen einen privaten Server statt gegen den gemeinsamen Hintergrunddienst
 aus – einen Versuch wert, wenn ein Lauf nichts liefert; das ist die
 dokumentierte Funktion des Flags, keine Garantie, dass es das Problem für
 jede Installation löst. Bestätigt `opencode run` die Verbindung weiterhin
@@ -276,6 +299,10 @@ Prüfe die Form des Eintrags. Ein `local`-Server braucht `command` als Array,
 nicht als String mit separatem `args`-Feld – ein String-`command` mit `args`
 ist das Format von Claude Desktop, und opencode ignoriert es stillschweigend
 statt einen Fehler zu werfen.
+
+Startet der Server, scheitert aber an der Anmeldung, sieh dir den Schlüssel für
+die Variablen an. opencode erwartet `environment`. Einen Schlüssel `env` wirft
+es ohne Warnung weg, und der Server startet ohne seine Zugangsdaten.
 
 ### `npx` meldet einen 404 für ein MCP-Paket {#package-404}
 
