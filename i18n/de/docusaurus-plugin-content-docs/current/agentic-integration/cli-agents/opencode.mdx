@@ -246,6 +246,30 @@ ausführen) und schicke denselben Prompt dort ab.
 
 Dem Modell fehlt `"tool_call": true` in seinem `models`-Eintrag.
 
+### Der Agent wiederholt denselben Tool-Call {#repeated-tool-calls}
+
+Der Agent liest dieselben Dateien wieder und wieder ein und kommt nie dazu, etwas zu ändern.
+opencode bricht so eine Schleife nicht von sich aus ab, und jeder Durchlauf geht von deinem
+Token-Kontingent ab. Leg deshalb in der `opencode.json` fest, wie viele Schritte jeder Agent
+höchstens machen darf:
+
+```json
+{
+  "agent": {
+    "build": { "steps": 30 },
+    "plan": { "steps": 30 }
+  }
+}
+```
+
+Ist die Grenze erreicht, verlangt opencode vom Modell keinen weiteren Tool-Call mehr, sondern
+eine Zusammenfassung dessen, was es bisher erledigt hat.
+
+Das Limit beendet eine Schleife, verhindert sie aber nicht. Meist entstehen solche Schleifen,
+wenn Thinking aus ist. Lass es bei `Qwen3.8-27B-NVFP4` für Planung und Tool-Arbeit deshalb
+eingeschaltet, siehe
+[Agent-Schleifen im Non-Thinking-Modus](/docs/v2/platform/aihosting/models/qwen3-8-27b-nvfp4#non-thinking-agent-loops).
+
 ### Ein MCP-Server startet nie {#mcp-server-fails}
 
 Prüfe die Form des Eintrags. Ein `local`-Server braucht `command` als Array,
