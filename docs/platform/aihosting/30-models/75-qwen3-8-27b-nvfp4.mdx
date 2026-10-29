@@ -344,6 +344,23 @@ The model has different recommended settings depending on the use case. Do not u
 If you see endless repetition, raise `presence_penalty` in steps up to 2.0. Higher values can
 occasionally mix languages and cost a little quality, so raise it only as far as needed.
 
+### Agent loops in non-thinking mode {#non-thinking-agent-loops}
+
+With thinking off, a coding agent driven by this model can get stuck: it calls the same tool with
+the same arguments over and over, for example reading the same file, and never moves on to the next
+step. The recommended parameters above don't prevent this. JetBrains describes the same behaviour
+in [their evaluation of Qwen3.8 for Junie](https://blog.jetbrains.com/junie/2026/08/qwen-for-junie/#qwen38-27b).
+
+Every repeated call sends the whole conversation again, so a loop that nothing stops can use
+millions of tokens in a single session. For agents:
+
+- **Plan and call tools with thinking on.** `"reasoning_effort": "medium"` is a good start. Thinking
+  costs more per answer, see [What the default costs](#reasoning-cost) for the numbers.
+- **Keep thinking off for single requests without a tool loop**, such as classification, routing,
+  and extraction.
+- **Set a step limit in the agent.** Sampling parameters don't end a loop, a step limit does. For
+  opencode, see [The agent keeps repeating the same tool call](/docs/v2/agentic-integration/cli-agents/opencode#repeated-tool-calls).
+
 ### Output length
 
 Set `max_tokens` according to task complexity to control cost and latency. Because reasoning tokens
@@ -417,6 +434,8 @@ What to do when you move a working integration across:
    most migrations first notice a difference, either as higher token bills or as empty answers.
 4. If your integration sends long conversations, check your context use. Kept reasoning blocks
    count towards the window; `preserve_thinking: false` restores the old behaviour.
+5. If an agent ran Qwen3.6 with thinking off, don't carry that over unchanged. Switch thinking on
+   or set a step limit, see [Agent loops in non-thinking mode](#non-thinking-agent-loops).
 
 Nothing else changes: the same `chat_template_kwargs` nesting, the same Base64 data URLs for
 images, the same tool-calling format.

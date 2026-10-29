@@ -347,6 +347,28 @@ Das Modell hat je nach Anwendungsfall unterschiedliche empfohlene Einstellungen.
 Wiederholt sich das Modell endlos, erhöhe `presence_penalty` schrittweise bis 2.0. Hohe Werte
 mischen gelegentlich Sprachen und kosten etwas Qualität, gehe also nur so hoch wie nötig.
 
+### Agent-Schleifen im Non-Thinking-Modus {#non-thinking-agent-loops}
+
+Ohne Thinking verrennt sich das Modell in Agent-Läufen manchmal. Es ruft dann dasselbe Tool mit
+denselben Argumenten wieder und wieder auf, liest etwa immer dieselbe Datei ein, und der nächste
+Arbeitsschritt kommt nie. Die empfohlenen Parameter oben ändern daran nichts. JetBrains hat bei
+Qwen3.8 dasselbe beobachtet, nachzulesen in
+[ihrem Test des Modells für Junie](https://blog.jetbrains.com/junie/2026/08/qwen-for-junie/#qwen38-27b).
+
+Teuer wird das, weil jeder Aufruf den kompletten bisherigen Verlauf noch einmal mitschickt. Bricht
+niemand die Schleife ab, gehen in einer einzigen Session schnell Millionen Token drauf.
+
+Für Agenten empfehlen wir deshalb:
+
+- **Lass Thinking an, sobald der Agent plant oder Tools aufruft.** `"reasoning_effort": "medium"`
+  ist ein guter Ausgangspunkt. Thinking kostet pro Antwort mehr Token. Wie viele, steht unter
+  [Was der Standard kostet](#reasoning-kosten).
+- **Schalte Thinking nur bei Einzelanfragen ohne Tool-Schleife ab**, also etwa bei Klassifikation,
+  Routing oder Extraktion.
+- **Setz im Agenten ein Schrittlimit.** Aus einer Schleife holt das Modell kein Sampling-Parameter
+  heraus, ein Schrittlimit beendet sie. Wie das in opencode geht, steht unter
+  [Der Agent wiederholt denselben Tool-Call](/docs/v2/agentic-integration/cli-agents/opencode#repeated-tool-calls).
+
 ### Ausgabelänge
 
 Über `max_tokens` steuerst du Kosten und Wartezeit. Weil die Reasoning-Token aus demselben Budget
@@ -423,6 +445,9 @@ Wenn du eine laufende Integration migrierst:
 4. Schickt deine Integration lange Verläufe, prüfe deinen Context-Verbrauch. Die erhaltenen
    Reasoning-Blöcke zählen mit. Mit `preserve_thinking: false` bekommst du das alte Verhalten
    zurück.
+5. Lief dein Agent mit Qwen3.6 bisher ohne Thinking, schalte es für Qwen3.8 ein oder setz ein
+   Schrittlimit. Warum, steht unter
+   [Agent-Schleifen im Non-Thinking-Modus](#non-thinking-agent-loops).
 
 Sonst bleibt alles gleich: dieselbe Verschachtelung in `chat_template_kwargs`, dieselben
 Base64-Data-URLs für Bilder, dasselbe Format für Tool-Calling.

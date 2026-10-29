@@ -237,6 +237,28 @@ with no subcommand) and send the same prompt there.
 
 The model is missing `"tool_call": true` in its `models` entry.
 
+### The agent keeps repeating the same tool call {#repeated-tool-calls}
+
+The agent reads the same files again and again and never gets to an edit. By default opencode
+doesn't stop such a loop, and every iteration counts against your token quota. Set a step limit
+for each agent in `opencode.json`:
+
+```json
+{
+  "agent": {
+    "build": { "steps": 30 },
+    "plan": { "steps": 30 }
+  }
+}
+```
+
+`steps` is the maximum number of agentic iterations. When the agent reaches it, opencode asks the
+model to summarise its work instead of making another tool call.
+
+The limit ends a loop but doesn't prevent it. Loops happen mostly with thinking off. With
+`Qwen3.8-27B-NVFP4`, switch thinking on for planning and tool work, see
+[Agent loops in non-thinking mode](/docs/v2/platform/aihosting/models/qwen3-8-27b-nvfp4#non-thinking-agent-loops).
+
 ### An MCP server never starts {#mcp-server-fails}
 
 Check the entry shape. A `local` server needs `command` as an array, not a string with
