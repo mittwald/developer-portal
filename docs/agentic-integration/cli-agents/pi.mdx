@@ -17,8 +17,16 @@ add.
 
 ## Installation {#installation}
 
+The installer script pins all dependencies and lets you update Pi later with `pi update`:
+
 ```bash
-npm install -g @earendil-works/pi-coding-agent
+curl -fsSL https://pi.dev/install.sh | sh
+```
+
+Or with npm, which needs Node.js 22.19 or newer:
+
+```bash
+npm install -g --ignore-scripts @earendil-works/pi-coding-agent
 ```
 
 Or with Homebrew:
@@ -43,8 +51,8 @@ gateway, Pi's first request sends a 2,640-character system prompt (as a
 6 KB. That's a small, fixed toolset and a compact prompt, so less of the model's
 context window is spent before you start working.
 
-opencode ships more capability out of the box — a plugin array, an MCP config block,
-and agent packs with per-agent model overrides. On disk, Pi installs to about 142 MB
+opencode ships more capability out of the box — a plugin array, agent packs with
+per-agent model overrides, and a step limit per agent. On disk, Pi installs to about 142 MB
 and opencode to about 160 MB, a modest difference either way.
 
 If you want a small, scriptable agent and prefer to add MCP servers and extensions
@@ -65,14 +73,6 @@ Pi reads providers from `~/.pi/agent/models.json`. Add a provider block:
       "apiKey": "sk-...",
       "models": [
         {
-          "id": "Qwen3.5-122B-A10B-FP8",
-          "name": "Qwen3.5-122B-A10B-FP8",
-          "reasoning": true,
-          "input": ["text", "image"],
-          "contextWindow": 245760,
-          "maxTokens": 32768
-        },
-        {
           "id": "Qwen3.8-27B-NVFP4",
           "name": "Qwen3.8-27B-NVFP4",
           "reasoning": true,
@@ -80,9 +80,10 @@ Pi reads providers from `~/.pi/agent/models.json`. Add a provider block:
           "contextWindow": 256000,
           "maxTokens": 32768,
           "samplingParams": {
-            "temperature": 0.7,
-            "top_p": 0.8,
-            "top_k": 20
+            "temperature": 1.0,
+            "top_p": 0.95,
+            "top_k": 20,
+            "presence_penalty": 0
           }
         },
         {
@@ -111,12 +112,18 @@ Make it the default in `~/.pi/agent/settings.json`:
 ```json
 {
   "defaultProvider": "mittwald",
-  "defaultModel": "Qwen3.5-122B-A10B-FP8"
+  "defaultModel": "Qwen3.8-27B-NVFP4"
 }
 ```
 
-Per-model `samplingParams` are optional. The recommended values for each model are on
-its page in the [AI models documentation](/docs/v2/platform/aihosting/models).
+Per-model `samplingParams` are optional. Pi merges them into every request body, so
+fields like `presence_penalty` reach the model unchanged. The recommended values for
+each model are on its page in the [AI models documentation](/docs/v2/platform/aihosting/models).
+
+The `Qwen3.8-27B-NVFP4` entry uses the values for thinking mode, because the model
+thinks by default and Pi leaves it that way. Pi sends its thinking level (`medium`
+unless you change `defaultThinkingLevel`) as `reasoning_effort`. The level `off` sends
+no field at all, so the model keeps thinking.
 
 ## Verifying the connection {#verify}
 
@@ -130,7 +137,7 @@ Then force a tool call, since a plain chat reply would succeed even with tool ca
 broken:
 
 ```bash
-pi --provider mittwald --model Qwen3.5-122B-A10B-FP8 --no-session \
+pi --provider mittwald --model Qwen3.8-27B-NVFP4 --no-session \
   -p "Create a file called hello.txt containing the word hello, then read it back."
 ```
 
@@ -145,48 +152,58 @@ the run ephemeral, so it doesn't leave a saved conversation behind.
 Extensions install from npm and are recorded in `settings.json` under `packages`:
 
 ```bash
-pi install npm:pi-mcp-adapter
+pi install npm:pi-safe-compact
 pi list
 ```
 
-| Extension                | What it does                                           |
-| ------------------------ | ------------------------------------------------------ |
-| `pi-mcp-adapter`         | **Required for MCP.** Pi has no MCP support without it |
-| `pi-safe-compact`        | Safer context compaction on long sessions              |
-| `@narumitw/pi-plan-mode` | A plan-then-execute mode                               |
-| `pi-background-tasks`    | Long-running commands without blocking the session     |
-| `@juicesharp/rpiv-todo`  | Task tracking inside a session                         |
+| Extension                | What it does                                       |
+| ------------------------ | -------------------------------------------------- |
+| `pi-safe-compact`        | Safer context compaction on long sessions          |
+| `@narumitw/pi-plan-mode` | A plan-then-execute mode                           |
+| `pi-background-tasks`    | Long-running commands without blocking the session |
+| `@juicesharp/rpiv-todo`  | Task tracking inside a session                     |
 
 Toggle what is enabled with `pi config`.
 
 ### MCP servers {#mcp-servers}
 
-Install `pi-mcp-adapter` first, then declare servers in `~/.pi/agent/mcp.json`:
+Pi supports MCP natively since version 0.99.0; you don't need an extension for it.
+Declare servers in `~/.pi/agent/mcp.json`:
 
 ```json
 {
   "mcpServers": {
     "context7": {
       "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp"],
-      "lifecycle": "lazy"
+      "args": ["-y", "@upstash/context7-mcp"]
     },
     "fetch": {
       "command": "uvx",
-      "args": ["mcp-server-fetch"],
-      "lifecycle": "lazy"
+      "args": ["mcp-server-fetch"]
     },
     "playwright": {
       "command": "npx",
-      "args": ["-y", "@playwright/mcp"],
-      "lifecycle": "lazy"
+      "args": ["-y", "@playwright/mcp"]
     }
   }
 }
 ```
 
-`lifecycle: "lazy"` starts a server on first use instead of at launch. Prefer it —
-several eagerly started servers noticeably slow down startup.
+Or add them from the shell, and check that every server connects:
+
+```bash
+pi mcp add context7 -- npx -y @upstash/context7-mcp
+pi mcp list
+```
+
+Pi connects all enabled servers in the background when a session starts. By default,
+their tools aren't declared to the model one by one; the model reaches them through
+Pi's `codemode` tool, which keeps the tool schemas out of every request. See
+[MCP Servers](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/mcp.md)
+in the Pi documentation for the `exposure` setting and remote servers.
+
+The `pi-mcp-adapter` extension still exists, but it replaces the built-in MCP support:
+with it installed, Pi no longer reads `mcp.json`.
 
 For mittwald infrastructure access, see
 [MCP Integration](/docs/v2/agentic-integration/mcp/).
@@ -210,7 +227,27 @@ Validate the file: `python3 -m json.tool ~/.pi/agent/models.json`.
 
 ### MCP servers are ignored {#mcp-ignored}
 
-`pi-mcp-adapter` is not installed. Check with `pi list`.
+Run `pi mcp list`. It connects to every enabled server and prints its state, tools,
+and errors. If the list is fine but a session has no MCP tools, check `pi list` for
+`pi-mcp-adapter`: that extension replaces the built-in MCP support, and Pi then
+ignores `mcp.json`. A project's `.pi/mcp.json` is only read once you trust the
+project.
+
+### The agent keeps repeating the same tool call {#repeated-tool-calls}
+
+The agent reads the same files again and again and never gets to an edit. Every
+iteration counts against your token quota. Pi 1.4.0 has no step or turn limit: neither
+the [settings](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/settings.md)
+nor the [command-line options](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/cli.md)
+offer one. In the terminal UI, press `Escape` to stop the current task. For
+unattended runs with `-p`, cap the run time from the shell, for example with GNU
+coreutils' `timeout 15m pi -p "..."`.
+
+Neither stops a loop from starting. Loops happen mostly with thinking off. With
+`Qwen3.8-27B-NVFP4`, keep thinking on for planning and tool work, as the configuration
+above does; if you turned it off, for example with `chat_template_kwargs` in
+`samplingParams`, turn it back on. See
+[Agent loops in non-thinking mode](/docs/v2/platform/aihosting/models/qwen3-8-27b-nvfp4#non-thinking-agent-loops).
 
 ### A `.pi/` directory appears even with `--no-session` {#pi-directory-appears}
 

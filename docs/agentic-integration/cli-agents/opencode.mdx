@@ -16,9 +16,18 @@ mittwald AI Hosting needs no special handling.
 
 ## Installation {#installation}
 
+opencode 2.x and 1.x are published as different npm packages:
+
 ```bash
+# opencode 2.x
+npm install -g @opencode/cli
+
+# opencode 1.x
 npm install -g opencode-ai
 ```
+
+Both versions install the same `opencode` command, so they can't be installed side by side.
+Remove a 1.x installation before you install 2.x.
 
 Check the install:
 
@@ -36,7 +45,7 @@ opencode reads configuration from either location:
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "mittwald/Qwen3.5-122B-A10B-FP8",
+  "model": "mittwald/Qwen3.8-27B-NVFP4",
   "provider": {
     "mittwald": {
       "npm": "@ai-sdk/openai-compatible",
@@ -46,12 +55,6 @@ opencode reads configuration from either location:
         "apiKey": "sk-..."
       },
       "models": {
-        "Qwen3.5-122B-A10B-FP8": {
-          "name": "Qwen3.5-122B-A10B-FP8",
-          "reasoning": true,
-          "tool_call": true,
-          "limit": { "context": 245760, "output": 32768 }
-        },
         "Qwen3.8-27B-NVFP4": {
           "name": "Qwen3.8-27B-NVFP4",
           "reasoning": true,
@@ -95,6 +98,17 @@ the agent's model rotation. Check each model's limits on its page in the
 [AI models documentation](/docs/v2/platform/aihosting/models).
 :::
 
+:::note[opencode 2.x reads this configuration unchanged]
+The example uses the 1.x configuration format, which opencode 2.x still supports. It reads the
+same files and converts the `provider` block when it loads them. 2.x ignores the per-model
+`reasoning` field and logs a warning about it; that doesn't affect thinking, which the model
+controls on the server side. 2.x also has a native format (`providers`, `package`, `settings`,
+`capabilities.tools`), described in opencode's
+[migration guide](https://opencode.ai/v2/docs/migrate-v1/). Converting to it is optional. Don't
+convert a file that opencode 1.x still reads, because 1.x doesn't understand the native 2.x
+format.
+:::
+
 ## Verifying the connection {#verify}
 
 ```bash
@@ -106,9 +120,10 @@ a scratch directory — the agent writes files where you start it. A plain quest
 succeed even with `tool_call` missing, which is why the check writes a file.
 
 Without `--auto`, you need to approve the file write before it happens. `--auto`
-auto-approves permissions that are not explicitly denied. `--standalone` runs against a
-private server instead of the shared background service — useful if `opencode run`
-produces no output (see [troubleshooting](#no-output) below).
+auto-approves permissions that are not explicitly denied. In opencode 2.x, `--standalone`
+runs against a private server instead of the shared background service — useful if
+`opencode run` produces no output (see [troubleshooting](#no-output) below). opencode 1.x has
+no background service and no `--standalone` flag.
 
 ## Usage {#usage}
 
@@ -129,7 +144,7 @@ MCP servers are declared in the top-level `mcp` object. Each entry is one of two
 shapes:
 
 - `"type": "local"` — `command` is an **array**: the executable followed by its
-  arguments. `env` is optional.
+  arguments. `environment` is optional and sets environment variables for the server.
 - `"type": "remote"` — `url` points at an MCP endpoint.
 
 ```json
@@ -162,7 +177,7 @@ shapes:
     "directus": {
       "type": "local",
       "command": ["npx", "-y", "@directus/content-mcp"],
-      "env": {
+      "environment": {
         "DIRECTUS_URL": "https://your-directus-instance.com",
         "DIRECTUS_TOKEN": "your-directus-token"
       },
@@ -171,7 +186,7 @@ shapes:
     "opensearch": {
       "type": "local",
       "command": ["uvx", "opensearch-mcp-server-py"],
-      "env": {
+      "environment": {
         "OPENSEARCH_URL": "https://localhost:9200",
         "OPENSEARCH_USERNAME": "your-opensearch-username",
         "OPENSEARCH_PASSWORD": "your-opensearch-password"
@@ -214,20 +229,26 @@ Plugins are listed in the `plugin` array:
 }
 ```
 
+:::warning[1.x plugins don't run in opencode 2.x]
+opencode 2.x has a new plugin API and calls the array `plugins`. Plugins written for 1.x don't
+load in 2.x, even if you rename the key. `opencode-scheduler` is one of them: it's built
+against the 1.x plugin API. Before you upgrade, check whether each plugin you use supports 2.x.
+:::
+
 Skills go in `~/.config/opencode/skills/`, one directory per skill.
 
 Agent packs add preconfigured subagents, each of which can point at its own model.
 Routing subagents to `Qwen3.6-35B-A3B-FP8` while the main agent stays on
-`Qwen3.5-122B-A10B-FP8` keeps long sessions responsive, since subagent work is mostly
-search and summarising.
+`Qwen3.8-27B-NVFP4` with thinking on (the model's default) keeps long sessions responsive,
+since subagent work is mostly search and summarising.
 
 ## Troubleshooting {#troubleshooting}
 
 ### `opencode run` produces no output and writes no file {#no-output}
 
 `opencode run` is non-interactive, and depending on the build it may return nothing —
-no output, no file, no error — rather than reporting what went wrong. `--standalone`
-runs the command against a private server instead of the shared background service,
+no output, no file, no error — rather than reporting what went wrong. In opencode 2.x,
+`--standalone` runs the command against a private server instead of the shared background service,
 which is worth trying if a run produces nothing; this is the documented purpose of the
 flag, not a guarantee it resolves the issue for every installation. If `opencode run`
 still doesn't confirm the connection, fall back to the interactive TUI (run `opencode`
@@ -264,6 +285,10 @@ The limit ends a loop but doesn't prevent it. Loops happen mostly with thinking 
 Check the entry shape. A `local` server needs `command` as an array, not a string with
 a separate `args` field — a string `command` with `args` is Claude Desktop's format,
 and opencode ignores it silently rather than erroring.
+
+If the server starts but fails to authenticate, check the name of the variables key. opencode
+expects `environment`. It drops an `env` key without a warning, so the server starts without
+its credentials.
 
 ### `npx` reports a 404 for an MCP package {#package-404}
 

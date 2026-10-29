@@ -44,7 +44,7 @@ zeigen lassen kannst, funktioniert genauso.
 | Agent                          | Konfigurationsdatei                | MCP-Unterstützung                     | Skills                               |
 | ------------------------------ | ---------------------------------- | ------------------------------------- | ------------------------------------ |
 | [Hermes Agent](./hermes-agent) | `~/.hermes/config.yaml`            | Eingebaut (`hermes mcp add`)          | Eingebaut, plus Registries           |
-| [Pi](./pi)                     | `~/.pi/agent/models.json`          | Über die Erweiterung `pi-mcp-adapter` | Verzeichnis-Discovery oder `--skill` |
+| [Pi](./pi)                     | `~/.pi/agent/models.json`          | Eingebaut (`pi mcp add`), seit 0.99.0 | Verzeichnis-Discovery oder `--skill` |
 | [opencode](./opencode)         | `~/.config/opencode/opencode.json` | Eingebaut (`mcp`-Konfigurationsblock) | `~/.config/opencode/skills/`         |
 
 ## Modellwahl {#model-choice}
@@ -52,24 +52,30 @@ zeigen lassen kannst, funktioniert genauso.
 Alle Modelle stehen in der [Dokumentation zu KI-Modellen](/docs/v2/platform/aihosting/models).
 Für agentische Arbeit:
 
-| Einsatzzweck               | Modell                  | Kontext           |
-| -------------------------- | ----------------------- | ----------------- |
-| Hauptmodell                | `Qwen3.5-122B-A10B-FP8` | 245.760           |
-| Schnellere Standardwahl    | `Qwen3.8-27B-NVFP4`     | 256.000           |
-| Subagenten, günstige Turns | `Qwen3.6-35B-A3B-FP8`   | 256.000           |
-| Reasoning-lastige Arbeit   | `gpt-oss-120b`          | 131.072           |
-| Routing, Klassifikation    | `Qwen3.5-0.8B`          | 262.144           |
-| Dokumente und Bilder       | `GLM-OCR`               | siehe Modellseite |
+| Einsatzzweck               | Modell                | Kontext           |
+| -------------------------- | --------------------- | ----------------- |
+| Hauptmodell                | `Qwen3.8-27B-NVFP4`   | 256.000           |
+| Subagenten, günstige Turns | `Qwen3.6-35B-A3B-FP8` | 256.000           |
+| Reasoning-lastige Arbeit   | `gpt-oss-120b`        | 131.072           |
+| Routing, Klassifikation    | `Qwen3.5-0.8B`        | 262.144           |
+| Dokumente und Bilder       | `GLM-OCR`             | siehe Modellseite |
 
-Bildverständnis (Vision) ist nicht auf einen einzigen Eintrag hier beschränkt:
-`Qwen3.5-122B-A10B-FP8`, `Qwen3.8-27B-NVFP4` und `Qwen3.6-35B-A3B-FP8`
-akzeptieren allesamt Bildeingaben als Base64-kodierte Data-URLs, wobei
-`Qwen3.8-27B-NVFP4` Anfragen auf 5 Bilder begrenzt.
+Bilder verstehen nicht nur die Modelle aus der Zeile „Dokumente und Bilder“:
+`Qwen3.8-27B-NVFP4` und `Qwen3.6-35B-A3B-FP8` nehmen ebenfalls Bilder an, als
+Base64-kodierte Data-URLs. `Qwen3.8-27B-NVFP4` verarbeitet höchstens 5 Bilder pro
+Anfrage.
 
-Starte mit `Qwen3.5-122B-A10B-FP8` als Hauptmodell. Unterstützt ein Agent
-eigene Modelle pro Subagent, setze die Subagenten auf `Qwen3.6-35B-A3B-FP8` –
-ihre Arbeit besteht meist aus Suchen und Zusammenfassen, und das schnellere
-Modell hält lange Sessions reaktionsfähig.
+Als Hauptmodell nimmst du `Qwen3.8-27B-NVFP4` mit eingeschaltetem Thinking, so ist
+es ohnehin voreingestellt. Schaltest du Thinking ab, kann sich der Agent festfahren
+und denselben Tool-Call immer wieder ausführen, siehe
+[Agent-Schleifen im Non-Thinking-Modus](/docs/v2/platform/aihosting/models/qwen3-8-27b-nvfp4#non-thinking-agent-loops).
+
+Kann dein Agent Subagenten ein eigenes Modell zuweisen, nimm für sie
+`Qwen3.6-35B-A3B-FP8`. Subagenten suchen und fassen vor allem zusammen, und mit dem
+schnelleren Modell bleiben auch lange Sessions flott.
+
+`Qwen3.5-122B-A10B-FP8` wird am 28.12.2026 abgeschaltet. Stell Agenten, die es noch
+nutzen, bis dahin auf `Qwen3.8-27B-NVFP4` um.
 
 ## Schnellstart {#quick-start}
 
@@ -87,8 +93,11 @@ Kontext am schnellsten durch Dateiinhalte und Befehlsausgaben.
 
 - Verweise gezielt auf einzelne Dateien und Funktionen statt auf ganze
   Repositories.
-- Nutze `temperature` bei 0,2 oder darunter für Edits und Tool Calls, damit
-  Ergebnisse reproduzierbar bleiben.
+- Halte dich an die Sampling-Parameter, die auf der Seite des jeweiligen Modells
+  stehen. Setz `temperature` nicht auf 0, sonst fangen die Modelle an, sich zu
+  wiederholen.
+- Hat dein Agent ein Schrittlimit, nutze es. Gerät ein Lauf in eine Schleife,
+  bricht er dann früh ab, statt unbemerkt dein Token-Kontingent aufzufressen.
 - Erhöhe `max_tokens` erst, wenn eine Antwort tatsächlich abgeschnitten wird.
 - Unterstützt der Agent Compaction oder Zusammenfassung, lass sie in langen
   Sessions aktiviert.
