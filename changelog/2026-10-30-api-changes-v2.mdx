@@ -1,0 +1,401 @@
+---
+title: API changes for v2 API, October 23 to October 30
+authors:
+  - machine
+tags:
+  - apiv2
+  - Container
+  - AI hosting
+  - Contract
+  - Customer
+  - Project
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week's update to the mittwald API introduces the new 'unspecified' enum value across various response properties and request parameters, enhances error handling with additional non-success status responses, and adds new endpoints for managing AI hosting keys and plans.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- The new enum value 'unspecified' has been added to the `/items/status` response property for the response status '200' in the following operations:
+  - `GET /v2/projects/{projectId}/services` (List Services belonging to a Project)
+  - `GET /v2/services` (List Services the executing user has access to)
+  - `GET /v2/stacks` (List Stacks of the Projects in which the executing user is owner or external member)
+  - `GET /v2/stacks/{stackId}` (Get a Stack)
+  
+- The new enum value 'unspecified' has been added to the `/items/services/items/status` response property for the response status '200' in the following operations:
+  - `GET /v2/projects/{projectId}/stacks` (List Stacks belonging to a Project)
+  - `GET /v2/stacks` (List Stacks of the Projects in which the executing user is owner or external member)
+  - `GET /v2/stacks/{stackId}` (Get a Stack)
+  - `PATCH /v2/stacks/{stackId}` (Create, update or delete Services or Volumes belonging to a Stack)
+  - `PUT /v2/stacks/{stackId}` (Declaratively create, update or delete Services or Volumes belonging to a Stack)
+
+- The new enum value 'unspecified' has been added to the `services/items/status` response property for the response status '201' in the operation:
+  - `POST /v2/projects/{projectId}/stacks` (Create a Stack)
+
+- The new enum value 'unspecified' has been added to the `services/items/status` response property for the response status '200' in the operation:
+  - `GET /v2/stacks/{stackId}` (Get a Stack)
+
+- The following endpoints have been added:
+  - `GET /v2/ai-hosting-keys` (Get all ai hosting keys the authenticated user can access)
+  - `GET /v2/ai-hostings` (Get all ai hosting plans the authenticated user can access)
+
+- The non-success response with the status '403' has been added to the following operations:
+  - `GET /v2/certificates/{certificateId}/contract` (Return the Contract for the given Certificate)
+  - `GET /v2/contracts/{contractId}` (Returns the Contract with the given ID)
+  - `GET /v2/contracts/{contractId}/base-items` (Return the BaseItem of the Contract with the given ID)
+  - `GET /v2/contracts/{contractId}/items/{contractItemId}` (Get the ContractItem with the given ID)
+  - `GET /v2/customers/{customerId}/ai-hostings/{aiHostingId}/contract` (Return the AI Hosting Contract for the given Customer)
+  - `GET /v2/customers/{customerId}/lead-fyndr-profile/contract` (Return the Contract for the given LeadFyndrProfile)
+  - `GET /v2/domains/{domainId}/contract` (Return the Contract for the given Domain)
+  - `GET /v2/licenses/{licenseId}/contract` (Return the Contract for the given License)
+  - `GET /v2/mail-addresses/{mailAddressId}/contract` (Return the Contract for the given Mail Address)
+  - `GET /v2/projects/{projectId}/contract` (Return the Contract for the given Project)
+  - `GET /v2/servers/{serverId}/contract` (Return the Contract for the given Server)
+
+- The non-success response with the status '400' has been added to the following operations:
+  - `PATCH /v2/customer-memberships/{customerMembershipId}` (Update a CustomerMembership)
+  - `PATCH /v2/project-memberships/{projectMembershipId}` (Update a ProjectMembership)
+
+- The non-success response with the status '404' has been added to the following operations:
+  - `PATCH /v2/customer-memberships/{customerMembershipId}` (Update a CustomerMembership)
+  - `PATCH /v2/project-memberships/{projectMembershipId}` (Update a ProjectMembership)
+
+- The non-success response with the status '412' has been added to the following operations:
+  - `PATCH /v2/customer-memberships/{customerMembershipId}` (Update a CustomerMembership)
+  - `PATCH /v2/project-memberships/{projectMembershipId}` (Update a ProjectMembership)
+
+- The new enum value 'unspecified' has been added to the `query` request parameter 'status' in the operation:
+  - `GET /v2/projects/{projectId}/services` (List Services belonging to a Project)
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "List Services belonging to a Project"
+
+
+- added the new 'unspecified' enum value to the '/items/status' response property for the response status '200'
+
+- added the new enum value 'unspecified' to the 'query' request parameter 'status'
+
+
+For details, refer to the <OperationLink operation="container-list-services" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Stacks belonging to a Project"
+
+
+- added the new 'unspecified' enum value to the '/items/services/items/status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="container-list-stacks" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a Stack"
+
+
+- added the new 'unspecified' enum value to the 'services/items/status' response property for the response status '201'
+
+
+For details, refer to the <OperationLink operation="container-create-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Services the executing user has access to"
+
+
+- added the new 'unspecified' enum value to the '/items/status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="container-list-accessible-services" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Stacks of the Projects in which the executing user is owner or external member"
+
+
+- added the new 'unspecified' enum value to the '/items/services/items/status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="container-list-self-stacks" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Stack"
+
+
+- added the new 'unspecified' enum value to the 'services/items/status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="container-get-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create, update or delete Services or Volumes belonging to a Stack"
+
+
+- added the new 'unspecified' enum value to the 'services/items/status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="container-update-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Declaratively create, update or delete Services or Volumes belonging to a Stack"
+
+
+- added the new 'unspecified' enum value to the 'services/items/status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="container-declare-stack" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Service belonging to a Stack"
+
+
+- added the new 'unspecified' enum value to the 'status' response property for the response status '200'
+
+
+For details, refer to the <OperationLink operation="container-get-service" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all ai hosting keys the authenticated user can access"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ai-hosting-user-get-keys" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all ai hosting plans the authenticated user can access"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="ai-hosting-user-get-plans" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the Contract for the given Certificate"
+
+
+- added the non-success response with the status '403'
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-certificate" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Returns the Contract with the given ID"
+
+
+- added the non-success response with the status '403'
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the BaseItem of the Contract with the given ID"
+
+
+- added the non-success response with the status '403'
+
+
+For details, refer to the <OperationLink operation="contract-get-base-item-of-contract" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the ContractItem with the given ID"
+
+
+- added the non-success response with the status '403'
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-item" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a customer membership"
+
+
+- added the non-success response with the status '400'
+
+- added the non-success response with the status '403'
+
+- added the non-success response with the status '404'
+
+- added the non-success response with the status '412'
+
+
+For details, refer to the <OperationLink operation="customer-update-customer-membership" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the AI Hosting Contract for the given Customer"
+
+
+- added the non-success response with the status '403'
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-ai-hosting" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the Contract for the given LeadFyndrProfile"
+
+
+- added the non-success response with the status '403'
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-lead-fyndr" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the Contract for the given Domain"
+
+
+- added the non-success response with the status '403'
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-domain" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the Contract for the given License"
+
+
+- added the non-success response with the status '403'
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-license" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the Contract for the given Mail Address"
+
+
+- added the non-success response with the status '403'
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-mail-address" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a ProjectMembership"
+
+
+- added the non-success response with the status '400'
+
+- added the non-success response with the status '403'
+
+- added the non-success response with the status '404'
+
+- added the non-success response with the status '412'
+
+
+For details, refer to the <OperationLink operation="project-update-project-membership" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the Contract for the given Project"
+
+
+- added the non-success response with the status '403'
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-project" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Return the Contract for the given Server"
+
+
+- added the non-success response with the status '403'
+
+
+For details, refer to the <OperationLink operation="contract-get-detail-of-contract-by-server" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK v2.2.20 Release Summary
+
+The mittwald PHP SDK has been updated to version 2.2.20. This release includes several enhancements and clarifications across various components:
+
+- **Container & Stack Networking**: Improved DNS resolution and isolation rules for containerized services. Managed applications within the same project can resolve services using `<serviceName>.<prefix>`, while containers within the same stack use the service name directly. Cross-stack communication is not supported to prevent unintended network exposure.
+
+- **Volume Lifecycle & Management**: Updated behavior for stack configuration regarding volumes. Volumes omitted from a stack request are safely detached but not deleted, ensuring data preservation. Explicit deletion is required via the dedicated volume endpoint. The `orphaned` flag now clearly indicates that unmounted volumes retain their data until explicitly removed.
+
+- **Service Configuration & Runtime Behavior**: 
+  - Ports now support single ports, ranges, and protocols, but mapping ports to different numbers is unsupported.
+  - Clarified the `unless-stopped` restart policy and noted that retry limits are accepted but ignored.
+  - Enforced lowercase decimal units for memory byte values.
+  - Container images are now resolved and locked to a specific digest at request time.
+
+- **Stack Identifiers & Service States**: 
+  - Added `unspecified` to the `ServiceStatus` enum.
+  - Updated the `prefix` field in stack responses to emphasize its role as an immutable identifier.
+  - Clarified the `shortId` field for SSH connections, noting that all API routes require the primary service `id`.
+
+- **SDK Documentation & Generated Code Cleanup**: Comprehensive updates to PHPDoc comments and removal of redundant docblocks to align with the latest API specifications and improve the IDE experience.
+
+For more details, please visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.2.20).
+
+### mittwald PHP SDK v2.2.19 Release Summary
+
+The mittwald PHP SDK has been updated to version 2.2.19. This release introduces new features, enhancements, and bug fixes to improve functionality and user experience.
+
+#### New Features
+- New endpoints for the AI Hosting API have been added, allowing developers to retrieve AI hosting keys and plans for authenticated users. These endpoints denormalize organization, project, and plan names, reducing the need for additional API calls.
+- Added `userGetKeys` and `userGetPlans` methods to the AI Hosting client.
+- Introduced comprehensive request and response models, along with `UserKey` and `UserPlan` schema definitions.
+
+#### Enhancements & Bug Fixes
+- **Contract API**: Improved error handling with explicit `403 Forbidden` responses for various contract endpoints.
+- **Customer & Project APIs**: Enhanced error handling for membership updates, capturing status codes `400`, `403`, `404`, and `412`.
+- **Container API**: Documentation updated to clarify `412 Precondition Failed` responses for pull-image webhooks when stacks are disabled or suspended.
+- **Activitylog Schema**: Updated parameter property references in `BackupRestoreRequested`.
+
+#### Code Generation Updates
+- Removed `declare(strict_types=1);` from all generated client files to align with updated code generator configurations.
+
+For more details, please visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.2.19).
+
+### mittwald JavaScript SDK Release 4.507.0
+
+The mittwald JavaScript SDK has been updated to version 4.507.0. This release includes an update to the generated client, enhancing the functionality and performance of the SDK. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.507.0](https://github.com/mittwald/api-client-js/releases/tag/4.507.0).
+
+### mittwald JavaScript SDK Release 4.506.0
+
+The mittwald JavaScript SDK has been updated to version 4.506.0. This release includes an update to the generated client, enhancing the functionality and performance of the SDK. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.506.0).
+
+### mittwald JavaScript SDK Release 4.505.0
+
+The mittwald JavaScript SDK has been updated to version 4.505.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.505.0](https://github.com/mittwald/api-client-js/releases/tag/4.505.0).
+
+### mittwald JavaScript SDK Release 4.504.0
+
+The mittwald JavaScript SDK version 4.504.0 has been released on October 26, 2026. This update includes a feature enhancement with an updated generated client. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.504.0).
+
