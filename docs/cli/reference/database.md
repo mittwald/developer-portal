@@ -27,6 +27,7 @@ Manage databases (like MySQL and Redis) in your projects
 
 
 
+
 ## `mw database list`
 
 List all kinds of databases belonging to a project.
@@ -913,6 +914,36 @@ FLAG DESCRIPTIONS
   --version=<value>  the Redis version to use
 
     Use the "database redis versions" command to list available versions
+```
+
+
+## `mw database redis delete DATABASE-ID`
+
+Delete a Redis database
+
+```
+USAGE
+  $ mw database redis delete DATABASE-ID [--token <value>] [-q] [-f]
+
+ARGUMENTS
+  DATABASE-ID  The ID of the database (when a project context is set, you can also use the name)
+
+FLAGS
+  -f, --force  do not ask for confirmation
+  -q, --quiet  suppress process output and only display a machine-readable summary
+
+AUTHENTICATION FLAGS
+  --token=<value>  API token to use for authentication (overrides environment and config file). NOTE: watch out that
+                   tokens passed via this flag might be logged in your shell history.
+
+DESCRIPTION
+  Delete a Redis database
+
+FLAG DESCRIPTIONS
+  -q, --quiet  suppress process output and only display a machine-readable summary
+
+    This flag controls if you want to see the process output or only a summary. When using mw non-interactively (e.g. in
+    scripts), you can use this flag to easily get the IDs of created resources for further processing.
 ```
 
 
