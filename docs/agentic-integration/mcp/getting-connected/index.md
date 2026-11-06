@@ -10,6 +10,12 @@ Welcome! This guide helps you set up authentication for mittwald MCP with your p
 
 **Why authentication is required**: mittwald MCP requires authenticated access to your mittwald resources. OAuth 2.1 is the recommended method for interactive use, and API tokens are available for headless/CI workflows.
 
+:::warning[MCP server currently unavailable]
+
+The mittwald MCP server is currently unavailable. There is currently no information on whether or when it will be available again. See the [MCP FAQ](https://www.mittwald.de/lp/mcp-faq) for the latest updates.
+
+:::
+
 ## Choose Your Tool {#choose-your-tool}
 
 mittwald MCP works with 7 popular AI tools. Choose the one you use:
