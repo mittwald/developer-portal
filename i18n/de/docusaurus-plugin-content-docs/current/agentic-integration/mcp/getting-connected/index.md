@@ -10,6 +10,12 @@ Willkommen! Diese Anleitung hilft dir, die Authentifizierung für mittwald MCP m
 
 **Warum Authentifizierung erforderlich ist**: mittwald MCP erfordert authentifizierten Zugriff auf deine mittwald-Ressourcen. OAuth 2.1 ist die empfohlene Methode für interaktive Nutzung, und API-Tokens stehen für CI/CD und nicht-interaktive Umgebungen zur Verfügung.
 
+:::warning[MCP-Server derzeit nicht verfügbar]
+
+Der mittwald MCP-Server ist derzeit nicht verfügbar. Aktuell gibt es keine Informationen dazu, ob oder wann er wieder verfügbar sein wird. Aktuelle Informationen findest du in den [MCP-FAQ](https://www.mittwald.de/lp/mcp-faq).
+
+:::
+
 ## Wähle dein Tool {#choose-your-tool}
 
 mittwald MCP funktioniert mit 7 beliebten KI-Tools. Wähle dasjenige, das du verwendest:
