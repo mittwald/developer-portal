@@ -73,17 +73,20 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+      # Provides the Dockerfile and .dockerignore; the site itself is packaged
+      # into the container image (see Dockerfile)
+      - name: Checkout
+        uses: actions/checkout@v7
       - name: Download a single artifact
         uses: actions/download-artifact@v8
         with:
           name: build
           path: build
-      - name: Deploy to mittwald space
-        uses: burnett01/rsync-deployments@9.0.2
+      - name: Deploy to mittwald container hosting
+        id: deploy
+        uses: mittwald/zerodeploy-action@v2
         with:
-          switches: -avzr --delete
-          path: build/
-          remote_path: /html/developer-portal-cutl1
-          remote_host: ${{ secrets.DEPLOY_HOST }}
-          remote_user: ${{ secrets.DEPLOY_USER }}
-          remote_key: ${{ secrets.DEPLOY_PRIVATE_KEY }}
+          mittwald-api-token: ${{ secrets.MITTWALD_API_TOKEN }}
+          mittwald-project-id: ${{ vars.MITTWALD_PROJECT_ID }}
+          service-name: developer-portal
+          image-tag: ${{ github.sha }}
