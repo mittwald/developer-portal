@@ -58,7 +58,7 @@ function ApiKeyRequired({
             error={error}
             onSubmit={onSubmit}
           >
-            <Button color="accent">
+            <Button color="success">
               <Translate id="playground.apikey.add">Add API token</Translate>
             </Button>
           </ApiKeyForm>

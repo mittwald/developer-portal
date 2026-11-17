@@ -5,10 +5,10 @@ import styles from "./HTTPMethod.module.css";
 
 export const methodColors: Record<string, BadgeProps["color"]> = {
   GET: "blue",
-  POST: "green",
-  PUT: "violet",
-  PATCH: "teal",
-  DELETE: "red",
+  POST: "success",
+  PUT: "lilac",
+  PATCH: "sage",
+  DELETE: "danger",
 };
 
 /** The HTTP method as a Flow badge, also usable in running text */

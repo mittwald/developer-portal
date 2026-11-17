@@ -6,7 +6,7 @@ import styles from "./styles.module.css";
 /** Marks new features, styled like the "Neu" (= new) badge in the Flow docs */
 export function NewBadge() {
   return (
-    <Badge color="violet" className={styles.badgeNew}>
+    <Badge color="lilac" className={styles.badgeNew}>
       <Translate id="component.newBadge.label">New</Translate>
     </Badge>
   );

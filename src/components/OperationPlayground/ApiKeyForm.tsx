@@ -82,8 +82,8 @@ function ApiKeyForm({
           )}
         </Content>
         <ActionGroup>
-          <Action onAction={handleSubmit}>
-            <Button color="accent" isPending={isVerifying}>
+          <Action onAction={() => handleSubmit()}>
+            <Button color="success" isPending={isVerifying}>
               <Translate id="playground.apikey.form.submit">
                 Verify & save
               </Translate>
