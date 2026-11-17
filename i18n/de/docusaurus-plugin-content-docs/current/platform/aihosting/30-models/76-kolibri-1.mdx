@@ -25,7 +25,7 @@ Es eignet sich für und unterstützt:
 
 Folgende Limitierungen gelten:
 
-- Maximale Context-Länge: 262.144 Token
+- Maximale Context-Länge: 1.048.576 Token, Ein- und Ausgabe zusammen, siehe [Lange Kontexte](#long-contexts)
 - Maximale Ausgabelänge: 65.536 Token pro Anfrage
 - Nur Text, keine Bild- oder Audioeingabe
 - Andere Sprachen als Deutsch und Englisch waren kein Trainingsziel und funktionieren spürbar schlechter
@@ -202,6 +202,12 @@ print(response.choices[0].message.tool_calls)
 
 Schickt dein Framework immer `tool_choice="required"` oder ein benanntes Tool, schlägt die Anfrage fehl. Stell das Framework auf `auto` um oder nimm für diesen Schritt ein anderes Modell.
 
+## Lange Kontexte {#long-contexts}
+
+Das Kontextfenster fasst 1.048.576 Token, Ein- und Ausgabe zusammen. Kolibri-1 wendet die Positionskodierung nur in seinen Sliding-Window-Schichten an und liest deshalb ohne Positionsskalierung über seine nativen 262.144 Token hinaus. Aleph Alpha hat das Modell bis 1.048.576 Token validiert. In unseren Tests hat es einen versteckten Code in deutschem Text bei 10, 50 und 90 Prozent Tiefe in Prompts von rund 1.040.000 Token gefunden.
+
+Lange Prompts einzulesen dauert. Rechne mit mehreren Minuten, wenn du an die Million Token herankommst. Aleph Alpha empfiehlt höchstens 262.144 Token für zeitkritische Anfragen und für komplexe Aufgaben. Nutz das volle Fenster dort, wo eine ganze Dokumentsammlung, eine Codebasis oder ein langer Agentenverlauf in eine einzige Anfrage passen muss.
+
 ## Umstieg von Qwen3.6-35B-A3B-FP8 {#switching-from-qwen3-6}
 
 Für Textaufgaben ist Kolibri-1 ein starker Ersatz für [Qwen3.6-35B-A3B-FP8](./70-qwen3-6-35b-a3b-fp8.mdx), auf Deutsch der bessere. Kolibri-1 ist kein Qwen-Ableger: Aleph Alpha hat eine eigene Architektur entworfen und das Modell von Grund auf trainiert. Beide Modelle rechnen pro Token mit rund 3 Milliarden Parametern, und Aleph Alpha vergleicht die beiden direkt. Aus deren Evaluation:
@@ -230,7 +236,7 @@ Was du beim Umzug einer laufenden Integration änderst:
 2. Nimm die Sampling-Parameter von Kolibri: `temperature` 1,0, `top_p` 0,97, `top_k` 128, oder lass sie weg und nimm die Standardwerte.
 3. Gib `reasoning_effort` mit statt nur `enable_thinking`, siehe [Reasoning-Tiefe steuern](#reasoning-effort). `enable_thinking: false` funktioniert weiterhin.
 4. Setz `max_tokens` mit Thinking auf mindestens 32.768.
-5. Prüf, ob dein Kontext in 262.144 Token passt.
+5. Lange Eingaben können bleiben: Kolibri-1 nimmt bis zu 1.048.576 Token an, etwa das Vierfache von Qwen3.6-35B-A3B-FP8. Was das an Zeit kostet, steht unter [Lange Kontexte](#long-contexts).
 
 ## Qualität dieses Builds {#quality}
 
