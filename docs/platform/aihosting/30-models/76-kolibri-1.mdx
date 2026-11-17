@@ -31,6 +31,7 @@ The following limitations apply:
 - Text only, no image or audio input
 - Languages other than German and English are not a training goal and work noticeably worse
 - `tool_choice="required"`, a named `tool_choice`, `parallel_tool_calls: false`, and `strict` tool schemas are not supported. Let the model decide with `tool_choice="auto"` (the default)
+- `tool_choice="none"` doesn't stop the model from writing a tool call. The call then arrives as text in `content` instead of in `tool_calls`. To get an answer without tools, leave out `tools`, see [Tool calling](#tool-calling)
 - Output at `temperature` 0 is not reproducible between requests
 - The model's knowledge ends in June 2026. Newer facts need tools or RAG
 
@@ -202,6 +203,8 @@ print(response.choices[0].message.tool_calls)
 ```
 
 If your framework always sends `tool_choice="required"` or a named tool, the request fails. Switch the framework to `auto` or use a different model for that step.
+
+The same applies the other way round: with `tool_choice="none"` the model can still decide to call a tool, and the call then appears as text in `content`, for example as a `<tool_call>` block. If a request must not use tools, don't send the `tools` field at all. Frameworks that keep the tool list in every request and switch tools off with `tool_choice="none"` need to drop the list for that step.
 
 ## Long contexts {#long-contexts}
 
