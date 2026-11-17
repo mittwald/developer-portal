@@ -2,7 +2,6 @@ import React from "react";
 import Translate, { translate } from "@docusaurus/Translate";
 import useBaseUrl from "@docusaurus/useBaseUrl";
 import Layout from "@theme/Layout";
-import ThemedImage from "@theme/ThemedImage";
 import { Heading } from "@mittwald/flow-react-components";
 import { IconPlug, IconRobot, IconRocket } from "@site/src/icons";
 
@@ -15,17 +14,13 @@ import Hero, { HeroEntries, HeroEntry } from "@site/src/components/Hero";
 import styles from "./index.module.css";
 
 function HomepageHeader() {
-  const lightLogo = useBaseUrl("/img/mittwald-logo-dark.svg");
-  const darkLogo = useBaseUrl("/img/mittwald-logo.svg");
+  // The hero is dark in both color modes (src/components/Hero)
+  const logo = useBaseUrl("/img/mittwald-logo.svg");
 
   return (
     <Hero>
       <Heading level={1} size="xxl" className={styles.heroTitle}>
-        <ThemedImage
-          className={styles.heroLogo}
-          sources={{ light: lightLogo, dark: darkLogo }}
-          alt="mittwald"
-        />
+        <img className={styles.heroLogo} src={logo} alt="mittwald" />
         <Translate id={"index.title"}>Developer Portal</Translate>
       </Heading>
       <HeroEntries>

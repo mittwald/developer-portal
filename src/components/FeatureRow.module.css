@@ -10,8 +10,20 @@
   }
 }
 
-/* On the landing page background (src/css/custom.css) */
+/* On a brand image (with its own grain), in dark mode in both color modes.
+   By default the cubes; a page sets its own image on the row through these
+   variables (declared on :root, so the row's own value wins) */
+:root {
+  --feature-row--background-image: url("/img/landing-cubes.webp");
+  --feature-row--background-position: center;
+  --feature-row--background-size: cover;
+  /* Behind an image that does not cover the row */
+  --feature-row--background-color: transparent;
+}
+
 .variant {
-  background: var(--landing--gradient);
-  background-blend-mode: overlay, normal;
+  background: var(--feature-row--background-image)
+    var(--feature-row--background-position) /
+    var(--feature-row--background-size) no-repeat
+    var(--feature-row--background-color);
 }

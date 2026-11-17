@@ -8,11 +8,14 @@
  * its tokens on `[data-theme]`, just like Docusaurus, so dark mode works
  * without separate overrides. Infima defines its own dark mode values on
  * `html[data-theme="dark"]`, which is why the mapping is applied to that
- * selector as well.
+ * selector as well. Sections always shown in dark mode
+ * (src/plugins/flowDarkScope.ts) need the mapping again, resolved with their
+ * dark tokens.
  */
 
 :root,
-html[data-theme="dark"] {
+html[data-theme="dark"],
+.flow-dark-scope {
   /* Colors */
   --ifm-color-primary: var(--primary--color--strong--100);
   --ifm-color-primary-dark: var(--primary--color--strong--200);
@@ -133,6 +136,11 @@ html[data-theme="dark"] {
 
 :root {
   --landing--gradient: var(--texture--grain), var(--landing--colors);
+}
+
+/* Sections always shown in dark mode inherit no text color from the page */
+.flow-dark-scope {
+  color: var(--ifm-font-color-base);
 }
 
 /* Infima hero (changelog archive), on the landing page background

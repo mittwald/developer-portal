@@ -30,7 +30,7 @@ import Hero, { HeroEntries, HeroEntry } from "@site/src/components/Hero";
 
 function MCPPageHeader() {
   return (
-    <Hero>
+    <Hero className={mcpStyles.hero}>
       <Heading level={1} size="xxl">
         mittwald MCP
       </Heading>
@@ -136,6 +136,7 @@ function OverviewFeature() {
   return (
     <FeatureRow
       variant
+      className={mcpStyles.spheresRow}
       intro={
         <Intro>
           <Icon>
@@ -156,7 +157,7 @@ function OverviewFeature() {
         </Intro>
       }
     >
-      <FeatureCard>
+      <FeatureCard backgroundColor="navy">
         <Heading level={3}>
           <Translate id="mcp.overview.toolset.title">
             Comprehensive toolset
@@ -193,7 +194,7 @@ function OverviewFeature() {
           </ul>
         </Text>
       </FeatureCard>
-      <FeatureCard>
+      <FeatureCard backgroundColor="navy">
         <Heading level={3}>
           <Translate id="mcp.overview.auth.title">
             Flexible authentication
@@ -348,6 +349,7 @@ function WorkflowFeature() {
   return (
     <FeatureRow
       variant
+      className={mcpStyles.spiralRow}
       intro={
         <Intro>
           <Icon>
@@ -366,7 +368,7 @@ function WorkflowFeature() {
         </Intro>
       }
     >
-      <FeatureCard>
+      <FeatureCard backgroundColor="navy">
         <Heading level={3}>
           <Translate id="mcp.workflow.steps.title">
             The agent workflow
