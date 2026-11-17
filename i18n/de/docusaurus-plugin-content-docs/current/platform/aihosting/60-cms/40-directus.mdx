@@ -24,7 +24,7 @@ Konfiguriere in den KI-Einstellungen den OpenAI-kompatiblen Provider mit den fol
 
 - **Base URL**: Gib `https://llm.aihosting.mittwald.de/v1` ein
 - **API Key**: Gib deinen mittwald AI Hosting API-Schlüssel ein
-- **Model**: Gib die Modell-ID ein, die du verwenden möchtest, z.B. `ministral-3-14b-instruct-2512`
+- **Model**: Gib die Modell-ID ein, die du verwenden möchtest, z. B. `Ministral-3-14B-Instruct-2512`
 
 Das System hängt automatisch `/chat/completions` an die Base URL an, wenn Anfragen gestellt werden. Füge dieses Pfadsegment daher nicht im Base URL-Feld ein.
 
@@ -36,8 +36,14 @@ Stelle nach der Konfiguration des Providers sicher, dass der KI-Assistent aktivi
 
 Du kannst jedes chat-fähige Modell von mittwald AI Hosting mit Directus verwenden. Empfohlene Modelle sind:
 
-- `ministral-3-14b-instruct-2512` — Allzweckmodell mit Vision-Unterstützung
+- `Ministral-3-14B-Instruct-2512` — Allzweckmodell mit Vision-Unterstützung
 - `gpt-oss-120b` — Großes Modell für komplexe Reasoning-Aufgaben
+- `DeepSeek-V4.1-Flash-1017` — Das größte Modell in unserem Angebot, mit Reasoning- und Vision-Unterstützung
+- `Kolibri-1` — Reasoning-Modell für Deutsch und Englisch, für deutsche Texte, Übersetzungen und SEO-Beschreibungen; nur Text
+
+`DeepSeek-V4.1-Flash-1017` und `Kolibri-1` sind in der [Testphase](../20-access-and-usage/40-lifecycle.mdx#testphase). Für den Produktivbetrieb wähle ein Stable- oder LTS-Modell. Beide denken standardmäßig nach, bevor sie antworten, Antworten dauern daher länger.
+
+Kolibri-1 ruft Tools nur mit `tool_choice` auf `auto` auf. Erzwingt der Assistent einen Tool-Aufruf mit `tool_choice="required"`, schlagen Anfragen an Kolibri-1 fehl; nimm in diesem Fall ein anderes Modell.
 
 Eine vollständige Liste der verfügbaren Modelle und ihrer Funktionen findest du in der [Modellübersicht](../../models/).
 

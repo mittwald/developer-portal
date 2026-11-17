@@ -33,13 +33,15 @@ default:
 
 ```yaml
 model:
-  default: Qwen3.8-27B-NVFP4
+  default: DeepSeek-V4.1-Flash-1017
   provider: mittwald
 providers:
   mittwald:
     api: https://llm.aihosting.mittwald.de/v1
     api_key: sk-...
     models:
+      DeepSeek-V4.1-Flash-1017:
+        context_length: 1048576
       Qwen3.8-27B-NVFP4:
         context_length: 256000
       Qwen3.6-35B-A3B-FP8:
@@ -70,9 +72,14 @@ key_env: MITTWALD_LLM_API_KEY
 ```
 
 :::note
-`context_length` is set per model under `models`. Both models above accept 256,000
-tokens. A `context_length` directly on the entry would apply to every model in it.
+`context_length` is set per model under `models`. `DeepSeek-V4.1-Flash-1017` accepts
+1,048,576 tokens, input and output together, and the two Qwen models accept 256,000 tokens.
+A `context_length` directly on the entry would apply to every model in it.
 :::
+
+The default model, `DeepSeek-V4.1-Flash-1017`, is the largest model we offer and the one we recommend for coding agents. It's in the [Testphase](../../platform/aihosting/20-access-and-usage/40-lifecycle.mdx#testphase), so it can queue at peak times and is unavailable for
+about 20 minutes during an update. For a production-stable default, set `model.default` to
+`Qwen3.8-27B-NVFP4` (Stable).
 
 ## Verifying the connection {#verify}
 
@@ -93,7 +100,7 @@ Then run one turn that forces a tool call, because a plain chat reply would succ
 even if tool calling were broken:
 
 ```bash
-hermes chat --oneshot --model Qwen3.8-27B-NVFP4 \
+hermes chat --oneshot --model DeepSeek-V4.1-Flash-1017 \
   -q "Create a file called hello.txt containing the word hello, then read it back."
 ```
 

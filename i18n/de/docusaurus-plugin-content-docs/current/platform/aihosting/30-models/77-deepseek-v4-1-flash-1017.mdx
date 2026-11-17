@@ -9,7 +9,7 @@ import TabItem from "@theme/TabItem";
 
 ## Beschreibung {#description}
 
-„DeepSeek-V4.1-Flash-1017“ ist ein multimodales Reasoning-Modell von DeepSeek. Es ist ein Mixture-of-Experts-Modell mit 552 Milliarden Parametern. Beim Lesen des Prompts rechnen pro Token 8 Milliarden davon mit, beim Schreiben der Antwort 16 Milliarden. Dadurch sind lange Eingaben günstig zu verarbeiten, und genau die brauchen Coding-Agenten und die Arbeit mit Dokumenten. Das Kontextfenster fasst rund eine Million Token. Unter unseren Modellen ist es das stärkste für Coding-Agenten und lang laufende agentische Aufgaben.
+„DeepSeek-V4.1-Flash-1017“ ist ein multimodales Reasoning-Modell von DeepSeek. Es ist ein Mixture-of-Experts-Modell mit 552 Milliarden Parametern. Beim Lesen des Prompts rechnen pro Token 8 Milliarden davon mit, beim Schreiben der Antwort 16 Milliarden. Dadurch sind lange Eingaben günstig zu verarbeiten, und genau die brauchen Coding-Agenten und die Arbeit mit Dokumenten. Das Kontextfenster fasst rund eine Million Token. Es ist das größte Modell in unserem Angebot und unsere Empfehlung für Coding-Agenten und lang laufende agentische Aufgaben.
 
 Dieses Modell ist in der [Testphase](../20-access-and-usage/40-lifecycle.mdx#testphase). Verhalten und Funktionsumfang können sich noch ändern. Für den produktiven Einsatz empfehlen wir Modelle mit dem Status Stable oder LTS.
 
@@ -46,7 +46,7 @@ Das Modell nimmt seine Reasoning-Tiefe als Zahl von 1 bis 100. Gib sie als `reas
 | `low`             | 50    | Alltäglicher Chat, Entwürfe, Übersetzung, Zusammenfassungen   |
 | `none`            | aus   | Klassifizierung, Routing, Extraktion, kurze Standardantworten |
 
-`none` schaltet den Thinking-Modus ab, `"thinking": false` bewirkt dasselbe. `xhigh` wird angenommen und bedeutet dasselbe wie `high`. Jeder andere Wert kommt als `400` zurück.
+`none` schaltet den Thinking-Modus ab, `"thinking": false` bewirkt dasselbe. `xhigh` wird angenommen und bedeutet dasselbe wie `high`. Jeder andere Wert kommt als `400` zurück. Das gilt auch für `medium` und `minimal`, die viele OpenAI-Clients standardmäßig schicken, auch dann, wenn sie `reasoning_effort` auf der obersten Ebene der Anfrage mitgeben. Stell einen solchen Client auf `low` oder `high`.
 
 <Tabs groupId="language">
   <TabItem value="python" label="Python">
@@ -167,7 +167,7 @@ DeepSeek hat seine Benchmarks mit bis zu 256.000 Ausgabe-Token gefahren. So viel
 
 ### Coding-Agenten {#coding-agents}
 
-DeepSeek hat dieses Release auf Agenten-Harnesses wie Claude Code, opencode und SWE-agent abgestimmt. Gegenüber DeepSeek-V4.1-Flash erledigt es Agentenaufgaben mit weniger und kürzeren Schritten. Für Agenten gilt:
+DeepSeek hat dieses Release in mehreren Agenten-Harnesses gemessen, darunter Claude Code und mini-SWE-agent. Gegenüber DeepSeek-V4.1-Flash erledigt es Agentenaufgaben schneller und mit kürzerer Ausgabe. Für Agenten gilt:
 
 - Lass Thinking an. `high` ist ein guter Start, `max` lohnt sich bei schwerem Debugging.
 - Behalte den Standard für `drop_thinking`. Innerhalb eines Tool-Loops bleibt das Reasoning so oder so erhalten.

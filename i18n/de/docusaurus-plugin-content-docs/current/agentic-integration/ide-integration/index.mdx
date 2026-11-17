@@ -18,11 +18,15 @@ Der Service bietet mehrere Modelle für unterschiedliche Entwicklungsaufgaben. E
 
 **Empfohlene Modelle:**
 
-- **Qwen3.5-122B-A10B-FP8**: Standardwahl für Coding – stärkstes Tool Calling,
-  245.760 Token Kontext
-- **Qwen3.8-27B-NVFP4**: schneller als das 122B-Modell, 256.000 Token Kontext
-- **Qwen3.6-35B-A3B-FP8**: das schnellste der drei, 256.000 Token Kontext, gut für
+- **DeepSeek-V4.1-Flash-1017**: das größte Modell in unserem Angebot und unsere Empfehlung für Coding-Agenten – 1.048.576 Token
+  Kontext, Bild-Input, Tool Calling. Es ist in der
+  [Testphase](/docs/v2/platform/aihosting/access-and-usage/lifecycle#testphase)
+- **Qwen3.8-27B-NVFP4**: die Stable-Wahl für den Produktivbetrieb, 256.000 Token Kontext,
+  bis zu 5 Bilder pro Anfrage
+- **Qwen3.6-35B-A3B-FP8**: das schnellste der Coding-Modelle, 256.000 Token Kontext, gut für
   Completion und schnelle Edits
+- **Kolibri-1**: Chat und Texte auf Deutsch, 262.144 Token Kontext, nur Text.
+  Es ist in der [Testphase](/docs/v2/platform/aihosting/access-and-usage/lifecycle#testphase)
 - **gpt-oss-120b**: reasoning-lastige Aufgaben, 131.072 Token Kontext
 - **Ministral-3-14B-Instruct-2512**: klein und schnell, 262.144 Token Kontext, für
   leichtgewichtige Assistenten
@@ -45,17 +49,20 @@ Läuft dein Agent lieber im Terminal statt im Editor? Unter
 1. **AI-Hosting-API-Key holen**: Siehe [API-Key einrichten](/docs/v2/platform/aihosting/access-and-usage/access)
 2. **IDE wählen**: Eine der Integrationen oben nutzen
 3. **Endpoint konfigurieren**: `https://llm.aihosting.mittwald.de/v1`
-4. **Modell wählen**: `Qwen3.5-122B-A10B-FP8`
+4. **Modell wählen**: `DeepSeek-V4.1-Flash-1017`, oder `Qwen3.8-27B-NVFP4`, wenn du ein Stable-Modell brauchst
 
 ## Best Practices
 
 ### Modellwahl
 
-- **Qwen3.5-122B-A10B-FP8**: Startpunkt für agentic Coding, Refactoring und Tool Use
-- **Qwen3.8-27B-NVFP4**: schnellere Antworten als das 122B-Modell, bei etwas
-  geringerer Qualität
+- **DeepSeek-V4.1-Flash-1017**: Startpunkt für agentic Coding, Refactoring und Tool Use.
+  Setz das Kontextfenster auf 1.048.576 Token und `max_tokens` auf mindestens 32.768, denn
+  das Modell denkt nach, bevor es antwortet
+- **Qwen3.8-27B-NVFP4**: Produktiv-Setups, die ein Modell mit dem Status Stable brauchen
 - **Qwen3.6-35B-A3B-FP8**: Inline-Completion und schnelle Edits, wo Latenz mehr
   zählt als Tiefe
+- **Kolibri-1**: Chat und Texte auf Deutsch. Es ruft Tools nur mit
+  `tool_choice: "auto"` auf, nutze es also nicht mit Agents, die einen Tool-Aufruf erzwingen
 - **gpt-oss-120b**: komplexes Reasoning, präzise Dokumentation, anspruchsvolle
   Automatisierungen
 - **Ministral-3-14B-Instruct-2512**: leichtgewichtige Assistenten und einfacher Chat
@@ -65,8 +72,10 @@ Läuft dein Agent lieber im Terminal statt im Editor? Unter
 - Nicht das ganze Repo senden, nur relevante Dateien/Funktionskörper
 - Vorherige Schritte zusammenfassen und IDs/Anker für Rehydration nutzen
 - Antworten streamen, `max_tokens` nur bei Bedarf erhöhen
-- Für Tools/Edits deterministisch bleiben: `temperature <= 0.2`
-- Repo-Scope bewusst klein halten
+- Für Tools/Edits deterministisch bleiben: `temperature <= 0.2`. Reasoning-Modelle wie
+  DeepSeek-V4.1-Flash-1017 und Kolibri-1 sind die Ausnahme: Behalte die Sampling-Parameter
+  von ihren Modellseiten bei
+- Repo-Scope bewusst klein halten, gezielt einzelne Dateien/Funktionen anfragen
 - Bei Orchestrierung mehrstufiger Änderungen bevorzugt strukturierte Outputs (JSON/Tool-Output) nutzen
 
 ### MCP Server Integration
@@ -97,4 +106,4 @@ Wähle deine IDE bzw. dein Tool:
 
 ## Disclaimer
 
-Drittanbieter-Tools, MCP-Server und externe Links werden zur Vereinfachung bereitgestellt, ohne Gewährleistung oder Empfehlung. Nutze sie auf eigenes Risiko, prüfe Lizenzen und Datenschutzrichtlinien und vergib nur die nötigen Berechtigungen (Least Privilege).
+Drittanbieter-Tools, MCP-Server und externe Links werden zur Vereinfachung bereitgestellt, ohne Gewährleistung oder Empfehlung. Nutze sie auf eigenes Risiko, prüfe Lizenzen und Datenschutzrichtlinien und vergib nur die nötigen Berechtigungen (Least Privilege). Schick keine sensiblen Daten an externe Dienste, wenn es nicht nötig und erlaubt ist.

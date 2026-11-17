@@ -24,7 +24,7 @@ In the AI settings, configure the OpenAI-compatible provider with the following 
 
 - **Base URL**: Enter `https://llm.aihosting.mittwald.de/v1`
 - **API Key**: Enter your mittwald AI Hosting API key
-- **Model**: Enter the model identifier you want to use, such as `ministral-3-14b-instruct-2512`
+- **Model**: Enter the model identifier you want to use, such as `Ministral-3-14B-Instruct-2512`
 
 The system automatically appends `/chat/completions` to the base URL when making requests, so do not include this path segment in the base URL field.
 
@@ -36,8 +36,14 @@ After configuring the provider, ensure the AI assistant is enabled. If AI featur
 
 You can use any chat-capable model from mittwald AI Hosting with Directus. Recommended models include:
 
-- `ministral-3-14b-instruct-2512` — General-purpose model with vision support
+- `Ministral-3-14B-Instruct-2512` — General-purpose model with vision support
 - `gpt-oss-120b` — Large model for complex reasoning tasks
+- `DeepSeek-V4.1-Flash-1017` — The largest model we offer, with reasoning and vision support
+- `Kolibri-1` — Reasoning model for German and English, for German texts, translations, and SEO descriptions; text only
+
+`DeepSeek-V4.1-Flash-1017` and `Kolibri-1` are in the [Testphase](../20-access-and-usage/40-lifecycle.mdx#testphase). For production use, pick a Stable or LTS model. Both think before they answer by default, so responses take longer.
+
+Kolibri-1 calls tools only with `tool_choice` set to `auto`. If the assistant forces a tool call with `tool_choice="required"`, requests to Kolibri-1 fail; use a different model in that case.
 
 For a complete list of available models and their capabilities, see the [models overview](../../models/).
 

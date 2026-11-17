@@ -88,12 +88,20 @@ The mittwald connector for WordPress implements chat completions (text generatio
 Chat completions are available with several models optimized for different tasks:
 
 - **gpt-oss-120b**: Open-source GPT-compatible model for general content generation and advanced reasoning
-- **Qwen3.5-122B-A10B-FP8** and **Qwen3.6-35B-A3B-FP8**: Large models with reasoning and vision capabilities
+- **DeepSeek-V4.1-Flash-1017**: The largest model we offer, with reasoning and vision capabilities
+- **Qwen3.8-27B-NVFP4** and **Qwen3.6-35B-A3B-FP8**: Models with reasoning and vision capabilities
+- **Kolibri-1**: Reasoning model for German and English; text-only, it does not accept image input
 - **Qwen3.5-0.8B**: Lightweight model for cost-sensitive tasks; text-only, it does not accept image input
 - **Ministral-3-14B-Instruct-2512**: Chat model with vision and image input capabilities
 - **GLM-OCR**: Document OCR model for extracting text from images and documents
 
-These models support standard text generation, JSON output formatting, tool calling, and streaming responses. The Ministral, Qwen3.5-122B, Qwen3.6 and GLM-OCR models additionally accept image input.
+These models support standard text generation, JSON output formatting, tool calling, and streaming responses. The DeepSeek, Qwen3.8, Qwen3.6, Ministral and GLM-OCR models additionally accept image input.
+
+For German content — titles, excerpts, summaries, and SEO descriptions — [Kolibri-1](../30-models/76-kolibri-1.mdx) is a natural fit, because its answers read like German, not like a translation. Alt text needs image input, so use a vision model for that feature. Kolibri-1 calls tools only with `tool_choice` set to `auto`; a plugin that forces a tool call with `tool_choice="required"` fails with this model.
+
+Kolibri-1 and DeepSeek-V4.1-Flash-1017 are in the [Testphase](../20-access-and-usage/40-lifecycle.mdx#testphase). For production sites, pick a Stable or LTS model, such as Qwen3.8-27B-NVFP4 (Stable). Both models think before they answer by default, which makes requests slower; the model pages explain how to control this.
+
+Qwen3.5-122B-A10B-FP8 will be disabled on 28.12.2026. If your site still uses it, switch to its successor Qwen3.8-27B-NVFP4, or to DeepSeek-V4.1-Flash-1017 (Testphase) if you need the largest model we offer.
 
 The plugin declares the capabilities of each model explicitly. Models that mittwald AI Hosting adds after a plugin release may therefore show up on the connectors screen without any declared capabilities until the plugin catches up.
 

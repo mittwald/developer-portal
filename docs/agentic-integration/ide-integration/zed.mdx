@@ -23,7 +23,9 @@ sidebar_position: 4
 4. Configure:
    - **Provider name**: `mittwald`
    - **API URL**: `https://llm.aihosting.mittwald.de/v1`
-   - **Model**: `Qwen3.5-122B-A10B-FP8`
+   - **API Key**: your mittwald AI Hosting API key
+   - **Model**: `DeepSeek-V4.1-Flash-1017`
+   - **Context window**: `1048576`
 
 ### Via settings.json
 
@@ -37,9 +39,16 @@ Alternatively, configure Zed via `settings.json`:
         "api_url": "https://llm.aihosting.mittwald.de/v1",
         "available_models": [
           {
-            "name": "Qwen3.5-122B-A10B-FP8",
-            "display_name": "Qwen3.5-122B-A10B-FP8",
-            "max_tokens": 245760
+            "name": "DeepSeek-V4.1-Flash-1017",
+            "display_name": "DeepSeek-V4.1-Flash-1017",
+            "max_tokens": 1048576,
+            "max_output_tokens": 32768,
+            "capabilities": {
+              "tools": true,
+              "images": true,
+              "parallel_tool_calls": false,
+              "prompt_cache_key": false
+            }
           }
         ]
       }
@@ -48,11 +57,21 @@ Alternatively, configure Zed via `settings.json`:
 }
 ```
 
-**Note:** Zed does not store API keys in `settings.json`. Set your API key as an environment variable:
+`max_output_tokens` leaves room for the reasoning that DeepSeek-V4.1-Flash-1017 writes before
+it answers, and `images` lets you attach screenshots. The model is in the
+[Testphase](/docs/v2/platform/aihosting/access-and-usage/lifecycle#testphase). For production use, add `Qwen3.8-27B-NVFP4` (Stable) with
+`"max_tokens": 256000` instead.
 
-```bash
-export MITTWALD_API_KEY=<your-api-key>
+:::note
+
+Don't put API keys in `settings.json`. Enter the key in the UI, or set it as an environment
+variable named after the provider ID:
+
+```shellsession
+user@local $ export MITTWALD_API_KEY=sk-your-api-key-here
 ```
+
+:::
 
 ## Usage
 
@@ -65,6 +84,6 @@ Once configured, you can use mittwald's AI models in Zed's Agent Panel for:
 
 ## Next Steps
 
-- [Explore other IDEs](./) - Compare different integrations
+- [Explore other IDEs](../) - Compare different integrations
 - [Learn about MCP](/docs/v2/agentic-integration/mcp/) - Infrastructure management
 - [Best practices](../#best-practices) - Optimize AI usage

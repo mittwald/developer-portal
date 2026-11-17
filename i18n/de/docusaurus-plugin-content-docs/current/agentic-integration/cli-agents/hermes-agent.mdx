@@ -34,13 +34,15 @@ und mach ihn zum Standard:
 
 ```yaml
 model:
-  default: Qwen3.8-27B-NVFP4
+  default: DeepSeek-V4.1-Flash-1017
   provider: mittwald
 providers:
   mittwald:
     api: https://llm.aihosting.mittwald.de/v1
     api_key: sk-...
     models:
+      DeepSeek-V4.1-Flash-1017:
+        context_length: 1048576
       Qwen3.8-27B-NVFP4:
         context_length: 256000
       Qwen3.6-35B-A3B-FP8:
@@ -73,10 +75,16 @@ key_env: MITTWALD_LLM_API_KEY
 ```
 
 :::note
-`context_length` steht pro Modell unter `models`. Beide Modelle oben verarbeiten
+`context_length` steht pro Modell unter `models`. `DeepSeek-V4.1-Flash-1017`
+verarbeitet 1.048.576 Token, Ein- und Ausgabe zusammen, die beiden Qwen-Modelle je
 256.000 Token. Steht `context_length` direkt im Eintrag, gilt der Wert für alle
 Modelle darin.
 :::
+
+Das Standardmodell `DeepSeek-V4.1-Flash-1017` ist das größte Modell in unserem Angebot und unsere Empfehlung für Coding-Agenten. Es ist in der [Testphase](../../platform/aihosting/20-access-and-usage/40-lifecycle.mdx#testphase), zu Spitzenzeiten können Anfragen also
+warten, und bei einem Update ist es etwa 20 Minuten nicht erreichbar. Willst du ein
+stabiles Standardmodell für den Produktivbetrieb, setz `model.default` auf
+`Qwen3.8-27B-NVFP4` (Stable).
 
 ## Verbindung prüfen {#verify}
 
@@ -98,7 +106,7 @@ Führe dann einen Turn aus, der einen Tool Call erzwingt, denn eine reine
 Chat-Antwort würde auch bei kaputtem Tool Calling gelingen:
 
 ```bash
-hermes chat --oneshot --model Qwen3.8-27B-NVFP4 \
+hermes chat --oneshot --model DeepSeek-V4.1-Flash-1017 \
   -q "Create a file called hello.txt containing the word hello, then read it back."
 ```
 
@@ -247,7 +255,7 @@ aus der `models`-Liste eine Zuordnung.
 ### Konfiguration und Endpoint getrennt prüfen {#checking-separately}
 
 `hermes doctor` und ein erzwungener Tool Call decken zwei unterschiedliche
-Fehlerarten ab, und es lohnt sich zu wissen, welche man gerade diagnostiziert:
+Fehlerarten ab, und es lohnt sich zu wissen, welche du gerade untersuchst:
 
 - `hermes doctor` prüft den Aufbau der `config.yaml`, meldet aber keine falsch
   geschriebenen oder unbekannten Schlüssel in einem `providers:`-Eintrag.

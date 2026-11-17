@@ -10,7 +10,7 @@ import TabItem from "@theme/TabItem";
 
 ## Description {#description}
 
-"DeepSeek-V4.1-Flash-1017" is a multimodal reasoning model by DeepSeek. It's a Mixture-of-Experts model with 552 billion parameters, of which 8 billion compute each token while it reads the prompt and 16 billion while it writes the answer. That design makes long inputs cheap to process, which is what coding agents and document work need. The context window holds about one million tokens. Among the models we offer, it's the strongest one for coding agents and long-horizon agentic work.
+"DeepSeek-V4.1-Flash-1017" is a multimodal reasoning model by DeepSeek. It's a Mixture-of-Experts model with 552 billion parameters, of which 8 billion compute each token while it reads the prompt and 16 billion while it writes the answer. That design makes long inputs cheap to process, which is what coding agents and document work need. The context window holds about one million tokens. It's the largest model we offer and the one we recommend for coding agents and long-horizon agentic work.
 
 This model is in the [Testphase](../20-access-and-usage/40-lifecycle.mdx#testphase). Its behavior and feature set can still change, so we recommend Stable or LTS models for production use.
 
@@ -47,7 +47,7 @@ The model takes its reasoning depth as a number from 1 to 100. Pass it as `reaso
 | `low`            | 50    | Everyday chat, drafting, translation, summaries             |
 | `none`           | off   | Classification, routing, extraction, short standard answers |
 
-`none` switches thinking off; `"thinking": false` does the same. `xhigh` is accepted and means the same as `high`. Any other value comes back as a `400`.
+`none` switches thinking off; `"thinking": false` does the same. `xhigh` is accepted and means the same as `high`. Any other value comes back as a `400`. That includes `medium` and `minimal`, which many OpenAI clients send by default, also when they send `reasoning_effort` at the top level of the request. Set such a client to `low` or `high`.
 
 <Tabs groupId="language">
   <TabItem value="python" label="Python">
@@ -168,7 +168,7 @@ DeepSeek ran its benchmarks with up to 256,000 output tokens. You don't need tha
 
 ### Coding agents {#coding-agents}
 
-DeepSeek tuned this release for agent harnesses such as Claude Code, opencode, and SWE-agent. Compared with DeepSeek-V4.1-Flash it finishes agent tasks with fewer and shorter steps. For agents:
+DeepSeek measured this release in several agent harnesses, among them Claude Code and mini-SWE-agent. Compared with DeepSeek-V4.1-Flash it finishes agent tasks faster and with shorter output. For agents:
 
 - Keep thinking on. `high` is the right start, `max` pays off on hard debugging.
 - Keep the default `drop_thinking`. Reasoning stays within a tool loop either way.

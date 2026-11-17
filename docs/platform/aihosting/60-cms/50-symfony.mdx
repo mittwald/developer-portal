@@ -172,7 +172,7 @@ Chat and embeddings are portable across Symfony AI bridges. Reranking and text-t
 
 The bridge ships a catalog of the model IDs it knows about, among them `gpt-oss-120b`, the Ministral and Qwen3.x chat models, `GLM-OCR`, `Qwen3-Embedding-8B`, `whisper-large-v3-turbo`, `Qwen3-VL-Reranker-2B` and `Qwen3-TTS-12Hz-1.7B-CustomVoice`.
 
-The [available models](../../models/) documentation is the authoritative list of what the API currently serves, including each model's capabilities and context size. Models that mittwald AI Hosting adds after a bridge release may not be in the catalog yet. In that case, update the package — or register the model yourself by passing an extended catalog as `$modelCatalog`:
+The [available models](../../models/) documentation is the authoritative list of what the API currently serves, including each model's capabilities and context size. Models that mittwald AI Hosting adds after a bridge release may not be in the catalog yet. In that case, update the package — or register the model yourself by passing an extended catalog as `$modelCatalog`. The following example registers the text-only model `Kolibri-1`:
 
 ```php
 use Mittwald\Symfony\AI\Platform\Bridge\ChatModel;
@@ -180,7 +180,7 @@ use Mittwald\Symfony\AI\Platform\Bridge\ModelCatalog;
 use Symfony\AI\Platform\Capability;
 
 $catalog = new ModelCatalog([
-    'some-new-model' => [
+    'Kolibri-1' => [
         'class' => ChatModel::class,
         'capabilities' => [
             Capability::INPUT_MESSAGES,
@@ -195,6 +195,8 @@ $platform = Factory::createPlatform(getenv('MITTWALD_AI_API_KEY'), modelCatalog:
 ```
 
 The models you pass are merged over the ones the bridge already knows.
+
+For German texts, translations, and SEO descriptions, [Kolibri-1](../30-models/76-kolibri-1.mdx) is a natural fit. It reads text only and calls tools only with `tool_choice` set to `auto`. For the hardest tasks, use [DeepSeek-V4.1-Flash-1017](../30-models/77-deepseek-v4-1-flash-1017.mdx), the largest model we offer. Both models are in the [Testphase](../20-access-and-usage/40-lifecycle.mdx#testphase) and think before they answer by default. For production use, pick a Stable or LTS model, such as [Qwen3.8-27B-NVFP4](../30-models/75-qwen3-8-27b-nvfp4.mdx) (Stable).
 
 ### Dedicated AI Hosting {#dedicated-ai-hosting}
 

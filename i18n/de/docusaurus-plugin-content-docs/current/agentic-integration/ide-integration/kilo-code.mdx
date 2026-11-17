@@ -14,20 +14,37 @@ Installiere Kilo Code über den [VS Code Marketplace](https://marketplace.visual
 
 ## Konfiguration
 
-1. Kilo-Code-Einstellungen in VS Code öffnen
-2. **Provider**: OpenAI Compatible
-3. **Base URL**: `https://llm.aihosting.mittwald.de/v1`
-4. **API Key**: Dein mittwald AI-Hosting-API-Key ([so bekommst du einen](/docs/v2/platform/aihosting/access-and-usage/access))
-5. **Model**: `Qwen3.5-122B-A10B-FP8`
+Konfiguriere Kilo Code mit den KI-Modellen von mittwald:
+
+1. Kilo-Code-Einstellungen in VS Code öffnen (Zahnrad-Symbol) und zum Tab **Providers** wechseln
+2. Unten in der Liste auf **Custom provider** klicken
+3. Den Dialog ausfüllen:
+   - **Provider ID** und **Display name**: `mittwald`
+   - **Provider API**: OpenAI Compatible
+   - **Base URL**: `https://llm.aihosting.mittwald.de/v1`
+   - **API key**: Dein mittwald AI-Hosting-API-Key ([so bekommst du einen](/docs/v2/platform/aihosting/access-and-usage/access))
+   - **Models**: `DeepSeek-V4.1-Flash-1017`
+4. Auf **Submit** klicken
+
+DeepSeek-V4.1-Flash-1017 hat ein Kontextfenster von 1.048.576 Token, liest Bilder und denkt
+nach, bevor es antwortet. Token-Limits und Bild-Input stellst du in der Konfigurationsdatei
+`kilo.jsonc` ein, siehe die [Anleitung von Kilo Code zu Custom Models](https://kilo.ai/docs/code-with-ai/agents/custom-models). Setz das
+Kontext-Limit auf `1048576`, das Output-Limit auf mindestens `32768` und ergänze `image` bei
+den Input-Modalitäten.
+
+Das Modell ist in der [Testphase](/docs/v2/platform/aihosting/access-and-usage/lifecycle#testphase). Für den Produktivbetrieb wähle stattdessen
+`Qwen3.8-27B-NVFP4` (Stable) mit einem Kontext-Limit von `256000`.
 
 ### Umgebungsvariablen
 
 Alternativ lokal per Umgebungsvariablen:
 
 ```shellsession
-user@local $ export OPENAI_API_KEY=<dein-mittwald-api-key>
+user@local $ export OPENAI_API_KEY=sk-your-api-key-here
 user@local $ export OPENAI_BASE_URL=https://llm.aihosting.mittwald.de/v1
 ```
+
+Wähl danach das Modell in der Modellauswahl von Kilo Code für Agent-Aufgaben aus.
 
 ## MCP Server Integration {#mcp}
 
@@ -83,8 +100,26 @@ Kilo Code unterstützt MCP-Server per UI (Tools → Add MCP Server) oder Konfigu
 }
 ```
 
+### Web Fetching
+
+Kilo Code kann Web-Fetch- und Browsing-Tools nutzen, um externe Seiten abzurufen und
+zusammenzufassen:
+
+**Best Practices:**
+
+- Öffentliche URLs bevorzugen (ohne Login)
+- Genaue Ziel-Links im Prompt angeben
+- Netzwerk-Scope klein halten
+- Den Agent bitten, zu jeder Aussage die Quell-URL anzugeben
+- Für Faktenextraktion deterministisch samplen: `temperature <= 0.2`
+
+**Beispiel-Prompts:**
+
+- "Fetch https://example.com/spec and summarize key endpoints in 10 bullet points. Include canonical links."
+- "Open https://huggingface.co/model-page and extract context length, modalities, and license. Return as JSON."
+
 ## Nächste Schritte
 
-- [Weitere Integrationen testen](./)
-- [MCP kennenlernen](/docs/v2/agentic-integration/mcp/)
-- [Best Practices](../#best-practices)
+- [Weitere Integrationen testen](../) - Verschiedene Tools vergleichen
+- [MCP kennenlernen](/docs/v2/agentic-integration/mcp/) - Infrastruktur-Management
+- [Best Practices](../#best-practices) - KI-Nutzung optimieren

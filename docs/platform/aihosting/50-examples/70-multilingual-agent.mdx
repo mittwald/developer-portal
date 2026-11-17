@@ -1,18 +1,22 @@
 ---
 sidebar_label: Multilingual tool-calling agent
-description: Build a tool-calling agent that handles 100+ languages with Qwen3.5-122B-A10B-FP8
+description: Build a tool-calling agent that answers in the user's language with DeepSeek-V4.1-Flash-1017
 title: Multilingual tool-calling agent
 ---
 
-The tool-calling agent pattern in this guide works with any chat model that supports function calling. The example uses [Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8), but you can substitute any of the following depending on cost and quality requirements:
+The tool-calling agent pattern in this guide works with any chat model that supports function calling. The example uses [DeepSeek-V4.1-Flash-1017](/docs/v2/platform/aihosting/models/deepseek-v4-1-flash-1017), but you can substitute any of the following depending on cost and quality requirements:
 
-| Model                   | Languages       | Notes                                   |
-| ----------------------- | --------------- | --------------------------------------- |
-| `Qwen3.5-122B-A10B-FP8` | 100+            | Thinking mode available; vision support |
-| `Qwen3.6-35B-A3B-FP8`   | 100+            | More cost-efficient; reasoning + vision |
-| `gpt-oss-120b`          | English-centric | Best for English-only workloads         |
+| Model                      | Languages       | Notes                                                                                  |
+| -------------------------- | --------------- | -------------------------------------------------------------------------------------- |
+| `DeepSeek-V4.1-Flash-1017` | Not specified   | Largest model we offer, recommended for agentic work; thinking mode, vision; Testphase |
+| `Qwen3.8-27B-NVFP4`        | Not specified   | Stable; holds up in tool loops; thinking mode, vision                                  |
+| `Qwen3.6-35B-A3B-FP8`      | 100+            | More cost-efficient; reasoning + vision                                                |
+| `Kolibri-1`                | German, English | Answers read like German; text only; `tool_choice="auto"` only; Testphase              |
+| `gpt-oss-120b`             | English-centric | Best for English-only workloads                                                        |
 
-All models use the same OpenAI-compatible tool-calling API — changing the model is a single line swap.
+`DeepSeek-V4.1-Flash-1017` and `Kolibri-1` are in the [Testphase](../20-access-and-usage/40-lifecycle.mdx#testphase). For production use, take `Qwen3.8-27B-NVFP4`, which has the status Stable. `Kolibri-1` fits when your users write German or English, and it works with the loop below because the loop sends `tool_choice="auto"`. It doesn't support `tool_choice="required"`, a named tool, or `parallel_tool_calls: false`.
+
+All models use the same OpenAI-compatible tool-calling API. To switch, change the `model` line and the parameter that turns thinking off, which differs between models: see the model page. Users can ask in German, French, Spanish, or any other supported language — the model understands the request, calls the right tools (defined in English), and answers in the user's language without any translation step.
 
 This guide shows a complete agentic loop: the model decides which tools to call, you execute them, and you feed the results back until the model has everything it needs.
 
@@ -126,14 +130,14 @@ def run_agent(user_message: str, system: str | None = None) -> str:
 
     while True:
         response = client.chat.completions.create(
-            model="Qwen3.5-122B-A10B-FP8",
+            model="DeepSeek-V4.1-Flash-1017",
             messages=messages,
             tools=tools,
             tool_choice="auto",
-            temperature=0.2,
-            extra_body={"chat_template_kwargs": {"enable_thinking": False}},
+            extra_body={"chat_template_kwargs": {"reasoning_effort": "none"}},
             # Thinking mode is on by default for this model — disable it here
             # to keep tool-call latency down across the agent loop.
+            # Qwen models use {"enable_thinking": False} instead.
         )
         msg = response.choices[0].message
         messages.append(msg)
