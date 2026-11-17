@@ -29,7 +29,7 @@ The following limitations apply:
 - Video input is not supported
 - Images must be submitted as Base64-encoded data URLs
 
-**Thinking mode is enabled by default, at reasoning depth `high`.** The model thinks even before short answers. See [Controlling reasoning depth](#reasoning-effort) for the cheaper levels and for turning it off. The parameters must be nested inside `chat_template_kwargs`.
+**Thinking mode is enabled by default, at reasoning depth `high`.** The model thinks even before short answers. See [Controlling reasoning depth](#reasoning-effort) for the cheaper levels and for turning it off. Send the parameters inside `chat_template_kwargs`.
 
 :::warning[An answer can come back empty if `max_tokens` is too small]
 If `max_tokens` runs out while the model is still reasoning, you get a response whose `content` is empty and whose `finish_reason` is `length`, and the reasoning tokens are still billed. Leave generous room in `max_tokens`, lower the reasoning depth, or switch thinking off for the request. When you see an empty `content`, check `finish_reason` first.

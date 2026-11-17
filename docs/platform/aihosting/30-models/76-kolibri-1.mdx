@@ -35,7 +35,7 @@ The following limitations apply:
 - Output at `temperature` 0 is not reproducible between requests
 - The model's knowledge ends in June 2026. Newer facts need tools or RAG
 
-**Thinking mode is enabled by default, at the highest reasoning depth.** See [Controlling reasoning depth](#reasoning-effort) for the cheaper levels and for turning it off. The parameters must be nested inside `chat_template_kwargs`.
+**Thinking mode is enabled by default, at the highest reasoning depth.** See [Controlling reasoning depth](#reasoning-effort) for the cheaper levels and for turning it off. Send the parameters inside `chat_template_kwargs`.
 
 :::warning[An answer can come back empty if `max_tokens` is too small]
 The model reasons before every answer. On date calculations and arithmetic the reasoning alone can run to several thousand tokens. If `max_tokens` runs out while the model is still reasoning, you get a response whose `content` is empty and whose `finish_reason` is `length`, and the reasoning tokens are still billed.
