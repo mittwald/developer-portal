@@ -138,10 +138,11 @@ no field at all, so the model keeps thinking.
 it's the default above. Its context window holds 1,048,576 tokens, input and output together,
 and it can write up to 262,144 tokens per request; `maxTokens` of 131,072 follows the model
 page's recommendation for coding agents and leaves the rest of the window for input. The model
-accepts the reasoning depths `low`, `high`, and `max`, but not Pi's default `medium`, so the settings
-above set `defaultThinkingLevel` to `high`. If you cycle through thinking levels during a session, skip `minimal` and `medium` while DeepSeek is selected; both come back as a `400`. The model is in the [Testphase](../../platform/aihosting/20-access-and-usage/40-lifecycle.mdx#testphase): it can queue
+knows the reasoning depths `low`, `high`, and `max`. Pi's levels `medium` and `minimal` are treated as
+`high` and `low`, so every level works. The settings above set `defaultThinkingLevel` to `high`, which
+is what the model does by default anyway. The model is in the [Testphase](../../platform/aihosting/20-access-and-usage/40-lifecycle.mdx#testphase): it can queue
 at peak times and is unavailable for about 20 minutes during an update. For a production-stable
-default, set `defaultModel` to `Qwen3.8-27B-NVFP4` (Stable) and drop `defaultThinkingLevel`. `Qwen3.8-27B-NVFP4` works with Pi's default `medium`. Pi's `minimal` level comes back as a `400` on both models.
+default, set `defaultModel` to `Qwen3.8-27B-NVFP4` (Stable) and drop `defaultThinkingLevel`. `Qwen3.8-27B-NVFP4` works with Pi's default `medium`, but answers Pi's `minimal` level with a `400`.
 
 ## Verifying the connection {#verify}
 

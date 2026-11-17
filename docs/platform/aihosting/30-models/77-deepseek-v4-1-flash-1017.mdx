@@ -47,7 +47,9 @@ The model takes its reasoning depth as a number from 1 to 100. Pass it as `reaso
 | `low`            | 50    | Everyday chat, drafting, translation, summaries             |
 | `none`           | off   | Classification, routing, extraction, short standard answers |
 
-`none` switches thinking off; `"thinking": false` does the same. `xhigh` is accepted and means the same as `high`. Any other value comes back as a `400`. That includes `medium` and `minimal`, which many OpenAI clients send by default, also when they send `reasoning_effort` at the top level of the request. Set such a client to `low` or `high`.
+`none` switches thinking off; `"thinking": false` does the same. `xhigh` is accepted and means the same as `high`. Any other value inside `chat_template_kwargs` comes back as a `400`.
+
+Many OpenAI clients send `reasoning_effort` at the top level of the request, next to `model`, and default to `medium` or `minimal`. The model doesn't know these two, so at the top level we treat `medium` as `high` and `minimal` as `low`. Such clients work without changes. Inside `chat_template_kwargs`, use only the values from the table.
 
 <Tabs groupId="language">
   <TabItem value="python" label="Python">

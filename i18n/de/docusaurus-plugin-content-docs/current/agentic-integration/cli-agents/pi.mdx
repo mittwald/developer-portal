@@ -146,12 +146,13 @@ weg, und das Modell denkt trotzdem.
 deshalb ist es oben voreingestellt. Sein Kontextfenster fasst 1.048.576 Token, Ein- und
 Ausgabe zusammen, und es schreibt bis zu 262.144 Token pro Anfrage. `maxTokens` von 131.072
 folgt der Empfehlung der Modellseite für Coding-Agenten und lässt den Rest des Fensters für
-die Eingabe frei. Das Modell kennt die Reasoning-Tiefen `low`, `high` und `max`, aber nicht Pis
-Standard `medium`. Deshalb setzen die Einstellungen oben `defaultThinkingLevel` auf `high`. Schaltest du während einer Sitzung durch die Thinking-Stufen, überspring `minimal` und `medium`, solange DeepSeek ausgewählt ist; beide kommen als `400` zurück.
+die Eingabe frei. Das Modell kennt die Reasoning-Tiefen `low`, `high` und `max`. Pis Stufen `medium` und
+`minimal` behandeln wir wie `high` und `low`, jede Stufe funktioniert also. Die Einstellungen oben
+setzen `defaultThinkingLevel` auf `high`, das entspricht dem Standard des Modells.
 Das Modell ist in der [Testphase](../../platform/aihosting/20-access-and-usage/40-lifecycle.mdx#testphase): Zu Spitzenzeiten können Anfragen warten, und bei
 einem Update ist es etwa 20 Minuten nicht erreichbar. Willst du ein stabiles Standardmodell
 für den Produktivbetrieb, setz `defaultModel` auf `Qwen3.8-27B-NVFP4` (Stable) und lass
-`defaultThinkingLevel` weg. `Qwen3.8-27B-NVFP4` kommt mit Pis Standard `medium` zurecht. Die Pi-Stufe `minimal` beantworten beide Modelle mit einem `400`.
+`defaultThinkingLevel` weg. `Qwen3.8-27B-NVFP4` kommt mit Pis Standard `medium` zurecht, beantwortet die Pi-Stufe `minimal` aber mit einem `400`.
 
 ## Verbindung prüfen {#verify}
 

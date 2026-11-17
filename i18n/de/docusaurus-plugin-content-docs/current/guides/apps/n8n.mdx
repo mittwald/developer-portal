@@ -129,15 +129,7 @@ Einige Modelle im mittwald AI Hosting – zum Beispiel [Qwen3.8-27B-NVFP4](../..
 
 Der eingebaute **OpenAI Chat Model**-Node von n8n bietet keine Möglichkeit, `extra_body` / `chat_template_kwargs` zu setzen – der Thinking-Modus lässt sich darüber also nicht umschalten. Mit diesem Node denkt ein Reasoning-Modell bei jeder Anfrage in seiner Standardtiefe, bei Kolibri-1 und DeepSeek-V4.1-Flash-1017 ist das `reasoning_effort` `high`. Das Reasoning zählt zum Ausgabelimit. Ist das Limit erschöpft, während das Modell noch nachdenkt, kommt eine Antwort mit leerem `content` und `finish_reason` `length` zurück, und die Reasoning-Token werden trotzdem berechnet. Setze die Option **Maximum Number of Tokens** des Nodes für diese Modelle auf mindestens 32.768.
 
-Ab n8n 3.2.2 kann der Node die Reasoning-Tiefe immerhin senken. Füge unter **Options** die Option **Model Supports Reasoning** hinzu, schalte sie ein und wähle einen **Reasoning Effort**. Der Node schickt diesen Wert als `reasoning_effort` mit. Abschalten lässt sich der Thinking-Modus so nicht, und nicht jedes Modell kennt jeden Wert. Einen unbekannten Wert beantwortet das Modell mit einem `400`:
-
-| Modell                   | Erlaubte Werte für **Reasoning Effort** |
-| ------------------------ | --------------------------------------- |
-| DeepSeek-V4.1-Flash-1017 | `low`, `high`                           |
-| Kolibri-1                | `low`, `medium`, `high`                 |
-| Qwen3.8-27B-NVFP4        | `low`, `medium`, `high`                 |
-
-Die Option steht anfangs auf `medium`. Stell sie also um, bevor du sie mit DeepSeek-V4.1-Flash-1017 nutzt.
+Ab n8n 3.2.2 kann der Node die Reasoning-Tiefe immerhin senken. Füge unter **Options** die Option **Model Supports Reasoning** hinzu, schalte sie ein und wähle einen **Reasoning Effort**. Der Node schickt diesen Wert als `reasoning_effort` mit. Abschalten lässt sich der Thinking-Modus so nicht. Kolibri-1, DeepSeek-V4.1-Flash-1017 und Qwen3.8-27B-NVFP4 nehmen `low`, `medium` und `high` an. DeepSeek-V4.1-Flash-1017 behandelt `medium` wie `high`, seine Standardtiefe. Bei diesem Modell spart also nur `low` Token.
 
 **Workaround:** Verwende eine Community-Node, die beliebige OpenAI-kompatible Parameter durchreicht, z. B. [`@rlquilez/n8n-nodes-openai-litellm`](https://www.npmjs.com/package/@rlquilez/n8n-nodes-openai-litellm):
 
