@@ -655,10 +655,14 @@ TODO
 
 ## Dry Running Webhooks
 
+:::warning
+Dry run webhooks are currently deactivated, and the [corresponding API operation](../../../reference/marketplace/deprecated-extension-dry-run-webhook) is deprecated.
+:::
+
 An Extension developer can trigger a webhook in dry run mode to make the Extension development easier.
 The developer defines the [webhook kind](#kind) for the dry run webhook execution, and the mStudio then calls the corresponding Extension webhook.
 The mStudio calls the webhook endpoint with [demo values](#demo-values).\
-After the dry run webhook call is completed, the mStudio returns the result of the webhook call in the [API response](../../../reference/marketplace/extension-dry-run-webhook).
+After the dry run webhook call is completed, the mStudio returns the result of the webhook call in the [API response](../../../reference/marketplace/deprecated-extension-dry-run-webhook).
 This includes the response body, the response headers, and general errors.\
 The mStudio includes the query parameter `dry-run=true` in dry-run webhook calls so that Extensions can identify them.
 If the `dry-run` query parameter is set to `true` in a webhook call, the Extension backend should handle the webhook call as such and interpret the webhook as a test.
