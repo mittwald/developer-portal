@@ -1,0 +1,14 @@
+# Serves the prebuilt site (`npm run build`) on http://localhost:3000 with the
+# production container image: read-only root filesystem, no capabilities.
+services:
+  web:
+    build: .
+    ports:
+      - "3000:8080"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
