@@ -28,7 +28,7 @@ Folgende Limitierungen gelten:
 - Keine Videoeingabe
 - Bilder müssen als Base64-kodierte Data-URLs übermittelt werden
 
-**Der Thinking-Modus ist standardmäßig an, in der Reasoning-Tiefe `high`.** Das Modell denkt auch vor kurzen Antworten nach. Die günstigeren Stufen und das Abschalten findest du unter [Reasoning-Tiefe steuern](#reasoning-effort). Die Parameter gehören in `chat_template_kwargs`.
+**Der Thinking-Modus ist standardmäßig in der Reasoning-Tiefe `high` aktiv.** Das Modell denkt auch vor kurzen Antworten nach. Die günstigeren Stufen und das Abschalten findest du unter [Reasoning-Tiefe steuern](#reasoning-effort). Die Parameter gehören in `chat_template_kwargs`.
 
 :::warning[Eine Antwort kann leer zurückkommen, wenn `max_tokens` zu klein ist]
 Ist `max_tokens` aufgebraucht, bevor das Nachdenken fertig ist, bekommst du eine Antwort mit leerem `content` und `finish_reason: length`. Abgerechnet werden die Reasoning-Token trotzdem. Lass bei `max_tokens` genug Luft, senke die Reasoning-Tiefe oder schalte den Thinking-Modus für diese Anfrage ab. Bekommst du einen leeren `content`, schau zuerst auf `finish_reason`.
@@ -156,7 +156,7 @@ Das sind die Empfehlungen von DeepSeek und gleichzeitig die Standardwerte, wenn 
 
 ### Ausgabelänge {#output-length}
 
-DeepSeek hat seine Benchmarks mit bis zu 256.000 Ausgabe-Token gefahren. So viel brauchst du für alltägliche Anfragen nicht, plane aber mehr Luft ein als bei einem Modell ohne Reasoning:
+DeepSeek hat seine Benchmarks mit bis zu 256.000 Ausgabe-Token gemacht. So viel brauchst du für alltägliche Anfragen nicht, plane aber mehr Luft ein als bei einem Modell ohne Reasoning:
 
 | Aufgabe                                   | Empfohlenes `max_tokens` |
 | ----------------------------------------- | ------------------------ |
@@ -182,7 +182,7 @@ Verkleinere Bilder vor dem Kodieren auf höchstens 1024 px an der längsten Kant
 
 ### Lange Kontexte {#long-contexts}
 
-Der volle Kontext von rund einer Million Token steht in jeder Anfrage zur Verfügung. Einen langen Prompt einzulesen dauert: Rechne mit Minuten statt Sekunden, sobald du mehrere hunderttausend Token schickst. Ein wiederholter Anfang, etwa dieselbe Codebasis in jeder Runde eines Agentenlaufs, landet im Cache und ist bei Folgeanfragen deutlich schneller eingelesen.
+Der volle Kontext von rund einer Million Token steht in jeder Anfrage zur Verfügung. Einen langen Prompt einzulesen dauert: Rechne mit Minuten statt Sekunden, sobald du mehrere hunderttausend Token schickst. Ein wiederholter Anfang, etwa dieselbe Codebasis in jeder Runde eines Agentenlaufs, kann im Cache landen und ist bei Folgeanfragen dann deutlich schneller eingelesen.
 
 ## Nutzungsbedingungen und Lizenz {#terms-of-use-and-licensing}
 

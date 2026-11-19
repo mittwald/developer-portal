@@ -9,7 +9,7 @@ import TabItem from "@theme/TabItem";
 
 ## Beschreibung {#description}
 
-„Kolibri-1“ ist ein Reasoning-Modell von Aleph Alpha, gebaut für Deutsch und Englisch. Es ist ein Mixture-of-Experts-Modell mit 78 Milliarden Parametern, von denen pro Token etwa 3,5 Milliarden mitrechnen. Aleph Alpha hat es mit einem Tokenizer trainiert, der auf den deutschen Wortbau zugeschnitten ist, und sich bewusst für Tiefe in zwei Sprachen statt Breite in vielen entschieden. Nimm es, wenn deine Nutzer auf Deutsch schreiben und die Antworten nach Deutsch klingen sollen, nicht nach Übersetzung.
+„Kolibri-1“ ist ein Reasoning-Modell aus Deutschland, gebaut von Aleph Alpha in Heidelberg für Deutsch und Englisch. Es ist ein Mixture-of-Experts-Modell mit 78 Milliarden Parametern, von denen pro Token etwa 3,5 Milliarden mitrechnen. Aleph Alpha hat es mit einem Tokenizer trainiert, der auf den deutschen Wortbau zugeschnitten ist, und sich bewusst für Tiefe in zwei Sprachen statt Breite in vielen entschieden. Nutze es, wenn deine Nutzer auf Deutsch schreiben und die Antworten nach Deutsch klingen sollen, nicht nach Übersetzung.
 
 Dieses Modell ist in der [Testphase](../20-access-and-usage/40-lifecycle.mdx#testphase). Wir können es kurzfristig abschalten, und Verhalten und Funktionsumfang können sich noch ändern. Für den produktiven Einsatz empfehlen wir Modelle mit dem Status Stable oder LTS.
 
@@ -19,9 +19,9 @@ Es eignet sich für und unterstützt:
 
 - Textgenerierung innerhalb einer Chat-Completion (Text zu Text), auf Deutsch und Englisch
 - Thinking / Reasoning für schrittweises Problemlösen, mit wählbarer Reasoning-Tiefe
-- Tool-Calling für agentische Workflows
 - Retrieval-Augmented Generation (RAG) über deutsche Dokumente
 - Verarbeitung langer Dokumente und erweiterter Kontexte
+- Tool-Calling für agentische Workflows, mit den unten genannten Limitierungen
 
 Folgende Limitierungen gelten:
 
@@ -49,7 +49,7 @@ Gib `reasoning_effort` in `chat_template_kwargs` mit:
 | Stufe             | Wofür                                                         |
 | ----------------- | ------------------------------------------------------------- |
 | `high` (Standard) | Mehrstufige Analysen, Mathematik, Planung, lange Agentenläufe |
-| `medium`          | Ausgleich zwischen Genauigkeit und Tempo                      |
+| `medium`          | Gute Balance zwischen Genauigkeit und Tempo                   |
 | `low`             | Alltäglicher Chat, Entwürfe, Zusammenfassungen                |
 | `none`            | Klassifizierung, Routing, Extraktion, kurze Standardantworten |
 
@@ -243,7 +243,7 @@ Was du beim Umzug einer laufenden Integration änderst:
 
 ## Qualität dieses Builds {#quality}
 
-Aleph Alpha veröffentlicht Kolibri-1 in BF16 und FP8. Wir haben die Experten-Gewichte mit einem deutschlastigen Kalibrierset auf 4 Bit (NVFP4) quantisiert und die Attention in FP8 gelassen. Die Quantisierung ändert nicht, was das Modell ist, die Modellkarte von Aleph Alpha gilt also vollständig.
+Aleph Alpha veröffentlicht Kolibri-1 in BF16 und FP8. Wir haben die Experten-Gewichte mit einem deutschlastigen Kalibrierset auf 4 Bit (NVFP4) quantisiert und die Attention in FP8 gelassen. Es bleibt dasselbe Modell, nur kompakter gespeichert, die Modellkarte von Aleph Alpha gilt also vollständig.
 
 Auf unserer Hardware gemessen, gegen Aleph Alphas FP8-Release, gleiche Engine und gleiche Einstellungen:
 
@@ -253,9 +253,9 @@ Auf unserer Hardware gemessen, gegen Aleph Alphas FP8-Release, gleiche Engine un
 | GSM8K, Aufgaben 1–50, je 2 Durchläufe (von 100)                                                             | 95          | 94           |
 | [Ger-RAG-eval](https://huggingface.co/datasets/deutsche-telekom/Ger-RAG-eval) Aufgaben 1, 2 und 4 (von 120) | 120         | 119          |
 | Tool-Calls mit richtiger Funktion und richtigen Argumenten (von 80)                                         | 78          | 78           |
-| Anfragen ohne nötiges Tool, die das Modell richtig in Ruhe lässt (von 20)                                   | 14          | 17           |
+| Anfragen ohne nötiges Tool, die das Modell korrekt ohne Tool-Aufruf bearbeitet (von 20)                     | 14          | 17           |
 
-Die Unterschiede liegen im Rauschen der Stichprobe. Methode und alle Ergebnisse stehen in der [Modellkarte des Builds](https://huggingface.co/mittwald/Kolibri-1-mixed-NVFP4-FP8).
+Die Unterschiede sind durch das Rauschen in den Ergebnissen der Stichproben zu erklären. Methode und alle Ergebnisse stehen in der [Modellkarte des Builds](https://huggingface.co/mittwald/Kolibri-1-mixed-NVFP4-FP8).
 
 ## Nutzungsbedingungen und Lizenz {#terms-of-use-and-licensing}
 
