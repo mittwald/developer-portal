@@ -27,7 +27,7 @@ The service offers several AI models optimized for different development tasks. 
   completion and quick edits
 - **Kolibri-1**: German-language chat and writing, 1,048,576-token context, text only.
   It's in the [Testphase](/docs/v2/platform/aihosting/access-and-usage/lifecycle#testphase)
-- **gpt-oss-120b**: reasoning-heavy work, 131,072-token context
+- **gpt-oss-120b**: text only, LTS lifecycle, 131,072-token context
 - **Ministral-3-14B-Instruct-2512**: small and fast, 262,144-token context, for
   lightweight assistants
 
@@ -57,13 +57,14 @@ Running an agent in the terminal instead of an editor? See
 
 - **DeepSeek-V4.1-Flash-1017**: start here for agentic coding, refactoring, and tool use.
   Set the context window to 1,048,576 tokens and `max_tokens` to at least 32,768, because
-  the model reasons before it answers
+  the model reasons before it answers. For hard reasoning and tricky debugging, set
+  `reasoning_effort: "max"`
 - **Qwen3.8-27B-NVFP4**: production setups that need a model with the status Stable
 - **Qwen3.6-35B-A3B-FP8**: inline completion and quick edits, where latency matters
   more than depth
 - **Kolibri-1**: chat and writing in German. It calls tools only with
   `tool_choice: "auto"`, so don't use it with agents that force a tool call
-- **gpt-oss-120b**: complex reasoning, precise documentation, advanced automations
+- **gpt-oss-120b**: text-only automations that need the LTS lifecycle
 - **Ministral-3-14B-Instruct-2512**: lightweight assistants and simple chat
 
 ### Long-Context Tips {#long-context-tips}

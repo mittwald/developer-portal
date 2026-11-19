@@ -27,7 +27,7 @@ Der Service bietet mehrere Modelle für unterschiedliche Entwicklungsaufgaben. E
   Completion und schnelle Edits
 - **Kolibri-1**: Chat und Texte auf Deutsch, 1.048.576 Token Kontext, nur Text.
   Es ist in der [Testphase](/docs/v2/platform/aihosting/access-and-usage/lifecycle#testphase)
-- **gpt-oss-120b**: reasoning-lastige Aufgaben, 131.072 Token Kontext
+- **gpt-oss-120b**: nur Text, Lifecycle LTS, 131.072 Token Kontext
 - **Ministral-3-14B-Instruct-2512**: klein und schnell, 262.144 Token Kontext, für
   leichtgewichtige Assistenten
 
@@ -57,14 +57,14 @@ Läuft dein Agent lieber im Terminal statt im Editor? Unter
 
 - **DeepSeek-V4.1-Flash-1017**: Startpunkt für agentic Coding, Refactoring und Tool Use.
   Setz das Kontextfenster auf 1.048.576 Token und `max_tokens` auf mindestens 32.768, denn
-  das Modell denkt nach, bevor es antwortet
+  das Modell denkt nach, bevor es antwortet. Für schwieriges Reasoning und kniffliges
+  Debugging setz `reasoning_effort: "max"`
 - **Qwen3.8-27B-NVFP4**: Produktiv-Setups, die ein Modell mit dem Status Stable brauchen
 - **Qwen3.6-35B-A3B-FP8**: Inline-Completion und schnelle Edits, wo Latenz mehr
   zählt als Tiefe
 - **Kolibri-1**: Chat und Texte auf Deutsch. Es ruft Tools nur mit
   `tool_choice: "auto"` auf, nutze es also nicht mit Agenten, die einen Tool-Aufruf erzwingen
-- **gpt-oss-120b**: komplexes Reasoning, präzise Dokumentation, anspruchsvolle
-  Automatisierungen
+- **gpt-oss-120b**: Automatisierungen nur mit Text, die den Lifecycle LTS brauchen
 - **Ministral-3-14B-Instruct-2512**: leichtgewichtige Assistenten und einfacher Chat
 
 ### Tipps für Long Context {#long-context-tips}
