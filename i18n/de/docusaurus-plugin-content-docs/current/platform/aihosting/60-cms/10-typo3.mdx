@@ -113,6 +113,19 @@ Der Befehl schickt die Anfrage durch die vollständige Pipeline von AiM und gibt
 
 Jede Testanfrage erscheint außerdem im Modul **Request Log** von AiM.
 
+### Modell auswählen {#aim-choosing-a-model}
+
+Für redaktionelle Arbeit auf Deutsch, so wie Seitentexte, Übersetzungen und SEO-Beschreibungen, passt [Kolibri-1](../30-models/76-kolibri-1.mdx) gut. Aleph Alpha hat das Modell für Deutsch und Englisch gebaut, und dessen Antworten lesen sich wie Deutsch, nicht wie eine Übersetzung. Zwei Grenzen solltest du kennen:
+
+- Kolibri-1 verarbeitet nur Text. Für Alternativtexte zu Bildern brauchst du ein Modell, das Bilder annimmt.
+- Kolibri-1 ruft Tools nur mit `tool_choice` auf `auto` auf. Eine Extension, die einen Tool-Aufruf mit `tool_choice="required"` oder einem benannten Tool erzwingt, scheitert mit diesem Modell.
+
+Für die schwierigsten Aufgaben nimm [DeepSeek-V4.1-Flash-1017](../30-models/77-deepseek-v4-1-flash-1017.mdx), das größte Modell in unserem Angebot. Es nimmt auch Bilder an.
+
+Beide Modelle sind in der [Testphase](../20-access-and-usage/40-lifecycle.mdx#testphase). Für den Produktivbetrieb wähle ein Stable- oder LTS-Modell, zum Beispiel [Qwen3.8-27B-NVFP4](../30-models/75-qwen3-8-27b-nvfp4.mdx) (Stable). Beide Modelle denken außerdem standardmäßig nach, bevor sie antworten. Das kostet Zeit und Token; wie du das steuerst, steht auf den Modellseiten.
+
+Fehlt ein Modell in der Liste **Model**, kennt die installierte Bridge es noch nicht. Siehe [Verfügbare Modelle in der Symfony-Anleitung](../symfony#available-models).
+
 ### Provider in den Site Settings konfigurieren {#aim-site-settings}
 
 Statt eine Provider-Konfiguration im Backend anzulegen, kannst du sie auch in der Datei `config/sites/<identifier>/settings.yaml` deiner Site definieren. Das ist praktisch, wenn du in einer TYPO3-Installation mit mehreren Sites unterschiedliche Konfigurationen pro Site verwenden oder deine Konfiguration in der Versionsverwaltung ablegen möchtest:

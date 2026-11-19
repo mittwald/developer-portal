@@ -16,19 +16,31 @@ Install the Kilo Code extension from the [VS Code Marketplace](https://marketpla
 
 Configure Kilo Code with mittwald's AI models:
 
-1. Open Kilo Code settings in VS Code
-2. Set **Provider**: OpenAI Compatible
-3. Set **Base URL**: `https://llm.aihosting.mittwald.de/v1`
-4. Set **API Key**: Your mittwald AI Hosting API key ([how to get one](/docs/v2/platform/aihosting/access-and-usage/access))
-5. Set **Model**: `Qwen3.5-122B-A10B-FP8`
+1. Open Kilo Code settings in VS Code (gear icon) and go to the **Providers** tab
+2. At the bottom of the list, click **Custom provider**
+3. Fill in the dialog:
+   - **Provider ID** and **Display name**: `mittwald`
+   - **Provider API**: OpenAI Compatible
+   - **Base URL**: `https://llm.aihosting.mittwald.de/v1`
+   - **API key**: Your mittwald AI Hosting API key ([how to get one](/docs/v2/platform/aihosting/access-and-usage/access))
+   - **Models**: `DeepSeek-V4.1-Flash-1017`
+4. Click **Submit**
+
+DeepSeek-V4.1-Flash-1017 has a context window of 1,048,576 tokens, reads images, and reasons
+before it answers. Token limits and image input are set in the `kilo.jsonc` configuration
+file, see the [Kilo Code guide to custom models](https://kilo.ai/docs/code-with-ai/agents/custom-models). Set the context limit to `1048576`,
+the output limit to at least `32768`, and add `image` to the input modalities.
+
+The model is in the [Testphase](/docs/v2/platform/aihosting/access-and-usage/lifecycle#testphase). For production use, choose `Qwen3.8-27B-NVFP4`
+(Stable) instead, with a context limit of `256000`.
 
 ### Environment Variables
 
 Alternatively, configure via environment variables:
 
-```bash
-export OPENAI_API_KEY=<your-mittwald-api-key>
-export OPENAI_BASE_URL=https://llm.aihosting.mittwald.de/v1
+```shellsession
+user@local $ export OPENAI_API_KEY=sk-your-api-key-here
+user@local $ export OPENAI_BASE_URL=https://llm.aihosting.mittwald.de/v1
 ```
 
 Then select the model in Kilo Code's model picker for agent tasks.
@@ -106,6 +118,6 @@ Kilo Code can use web-fetch/browsing tools to retrieve and summarize external pa
 
 ## Next Steps
 
-- [Try other integrations](./) - Compare different tools
+- [Try other integrations](../) - Compare different tools
 - [Learn about MCP](/docs/v2/agentic-integration/mcp/) - Infrastructure management
 - [Best practices](../#best-practices) - Optimize your AI usage

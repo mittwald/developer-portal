@@ -125,15 +125,17 @@ n8n ships with a [security audit tool](https://docs.n8n.io/hosting/securing/secu
 
 ## Reasoning models and thinking mode {#reasoning-models-and-thinking-mode}
 
-Some mittwald AI Hosting models — for example [Qwen3.8-27B-NVFP4](../../../platform/aihosting/models/qwen3-8-27b-nvfp4), [Qwen3.6-35B-A3B-FP8](../../../platform/aihosting/models/qwen3-6-35b-a3b-fp8) and [Qwen3.5-122B-A10B-FP8](../../../platform/aihosting/models/qwen3-5-122b-a10b-fp8) — ship with "thinking mode" enabled by default. Disabling (or, for other models, enabling) it requires sending `enable_thinking` nested inside `chat_template_kwargs` via the `extra_body` field of the chat completion request. See the respective model page for the exact request format.
+Some mittwald AI Hosting models — for example [Qwen3.8-27B-NVFP4](../../../platform/aihosting/models/qwen3-8-27b-nvfp4), [Qwen3.6-35B-A3B-FP8](../../../platform/aihosting/models/qwen3-6-35b-a3b-fp8), [Kolibri-1](../../../platform/aihosting/models/kolibri-1) and [DeepSeek-V4.1-Flash-1017](../../../platform/aihosting/models/deepseek-v4-1-flash-1017) — ship with "thinking mode" enabled by default. To switch it off or change the reasoning depth, you send parameters such as `enable_thinking` or `reasoning_effort` nested inside `chat_template_kwargs` in the `extra_body` field of the chat completion request. Which parameters a model accepts differs from model to model; see the respective model page for the exact request format.
 
-n8n's built-in **OpenAI Chat Model** node does not expose a way to set `extra_body` / `chat_template_kwargs`, so thinking mode cannot be toggled through that node.
+n8n's built-in **OpenAI Chat Model** node does not expose a way to set `extra_body` / `chat_template_kwargs`, so thinking mode cannot be toggled through that node. With this node, a reasoning model thinks on every request at its default depth — for Kolibri-1 and DeepSeek-V4.1-Flash-1017 that's `reasoning_effort` `high`. The reasoning counts towards the output limit. If the limit runs out while the model is still reasoning, the response has an empty `content` and `finish_reason` `length`, and the reasoning tokens are still billed. Set the node's **Maximum Number of Tokens** option to at least 32,768 for these models.
+
+From n8n 3.2.2 on, the node can at least lower the reasoning depth. Under **Options**, add **Model Supports Reasoning**, switch it on, and pick a **Reasoning Effort**. The node sends that value as `reasoning_effort`. It can't switch thinking off. Kolibri-1, DeepSeek-V4.1-Flash-1017, and Qwen3.8-27B-NVFP4 accept `low`, `medium`, and `high`. DeepSeek-V4.1-Flash-1017 doesn't know `medium` itself. Because many OpenAI clients send `medium`, we map it to the model's default depth (`high`), see [Controlling reasoning depth](../../../platform/aihosting/models/deepseek-v4-1-flash-1017#reasoning-effort). For that model, only `low` actually saves tokens.
 
 **Workaround:** use a community node that forwards arbitrary OpenAI-compatible parameters, such as [`@rlquilez/n8n-nodes-openai-litellm`](https://www.npmjs.com/package/@rlquilez/n8n-nodes-openai-litellm):
 
 1. In n8n, go to **Settings → Community Nodes** and install `@rlquilez/n8n-nodes-openai-litellm`.
 2. Configure the node with your mittwald AI Hosting credentials: base URL `https://llm.aihosting.mittwald.de/v1` and your API key.
-3. Set the node's extra body option to `{"chat_template_kwargs": {"enable_thinking": false}}` (or `true`, depending on the model and desired behavior).
+3. Set the node's extra body option to the parameters of your model. For example, `{"chat_template_kwargs": {"enable_thinking": false}}` switches thinking off for the Qwen models and Kolibri-1. For DeepSeek-V4.1-Flash-1017, use `{"chat_template_kwargs": {"thinking": false}}` instead. To keep thinking on at a lower depth, send `{"chat_template_kwargs": {"reasoning_effort": "low"}}` to Kolibri-1 or DeepSeek-V4.1-Flash-1017.
 
 :::note
 This limitation is specific to n8n's built-in node, not to the mittwald AI Hosting API. If you call the API directly — for example with an HTTP Request node, or from your own backend — the standard `extra_body` approach shown on the model pages works without any community node.
@@ -311,7 +313,7 @@ Let the initial webhook listen in test mode. You can test it, for example with P
 user@local $ curl -X POST -d '{
     "chatInput": "Hello World!",
     "sessionId": 42
-  }'
+  }' \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer xxx.yyy.zzz" \
   https://p-XXXXXX.project.space/webhook-test/<webhook uuid>
@@ -323,7 +325,7 @@ As long as our RAG setup isn’t loaded with documents, we have a simple chatbot
 user@local $ curl -X POST -d '{
     "chatInput": "How many documents do you know?",
     "sessionId": 42
-  }'
+  }' \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer xxx.yyy.zzz" \
   https://p-XXXXXX.project.space/webhook-test/<webhook uuid>
@@ -363,7 +365,7 @@ user@local $ scp -r python3_docs/*.txt <mittwald SSH URL n8n Container, see mStu
 user@local $ curl -X POST -d '{
     "chatInput": "How to report bugs in Python?",
     "sessionId": 42
-  }'
+  }' \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer xxx.yyy.zzz" \
   https://p-XXXXXX.project.space/webhook-test/<webhook uuid>
@@ -373,7 +375,7 @@ user@local $ curl -X POST -d '{
 user@local $ curl -X POST -d '{
     "chatInput": "Name your document source",
     "sessionId": 42
-  }'
+  }' \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer xxx.yyy.zzz" \
   https://p-XXXXXX.project.space/webhook-test/<webhook uuid>

@@ -8,23 +8,25 @@ Jede Anfrage mit einem großen Frontier-Modell zu beantworten ist präzise, aber
 
 Dieser Guide baut eine dreistufige Kaskade auf mittwald AI Hosting mit nur dem `openai`-Paket:
 
-| Stufe          | Modell                  | Wann einsetzen                                             |
-| -------------- | ----------------------- | ---------------------------------------------------------- |
-| 1 — schnell    | `Qwen3.5-0.8B`          | Einfache Nachschlagefragen, Ja/Nein, kurze Faktenantworten |
-| 2 — ausgewogen | `Qwen3.6-35B-A3B-FP8`   | Mehrschrittiges Reasoning, Code, Vergleiche                |
-| 3 — Frontier   | `Qwen3.5-122B-A10B-FP8` | Komplexe Analysen, lange Dokumente, Vision                 |
+| Stufe          | Modell                     | Wann einsetzen                                             |
+| -------------- | -------------------------- | ---------------------------------------------------------- |
+| 1 — schnell    | `Qwen3.5-0.8B`             | Einfache Nachschlagefragen, Ja/Nein, kurze Faktenantworten |
+| 2 — ausgewogen | `Qwen3.6-35B-A3B-FP8`      | Mehrschrittiges Reasoning, Code, Vergleiche                |
+| 3 — Frontier   | `DeepSeek-V4.1-Flash-1017` | Komplexe Analysen, lange Dokumente, Vision                 |
 
 Für Stufe 3 kann je nach Workload ein beliebiges großes Modell eingesetzt werden:
 
-| Alternative für Stufe 3 | Stärken                                              |
-| ----------------------- | ---------------------------------------------------- |
-| `Qwen3.5-122B-A10B-FP8` | Thinking-Modus, Vision, starkes Coding, 245k Context |
-| `gpt-oss-120b`          | Textbasiertes Reasoning, 131k Context                |
+| Alternative für Stufe 3    | Stärken                                                           |
+| -------------------------- | ----------------------------------------------------------------- |
+| `DeepSeek-V4.1-Flash-1017` | Größtes Modell, Thinking-Modus, Vision, Coding, 1.048.576 Context |
+| `Qwen3.8-27B-NVFP4`        | Stable, Thinking-Modus, Vision, Tool-Schleifen, 256.000 Context   |
 
-Die Modellseiten für Parameterdetails: [Qwen3.5-0.8B](/docs/v2/platform/aihosting/models/qwen3-5-0-8b), [Qwen3.6-35B-A3B-FP8](/docs/v2/platform/aihosting/models/qwen3-6-35b-a3b-fp8), [Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8).
+`DeepSeek-V4.1-Flash-1017` ist in der [Testphase](../20-access-and-usage/40-lifecycle.mdx#testphase): Wir können es kurzfristig abschalten, und Verhalten und Funktionsumfang können sich noch ändern. Wenn Stufe 3 Produktivverkehr bedient, nimm `Qwen3.8-27B-NVFP4` mit dem Status Stable.
+
+Die Modellseiten für Parameterdetails: [Qwen3.5-0.8B](/docs/v2/platform/aihosting/models/qwen3-5-0-8b), [Qwen3.6-35B-A3B-FP8](/docs/v2/platform/aihosting/models/qwen3-6-35b-a3b-fp8), [DeepSeek-V4.1-Flash-1017](/docs/v2/platform/aihosting/models/deepseek-v4-1-flash-1017), [Qwen3.8-27B-NVFP4](/docs/v2/platform/aihosting/models/qwen3-8-27b-nvfp4).
 
 :::tip Thinking-Modus
-`Qwen3.5-122B-A10B-FP8` hat standardmäßig den Thinking-Modus aktiviert, was Latenz hinzufügt. Für eine auf schnelle Antworten ausgelegte Kaskade diesen über `extra_body={"chat_template_kwargs": {"enable_thinking": False}}` deaktivieren — siehe [Thinking-Modus deaktivieren](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8#thinking-modus-deaktivieren). Aktiviert lassen, wenn Anfragen der Stufe 3 von schrittweisem Reasoning profitieren.
+`DeepSeek-V4.1-Flash-1017` hat den Thinking-Modus standardmäßig aktiviert, was Latenz kostet. Für eine auf schnelle Antworten ausgelegte Kaskade schalte ihn mit `extra_body={"chat_template_kwargs": {"reasoning_effort": "none"}}` ab, siehe [Reasoning-Tiefe steuern](/docs/v2/platform/aihosting/models/deepseek-v4-1-flash-1017#reasoning-effort). Lass ihn an, wenn Anfragen der Stufe 3 von schrittweisem Reasoning profitieren. `Qwen3.8-27B-NVFP4` schaltet das Thinking stattdessen mit `"enable_thinking": False` ab, siehe [Thinking-Modus deaktivieren](/docs/v2/platform/aihosting/models/qwen3-8-27b-nvfp4#thinking-modus-deaktivieren).
 :::
 
 ## Einrichtung {#einrichtung}
@@ -34,7 +36,7 @@ user@local $ pip install openai
 user@local $ export OPENAI_API_KEY="sk-…"
 ```
 
-## Der Router
+## Der Router {#router}
 
 Der Router sendet jede Anfrage an `Qwen3.5-0.8B` und lässt die Komplexität in einem Wort klassifizieren. Da die Klassifizierer-Ausgabe nur ein einzelnes Token ist (`simple`, `moderate` oder `complex`), sind die Kosten vernachlässigbar – typischerweise weniger als 0,1 % der Gesamtausgaben.
 
@@ -45,12 +47,12 @@ from openai import OpenAI
 client = OpenAI(base_url="https://llm.aihosting.mittwald.de/v1")
 
 # Stufe-3-Modell je nach Workload tauschen:
-#   "Qwen3.5-122B-A10B-FP8"   — Thinking-Modus, Vision, starkes Coding, 245k Context
-#   "gpt-oss-120b"             — Textbasiertes Reasoning, 131k Context
+#   "DeepSeek-V4.1-Flash-1017" — größtes Modell, Thinking-Modus, Vision, 1M Context (Testphase)
+#   "Qwen3.8-27B-NVFP4"        — Stable, Thinking-Modus, Vision, 256k Context
 TIERS = {
     "simple":   "Qwen3.5-0.8B",
     "moderate": "Qwen3.6-35B-A3B-FP8",
-    "complex":  "Qwen3.5-122B-A10B-FP8",
+    "complex":  "DeepSeek-V4.1-Flash-1017",
 }
 
 CLASSIFIER_SYSTEM = """\
@@ -95,7 +97,7 @@ def cascade(query: str) -> dict:
     return {"tier": tier, "model": model, "answer": text}
 ```
 
-## Verwendung
+## Verwendung {#verwendung}
 
 ```python
 queries = [
@@ -112,7 +114,23 @@ for q in queries:
     print(f"  A: {result['answer'][:120]}\n")
 ```
 
-## Eskalation bei kurzen Antworten
+Erwartete Ausgabe:
+
+```
+[simple  ] Qwen3.5-0.8B
+  F: Was ist die Hauptstadt von Frankreich?
+  A: Paris.
+
+[moderate] Qwen3.6-35B-A3B-FP8
+  F: Schreibe eine Python-Funktion, die zwei sortierte Listen zusammenführt.
+  A: def merge_sorted(a, b): ...
+
+[complex ] DeepSeek-V4.1-Flash-1017
+  F: Analysiere die Architektur-Tradeoffs zwischen event-getriebenen und Request-Res…
+  A: Event-getriebene Architekturen entkoppeln Produzenten von Konsumenten…
+```
+
+## Eskalation bei kurzen Antworten {#eskalation}
 
 Manche Anfragen werden fälschlicherweise als `simple` klassifiziert, aber das kleine Modell liefert eine unbefriedigend kurze Antwort. Mit einer Wortanzahl-Prüfung kann automatisch eskaliert werden:
 
@@ -134,9 +152,9 @@ def cascade_with_escalation(query: str, min_words: int = 20) -> dict:
     return {"tier": tier, "model": model, "answer": text}
 ```
 
-## System-Prompt durchreichen
+## System-Prompt durchreichen {#system-prompt}
 
-Um einen System-Prompt hinzuzufügen (z. B. für eine Kundensupport-Persona), diesen an die jeweilige Stufe weitergeben:
+Um einen System-Prompt hinzuzufügen (z. B. für eine Kundensupport-Persona), gib ihn an die jeweilige Stufe weiter:
 
 ```python
 SYSTEM = "Du bist ein knapper Support-Agent für mittwald. Antworte in der Sprache des Nutzers."
@@ -154,14 +172,3 @@ def cascade_with_system(query: str) -> dict:
     )
     return {"tier": tier, "model": model, "answer": resp.choices[0].message.content}
 ```
-
-:::tip Kostenschätzung
-Bei einer typischen Support-Workload (70 % einfach, 20 % mittel, 10 % komplex) und 100.000 Anfragen/Monat bei durchschnittlich 300 Token:
-
-| Szenario                              | Monatliche Kosten |
-| ------------------------------------- | ----------------- |
-| Alle Anfragen → Qwen3.5-122B-A10B-FP8 | ~30 €             |
-| Dreistufige Kaskade                   | ~8 €              |
-
-Die Klassifizierer-Anfrage kostet insgesamt weniger als 0,10 € und ist nicht separat aufgeführt.
-:::

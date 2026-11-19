@@ -21,22 +21,43 @@ Continue wird über eine `config.yaml` konfiguriert, typischerweise unter `~/.co
 
 ### Basis-Konfiguration
 
+Lege mittwald als Model Provider an:
+
 ```yaml
 name: mittwald
 version: 1.0.0
 schema: v1
 models:
-  - name: Qwen3.5-122B-A10B-FP8
+  - name: DeepSeek-V4.1-Flash-1017
     provider: openai
-    model: Qwen3.5-122B-A10B-FP8
+    model: DeepSeek-V4.1-Flash-1017
     apiBase: https://llm.aihosting.mittwald.de/v1
-    apiKey: <INSERT-API-KEY>
+    apiKey: sk-your-api-key-here
     roles:
       - chat
       - edit
       - apply
     capabilities:
       - tool_use
+      - image_input
+    defaultCompletionOptions:
+      contextLength: 1048576
+      maxTokens: 32768
+      temperature: 1.0
+      topP: 1.0
+  - name: Kolibri-1
+    provider: openai
+    model: Kolibri-1
+    apiBase: https://llm.aihosting.mittwald.de/v1
+    apiKey: sk-your-api-key-here
+    roles:
+      - chat
+    defaultCompletionOptions:
+      contextLength: 1048576
+      maxTokens: 32768
+      temperature: 1.0
+      topP: 0.97
+      topK: 128
 context:
   - provider: code
   - provider: docs
@@ -47,11 +68,23 @@ context:
   - provider: codebase
 ```
 
-Ersetze `<INSERT-API-KEY>` durch deinen mittwald AI-Hosting-API-Key ([so bekommst du einen](/docs/v2/platform/aihosting/access-and-usage/access)).
+Ersetze `sk-your-api-key-here` durch deinen mittwald AI-Hosting-API-Key ([so bekommst du einen](/docs/v2/platform/aihosting/access-and-usage/access)).
+
+Die Konfiguration legt zwei Modelle an:
+
+- **DeepSeek-V4.1-Flash-1017** für Chat, Edits und den Agent-Modus. Es liest Bilder und denkt
+  nach, bevor es antwortet, deshalb lässt `maxTokens` Platz für das Reasoning. Bricht eine
+  Antwort ab, bevor das Modell etwas schreibt, erhöhe `maxTokens`.
+- **Kolibri-1** für Chat auf Deutsch. Es liest nur Text und ruft Tools nur mit
+  `tool_choice: "auto"` auf, deshalb fehlt `tool_use` in der Konfiguration. Im Agent-Modus
+  nutzt du DeepSeek-V4.1-Flash-1017.
+
+Beide Modelle sind in der [Testphase](/docs/v2/platform/aihosting/access-and-usage/lifecycle#testphase). Für den Produktivbetrieb wähle stattdessen
+`Qwen3.8-27B-NVFP4` (Stable) mit `contextLength: 256000`.
 
 ## MCP Server Integration {#mcp}
 
-Continue unterstützt Model Context Protocol Server. Ergänze MCP-Server in deiner `config.yaml`:
+Continue unterstützt Model Context Protocol Server für erweiterte Fähigkeiten. Ergänze MCP-Server in deiner `config.yaml`:
 
 ```yaml
 mcpServers:
@@ -117,18 +150,22 @@ Bitte den Assistenten explizit um Tool-Nutzung, z. B.:
 - "Query OpenSearch for recent error logs..."
 - "Use mittwald MCP to list my projects"
 
+Begrenze den Zugriff immer eng und prüfe jeden Datenzugriff und jede Änderung.
+
 ## Best Practices
 
 ### Sicherheit mit MCP-Servern
 
 - Zugriff strikt begrenzen (Datenbanken, Domains, Pfade)
 - Tool-Aufrufe für Audits protokollieren
-- Für Tool-Planung niedrige Temperatur verwenden (`<= 0.2`)
+- Für Tool-Planung niedrige Temperatur verwenden (`<= 0.2`), um Halluzinationen zu reduzieren.
+  Reasoning-Modelle wie DeepSeek-V4.1-Flash-1017 sind die Ausnahme: Behalte die
+  Sampling-Parameter von ihren Modellseiten bei
 - Diffs und Queries vor Ausführung prüfen
 - Wenn möglich read-only beginnen
 
 ## Nächste Schritte
 
-- [Weitere IDE-Integrationen](./)
-- [MCP kennenlernen](/docs/v2/agentic-integration/mcp/)
-- [Agent Skills installieren](/docs/v2/agentic-integration/agent-skills/)
+- [Weitere IDE-Integrationen](../) - Andere Tools ausprobieren
+- [MCP kennenlernen](/docs/v2/agentic-integration/mcp/) - Infrastruktur-Management im Detail
+- [Agent Skills installieren](/docs/v2/agentic-integration/agent-skills/) - Workflow-Anleitungen ergänzen

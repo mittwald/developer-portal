@@ -1,0 +1,264 @@
+---
+sidebar_label: Kolibri-1
+description: Detaillierte Informationen zu Kolibri-1
+title: Kolibri-1
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+## Beschreibung {#description}
+
+„Kolibri-1“ ist ein Reasoning-Modell aus Deutschland, gebaut von Aleph Alpha in Heidelberg für Deutsch und Englisch. Es ist ein Mixture-of-Experts-Modell mit 78 Milliarden Parametern, von denen pro Token etwa 3,5 Milliarden mitrechnen. Aleph Alpha hat es mit einem Tokenizer trainiert, der auf den deutschen Wortbau zugeschnitten ist, und sich bewusst für Tiefe in zwei Sprachen statt Breite in vielen entschieden. Nutze es, wenn deine Nutzer auf Deutsch schreiben und die Antworten nach Deutsch klingen sollen, nicht nach Übersetzung.
+
+Dieses Modell ist in der [Testphase](../20-access-and-usage/40-lifecycle.mdx#testphase). Wir können es kurzfristig abschalten, und Verhalten und Funktionsumfang können sich noch ändern. Für den produktiven Einsatz empfehlen wir Modelle mit dem Status Stable oder LTS.
+
+Wir betreiben eine eigene Quantisierung des Modells, [`mittwald/Kolibri-1-mixed-NVFP4-FP8`](https://huggingface.co/mittwald/Kolibri-1-mixed-NVFP4-FP8). Sie liegt in der Qualität gleichauf mit Aleph Alphas FP8-Release, siehe [Qualität dieses Builds](#quality).
+
+Es eignet sich für und unterstützt:
+
+- Textgenerierung innerhalb einer Chat-Completion (Text zu Text), auf Deutsch und Englisch
+- Thinking / Reasoning für schrittweises Problemlösen, mit wählbarer Reasoning-Tiefe
+- Retrieval-Augmented Generation (RAG) über deutsche Dokumente
+- Verarbeitung langer Dokumente und erweiterter Kontexte
+- Tool-Calling für agentische Workflows, mit den unten genannten Limitierungen
+
+Folgende Limitierungen gelten:
+
+- Maximale Context-Länge: 1.048.576 Token, Ein- und Ausgabe zusammen, siehe [Lange Kontexte](#long-contexts)
+- Maximale Ausgabelänge: 65.536 Token pro Anfrage
+- Nur Text, keine Bild- oder Audioeingabe
+- Andere Sprachen als Deutsch und Englisch waren kein Trainingsziel und funktionieren spürbar schlechter
+- `tool_choice="required"`, ein benanntes `tool_choice`, `parallel_tool_calls: false` und `strict`-Tool-Schemas werden nicht unterstützt. Lass das Modell mit `tool_choice="auto"` (Standard) selbst entscheiden
+- `tool_choice="none"` hält das Modell nicht davon ab, einen Tool-Call zu schreiben. Der Aufruf landet dann als Text in `content` statt in `tool_calls`. Willst du eine Antwort ohne Tools, lass `tools` weg, siehe [Tool-Calling](#tool-calling)
+- Ausgaben bei `temperature` 0 sind zwischen zwei Anfragen nicht reproduzierbar
+- Das Wissen des Modells endet im Juni 2026. Für neuere Fakten braucht es Tools oder RAG
+
+**Der Thinking-Modus ist standardmäßig an, und zwar in der höchsten Reasoning-Tiefe.** Die günstigeren Stufen und das Abschalten findest du unter [Reasoning-Tiefe steuern](#reasoning-effort). Die Parameter gehören in `chat_template_kwargs`.
+
+:::warning[Eine Antwort kann leer zurückkommen, wenn `max_tokens` zu klein ist]
+Das Modell denkt vor jeder Antwort nach. Bei Datumsberechnungen und Rechenaufgaben kann das Nachdenken allein mehrere tausend Token lang werden. Ist `max_tokens` aufgebraucht, bevor das Nachdenken fertig ist, bekommst du eine Antwort mit leerem `content` und `finish_reason: length`. Abgerechnet werden die Reasoning-Token trotzdem.
+
+Setz `max_tokens` mit Thinking auf mindestens 32.768, senke die Reasoning-Tiefe oder schalte den Thinking-Modus für diese Anfrage ab. Bekommst du einen leeren `content`, schau zuerst auf `finish_reason`.
+:::
+
+### Reasoning-Tiefe steuern {#reasoning-effort}
+
+Gib `reasoning_effort` in `chat_template_kwargs` mit:
+
+| Stufe             | Wofür                                                         |
+| ----------------- | ------------------------------------------------------------- |
+| `high` (Standard) | Mehrstufige Analysen, Mathematik, Planung, lange Agentenläufe |
+| `medium`          | Gute Balance zwischen Genauigkeit und Tempo                   |
+| `low`             | Alltäglicher Chat, Entwürfe, Zusammenfassungen                |
+| `none`            | Klassifizierung, Routing, Extraktion, kurze Standardantworten |
+
+`none` schaltet den Thinking-Modus ab, `"enable_thinking": false` bewirkt dasselbe. Ohne Thinking antwortet das Modell sofort und verbraucht keine Reasoning-Token.
+
+<Tabs groupId="language">
+  <TabItem value="python" label="Python">
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1",
+    api_key="sk-your-api-key-here",
+)
+
+response = client.chat.completions.create(
+    model="Kolibri-1",
+    messages=[{"role": "user", "content": "Erkläre in drei Sätzen, wie eine Wärmepumpe funktioniert."}],
+    temperature=1.0,
+    top_p=0.97,
+    max_tokens=32768,
+    extra_body={
+        "top_k": 128,
+        "chat_template_kwargs": {"reasoning_effort": "low"},
+    },
+)
+
+print(response.choices[0].message.content)
+```
+
+  </TabItem>
+  <TabItem value="javascript" label="JavaScript">
+
+```ts
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  baseURL: "https://llm.aihosting.mittwald.de/v1",
+  apiKey: "sk-your-api-key-here",
+});
+
+const response = await client.chat.completions.create({
+  model: "Kolibri-1",
+  messages: [
+    {
+      role: "user",
+      content: "Erkläre in drei Sätzen, wie eine Wärmepumpe funktioniert.",
+    },
+  ],
+  temperature: 1.0,
+  top_p: 0.97,
+  max_tokens: 32768,
+  // @ts-ignore – vLLM-Erweiterungen
+  top_k: 128,
+  chat_template_kwargs: { reasoning_effort: "low" },
+} as any);
+
+console.log(response.choices[0].message.content);
+```
+
+  </TabItem>
+  <TabItem value="php" label="PHP">
+
+```php
+<?php
+// composer require openai-php/client guzzlehttp/guzzle
+
+$client = OpenAI::factory()
+    ->withBaseUri('https://llm.aihosting.mittwald.de/v1')
+    ->withApiKey('sk-your-api-key-here')
+    ->make();
+
+$response = $client->chat()->create([
+    'model' => 'Kolibri-1',
+    'messages' => [
+        ['role' => 'user', 'content' => 'Erkläre in drei Sätzen, wie eine Wärmepumpe funktioniert.'],
+    ],
+    'temperature' => 1.0,
+    'top_p' => 0.97,
+    'top_k' => 128,
+    'max_tokens' => 32768,
+    'chat_template_kwargs' => ['reasoning_effort' => 'low'],
+]);
+
+echo $response->choices[0]->message->content;
+```
+
+  </TabItem>
+</Tabs>
+
+Standardmäßig fällt das Reasoning früherer Runden aus dem Verlauf heraus. Willst du es behalten, etwa bei langen Agentenläufen, schick `"preserve_thinking": true` in `chat_template_kwargs`. Behaltenes Reasoning zählt zum Kontextfenster.
+
+### Antwort auslesen {#reading-the-response}
+
+Mit Thinking liefert das Modell zwei getrennte Felder:
+
+| Feld                           | Inhalt                                      |
+| ------------------------------ | ------------------------------------------- |
+| `choices[0].message.reasoning` | Interne Gedankenkette (kann sehr lang sein) |
+| `choices[0].message.content`   | Die eigentliche Antwort                     |
+
+## Empfohlene Inferenzparameter {#recommended-inference-parameters}
+
+Das sind die Empfehlungen von Aleph Alpha und gleichzeitig die Standardwerte, wenn du nichts mitschickst. Verzichte auf Greedy-Decoding (`temperature` 0): Es kostet Qualität und kann zu Wiederholungen führen.
+
+| Parameter            | Wert |
+| -------------------- | ---- |
+| `temperature`        | 1,0  |
+| `top_p`              | 0,97 |
+| `top_k`              | 128  |
+| `repetition_penalty` | 1,05 |
+
+`repetition_penalty` 1,05 setzen wir auf dem Server. Bei Prompts, die zu Schleifen neigen, hat das die Zahl der Antworten halbiert, die an `max_tokens` stoßen, ohne Genauigkeit zu kosten.
+
+### Ausgabelänge {#output-length}
+
+| Aufgabe                                          | Empfohlenes `max_tokens` |
+| ------------------------------------------------ | ------------------------ |
+| Thinking aus (`reasoning_effort: "none"`)        | 1.024–4.096              |
+| Normale Anfragen mit Thinking                    | 32.768                   |
+| Schwere Mathematik, Planung, lange Tool-Abfolgen | 65.536                   |
+
+## Tool-Calling {#tool-calling}
+
+Kolibri-1 ruft Tools über das normale Feld `tools` auf und kann Tool-Calls mit Thinking kombinieren. Lass `tool_choice` auf `auto`. Ob ein Tool nötig ist, entscheidet das Modell selbst: In unseren Tests hat es in 78 von 80 Fällen die richtige Funktion mit den richtigen Argumenten gewählt.
+
+```python
+tools = [{
+    "type": "function",
+    "function": {
+        "name": "get_weather",
+        "description": "Current weather for a city",
+        "parameters": {
+            "type": "object",
+            "properties": {"city": {"type": "string"}},
+            "required": ["city"],
+        },
+    },
+}]
+
+response = client.chat.completions.create(
+    model="Kolibri-1",
+    messages=[{"role": "user", "content": "Wie ist das Wetter in Espelkamp?"}],
+    tools=tools,
+    max_tokens=32768,
+)
+
+print(response.choices[0].message.tool_calls)
+```
+
+Schickt dein Framework immer `tool_choice="required"` oder ein benanntes Tool, schlägt die Anfrage fehl. Stell das Framework auf `auto` um oder nimm für diesen Schritt ein anderes Modell.
+
+Umgekehrt gilt dasselbe: Mit `tool_choice="none"` kann das Modell trotzdem ein Tool aufrufen wollen, und der Aufruf erscheint dann als Text in `content`, etwa als `<tool_call>`-Block. Darf eine Anfrage keine Tools nutzen, schick das Feld `tools` gar nicht erst mit. Frameworks, die die Tool-Liste in jeder Anfrage mitsenden und Tools per `tool_choice="none"` abschalten, müssen die Liste für diesen Schritt weglassen.
+
+## Lange Kontexte {#long-contexts}
+
+Das Kontextfenster fasst 1.048.576 Token, Ein- und Ausgabe zusammen. Kolibri-1 wendet die Positionskodierung nur in seinen Sliding-Window-Schichten an und liest deshalb ohne Positionsskalierung über seine nativen 262.144 Token hinaus. Aleph Alpha hat das Modell bis 1.048.576 Token validiert. In unseren Tests hat es einen versteckten Code in deutschem Text bei 10, 50 und 90 Prozent Tiefe in Prompts von rund 1.040.000 Token gefunden.
+
+Lange Prompts einzulesen dauert. Rechne mit mehreren Minuten, wenn du an die Million Token herankommst. Aleph Alpha empfiehlt höchstens 262.144 Token für zeitkritische Anfragen und für komplexe Aufgaben. Nutz das volle Fenster dort, wo eine ganze Dokumentsammlung, eine Codebasis oder ein langer Agentenverlauf in eine einzige Anfrage passen muss.
+
+## Umstieg von Qwen3.6-35B-A3B-FP8 {#switching-from-qwen3-6}
+
+Für Textaufgaben ist Kolibri-1 ein starker Ersatz für [Qwen3.6-35B-A3B-FP8](./70-qwen3-6-35b-a3b-fp8.mdx), auf Deutsch der bessere. Kolibri-1 ist kein Qwen-Ableger: Aleph Alpha hat eine eigene Architektur entworfen und das Modell von Grund auf trainiert. Beide Modelle rechnen pro Token mit rund 3 Milliarden Parametern, und Aleph Alpha vergleicht die beiden direkt. Aus deren Evaluation:
+
+| Benchmark (Evaluation von Aleph Alpha)       | Kolibri-1 | Qwen3.6 35B-A3B |
+| -------------------------------------------- | --------- | --------------- |
+| Gesamt, Englisch                             | 75,0      | 71,4            |
+| Gesamt, Deutsch                              | 71,0      | 67,3            |
+| Mathematik, Deutsch (Durchschnitt)           | 89,3      | 83,7            |
+| Code (Durchschnitt)                          | 88,9      | 87,7            |
+| Anweisungen befolgen (IFBench)               | 79,1      | 66,1            |
+| Agentische Recherche, Deutsch (Durchschnitt) | 68,4      | 58,8            |
+| Branchen-RAG, Deutsch (Durchschnitt)         | 68,6      | 65,8            |
+| Tool-Calling (BFCL v4, gesamt)               | 60,4      | 67,2            |
+| Wissen, Deutsch (Durchschnitt)               | 57,6      | 61,0            |
+
+Steig um, wenn deine Anfragen Text sind und überwiegend Deutsch, etwa bei Assistenten, RAG über deutsche Dokumente und Extraktion mit vielen Vorgaben. Bleib bei Qwen3.6, wenn du Folgendes brauchst:
+
+- **Bilder.** Kolibri-1 liest nur Text.
+- **Viele Tools in einer Agentenschleife.** Qwen3.6 schneidet bei Tool-Calling-Benchmarks besser ab, und Kolibri-1 nimmt kein `tool_choice="required"` und kein benanntes Tool an.
+- **Faktenwissen ohne Quellen.** Qwen3.6 weiß aus sich heraus mehr. Mit RAG schließt sich die Lücke, siehe die RAG-Zeilen oben.
+
+Was du beim Umzug einer laufenden Integration änderst:
+
+1. Setz `model` auf `Kolibri-1`.
+2. Nimm die Sampling-Parameter von Kolibri: `temperature` 1,0, `top_p` 0,97, `top_k` 128, oder lass sie weg und nimm die Standardwerte.
+3. Gib `reasoning_effort` mit statt nur `enable_thinking`, siehe [Reasoning-Tiefe steuern](#reasoning-effort). `enable_thinking: false` funktioniert weiterhin.
+4. Setz `max_tokens` mit Thinking auf mindestens 32.768.
+5. Lange Eingaben können bleiben: Kolibri-1 nimmt bis zu 1.048.576 Token an, etwa das Vierfache von Qwen3.6-35B-A3B-FP8. Was das an Zeit kostet, steht unter [Lange Kontexte](#long-contexts).
+
+## Qualität dieses Builds {#quality}
+
+Aleph Alpha veröffentlicht Kolibri-1 in BF16 und FP8. Wir haben die Experten-Gewichte mit einem deutschlastigen Kalibrierset auf 4 Bit (NVFP4) quantisiert und die Attention in FP8 gelassen. Es bleibt dasselbe Modell, nur kompakter gespeichert, die Modellkarte von Aleph Alpha gilt also vollständig.
+
+Auf unserer Hardware gemessen, gegen Aleph Alphas FP8-Release, gleiche Engine und gleiche Einstellungen:
+
+| Test                                                                                                        | FP8-Release | Dieser Build |
+| ----------------------------------------------------------------------------------------------------------- | ----------- | ------------ |
+| Deutsche Faktenfragen (von 20)                                                                              | 20          | 20           |
+| GSM8K, Aufgaben 1–50, je 2 Durchläufe (von 100)                                                             | 95          | 94           |
+| [Ger-RAG-eval](https://huggingface.co/datasets/deutsche-telekom/Ger-RAG-eval) Aufgaben 1, 2 und 4 (von 120) | 120         | 119          |
+| Tool-Calls mit richtiger Funktion und richtigen Argumenten (von 80)                                         | 78          | 78           |
+| Anfragen ohne nötiges Tool, die das Modell korrekt ohne Tool-Aufruf bearbeitet (von 20)                     | 14          | 17           |
+
+Die Unterschiede sind durch das Rauschen in den Ergebnissen der Stichproben zu erklären. Methode und alle Ergebnisse stehen in der [Modellkarte des Builds](https://huggingface.co/mittwald/Kolibri-1-mixed-NVFP4-FP8).
+
+## Nutzungsbedingungen und Lizenz {#terms-of-use-and-licensing}
+
+Aleph Alpha stellt das Modell unter der [Apache-2.0-Lizenz](https://www.apache.org/licenses/LICENSE-2.0.html) bereit. Unser quantisierter Build steht unter derselben Lizenz. Für die Weiterverwendung der erzeugten Inhalte gelten keine zusätzlichen Einschränkungen.
+
+Aleph Alpha bittet darum, Kolibri nicht für rechtswidrige Zwecke einzusetzen, insbesondere nicht für die nach Artikel 5 der KI-Verordnung (EU AI Act) verbotenen Praktiken. Bei Entscheidungen mit hoher Tragweite bau eigene Prüfungen in deine Anwendung ein. Mehr dazu unter [Responsible Use und Risiken in der Modellkarte von Aleph Alpha](https://huggingface.co/Aleph-Alpha/Kolibri-1-BF16#responsible-use).

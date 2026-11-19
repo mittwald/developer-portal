@@ -23,9 +23,13 @@ sidebar_position: 4
 4. Konfigurieren:
    - **Provider name**: `mittwald`
    - **API URL**: `https://llm.aihosting.mittwald.de/v1`
-   - **Model**: `Qwen3.5-122B-A10B-FP8`
+   - **API Key**: dein mittwald AI-Hosting-API-Key
+   - **Model**: `DeepSeek-V4.1-Flash-1017`
+   - **Context window**: `1048576`
 
 ### Über settings.json
+
+Alternativ konfigurierst du Zed über `settings.json`:
 
 ```json
 {
@@ -35,9 +39,16 @@ sidebar_position: 4
         "api_url": "https://llm.aihosting.mittwald.de/v1",
         "available_models": [
           {
-            "name": "Qwen3.5-122B-A10B-FP8",
-            "display_name": "Qwen3.5-122B-A10B-FP8",
-            "max_tokens": 245760
+            "name": "DeepSeek-V4.1-Flash-1017",
+            "display_name": "DeepSeek-V4.1-Flash-1017",
+            "max_tokens": 1048576,
+            "max_output_tokens": 32768,
+            "capabilities": {
+              "tools": true,
+              "images": true,
+              "parallel_tool_calls": false,
+              "prompt_cache_key": false
+            }
           }
         ]
       }
@@ -46,11 +57,21 @@ sidebar_position: 4
 }
 ```
 
-**Hinweis:** Zed speichert API-Keys nicht in `settings.json`. Setze den Key als Umgebungsvariable:
+`max_output_tokens` lässt Platz für das Reasoning, das DeepSeek-V4.1-Flash-1017 vor der
+Antwort schreibt, und mit `images` kannst du Screenshots anhängen. Das Modell ist in der
+[Testphase](/docs/v2/platform/aihosting/access-and-usage/lifecycle#testphase). Für den Produktivbetrieb trag stattdessen `Qwen3.8-27B-NVFP4` (Stable) mit
+`"max_tokens": 256000` ein.
+
+:::note
+
+Leg API-Keys nicht in `settings.json` ab. Gib den Key in der UI ein oder setze ihn als
+Umgebungsvariable, die nach der Provider-ID benannt ist:
 
 ```shellsession
-user@local $ export MITTWALD_API_KEY=<dein-api-key>
+user@local $ export MITTWALD_API_KEY=sk-your-api-key-here
 ```
+
+:::
 
 ## Nutzung
 
@@ -63,6 +84,6 @@ Nach der Konfiguration kannst du mittwald KI-Modelle im Agent Panel nutzen für:
 
 ## Nächste Schritte
 
-- [Weitere IDEs ansehen](./)
-- [MCP kennenlernen](/docs/v2/agentic-integration/mcp/)
-- [Best Practices](../#best-practices)
+- [Weitere IDEs ansehen](../) - Integrationen vergleichen
+- [MCP kennenlernen](/docs/v2/agentic-integration/mcp/) - Infrastruktur-Management
+- [Best Practices](../#best-practices) - KI-Nutzung optimieren
