@@ -272,7 +272,7 @@ Zusätzlich können folgende optionale Parameter übermittelt werden:
 
 - `language`: Die Sprache der Audioeingabe (ISO-639-1-Format). Falls nicht angegeben, wird standardmäßig Deutsch ("de") angenommen. Es wird dringend empfohlen, diesen Parameter immer explizit zu setzen, um die beste Genauigkeit zu erzielen.
 - `temperature`: Sampling-Temperatur, empfohlener Wert ist 0 (Standard)
-- `response_format`: Format der Antwort (json oder text). Andere Formate wie srt, vtt und verbose_json werden derzeit nicht unterstützt.
+- `response_format`: `json` (Standard) oder `verbose_json` mit Zeitstempeln je Segment, erkannter Sprache und Dauer. `text` wird angenommen, liefert aber trotzdem einen JSON-Body. `srt` und `vtt` werden nicht unterstützt und ergeben HTTP 400.
 
 ```sh
 curl -X POST https://llm.aihosting.mittwald.de/v1/audio/transcriptions \
@@ -309,7 +309,7 @@ curl -X POST https://llm.aihosting.mittwald.de/v1/audio/speech \
     --output willkommen.mp3
 ```
 
-Der Antwortkörper ist die Audiodatei selbst, kein JSON. Schreib ihn direkt in eine Datei oder gib ihn an deinen Player weiter. Nur Fehler kommen als JSON zurück. Der `Content-Type` ist immer `audio/mpeg`, egal welches Format du angefordert hast. Benenn die Datei also nach deinem `response_format`.
+Der Antwortkörper ist die Audiodatei selbst, kein JSON. Schreib ihn direkt in eine Datei oder gib ihn an deinen Player weiter. Nur Fehler kommen als JSON zurück. Der `Content-Type` passt zum angeforderten Format: `audio/wav`, `audio/pcm`, `audio/flac`, `audio/mpeg` für `mp3` und `audio/ogg` für `opus`.
 
 Der Parameter `input` enthält den zu sprechenden Text und darf nicht leer sein. `model` wählt das TTS-Modell. `voice` ist Pflicht und muss einer von `aiden`, `dylan`, `eric`, `ono_anna`, `ryan`, `serena`, `sohee`, `uncle_fu`, `vivian` sein; ein unbekannter Name schlägt fehl.
 
