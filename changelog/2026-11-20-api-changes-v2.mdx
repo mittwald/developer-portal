@@ -1,10 +1,9 @@
 ---
-title: Breaking (!) API changes for v2 API, November 13 to November 20
+title: API changes for v2 API, November 13 to November 20
 authors:
   - machine
 tags:
   - apiv2
-  - breaking
   - AI hosting
   - AIssistant
   - User
@@ -20,61 +19,21 @@ tags:
 import OperationHint from "@site/src/components/OperationHint";
 import OperationLink from "@site/src/components/OperationLink";
 
-In the week of 11/13/2026 to 11/20/2026, the mittwald API underwent significant changes, including the removal of multiple API paths and schemas without deprecation, the addition of new endpoints, and updates to response properties, enhancing the overall functionality and structure of the API.
+In the week of 11/13/2026 to 11/20/2026, the LeadFyndr API was removed following the discontinuation of the LeadFyndr product. In addition, new endpoints for AIssistant chats, AuthInfo2 domain checks and compromised password lookups were added, and several response schemas were updated.
 
 {/* truncate */}
 
+:::info LeadFyndr has been discontinued
 
+The LeadFyndr product has been discontinued. As a consequence, all LeadFyndr-related API operations (operation IDs prefixed with `leadfyndr-`) and their `de.mittwald.v1.leadfyndr.*` schemas have been removed from the API.
 
-:::caution Breaking changes
-
-This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
-
-While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+If you still have integrations using these operations, please remove them. Apart from this, the changes listed below are not breaking.
 
 :::
 
-
-
 ## Summary
 
-
-- The following API paths have been removed without deprecation, resulting in breaking changes:
-  - `GET /v2/cities` (Operation ID: `leadfyndr-get-cities`)
-  - `GET /v2/customers/{customerId}/lead-fyndr-profile` (Operation ID: `leadfyndr-get-lead-fyndr-profile`)
-  - `GET /v2/customers/{customerId}/lead-fyndr-profile-request` (Operation ID: `leadfyndr-get-lead-fyndr-profile-request`)
-  - `POST /v2/customers/{customerId}/lead-fyndr-profile-request` (Operation ID: `leadfyndr-create-lead-fyndr-access-request`)
-  - `GET /v2/customers/{customerId}/lead-fyndr-profile/tariff` (Operation ID: `leadfyndr-get-lead-fyndr-profile-tariff-options`)
-  - `GET /v2/customers/{customerId}/leads` (Operation ID: `leadfyndr-list-leads`)
-  - `GET /v2/customers/{customerId}/leads/{leadId}` (Operation ID: `leadfyndr-get-lead`)
-  - `GET /v2/customers/{customerId}/unlocked-leads` (Operation ID: `leadfyndr-list-unlocked-leads`)
-  - `POST /v2/customers/{customerId}/unlocked-leads-export` (Operation ID: `leadfyndr-create-leads-export`)
-  - `GET /v2/customers/{customerId}/unlocked-leads-exports` (Operation ID: `leadfyndr-get-leads-export-history`)
-  - `GET /v2/customers/{customerId}/unlocked-leads/{leadId}` (Operation ID: `leadfyndr-get-unlocked-lead`)
-  - `POST /v2/customers/{customerId}/unlocked-leads/{leadId}` (Operation ID: `leadfyndr-unlock-lead`)
-  - `DELETE /v2/customers/{customerId}/unlocked-leads/{leadId}/reservation` (Operation ID: `leadfyndr-remove-unlocked-lead-reservation`)
-  - `POST /v2/customers/{customerId}/unlocked-leads/{leadId}/reservation` (Operation ID: `leadfyndr-reserve-unlocked-lead`)
-
-- The following schemas have been removed:
-  - `de.mittwald.v1.leadfyndr.BasicCompany`
-  - `de.mittwald.v1.leadfyndr.BasicMetrics`
-  - `de.mittwald.v1.leadfyndr.City`
-  - `de.mittwald.v1.leadfyndr.Contact`
-  - `de.mittwald.v1.leadfyndr.DetailCompany`
-  - `de.mittwald.v1.leadfyndr.DetailMetrics`
-  - `de.mittwald.v1.leadfyndr.Hoster`
-  - `de.mittwald.v1.leadfyndr.Lead`
-  - `de.mittwald.v1.leadfyndr.LeadsExport`
-  - `de.mittwald.v1.leadfyndr.LeadsExportExporter`
-  - `de.mittwald.v1.leadfyndr.Lighthouse`
-  - `de.mittwald.v1.leadfyndr.Metric`
-  - `de.mittwald.v1.leadfyndr.Profile`
-  - `de.mittwald.v1.leadfyndr.ProfileRequest`
-  - `de.mittwald.v1.leadfyndr.SocialMedia`
-  - `de.mittwald.v1.leadfyndr.TariffOptions`
-  - `de.mittwald.v1.leadfyndr.Technology`
-  - `de.mittwald.v1.leadfyndr.UnlockedLead`
-  - `de.mittwald.v1.leadfyndr.User`
+- All LeadFyndr operations and schemas have been removed due to the discontinuation of the LeadFyndr product (see above).
 
 - The following optional properties have been added to the response with a `200` status for the operation `GET /v2/ai-hosting-keys` (Operation ID: `ai-hosting-user-get-keys`):
   - `/items/tokenUsage/keyAvailable`
@@ -122,191 +81,9 @@ _Disclaimer: This summary is AI-generated. If you find any discrepancies, please
 
 ## Detailed changes
 
+### LeadFyndr
 
-
-### Changes in "leadfyndr-get-cities"
-
-
-- ⚠️ **Breaking:** api path removed without deprecation
-
-
-For details, refer to the <OperationLink operation="leadfyndr-get-cities" apiVersion="v2" /> endpoint.
-
-
-
-### Changes in "leadfyndr-get-lead-fyndr-profile"
-
-
-- ⚠️ **Breaking:** api path removed without deprecation
-
-
-For details, refer to the <OperationLink operation="leadfyndr-get-lead-fyndr-profile" apiVersion="v2" /> endpoint.
-
-
-
-### Changes in "leadfyndr-get-lead-fyndr-profile-request"
-
-
-- ⚠️ **Breaking:** api path removed without deprecation
-
-
-For details, refer to the <OperationLink operation="leadfyndr-get-lead-fyndr-profile-request" apiVersion="v2" /> endpoint.
-
-
-
-### Changes in "leadfyndr-create-lead-fyndr-access-request"
-
-
-- ⚠️ **Breaking:** api path removed without deprecation
-
-
-For details, refer to the <OperationLink operation="leadfyndr-create-lead-fyndr-access-request" apiVersion="v2" /> endpoint.
-
-
-
-### Changes in "leadfyndr-get-lead-fyndr-profile-tariff-options"
-
-
-- ⚠️ **Breaking:** api path removed without deprecation
-
-
-For details, refer to the <OperationLink operation="leadfyndr-get-lead-fyndr-profile-tariff-options" apiVersion="v2" /> endpoint.
-
-
-
-### Changes in "leadfyndr-list-leads"
-
-
-- ⚠️ **Breaking:** api path removed without deprecation
-
-
-For details, refer to the <OperationLink operation="leadfyndr-list-leads" apiVersion="v2" /> endpoint.
-
-
-
-### Changes in "leadfyndr-get-lead"
-
-
-- ⚠️ **Breaking:** api path removed without deprecation
-
-
-For details, refer to the <OperationLink operation="leadfyndr-get-lead" apiVersion="v2" /> endpoint.
-
-
-
-### Changes in "leadfyndr-list-unlocked-leads"
-
-
-- ⚠️ **Breaking:** api path removed without deprecation
-
-
-For details, refer to the <OperationLink operation="leadfyndr-list-unlocked-leads" apiVersion="v2" /> endpoint.
-
-
-
-### Changes in "leadfyndr-create-leads-export"
-
-
-- ⚠️ **Breaking:** api path removed without deprecation
-
-
-For details, refer to the <OperationLink operation="leadfyndr-create-leads-export" apiVersion="v2" /> endpoint.
-
-
-
-### Changes in "leadfyndr-get-leads-export-history"
-
-
-- ⚠️ **Breaking:** api path removed without deprecation
-
-
-For details, refer to the <OperationLink operation="leadfyndr-get-leads-export-history" apiVersion="v2" /> endpoint.
-
-
-
-### Changes in "leadfyndr-get-unlocked-lead"
-
-
-- ⚠️ **Breaking:** api path removed without deprecation
-
-
-For details, refer to the <OperationLink operation="leadfyndr-get-unlocked-lead" apiVersion="v2" /> endpoint.
-
-
-
-### Changes in "leadfyndr-unlock-lead"
-
-
-- ⚠️ **Breaking:** api path removed without deprecation
-
-
-For details, refer to the <OperationLink operation="leadfyndr-unlock-lead" apiVersion="v2" /> endpoint.
-
-
-
-### Changes in "leadfyndr-remove-unlocked-lead-reservation"
-
-
-- ⚠️ **Breaking:** api path removed without deprecation
-
-
-For details, refer to the <OperationLink operation="leadfyndr-remove-unlocked-lead-reservation" apiVersion="v2" /> endpoint.
-
-
-
-### Changes in "leadfyndr-reserve-unlocked-lead"
-
-
-- ⚠️ **Breaking:** api path removed without deprecation
-
-
-For details, refer to the <OperationLink operation="leadfyndr-reserve-unlocked-lead" apiVersion="v2" /> endpoint.
-
-
-
-### Changes in ""
-
-
-- removed the schema 'de.mittwald.v1.leadfyndr.BasicCompany'
-
-- removed the schema 'de.mittwald.v1.leadfyndr.BasicMetrics'
-
-- removed the schema 'de.mittwald.v1.leadfyndr.City'
-
-- removed the schema 'de.mittwald.v1.leadfyndr.Contact'
-
-- removed the schema 'de.mittwald.v1.leadfyndr.DetailCompany'
-
-- removed the schema 'de.mittwald.v1.leadfyndr.DetailMetrics'
-
-- removed the schema 'de.mittwald.v1.leadfyndr.Hoster'
-
-- removed the schema 'de.mittwald.v1.leadfyndr.Lead'
-
-- removed the schema 'de.mittwald.v1.leadfyndr.LeadsExport'
-
-- removed the schema 'de.mittwald.v1.leadfyndr.LeadsExportExporter'
-
-- removed the schema 'de.mittwald.v1.leadfyndr.Lighthouse'
-
-- removed the schema 'de.mittwald.v1.leadfyndr.Metric'
-
-- removed the schema 'de.mittwald.v1.leadfyndr.Profile'
-
-- removed the schema 'de.mittwald.v1.leadfyndr.ProfileRequest'
-
-- removed the schema 'de.mittwald.v1.leadfyndr.SocialMedia'
-
-- removed the schema 'de.mittwald.v1.leadfyndr.TariffOptions'
-
-- removed the schema 'de.mittwald.v1.leadfyndr.Technology'
-
-- removed the schema 'de.mittwald.v1.leadfyndr.UnlockedLead'
-
-- removed the schema 'de.mittwald.v1.leadfyndr.User'
-
-
-For details, refer to the <OperationLink operation="" apiVersion="v2" /> endpoint.
+- removed all operations prefixed with `leadfyndr-` and all `de.mittwald.v1.leadfyndr.*` schemas, as the LeadFyndr product has been discontinued
 
 
 
