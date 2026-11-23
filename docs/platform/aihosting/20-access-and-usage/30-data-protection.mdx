@@ -1,21 +1,49 @@
 ---
 sidebar_label: Data protection
-description: Information about data protection
+description: What mittwald AI hosting stores about your requests, for how long, and what it doesn't store
 title: Notes on data protection
 ---
 
 :::note
-Ensuring data protection-compliant usage is the responsibility of the applying party. This includes consent, purpose limitation, and the design of the AI functionality in the specific use case.
+You are responsible for using AI hosting in a way that complies with data protection law in your use case. That includes consent, purpose limitation, and how you design the AI functionality.
 :::
 
-The models provided by mittwald’s AI hosting are tailored for data-sensitive applications used by agencies or their end customers. All models run on mittwald's infrastructure and are integrated into our existing hosting environment. If mittwald’s AI hosting is accessed through a mittwald hosting product, all data processing remains entirely within our infrastructure.
+All models run on infrastructure that mittwald operates in Germany. Requests are encrypted in transit (HTTPS) and aren't passed to third parties. If you call AI hosting from a mittwald hosting product, your data never leaves mittwald's infrastructure.
 
-All communications with the offered models are encrypted during transmission according to the state of the art (https).
+## What we don't store {#content}
 
-The models provided are not self-learning; each model remains in the state in which it was published. Queries or submitted data do not influence the model, nor are they aggregated, stored, or used to improve the models.
+We don't store the content of your requests or the model's answers: prompts, messages, images, audio, documents, reasoning output, tool calls, or embeddings. The content is processed in memory while the request runs and is discarded afterwards. This also applies to requests that fail or are rejected, for example because of a rate limit.
 
-Our models operate in a **stateless** manner, meaning no content-related information from submitted inputs, outputs, or prompts is stored or processed for other purposes. However, for billing, performance analysis, and system stability improvements, we retain log files and metadata of submitted requests. These include IP address, API key used, timestamp of the request, and number of tokens transmitted—but not their content.
+The models don't learn from your requests. Each model stays in the state in which it was published, and your data isn't used to train or improve any model.
 
-Our product is designed for GDPR-compliant usage, as no data is transferred to third parties and no content data is stored. However, we point out that GDPR and legal compliance ultimately depend on the specific use case. For example, the models in mittwald’s AI hosting can be used to build your own AI applications. In these cases, it may be necessary to obtain user consent if personal data is processed, or the algorithm generated with our product may not comply with legal requirements such as the EU AI Act. We have no influence on this and refer to the Terms of Use.
+There's one short-lived exception: a completed answer can be held in an in-memory cache for up to 60 seconds. If a byte-identical request arrives within that time, it's answered from the cache. The cache is never written to disk, and the request itself is only kept as a hash that identifies it in the cache.
 
-If user applications store model-generated content or embeddings, this storage or processing occurs within the services and hosting products used by the application—but not within the scope of mittwald’s AI hosting. For example, Open WebUI can run in mittwald’s container hosting. The chat history or uploaded documents are stored within these containers in the corresponding hosting infrastructure, not in the models themselves.
+## What we store {#metadata}
+
+To operate the service, bill usage, and investigate errors, we store metadata about each request. Metadata never includes the content of a request or an answer.
+
+| Data                       | Contents                                                                                                                                                                                                                 | Retention                                      |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------- |
+| Access logs                | Timestamp, IP address, path, status code, response size, user agent                                                                                                                                                      | 7 days                                         |
+| Application and error logs | Timestamp, error type, status code, model, request ID, IP address shortened to the network (IPv4 /24, IPv6 /48)                                                                                                          | 7 days; error reports about 30 days            |
+| Operating metrics          | Counters per model and pseudonymized API key, such as request count, latency, error rate, and token count                                                                                                                | 14 days                                        |
+| Usage records              | Per request: timestamp, model, endpoint, input and output tokens, cost, status, user agent, a hash of the API key, the API key's name, project, and the optional `user` parameter. Daily totals per project and API key. | [TBD: statutory retention for billing records] |
+| Client IP in usage records | IP address of the client that sent the request                                                                                                                                                                           | 30 days                                        |
+
+Backups of usage records are kept for 4 weeks and then overwritten. Everything else is deleted automatically when its retention period ends; age is the only deletion criterion.
+
+:::tip[Keep personal data out of metadata fields]
+The optional `user` parameter and the names of your API keys and projects are stored as metadata. Use pseudonymous identifiers there, never names, email addresses, or health information.
+:::
+
+## Shared and dedicated hosting {#shared-dedicated}
+
+With shared AI hosting, requests from different customers run on the same GPUs and the same model instances. Each request is processed on its own and doesn't change the model. [TBD: paragraph on separation between customers.]
+
+With [Dedicated AI hosting](../70-dedicated/index.mdx), you get GPUs and a complete stack, from gateway to model servers and endpoint, that serve only you. No other mittwald customer's requests run on it. If you resell dedicated capacity to your own customers, the description of shared hosting applies to them, with you as the operator. If you have admin access to your dedicated gateway, any logging you turn on there is under your control.
+
+## Your own applications {#applications}
+
+If your application stores model output or embeddings, that storage happens in the services your application runs on, not in AI hosting. For example, when you run Open WebUI in mittwald's container hosting, chat history and uploaded documents live in that container's storage.
+
+Whether a specific application complies with the GDPR or the EU AI Act depends on what it does. You may need user consent when it processes personal data, and the Terms of Use apply.

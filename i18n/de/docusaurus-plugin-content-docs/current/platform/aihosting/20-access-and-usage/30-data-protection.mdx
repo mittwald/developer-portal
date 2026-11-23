@@ -1,21 +1,49 @@
 ---
 sidebar_label: Datenschutz
-description: Information zum Datenschutz bei der Nutzung des AI-Hostings
+description: Was das AI-Hosting von mittwald zu deinen Anfragen speichert, wie lange, und was nicht
 title: Hinweise zum Datenschutz
 ---
 
 :::note
-Die datenschutzkonforme Nutzung liegt in der Verantwortung der anwendenden Partei. Dies umfasst auch Einwilligungen, Zweckbindung und Ausgestaltung der KI-Funktion im konkreten Use Case.
+Für die datenschutzkonforme Nutzung im konkreten Anwendungsfall bist du verantwortlich. Dazu gehören Einwilligungen, Zweckbindung und die Ausgestaltung der KI-Funktion.
 :::
 
-Die Modelle von mittwalds AI-Hosting richten sich an datensensitive Anwendungsfälle für Agenturen oder deren Endkunden. Alle Modelle werden auf der mittwald Infrastruktur betrieben und gliedern sich so in unsere bestehende Hosting-Welt ein. Findet die Nutzung von mittwalds AI-Hosting aus einem mittwald Hosting-Produkt heraus statt, verbleibt die komplette Datenverarbeitung innerhalb unserer Infrastruktur.
+Alle Modelle laufen in der Infrastruktur, die mittwald in Deutschland betreibt. Anfragen werden verschlüsselt übertragen (HTTPS) und nicht an Dritte weitergegeben. Nutzt du das AI-Hosting aus einem mittwald-Hosting-Produkt heraus, verlassen deine Daten die Infrastruktur von mittwald nicht.
 
-Jede Kommunikation mit den angebotenen Modellen ist nach dem Stand der Technik im Transport verschlüsselt (https).
+## Was wir nicht speichern {#inhalte}
 
-Die angebotenen Modelle sind nicht selbstlernend, das Modell hat immer den Stand der Veröffentlichung. Abfragen oder übergebene Daten fließen somit nicht in das Modell ein und werden von uns auch nicht aggregiert oder zur Verbesserung der Modelle genutzt oder gespeichert.
+Die Inhalte deiner Anfragen und die Antworten der Modelle speichern wir nicht: Prompts, Nachrichten, Bilder, Audio, Dokumente, Reasoning-Ausgaben, Tool-Calls und Embeddings. Die Inhalte werden während der Anfrage im Arbeitsspeicher verarbeitet und danach verworfen. Das gilt auch für Anfragen, die fehlschlagen oder abgelehnt werden, etwa wegen eines Rate Limits.
 
-Unsere angebotenen Modelle agieren **stateless**, d.h. es werden keine inhaltlichen Informationen zu übersendeten Eingaben, Ausgaben oder Prompts gespeichert oder für andere Zwecke verarbeitet. Zu Abrechnungszwecken und zur Verbesserung und Analyse der Systemstabilität halten wir jedoch Log-Files und Meta-Informationen von abgesendeten Requests vor. Diese umfassen die IP-Adresse, den verwendeten API-Key, Uhrzeit der Anfrage sowie die Anzahl der übermittelten Token, jedoch nicht deren Inhalt.
+Die Modelle lernen nicht aus deinen Anfragen. Jedes Modell bleibt in dem Stand, in dem es veröffentlicht wurde, und deine Daten werden nicht zum Training oder zur Verbesserung eines Modells verwendet.
 
-Unser Produkt wurde so gestaltet, dass es DSGVO-konform eingesetzt werden kann, indem keine Übertragung an Drittanbieter stattfindet und keine Inhaltsdaten gespeichert werden. Wir weisen jedoch darauf hin, dass die DSGVO- und Rechtskonformität letztendlich vom individuellen Anwendungsfall abhängig ist. Beispielsweise können die Modelle in mittwalds AI-Hosting genutzt werden, um eigene KI-Anwendungen zu erstellen. Hierbei kann es möglich sein, dass dennoch bei potentieller Verarbeitung personenbezogener Daten applikationsseitig eine Einwilligung des Nutzers vorliegen muss oder ein mit unserem Produkt generierter Algorithmus nicht konform mit rechtlichen Bestimmungen wie bspw. dem EU-AI-Act ist. Hierauf haben wir keinen Einfluss und verweisen auf die Nutzungsbedingungen.
+Eine kurzlebige Ausnahme gibt es: Eine fertige Antwort kann bis zu 60 Sekunden in einem Zwischenspeicher im Arbeitsspeicher liegen. Kommt in dieser Zeit eine byte-identische Anfrage, wird sie aus dem Zwischenspeicher beantwortet. Der Zwischenspeicher wird nie auf Datenträger geschrieben, und von der Anfrage selbst liegt dort nur ein Hashwert, über den sie wiedererkannt wird.
 
-Werden durch die Applikation des Nutzers vom Model generierte Inhalte oder Embeddings gespeichert, so findet diese Speicherung oder Verarbeitung im Rahmen der für die Applikation verwendeten Services und Hosting-Produkte statt, jedoch nicht im Rahmen von mittwalds AI-Hosting. Dies sei am Beispiel von Open WebUI erklärt: Open WebUI kann in mittwalds Container-Hosting betrieben werden. Die Chat-Historie oder hochgeladene Dokumente werden innerhalb der Container in der Hosting-Infrastruktur gespeichert, die genutzten Modelle speichern diese nicht ab.
+## Was wir speichern {#metadaten}
+
+Für den Betrieb, die Abrechnung und die Fehleranalyse speichern wir Metadaten zu jeder Anfrage. Metadaten enthalten nie den Inhalt einer Anfrage oder Antwort.
+
+| Daten                            | Inhalt                                                                                                                                                                                                                                    | Speicherdauer                                                     |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| Zugriffsprotokolle               | Zeitpunkt, IP-Adresse, Pfad, Statuscode, Datenmenge, User-Agent                                                                                                                                                                           | 7 Tage                                                            |
+| Anwendungs- und Fehlerprotokolle | Zeitpunkt, Fehlerart, Statuscode, Modell, Anfrage-ID, IP-Adresse auf das Netz gekürzt (IPv4 /24, IPv6 /48)                                                                                                                                | 7 Tage, Fehlerberichte rund 30 Tage                               |
+| Betriebsmetriken                 | Zähler je Modell und pseudonymisiertem API-Schlüssel, etwa Anzahl der Anfragen, Antwortzeit, Fehlerquote und Token-Menge                                                                                                                  | 14 Tage                                                           |
+| Nutzungsdaten                    | Je Anfrage: Zeitpunkt, Modell, Endpunkt, Ein- und Ausgabe-Tokens, Kosten, Status, User-Agent, Hashwert des API-Schlüssels, Name des API-Schlüssels, Projekt und der optionale Parameter `user`. Tagessummen je Projekt und API-Schlüssel. | [OFFEN: gesetzliche Aufbewahrungsfrist für Abrechnungsunterlagen] |
+| Client-IP in den Nutzungsdaten   | IP-Adresse des Clients, der die Anfrage geschickt hat                                                                                                                                                                                     | 30 Tage                                                           |
+
+Sicherungskopien der Nutzungsdaten bewahren wir 4 Wochen auf, danach werden sie überschrieben. Alles andere wird nach Ablauf der Frist automatisch gelöscht. Einziges Löschkriterium ist das Alter.
+
+:::tip[Keine personenbezogenen Daten in Metadatenfeldern]
+Den optionalen Parameter `user` und die Namen deiner API-Schlüssel und Projekte speichern wir als Metadaten. Verwende dort pseudonyme Kennungen, keine Namen, E-Mail-Adressen oder Gesundheitsangaben.
+:::
+
+## Shared und Dedicated Hosting {#shared-und-dedicated}
+
+Beim Shared AI-Hosting laufen Anfragen verschiedener Kunden auf denselben GPUs und denselben Modellinstanzen. Jede Anfrage wird für sich verarbeitet und verändert das Modell nicht. [OFFEN: Absatz zur Trennung zwischen Kunden.]
+
+Mit [Dedicated AI-Hosting](../70-dedicated/index.mdx) bekommst du GPUs und einen vollständigen Stack, vom Gateway über die Modellserver bis zum Endpunkt, die nur für dich arbeiten. Anfragen anderer mittwald-Kunden laufen dort nicht. Verkaufst du Dedicated-Kapazität an eigene Kunden weiter, gilt für sie die Beschreibung des Shared Hostings, mit dir als Betreiber. Hast du Admin-Zugriff auf dein Dedicated-Gateway, liegt jedes Logging, das du dort einschaltest, in deiner Hand.
+
+## Deine eigenen Anwendungen {#eigene-anwendungen}
+
+Speichert deine Anwendung Modellausgaben oder Embeddings, passiert das in den Diensten, auf denen deine Anwendung läuft, nicht im AI-Hosting. Betreibst du zum Beispiel Open WebUI im Container-Hosting von mittwald, liegen Chatverläufe und hochgeladene Dokumente im Speicher dieses Containers.
+
+Ob eine Anwendung die DSGVO oder den EU AI Act einhält, hängt davon ab, was sie tut. Verarbeitet sie personenbezogene Daten, brauchst du unter Umständen eine Einwilligung der Nutzer, und es gelten die Nutzungsbedingungen.
