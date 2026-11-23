@@ -1,49 +1,53 @@
 ---
 sidebar_label: Datenschutz
-description: Was das AI-Hosting von mittwald zu deinen Anfragen speichert, wie lange, und was nicht
+description: Verarbeitung von Anfrageinhalten und Metadaten im AI-Hosting von mittwald, mit Datenkategorien und Speicherfristen
 title: Hinweise zum Datenschutz
 ---
 
 :::note
-Für die datenschutzkonforme Nutzung im konkreten Anwendungsfall bist du verantwortlich. Dazu gehören Einwilligungen, Zweckbindung und die Ausgestaltung der KI-Funktion.
+Als Verantwortlicher bleibst du dafür verantwortlich, dass deine Nutzung des AI-Hostings dem geltenden Datenschutzrecht entspricht. Dazu gehören insbesondere die Rechtsgrundlage der Verarbeitung, die Zweckbindung, gegebenenfalls erforderliche Einwilligungen und die Ausgestaltung der KI-Funktion im konkreten Anwendungsfall.
 :::
 
-Alle Modelle laufen in der Infrastruktur, die mittwald in Deutschland betreibt. Anfragen werden verschlüsselt übertragen (HTTPS) und nicht an Dritte weitergegeben. Nutzt du das AI-Hosting aus einem mittwald-Hosting-Produkt heraus, verlassen deine Daten die Infrastruktur von mittwald nicht.
+## Ort der Verarbeitung {#ort-der-verarbeitung}
 
-## Was wir nicht speichern {#inhalte}
+Die Verarbeitung erfolgt ausschließlich in der Infrastruktur, die mittwald in Deutschland betreibt. Daten werden ausschließlich verschlüsselt übertragen (HTTPS). Anfrageinhalte werden nicht an Dritte übermittelt. Greifst du aus einem mittwald-Hosting-Produkt auf das AI-Hosting zu, findet die Verarbeitung vollständig innerhalb der Infrastruktur von mittwald statt.
 
-Die Inhalte deiner Anfragen und die Antworten der Modelle speichern wir nicht: Prompts, Nachrichten, Bilder, Audio, Dokumente, Reasoning-Ausgaben, Tool-Calls und Embeddings. Die Inhalte werden während der Anfrage im Arbeitsspeicher verarbeitet und danach verworfen. Das gilt auch für Anfragen, die fehlschlagen oder abgelehnt werden, etwa wegen eines Rate Limits.
+## Anfrageinhalte {#anfrageinhalte}
 
-Die Modelle lernen nicht aus deinen Anfragen. Jedes Modell bleibt in dem Stand, in dem es veröffentlicht wurde, und deine Daten werden nicht zum Training oder zur Verbesserung eines Modells verwendet.
+Anfrageinhalte sind alle Daten, die du an ein Modell übermittelst, und alle Ausgaben, die das Modell zurückgibt, insbesondere Prompts, Nachrichten, Bilder, Audio, Dokumente, Reasoning-Ausgaben, Tool-Calls und Embeddings.
 
-Eine kurzlebige Ausnahme gibt es: Eine fertige Antwort kann bis zu 60 Sekunden in einem Zwischenspeicher im Arbeitsspeicher liegen. Kommt in dieser Zeit eine byte-identische Anfrage, wird sie aus dem Zwischenspeicher beantwortet. Der Zwischenspeicher wird nie auf Datenträger geschrieben, und von der Anfrage selbst liegt dort nur ein Hashwert, über den sie wiedererkannt wird.
+Anfrageinhalte werden ausschließlich im flüchtigen Arbeitsspeicher und allein zur Erzeugung der Antwort verarbeitet. Nach Abschluss der Anfrage werden sie gelöscht. Anfrageinhalte werden weder in Protokolle noch in Datenbanken oder andere dauerhafte Speicher geschrieben. Das gilt auch für Anfragen, die fehlschlagen oder abgelehnt werden, etwa weil ein Rate Limit überschritten wurde.
 
-## Was wir speichern {#metadaten}
+Anfrageinhalte werden nicht zum Training, zum Feintuning oder zur sonstigen Verbesserung von Modellen verwendet. Die Modelle sind nicht selbstlernend. Jedes Modell bleibt in dem Stand, in dem es veröffentlicht wurde.
 
-Für den Betrieb, die Abrechnung und die Fehleranalyse speichern wir Metadaten zu jeder Anfrage. Metadaten enthalten nie den Inhalt einer Anfrage oder Antwort.
+**Ausnahme: Antwort-Zwischenspeicher.** Damit identische Anfragen effizient beantwortet werden können, kann eine fertige Antwort für höchstens 60 Sekunden in einem Zwischenspeicher im flüchtigen Arbeitsspeicher vorgehalten werden. Geht in diesem Zeitraum eine byte-identische Anfrage ein, wird sie aus dem Zwischenspeicher beantwortet. Die Anfrage selbst liegt dort nur als kryptografischer Hashwert vor. Der Zwischenspeicher wird nicht dauerhaft gespeichert und nach 60 Sekunden automatisch gelöscht.
 
-| Daten                            | Inhalt                                                                                                                                                                                                                                    | Speicherdauer                                                     |
-| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| Zugriffsprotokolle               | Zeitpunkt, IP-Adresse, Pfad, Statuscode, Datenmenge, User-Agent                                                                                                                                                                           | 7 Tage                                                            |
-| Anwendungs- und Fehlerprotokolle | Zeitpunkt, Fehlerart, Statuscode, Modell, Anfrage-ID, IP-Adresse auf das Netz gekürzt (IPv4 /24, IPv6 /48)                                                                                                                                | 7 Tage, Fehlerberichte rund 30 Tage                               |
-| Betriebsmetriken                 | Zähler je Modell und pseudonymisiertem API-Schlüssel, etwa Anzahl der Anfragen, Antwortzeit, Fehlerquote und Token-Menge                                                                                                                  | 14 Tage                                                           |
-| Nutzungsdaten                    | Je Anfrage: Zeitpunkt, Modell, Endpunkt, Ein- und Ausgabe-Tokens, Kosten, Status, User-Agent, Hashwert des API-Schlüssels, Name des API-Schlüssels, Projekt und der optionale Parameter `user`. Tagessummen je Projekt und API-Schlüssel. | [OFFEN: gesetzliche Aufbewahrungsfrist für Abrechnungsunterlagen] |
-| Client-IP in den Nutzungsdaten   | IP-Adresse des Clients, der die Anfrage geschickt hat                                                                                                                                                                                     | 30 Tage                                                           |
+## Metadaten {#metadaten}
 
-Sicherungskopien der Nutzungsdaten bewahren wir 4 Wochen auf, danach werden sie überschrieben. Alles andere wird nach Ablauf der Frist automatisch gelöscht. Einziges Löschkriterium ist das Alter.
+Zum Betrieb des Dienstes, zur Gewährleistung seiner Sicherheit, zur Fehleranalyse und zur Abrechnung verarbeitet mittwald Metadaten zu jeder Anfrage. Metadaten enthalten keine Anfrageinhalte.
+
+| Kategorie                          | Daten                                                                                                                                                                                                                                               | Zweck                         | Speicherfrist                                                     |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- | ----------------------------------------------------------------- |
+| Zugriffsprotokolle                 | Zeitpunkt, IP-Adresse, aufgerufener Pfad, Statuscode, Datenmenge, User-Agent                                                                                                                                                                        | Betrieb, Sicherheit           | 7 Tage                                                            |
+| Anwendungs- und Fehlerprotokolle   | Zeitpunkt, Fehlerart, Statuscode, Modell, Anfrage-ID, IP-Adresse auf das Netzpräfix gekürzt (IPv4 /24, IPv6 /48)                                                                                                                                    | Betrieb, Fehleranalyse        | 7 Tage, Fehlerberichte rund 30 Tage                               |
+| Betriebsmetriken                   | Aggregierte Zähler je Modell und pseudonymisiertem API-Schlüssel, etwa Anzahl der Anfragen, Antwortzeiten, Fehlerquote und Anzahl der Tokens                                                                                                        | Betrieb, Kapazitätsplanung    | 14 Tage                                                           |
+| Nutzungsdaten                      | Je Anfrage: Zeitpunkt, Modell, Endpunkt, Anzahl der Ein- und Ausgabe-Tokens, Kosten, Status, User-Agent, Hashwert des API-Schlüssels, Name des API-Schlüssels, Projekt und der optionale Parameter `user`; Tagessummen je Projekt und API-Schlüssel | Abrechnung                    | [OFFEN: gesetzliche Aufbewahrungsfrist für Abrechnungsunterlagen] |
+| Client-IP-Adresse in Nutzungsdaten | IP-Adresse des Clients, der die Anfrage gesendet hat                                                                                                                                                                                                | Sicherheit, Missbrauchsabwehr | 30 Tage                                                           |
+
+Sicherungskopien der Nutzungsdaten werden 4 Wochen aufbewahrt und anschließend überschrieben. Alle übrigen Metadaten werden nach Ablauf der jeweiligen Speicherfrist automatisch und fortlaufend gelöscht. Einziges Löschkriterium ist das Alter der Daten.
 
 :::tip[Keine personenbezogenen Daten in Metadatenfeldern]
-Den optionalen Parameter `user` und die Namen deiner API-Schlüssel und Projekte speichern wir als Metadaten. Verwende dort pseudonyme Kennungen, keine Namen, E-Mail-Adressen oder Gesundheitsangaben.
+Der optionale Parameter `user` sowie die Namen deiner API-Schlüssel und Projekte werden als Metadaten gespeichert. Verwende in diesen Feldern ausschließlich pseudonyme Kennungen und trage keine Namen, E-Mail-Adressen, Gesundheitsdaten oder andere besondere Kategorien personenbezogener Daten ein.
 :::
 
-## Shared und Dedicated Hosting {#shared-und-dedicated}
+## Shared und Dedicated AI-Hosting {#shared-und-dedicated}
 
-Beim Shared AI-Hosting laufen Anfragen verschiedener Kunden auf denselben GPUs und denselben Modellinstanzen. Jede Anfrage wird für sich verarbeitet und verändert das Modell nicht. [OFFEN: Absatz zur Trennung zwischen Kunden.]
+Im Shared AI-Hosting werden Anfragen verschiedener Kunden auf derselben Hardware und denselben Modellinstanzen verarbeitet. Jede Anfrage wird getrennt verarbeitet und verändert das Modell nicht. [OFFEN: Absatz zur Trennung zwischen Kunden.]
 
-Mit [Dedicated AI-Hosting](../70-dedicated/index.mdx) bekommst du GPUs und einen vollständigen Stack, vom Gateway über die Modellserver bis zum Endpunkt, die nur für dich arbeiten. Anfragen anderer mittwald-Kunden laufen dort nicht. Verkaufst du Dedicated-Kapazität an eigene Kunden weiter, gilt für sie die Beschreibung des Shared Hostings, mit dir als Betreiber. Hast du Admin-Zugriff auf dein Dedicated-Gateway, liegt jedes Logging, das du dort einschaltest, in deiner Hand.
+Im [Dedicated AI-Hosting](../70-dedicated/index.mdx) sind die GPUs und der vollständige Stack, vom Gateway über die Modellserver bis zum Endpunkt, ausschließlich für dich reserviert. Anfragen anderer mittwald-Kunden werden auf dieser Infrastruktur nicht verarbeitet. Stellst du Dedicated-Kapazität eigenen Kunden zur Verfügung, gilt für diese die Beschreibung des Shared AI-Hostings entsprechend, mit dir als Betreiber. Hast du administrativen Zugriff auf dein Dedicated-Gateway, bist du für zusätzliches Logging, das du dort aktivierst, selbst verantwortlich.
 
-## Deine eigenen Anwendungen {#eigene-anwendungen}
+## Verarbeitung in deinen eigenen Anwendungen {#eigene-anwendungen}
 
-Speichert deine Anwendung Modellausgaben oder Embeddings, passiert das in den Diensten, auf denen deine Anwendung läuft, nicht im AI-Hosting. Betreibst du zum Beispiel Open WebUI im Container-Hosting von mittwald, liegen Chatverläufe und hochgeladene Dokumente im Speicher dieses Containers.
+Speichert deine Anwendung Modellausgaben oder Embeddings, erfolgt diese Speicherung in den Diensten und Hosting-Produkten, die deine Anwendung nutzt, und liegt außerhalb des AI-Hostings. Betreibst du zum Beispiel Open WebUI im Container-Hosting von mittwald, werden Chatverläufe und hochgeladene Dokumente im Speicher dieses Containers abgelegt.
 
-Ob eine Anwendung die DSGVO oder den EU AI Act einhält, hängt davon ab, was sie tut. Verarbeitet sie personenbezogene Daten, brauchst du unter Umständen eine Einwilligung der Nutzer, und es gelten die Nutzungsbedingungen.
+Ob eine Anwendung die DSGVO, den EU AI Act oder andere rechtliche Vorgaben einhält, hängt von ihrem Zweck und ihrer Ausgestaltung ab. Werden personenbezogene Daten verarbeitet, kann eine Einwilligung der betroffenen Personen erforderlich sein. Es gelten die Nutzungsbedingungen.

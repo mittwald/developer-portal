@@ -1,49 +1,53 @@
 ---
 sidebar_label: Data protection
-description: What mittwald AI hosting stores about your requests, for how long, and what it doesn't store
+description: Processing of request content and metadata in mittwald AI hosting, including categories of data and retention periods
 title: Notes on data protection
 ---
 
 :::note
-You are responsible for using AI hosting in a way that complies with data protection law in your use case. That includes consent, purpose limitation, and how you design the AI functionality.
+As the controller, you remain responsible for ensuring that your use of AI hosting complies with applicable data protection law. This includes, in particular, the legal basis for processing, purpose limitation, any consent required, and the design of the AI functionality in your specific use case.
 :::
 
-All models run on infrastructure that mittwald operates in Germany. Requests are encrypted in transit (HTTPS) and aren't passed to third parties. If you call AI hosting from a mittwald hosting product, your data never leaves mittwald's infrastructure.
+## Place of processing {#place-of-processing}
 
-## What we don't store {#content}
+All processing takes place on infrastructure that mittwald operates in Germany. Data is transmitted exclusively in encrypted form (HTTPS). Request content isn't disclosed to third parties. If you access AI hosting from a mittwald hosting product, processing takes place entirely within mittwald's infrastructure.
 
-We don't store the content of your requests or the model's answers: prompts, messages, images, audio, documents, reasoning output, tool calls, or embeddings. The content is processed in memory while the request runs and is discarded afterwards. This also applies to requests that fail or are rejected, for example because of a rate limit.
+## Request content {#content}
 
-The models don't learn from your requests. Each model stays in the state in which it was published, and your data isn't used to train or improve any model.
+Request content comprises all data you submit to a model and all output the model returns, in particular prompts, messages, images, audio, documents, reasoning output, tool calls, and embeddings.
 
-There's one short-lived exception: a completed answer can be held in an in-memory cache for up to 60 seconds. If a byte-identical request arrives within that time, it's answered from the cache. The cache is never written to disk, and the request itself is only kept as a hash that identifies it in the cache.
+Request content is processed exclusively in volatile memory, solely for the purpose of generating the response, and is deleted once the request has been completed. Request content isn't written to logs, databases, or other persistent storage. This also applies to requests that fail or are rejected, for example because a rate limit has been exceeded.
 
-## What we store {#metadata}
+Request content isn't used to train, fine-tune, or otherwise improve models. The models aren't self-learning; each model remains in the state in which it was published.
 
-To operate the service, bill usage, and investigate errors, we store metadata about each request. Metadata never includes the content of a request or an answer.
+**Exception: response cache.** To answer identical requests efficiently, a completed response can be held in a cache in volatile memory for a maximum of 60 seconds. If a byte-identical request is received within this period, it's answered from the cache. The request itself is held in the cache only as a cryptographic hash value. The cache isn't written to persistent storage and is deleted automatically after 60 seconds.
 
-| Data                       | Contents                                                                                                                                                                                                                 | Retention                                      |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------- |
-| Access logs                | Timestamp, IP address, path, status code, response size, user agent                                                                                                                                                      | 7 days                                         |
-| Application and error logs | Timestamp, error type, status code, model, request ID, IP address shortened to the network (IPv4 /24, IPv6 /48)                                                                                                          | 7 days; error reports about 30 days            |
-| Operating metrics          | Counters per model and pseudonymized API key, such as request count, latency, error rate, and token count                                                                                                                | 14 days                                        |
-| Usage records              | Per request: timestamp, model, endpoint, input and output tokens, cost, status, user agent, a hash of the API key, the API key's name, project, and the optional `user` parameter. Daily totals per project and API key. | [TBD: statutory retention for billing records] |
-| Client IP in usage records | IP address of the client that sent the request                                                                                                                                                                           | 30 days                                        |
+## Metadata {#metadata}
 
-Backups of usage records are kept for 4 weeks and then overwritten. Everything else is deleted automatically when its retention period ends; age is the only deletion criterion.
+For the purposes of operating the service, ensuring its security, investigating errors, and billing, mittwald processes metadata about each request. Metadata doesn't include any request content.
 
-:::tip[Keep personal data out of metadata fields]
-The optional `user` parameter and the names of your API keys and projects are stored as metadata. Use pseudonymous identifiers there, never names, email addresses, or health information.
+| Category                        | Data                                                                                                                                                                                                                                    | Purpose                        | Retention period                                      |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ | ----------------------------------------------------- |
+| Access logs                     | Timestamp, IP address, requested path, status code, data volume, user agent                                                                                                                                                             | Operation, security            | 7 days                                                |
+| Application and error logs      | Timestamp, error type, status code, model, request ID, IP address truncated to the network prefix (IPv4 /24, IPv6 /48)                                                                                                                  | Operation, error investigation | 7 days; error reports approximately 30 days           |
+| Operating metrics               | Aggregated counters per model and pseudonymized API key, such as number of requests, response times, error rate, and number of tokens                                                                                                   | Operation, capacity planning   | 14 days                                               |
+| Usage data                      | Per request: timestamp, model, endpoint, number of input and output tokens, costs, status, user agent, hash value of the API key, name of the API key, project, and the optional `user` parameter; daily totals per project and API key | Billing                        | [TBD: statutory retention period for billing records] |
+| Client IP address in usage data | IP address of the client that sent the request                                                                                                                                                                                          | Security, abuse prevention     | 30 days                                               |
+
+Backup copies of usage data are retained for 4 weeks and are then overwritten. All other metadata is deleted automatically and on a continuous basis once its retention period has expired. The sole deletion criterion is the age of the data.
+
+:::tip[Avoid personal data in metadata fields]
+The optional `user` parameter and the names of your API keys and projects are stored as metadata. Use only pseudonymous identifiers in these fields, and don't enter names, email addresses, health data, or other special categories of personal data.
 :::
 
-## Shared and dedicated hosting {#shared-dedicated}
+## Shared and dedicated AI hosting {#shared-dedicated}
 
-With shared AI hosting, requests from different customers run on the same GPUs and the same model instances. Each request is processed on its own and doesn't change the model. [TBD: paragraph on separation between customers.]
+In shared AI hosting, requests from different customers are processed on the same hardware and the same model instances. Each request is processed separately and doesn't modify the model. [TBD: paragraph on separation between customers.]
 
-With [Dedicated AI hosting](../70-dedicated/index.mdx), you get GPUs and a complete stack, from gateway to model servers and endpoint, that serve only you. No other mittwald customer's requests run on it. If you resell dedicated capacity to your own customers, the description of shared hosting applies to them, with you as the operator. If you have admin access to your dedicated gateway, any logging you turn on there is under your control.
+In [Dedicated AI hosting](../70-dedicated/index.mdx), the GPUs and the complete stack, from the gateway through the model servers to the endpoint, are reserved exclusively for you. Requests from other mittwald customers aren't processed on this infrastructure. If you make dedicated capacity available to your own customers, the description of shared AI hosting applies to them accordingly, with you as the operator. If you have administrative access to your dedicated gateway, you're responsible for any additional logging you enable there.
 
-## Your own applications {#applications}
+## Processing in your own applications {#applications}
 
-If your application stores model output or embeddings, that storage happens in the services your application runs on, not in AI hosting. For example, when you run Open WebUI in mittwald's container hosting, chat history and uploaded documents live in that container's storage.
+If your application stores model output or embeddings, that storage takes place in the services and hosting products your application uses and is outside the scope of AI hosting. For example, if you run Open WebUI in mittwald's container hosting, chat histories and uploaded documents are stored in that container's storage.
 
-Whether a specific application complies with the GDPR or the EU AI Act depends on what it does. You may need user consent when it processes personal data, and the Terms of Use apply.
+Whether a specific application complies with the GDPR, the EU AI Act, or other legal requirements depends on its purpose and design. Where personal data is processed, consent from the data subjects may be required. The Terms of Use apply.
