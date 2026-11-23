@@ -389,9 +389,9 @@ Copilot reviews every pull request automatically; its review does not count as a
 
 Code owners (see `.github/CODEOWNERS`):
 
-| Paths (English and German) | Owner |
-| --- | --- |
-| `docs/platform/aihosting/` | `@mittwald/ai-developers` |
+| Paths (English and German)  | Owner                     |
+| --------------------------- | ------------------------- |
+| `docs/platform/aihosting/`  | `@mittwald/ai-developers` |
 | `docs/agentic-integration/` | `@mittwald/ai-developers` |
 
 The German paths are the same directories under
