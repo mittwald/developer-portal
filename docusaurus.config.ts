@@ -1,11 +1,12 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
-import { Config } from "@docusaurus/types";
+import { Config, PluginModule } from "@docusaurus/types";
 import { Options, ThemeConfig } from "@docusaurus/preset-classic";
 import { Options as ClientRedirectOptions } from "@docusaurus/plugin-client-redirects";
 import { flowTheme } from "./src/prism/flowTheme";
 import rehypeFlowSections from "./src/plugins/rehypeFlowSections";
+import deprecationsPlugin from "./src/plugins/deprecations";
 import path from "node:path";
 import { proIconsPackage, readProIconsVersion } from "./dev/proIcons";
 
@@ -144,6 +145,10 @@ const config: Config = {
         rehypePlugins: [rehypeFlowSections],
       },
     ],
+    // Deprecation announcements from deprecations/*.yaml, rendered in the API
+    // docs (/docs/v2/deprecations/, apiSidebar) with RSS/Atom feeds. Typed
+    // content, while the config expects plugins with unknown content.
+    deprecationsPlugin as PluginModule,
     webpackCryptoFallbackPlugin,
     proIconsPlugin,
     [

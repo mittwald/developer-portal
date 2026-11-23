@@ -1,5 +1,9 @@
 // @ts-check
 
+const {
+  deprecationsSidebarCategory,
+} = require("./src/plugins/deprecations/sidebar");
+
 /** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
 const sidebars = {
   // By default, Docusaurus generates a sidebar from the docs folder structure
@@ -162,6 +166,12 @@ const sidebars = {
         },
       ],
     },
+    // Entries from deprecations/*.yaml; the pages are rendered by the
+    // deprecations plugin (src/plugins/deprecations) with this sidebar
+    deprecationsSidebarCategory({
+      contentPath: "deprecations",
+      basePath: "/docs/v2/deprecations",
+    }),
     {
       type: "category",
       label: "API Reference",
