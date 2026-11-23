@@ -375,6 +375,32 @@ const title = translate({ id: "component.title" });
 5. **Documentation**: Update both English and German versions
 6. **OpenAPI Changes**: Run `npm run generate` after spec updates
 
+## Review and Merge
+
+`master` is protected by a repository ruleset. A pull request can be merged when:
+
+- the `build` status check has passed,
+- it has at least one approving review from someone other than the author,
+- every changed file that has a code owner in `.github/CODEOWNERS` is approved by one of
+  its owners, and
+- all review threads are resolved.
+
+Copilot reviews every pull request automatically; its review does not count as an approval.
+
+Code owners (see `.github/CODEOWNERS`):
+
+| Paths (English and German)  | Owner                     |
+| --------------------------- | ------------------------- |
+| `docs/platform/aihosting/`  | `@mittwald/ai-developers` |
+| `docs/agentic-integration/` | `@mittwald/ai-developers` |
+
+The German paths are the same directories under
+`i18n/de/docusaurus-plugin-content-docs/current/`. A pull request that only touches these
+paths needs one approval from another member of `@mittwald/ai-developers` and can then be
+merged by that team without anyone else. Files without a code owner (for example
+`sidebars.ts`, `src/` or `static/`) only need the general approval from anyone with write
+access; for changes there, ask the portal maintainers for review.
+
 ## Key Project Characteristics
 
 - **Framework**: Docusaurus v3 with React 19
