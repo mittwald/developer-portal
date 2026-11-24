@@ -1,0 +1,35 @@
+# EXAMPLE ENTRY: shows the data model; the content and dates are made up.
+# Drafts are rendered by `npm start` only, not in production builds.
+title: "Example: Dedicated endpoints for linking app databases"
+summary: >-
+  The dedicated endpoints for linking databases to app installations are
+  replaced by the generic app installation update.
+# Optional here: "api/v2" is derived from the operations below. Use "api" for
+# changes affecting all API versions, or list several, e.g. [api/v2, api/v3].
+scope: api/v2
+announced: 2026-11-23
+sunset: 2027-05-31
+operations:
+  - app-link-database
+  - app-set-database-users
+# description and replacement are MDX, rendered like docs. Links to
+# "operation:<operationId>" (or "operation:v1/<operationId>") become
+# <OperationLink> components; with an empty link text, they show method and
+# path. <OperationLink> can be used directly as well. Unknown operations fail
+# the build.
+description: |
+  Linking a database to an app installation and setting its database users
+  used to require dedicated endpoints. Both are now part of
+  [](operation:app-patch-appinstallation), which updates an app installation
+  in a single request.
+
+  :::note
+
+  Until the sunset date, both endpoints keep working unchanged.
+
+  :::
+replacement: |
+  Use <OperationLink operation="app-patch-appinstallation" /> instead. Regular
+  Markdown links work as well, e.g. to
+  [the API introduction](/docs/v2/api/intro/).
+draft: true

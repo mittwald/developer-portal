@@ -10,6 +10,7 @@ import {
   faMoon,
   faPlug,
   faRocket,
+  faRss,
   faSun,
   faUserRobot,
   faUsers,
@@ -61,6 +62,7 @@ export const IconNotFound = fontAwesomeIcon(faFileCircleQuestion);
 export const IconPlug = fontAwesomeIcon(faPlug);
 export const IconRobot = fontAwesomeIcon(faUserRobot);
 export const IconRocket = fontAwesomeIcon(faRocket);
+export const IconRss = fontAwesomeIcon(faRss);
 export const IconTextWrap = fontAwesomeIcon(faArrowTurnDownLeft);
 export const IconUsers = fontAwesomeIcon(faUsers);
 

@@ -1,6 +1,7 @@
 import React, { type ReactNode } from "react";
 import { useLocation } from "@docusaurus/router";
 import useBaseUrl from "@docusaurus/useBaseUrl";
+import { usePluginData } from "@docusaurus/useGlobalData";
 import {
   useActiveDocContext,
   useLayoutDoc,
@@ -16,6 +17,7 @@ import {
   MenuItem,
   Text,
 } from "@mittwald/flow-react-components";
+import type { DeprecationsGlobalData } from "@site/src/plugins/deprecations/types";
 import styles from "./styles.module.css";
 
 /**
@@ -40,10 +42,25 @@ interface Entry {
   isActive: boolean;
 }
 
+/**
+ * Sidebar of the current page if it is not a doc but rendered with a docs
+ * sidebar, like the deprecation pages (src/plugins/deprecations)
+ */
+function useNonDocSidebar(): string | undefined {
+  const { pathname } = useLocation();
+  const deprecations = usePluginData("deprecations") as
+    DeprecationsGlobalData | undefined;
+  return deprecations && pathname.startsWith(deprecations.path)
+    ? deprecations.sidebar
+    : undefined;
+}
+
 /** Resolves a doc item like Docusaurus' DocNavbarItem does */
 function useDocEntry(docId: string, label: string): Entry | null {
   const { activeDoc } = useActiveDocContext(undefined);
   const doc = useLayoutDoc(docId, undefined);
+  const nonDocSidebar = useNonDocSidebar();
+  const activeSidebar = activeDoc?.sidebar ?? nonDocSidebar;
   if (!doc) {
     return null;
   }
@@ -51,8 +68,7 @@ function useDocEntry(docId: string, label: string): Entry | null {
   return {
     href: doc.path,
     label,
-    isActive:
-      pageActive || (!!activeDoc?.sidebar && activeDoc.sidebar === doc.sidebar),
+    isActive: pageActive || (!!activeSidebar && activeSidebar === doc.sidebar),
   };
 }
 
