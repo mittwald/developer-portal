@@ -52,7 +52,7 @@ function UnavailableNotice() {
             }}
           >
             {
-              "The mittwald MCP server is temporarily unavailable. It will be available again, but there is no date for this yet. See the {link} for more information."
+              "The mittwald MCP server is temporarily unavailable. There is no date for restoring the service yet. See the {link} for more information."
             }
           </Translate>
         </Text>

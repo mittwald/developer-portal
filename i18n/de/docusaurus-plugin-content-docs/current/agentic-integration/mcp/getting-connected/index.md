@@ -12,7 +12,7 @@ Willkommen! Diese Anleitung hilft dir, die Authentifizierung für mittwald MCP m
 
 :::warning[MCP-Server vorübergehend nicht verfügbar]
 
-Der mittwald MCP-Server ist vorübergehend nicht verfügbar. Er wird wieder verfügbar sein, einen Termin dafür gibt es aber noch nicht. Aktuelle Informationen findest du in den [MCP-FAQ](https://www.mittwald.de/lp/mcp-faq).
+Der mittwald MCP-Server ist vorübergehend nicht verfügbar. Einen Termin für eine Wiederherstellung des Services gibt es derzeit noch nicht. Aktuelle Informationen findest du in den [MCP-FAQ](https://www.mittwald.de/lp/mcp-faq).
 
 :::
 

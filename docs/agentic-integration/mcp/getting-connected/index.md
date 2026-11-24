@@ -12,7 +12,7 @@ Welcome! This guide helps you set up authentication for mittwald MCP with your p
 
 :::warning[MCP server temporarily unavailable]
 
-The mittwald MCP server is temporarily unavailable. It will be available again, but there is no date for this yet. See the [MCP FAQ](https://www.mittwald.de/lp/mcp-faq) for the latest updates.
+The mittwald MCP server is temporarily unavailable. There is no date for restoring the service yet. See the [MCP FAQ](https://www.mittwald.de/lp/mcp-faq) for the latest updates.
 
 :::
 
