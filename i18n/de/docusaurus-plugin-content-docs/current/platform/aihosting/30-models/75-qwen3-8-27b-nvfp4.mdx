@@ -24,7 +24,7 @@ Es eignet sich für und unterstützt:
 Folgende Limitierungen gelten:
 
 - Maximale Context-Länge: 256.000 Token
-- Maximal 5 Bilder pro Anfrage
+- Maximal 16 Bilder pro Anfrage
 - Bilder müssen als Base64-kodierte Data-URLs übermittelt werden (keine externen URLs)
 - Video verarbeitet das Modell zwar, wir bieten es über diesen Endpunkt aber nicht an
 
@@ -403,7 +403,7 @@ Für präzise Texterkennung (OCR) oder das Auslesen von Daten nimm stattdessen `
 
 Bilder sollten vor der Base64-Kodierung auf maximal 1024 px an der längsten Seite skaliert werden – große Bilder erhöhen die Wartezeit bis zum ersten Token (TTFT) erheblich. Die erste Anfrage für ein neues Bild hat eine längere TTFT, während der Bild-Encoder aufwärmt; nachfolgende Anfragen mit demselben Bild profitieren vom Caching. Fertige Hilfsfunktionen sind in den [Python-Beispielen](../../examples/python/#vision-encoding) und [JavaScript-Beispielen](../../examples/javascript/#vision-encoding) verfügbar.
 
-In eine Anfrage passen höchstens 5 Bilder. Hast du mehr, teile sie auf mehrere Anfragen auf.
+In eine Anfrage passen höchstens 16 Bilder. Hast du mehr, teile sie auf mehrere Anfragen auf.
 
 ### Mathematikaufgaben
 
