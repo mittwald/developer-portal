@@ -25,7 +25,7 @@ It supports and is suitable for:
 The following limitations apply:
 
 - Maximum context length: 256,000 tokens
-- At most 5 images per request
+- At most 16 images per request
 - Images must be submitted as Base64-encoded data URLs (no remote URLs)
 - Video input is not offered on this endpoint, even though the model itself can process video
 
@@ -396,7 +396,7 @@ documents, `GLM-OCR` is the better fit.
 
 Always resize images to a maximum of 1024 px on the longest edge before encoding as Base64 - large images significantly increase time to first token (TTFT). The first request for a new image will have a longer TTFT while the image encoder warms up; subsequent requests with the same image benefit from caching. See the [Python examples](../../examples/python/#vision-encoding) or [JavaScript examples](../../examples/javascript/#vision-encoding) for a ready-to-use helper.
 
-At most 5 images fit into one request. Split larger batches across requests.
+At most 16 images fit into one request. Split larger batches across requests.
 
 ### Math problems
 
