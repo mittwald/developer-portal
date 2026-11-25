@@ -40,7 +40,7 @@ Nach dem Erstellen der Ressource kannst du innerhalb deiner Hosting-Umgebung üb
 
 Alternativ kannst du einen MariaDB-Container manuell einrichten:
 
-1. Gehe in deinem Projekt in mStudio auf den **Container**-Menüpunkt und erstelle einen neuen Container. Du kannst einen beliebigen Namen wählen.
+1. Gehe in deinem Projekt in mStudio auf den **Container**-Menüpunkt, lege einen neuen Stack an oder öffne einen bestehenden und klicke im Container-Bereich des Stacks auf **„Anlegen“**, um einen neuen Container zu erstellen. Du kannst einen beliebigen Namen wählen.
 
 2. Gib das Image `mariadb:lts-ubi9` ein. Du kannst den Entrypoint und das Command wie vorgeschlagen beibehalten.
 
@@ -73,6 +73,18 @@ Denke daran, die Standard-Zugangsdaten in diesen Umgebungsvariablen durch sicher
 Übernehme den vorgeschlagenen Standardport `3306`.
 
 ### Verwendung der CLI mit `mw container run` {#using-cli-container-run}
+
+:::note
+
+Die CLI stellt den Container in dem Stack bereit, der in deinem CLI-Kontext gespeichert ist. Falls du noch keinen Stack angelegt hast, lege zuerst einen an:
+
+```shellsession
+user@local $ mw stack create --description "MariaDB" --update-context
+```
+
+Alternativ kannst du die ID eines bestehenden Stacks mit `--stack-id` angeben. Details findest du unter [Einen Container-Stack anlegen](/docs/v2/platform/workloads/containers#create-stack).
+
+:::
 
 Du kannst auch einen MariaDB-Container mit der mittwald CLI und dem Befehl `mw container run` bereitstellen:
 

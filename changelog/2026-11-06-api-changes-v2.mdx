@@ -1,0 +1,519 @@
+---
+title: API changes for v2 API, October 30 to November 6
+authors:
+  - machine
+tags:
+  - apiv2
+  - Domain
+  - App
+  - User
+  - Cronjob
+  - Customer
+  - Database
+  - Notification
+  - Project
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week's updates to the mittwald API include the removal of two schemas, the addition of several new endpoints and optional request properties, as well as enhancements to response properties and non-success status codes across various operations.
+
+{/* truncate */}
+
+
+
+## Summary
+
+
+- The schemas `de.mittwald.v1.directus.Domain` and `de.mittwald.v1.directus.EmailInbox` have been removed from the API components.
+- The optional property `/items/accessProtection` has been added to the response with a `200` status for the `POST /v2/actions/list-ingresses-compatible-with-certificate` operation.
+- A non-success response with the status `403` has been added for the `GET /v2/app-installations/{appInstallationId}` operation.
+- The new optional request property `autoUpdatesActivated` has been added to the `PATCH /v2/app-installations/{appInstallationId}` operation.
+- The required property `/items/stagingAllowed` has been added to the response with a `200` status for both the `GET /v2/apps` and `GET /v2/apps/{appId}` operations.
+- The optional property `passkeyChallenge` and the required property `availableSecondFactors` have been added to the response with a `202` status for the `POST /v2/authenticate` operation.
+- The new optional request property `passkeyCredential` has been added to the `POST /v2/authenticate-mfa`, `DELETE /v2/users/self`, `DELETE /v2/users/self/credentials/mfa`, `PUT /v2/users/self/credentials/mfa`, and `PUT /v2/users/self/credentials/password` operations.
+- The request property `multiFactorCode` has become optional for the `POST /v2/authenticate-mfa`, `DELETE /v2/users/self/credentials/mfa`, and `PUT /v2/users/self/credentials/mfa` operations.
+- The following endpoints have been added:
+  - `POST /v2/authenticate-passkey` for authenticating with a passkey.
+  - `POST /v2/notification-settings/actions/reset` for resetting notification settings to their defaults.
+  - `POST /v2/passkey-challenges` for creating a challenge for a passkey login.
+  - `POST /v2/users/self/passkey-challenges` for creating a challenge to confirm an action with a passkey.
+  - `POST /v2/users/self/passkey-registration-challenges` for creating a challenge to register a new passkey.
+  - `GET /v2/users/self/passkeys` for getting registered passkeys.
+  - `POST /v2/users/self/passkeys` for registering a new passkey.
+  - `DELETE /v2/users/self/passkeys/{passkeyId}` for deleting a passkey.
+  - `PATCH /v2/users/self/passkeys/{passkeyId}` for renaming a passkey.
+- A non-success response with the status `403` has been added for the following operations:
+  - `GET /v2/cronjobs/{cronjobId}`
+  - `GET /v2/customer-invites/{customerInviteId}`
+  - `GET /v2/customers/{customerId}/memberships`
+  - `GET /v2/mysql-databases/{mysqlDatabaseId}`
+  - `POST /v2/projects/{projectId}/dns-zones`
+  - `GET /v2/redis-databases/{redisDatabaseId}`
+  - `POST /v2/register`
+  - `GET /v2/project-invites/{projectInviteId}`
+  - `GET /v2/users/{userId}`
+- A non-success response with the status `400` has been added for the `GET /v2/users/{userId}` operation.
+- A non-success response with the status `401` has been added for the `GET /v2/users/{userId}` operation.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in ""
+
+
+- removed the schema 'de.mittwald.v1.directus.Domain'
+
+- removed the schema 'de.mittwald.v1.directus.EmailInbox'
+
+
+For details, refer to the <OperationLink operation="" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Ingresses compatible with a certificate"
+
+
+- added the optional property '/items/accessProtection' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ingress-list-ingresses-compatible-with-certificate" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an app installation"
+
+
+- added the non-success response with the status '403'
+
+
+For details, refer to the <OperationLink operation="app-get-appinstallation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update properties belonging to an app installation"
+
+
+- added the new optional request property 'autoUpdatesActivated'
+
+
+For details, refer to the <OperationLink operation="app-patch-appinstallation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List apps"
+
+
+- added the required property '/items/stagingAllowed' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-list-apps" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an app"
+
+
+- added the required property 'stagingAllowed' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="app-get-app" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Authenticate yourself to get an access token"
+
+
+- added the optional property 'passkeyChallenge' to the response with the '202' status
+
+- added the required property 'availableSecondFactors' to the response with the '202' status
+
+
+For details, refer to the <OperationLink operation="user-authenticate" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Validate your second factor"
+
+
+- added the new optional request property 'passkeyCredential'
+
+- the request property 'multiFactorCode' became optional
+
+
+For details, refer to the <OperationLink operation="user-authenticate-mfa" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Authenticate yourself with a passkey to get an access token"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="user-authenticate-passkey" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a cronjob"
+
+
+- added the non-success response with the status '403'
+
+
+For details, refer to the <OperationLink operation="cronjob-get-cronjob" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a customer invite"
+
+
+- added the non-success response with the status '403'
+
+
+For details, refer to the <OperationLink operation="customer-get-customer-invite" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Memberships belonging to a Customer"
+
+
+- added the non-success response with the status '403'
+
+
+For details, refer to the <OperationLink operation="customer-list-memberships-for-customer" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Ingresses"
+
+
+- added the optional property '/items/accessProtection' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ingress-list-ingresses" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get an Ingress"
+
+
+- added the optional property 'accessProtection' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="ingress-get-ingress" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a MySQL database"
+
+
+- added the non-success response with the status '403'
+
+
+For details, refer to the <OperationLink operation="database-get-mysql-database" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Reset notification settings to their defaults"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="notifications-reset-notification-settings" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a challenge for a passkey login"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="user-create-passkey-challenge" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a ProjectInvite"
+
+
+- added the non-success response with the status '403'
+
+
+For details, refer to the <OperationLink operation="project-get-project-invite" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the activities of a project"
+
+
+- added the optional property '/items/credential' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-list-project-activities" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a DNS Zone for a verified Ingress in a Project"
+
+
+- added the non-success response with the status '403'
+
+
+For details, refer to the <OperationLink operation="dns-create-project-dns-zone" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Redis database"
+
+
+- added the non-success response with the status '403'
+
+
+For details, refer to the <OperationLink operation="database-get-redis-database" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Register with email and password"
+
+
+- added the non-success response with the status '403'
+
+
+For details, refer to the <OperationLink operation="user-register" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Delete your account and all your personal data"
+
+
+- added the new optional request property 'passkeyCredential'
+
+
+For details, refer to the <OperationLink operation="user-delete-user" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Disable Multi Factor Authentication"
+
+
+- added the new optional request property 'passkeyCredential'
+
+- the request property 'multiFactorCode' became optional
+
+
+For details, refer to the <OperationLink operation="user-disable-mfa" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Reset RecoveryCodes for MFA"
+
+
+- added the new optional request property 'passkeyCredential'
+
+- the request property 'multiFactorCode' became optional
+
+
+For details, refer to the <OperationLink operation="user-reset-recoverycodes" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Change your password"
+
+
+- added the new optional request property 'passkeyCredential'
+
+
+For details, refer to the <OperationLink operation="user-change-password" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a challenge to confirm an action with a passkey"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="user-create-passkey-confirmation-challenge" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a challenge to register a new passkey"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="user-create-passkey-registration-challenge" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get your registered passkeys"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="user-list-passkeys" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Register a new passkey"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="user-create-passkey" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Delete a passkey"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="user-delete-passkey" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Rename a passkey"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="user-update-passkey" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get profile information for a user"
+
+
+- added the non-success response with the status '400'
+
+- added the non-success response with the status '401'
+
+
+For details, refer to the <OperationLink operation="user-get-user" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK v2.2.23 Release Summary
+
+The mittwald PHP SDK has been updated to version 2.2.23, introducing several new features and improvements. This release includes a dedicated endpoint for resetting notification settings, enhanced activity log tracing with credential identification, and staging flags for application models. Additionally, client-side error handling has been improved with typed response classes for various HTTP status codes, and schema namespaces have been updated to align with the Redirectus service.
+
+#### New Features
+- **Reset Notification Settings:** A new `notificationsResetNotificationSettings` endpoint in `NotificationClient` allows users to reset all notification channel settings to their defaults.
+- **Activity Log Credential Tracking:** The `LogEntry` schema now includes a `credential` field to track the authentication method used for actions.
+- **Application Staging Support:** The `App` schema now features a `stagingAllowed` property to indicate if staging `AppInstallation` instances can be created.
+
+#### Improvements & Updates
+- **Enhanced Error Handling:** Typed response classes for common HTTP status codes have been added to improve exception handling:
+  - `GetUser`: Handles `400 Bad Request` and `401 Unauthorized` responses.
+  - `Register`: Handles `403 Forbidden` responses.
+  - `DnsCreateProjectDnsZone`: Handles `403 Forbidden` responses.
+- **DNS Zone Creation Documentation:** Clarified documentation for creating DNS subzones.
+- **Schema Namespace Migration:** The `Domain` and `EmailInbox` models have been moved to the `Redirectus` namespace.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.2.23).
+
+### mittwald PHP SDK v2.2.22 Release Summary
+
+The mittwald PHP SDK has been updated to version 2.2.22. This release introduces significant new features and enhancements to improve user authentication and application management.
+
+#### Features Added
+- **Passkey (WebAuthn) Support**: Comprehensive support for passkey lifecycle management, including endpoints for creating, authenticating, registering, challenging, confirming, and deleting passkeys.
+- **Automatic App Updates**: A new `autoUpdatesActivated` boolean field in the `PatchAppinstallation` client allows for automatic version updates of app installations.
+
+#### Enhancements
+- **MFA & Authentication Flow**: 
+  - The `multiFactorCode` is now optional in MFA and password change requests.
+  - Added `passkeyCredential` support to `AuthenticateMfa` and `ChangePassword` requests.
+  - Updated `AuthenticateAcceptedResponse` to include `availableSecondFactors` and `passkeyChallenge` for dynamic MFA method discovery.
+- **HTTP Status Handling**: Introduced dedicated `403 Forbidden` response classes for operations such as `GetAppinstallation`, `GetCronjob`, `GetMysqlDatabase`, and `GetRedisDatabase`.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.2.22).
+
+### mittwald PHP SDK v2.2.21 Release Summary
+
+The mittwald PHP SDK has been updated to version v2.2.21. This release includes several bug fixes, improvements, and new features. 
+
+#### Bug Fixes & Improvements
+- Enhanced handling for HTTP 403 (Forbidden) status codes in the Customer and Project client modules.
+- Updated `CustomerClientImpl` and `ProjectClientImpl` to map 403 responses to new `ForbiddenResponse` classes for specific endpoints, improving error handling clarity.
+
+#### New Features
+- **Ingress Access Protection Configuration**: 
+  - Added schema support for configuring Ingress access protection, allowing detailed control over authentication and authorization.
+  - Introduced support for `mStudio` and external `OpenID Connect (OIDC)` authentication providers.
+  - Implemented `PathAccessProtection` and `AllPathsAccessProtection` models for defining protection scope.
+  - Added `AccessProtectionRules` for setting access policies based on email addresses, domains, project memberships, and authenticated user access.
+  - Extended the `Ingress` model with the `accessProtection` property to support these configurations.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.2.21).
+
+### mittwald JavaScript SDK Release 4.517.0
+
+The mittwald JavaScript SDK has been updated to version 4.517.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.517.0](https://github.com/mittwald/api-client-js/releases/tag/4.517.0).
+
+### mittwald JavaScript SDK Release 4.516.0
+
+The mittwald JavaScript SDK has been updated to version 4.516.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.516.0).
+
+### mittwald JavaScript SDK Release 4.515.0
+
+The mittwald JavaScript SDK has been updated to version 4.515.0. This release includes the following feature:
+
+- Updated the generated client to enhance functionality ([commit 67e4c89](https://github.com/mittwald/api-client-js/commit/67e4c89fc8f0ee1a330e619098682b1d06fc2fbf)).
+
+For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.515.0](https://github.com/mittwald/api-client-js/releases/tag/4.515.0).
+
+### mittwald JavaScript SDK Release 4.514.0
+
+The mittwald JavaScript SDK has been updated to version 4.514.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.514.0).
+
+### mittwald JavaScript SDK Release 4.513.0
+
+The mittwald JavaScript SDK has been updated to version 4.513.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.513.0).
+
+### mittwald JavaScript SDK Release 4.512.0
+
+The mittwald JavaScript SDK has been updated to version 4.512.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.512.0).
+
+### mittwald JavaScript SDK Release 4.511.0
+
+The mittwald JavaScript SDK has been updated to version 4.511.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.511.0](https://github.com/mittwald/api-client-js/releases/tag/4.511.0).
+
+### mittwald JavaScript SDK Release 4.510.0
+
+The mittwald JavaScript SDK has been updated to version 4.510.0. This release includes the following feature:
+
+- Updated the generated client to enhance functionality and performance ([commit 6f2aca2](https://github.com/mittwald/api-client-js/commit/6f2aca234f8ce7d6210bef70ffdd80e37cf35056)).
+
+For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.510.0).
+
+### mittwald JavaScript SDK Release 4.509.0
+
+The mittwald JavaScript SDK has been updated to version 4.509.0. This release includes the following feature:
+
+- Updated the generated client to enhance functionality and performance. For more details, refer to commit [85f7aaa](https://github.com/mittwald/api-client-js/commit/85f7aaa476eab50a187fac5c6c30d67de7d23ea2).
+
+For further information, please visit the [release page](https://github.com/mittwald/api-client-js/releases/tag/4.509.0).
+
+### mittwald JavaScript SDK Release 4.508.0
+
+The mittwald JavaScript SDK has been updated to version 4.508.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.508.0](https://github.com/mittwald/api-client-js/releases/tag/4.508.0).
+

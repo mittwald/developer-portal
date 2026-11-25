@@ -18,12 +18,16 @@ The service offers several AI models optimized for different development tasks. 
 
 **Recommended models:**
 
-- **Qwen3.5-122B-A10B-FP8**: the default choice for coding — strongest tool calling,
-  245,760-token context
-- **Qwen3.8-27B-NVFP4**: faster than the 122B model, 256,000-token context
-- **Qwen3.6-35B-A3B-FP8**: fastest of the three, 256,000-token context, good for
+- **DeepSeek-V4.1-Flash-1017**: the largest model we offer and our recommendation for coding agents — 1,048,576-token
+  context, image input, tool calling. It's in the
+  [Testphase](/docs/v2/platform/aihosting/access-and-usage/lifecycle#testphase)
+- **Qwen3.8-27B-NVFP4**: the Stable choice for production use, 256,000-token context,
+  up to 5 images per request
+- **Qwen3.6-35B-A3B-FP8**: fastest of the coding models, 256,000-token context, good for
   completion and quick edits
-- **gpt-oss-120b**: reasoning-heavy work, 131,072-token context
+- **Kolibri-1**: German-language chat and writing, 1,048,576-token context, text only.
+  It's in the [Testphase](/docs/v2/platform/aihosting/access-and-usage/lifecycle#testphase)
+- **gpt-oss-120b**: text only, LTS lifecycle, 131,072-token context
 - **Ministral-3-14B-Instruct-2512**: small and fast, 262,144-token context, for
   lightweight assistants
 
@@ -31,7 +35,7 @@ The service offers several AI models optimized for different development tasks. 
 
 | IDE/Tool                                 | Integrations                                                       |
 | ---------------------------------------- | ------------------------------------------------------------------ |
-| Jetbrains IDEs (IntelliJ, PHPStorm, ...) | [JetBrains AI](./jetbrains-ai), [Continue](./continue)             |
+| JetBrains IDEs (IntelliJ, PHPStorm, ...) | [JetBrains AI](./jetbrains-ai), [Continue](./continue)             |
 | Visual Studio Code                       | [Continue](./continue), [Cline](./cline), [Kilo Code](./kilo-code) |
 | Cursor                                   | [Cline](./cline)                                                   |
 | Windsurf                                 | [Cline](./cline)                                                   |
@@ -45,18 +49,22 @@ Running an agent in the terminal instead of an editor? See
 1. **Get your AI Hosting API key**: See [Gaining access](/docs/v2/platform/aihosting/access-and-usage/access)
 2. **Choose your IDE**: Select from the integrations above
 3. **Configure endpoint**: `https://llm.aihosting.mittwald.de/v1`
-4. **Select model**: `Qwen3.5-122B-A10B-FP8`
+4. **Select model**: `DeepSeek-V4.1-Flash-1017`, or `Qwen3.8-27B-NVFP4` if you need a Stable model
 
 ## Best Practices
 
 ### Model Selection
 
-- **Qwen3.5-122B-A10B-FP8**: start here for agentic coding, refactoring and tool use
-- **Qwen3.8-27B-NVFP4**: want faster replies than the 122B model, at a small quality
-  cost
+- **DeepSeek-V4.1-Flash-1017**: start here for agentic coding, refactoring, and tool use.
+  Set the context window to 1,048,576 tokens and `max_tokens` to at least 32,768, because
+  the model reasons before it answers. For hard reasoning and tricky debugging, set
+  `reasoning_effort: "max"`
+- **Qwen3.8-27B-NVFP4**: production setups that need a model with the status Stable
 - **Qwen3.6-35B-A3B-FP8**: inline completion and quick edits, where latency matters
   more than depth
-- **gpt-oss-120b**: complex reasoning, precise documentation, advanced automations
+- **Kolibri-1**: chat and writing in German. It calls tools only with
+  `tool_choice: "auto"`, so don't use it with agents that force a tool call
+- **gpt-oss-120b**: automations that need the LTS lifecycle and process text only
 - **Ministral-3-14B-Instruct-2512**: lightweight assistants and simple chat
 
 ### Long-Context Tips {#long-context-tips}
@@ -64,7 +72,9 @@ Running an agent in the terminal instead of an editor? See
 - Avoid sending entire repositories; retrieve relevant files/function bodies only
 - Summarize prior steps and include IDs/anchors to rehydrate context on demand
 - Stream responses; raise `max_tokens` only when necessary
-- Prefer deterministic sampling for tools and edits: `temperature <= 0.2`
+- Prefer deterministic sampling for tools and edits: `temperature <= 0.2`. Reasoning models
+  such as DeepSeek-V4.1-Flash-1017 and Kolibri-1 are the exception: keep the sampling
+  parameters from their model pages
 - Limit repo scope; request specific files/functions to keep context efficient
 - Prefer JSON/tool outputs when orchestrating multi-step changes
 

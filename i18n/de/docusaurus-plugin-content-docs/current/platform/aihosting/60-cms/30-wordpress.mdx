@@ -87,13 +87,21 @@ Der mittwald-Connector für WordPress implementiert Chat-Completions (Textgeneri
 
 Chat-Completions stehen mit mehreren für unterschiedliche Aufgaben optimierten Modellen zur Verfügung:
 
-- **gpt-oss-120b**: Open-Source GPT-kompatibles Modell für allgemeine Content-Generierung und fortgeschrittenes Reasoning
-- **Qwen3.5-122B-A10B-FP8** und **Qwen3.6-35B-A3B-FP8**: Große Modelle mit Reasoning- und Vision-Funktionen
+- **gpt-oss-120b**: Modell nur für Text, mit dem Lifecycle LTS, für allgemeine Content-Generierung
+- **DeepSeek-V4.1-Flash-1017**: Das größte Modell in unserem Angebot, mit Reasoning- und Vision-Funktionen
+- **Qwen3.8-27B-NVFP4** und **Qwen3.6-35B-A3B-FP8**: Modelle mit Reasoning- und Vision-Funktionen
+- **Kolibri-1**: Reasoning-Modell für Deutsch und Englisch; reines Textmodell, es verarbeitet keine Bildeingaben
 - **Qwen3.5-0.8B**: Leichtgewichtiges Modell für kostensensitive Aufgaben; reines Textmodell, es verarbeitet keine Bildeingaben
 - **Ministral-3-14B-Instruct-2512**: Chat-Modell mit Vision- und Bildeingabe-Funktionen
 - **GLM-OCR**: OCR-Modell zur Texterkennung in Bildern und Dokumenten
 
-Diese Modelle unterstützen Standard-Textgenerierung, JSON-Ausgabeformatierung, Tool Calling und Streaming-Antworten. Die Modelle Ministral, Qwen3.5-122B, Qwen3.6 und GLM-OCR verarbeiten zusätzlich Bildeingaben.
+Diese Modelle unterstützen Standard-Textgenerierung, JSON-Ausgabeformatierung, Tool Calling und Streaming-Antworten. Die Modelle DeepSeek, Qwen3.8, Qwen3.6, Ministral und GLM-OCR verarbeiten zusätzlich Bildeingaben.
+
+Für deutsche Inhalte, so wie Titel, Auszüge, Zusammenfassungen und SEO-Beschreibungen, passt [Kolibri-1](../30-models/76-kolibri-1.mdx) gut, weil sich dessen Antworten wie Deutsch lesen und nicht wie eine Übersetzung. Alt-Texte brauchen Bildeingabe, nimm für diese Funktion also ein Vision-Modell. Kolibri-1 ruft Tools nur mit `tool_choice` auf `auto` auf; ein Plugin, das einen Tool-Aufruf mit `tool_choice="required"` erzwingt, scheitert mit diesem Modell.
+
+Kolibri-1 und DeepSeek-V4.1-Flash-1017 sind in der [Testphase](../20-access-and-usage/40-lifecycle.mdx#testphase). Für produktive Websites wähle ein Stable- oder LTS-Modell, zum Beispiel Qwen3.8-27B-NVFP4 (Stable). Beide Modelle denken standardmäßig nach, bevor sie antworten, dadurch dauern Anfragen länger; wie du das steuerst, steht auf den Modellseiten.
+
+Qwen3.5-122B-A10B-FP8 wird am 28.12.2026 abgeschaltet. Nutzt deine Website es noch, wechsle zum Nachfolger Qwen3.8-27B-NVFP4 oder, wenn du das größte Modell in unserem Angebot brauchst, zu DeepSeek-V4.1-Flash-1017 (Testphase).
 
 Das Plugin deklariert die Fähigkeiten jedes Modells explizit. Modelle, die mittwald AI Hosting nach einem Plugin-Release hinzufügt, können daher auf dem Connectors-Bildschirm zunächst ohne deklarierte Fähigkeiten erscheinen, bis das Plugin nachzieht.
 

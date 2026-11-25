@@ -7,7 +7,7 @@ title: Extracting text from documents with GLM-OCR
 GLM-OCR is a document OCR model — built only for reading text, not for chat or image understanding. Use it when you need to digitise PDFs, parse scanned invoices, or pull fields from forms.
 
 :::tip When to use GLM-OCR
-Use GLM-OCR for **text extraction** from documents (PDF, DOCX, PPTX, XLSX, HTML, images). For tasks that involve reasoning or conversation on top of a document — e.g. "summarise and explain this contract" — a general vision model like [Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8) is a better fit. You can combine both: OCR first, then pass the text to another model.
+Use GLM-OCR for **text extraction** from documents (PDF, DOCX, PPTX, XLSX, HTML, images). For tasks that involve reasoning or conversation on top of a document — e.g. "summarise and explain this contract" — a general vision model like [DeepSeek-V4.1-Flash-1017](/docs/v2/platform/aihosting/models/deepseek-v4-1-flash-1017) is a better fit. You can combine both: OCR first, then pass the text to another model, for German texts for example [Kolibri-1](/docs/v2/platform/aihosting/models/kolibri-1).
 
 Supported formats, limits, output modes, inference parameters, and JavaScript/PHP code examples are in the [GLM-OCR model reference](/docs/v2/platform/aihosting/models/glm-ocr).
 :::
@@ -292,7 +292,9 @@ Combine four mittwald AI Hosting models into a complete document question-answer
 1. **GLM-OCR** digitises your documents — using **Markdown output mode** so headings and structure are preserved, which produces cleaner chunks and better retrieval quality than flat text
 2. **[Qwen3-Embedding-8B](/docs/v2/platform/aihosting/models/qwen3-embedding-8b)** turns text chunks into vectors for a fast first retrieval pass
 3. **[Qwen3-VL-Reranker-2B](/docs/v2/platform/aihosting/models/qwen3-vl-reranker-2b)** re-scores the retrieved candidates against the full question and narrows them down to the most relevant few
-4. **[Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8)** answers questions in natural language based on the reranked context
+4. **[DeepSeek-V4.1-Flash-1017](/docs/v2/platform/aihosting/models/deepseek-v4-1-flash-1017)** answers questions in natural language based on the reranked context. For German documents, [Kolibri-1](/docs/v2/platform/aihosting/models/kolibri-1) gives answers that read like German
+
+The answering step only sees the extracted text, so any chat model fits there. `DeepSeek-V4.1-Flash-1017` and `Kolibri-1` are in the [Testphase](../20-access-and-usage/40-lifecycle.mdx#testphase); for production use, take [Qwen3.8-27B-NVFP4](/docs/v2/platform/aihosting/models/qwen3-8-27b-nvfp4), which has the status Stable.
 
 ```shellsession
 user@local $ pip install openai pypdf requests
@@ -418,15 +420,15 @@ The response's `results` list gives an `index` (position in the `documents` arra
 Retrieve a wider candidate set from the vector index, then let the reranker narrow it down before answering:
 
 ```python
-# ── Step 5: Answer with Qwen3.5-122B-A10B-FP8 ────────────────────────────────
-# Qwen3.5 has thinking mode enabled by default — disable it for Q&A tasks so
-# the answer is returned in message.content rather than reasoning_content.
-# See: /docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8
+# ── Step 5: Answer with DeepSeek-V4.1-Flash-1017 ─────────────────────────────
+# DeepSeek-V4.1-Flash-1017 has thinking mode enabled by default — disable it for
+# Q&A tasks so the reasoning doesn't use up max_tokens before the answer.
+# See: /docs/v2/platform/aihosting/models/deepseek-v4-1-flash-1017
 
 def answer(question: str, chunks: list[str]) -> str:
     context = "\n\n---\n\n".join(chunks)
     resp = client.chat.completions.create(
-        model="Qwen3.5-122B-A10B-FP8",
+        model="DeepSeek-V4.1-Flash-1017",
         messages=[
             {
                 "role": "system",
@@ -437,10 +439,10 @@ def answer(question: str, chunks: list[str]) -> str:
                 "content": f"Context:\n{context}\n\nQuestion: {question}",
             },
         ],
-        temperature=0.7,
-        top_p=0.8,
+        temperature=1.0,
+        top_p=1.0,
         max_tokens=1024,
-        extra_body={"chat_template_kwargs": {"enable_thinking": False}},
+        extra_body={"chat_template_kwargs": {"reasoning_effort": "none"}},
     )
     return resp.choices[0].message.content
 
@@ -748,7 +750,7 @@ Create a new **OpenAI API** credential in n8n and override the base URL:
 | API Key  | your mStudio AI Hosting key (`sk-…`)   |
 | Base URL | `https://llm.aihosting.mittwald.de/v1` |
 
-GLM-OCR, [Qwen3-Embedding-8B](/docs/v2/platform/aihosting/models/qwen3-embedding-8b), and [Qwen3.5-122B-A10B-FP8](/docs/v2/platform/aihosting/models/qwen3-5-122b-a10b-fp8) all share this single credential.
+GLM-OCR, [Qwen3-Embedding-8B](/docs/v2/platform/aihosting/models/qwen3-embedding-8b), and [DeepSeek-V4.1-Flash-1017](/docs/v2/platform/aihosting/models/deepseek-v4-1-flash-1017) all share this single credential.
 
 ### Document ingestion workflow
 
@@ -793,7 +795,7 @@ A second workflow answers user questions on demand:
        ↓
 [Postgres (pgvector) node]  SELECT top-3 chunks by vector similarity
        ↓
-[OpenAI Chat node]  model: Qwen3.5-122B-A10B-FP8
+[OpenAI Chat node]  model: DeepSeek-V4.1-Flash-1017
   system: "Answer only from the provided context."
   user:   "Context: {{chunks}}\n\nQuestion: {{question}}"
        ↓

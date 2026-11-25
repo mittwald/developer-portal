@@ -1,0 +1,513 @@
+---
+title: Breaking (!) API changes for v2 API, November 6 to November 13
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - User
+  - Contract
+  - Domain
+  - Project
+  - Container
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+During the week of November 6 to November 13, 2026, the mittwald API underwent significant changes, including the removal of several API paths without deprecation, updates to request and response properties, the addition of new endpoints, and modifications to existing request parameters and their types.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The following API paths have been removed without deprecation, resulting in breaking changes:
+  - `POST /v2/customers/{customerId}/recommendation-suggestions`
+  - `GET /v2/customers/{customerId}/wallet`
+  - `POST /v2/customers/{customerId}/wallet`
+
+- The type/format of the 'userId' request parameter has changed from 'string' to 'string'/'uuid' for the following operations:
+  - `GET /v2/poll-settings/{userId}`
+  - `POST /v2/poll-settings/{userId}`
+
+- The 'userId' request property type/format has changed from 'string' to 'string'/'uuid' for the `POST /v2/poll-settings/{userId}` operation.
+
+- The 'reason' request property's maxLength has been set to '1000' for the following operations:
+  - `POST /v2/contracts/{contractId}/items/{contractItemId}/termination`
+  - `POST /v2/contracts/{contractId}/termination`
+
+- The 'explanation' request property's maxLength has been set to '10000' for the `POST /v2/contracts/{contractId}/termination` operation.
+
+- The 'zoneFile' request property's maxLength has been set to '262144' for the `POST /v2/projects/{projectId}/dns-zone-imports` operation.
+
+- The following endpoints have been added:
+  - `GET /v2/apps/metrics` (deprecated metrics passthrough)
+  - `GET /v2/projects/{projectId}/usage-metrics`
+  - `GET /v2/projects/{projectId}/usage-metrics/breakdown`
+  - `GET /v2/servers/{serverId}/usage-metrics`
+  - `GET /v2/servers/{serverId}/usage-metrics/breakdown`
+
+- The following optional request property has been added:
+  - 'captchaToken' for the operations:
+    - `POST /v2/authenticate`
+    - `POST /v2/authenticate-mfa`
+    - `POST /v2/authenticate-passkey`
+    - `POST /v2/register`
+
+- The following non-success responses have been added:
+  - Status '503' for the operations:
+    - `POST /v2/authenticate`
+    - `POST /v2/authenticate-mfa`
+    - `POST /v2/authenticate-passkey`
+    - `POST /v2/register`
+  - Status '500' for the operations:
+    - `GET /v2/poll-settings/{userId}`
+    - `POST /v2/poll-settings/{userId}`
+
+- The following non-success responses have been removed:
+  - Status '400' for `GET /v2/poll-settings/{userId}`
+  - Status '404' for `GET /v2/poll-settings/{userId}`
+  - Status '403' for `POST /v2/poll-settings/{userId}`
+
+- The 'message' response property has become required for the status '429' for the operations:
+  - `POST /v2/signup/email/resend`
+  - `POST /v2/users/self/credentials/email/actions/resend-email`
+
+- The 'type' response property has become required for the status '429' for the operations:
+  - `POST /v2/signup/email/resend`
+  - `POST /v2/users/self/credentials/email/actions/resend-email`
+
+- The following response properties have been added to the `GET /v2/container-templates` operation:
+  - '/items/userInputs/items/dataType'
+  - '/items/userInputs/items/description'
+  - '/items/userInputs/items/errorMessage'
+  - '/items/userInputs/items/format'
+  - '/items/userInputs/items/options'
+
+- The following response properties have been added to the `GET /v2/container-templates/{templateId}` operation:
+  - 'userInputs/items/dataType'
+  - 'userInputs/items/description'
+  - 'userInputs/items/errorMessage'
+  - 'userInputs/items/format'
+  - 'userInputs/items/options'
+
+- The API operation ID 'extension-dry-run-webhook' has been removed and replaced with 'deprecated-extension-dry-run-webhook' for the operation `POST /v2/contributors/{contributorId}/extensions/{extensionId}/extension-instances/{extensionInstanceId}/actions/dry-run/{webhookKind}`.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "customer-create-recommendation-suggestion"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+
+For details, refer to the <OperationLink operation="customer-create-recommendation-suggestion" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "customer-get-wallet"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+
+For details, refer to the <OperationLink operation="customer-get-wallet" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "customer-create-wallet"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+
+For details, refer to the <OperationLink operation="customer-create-wallet" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get poll settings for the specified user"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'userId', the type/format was changed from 'string'/'' to 'string'/'uuid'
+
+- added the non-success response with the status '500'
+
+- removed the non-success response with the status '400'
+
+- removed the non-success response with the status '404'
+
+
+For details, refer to the <OperationLink operation="user-get-poll-status" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Store new or update poll settings"
+
+
+- ⚠️ **Breaking:** for the 'path' request parameter 'userId', the type/format was changed from 'string'/'' to 'string'/'uuid'
+
+- ⚠️ **Breaking:** the 'userId' request property type/format changed from 'string'/'' to 'string'/'uuid'
+
+- added the non-success response with the status '500'
+
+- removed the non-success response with the status '403'
+
+
+For details, refer to the <OperationLink operation="user-post-poll-status" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Authenticate yourself to get an access token"
+
+
+- added the new 'email' enum value to the 'availableSecondFactors/items/' response property for the response status '202'
+
+- added the new optional request property 'captchaToken'
+
+- added the non-success response with the status '503'
+
+
+For details, refer to the <OperationLink operation="user-authenticate" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Schedule the Termination of a ContractItem"
+
+
+- the 'reason' request property's maxLength was set to '1000'
+
+
+For details, refer to the <OperationLink operation="contract-terminate-contract-item" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Schedule the Termination of a Contract"
+
+
+- the 'explanation' request property's maxLength was set to '10000'
+
+- the 'reason' request property's maxLength was set to '1000'
+
+
+For details, refer to the <OperationLink operation="contract-terminate-contract" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Import a DNS zone file into a Project, or preview it with dry-run"
+
+
+- the 'zoneFile' request property's maxLength was set to '262144'
+
+
+For details, refer to the <OperationLink operation="dns-create-dns-zone-file-import" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Removed metrics passthrough; use the usage-metrics routes instead"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="deprecated-project-metrics-passthrough" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Validate your second factor"
+
+
+- added the new optional request property 'captchaToken'
+
+- added the non-success response with the status '503'
+
+
+For details, refer to the <OperationLink operation="user-authenticate-mfa" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Authenticate yourself with a passkey to get an access token"
+
+
+- added the new optional request property 'captchaToken'
+
+- added the non-success response with the status '503'
+
+
+For details, refer to the <OperationLink operation="user-authenticate-passkey" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a CertificateRequest"
+
+
+- added 'subschema #19' to the 'message' response property 'oneOf' list for the response status '400'
+
+
+For details, refer to the <OperationLink operation="ssl-create-certificate-request" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a Certificate"
+
+
+- added 'subschema #19' to the 'message' response property 'oneOf' list for the response status '400'
+
+
+For details, refer to the <OperationLink operation="ssl-replace-certificate" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Check the replacement of a Certificate"
+
+
+- added 'subschema #19' to the 'errors/items/message' response property 'oneOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="ssl-check-replace-certificate" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Container Templates"
+
+
+- added the optional property '/items/userInputs/items/dataType' to the response with the '200' status
+
+- added the optional property '/items/userInputs/items/description' to the response with the '200' status
+
+- added the optional property '/items/userInputs/items/errorMessage' to the response with the '200' status
+
+- added the optional property '/items/userInputs/items/format' to the response with the '200' status
+
+- added the optional property '/items/userInputs/items/options' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-list-templates" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a Container Template by ID"
+
+
+- added the optional property 'userInputs/items/dataType' to the response with the '200' status
+
+- added the optional property 'userInputs/items/description' to the response with the '200' status
+
+- added the optional property 'userInputs/items/errorMessage' to the response with the '200' status
+
+- added the optional property 'userInputs/items/format' to the response with the '200' status
+
+- added the optional property 'userInputs/items/options' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="container-get-template" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "extension-dry-run-webhook"
+
+
+- api operation id 'extension-dry-run-webhook' removed and replaced with 'deprecated-extension-dry-run-webhook'
+
+
+For details, refer to the <OperationLink operation="extension-dry-run-webhook" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get usage metrics for a project"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="project-get-usage-metrics" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a usage-metrics breakdown for a project"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="project-get-usage-metrics-breakdown" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Register with email and password"
+
+
+- added the new optional request property 'captchaToken'
+
+- added the non-success response with the status '503'
+
+
+For details, refer to the <OperationLink operation="user-register" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get usage metrics for a server"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="project-get-server-usage-metrics" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a usage-metrics breakdown for a server"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="project-get-server-usage-metrics-breakdown" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Resend the mail address verification email. Replaced by POST /v2/users/self/credentials/email/actions/resend-email.
+"
+
+
+- the response property 'message' became required for the status '429'
+
+- the response property 'type' became required for the status '429'
+
+
+For details, refer to the <OperationLink operation="deprecated-user-resend-verification-email" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Resend the mail address verification email"
+
+
+- the response property 'message' became required for the status '429'
+
+- the response property 'type' became required for the status '429'
+
+
+For details, refer to the <OperationLink operation="user-resend-verification-email" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald PHP SDK Release v2.2.27
+
+The latest release of the mittwald PHP SDK, version 2.2.27, is now available. This update introduces several new features and improvements aimed at enhancing user experience and system reliability. 
+
+[View the release on GitHub](https://github.com/mittwald/api-client-php/releases/tag/v2.2.27)
+
+#### New Features
+- **Poll Status Management**: New `GET` and `POST` endpoints for `/v2/poll-settings/{userId}` allow for tracking and updating user poll preferences, including status states and visibility toggles.
+- **CAPTCHA Integration**: An optional `captchaToken` field has been added to various authentication and registration workflows to ensure compliance with CAPTCHA challenges.
+
+#### Improvements
+- **Enhanced Template Inputs**: Expanded configuration fields for `TemplateUserInputsItem` to improve UI control and rendering.
+- **Standardized Error Handling**: Refactored error response schemas for consistency and better handling of rate limits.
+- **503 Service Unavailable Support**: Added response classes to manage service downtime scenarios explicitly.
+
+#### Client Updates
+- Client stubs have been regenerated to align with the updated API specifications.
+- The `UserClient` interface has been updated to include new poll status methods and revised authentication request/response types.
+
+For more details, please refer to the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.2.27).
+
+### mittwald PHP SDK v2.2.26 Release Summary
+
+The mittwald PHP SDK has been updated to version v2.2.26. This release introduces several new features, deprecations, and internal updates. 
+
+#### New Features
+- **Project & Server Usage Metrics**: Four new endpoints have been added to the `Project` client to monitor resource consumption:
+  - `getUsageMetrics`: Retrieves overall usage metrics for a project.
+  - `getUsageMetricsBreakdown`: Provides a detailed breakdown of project usage metrics.
+  - `getServerUsageMetrics`: Fetches usage metrics for a specific server.
+  - `getServerUsageMetricsBreakdown`: Retrieves a detailed breakdown of server usage metrics.
+  
+  These endpoints support filtering by `cpu` and `memory` metric types and allow specifying custom time ranges for historical data using `from` and `to` query parameters.
+
+#### Deprecated Features
+- **Customer Wallet & Recommendation Suggestion**: The operations `createRecommendationSuggestion`, `createWallet`, and `getWallet` have been removed from the `CustomerClient`. Associated request and response classes have been deleted.
+- **Extension Dry Run Webhook**: The `extensionDryRunWebhook` operation in the `MarketplaceClient` has been deprecated and moved to the `DeprecatedExtensionDryRunWebhook` namespace, marked with `@deprecated`.
+
+#### Internal & Generated Code Updates
+- All API client classes have been regenerated to align with the latest specification, ensuring strict type safety, validated request builders, and accurate response parsing.
+- Introduced `DeprecatedProjectMetricsPassthrough` response classes to handle legacy metric passthrough responses during the transition period.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.2.26).
+
+### mittwald PHP SDK v2.2.25 Release Summary
+
+The mittwald PHP SDK has been updated to version 2.2.25. This release focuses on enhancing validation, clarifying behavior, and improving error handling. Key updates include:
+
+- **DNS Zone File Import Enhancements**: Introduced stricter validation limits, including a maximum payload size of 256 KiB and a limit of 1,000 distinct owner names for the `zoneFile` parameter. The `DnsCreateDnsZoneFileImportRequest` and `DnsCreateDnsZoneFileImportRequestBody` classes have been updated to reflect these changes.
+
+- **TTL Normalization Clarifications**: The `ttlNormalized` flag now accurately indicates when source TTLs are outside the valid 60–86400 second range. Documentation for `ttlSeconds` has been refined to clarify that values are clamped within this range.
+
+- **SSL Certificate Error Handling**: Added a new diagnostic error type, `CertificateErrorMessageAlternative19`, to handle cases where a certificate is mistakenly provided instead of a private key.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.2.25).
+
+### mittwald PHP SDK v2.2.24 Release Summary
+
+The mittwald PHP SDK has been updated to version 2.2.24. This release focuses on enhancing the contract termination API schemas by introducing updated validation constraints. The improvements aim to standardize input limits and enhance payload handling.
+
+#### Key Updates:
+- **Contract Termination Workflow**: Enforces documented character limits for explanatory fields, improving API client validation and ensuring consistent data handling.
+- **Field Constraints**:
+  - `explanation` field: Maximum length set to 10,000 characters.
+  - `reason` field: Maximum length set to 1,000 characters.
+
+These changes are reflected in the updated schema definitions, providing precise validation rules for clients during termination workflows.
+
+For more details, visit the [release page](https://github.com/mittwald/api-client-php/releases/tag/v2.2.24).
+
+### mittwald JavaScript SDK Release 4.524.0
+
+The mittwald JavaScript SDK has been updated to version 4.524.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.524.0](https://github.com/mittwald/api-client-js/releases/tag/4.524.0).
+
+### mittwald JavaScript SDK Release 4.523.0
+
+The mittwald JavaScript SDK has been updated to version 4.523.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.523.0).
+
+### mittwald JavaScript SDK Release 4.522.0
+
+The mittwald JavaScript SDK has been updated to version 4.522.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.522.0](https://github.com/mittwald/api-client-js/releases/tag/4.522.0).
+
+### mittwald JavaScript SDK Release 4.521.0
+
+The mittwald JavaScript SDK has been updated to version 4.521.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.521.0).
+
+### mittwald JavaScript SDK Release 4.520.0
+
+The mittwald JavaScript SDK has been updated to version 4.520.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.520.0).
+
+### mittwald JavaScript SDK Release 4.519.0
+
+The mittwald JavaScript SDK has been updated to version 4.519.0. This release includes an update to the generated client, enhancing the functionality and performance of the SDK. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.519.0).
+
+### mittwald JavaScript SDK Release 4.518.0
+
+The mittwald JavaScript SDK has been updated to version 4.518.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.518.0](https://github.com/mittwald/api-client-js/releases/tag/4.518.0).
+

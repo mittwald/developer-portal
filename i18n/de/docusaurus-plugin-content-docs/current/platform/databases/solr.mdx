@@ -122,7 +122,7 @@ Die `typo3_solr_version` sollte mit der Version der TYPO3 Solr-Erweiterung über
 
 Alternativ kannst du einen Solr-Container manuell einrichten:
 
-1. Gehe in deinem Projekt in mStudio auf den **Container**-Menüpunkt und erstelle einen neuen Container. Du kannst einen beliebigen Namen wählen.
+1. Gehe in deinem Projekt in mStudio auf den **Container**-Menüpunkt, lege einen neuen Stack an oder öffne einen bestehenden und klicke im Container-Bereich des Stacks auf **„Anlegen“**, um einen neuen Container zu erstellen. Du kannst einen beliebigen Namen wählen.
 
 2. Gib als Image entweder `solr:9` oder eine spezifischere Versionsnummer wie `solr:9.9` ein, je nachdem, wie spezifisch die Version eingeschränkt werden soll. Du kannst den Entrypoint und das Command wie vorgeschlagen beibehalten.
 
@@ -144,6 +144,18 @@ Alternativ kannst du einen Solr-Container manuell einrichten:
 Die vorgeschlagenen Port-Werte sind im Solr-Kontext Standard und können unverändert übernommen werden. Der Standardport für Solr ist 8983.
 
 ### Verwendung der CLI mit `mw container run`
+
+:::note
+
+Die CLI stellt den Container in dem Stack bereit, der in deinem CLI-Kontext gespeichert ist. Falls du noch keinen Stack angelegt hast, lege zuerst einen an:
+
+```shellsession
+user@local $ mw stack create --description "Solr" --update-context
+```
+
+Alternativ kannst du die ID eines bestehenden Stacks mit `--stack-id` angeben. Details findest du unter [Einen Container-Stack anlegen](/docs/v2/platform/workloads/containers#create-stack).
+
+:::
 
 Du kannst auch einen Solr-Container mit der mittwald CLI und dem Befehl `mw container run` bereitstellen:
 

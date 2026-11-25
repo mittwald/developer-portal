@@ -78,6 +78,14 @@ hinzu:
       "apiKey": "sk-...",
       "models": [
         {
+          "id": "DeepSeek-V4.1-Flash-1017",
+          "name": "DeepSeek-V4.1-Flash-1017",
+          "reasoning": true,
+          "input": ["text", "image"],
+          "contextWindow": 1048576,
+          "maxTokens": 131072
+        },
+        {
           "id": "Qwen3.8-27B-NVFP4",
           "name": "Qwen3.8-27B-NVFP4",
           "reasoning": true,
@@ -118,7 +126,8 @@ Mach ihn in `~/.pi/agent/settings.json` zum Standard:
 ```json
 {
   "defaultProvider": "mittwald",
-  "defaultModel": "Qwen3.8-27B-NVFP4"
+  "defaultModel": "DeepSeek-V4.1-Flash-1017",
+  "defaultThinkingLevel": "high"
 }
 ```
 
@@ -133,6 +142,17 @@ Thinking-Stufe als `reasoning_effort` mit. Solange du `defaultThinkingLevel`
 nicht änderst, ist das `medium`. Bei der Stufe `off` lässt Pi das Feld ganz
 weg, und das Modell denkt trotzdem.
 
+`DeepSeek-V4.1-Flash-1017` ist das größte Modell in unserem Angebot und unsere Empfehlung für Coding-Agenten,
+deshalb ist es oben voreingestellt. Sein Kontextfenster fasst 1.048.576 Token, Ein- und
+Ausgabe zusammen, und es schreibt bis zu 262.144 Token pro Anfrage. `maxTokens` von 131.072
+folgt der Empfehlung der Modellseite für Coding-Agenten und lässt den Rest des Fensters für
+die Eingabe frei. Das Modell kennt die Reasoning-Tiefen `low`, `high` und `max`. Pis Stufen `medium` und
+`minimal` behandeln wir wie `high` und `low`, jede Stufe funktioniert also. Die Einstellungen oben
+setzen `defaultThinkingLevel` auf `high`, das entspricht dem Standard des Modells.
+Das Modell ist in der [Testphase](../../platform/aihosting/20-access-and-usage/40-lifecycle.mdx#testphase): Wir können es kurzfristig abschalten, und Verhalten und Funktionsumfang können sich noch ändern. Willst du ein stabiles Standardmodell
+für den Produktivbetrieb, setz `defaultModel` auf `Qwen3.8-27B-NVFP4` (Stable) und lass
+`defaultThinkingLevel` weg. `Qwen3.8-27B-NVFP4` kommt mit Pis Standard `medium` zurecht, beantwortet die Pi-Stufe `minimal` aber mit einem `400`.
+
 ## Verbindung prüfen {#verify}
 
 Die deklarierten Modelle sollten jetzt aufgelistet sein:
@@ -145,7 +165,7 @@ Erzwinge dann einen Tool Call, denn eine reine Chat-Antwort würde auch bei
 kaputtem Tool Calling gelingen:
 
 ```bash
-pi --provider mittwald --model Qwen3.8-27B-NVFP4 --no-session \
+pi --provider mittwald --model DeepSeek-V4.1-Flash-1017 --no-session \
   -p "Create a file called hello.txt containing the word hello, then read it back."
 ```
 

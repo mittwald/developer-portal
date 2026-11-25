@@ -1,0 +1,190 @@
+---
+sidebar_label: DeepSeek-V4.1-Flash-1017
+description: Detailed information on DeepSeek-V4.1-Flash-1017
+title: DeepSeek-V4.1-Flash-1017
+slug: /platform/aihosting/models/deepseek-v4-1-flash-1017
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+## Description {#description}
+
+"DeepSeek-V4.1-Flash-1017" is a multimodal reasoning model by DeepSeek. It's a Mixture-of-Experts model with 552 billion parameters, of which 8 billion compute each token while it reads the prompt and 16 billion while it writes the answer. That design makes long inputs cheap to process, which is what coding agents and document work need. The context window holds about one million tokens. It's the largest model we offer and the one we recommend for coding agents and long-horizon agentic work.
+
+This model is in the [Testphase](../20-access-and-usage/40-lifecycle.mdx#testphase). We can shut it down at short notice, and its behavior and feature set can still change, so we recommend Stable or LTS models for production use.
+
+It supports and is suitable for:
+
+- Text generation within a chat completion (text to text)
+- Thinking / reasoning for step-by-step problem solving, with a reasoning depth you can set from 1 to 100
+- Tool-calling for coding agents and agentic workflows
+- Image understanding (vision), including several images per request
+- Whole code bases, document collections, and long agent traces in a single request
+
+The following limitations apply:
+
+- Maximum context length: 1,048,576 tokens, input and output together
+- Maximum output length: 262,144 tokens per request
+- Video input is not supported
+- Images must be submitted as Base64-encoded data URLs
+
+**Thinking mode is enabled by default, at reasoning depth `high`.** The model thinks even before short answers. See [Controlling reasoning depth](#reasoning-effort) for the cheaper levels and for turning it off. Send the parameters inside `chat_template_kwargs`.
+
+:::warning[An answer can come back empty if `max_tokens` is too small]
+If `max_tokens` runs out while the model is still reasoning, you get a response whose `content` is empty and whose `finish_reason` is `length`, and the reasoning tokens are still billed. Leave generous room in `max_tokens`, lower the reasoning depth, or switch thinking off for the request. When you see an empty `content`, check `finish_reason` first.
+:::
+
+### Controlling reasoning depth {#reasoning-effort}
+
+The model takes its reasoning depth as a number from 1 to 100. Pass it as `reasoning_effort` inside `chat_template_kwargs`, either as a number or as one of these names:
+
+| Value            | Depth | Use for                                                     |
+| ---------------- | ----- | ----------------------------------------------------------- |
+| `max`            | 100   | Hard analysis, tricky debugging, long agent runs            |
+| `high` (default) | 75    | Code with several steps, tool loops, planning               |
+| `low`            | 50    | Everyday chat, drafting, translation, summaries             |
+| `none`           | off   | Classification, routing, extraction, short standard answers |
+
+`none` switches thinking off; `"thinking": false` does the same. `xhigh` is accepted and means the same as `high`. Any other value inside `chat_template_kwargs` comes back as a `400`.
+
+Many OpenAI clients send `reasoning_effort` at the top level of the request, next to `model`, and default to `medium` or `minimal`. The model doesn't know these two, so at the top level we treat `medium` as `high` and `minimal` as `low`. Such clients work without changes. Inside `chat_template_kwargs`, use only the values from the table.
+
+<Tabs groupId="language">
+  <TabItem value="python" label="Python">
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://llm.aihosting.mittwald.de/v1",
+    api_key="sk-your-api-key-here",
+)
+
+response = client.chat.completions.create(
+    model="DeepSeek-V4.1-Flash-1017",
+    messages=[{"role": "user", "content": "Summarise this changelog entry in one sentence."}],
+    temperature=1.0,
+    top_p=1.0,
+    max_tokens=32768,
+    extra_body={
+        "chat_template_kwargs": {"reasoning_effort": "low"},
+    },
+)
+
+print(response.choices[0].message.content)
+```
+
+  </TabItem>
+  <TabItem value="javascript" label="JavaScript">
+
+```ts
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  baseURL: "https://llm.aihosting.mittwald.de/v1",
+  apiKey: "sk-your-api-key-here",
+});
+
+const response = await client.chat.completions.create({
+  model: "DeepSeek-V4.1-Flash-1017",
+  messages: [
+    {
+      role: "user",
+      content: "Summarise this changelog entry in one sentence.",
+    },
+  ],
+  temperature: 1.0,
+  top_p: 1.0,
+  max_tokens: 32768,
+  // @ts-ignore – vLLM extension
+  chat_template_kwargs: { reasoning_effort: "low" },
+} as any);
+
+console.log(response.choices[0].message.content);
+```
+
+  </TabItem>
+  <TabItem value="php" label="PHP">
+
+```php
+<?php
+// composer require openai-php/client guzzlehttp/guzzle
+
+$client = OpenAI::factory()
+    ->withBaseUri('https://llm.aihosting.mittwald.de/v1')
+    ->withApiKey('sk-your-api-key-here')
+    ->make();
+
+$response = $client->chat()->create([
+    'model' => 'DeepSeek-V4.1-Flash-1017',
+    'messages' => [
+        ['role' => 'user', 'content' => 'Summarise this changelog entry in one sentence.'],
+    ],
+    'temperature' => 1.0,
+    'top_p' => 1.0,
+    'max_tokens' => 32768,
+    'chat_template_kwargs' => ['reasoning_effort' => 'low'],
+]);
+
+echo $response->choices[0]->message->content;
+```
+
+  </TabItem>
+</Tabs>
+
+### Reasoning across turns {#reasoning-across-turns}
+
+Without tools, the model drops the reasoning of earlier turns and keeps only the reasoning for the latest user message. Within a tool loop the reasoning stays in the conversation until the next user message, so an agent keeps its plan across tool calls. To keep all reasoning, send `"drop_thinking": false` in `chat_template_kwargs`. Kept reasoning counts towards the context window.
+
+### Reading the response {#reading-the-response}
+
+With thinking on, the model returns two separate fields:
+
+| Field                          | Contents                                     |
+| ------------------------------ | -------------------------------------------- |
+| `choices[0].message.reasoning` | Internal chain-of-thought (may be very long) |
+| `choices[0].message.content`   | Final answer                                 |
+
+## Recommended inference parameters {#recommended-inference-parameters}
+
+These are DeepSeek's recommendations and also the defaults if you send nothing:
+
+| Parameter     | Value |
+| ------------- | ----- |
+| `temperature` | 1.0   |
+| `top_p`       | 1.0   |
+
+### Output length {#output-length}
+
+DeepSeek ran its benchmarks with up to 256,000 output tokens. You don't need that much for everyday requests, but leave more room than with a model that doesn't reason:
+
+| Task type                                 | Recommended `max_tokens` |
+| ----------------------------------------- | ------------------------ |
+| Thinking off (`reasoning_effort: "none"`) | 1,024–4,096              |
+| Standard queries with thinking            | 32,768                   |
+| Coding agents, `reasoning_effort: "max"`  | 131,072–262,144          |
+
+## Tips for specific tasks {#tips}
+
+### Coding agents {#coding-agents}
+
+DeepSeek measured this release in several agent harnesses, among them Claude Code and mini-SWE-agent. Compared with DeepSeek-V4.1-Flash it finishes agent tasks faster and with shorter output. For agents:
+
+- Keep thinking on. `high` is the right start, `max` pays off on hard debugging.
+- Keep the default `drop_thinking`. Reasoning stays within a tool loop either way.
+- Set a step limit in the agent. Sampling parameters don't end a loop, a step limit does.
+
+### Vision (image to text) {#vision}
+
+Send images as Base64-encoded data URLs. The model reads many images per request. In our tests, tasks that compare or count across images were reliable up to about 16 images per request.
+
+Resize images to a maximum of 1024 px on the longest edge before encoding. Larger images don't add detail the model uses, but they make the request slower. See the [Python examples](../../examples/python/#vision-encoding) or [JavaScript examples](../../examples/javascript/#vision-encoding) for a ready-to-use helper.
+
+### Long contexts {#long-contexts}
+
+The full context of about one million tokens is available in every request. Reading in a long prompt takes time: plan for minutes, not seconds, once you send several hundred thousand tokens. A repeated prefix, such as the same code base in every turn of an agent run, may be cached and is then read in much faster on follow-up requests.
+
+## Terms of use and licensing {#terms-of-use-and-licensing}
+
+The model is provided by DeepSeek under the [MIT License](https://opensource.org/license/mit), and reuse of the generated content is not subject to any additional restrictions.

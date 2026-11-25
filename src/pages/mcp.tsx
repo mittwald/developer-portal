@@ -3,6 +3,8 @@ import Layout from "@theme/Layout";
 import Translate, { translate } from "@docusaurus/Translate";
 import CodeBlock from "@theme/CodeBlock";
 import {
+  Alert,
+  Content,
   Flex,
   Heading,
   Icon,
@@ -28,6 +30,37 @@ import FeatureRow from "@site/src/components/FeatureRow";
 import Intro from "@site/src/components/Intro";
 import Hero, { HeroEntries, HeroEntry } from "@site/src/components/Hero";
 
+/** Notice that the MCP server is temporarily unavailable */
+function UnavailableNotice() {
+  return (
+    <Alert status="warning" className={mcpStyles.unavailable}>
+      <Heading>
+        <Translate id="mcp.unavailable.title">
+          mittwald MCP is temporarily unavailable
+        </Translate>
+      </Heading>
+      <Content>
+        <Text>
+          <Translate
+            id="mcp.unavailable.body"
+            values={{
+              link: (
+                <FlowLink inline href="https://www.mittwald.de/lp/mcp-faq">
+                  <Translate id="mcp.unavailable.body.link">MCP FAQ</Translate>
+                </FlowLink>
+              ),
+            }}
+          >
+            {
+              "The mittwald MCP server is temporarily unavailable. There is no date for restoring the service yet. See the {link} for more information."
+            }
+          </Translate>
+        </Text>
+      </Content>
+    </Alert>
+  );
+}
+
 function MCPPageHeader() {
   return (
     <Hero className={mcpStyles.hero}>
@@ -40,6 +73,7 @@ function MCPPageHeader() {
           infrastructure work with safe, auditable tool calls.
         </Translate>
       </Text>
+      <UnavailableNotice />
       <Image
         src={demo}
         withRoundedCorners={false}

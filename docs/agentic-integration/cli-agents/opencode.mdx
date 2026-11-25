@@ -45,7 +45,7 @@ opencode reads configuration from either location:
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "mittwald/Qwen3.8-27B-NVFP4",
+  "model": "mittwald/DeepSeek-V4.1-Flash-1017",
   "provider": {
     "mittwald": {
       "npm": "@ai-sdk/openai-compatible",
@@ -55,6 +55,12 @@ opencode reads configuration from either location:
         "apiKey": "sk-..."
       },
       "models": {
+        "DeepSeek-V4.1-Flash-1017": {
+          "name": "DeepSeek-V4.1-Flash-1017",
+          "reasoning": true,
+          "tool_call": true,
+          "limit": { "context": 1048576, "output": 131072 }
+        },
         "Qwen3.8-27B-NVFP4": {
           "name": "Qwen3.8-27B-NVFP4",
           "reasoning": true,
@@ -88,6 +94,12 @@ Replace `sk-...` with your AI Hosting API key. You create it in the **AI-Hosting
 section of your mStudio project — see
 [Gaining access](/docs/v2/platform/aihosting/access-and-usage/access). An mStudio API
 token from your profile settings is a different credential and will not work here.
+
+The default model, `DeepSeek-V4.1-Flash-1017`, is the largest model we offer and the one we recommend for coding agents. Its context window holds 1,048,576 tokens, input and output together, and it can write
+up to 262,144 tokens per request. The `output` value of 131,072 follows the model page's
+recommendation for coding agents and leaves the rest of the window for input. The model is in
+the [Testphase](../../platform/aihosting/20-access-and-usage/40-lifecycle.mdx#testphase): we can shut it down at short notice, and its behavior and feature set can still change. For a production-stable default, set `model` to
+`mittwald/Qwen3.8-27B-NVFP4` (Stable).
 
 :::note[Declare `tool_call` explicitly]
 Without `"tool_call": true`, opencode will not offer the model its tools, and the agent
@@ -239,7 +251,8 @@ Skills go in `~/.config/opencode/skills/`, one directory per skill.
 
 Agent packs add preconfigured subagents, each of which can point at its own model.
 Routing subagents to `Qwen3.6-35B-A3B-FP8` while the main agent stays on
-`Qwen3.8-27B-NVFP4` with thinking on (the model's default) keeps long sessions responsive,
+`DeepSeek-V4.1-Flash-1017` or `Qwen3.8-27B-NVFP4` with thinking on (the default for both)
+keeps long sessions responsive,
 since subagent work is mostly search and summarising.
 
 ## Troubleshooting {#troubleshooting}
@@ -277,7 +290,7 @@ for each agent in `opencode.json`:
 model to summarise its work instead of making another tool call.
 
 The limit ends a loop but doesn't prevent it. Loops happen mostly with thinking off. With
-`Qwen3.8-27B-NVFP4`, switch thinking on for planning and tool work, see
+`Qwen3.8-27B-NVFP4`, keep thinking on for planning and tool work, see
 [Agent loops in non-thinking mode](/docs/v2/platform/aihosting/models/qwen3-8-27b-nvfp4#non-thinking-agent-loops).
 
 ### An MCP server never starts {#mcp-server-fails}

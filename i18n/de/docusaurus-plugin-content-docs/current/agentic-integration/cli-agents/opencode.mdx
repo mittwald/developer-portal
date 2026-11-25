@@ -45,7 +45,7 @@ opencode liest die Konfiguration aus einem der beiden Orte:
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "mittwald/Qwen3.8-27B-NVFP4",
+  "model": "mittwald/DeepSeek-V4.1-Flash-1017",
   "provider": {
     "mittwald": {
       "npm": "@ai-sdk/openai-compatible",
@@ -55,6 +55,12 @@ opencode liest die Konfiguration aus einem der beiden Orte:
         "apiKey": "sk-..."
       },
       "models": {
+        "DeepSeek-V4.1-Flash-1017": {
+          "name": "DeepSeek-V4.1-Flash-1017",
+          "reasoning": true,
+          "tool_call": true,
+          "limit": { "context": 1048576, "output": 131072 }
+        },
         "Qwen3.8-27B-NVFP4": {
           "name": "Qwen3.8-27B-NVFP4",
           "reasoning": true,
@@ -90,6 +96,12 @@ Ersetze `sk-...` durch deinen AI-Hosting-API-Key. Den legst du im Bereich
 mStudio-API-Token aus den Profileinstellungen ist ein anderes Zugangsmittel und
 funktioniert hier nicht.
 
+Das Standardmodell `DeepSeek-V4.1-Flash-1017` ist das größte Modell in unserem Angebot und unsere Empfehlung für Coding-Agenten. Sein Kontextfenster fasst 1.048.576 Token, Ein- und Ausgabe zusammen, und es
+schreibt bis zu 262.144 Token pro Anfrage. Der `output`-Wert von 131.072 folgt der Empfehlung
+der Modellseite für Coding-Agenten und lässt den Rest des Fensters für die Eingabe frei. Das
+Modell ist in der [Testphase](../../platform/aihosting/20-access-and-usage/40-lifecycle.mdx#testphase): Wir können es kurzfristig abschalten, und Verhalten und Funktionsumfang können sich noch ändern. Willst du ein stabiles Standardmodell für den
+Produktivbetrieb, setz `model` auf `mittwald/Qwen3.8-27B-NVFP4` (Stable).
+
 :::note[`tool_call` explizit deklarieren]
 Ohne `"tool_call": true` bietet opencode dem Modell seine Tools gar nicht
 erst an, der Agent kann dann nur noch Text erzeugen – er kann keine Dateien
@@ -121,7 +133,7 @@ opencode run --auto "Create a file called hello.txt containing the word hello, t
 Erwartet: opencode schreibt die Datei, liest sie zurück und gibt den Inhalt
 aus. Führe das in einem Scratch-Verzeichnis aus – der Agent schreibt Dateien
 dort, wo du ihn startest. Eine reine Frage würde auch bei fehlendem
-`tool_call` gelingen, deshalb prüft der Test über eine Dateischreibung.
+`tool_call` gelingen, deshalb schreibt der Test eine Datei.
 
 Ohne `--auto` musst du den Dateischreibzugriff erst genehmigen, bevor er
 passiert. `--auto` genehmigt automatisch Berechtigungen, die nicht explizit
@@ -247,8 +259,8 @@ Skills liegen unter `~/.config/opencode/skills/`, ein Verzeichnis pro Skill.
 
 Agent Packs fügen vorkonfigurierte Subagenten hinzu, jeder davon kann auf ein
 eigenes Modell zeigen. Lass die Subagenten auf `Qwen3.6-35B-A3B-FP8` laufen
-und den Hauptagenten auf `Qwen3.8-27B-NVFP4` mit eingeschaltetem Thinking, so
-wie das Modell ausgeliefert wird. Dann bleiben auch lange Sessions flott, denn
+und den Hauptagenten auf `DeepSeek-V4.1-Flash-1017` oder `Qwen3.8-27B-NVFP4` mit
+eingeschaltetem Thinking, so wie beide Modelle ausgeliefert werden. Dann bleiben auch lange Sessions flott, denn
 Subagenten suchen und fassen vor allem zusammen.
 
 ## Troubleshooting {#troubleshooting}

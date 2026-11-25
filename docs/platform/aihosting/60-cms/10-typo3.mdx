@@ -111,6 +111,19 @@ The command sends the request through AiM's full pipeline and prints the respons
 
 Every test request also shows up in AiM's **Request Log** module.
 
+### Choosing a model {#aim-choosing-a-model}
+
+For German editorial work — page texts, translations, and SEO descriptions — [Kolibri-1](../30-models/76-kolibri-1.mdx) is a natural fit. Aleph Alpha built it for German and English, and its answers read like German, not like a translation. Keep two limits in mind:
+
+- Kolibri-1 reads text only. Alt text for images needs a model that accepts images.
+- Kolibri-1 calls tools only with `tool_choice` set to `auto`. An extension that forces a tool call with `tool_choice="required"` or a named tool fails with this model.
+
+For the hardest tasks, use [DeepSeek-V4.1-Flash-1017](../30-models/77-deepseek-v4-1-flash-1017.mdx), the largest model we offer. It also accepts images.
+
+Both models are in the [Testphase](../20-access-and-usage/40-lifecycle.mdx#testphase). For production use, pick a Stable or LTS model, such as [Qwen3.8-27B-NVFP4](../30-models/75-qwen3-8-27b-nvfp4.mdx) (Stable). Both models also think before they answer by default, which adds latency and token cost; the model pages explain how to control this.
+
+If a model is missing from the **Model** list, the installed bridge doesn't know it yet. See [Available models in the Symfony guide](../symfony#available-models).
+
 ### Configuring the provider in site settings {#aim-site-settings}
 
 Instead of creating a provider configuration in the backend, you can also define one in your site's `config/sites/<identifier>/settings.yaml`. This is useful if you want to use different configurations for different sites in a multi-site TYPO3 installation, or if you want to keep your configuration in version control:

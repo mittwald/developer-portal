@@ -172,7 +172,7 @@ Chat und Embeddings sind zwischen den Symfony-AI-Bridges portabel. Reranking und
 
 Die Bridge bringt einen Katalog der ihr bekannten Modell-IDs mit, darunter `gpt-oss-120b`, die Chat-Modelle der Ministral- und Qwen3.x-Familien, `GLM-OCR`, `Qwen3-Embedding-8B`, `whisper-large-v3-turbo`, `Qwen3-VL-Reranker-2B` und `Qwen3-TTS-12Hz-1.7B-CustomVoice`.
 
-Maßgeblich dafür, was die API aktuell ausliefert, ist die Dokumentation der [verfügbaren Modelle](../../models/) — inklusive der Fähigkeiten und Kontextgrößen der einzelnen Modelle. Modelle, die mittwald AI Hosting nach einem Bridge-Release hinzufügt, sind möglicherweise noch nicht im Katalog enthalten. Aktualisiere in diesem Fall das Paket — oder registriere das Modell selbst, indem du einen erweiterten Katalog als `$modelCatalog` übergibst:
+Maßgeblich dafür, was die API aktuell ausliefert, ist die Dokumentation der [verfügbaren Modelle](../../models/) — inklusive der Fähigkeiten und Kontextgrößen der einzelnen Modelle. Modelle, die mittwald AI Hosting nach einem Bridge-Release hinzufügt, sind möglicherweise noch nicht im Katalog enthalten. Aktualisiere in diesem Fall das Paket — oder registriere das Modell selbst, indem du einen erweiterten Katalog als `$modelCatalog` übergibst. Das folgende Beispiel registriert das reine Textmodell `Kolibri-1`:
 
 ```php
 use Mittwald\Symfony\AI\Platform\Bridge\ChatModel;
@@ -180,7 +180,7 @@ use Mittwald\Symfony\AI\Platform\Bridge\ModelCatalog;
 use Symfony\AI\Platform\Capability;
 
 $catalog = new ModelCatalog([
-    'some-new-model' => [
+    'Kolibri-1' => [
         'class' => ChatModel::class,
         'capabilities' => [
             Capability::INPUT_MESSAGES,
@@ -195,6 +195,8 @@ $platform = Factory::createPlatform(getenv('MITTWALD_AI_API_KEY'), modelCatalog:
 ```
 
 Die von dir übergebenen Modelle werden mit denen zusammengeführt, die die Bridge bereits kennt.
+
+Für deutsche Texte, Übersetzungen und SEO-Beschreibungen passt [Kolibri-1](../30-models/76-kolibri-1.mdx) gut. Das Modell verarbeitet nur Text und ruft Tools nur mit `tool_choice` auf `auto` auf. Für die schwierigsten Aufgaben nimm [DeepSeek-V4.1-Flash-1017](../30-models/77-deepseek-v4-1-flash-1017.mdx), das größte Modell in unserem Angebot. Beide Modelle sind in der [Testphase](../20-access-and-usage/40-lifecycle.mdx#testphase) und denken standardmäßig nach, bevor sie antworten. Für den Produktivbetrieb wähle ein Stable- oder LTS-Modell, zum Beispiel [Qwen3.8-27B-NVFP4](../30-models/75-qwen3-8-27b-nvfp4.mdx) (Stable).
 
 ### Dedicated AI Hosting {#dedicated-ai-hosting}
 
