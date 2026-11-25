@@ -48,6 +48,8 @@ curl -i -X POST https://llm.aihosting.mittwald.de/v1/chat/completions \
 
 Der Parameter `model` erfordert eine gültige Modellbezeichnung, welcher über die `/v1/models`-Route ermittelt werden kann. Es können weitere Modellparameter wie `temperature`, `top_p` oder `top_k` übermittelt werden. Empfohlene Einstellungen hierfür finden sich in der Beschreibung der Modelle, sofern diese vom Standard abweichen. Welche erweiterten Parameter Einfluss auf die Antwort nehmen ist modellabhängig.
 
+Eine Anfrage erzeugt höchstens 4 Antworten: `n` bei `/v1/chat/completions`, und die Zahl der Einträge in `prompt` mal `n` bei `/v1/completions`. Siehe [Einträge pro Anfrage](../deviations-and-limitations/#entries-per-request).
+
 ### System-Prompt {#system-prompt}
 
 Alle Chat-Modelle unterstützen einen System-Prompt über den Nachrichtentyp `role: "system"`. Dieser wird als erster Eintrag im `messages`-Array übergeben:
@@ -251,7 +253,7 @@ curl -i -X POST https://llm.aihosting.mittwald.de/v1/embeddings \
     }'
 ```
 
-`input` akzeptiert entweder einen einzelnen String wie oben oder ein Array mit Strings. Übergib ein Array wie `["Ein wichtiges Dokument", "Noch ein wichtiges Dokument"]`, um mehrere Embeddings in einer Anfrage zu erstellen. Jeder Eintrag im `data`-Array der Antwort enthält einen `index`, der seine Position im `input`-Array angibt und bei `0` beginnt. Verwende diesen Wert, um jedes Embedding dem jeweiligen Eingabetext zuzuordnen. Wie viele Einträge eine Anfrage höchstens enthalten darf, hängt vom Modell ab und steht auf der jeweiligen Modellseite. Größere Anfragen lehnt der Endpunkt mit HTTP `400` und der Fehlermeldung `Batch too large` ab.
+`input` akzeptiert entweder einen einzelnen String wie oben oder ein Array mit Strings. Übergib ein Array wie `["Ein wichtiges Dokument", "Noch ein wichtiges Dokument"]`, um mehrere Embeddings in einer Anfrage zu erstellen. Jeder Eintrag im `data`-Array der Antwort enthält einen `index`, der seine Position im `input`-Array angibt und bei `0` beginnt. Verwende diesen Wert, um jedes Embedding dem jeweiligen Eingabetext zuzuordnen. Wie viele Einträge eine Anfrage höchstens enthalten darf, hängt vom Modell ab und steht auf der jeweiligen Modellseite und unter [Einträge pro Anfrage](../deviations-and-limitations/#entries-per-request). Größere Anfragen lehnt der Endpunkt mit HTTP `400` und der Fehlermeldung `Batch too large` ab.
 
 Abhängig vom Embedding-Modell können weitere Parameter wie `dimensions` übermittelt werden. [Qwen3-Embedding-8B](../../models/qwen3-embedding-8b/) unterstützt `dimensions` mit einer modellspezifischen Auswahl an Werten. Die unterstützten Parameter und Werte findest du auf der jeweiligen Modellseite. Die Unterstützung ist eine Eigenschaft des einzelnen Modells und nicht des gesamten Endpunkts.
 
