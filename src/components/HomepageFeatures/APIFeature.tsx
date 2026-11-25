@@ -62,7 +62,7 @@ function APIIntro() {
 
 function APIDocumentation() {
   return (
-    <FeatureCard>
+    <FeatureCard backgroundColor="navy">
       <Heading level={3}>
         <Translate id="index.reference.title">API Reference</Translate>
       </Heading>
@@ -119,7 +119,7 @@ function APIDocumentation() {
 
 function APILibraries() {
   return (
-    <FeatureCard>
+    <FeatureCard backgroundColor="navy">
       <Heading level={3}>
         <Translate id="index.sdks.title">SDKs and libraries</Translate>
       </Heading>

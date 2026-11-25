@@ -12,7 +12,7 @@ import DevelopmentFeature from "@site/src/components/CLIFeatures/DevelopmentFeat
 
 function CLIPageHeader() {
   return (
-    <Hero>
+    <Hero className={styles.hero}>
       <Heading level={1} size="xxl">
         mw –{" "}
         <Translate id={"cli.title"}>the mittwald command-line tool</Translate>

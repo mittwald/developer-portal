@@ -1,4 +1,5 @@
 import React, { type PropsWithChildren, type ReactNode } from "react";
+import clsx from "clsx";
 import Translate from "@docusaurus/Translate";
 import {
   AccentBox,
@@ -11,15 +12,22 @@ import {
   Link,
   Text,
 } from "@mittwald/flow-react-components";
+import { FLOW_DARK_SCOPE_CLASS } from "@site/src/plugins/flowDarkScopeClass";
 import styles from "./styles.module.css";
 
 /**
  * Header of the landing pages on the Flow gradient: its content (title, lead
  * text, image, actions) is centered and stacked.
  */
-export default function Hero({ children }: PropsWithChildren<{}>) {
+export default function Hero({
+  className,
+  children,
+}: PropsWithChildren<{
+  /** e.g. to set a page's own background image (see styles.module.css) */
+  className?: string;
+}>) {
   return (
-    <header className={styles.hero}>
+    <header className={clsx(styles.hero, FLOW_DARK_SCOPE_CLASS, className)}>
       <Flex direction="column" align="center" gap="l" className="container">
         {children}
       </Flex>
@@ -56,7 +64,10 @@ interface HeroEntryProps {
   description: ReactNode;
 }
 
-/** An entry point in the hero: a linked accent box with an illustrated message */
+/**
+ * An entry point in the hero: a linked navy accent box with an illustrated
+ * message
+ */
 export function HeroEntry({
   href,
   target,
@@ -67,7 +78,7 @@ export function HeroEntry({
   return (
     <Link href={href} target={target} className={styles.entry}>
       <LayoutCard className={styles.entryCard}>
-        <AccentBox backgroundColor="neutral">
+        <AccentBox backgroundColor="navy">
           <IllustratedMessage className={styles.entryMessage}>
             <Icon>{icon}</Icon>
             <Heading level={2}>{title}</Heading>

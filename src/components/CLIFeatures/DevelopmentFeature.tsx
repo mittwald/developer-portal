@@ -5,6 +5,7 @@ import Intro from "@site/src/components/Intro";
 import { Heading, IconCode, Link, Text } from "@mittwald/flow-react-components";
 import Translate from "@docusaurus/Translate";
 import CodeBlock from "@theme/CodeBlock";
+import styles from "./DevelopmentFeature.module.css";
 
 function DevelopmentIntro() {
   return (
@@ -26,7 +27,7 @@ function DevelopmentIntro() {
 
 function DevelopmentDocumentation() {
   return (
-    <FeatureCard>
+    <FeatureCard backgroundColor="navy">
       <Heading level={3}>
         <Translate id="cli.dev.features.title">Development features</Translate>
       </Heading>
@@ -61,7 +62,7 @@ function DevelopmentDocumentation() {
 
 function DevelopmentExample() {
   return (
-    <FeatureCard>
+    <FeatureCard backgroundColor="navy">
       <CodeBlock language="shell-session">{`$ # Setup ddev project
 $ mw ddev init
 
@@ -81,7 +82,7 @@ $ ddev start`}</CodeBlock>
 
 export default function DevelopmentFeature() {
   return (
-    <FeatureRow variant intro={<DevelopmentIntro />}>
+    <FeatureRow variant className={styles.row} intro={<DevelopmentIntro />}>
       <DevelopmentDocumentation />
       <DevelopmentExample />
     </FeatureRow>

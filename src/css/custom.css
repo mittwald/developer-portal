@@ -8,52 +8,56 @@
  * its tokens on `[data-theme]`, just like Docusaurus, so dark mode works
  * without separate overrides. Infima defines its own dark mode values on
  * `html[data-theme="dark"]`, which is why the mapping is applied to that
- * selector as well.
+ * selector as well. Sections always shown in dark mode
+ * (src/plugins/flowDarkScope.ts) need the mapping again, resolved with their
+ * dark tokens.
  */
 
 :root,
-html[data-theme="dark"] {
+html[data-theme="dark"],
+.flow-dark-scope {
   /* Colors */
-  --ifm-color-primary: var(--primary--color--800);
-  --ifm-color-primary-dark: var(--primary--color--900);
-  --ifm-color-primary-darker: var(--primary--color--1000);
-  --ifm-color-info: var(--info--color--800);
-  --ifm-color-info-dark: var(--info--color--900);
-  --ifm-color-info-darker: var(--info--color--1000);
-  --ifm-color-success: var(--success--color--800);
-  --ifm-color-success-dark: var(--success--color--900);
-  --ifm-color-success-darker: var(--success--color--1000);
-  --ifm-color-warning: var(--warning--color--700);
-  --ifm-color-warning-dark: var(--warning--color--900);
-  --ifm-color-warning-darker: var(--warning--color--1000);
-  --ifm-color-danger: var(--danger--color--800);
-  --ifm-color-danger-dark: var(--danger--color--900);
-  --ifm-color-danger-darker: var(--danger--color--1000);
+  --ifm-color-primary: var(--primary--color--strong--100);
+  --ifm-color-primary-dark: var(--primary--color--strong--200);
+  --ifm-color-primary-darker: var(--primary--color--strong--300);
+  --ifm-color-info: var(--info--color--strong--100);
+  --ifm-color-info-dark: var(--info--color--strong--200);
+  --ifm-color-info-darker: var(--info--color--strong--300);
+  --ifm-color-success: var(--success--color--strong--100);
+  --ifm-color-success-dark: var(--success--color--strong--200);
+  --ifm-color-success-darker: var(--success--color--strong--300);
+  --ifm-color-warning: var(--warning--color--strong--100);
+  --ifm-color-warning-dark: var(--warning--color--strong--200);
+  --ifm-color-warning-darker: var(--warning--color--strong--300);
+  --ifm-color-danger: var(--danger--color--strong--100);
+  --ifm-color-danger-dark: var(--danger--color--strong--200);
+  --ifm-color-danger-darker: var(--danger--color--strong--300);
 
-  --ifm-color-emphasis-0: var(--neutral--color--100);
-  --ifm-color-emphasis-100: var(--neutral--color--200);
-  --ifm-color-emphasis-200: var(--neutral--color--300);
-  --ifm-color-emphasis-300: var(--neutral--color--400);
-  --ifm-color-emphasis-400: var(--neutral--color--500);
-  --ifm-color-emphasis-500: var(--neutral--color--600);
-  --ifm-color-emphasis-600: var(--neutral--color--700);
-  --ifm-color-emphasis-700: var(--neutral--color--800);
-  --ifm-color-emphasis-800: var(--neutral--color--900);
-  --ifm-color-emphasis-900: var(--neutral--color--1000);
-  --ifm-color-emphasis-1000: var(--neutral--color--1100);
+  /* Infima's gray scale, mapped by role: surfaces, borders, then content */
+  --ifm-color-emphasis-0: var(--elevation--color--100);
+  --ifm-color-emphasis-100: var(--elevation--color--200);
+  --ifm-color-emphasis-200: var(--elevation--color--300);
+  --ifm-color-emphasis-300: var(--border--color--100);
+  --ifm-color-emphasis-400: var(--border--color--200);
+  --ifm-color-emphasis-500: var(--border--color--300);
+  --ifm-color-emphasis-600: var(--content--color--100);
+  --ifm-color-emphasis-700: var(--content--color--100);
+  --ifm-color-emphasis-800: var(--content--color--200);
+  --ifm-color-emphasis-900: var(--content--color--300);
+  --ifm-color-emphasis-1000: var(--content--color--300);
 
-  --ifm-background-color: var(--neutral--color--100);
-  --ifm-background-surface-color: var(--neutral--color--100);
+  --ifm-background-color: var(--elevation--color--100);
+  --ifm-background-surface-color: var(--elevation--color--100);
   --ifm-color-content: var(--text--color--default);
-  --ifm-color-content-secondary: var(--neutral--color--800);
+  --ifm-color-content-secondary: var(--content--color--100);
   --ifm-font-color-base: var(--text--color--default);
   --ifm-heading-color: var(--heading--color);
-  --ifm-hover-overlay: var(--neutral--color--200);
+  --ifm-hover-overlay: var(--elevation--color--200);
   --ifm-hr-background-color: var(--separator--color);
   --ifm-toc-border-color: var(--separator--color);
   --ifm-table-border-color: var(--separator--color);
   --ifm-table-head-background: transparent;
-  --ifm-table-stripe-background: var(--neutral--color--200);
+  --ifm-table-stripe-background: var(--elevation--color--200);
   --ifm-blockquote-border-color: var(--text--blockquote-border-color);
   --docusaurus-highlighted-code-line-bg: var(
     --neutral-soft-background-color--default
@@ -77,13 +81,13 @@ html[data-theme="dark"] {
   --ifm-menu-link-sublist-icon-filter: none;
 
   /* Navbar */
-  --ifm-navbar-background-color: var(--neutral--color--100);
+  --ifm-navbar-background-color: var(--elevation--color--100);
   --ifm-navbar-height: 72px;
   --ifm-navbar-link-color: var(--text--color--default);
   --ifm-navbar-shadow: none;
 
   /* Footer */
-  --ifm-footer-background-color: var(--neutral--color--200);
+  --ifm-footer-background-color: var(--elevation--color--200);
   --ifm-footer-color: var(--text--color--default);
 
   /* Code */
@@ -134,6 +138,11 @@ html[data-theme="dark"] {
   --landing--gradient: var(--texture--grain), var(--landing--colors);
 }
 
+/* Sections always shown in dark mode inherit no text color from the page */
+.flow-dark-scope {
+  color: var(--ifm-font-color-base);
+}
+
 /* Infima hero (changelog archive), on the landing page background
    (src/components/Hero) */
 .hero--primary {
@@ -143,7 +152,7 @@ html[data-theme="dark"] {
 }
 
 main.index {
-  background-color: var(--neutral--color--200);
+  background-color: var(--elevation--color--200);
 }
 
 /* Space between sidebar and content. As padding of the main container (and

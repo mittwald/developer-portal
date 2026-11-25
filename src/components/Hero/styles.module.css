@@ -1,8 +1,17 @@
-/* On the landing page background (src/css/custom.css) */
+/* On a brand image (with its own grain), in dark mode in both color modes.
+   By default the wave; a page sets its own image on the hero through these
+   variables (declared on :root, so the hero's own value wins) */
+:root {
+  --hero--background-image: url("/img/landing-wave.webp");
+  /* On wide screens only a strip of the square wave shows; at this height it
+     holds the whole curve instead of the black below it */
+  --hero--background-position: center 62%;
+}
+
 .hero {
   padding: calc(var(--size-rem--xxl) * 1.5) var(--size-rem--m);
-  background: var(--landing--gradient);
-  background-blend-mode: overlay, normal;
+  background: var(--hero--background-image) var(--hero--background-position) /
+    cover no-repeat;
 }
 
 /* On small screens the container alone pads the content, flush with the
@@ -52,19 +61,26 @@
   height: 100%;
 }
 
-/* The whole box is the link; hovering it darkens the box one step */
+/* The whole box is the link; hovering it moves the navy box one step */
 .entryCard :global(.flow--accent-box) {
   transition: background-color var(--transition--duration--default);
 }
 
-.entry:hover .entryCard :global(.flow--accent-box) {
-  background-color: var(--neutral--color--400);
+.entry:hover .entryCard {
+  --accent-box--background-color-navy: var(
+    --decorative-navy--color--quiet--200
+  );
 }
 
 /* The layout card pads the box, the box pads the message */
 .entryMessage {
   flex-grow: 1;
   padding: 0;
+}
+
+/* Centered lines of similar length */
+.entryMessage :global(.flow--illustrated-message--text) {
+  text-wrap: balance;
 }
 
 /* Styled like a dark Flow inline link (the whole box is the link); at the

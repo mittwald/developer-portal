@@ -22,17 +22,17 @@ function PlaygroundActions({
 }: PlaygroundActionsProps) {
   return (
     <ActionGroup>
-      <Action onAction={onExecute}>
+      <Action onAction={() => onExecute()}>
         <Button
           isPending={requestState === "loading"}
           isSucceeded={requestState === "success"}
           isFailed={requestState === "error"}
-          color="accent"
+          color="success"
         >
           <Translate id="playground.actions.execute">Execute request</Translate>
         </Button>
       </Action>
-      <Action onAction={onReset}>
+      <Action onAction={() => onReset()}>
         <Button variant="soft" color="secondary" slot="secondary">
           <Translate id="playground.actions.reset">Reset</Translate>
         </Button>

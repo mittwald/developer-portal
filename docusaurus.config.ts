@@ -6,6 +6,7 @@ import { Options, ThemeConfig } from "@docusaurus/preset-classic";
 import { Options as ClientRedirectOptions } from "@docusaurus/plugin-client-redirects";
 import { flowTheme } from "./src/prism/flowTheme";
 import rehypeFlowSections from "./src/plugins/rehypeFlowSections";
+import flowDarkScopePlugin from "./src/plugins/flowDarkScope";
 import path from "node:path";
 import { proIconsPackage, readProIconsVersion } from "./dev/proIcons";
 
@@ -146,6 +147,7 @@ const config: Config = {
     ],
     webpackCryptoFallbackPlugin,
     proIconsPlugin,
+    flowDarkScopePlugin,
     [
       "docusaurus-plugin-llms",
       {

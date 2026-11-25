@@ -6,13 +6,13 @@ import styles from "./HTTPResponseStatus.module.css";
 
 export function getColorByCode(code: string): BadgeProps["color"] {
   if (code.startsWith("2")) {
-    return "green";
+    return "success";
   } else if (code.startsWith("3")) {
     return "blue";
   } else if (code.startsWith("4")) {
-    return "orange";
+    return "warning";
   } else if (code.startsWith("5")) {
-    return "red";
+    return "danger";
   } else {
     return "neutral";
   }
