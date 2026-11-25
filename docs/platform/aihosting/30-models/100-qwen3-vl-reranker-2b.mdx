@@ -35,6 +35,8 @@ The following limitations apply:
 
 Qwen3-VL-Reranker-2B is served via the **`/v1/rerank`** endpoint, which follows the Cohere-compatible reranking API format.
 
+A request may contain at most 16 entries in `documents`. Larger requests are rejected with HTTP `400` and the error message `Batch too large`. If you have more candidates, split them across several requests, or narrow them down with an embedding search first, as shown in [Integrating into a RAG pipeline](#integrating-into-a-rag-pipeline). See [Entries per request](../../api-endpoints/deviations-and-limitations/#entries-per-request) for the limits of the other endpoints.
+
 ### Basic reranking
 
 <Tabs groupId="language">

@@ -9,7 +9,7 @@ title: Deviations and limitations
 Although our API is compatible with the OpenAI API, there are some limitations:
 
 - Only selected endpoints are implemented (see [list](../supported-endpoints/))
-- Some parameters like `n`, `logprobs`, `functions` (depending on the model) are not available
+- Some parameters like `logprobs` and `functions` (depending on the model) are not available. `n` is limited to 4, see [Entries per request](#entries-per-request)
 - Vision input is currently only supported via Base64, not via URLs
 - On `/v1/audio/speech`, an invalid `voice`, `language` or `instructions` returns HTTP 400 with a generic `Got bad request.` that does not name the parameter, while `response_format` and `speed` are rejected with a message that does. See the [Qwen3-TTS model page](../../models/qwen3-tts-customvoice/#error-responses)
 - The `response_format` parameter only accepts `"text"` as the value. The OpenAI-style `{"type": "json_object"}` variant is not supported and is silently ignored. To reliably obtain JSON output, instruct the model via the system prompt or user message (e.g. "Respond with a valid JSON object only.").
@@ -19,6 +19,32 @@ Although our API is compatible with the OpenAI API, there are some limitations:
 All requests are subject to a rate limit to ensure fair and consistent usage and availability of the models for all users. Requests are limited according to the respective tariff the user has booked. Please check the according price information regarding the limitations applied in your case.
 
 All models are also subject to model-specific limitations. These always include the allowed context length measured in the number of transmitted tokens. For vision-capable models that process images, only a limited number of images can be transmitted per request, meaning _across the entire submitted context_. This affects all images sent in the full chat history of a request.
+
+### Entries per request {#entries-per-request}
+
+Some endpoints accept several inputs in one request. How many entries a single request may contain is limited per model:
+
+| Endpoint               | What counts               | At most                                                         |
+| ---------------------- | ------------------------- | --------------------------------------------------------------- |
+| `/v1/embeddings`       | entries in `input`        | 200 ([Qwen3-Embedding-8B](../../models/qwen3-embedding-8b/))    |
+| `/v1/rerank`           | entries in `documents`    | 16 ([Qwen3-VL-Reranker-2B](../../models/qwen3-vl-reranker-2b/)) |
+| `/v1/completions`      | entries in `prompt` × `n` | 4                                                               |
+| `/v1/chat/completions` | `n`                       | 4                                                               |
+
+The limits apply per model and can change when a model is replaced. A larger request is rejected with HTTP `400`, the type `invalid_request_error` and the affected field in `param`, for example:
+
+```json
+{
+  "error": {
+    "message": "Batch too large: 201 inputs, Qwen3-Embedding-8B accepts at most 200 per request. Split the request into smaller batches.",
+    "type": "invalid_request_error",
+    "param": "input",
+    "code": "400"
+  }
+}
+```
+
+For `n` and `prompt`, the message starts with `Too many parallel generations`. Split larger lists into several requests. Requests you send in parallel count toward the rate limit of your tariff like any other request.
 
 ### Request timeout {#request-timeout}
 

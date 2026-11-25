@@ -9,7 +9,7 @@ title: Abweichungen und Limitierungen
 Obwohl unsere API kompatibel zur OpenAI-API ist, gibt es einige Einschränkungen:
 
 - Nur ausgewählte Endpunkte sind implementiert (siehe [Liste](../supported-endpoints/))
-- Einige Parameter wie `n`, `logprobs`, `functions` (je nach Modell) sind nicht verfügbar
+- Einige Parameter wie `logprobs` und `functions` (je nach Modell) sind nicht verfügbar. `n` ist auf 4 begrenzt, siehe [Einträge pro Anfrage](#entries-per-request)
 - Vision-Input erfolgt derzeit nur über Base64, nicht über URLs
 - Auf `/v1/audio/speech` antwortet eine ungültige `voice`, `language` oder `instructions` mit HTTP 400 und einem allgemeinen `Got bad request.`, das den Parameter nicht nennt. `response_format` und `speed` werden dagegen mit einer Meldung abgewiesen, die das Feld nennt. Siehe [Modellseite zu Qwen3-TTS](../../models/qwen3-tts-customvoice/#fehlerantworten)
 - Der Parameter `response_format` akzeptiert ausschließlich den Wert `"text"`. Die OpenAI-Variante `{"type": "json_object"}` wird nicht unterstützt und stillschweigend ignoriert. Um zuverlässig JSON-Ausgaben zu erhalten, formuliere die Anforderung direkt im System-Prompt oder in der Nutzernachricht (z. B. „Antworte ausschließlich mit einem validen JSON-Objekt.").
@@ -19,6 +19,32 @@ Obwohl unsere API kompatibel zur OpenAI-API ist, gibt es einige Einschränkungen
 Alle Anfragen unterliegen einem RateLimit, um eine faire und gleichmäßige Nutzung und Verfügbarkeit der Modelle für alle Nutzer zu gewährleisten. Die geltenden Limits richten sich nach dem gebuchten Tarif. Die jeweiligen Werte sind den Preisinformationen zu entnehmen.
 
 Alle Modelle unterliegen zudem modellspezifischen Limitierungen. Diese umfassen immer die erlaubte Context-Länge gemessen an der Anzahl an übermittelten Tokens. Bei Vision-fähigen Modellen zur Verarbeitung von Bildern können je Anfrage und somit im _gesamten übermittelten Context_ nur eine limitierte Anzahl an Bildern übertragen werden. Dies betrifft somit alle in der gesamten Chat-Historie einer Anfrage übermittelten Bilder.
+
+### Einträge pro Anfrage {#entries-per-request}
+
+Einige Endpunkte nehmen mehrere Eingaben in einer Anfrage an. Wie viele Einträge eine einzelne Anfrage enthalten darf, ist je Modell begrenzt:
+
+| Endpunkt               | Was zählt                  | Höchstens                                                       |
+| ---------------------- | -------------------------- | --------------------------------------------------------------- |
+| `/v1/embeddings`       | Einträge in `input`        | 200 ([Qwen3-Embedding-8B](../../models/qwen3-embedding-8b/))    |
+| `/v1/rerank`           | Einträge in `documents`    | 16 ([Qwen3-VL-Reranker-2B](../../models/qwen3-vl-reranker-2b/)) |
+| `/v1/completions`      | Einträge in `prompt` × `n` | 4                                                               |
+| `/v1/chat/completions` | `n`                        | 4                                                               |
+
+Die Grenzen gelten je Modell und können sich ändern, wenn ein Modell ersetzt wird. Eine größere Anfrage lehnt der Endpunkt mit HTTP `400` ab, mit dem Typ `invalid_request_error` und dem betroffenen Feld in `param`, zum Beispiel:
+
+```json
+{
+  "error": {
+    "message": "Batch too large: 201 inputs, Qwen3-Embedding-8B accepts at most 200 per request. Split the request into smaller batches.",
+    "type": "invalid_request_error",
+    "param": "input",
+    "code": "400"
+  }
+}
+```
+
+Bei `n` und `prompt` beginnt die Meldung mit `Too many parallel generations`. Teile größere Listen auf mehrere Anfragen auf. Parallel gesendete Anfragen zählen wie jede andere Anfrage gegen das RateLimit deines Tarifs.
 
 ### Anfrage-Timeout {#request-timeout}
 
