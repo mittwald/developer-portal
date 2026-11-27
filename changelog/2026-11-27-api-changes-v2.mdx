@@ -1,0 +1,479 @@
+---
+title: Breaking (!) API changes for v2 API, November 20 to November 27
+authors:
+  - machine
+tags:
+  - apiv2
+  - breaking
+  - Hibp
+  - Conversation
+  - Cronjob
+  - Project
+  - Marketplace
+  - Customer
+  - Notification
+
+---
+
+import OperationHint from "@site/src/components/OperationHint";
+import OperationLink from "@site/src/components/OperationLink";
+
+This week, the mittwald API underwent significant changes, including the removal of several API paths without deprecation, the addition of new optional request properties and response properties, and the introduction of new endpoints for managing notification settings and cronjobs.
+
+{/* truncate */}
+
+
+
+:::caution Breaking changes
+
+This document contains changes that can under certain circumstances be considered breaking. Please review the changes carefully.
+
+While we generally strive to avoid breaking changes in accordance with our [API stability guarantees](../../../../../docs/v2/api/stability), we occasionally might perform changes that would be considered breaking in the strictest sense of the term, but we do not consider as breaking in a practical sense. We will always provide ample notice and documentation for such changes.
+
+:::
+
+
+
+## Summary
+
+
+- The API path `/v2/notification-settings/actions/reset` has been removed without deprecation for the `POST` operation `notifications-reset-notification-settings`. This is a breaking change.
+- The API path `/v2/notification-settings/{messageType}` has been removed without deprecation for the `PATCH` operation `notifications-adjust-notification-message-type-settings`. This is a breaking change.
+- The optional response header `X-Hibp-Internal-Available` has been removed for the status `200` in the `GET` operation `hibp-get-compromised-password-hash-range` at the path `/v2/compromised-password-hashes/ranges/{hashPrefix}`.
+- A new enum value `mittwaldMessage` has been added to the response property `messageContent` for the `GET` operation `conversation-list-messages-by-conversation` at the path `/v2/conversations/{conversationId}/messages` for the response status `200`.
+- The `description` request property's maxLength has been set to `80` for the `PATCH` operation `cronjob-update-cronjob` at the path `/v2/cronjobs/{cronjobId}`.
+- The `description` request property's maxLength has been set to `80` for the `POST` operation `cronjob-create-cronjob` at the path `/v2/projects/{projectId}/cronjobs`.
+- A new optional request property `disableAllInstances` has been added for the `PUT` operation `extension-set-extension-published-state` at the path `/v2/contributors/{contributorId}/extensions/{extensionId}/published`.
+- A new optional request property `destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/failOnHttpError` has been added for the `PATCH` operation `cronjob-update-cronjob` at the path `/v2/cronjobs/{cronjobId}`.
+- A new optional request property `destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/followRedirects` has been added for the `PATCH` operation `cronjob-update-cronjob` at the path `/v2/cronjobs/{cronjobId}`.
+- A new optional request property `destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/headers` has been added for the `PATCH` operation `cronjob-update-cronjob` at the path `/v2/cronjobs/{cronjobId}`.
+- A new optional request property `destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/hideProgress` has been added for the `PATCH` operation `cronjob-update-cronjob` at the path `/v2/cronjobs/{cronjobId}`.
+- A new optional request property `destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/method` has been added for the `PATCH` operation `cronjob-update-cronjob` at the path `/v2/cronjobs/{cronjobId}`.
+- A new optional request property `destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/showResponseHeaders` has been added for the `PATCH` operation `cronjob-update-cronjob` at the path `/v2/cronjobs/{cronjobId}`.
+- A new optional request property `target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/failOnHttpError` has been added for the `PATCH` operation `cronjob-update-cronjob` at the path `/v2/cronjobs/{cronjobId}`.
+- A new optional request property `target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/followRedirects` has been added for the `PATCH` operation `cronjob-update-cronjob` at the path `/v2/cronjobs/{cronjobId}`.
+- A new optional request property `target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/headers` has been added for the `PATCH` operation `cronjob-update-cronjob` at the path `/v2/cronjobs/{cronjobId}`.
+- A new optional request property `target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/hideProgress` has been added for the `PATCH` operation `cronjob-update-cronjob` at the path `/v2/cronjobs/{cronjobId}`.
+- A new optional request property `target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/method` has been added for the `PATCH` operation `cronjob-update-cronjob` at the path `/v2/cronjobs/{cronjobId}`.
+- A new optional request property `target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/showResponseHeaders` has been added for the `PATCH` operation `cronjob-update-cronjob` at the path `/v2/cronjobs/{cronjobId}`.
+- A new endpoint has been added for the `POST` operation `cronjob-resend-notification-email-verification` at the path `/v2/cronjobs/{cronjobId}/actions/resend-notification-email-verification`.
+- A new endpoint has been added for the `POST` operation `cronjob-verify-notification-email` at the path `/v2/cronjobs/{cronjobId}/actions/verify-notification-email`.
+- A new optional property `/items/emailHidden` has been added to the response with the `200` status for the `GET` operation `customer-list-customer-memberships` at the path `/v2/customer-memberships`.
+- A new optional property `/items/mfaHidden` has been added to the response with the `200` status for the `GET` operation `customer-list-customer-memberships` at the path `/v2/customer-memberships`.
+- A new optional property `emailHidden` has been added to the response with the `200` status for the `GET` operation `customer-get-customer-membership` at the path `/v2/customer-memberships/{customerMembershipId}`.
+- A new optional property `mfaHidden` has been added to the response with the `200` status for the `GET` operation `customer-get-customer-membership` at the path `/v2/customer-memberships/{customerMembershipId}`.
+- A new optional property `/items/emailHidden` has been added to the response with the `200` status for the `GET` operation `customer-list-memberships-for-customer` at the path `/v2/customers/{customerId}/memberships`.
+- A new optional property `/items/mfaHidden` has been added to the response with the `200` status for the `GET` operation `customer-list-memberships-for-customer` at the path `/v2/customers/{customerId}/memberships`.
+- A new endpoint has been added for the `DELETE` operation `notifications-delete-notification-settings-overrides` at the path `/v2/notification-settings/overrides`.
+- A new endpoint has been added for the `GET` operation `notifications-get-notification-settings-overrides` at the path `/v2/notification-settings/overrides`.
+- A new endpoint has been added for the `PATCH` operation `notifications-update-notification-settings-override-for-message-type` at the path `/v2/notification-settings/overrides/message-types/{messageType}`.
+- A new optional property `/items/emailHidden` has been added to the response with the `200` status for the `GET` operation `project-list-project-memberships` at the path `/v2/project-memberships`.
+- A new optional property `/items/mfaHidden` has been added to the response with the `200` status for the `GET` operation `project-list-project-memberships` at the path `/v2/project-memberships`.
+- A new optional property `emailHidden` has been added to the response with the `200` status for the `GET` operation `project-get-project-membership` at the path `/v2/project-memberships/{projectMembershipId}`.
+- A new optional property `mfaHidden` has been added to the response with the `200` status for the `GET` operation `project-get-project-membership` at the path `/v2/project-memberships/{projectMembershipId}`.
+- A new optional property `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.CronjobNotificationEmailUpdated]/changes/after/notificationEmailVerificationPending` has been added to the response with the `200` status for the `GET` operation `project-list-project-activities` at the path `/v2/projects/{projectId}/activities`.
+- A new optional property `/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.CronjobNotificationEmailUpdated]/changes/before/notificationEmailVerificationPending` has been added to the response with the `200` status for the `GET` operation `project-list-project-activities` at the path `/v2/projects/{projectId}/activities`.
+- A new property `#/components/schemas/de.mittwald.v1.activitylog.CronjobNotificationEmailVerificationUpdated` has been added to the `anyOf` list of the response property `action` for the `GET` operation `project-list-project-activities` at the path `/v2/projects/{projectId}/activities`.
+- A new optional property `/items/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/failOnHttpError` has been added to the response with the `200` status for the `GET` operation `cronjob-list-cronjobs` at the path `/v2/projects/{projectId}/cronjobs`.
+- A new optional property `/items/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/followRedirects` has been added to the response with the `200` status for the `GET` operation `cronjob-list-cronjobs` at the path `/v2/projects/{projectId}/cronjobs`.
+- A new optional property `/items/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/headers` has been added to the response with the `200` status for the `GET` operation `cronjob-list-cronjobs` at the path `/v2/projects/{projectId}/cronjobs`.
+- A new optional property `/items/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/hideProgress` has been added to the response with the `200` status for the `GET` operation `cronjob-list-cronjobs` at the path `/v2/projects/{projectId}/cronjobs`.
+- A new optional property `/items/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/method` has been added to the response with the `200` status for the `GET` operation `cronjob-list-cronjobs` at the path `/v2/projects/{projectId}/cronjobs`.
+- A new optional property `/items/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/showResponseHeaders` has been added to the response with the `200` status for the `GET` operation `cronjob-list-cronjobs` at the path `/v2/projects/{projectId}/cronjobs`.
+- A new optional property `/items/notificationEmailVerification` has been added to the response with the `200` status for the `GET` operation `cronjob-list-cronjobs` at the path `/v2/projects/{projectId}/cronjobs`.
+- A new optional property `/items/target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/failOnHttpError` has been added to the response with the `200` status for the `GET` operation `cronjob-list-cronjobs` at the path `/v2/projects/{projectId}/cronjobs`.
+- A new optional property `/items/target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/followRedirects` has been added to the response with the `200` status for the `GET` operation `cronjob-list-cronjobs` at the path `/v2/projects/{projectId}/cronjobs`.
+- A new optional property `/items/target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/headers` has been added to the response with the `200` status for the `GET` operation `cronjob-list-cronjobs` at the path `/v2/projects/{projectId}/cronjobs`.
+- A new optional property `/items/target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/hideProgress` has been added to the response with the `200` status for the `GET` operation `cronjob-list-cronjobs` at the path `/v2/projects/{projectId}/cronjobs`.
+- A new optional property `/items/target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/method` has been added to the response with the `200` status for the `GET` operation `cronjob-list-cronjobs` at the path `/v2/projects/{projectId}/cronjobs`.
+- A new optional property `/items/target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/showResponseHeaders` has been added to the response with the `200` status for the `GET` operation `cronjob-list-cronjobs` at the path `/v2/projects/{projectId}/cronjobs`.
+- A new optional request property `destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/failOnHttpError` has been added for the `POST` operation `cronjob-create-cronjob` at the path `/v2/projects/{projectId}/cronjobs`.
+- A new optional request property `destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/followRedirects` has been added for the `POST` operation `cronjob-create-cronjob` at the path `/v2/projects/{projectId}/cronjobs`.
+- A new optional request property `destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/headers` has been added for the `POST` operation `cronjob-create-cronjob` at the path `/v2/projects/{projectId}/cronjobs`.
+- A new optional request property `destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/hideProgress` has been added for the `POST` operation `cronjob-create-cronjob` at the path `/v2/projects/{projectId}/cronjobs`.
+- A new optional request property `destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/method` has been added for the `POST` operation `cronjob-create-cronjob` at the path `/v2/projects/{projectId}/cronjobs`.
+- A new optional request property `destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/showResponseHeaders` has been added for the `POST` operation `cronjob-create-cronjob` at the path `/v2/projects/{projectId}/cronjobs`.
+- A new optional request property `target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/failOnHttpError` has been added for the `POST` operation `cronjob-create-cronjob` at the path `/v2/projects/{projectId}/cronjobs`.
+- A new optional request property `target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/followRedirects` has been added for the `POST` operation `cronjob-create-cronjob` at the path `/v2/projects/{projectId}/cronjobs`.
+- A new optional request property `target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/headers` has been added for the `POST` operation `cronjob-create-cronjob` at the path `/v2/projects/{projectId}/cronjobs`.
+- A new optional request property `target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/hideProgress` has been added for the `POST` operation `cronjob-create-cronjob` at the path `/v2/projects/{projectId}/cronjobs`.
+- A new optional request property `target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/method` has been added for the `POST` operation `cronjob-create-cronjob` at the path `/v2/projects/{projectId}/cronjobs`.
+- A new optional request property `target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/showResponseHeaders` has been added for the `POST` operation `cronjob-create-cronjob` at the path `/v2/projects/{projectId}/cronjobs`.
+- A new optional property `/items/emailHidden` has been added to the response with the `200` status for the `GET` operation `project-list-memberships-for-project` at the path `/v2/projects/{projectId}/memberships`.
+- A new optional property `/items/mfaHidden` has been added to the response with the `200` status for the `GET` operation `project-list-memberships-for-project` at the path `/v2/projects/{projectId}/memberships`.
+- A new optional property `emailHidden` has been added to the response with the `200` status for the `GET` operation `project-get-self-membership-for-project` at the path `/v2/projects/{projectId}/memberships/self`.
+- A new optional property `mfaHidden` has been added to the response with the `200` status for the `GET` operation `project-get-self-membership-for-project` at the path `/v2/projects/{projectId}/memberships/self`.
+
+_Disclaimer: This summary is AI-generated. If you find any discrepancies, please refer to the detailed changes below._
+
+
+## Detailed changes
+
+
+
+### Changes in "notifications-reset-notification-settings"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+
+For details, refer to the <OperationLink operation="notifications-reset-notification-settings" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "notifications-adjust-notification-message-type-settings"
+
+
+- ⚠️ **Breaking:** api path removed without deprecation
+
+
+For details, refer to the <OperationLink operation="notifications-adjust-notification-message-type-settings" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the leaked-password suffixes of a SHA-1 prefix"
+
+
+- the optional response header 'X-Hibp-Internal-Available' removed for the status '200'
+
+
+For details, refer to the <OperationLink operation="hibp-get-compromised-password-hash-range" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get all message of the conversation"
+
+
+- added the new 'mittwaldMessage' enum value to the '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.ServiceRequest]/allOf[subschema #2]/messageContent' response property for the response status '200'
+
+- added '#/components/schemas/de.mittwald.v1.conversation.ServiceRequestMittwaldMessagePayload' to the '/items/oneOf[#/components/schemas/de.mittwald.v1.conversation.ServiceRequest]/allOf[subschema #2]/meta' response property 'oneOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="conversation-list-messages-by-conversation" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update a cronjob"
+
+
+- the 'description' request property's maxLength was set to '80'
+
+- added the new optional request property 'destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/failOnHttpError'
+
+- added the new optional request property 'destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/followRedirects'
+
+- added the new optional request property 'destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/headers'
+
+- added the new optional request property 'destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/hideProgress'
+
+- added the new optional request property 'destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/method'
+
+- added the new optional request property 'destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/showResponseHeaders'
+
+- added the new optional request property 'target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/failOnHttpError'
+
+- added the new optional request property 'target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/followRedirects'
+
+- added the new optional request property 'target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/headers'
+
+- added the new optional request property 'target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/hideProgress'
+
+- added the new optional request property 'target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/method'
+
+- added the new optional request property 'target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/showResponseHeaders'
+
+
+For details, refer to the <OperationLink operation="cronjob-update-cronjob" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the activities of a project"
+
+
+- added the new 'cronjob.notification-email-verified' enum value to the '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.CronjobNotificationEmailUpdated]/name' response property for the response status '200'
+
+- added the optional property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.CronjobNotificationEmailUpdated]/changes/after/notificationEmailVerificationPending' to the response with the '200' status
+
+- added the optional property '/items/action/anyOf[#/components/schemas/de.mittwald.v1.activitylog.CronjobNotificationEmailUpdated]/changes/before/notificationEmailVerificationPending' to the response with the '200' status
+
+- added '#/components/schemas/de.mittwald.v1.activitylog.CronjobNotificationEmailVerificationUpdated' to the '/items/action' response property 'anyOf' list for the response status '200'
+
+
+For details, refer to the <OperationLink operation="project-list-project-activities" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Create a cronjob"
+
+
+- the 'description' request property's maxLength was set to '80'
+
+- added the new optional request property 'destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/failOnHttpError'
+
+- added the new optional request property 'destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/followRedirects'
+
+- added the new optional request property 'destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/headers'
+
+- added the new optional request property 'destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/hideProgress'
+
+- added the new optional request property 'destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/method'
+
+- added the new optional request property 'destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/showResponseHeaders'
+
+- added the new optional request property 'target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/failOnHttpError'
+
+- added the new optional request property 'target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/followRedirects'
+
+- added the new optional request property 'target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/headers'
+
+- added the new optional request property 'target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/hideProgress'
+
+- added the new optional request property 'target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/method'
+
+- added the new optional request property 'target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/showResponseHeaders'
+
+
+For details, refer to the <OperationLink operation="cronjob-create-cronjob" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Publish or withdraw an Extension"
+
+
+- added the new optional request property 'disableAllInstances'
+
+
+For details, refer to the <OperationLink operation="extension-set-extension-published-state" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a cronjob"
+
+
+- added the optional property 'destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/failOnHttpError' to the response with the '200' status
+
+- added the optional property 'destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/followRedirects' to the response with the '200' status
+
+- added the optional property 'destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/headers' to the response with the '200' status
+
+- added the optional property 'destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/hideProgress' to the response with the '200' status
+
+- added the optional property 'destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/method' to the response with the '200' status
+
+- added the optional property 'destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/showResponseHeaders' to the response with the '200' status
+
+- added the optional property 'notificationEmailVerification' to the response with the '200' status
+
+- added the optional property 'target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/failOnHttpError' to the response with the '200' status
+
+- added the optional property 'target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/followRedirects' to the response with the '200' status
+
+- added the optional property 'target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/headers' to the response with the '200' status
+
+- added the optional property 'target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/hideProgress' to the response with the '200' status
+
+- added the optional property 'target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/method' to the response with the '200' status
+
+- added the optional property 'target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/showResponseHeaders' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="cronjob-get-cronjob" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Resend the verification mail for the notification email of a cronjob"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="cronjob-resend-notification-email-verification" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Confirm the notification email of a cronjob"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="cronjob-verify-notification-email" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List customer memberships belonging to the executing user"
+
+
+- added the optional property '/items/emailHidden' to the response with the '200' status
+
+- added the optional property '/items/mfaHidden' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="customer-list-customer-memberships" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a customer membership"
+
+
+- added the optional property 'emailHidden' to the response with the '200' status
+
+- added the optional property 'mfaHidden' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="customer-get-customer-membership" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Memberships belonging to a Customer"
+
+
+- added the optional property '/items/emailHidden' to the response with the '200' status
+
+- added the optional property '/items/mfaHidden' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="customer-list-memberships-for-customer" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Delete all notification settings overrides"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="notifications-delete-notification-settings-overrides" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the notification settings the executing user adjusted"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="notifications-get-notification-settings-overrides" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Update the notification settings override of a message type"
+
+
+- endpoint added
+
+
+For details, refer to the <OperationLink operation="notifications-update-notification-settings-override-for-message-type" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List ProjectMemberships belonging to the executing user"
+
+
+- added the optional property '/items/emailHidden' to the response with the '200' status
+
+- added the optional property '/items/mfaHidden' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-list-project-memberships" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get a ProjectMembership"
+
+
+- added the optional property 'emailHidden' to the response with the '200' status
+
+- added the optional property 'mfaHidden' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-get-project-membership" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List cronjobs belonging to a Project"
+
+
+- added the optional property '/items/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/failOnHttpError' to the response with the '200' status
+
+- added the optional property '/items/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/followRedirects' to the response with the '200' status
+
+- added the optional property '/items/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/headers' to the response with the '200' status
+
+- added the optional property '/items/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/hideProgress' to the response with the '200' status
+
+- added the optional property '/items/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/method' to the response with the '200' status
+
+- added the optional property '/items/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/showResponseHeaders' to the response with the '200' status
+
+- added the optional property '/items/notificationEmailVerification' to the response with the '200' status
+
+- added the optional property '/items/target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/failOnHttpError' to the response with the '200' status
+
+- added the optional property '/items/target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/followRedirects' to the response with the '200' status
+
+- added the optional property '/items/target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/headers' to the response with the '200' status
+
+- added the optional property '/items/target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/hideProgress' to the response with the '200' status
+
+- added the optional property '/items/target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/method' to the response with the '200' status
+
+- added the optional property '/items/target/oneOf[#/components/schemas/de.mittwald.v1.cronjob.AppInstallationTarget]/destination/oneOf[#/components/schemas/de.mittwald.v1.cronjob.CronjobUrl]/showResponseHeaders' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="cronjob-list-cronjobs" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "List Memberships belonging to a Project"
+
+
+- added the optional property '/items/emailHidden' to the response with the '200' status
+
+- added the optional property '/items/mfaHidden' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-list-memberships-for-project" apiVersion="v2" /> endpoint.
+
+
+
+### Changes in "Get the executing user's membership in a Project"
+
+
+- added the optional property 'emailHidden' to the response with the '200' status
+
+- added the optional property 'mfaHidden' to the response with the '200' status
+
+
+For details, refer to the <OperationLink operation="project-get-self-membership-for-project" apiVersion="v2" /> endpoint.
+
+
+
+
+## Client package releases
+
+
+### mittwald JavaScript SDK Release 4.536.0
+
+The mittwald JavaScript SDK has been updated to version 4.536.0. This release includes an update to the generated client, enhancing the functionality and performance of the SDK. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.536.0).
+
+### mittwald JavaScript SDK Release 4.535.0
+
+The mittwald JavaScript SDK version 4.535.0 has been released. This update includes a feature enhancement with an updated generated client. For more details, you can view the release on [GitHub](https://github.com/mittwald/api-client-js/releases/tag/4.535.0).
+
+### mittwald JavaScript SDK Release 4.534.0
+
+The mittwald JavaScript SDK has been updated to version 4.534.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.534.0](https://github.com/mittwald/api-client-js/releases/tag/4.534.0).
+
+### mittwald JavaScript SDK Release 4.533.0
+
+The mittwald JavaScript SDK has been updated to version 4.533.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.533.0).
+
+### mittwald JavaScript SDK Release 4.532.0
+
+The mittwald JavaScript SDK has been updated to version 4.532.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub [here](https://github.com/mittwald/api-client-js/releases/tag/4.532.0).
+
+### mittwald JavaScript SDK Release 4.531.0
+
+The mittwald JavaScript SDK has been updated to version 4.531.0. This release includes an update to the generated client, enhancing the SDK's functionality. For more details, you can view the release on GitHub: [mittwald JavaScript SDK 4.531.0](https://github.com/mittwald/api-client-js/releases/tag/4.531.0).
+
